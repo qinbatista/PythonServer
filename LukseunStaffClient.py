@@ -16,7 +16,7 @@ ac:de:48:00:11:22,1,覃于澎
 总消息长不能超过2048个字节
 """
 #host  = 'magicwandai.com' # 这是服务器的电脑的ip
-host  = '192.168.0.102' # 这是服务器的电脑的ip
+host  = '192.168.1.183' # 这是服务器的电脑的ip
 port = 2002 #接口选择大于10000的，避免冲突
 def main():
 	thread1 = threading.Thread(target=run,name="ThreadClient",args=("123","123"))
