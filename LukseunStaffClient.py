@@ -32,7 +32,7 @@ def ThreadRunClass(p1, p2):
 	threadpool = []
 	for num in range(1,2500):
 		th = threading.Thread(target=run, args=(run, num))
-	threadpool.append(th)
+		threadpool.append(th)
 	for th in threadpool:
 		th.start()
 	for th in threadpool:
