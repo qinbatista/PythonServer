@@ -20,3 +20,4 @@ class DES:
 		data = base64.decodebytes(data)
 		d = k.decrypt(data)
 		return d
+def 
