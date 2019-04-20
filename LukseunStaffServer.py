@@ -12,9 +12,13 @@ port = 2002
 DESKey = "67891234"
 DESVector = "6789123467891234"
 def main():
+	# target：调用的方法名
+	# args：方法中传递的参数
+	# name：线程名字
 	thread1 = threading.Thread(target=run,name="thread",args=("paramMessage1","paramMessage2"))
 	thread1.start()
 def StaffCheckIn(message,IPAdress):
+	print("StaffCheckIn")
 	status=""
 	des = DES(DESKey,DESVector)
 	# message = str.encode(message)
@@ -58,34 +62,35 @@ def StaffCheckIn(message,IPAdress):
 	return  {"status":status,"message":"Send Success"}
 def run(param1,param2):
 	s=socket.socket()
-	s.bind(('',port))
-	s.listen(10)
+	s.bind(('',port))#server (ipAdress,port)
+	s.listen(10)# 监听最多10个连接请求 (Monitor up to 10 connection requests)
 	while True:
-		cs,address = s.accept()
-		ra=cs.recv(2048)
+		# cs include laddr is server and raddr is client
+		cs,address = s.accept()# wait client connect # 阻塞等待链接,创建新链接对象（obj)和客户端地址（addr)
+		ra=cs.recv(2048)# 每次传送的字节数
 		# message = ra.decode(encoding='utf-8')
 		IPAdress = str(list(address)[0])
 		status = StaffCheckIn(ra,IPAdress)
-		cs.send(str(status).encode(encoding="utf-8"))
+		cs.send(str(status).encode(encoding="utf-8"))# 通过新链接对象发送数据
 	cs.close()
 class DES:
-    #IV必须是 8 字节长度的十六进制数
-    iv = ''
-    #key加密密钥长度，24字节
-    key = ''
-    def __init__(self, iv, key):
-        self.iv = iv
-        self.key = key
-    def encrypt(self, data):
-        k = pyDes.triple_des(self.key, pyDes.CBC, self.iv, pad=None, padmode=pyDes.PAD_PKCS5)
-        d = k.encrypt(data)
-        d = base64.encodestring(d)
-        return d
-    def decrypt(self, data):
-        k = pyDes.triple_des(self.key, pyDes.CBC, self.iv, pad=None, padmode=pyDes.PAD_PKCS5)
-        data = base64.decodebytes(data)
-        d = k.decrypt(data)
-        return d
+	#IV必须是 8 字节长度的十六进制数
+	iv = ''
+	#key加密密钥长度，24字节
+	key = ''
+	def __init__(self, iv, key):
+		self.iv = iv
+		self.key = key
+	def encrypt(self, data):
+		k = pyDes.triple_des(self.key, pyDes.CBC, self.iv, pad=None, padmode=pyDes.PAD_PKCS5)
+		d = k.encrypt(data)
+		d = base64.encodestring(d)
+		return d
+	def decrypt(self, data):
+		k = pyDes.triple_des(self.key, pyDes.CBC, self.iv, pad=None, padmode=pyDes.PAD_PKCS5)
+		data = base64.decodebytes(data)
+		d = k.decrypt(data)
+		return d
 
 if __name__ == '__main__':
 # 	data = "{\"MacAdress\":\"ACDE48001122\", \"UserName\":\"abc\", \"Random\":\"774\"}"
