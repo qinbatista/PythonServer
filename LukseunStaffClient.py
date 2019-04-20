@@ -32,12 +32,12 @@ def run(param1,param2):
 	s.connect(address)
 	des = EncryptionAlgorithm.DES(DESKey,DESVector)
 	mssage = "{\"MacAddress\":\"ACDE48001122\", \"UserName\":\"abc\", \"Random\":\"774\"}"
-	LogRecorder.LogUtility("[LogRecorder][run]->send encrypted message: "+mssage)
+	LogRecorder.LogUtility("[Clinet][LogRecorder][run]->send encrypted message: "+mssage)
 	s.send(des.encrypt(mssage.encode(encoding="utf-8")))
 	data = s.recv(2048)
-	LogRecorder.LogUtility("[LogRecorder][run]->recived encrypted message: "+str(data))
+	LogRecorder.LogUtility("[Clinet][LogRecorder][run]->recived encrypted message: "+str(data))
 	byteData = des.decrypt(data)
-	LogRecorder.LogUtility("[LogRecorder][run]-> decrypted message: "+str(byteData))
+	LogRecorder.LogUtility("[Clinet][LogRecorder][run]-> decrypted message: "+str(byteData))
 	MessageDict = eval(byteData.decode(encoding="utf-8"))
 	s.close()
 

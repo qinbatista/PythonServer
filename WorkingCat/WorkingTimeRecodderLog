@@ -1,0 +1,88 @@
+{}[2019-04-20 15:35:34] [LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:35:34] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:35:34] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:35:34] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:1
+[2019-04-20 15:35:34] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"1","message":"Check in"}
+[2019-04-20 15:35:34] [LogRecorder][run]->recived encrypted message: b'JppPxDEu0W8ab9mSrQ78826MtEDVIK3pXSauvQQY+LvWIHVhkR7Sng==\n'
+[2019-04-20 15:35:34] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W8ab9mSrQ78826MtEDVIK3pXSauvQQY+LvWIHVhkR7Sng==\n'
+[2019-04-20 15:35:34] [LogRecorder][run]-> decrypted message: b'{"status":"1","message":"Check in"}'
+[2019-04-20 15:35:37] [LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:35:37] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:35:37] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:35:37] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:35:37] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:35:37] [LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:35:37] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:35:37] [LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'
+[2019-04-20 15:36:41] [Clinet][LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:41] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:36:41] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:41] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:36:41] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:36:41] [Clinet][LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:41] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:41] [Clinet][LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'
+[2019-04-20 15:36:42] [Clinet][LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:42] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:36:43] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:43] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:36:43] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:36:43] [Clinet][LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:43] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:43] [Clinet][LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'
+[2019-04-20 15:36:44] [Clinet][LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:44] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:36:44] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:44] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:36:44] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:36:44] [Clinet][LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:44] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:44] [Clinet][LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'
+[2019-04-20 15:36:45] [Clinet][LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:45] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:36:45] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:45] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:36:45] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:36:45] [Clinet][LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:45] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:45] [Clinet][LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'
+[2019-04-20 15:36:46] [Clinet][LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:46] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:36:46] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:36:46] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:36:46] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:36:46] [Clinet][LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:46] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:36:46] [Clinet][LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'
+[2019-04-20 15:37:27] [Clinet][LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:37:27] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:37:28] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:37:28] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:37:28] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:37:28] [Clinet][LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:37:28] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:37:28] [Clinet][LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'
+[2019-04-20 15:37:30] [Clinet][LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:37:30] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:37:30] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:37:30] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:37:30] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:37:30] [Clinet][LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:37:30] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:37:30] [Clinet][LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'
+[2019-04-20 15:37:30] [Clinet][LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:37:30] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:37:31] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:37:31] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:37:31] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:37:31] [Clinet][LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:37:31] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:37:31] [Clinet][LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'
+[2019-04-20 15:37:31] [Clinet][LogRecorder][run]->send encrypted message: {"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:37:31] [Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:b'boUMg+MwssJlNm8Ys8dalLDla9dLdgR37R30YBT8yagddNdIYxDWG9SOZee09FHwoYOIdmPt9oja\n4zDAOOLAtg==\n'
+[2019-04-20 15:37:31] [Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:{"MacAddress":"ACDE48001122", "UserName":"abc", "Random":"774"}
+[2019-04-20 15:37:31] [Server][WorkingTimeRecoder][StaffCheckIn]->IP:192.168.1.183 UserName->abc status:2
+[2019-04-20 15:37:31] [Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: {"status":"2","message":"Check out"}
+[2019-04-20 15:37:31] [Clinet][LogRecorder][run]->recived encrypted message: b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:37:31] [Server][LukseunStaffServer][run]->sent encrypted message to client:b'JppPxDEu0W9O5wRappn69JcvUyBfCM8JCzp9NTLpIv67w2Nu5tN8dw==\n'
+[2019-04-20 15:37:31] [Clinet][LogRecorder][run]-> decrypted message: b'{"status":"2","message":"Check out"}'

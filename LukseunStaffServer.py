@@ -30,7 +30,7 @@ def run(param1,param2):
 		IPAdress = str(list(address)[0])
 		status = WorkingTimeRecoder.StaffCheckIn(ra,IPAdress)
 		cs.send(status)# 通过新链接对象发送数据
-		LogRecorder.LogUtility("[LukseunStaffServer][run]->sent encrypted message to client:"+ str(status))
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][run]->sent encrypted message to client:"+ str(status))
 	cs.close()
 
 
