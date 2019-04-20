@@ -20,12 +20,12 @@ MessageList=[
 ]
 def StaffCheckIn(message,IPAdress):
 	global MessageList
-	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]->recived encrypted message:"+str(message))
+	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->recived encrypted message:"+str(message))
 	des = EncryptionAlgorithm.DES(DESKey,DESVector)
 	# message = str.encode(message)	#string to byte
 	message = des.decrypt(message)	#decrypt byte message
 	message = bytes.decode(message) #byte to string
-	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]->decrypted message:"+message)
+	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
 	if message=="":
 		return  des.encrypt(str.encode(MessageList[0]))
 	status=0
@@ -59,11 +59,11 @@ def StaffCheckIn(message,IPAdress):
 			status=2
 		adddirc["IP"]=IPAdress
 		adddirc["UserName"]=UserName
-		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]->IP:"+IPAdress+" UserName->"+UserName+" status:"+str(status))
+		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->IP:"+IPAdress+" UserName->"+UserName+" status:"+str(status))
 		JsonChannelList[MacAdress][ReciveData].update(adddirc)
 	with open(DataBaseJsonLocation, 'w',encoding="UTF-8") as json_file:
 		json_file.write(json.dumps(JsonChannelList,ensure_ascii=False,sort_keys=True, indent=4, separators=(',', ':')))
-	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn] encrypted MessageList[status]: "+MessageList[status])
+	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"] encrypted MessageList[status]: "+MessageList[status])
 	return  des.encrypt(str.encode(MessageList[status]))
 
 if __name__ == "__main__":
