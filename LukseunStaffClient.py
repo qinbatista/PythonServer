@@ -21,7 +21,6 @@ host  = '192.168.1.183' # 这是服务器的电脑的ip
 port = 2002 #接口选择大于10000的，避免冲突
 DESKey = "67891234"
 DESVector = "6789123467891234"
-
 def main():
 	thread1 = threading.Thread(target=run,name="ThreadClient",args=("123","123"))
 	thread1.start()
@@ -30,7 +29,7 @@ def get_mac_address():
 	return ":".join([mac[e:e+2] for e in range(0,11,2)])
 def ThreadRunClass(p1, p2):
 	threadpool = []
-	for num in range(1,2500):
+	for num in range(0,100):
 		th = threading.Thread(target=run, args=(run, num))
 		threadpool.append(th)
 	for th in threadpool:
@@ -51,7 +50,7 @@ def run(param1,param2):
 	LogRecorder.LogUtility("["+str(param2)+"][LogRecorder][run]-> decrypted message: "+str(byteData))
 	s.close()
 	LogRecorder.LogUtility("["+str(param2)+"][LogRecorder][run]->Thread["+str(param2)+"]:Successed")
-if __name__ == '__main__':
+def mainProcesses():
 	# 开始时间
 	start = time.time()
 	pool = multiprocessing.Pool(processes=4)
@@ -62,4 +61,6 @@ if __name__ == '__main__':
 	# 结束时间
 	end = time.time()
 	print("完成的时间为：" + str(end - start))
+if __name__ == '__main__':
 	# main()
+	mainProcesses()

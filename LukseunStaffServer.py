@@ -21,7 +21,7 @@ def main():
 def run(param1,param2):
 	s=socket.socket()
 	s.bind(('',port))#server (ipAdress,port)
-	s.listen(10)# 监听最多10个连接请求 (Monitor up to 10 connection requests)
+	s.listen(65535)# 监听最多10个连接请求 (Monitor up to 10 connection requests)
 	while True:
 		# cs include laddr is server and raddr is client
 		cs,address = s.accept()# wait client connect # 阻塞等待链接,创建新链接对象（obj)和客户端地址（addr)
