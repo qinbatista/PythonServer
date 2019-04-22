@@ -16,9 +16,9 @@ ac:de:48:00:11:22,1,覃于澎
 
 总消息长不能超过2048个字节
 """
-host  = 'magicwandai.com' # 这是服务器的电脑的ip
+#host  = 'magicwandai.com' # 这是服务器的电脑的ip
 #host  = '155.138.222.30' # 这是服务器的电脑的ip
-#host = "192.168.1.183"
+host = "192.168.1.183"
 port = 2002 #接口选择大于10000的，避免冲突
 DESKey = "67891234"
 DESVector = "6789123467891234"
@@ -57,7 +57,7 @@ def run(param1,param2):
 			LogRecorder.LogUtility("["+str(param2)+"][LogRecorder][run]-> decrypted message: "+str(byteData))
 			s.settimeout(None)
 			s.close()
-			LogRecorder.LogUtility("["+str(param2)+"][LogRecorder][run]->Thread["+str(param2)+"]:Successed")
+			LogRecorder.LogUtility("["+str(param2)+"][LogRecorder][run]->Thread["+str(param2)+"]:Successed","test",True)
 			Finished=False
 		except socket.error:
 			s.close()

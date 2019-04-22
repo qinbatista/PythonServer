@@ -29,7 +29,8 @@ def run(param1,param2):
 		ra=cs.recv(2048)# 返回得到的数据，最多接受2048个字节
 		# message = ra.decode(encoding='utf-8')
 		IPAdress = str(list(address)[0])
-		status = WorkingTimeRecoder.StaffCheckIn(ra,IPAdress)
+		status = str("").encode()#WorkingTimeRecoder.StaffCheckIn(ra,IPAdress)
+		#status = WorkingTimeRecoder.StaffCheckIn(ra,IPAdress)
 		cs.send(status)# 通过新链接对象发送数据
 		LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][run]->sent encrypted message to client:"+ str(status))
 
