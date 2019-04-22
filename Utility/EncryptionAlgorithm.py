@@ -17,6 +17,5 @@ class DES:
 		return d
 	def decrypt(self, data):
 		k = pyDes.triple_des(self.key, pyDes.CBC, self.iv, pad=None, padmode=pyDes.PAD_PKCS5)
-		data = base64.decodebytes(data)
-		d = k.decrypt(data)
+		d = k.decrypt(base64.decodebytes(data))
 		return d

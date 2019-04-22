@@ -30,7 +30,7 @@ def get_mac_address():
 	return ":".join([mac[e:e+2] for e in range(0,11,2)])
 def ThreadRunClass(p1, p2):
 	threadpool = []
-	for num in range(1,2500):
+	for num in range(1,1250):
 		th = threading.Thread(target=run, args=(run, num))
 		threadpool.append(th)
 	for th in threadpool:
@@ -55,7 +55,7 @@ if __name__ == '__main__':
 	# 开始时间
 	start = time.time()
 	pool = multiprocessing.Pool(processes=4)
-	for i in range(4):
+	for i in range(8):
 		pool.apply_async(ThreadRunClass, (i, i))
 	pool.close()
 	pool.join()
