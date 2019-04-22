@@ -24,16 +24,18 @@ def run(param1,param2):
 	s.listen(65535)# 监听最多10个连接请求 (Monitor up to 10 connection requests)
 	LogRecorder.LogUtility("[Server][LukseunStaffServer][run]->Server Started")
 	while True:
-		# cs include laddr is server and raddr is client
-		cs,address = s.accept()# wait client connect # 阻塞等待链接,创建新链接对象（obj)和客户端地址（addr)
-		ra=cs.recv(2048)# 返回得到的数据，最多接受2048个字节
-		# message = ra.decode(encoding='utf-8')
-		IPAdress = str(list(address)[0])
-		status = str("").encode()#WorkingTimeRecoder.StaffCheckIn(ra,IPAdress)
-		#status = WorkingTimeRecoder.StaffCheckIn(ra,IPAdress)
-		cs.send(status)# 通过新链接对象发送数据
-		LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][run]->sent encrypted message to client:"+ str(status))
-
+		try:
+			# cs include laddr is server and raddr is client
+			cs,address = s.accept()# wait client connect # 阻塞等待链接,创建新链接对象（obj)和客户端地址（addr)
+			ra=cs.recv(2048)# 返回得到的数据，最多接受2048个字节
+			# message = ra.decode(encoding='utf-8')
+			IPAdress = str(list(address)[0])
+			#status = str("").encode()#WorkingTimeRecoder.StaffCheckIn(ra,IPAdress)#测试服务器连接
+			status = WorkingTimeRecoder.StaffCheckIn(ra,IPAdress)#真实测试
+			cs.send(status)# 通过新链接对象发送数据
+			LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][run]->sent encrypted message to client:"+ str(status))
+		except socket.error:
+			LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][run]->connecting failed, restart")
 	cs.close()
 
 
