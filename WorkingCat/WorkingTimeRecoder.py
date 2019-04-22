@@ -62,14 +62,7 @@ def StaffCheckIn(message,IPAdress):
 	with open(DataBaseJsonLocation, 'w',encoding="UTF-8") as json_file:
 		json_file.write(json.dumps(JsonChannelList,ensure_ascii=False,sort_keys=True, indent=4, separators=(',', ':')))
 	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"] encrypted MessageList[status]: "+MessageList[status])
-	# return  des.encrypt(str.encode(MessageList[status]))
-
-	ClientData = json.loads(MessageList[status],encoding="utf-8")
-	ClientData.update({"CheckIn":JsonChannelList[MacAdress][ReciveData]["CheckIn"]})
-	ClientData.update({"CheckOut":JsonChannelList[MacAdress][ReciveData]["CheckOut"]})
-	ClientData = str(ClientData).replace("'","\"")
-	print(ClientData)
-	return  des.encrypt(str.encode(str(ClientData)))
+	return  des.encrypt(str.encode(MessageList[status]))
 
 if __name__ == "__main__":
 	pass
