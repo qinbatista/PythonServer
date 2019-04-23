@@ -11,12 +11,12 @@ import EncryptionAlgorithm
 DESKey = "67891234"
 DESVector = "6789123467891234"
 MessageList=[
-	"{\"status\":\"0\",\"message\":\"get null message\"}",
-	"{\"status\":\"1\",\"message\":\"Check in\"}",
-	"{\"status\":\"2\",\"message\":\"Check out\"}",
-	"{\"status\":\"3\",\"message\":\"get null message\"}",
-	"{\"status\":\"4\",\"message\":\"get null message\"}",
-	"{\"status\":\"5\",\"message\":\"get null message\"}",
+	"{\"status\":\"00\"}",#\"message\":\"get null message\"}",
+	"{\"status\":\"01\"}",#\"message\":\"Check in\"}",
+	"{\"status\":\"02\"}",#\"message\":\"Check out\"}",
+	"{\"status\":\"03\"}",#\"message\":\"get null message\"}",
+	"{\"status\":\"04\"}",#\"message\":\"get null message\"}",
+	"{\"status\":\"05\"}",#\"message\":\"get null message\"}",
 ]
 def StaffCheckIn(message,IPAdress):
 	global MessageList
