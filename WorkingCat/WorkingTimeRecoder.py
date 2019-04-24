@@ -3,6 +3,7 @@ import json
 import time
 import os
 import codecs
+import threading
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0,sys.path[0]+"/Utility")
@@ -19,10 +20,12 @@ MessageList=[
 	"{\"status\":\"05\"}",#\"message\":\"get null message\"}",
 ]
 def StaffCheckIn(message,IPAdress):
+	mutex = threading.Lock()
+	mutex.acquire()
 	global MessageList
 	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->recived encrypted message:"+str(message))
 	des = EncryptionAlgorithm.DES(DESKey,DESVector)
-	# message = str.encode(message)	#string to byte
+	# message = str.encode(message)	#string to byte d
 	message = des.decrypt(message)	#decrypt byte message
 	message = bytes.decode(message) #byte to string
 	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
@@ -42,7 +45,13 @@ def StaffCheckIn(message,IPAdress):
 	if os.path.isfile(DataBaseJsonLocation)==False:
 		f=codecs.open(DataBaseJsonLocation,'w', 'UTF-8')
 		f.close()
-	readed = json.load(open(DataBaseJsonLocation, 'r',encoding="UTF-8"))
+	OpenError = True
+	while OpenError:
+		try:
+			readed = json.load(open(DataBaseJsonLocation, 'r',encoding="UTF-8"))
+			OpenError=False
+		except:
+			OpenError=True
 	JsonChannelList = readed
 	ReciveTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 	ReciveData = time.strftime("%Y-%m-%d", time.localtime())
@@ -68,6 +77,7 @@ def StaffCheckIn(message,IPAdress):
 	with open(DataBaseJsonLocation, 'w',encoding="UTF-8") as json_file:
 		json_file.write(json.dumps(JsonChannelList,ensure_ascii=False,sort_keys=True, indent=4, separators=(',', ':')))
 	LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"] encrypted MessageList[status]: "+MessageList[status])
+	mutex.release()
 	return  des.encrypt(str.encode(MessageList[status]))
 
 if __name__ == "__main__":

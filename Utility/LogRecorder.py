@@ -1,9 +1,12 @@
 import time
 import os
 import codecs
+import threading
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 def LogUtility(message, fileName = "WorkingTimeRecodderLog",printLog = True, RecordLog = False):
+	mutex = threading.Lock()
+	mutex.acquire()
 	if printLog==True:
 		print(message) #print message on log
 	if RecordLog == True:
@@ -14,3 +17,4 @@ def LogUtility(message, fileName = "WorkingTimeRecodderLog",printLog = True, Rec
 		f.write("["+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"] "+message)
 		f.write('\n')
 		f.close()
+	mutex.release()

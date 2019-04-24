@@ -21,27 +21,23 @@ ac:de:48:00:11:22,1,覃于澎
 #host  = 'magicwandai.com' # 这是服务器的电脑的ip
 #host  = '155.138.222.30' # 这是服务器的电脑的ip
 host = "192.168.1.183"
-port = 2002 #接口选择大于10000的，避免冲突
 DESKey = "67891234"
 DESVector = "6789123467891234"
 TotalProcesses = 10
-TotalThread = 10
+TotalThread = 50
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 class LukseunClient():
-	def __init__(self,myHeader, myMessage):
+	def __init__(self,myHeader, myMessage,myPort):
 		self.header = myHeader
 		self.msg = myMessage
+		self.port = myPort
 	def get_mac_address(self):
 		mac=uuid.UUID(int = uuid.getnode()).hex[-12:]
 		return ":".join([mac[e:e+2] for e in range(0,11,2)])
 	def SingalMessage(self):
 		self.run("1","1")
 	def MultMessage(self):
-		if os.path.isfile(PythonLocation()+"/WorkingCat/failed"):
-			os.remove(PythonLocation()+"/WorkingCat/failed")
-		if os.path.isfile(PythonLocation()+"/WorkingCat/success"):
-			os.remove(PythonLocation()+"/WorkingCat/success")
 		start = time.time()
 		pool = multiprocessing.Pool(processes=TotalProcesses)
 		for i in range(TotalProcesses):
@@ -63,7 +59,7 @@ class LukseunClient():
 		Finished=True
 		while Finished:
 			try:
-				address = (host, port)
+				address = (host, self.port)
 				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				s.settimeout(10)
 				s.connect(address)
@@ -77,7 +73,8 @@ class LukseunClient():
 			except socket.error:
 				s.close()
 				time.sleep(5)
-				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->Thread["+str(param2)+"]:connecting error","failed", True,True)
+				print(s)
+				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->Thread["+str(param2)+"]:connecting error:"+str(self.port),"failed", True,True)
 	def HeaderSolution(self):
 		pass
 	def SendHeader(self,s,TestMessage):
@@ -107,9 +104,31 @@ class LukseunClient():
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
 		byteData = des.decrypt(data)
 		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]-> decrypted message: "+str(byteData))
-
-if __name__ == '__main__':
-	ct = LukseunClient("workingcat","{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}")
-	#ct.SingalMessage() 
+def main():
+	thread1 = threading.Thread(target=runPort1,name="thread",args=("paramMessage1","paramMessage2"))
+	thread2 = threading.Thread(target=runPort2,name="thread",args=("paramMessage1","paramMessage2"))
+	thread1.start()
+	thread2.start()
+	thread1.join()
+	thread2.join()
+	#DebugUtility.ErrorRate()
+def runPort1(param1,param2):
+	ct = LukseunClient("workingcat","{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",10001)
+	#ct.SingalMessage()
 	ct.MultMessage()
+	LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->finished port1:"+str(10001))
 	DebugUtility.ErrorRate()
+def runPort2(param1,param2):
+	ct = LukseunClient("workingcat","{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",10002)
+	#ct.SingalMessage()
+	ct.MultMessage()
+	LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->finished port2:"+str(10002))
+	DebugUtility.ErrorRate()
+if __name__ == '__main__':
+	#print(PythonLocation())
+	if os.path.isfile(PythonLocation()+"/WorkingCat/failed"):
+		os.remove(PythonLocation()+"/WorkingCat/failed")
+	if os.path.isfile(PythonLocation()+"/WorkingCat/success"):
+		os.remove(PythonLocation()+"/WorkingCat/success")
+	main()
+
