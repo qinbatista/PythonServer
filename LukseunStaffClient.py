@@ -8,6 +8,7 @@ import multiprocessing
 import EncryptionAlgorithm
 import LogRecorder
 import AnalysisHeader
+import DebugUtility
 """
 发送消息内容为：
 mac地址,签到状态,用户名
@@ -25,6 +26,8 @@ DESKey = "67891234"
 DESVector = "6789123467891234"
 TotalProcesses = 10
 TotalThread = 10
+def PythonLocation():
+	return os.path.dirname(os.path.realpath(__file__))
 class LukseunClient():
 	def __init__(self,myHeader, myMessage):
 		self.header = myHeader
@@ -35,6 +38,10 @@ class LukseunClient():
 	def SingalMessage(self):
 		self.run("1","1")
 	def MultMessage(self):
+		if os.path.isfile(PythonLocation()+"/WorkingCat/failed"):
+			os.remove(PythonLocation()+"/WorkingCat/failed")
+		if os.path.isfile(PythonLocation()+"/WorkingCat/success"):
+			os.remove(PythonLocation()+"/WorkingCat/success")
 		start = time.time()
 		pool = multiprocessing.Pool(processes=TotalProcesses)
 		for i in range(TotalProcesses):
@@ -105,3 +112,4 @@ if __name__ == '__main__':
 	ct = LukseunClient("workingcat","{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}")
 	#ct.SingalMessage() 
 	ct.MultMessage()
+	DebugUtility.ErrorRate()
