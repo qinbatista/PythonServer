@@ -14,7 +14,7 @@ MessageList=[
 	"{\"status\":\"00\"}",#\"message\":\"get null message\"}",
 	"{\"status\":\"01\"}",#\"message\":\"Check in\"}",
 	"{\"status\":\"02\"}",#\"message\":\"Check out\"}",
-	"{\"status\":\"03\"}",#\"message\":\"get null message\"}",
+	"{\"status\":\"03\"}",#\"message\":\"Message is illegal\"}",
 	"{\"status\":\"04\"}",#\"message\":\"get null message\"}",
 	"{\"status\":\"05\"}",#\"message\":\"get null message\"}",
 ]
@@ -30,8 +30,14 @@ def StaffCheckIn(message,IPAdress):
 		return  des.encrypt(str.encode(MessageList[0]))
 	status=0
 	MessageDic = json.loads(message)
-	MacAdress = MessageDic["MacAddress"]
-	UserName = MessageDic["UserName"]
+	if "MacAddress" in MessageDic:
+		MacAdress = MessageDic["MacAddress"]
+	else:
+		return  des.encrypt(str.encode(MessageList[3]))
+	if "UserName" in MessageDic:
+		UserName = MessageDic["UserName"]
+	else:
+		return  des.encrypt(str.encode(MessageList[3]))
 	DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
 	if os.path.isfile(DataBaseJsonLocation)==False:
 		f=codecs.open(DataBaseJsonLocation,'w', 'UTF-8')

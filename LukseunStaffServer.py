@@ -14,55 +14,59 @@ port = 2002
 DESKey = "67891234"
 DESVector = "6789123467891234"
 def main():
-	# target：调用的方法名
-	# args：方法中传递的参数
-	# name：线程名字
 	thread1 = threading.Thread(target=run,name="thread",args=("paramMessage1","paramMessage2"))
 	thread1.start()
 
+def HeaderSolution(cs,address):
+	ra = cs.recv(36) #先接受消息头
+	HeaderMessage = AnalysisHeader.Header(ra)
+	IPAdress = str(list(address)[0])
+	LogRecorder.LogUtility("[Server][LukseunStaffServer][run]->Recived header: "+bytes.decode(ra))
+	LogRecorder.LogUtility("[Server][LukseunStaffServer][run]->decrypt header: new.size="+HeaderMessage.size+" new.Legal="+HeaderMessage.Legal+" new.md5="+HeaderMessage.md5)
+	if HeaderMessage.Legal=="":
+		return "",IPAdress
+	cs.send(str.encode(HeaderMessage.md5))# 通过新链接对象发送数据
+	LogRecorder.LogUtility("[Server][LukseunStaffServer][run]->IPAdress="+IPAdress+" pass")
+	return HeaderMessage,IPAdress
+
+def MessageSolution(HeaderMessage,cs,IPAdress):
+	sizebuffer = int(HeaderMessage.size)
+	reMsg=b""
+	ReciveBufferSize = 1024
+	while sizebuffer!=0:
+		if int(sizebuffer)>ReciveBufferSize:
+			reMsg =reMsg+ cs.recv(ReciveBufferSize)
+			sizebuffer=sizebuffer-ReciveBufferSize
+		else:
+			reMsg=reMsg+cs.recv(sizebuffer)
+			sizebuffer = 0
+	#send result message to client
+	if HeaderMessage.Legal =="workingcat":
+		status = WorkingTimeRecoder.StaffCheckIn(reMsg,IPAdress)
+	LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][run]->sent encrypted message to client:"+ str(status))
+	cs.send(status)
+
 def run(param1,param2):
 	s=socket.socket()
-	s.bind(('',port))#server (ipAdress,port)
-	s.listen(65535)# 监听最多10个连接请求 (Monitor up to 10 connection requests)
+	s.bind(('',port))
+	s.listen(65535)
 	LogRecorder.LogUtility("[Server][LukseunStaffServer][run]->Server Started")
 	while True:
 		try:
-			# cs include laddr is server and raddr is client
-			cs,address = s.accept()# wait client connect # 阻塞等待链接,创建新链接对象（obj)和客户端地址（addr)
-			des = EncryptionAlgorithm.DES(DESKey,DESVector)
-			ra = cs.recv(36) #先接受消息头
-			new = AnalysisHeader.Header(ra)
-			print(new.size)
-			print(new.Legal)
-			print(new.md5)
-			IPAdress = str(list(address)[0])
-			#status = str("").encode()#WorkingTimeRecoder.StaffCheckIn(ra,IPAdress)#测试服务器连接
-			cs.send(str.encode("pass"))# 通过新链接对象发送数据
-			sizebuffer = int(new.size)
-			reMsg=b""
-			while sizebuffer!=0:
-				if int(sizebuffer)>2048:
-					reMsg =reMsg+ cs.recv(2048)# 返回得到的数据，最多接受2048个字节
-					sizebuffer=sizebuffer-2048
-				else:
-					reMsg=reMsg+cs.recv(sizebuffer)
-					sizebuffer = 0
-			status = WorkingTimeRecoder.StaffCheckIn(reMsg,IPAdress)#真实测试
-			LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][run]->sent encrypted message to client:"+ str(status))
-			cs.send(status)
+			cs,address = s.accept()
+			#solve header verification
+			HeaderMessage,IPAdress = HeaderSolution(cs,address)
+			if HeaderMessage == "":
+				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][run]->Recive illegal data from:"+IPAdress)
+				continue
+			else:
+				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][run]->Recive legal data from:"+IPAdress)
+			#solve message information
+			MessageSolution(HeaderMessage,cs,IPAdress)
 		except socket.error:
 			LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][run]->connecting failed, restart")
 	cs.close()
 
 
 if __name__ == '__main__':
-	# data = "{\"MacAdress\":\"ACDE48001122\", \"UserName\":\"abc\", \"Random\":\"774\"}"
-	# des = EncryptionAlgorithm.DES(DESKey,DESVector)
-	# encryptdata = des.encrypt(data.encode('utf-8'))
-	# encryptdataString =bytes.decode(encryptdata)
-	# print(encryptdataString)
-	# encryptdata = str.encode(encryptdataString)
-	# print(encryptdata)
-	# decryptdata = des.decrypt(encryptdata)
-	# print(decryptdata)
 	main()

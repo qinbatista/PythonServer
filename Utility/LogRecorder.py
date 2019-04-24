@@ -3,7 +3,7 @@ import os
 import codecs
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
-def LogUtility(message, fileName = "WorkingTimeRecodderLog",printLog = True, RecordLog = True):
+def LogUtility(message, fileName = "WorkingTimeRecodderLog",printLog = True, RecordLog = False):
 	if printLog==True:
 		print(message) #print message on log
 	if RecordLog == True:

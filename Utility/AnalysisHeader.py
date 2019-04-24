@@ -45,6 +45,9 @@ class Header:
 		if md5String=="6275e26419211d1f526e674d97110e15":#md5 of string of "natasha"
 			LogRecorder.LogUtility("[AnalysisHeader][isLegalMessage]Get Natasha message, pass")
 			return "natasha"
+		elif md5String=="7e1bd1f7a5fb2e316fafb6a4bf5d174e":#md5 of string of "natasha"
+			LogRecorder.LogUtility("[AnalysisHeader][isLegalMessage]Get Natasha message, pass")
+			return "workingcat"
 		else:
 			return ""
 	def MakeHeader(self,KeyString,StringLength):
