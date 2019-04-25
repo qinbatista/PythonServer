@@ -40,7 +40,7 @@ def ErrorGraph(myNp):
 	plt.xlabel('Port Number')
 	plt.ylabel('Error Rate')
 	for i in range(0,len(myNp)):
-		if(i%9==0 and i!=0):
+		if((i+1)%10==0 and i!=0):
 			ListPortQuantity.append(myNp[i][2])
 			ListErrorRate.append(myNp[i][3])
 			l1 = plt.plot(ListPortQuantity, ListErrorRate,"x-")

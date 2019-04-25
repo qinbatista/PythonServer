@@ -105,6 +105,8 @@ class LukseunClient():
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
 		byteData = des.decrypt(data)
 		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]-> decrypted message: "+str(byteData))
+	def MessageConstruction(self):
+		pass
 def main():
 	global PortQuantity
 	global TotalThread
