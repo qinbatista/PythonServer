@@ -15,10 +15,37 @@ port2 = 10002
 DESKey = "67891234"
 DESVector = "6789123467891234"
 def main():
-	thread1 = threading.Thread(target=runPort1,name="thread",args=("paramMessage1","paramMessage2"))
-	thread1.start()
-	thread2 = threading.Thread(target=runPort2,name="thread",args=("paramMessage1","paramMessage2"))
-	thread2.start()
+	threads = [StartServer(args=((10000+n,""))) for n in range(0,10)]
+	for t in threads:
+		t.start()
+	for t in threads:
+	 	t.join()
+	# thread1 = threading.Thread(target=runPort1,name="thread",args=("paramMessage1","paramMessage2"))
+	# thread1.start()
+	# thread2 = threading.Thread(target=runPort2,name="thread",args=("paramMessage1","paramMessage2"))
+	# thread2.start()
+
+class StartServer(threading.Thread):
+	def run(self):
+		s=socket.socket()
+		s.bind(('',self._args[0]))
+		s.listen(65535)
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][run][]->Server Started, Port:"+str(self._args[0]))
+		while True:
+			try:
+				cs,address = s.accept()
+				#solve header verification
+				HeaderMessage,IPAdress = HeaderSolution(cs,address)
+				if HeaderMessage == "":
+					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive illegal data from:"+IPAdress)
+					continue
+				else:
+					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive legal data from:"+IPAdress)
+				#solve message information
+				MessageSolution(HeaderMessage,cs,IPAdress)
+			except socket.error:
+				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->connecting failed, restart")
+		cs.close()
 
 def HeaderSolution(cs,address):
 	ra = cs.recv(36) #先接受消息头
@@ -48,47 +75,6 @@ def MessageSolution(HeaderMessage,cs,IPAdress):
 		status = WorkingTimeRecoder.StaffCheckIn(reMsg,IPAdress)
 	LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->sent encrypted message to client:"+ str(status))
 	cs.send(status)
-
-def runPort1(param1,param2):
-	s=socket.socket()
-	s.bind(('',port1))
-	s.listen(65535)
-	LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Server Started")
-	while True:
-		try:
-			cs,address = s.accept()
-			#solve header verification
-			HeaderMessage,IPAdress = HeaderSolution(cs,address)
-			if HeaderMessage == "":
-				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive illegal data from:"+IPAdress)
-				continue
-			else:
-				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive legal data from:"+IPAdress)
-			#solve message information
-			MessageSolution(HeaderMessage,cs,IPAdress)
-		except socket.error:
-			LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->connecting failed, restart")
-	cs.close()
-def runPort2(param1,param2):
-	s=socket.socket()
-	s.bind(('',port2))
-	s.listen(65535)
-	LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort2]->Server Started")
-	while True:
-		try:
-			cs,address = s.accept()
-			#solve header verification
-			HeaderMessage,IPAdress = HeaderSolution(cs,address)
-			if HeaderMessage == "":
-				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive illegal data from:"+IPAdress)
-				continue
-			else:
-				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive legal data from:"+IPAdress)
-			#solve message information
-			MessageSolution(HeaderMessage,cs,IPAdress)
-		except socket.error:
-			LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->connecting failed, restart")
-	cs.close()
 
 
 if __name__ == '__main__':

@@ -23,8 +23,9 @@ ac:de:48:00:11:22,1,覃于澎
 host = "192.168.1.183"
 DESKey = "67891234"
 DESVector = "6789123467891234"
-TotalProcesses = 10
-TotalThread = 50
+TotalProcesses = 1
+TotalThread = 1000
+PortQuantity = 1
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 class LukseunClient():
@@ -105,30 +106,42 @@ class LukseunClient():
 		byteData = des.decrypt(data)
 		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]-> decrypted message: "+str(byteData))
 def main():
-	thread1 = threading.Thread(target=runPort1,name="thread",args=("paramMessage1","paramMessage2"))
-	thread2 = threading.Thread(target=runPort2,name="thread",args=("paramMessage1","paramMessage2"))
-	thread1.start()
-	thread2.start()
-	thread1.join()
-	thread2.join()
-	#DebugUtility.ErrorRate()
-def runPort1(param1,param2):
-	ct = LukseunClient("workingcat","{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",10001)
-	#ct.SingalMessage()
-	ct.MultMessage()
-	LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->finished port1:"+str(10001))
-	DebugUtility.ErrorRate()
-def runPort2(param1,param2):
-	ct = LukseunClient("workingcat","{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",10002)
-	#ct.SingalMessage()
-	ct.MultMessage()
-	LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->finished port2:"+str(10002))
-	DebugUtility.ErrorRate()
+	global PortQuantity
+	global TotalThread
+	threads = [PressureTest(args=((10000+n,""))) for n in range(0,PortQuantity)]
+	for t in threads:
+		t.start()
+	for t in threads:
+	 	t.join()
+	DebugUtility.ErrorRate(TotalProcesses,TotalThread,PortQuantity)
+class PressureTest(threading.Thread):
+	def run(self):
+		ct = LukseunClient("workingcat","{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",self._args[0])
+		#ct.SingalMessage()
+		ct.MultMessage()
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->finished port1:"+str(self._args[0]))
+def AdaptationTest():
+	global TotalThread
+	global PortQuantity
+	totalthreadNum = TotalThread
+	for i in range(1,11):
+		totalthreadNum = totalthreadNum*i
+		PortQuantity=1
+		for n in range(PortQuantity,11):
+			TotalThread = int(totalthreadNum/n)
+			PortQuantity = int(PortQuantity)
+			PortQuantity = n
+			main()
 if __name__ == '__main__':
 	#print(PythonLocation())
 	if os.path.isfile(PythonLocation()+"/WorkingCat/failed"):
 		os.remove(PythonLocation()+"/WorkingCat/failed")
 	if os.path.isfile(PythonLocation()+"/WorkingCat/success"):
 		os.remove(PythonLocation()+"/WorkingCat/success")
-	main()
+	if os.path.isfile(PythonLocation()+"/WorkingCat/ErrorRate"):
+		os.remove(PythonLocation()+"/WorkingCat/ErrorRate")
+	AdaptationTest()
+	DebugUtility.GetErrorRate()
+	#main()
+
 
