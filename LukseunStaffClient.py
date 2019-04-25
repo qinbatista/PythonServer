@@ -24,7 +24,7 @@ host = "192.168.1.183"
 DESKey = "67891234"
 DESVector = "6789123467891234"
 TotalProcesses = 1
-TotalThread = 1000
+TotalThread = 100
 PortQuantity = 1
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
@@ -125,12 +125,13 @@ def AdaptationTest():
 	global PortQuantity
 	totalthreadNum = TotalThread
 	for i in range(1,11):
-		totalthreadNum = totalthreadNum*i
+		count = totalthreadNum*i
 		PortQuantity=1
 		for n in range(PortQuantity,11):
-			TotalThread = int(totalthreadNum/n)
-			PortQuantity = int(PortQuantity)
+			TotalThread = int(count/n)
 			PortQuantity = n
+			print(TotalThread)
+			print(PortQuantity)
 			main()
 if __name__ == '__main__':
 	#print(PythonLocation())
