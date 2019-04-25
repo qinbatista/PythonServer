@@ -20,11 +20,11 @@ ac:de:48:00:11:22,1,覃于澎
 """
 #host  = 'magicwandai.com' # 这是服务器的电脑的ip
 #host  = '155.138.222.30' # 这是服务器的电脑的ip
-host = "192.168.1.183"
+host = "127.0.0.1"
 DESKey = "67891234"
 DESVector = "6789123467891234"
 TotalProcesses = 1
-TotalThread = 100
+TotalThread = 1000
 PortQuantity = 1
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
