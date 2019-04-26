@@ -52,7 +52,7 @@ class LukseunClient():
 				Portvalue = self.port+ThreadID%self.ServerPortNumber
 				address = (host, Portvalue)
 				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-				s.settimeout(10)
+				s.settimeout(5)
 				s.connect(address)
 				TestMessage = msg
 				self.__SendHeader(s,TestMessage)
@@ -112,6 +112,10 @@ class LukseunClient():
 		pool.join()
 		end = time.time()
 		print("Total time：" + str(end - start))
+	def DownloadData(self):
+		pass
+	def UploadData(self):
+		pass
 	"""
 	⬆️above codes are public method
 	"""
@@ -122,45 +126,17 @@ def DelCache():
 		os.remove(PythonLocation()+"/WorkingCat/success")
 	if os.path.isfile(PythonLocation()+"/WorkingCat/ErrorRate"):
 		os.remove(PythonLocation()+"/WorkingCat/ErrorRate")
-# def StressTest():
-# 	global PortQuantity
-# 	global TotalThread
-# 	threads = [run(args=((10000+n,""))) for n in range(0,PortQuantity)]
-# 	for t in threads:
-# 		t.start()
-# 	for t in threads:
-# 	 	t.join()
-# 	DebugUtility.ErrorRate(TotalProcesses,TotalThread,PortQuantity)
-# class run(threading.Thread):
-# 	def run(self):
-# 		ct = LukseunClient("workingcat",self._args[0])
-# 		ct.SendMsg("{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}")
-# 		#ct.Test_MultMessage("{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}")
-# 		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->finished port1:"+str(self._args[0]))
-# def AdaptationTest():
-# 	global TotalThread
-# 	global PortQuantity
-# 	totalthreadNum = TotalThread
-# 	for i in range(1,11):
-# 		count = totalthreadNum*i
-# 		PortQuantity=1
-# 		for n in range(PortQuantity,11):
-# 			TotalThread = int(count/n)
-# 			PortQuantity = n
-# 			print(TotalThread)
-# 			print(PortQuantity)
-# 			StressTest()
 if __name__ == '__main__':
 	DelCache()
 	ct = LukseunClient("workingcat",ServerPortNumber=3)
-	#ct.SendMsg("{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}")
+	ct.SendMsg("{\"session\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}")
 	# ct.Test_MultMessage("{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",1,100)
 	ProcessNumber = 100
-	for ProccIncreaseIndex in range(1,101):
-		for PortIncreaseIndex in range(1,11):
-			ct = LukseunClient("workingcat",ServerPortNumber=PortIncreaseIndex)
-			ct.Test_MultMessage("{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",1,ProcessNumber*ProccIncreaseIndex)
-			DebugUtility.ErrorRate(1,ProcessNumber*ProccIncreaseIndex,PortIncreaseIndex)
-	DebugUtility.GetErrorRate()
+	# for ProccIncreaseIndex in range(1,101):
+	# 	for PortIncreaseIndex in range(1,11):
+	# 		ct = LukseunClient("workingcat",ServerPortNumber=PortIncreaseIndex)
+	# 		ct.Test_MultMessage("{\"UserID\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",1,ProcessNumber*ProccIncreaseIndex)
+	# 		DebugUtility.ErrorRate(1,ProcessNumber*ProccIncreaseIndex,PortIncreaseIndex)
+	# DebugUtility.GetErrorRate()
 
 

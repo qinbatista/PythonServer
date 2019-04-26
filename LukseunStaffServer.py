@@ -35,46 +35,51 @@ class StartServer(threading.Thread):
 			try:
 				cs,address = s.accept()
 				#solve header verification
-				HeaderMessage,IPAdress = HeaderSolution(cs,address)
+				HeaderMessage,IPAdress = self.HeaderSolution(cs,address)
 				if HeaderMessage == "":
 					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive illegal data from:"+IPAdress)
 					continue
 				else:
 					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive legal data from:"+IPAdress)
 				#solve message information
-				MessageSolution(HeaderMessage,cs,IPAdress)
+				self.MessageSolution(HeaderMessage,cs,IPAdress)
 			except socket.error:
 				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->connecting failed, restart")
 		cs.close()
+	def HeaderSolution(self,cs,address):
+		ra = cs.recv(36)
+		HeaderMessage = AnalysisHeader.Header(ra)
+		IPAdress = str(list(address)[0])
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Recived header: "+bytes.decode(ra))
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->decrypt header: new.size="+HeaderMessage.size+" new.Legal="+HeaderMessage.Legal+" new.md5="+HeaderMessage.md5)
+		if HeaderMessage.Legal=="":
+			return "",IPAdress
+		cs.send(str.encode(HeaderMessage.md5))
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->IPAdress="+IPAdress+" pass")
+		return HeaderMessage,IPAdress
 
-def HeaderSolution(cs,address):
-	ra = cs.recv(36) #先接受消息头
-	HeaderMessage = AnalysisHeader.Header(ra)
-	IPAdress = str(list(address)[0])
-	LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Recived header: "+bytes.decode(ra))
-	LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->decrypt header: new.size="+HeaderMessage.size+" new.Legal="+HeaderMessage.Legal+" new.md5="+HeaderMessage.md5)
-	if HeaderMessage.Legal=="":
-		return "",IPAdress
-	cs.send(str.encode(HeaderMessage.md5))# 通过新链接对象发送数据
-	LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->IPAdress="+IPAdress+" pass")
-	return HeaderMessage,IPAdress
+	def MessageSolution(self,HeaderMessage,cs,IPAdress):
+		sizebuffer = int(HeaderMessage.size)
+		reMsg=b""
+		ReciveBufferSize = 1024
+		while sizebuffer!=0:
+			if int(sizebuffer)>ReciveBufferSize:
+				reMsg =reMsg+ cs.recv(ReciveBufferSize)
+				sizebuffer=sizebuffer-ReciveBufferSize
+			else:
+				reMsg=reMsg+cs.recv(sizebuffer)
+				sizebuffer = 0
+		#send result message to client
+		if HeaderMessage.Legal =="workingcat":
+			myWTR = WorkingTimeRecoder.WorkingTimeRecoderClass()
+			status = myWTR.ResolveMsg(reMsg,IPAdress)
+		if HeaderMessage.Legal =="natasha":
+			myWTR = WorkingTimeRecoder.WorkingTimeRecoderClass()
+			status = myWTR.ResolveMsg(reMsg,IPAdress)
+		LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->sent encrypted message to client:"+ str(status))
+		cs.send(status)
 
-def MessageSolution(HeaderMessage,cs,IPAdress):
-	sizebuffer = int(HeaderMessage.size)
-	reMsg=b""
-	ReciveBufferSize = 1024
-	while sizebuffer!=0:
-		if int(sizebuffer)>ReciveBufferSize:
-			reMsg =reMsg+ cs.recv(ReciveBufferSize)
-			sizebuffer=sizebuffer-ReciveBufferSize
-		else:
-			reMsg=reMsg+cs.recv(sizebuffer)
-			sizebuffer = 0
-	#send result message to client
-	if HeaderMessage.Legal =="workingcat":
-		status = WorkingTimeRecoder.StaffCheckIn(reMsg,IPAdress)
-	LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->sent encrypted message to client:"+ str(status))
-	cs.send(status)
+
 
 
 if __name__ == '__main__':
