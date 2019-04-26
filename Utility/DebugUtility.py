@@ -3,9 +3,12 @@ import os
 import codecs
 import numpy as np
 import matplotlib.pyplot as plt
+import threading
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 def ErrorRate(TotalProcesses,TotalThread,PortQuantity):
+	mutex = threading.Lock()
+	mutex.acquire()
 	FailedQuantity=0
 	SuccessQuantity=1
 	if os.path.isfile(PythonLocation()+"/../WorkingCat/failed"):
@@ -24,6 +27,7 @@ def ErrorRate(TotalProcesses,TotalThread,PortQuantity):
 	f.write(str(TotalProcesses)+","+str(TotalThread)+","+str(PortQuantity)+","+str(FailedQuantity/SuccessQuantity))
 	f.write('\n')
 	f.close()
+	mutex.release()
 def GetErrorRate():
 	dataMat = []
 	if os.path.isfile(PythonLocation()+'/../WorkingCat/ErrorRate')==False:

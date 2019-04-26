@@ -69,8 +69,12 @@ class WorkingTimeRecoderClass():
 		message = bytes.decode(message) #byte to string
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
 		if message=="":
-			return  des.encrypt(str.encode(MessageList[0]))
+			session="error"
+			UserName="error"
+			function="error"
+			return session,UserName,function
 		MessageDic = json.loads(message)
+	
 		if "session" in MessageDic:
 			session = MessageDic["session"]
 		else:

@@ -46,6 +46,8 @@ class LukseunClient():
 	def __run(self,msg,TotalProcessesID=1,ThreadID=1):
 		Finished=True
 		while Finished:
+			s=None
+			DesMessage=""
 			try:
 				# print("ThreadID("+str(ThreadID)+")self.ServerPortNumber("+str(self.ServerPortNumber)+") remainder="+str(ThreadID%self.ServerPortNumber)+" value ="+self.port+ThreadID%self.ServerPortNumber)
 				# time.sleep(5)
@@ -56,20 +58,28 @@ class LukseunClient():
 				s.connect(address)
 				TestMessage = msg
 				self.__SendHeader(s,TestMessage)
-				self.__SendMessage(s,TestMessage)
+				DesMessage = self.__SendMessage(s,TestMessage)
 				s.settimeout(None)
 				s.close()
-				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run][Port:"+str(Portvalue)+"][Processes:"+str(TotalProcessesID)+"][Thread:"+str(ThreadID)+"]:Successed","success",True,True)
+				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run][Port:"+str(Portvalue)+"][Processes:"+str(TotalProcessesID)+"][Thread:"+str(ThreadID)+"]:Successed:"+str(DesMessage),"success",True,True)
 				Finished=False
-			except socket.error:
-				time.sleep(5)
-				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run][Port:"+str(Portvalue)+"][Processes:"+str(TotalProcessesID)+"][Thread:"+str(ThreadID)+"]:connecting error","failed", True,True)
+			except socket.error as e:
+				#print(str(e))
+				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run][Port:"+str(Portvalue)+"][Processes:"+str(TotalProcessesID)+"][Thread:"+str(ThreadID)+"]:connecting error:"+str(DesMessage)+"->"+str(e),"failed", True,True)
+				if s!=None:
+					s.close()
+				time.sleep(1)
+			finally:
+				if DesMessage!="":
+					Finished=False
+				else:
+					Finished=True
 	def __HeaderSolution(self):
 		pass
 	def __SendHeader(self,s,TestMessage):
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->send encrypted header: "+ TestMessage)
 		TestMessage = des.encrypt(TestMessage)
-		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->send encrypted header: "+ bytes.decode(TestMessage))
 		#send header
 		headertool = AnalysisHeader.Header()
 		message = headertool.MakeHeader(self.header,str(len(TestMessage)))
@@ -96,7 +106,7 @@ class LukseunClient():
 		sizebuffer = int(headertool.size)
 		reMsg=b""
 		en = EncryptionAlgorithm.DES()
-		mytime = en.MD5Encrypt(str(time.time()))
+		mytime = "6275e26419211d1f526e674d97110e15"#en.MD5Encrypt(str(time.time()))
 		s.send(str.encode(mytime))
 		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->send encrypted data: "+ str(mytime))
 		ReciveBufferSize = 1024
@@ -105,6 +115,7 @@ class LukseunClient():
 				reMsg =reMsg+ s.recv(ReciveBufferSize)
 				sizebuffer=sizebuffer-ReciveBufferSize
 			else:
+				print("[LukseunClient][LogRecorder][run]->buffersize:"+str(sizebuffer))
 				reMsg=reMsg+s.recv(sizebuffer)
 				sizebuffer = 0
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
@@ -151,13 +162,13 @@ if __name__ == '__main__':
 	ct = LukseunClient("workingcat",ServerPortNumber=3)
 	#ct.SendMsg(message)
 	#ct.SendMsg(message)
-	ct.Test_MultMessage(message,1,100)
-	ProcessNumber = 100
-	for ProccIncreaseIndex in range(1,101):
-		for PortIncreaseIndex in range(1,11):
-			ct = LukseunClient("workingcat",ServerPortNumber=PortIncreaseIndex)
-			ct.Test_MultMessage(message,1,ProcessNumber*ProccIncreaseIndex)
-			DebugUtility.ErrorRate(1,ProcessNumber*ProccIncreaseIndex,PortIncreaseIndex)
-	DebugUtility.GetErrorRate()
+	ct.Test_MultMessage(message,3,100)
+	# ProcessNumber = 100
+	# for ProccIncreaseIndex in range(1,101):
+	# 	for PortIncreaseIndex in range(1,11):
+	# 		ct = LukseunClient("workingcat",ServerPortNumber=PortIncreaseIndex)
+	# 		ct.Test_MultMessage(message,1,ProcessNumber*ProccIncreaseIndex)
+	# 		DebugUtility.ErrorRate(1,ProcessNumber*ProccIncreaseIndex,PortIncreaseIndex)
+	#DebugUtility.GetErrorRate()
 
 

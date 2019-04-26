@@ -36,7 +36,7 @@ class StartServer(threading.Thread):
 				cs,address = s.accept()
 				#solve header verification
 				HeaderMessage,IPAdress = self.HeaderSolution(cs,address)
-				if HeaderMessage.App == "":
+				if HeaderMessage== "":
 					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive illegal data from:"+IPAdress)
 					continue
 				else:
@@ -55,7 +55,7 @@ class StartServer(threading.Thread):
 		if HeaderMessage.App=="":
 			return "",IPAdress
 		en = EncryptionAlgorithm.DES()
-		mytime = en.MD5Encrypt(str(time.time()))
+		mytime = "6275e26419211d1f526e674d97110e15"#en.MD5Encrypt(str(time.time()))
 		cs.send(str.encode(mytime))
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Send header:"+mytime)
 		return HeaderMessage,IPAdress
