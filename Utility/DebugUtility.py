@@ -26,6 +26,9 @@ def ErrorRate(TotalProcesses,TotalThread,PortQuantity):
 	f.close()
 def GetErrorRate():
 	dataMat = []
+	if os.path.isfile(PythonLocation()+'/../WorkingCat/ErrorRate')==False:
+		print("[DebugUtility][GetErrorRate]->100% success!")
+		return
 	fr = open(PythonLocation()+'/../WorkingCat/ErrorRate')
 	for line in fr.readlines():
 		curLine = line.strip().split(',')
