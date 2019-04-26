@@ -36,7 +36,7 @@ class StartServer(threading.Thread):
 				cs,address = s.accept()
 				#solve header verification
 				HeaderMessage,IPAdress = self.HeaderSolution(cs,address)
-				if HeaderMessage == "":
+				if HeaderMessage.App == "":
 					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive illegal data from:"+IPAdress)
 					continue
 				else:

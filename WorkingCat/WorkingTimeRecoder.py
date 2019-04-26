@@ -16,15 +16,13 @@ MessageList=[
 	"{\"status\":\"01\",\"message\":\"Check in\"}",
 	"{\"status\":\"02\",\"message\":\"Check out\"}",
 	"{\"status\":\"03\",\"message\":\"Message is illegal\"}",
-	"{\"status\":\"04\",\"message\":\"get null message\"}",
+	"{\"status\":\"04\",\"message\":\"your all personal data\"}",
 	"{\"status\":\"05\",\"message\":\"get null message\"}",
 ]
 class WorkingTimeRecoderClass():
-	def SolveSQLMessage(self):
-		pass
-	def SolveJsonMessage(self,session,IPAdress,UserName):
-		mutex = threading.Lock()
-		mutex.acquire()
+	def CheckTime_SQL(self):
+		return 3
+	def CheckTime_Json(self,session,IPAdress,UserName):
 		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
 		if os.path.isfile(DataBaseJsonLocation)==False:
 			f=codecs.open(DataBaseJsonLocation,'w', 'UTF-8')
@@ -61,14 +59,9 @@ class WorkingTimeRecoderClass():
 		with open(DataBaseJsonLocation, 'w',encoding="UTF-8") as json_file:
 			json_file.write(json.dumps(JsonChannelList,ensure_ascii=False,sort_keys=True, indent=4, separators=(',', ':')))
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"] encrypted MessageList[status]: "+MessageList[status])
-		mutex.release()
 		return status
-	def ResolveMsg(self,message,IPAdress):
-		des = EncryptionAlgorithm.DES(DESKey,DESVector)
-		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
-		if function=="CheckTime":
-			status = self.SolveJsonMessage(session,IPAdress,UserName)
-		return  des.encrypt(str.encode(MessageList[status]))
+	def GetMyAlldata_Json(self,session):
+		return 3
 	def VerifyMessageIntegrity(self,message,IPAdress):
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->recived encrypted message:"+str(message))
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
@@ -80,11 +73,29 @@ class WorkingTimeRecoderClass():
 		MessageDic = json.loads(message)
 		if "session" in MessageDic:
 			session = MessageDic["session"]
+		else:
+			session =""
 		if "UserName" in MessageDic:
 			UserName = MessageDic["UserName"]
+		else:
+			UserName =""
 		if "Function" in MessageDic:
 			function = MessageDic["Function"]
+		else:
+			function =""
 		return session,UserName,function
+	def ResolveMsg(self,message,IPAdress):
+		mutex = threading.Lock()
+		mutex.acquire()
+		des = EncryptionAlgorithm.DES(DESKey,DESVector)
+		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
+		status=0
+		if function=="CheckTime":
+			status = self.CheckTime_Json(session,IPAdress,UserName)
+		if function =="GetMyAlldata":
+			status = self.GetMyAlldata_Json(session)
+		mutex.release()
+		return  des.encrypt(str.encode(MessageList[status]))
 
 if __name__ == "__main__":
 	pass
