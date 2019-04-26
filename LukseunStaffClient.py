@@ -148,7 +148,7 @@ def DelCache():
 if __name__ == '__main__':
 	DelCache()
 	ct = LukseunClient("workingcat",ServerPortNumber=3)
-	ct.SendMsg("{\"session\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}")
+	ct.SendMsg("{\"session\":\"ACDE48001122\", \"Function\":\"CheckTime\",\"UserName\":\"abc\", \"Random\":\"774\"}")
 	# ct.Test_MultMessage("{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",1,100)
 	#ProcessNumber = 100
 	# for ProccIncreaseIndex in range(1,101):

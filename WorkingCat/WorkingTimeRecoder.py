@@ -20,31 +20,11 @@ MessageList=[
 	"{\"status\":\"05\",\"message\":\"get null message\"}",
 ]
 class WorkingTimeRecoderClass():
-	def SendSQLMessage(self):
+	def SolveSQLMessage(self):
 		pass
-	def SendJsonMessage(self):
-		pass
-	def ResolveMsg(self,message,IPAdress):
+	def SolveJsonMessage(self,session,IPAdress,UserName):
 		mutex = threading.Lock()
 		mutex.acquire()
-		global MessageList
-		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->recived encrypted message:"+str(message))
-		des = EncryptionAlgorithm.DES(DESKey,DESVector)
-		message = des.decrypt(message)	#decrypt byte message
-		message = bytes.decode(message) #byte to string
-		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
-		if message=="":
-			return  des.encrypt(str.encode(MessageList[0]))
-		status=0
-		MessageDic = json.loads(message)
-		if "session" in MessageDic:
-			MacAdress = MessageDic["session"]
-		else:
-			return  des.encrypt(str.encode(MessageList[3]))
-		if "UserName" in MessageDic:
-			UserName = MessageDic["UserName"]
-		else:
-			return  des.encrypt(str.encode(MessageList[3]))
 		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
 		if os.path.isfile(DataBaseJsonLocation)==False:
 			f=codecs.open(DataBaseJsonLocation,'w', 'UTF-8')
@@ -59,15 +39,15 @@ class WorkingTimeRecoderClass():
 		JsonChannelList = readed
 		ReciveTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 		ReciveData = time.strftime("%Y-%m-%d", time.localtime())
-		if MacAdress not in readed:
-			addirc = {MacAdress:{ReciveData:{"CheckIn":"","CheckOut":"","IP":"","UserName":""}}}
+		if session not in readed:
+			addirc = {session:{ReciveData:{"CheckIn":"","CheckOut":"","IP":"","UserName":""}}}
 			JsonChannelList.update(addirc)
-		if ReciveData not in readed[MacAdress]:
+		if ReciveData not in readed[session]:
 			ReciveData = time.strftime("%Y-%m-%d", time.localtime())
-			adddirc = {MacAdress:{ReciveData:{"CheckIn":"","CheckOut":"","IP":"","UserName":""}}}
-			JsonChannelList[MacAdress].update(adddirc[MacAdress])
-		if JsonChannelList[MacAdress][ReciveData]!="":
-			adddirc = JsonChannelList[MacAdress][ReciveData]
+			adddirc = {session:{ReciveData:{"CheckIn":"","CheckOut":"","IP":"","UserName":""}}}
+			JsonChannelList[session].update(adddirc[session])
+		if JsonChannelList[session][ReciveData]!="":
+			adddirc = JsonChannelList[session][ReciveData]
 			if adddirc["CheckIn"]=="":
 				adddirc["CheckIn"]=ReciveTime
 				status=1
@@ -77,12 +57,34 @@ class WorkingTimeRecoderClass():
 			adddirc["IP"]=IPAdress
 			adddirc["UserName"]=UserName
 			LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->IP:"+IPAdress+" UserName->"+UserName+" status:"+str(status))
-			JsonChannelList[MacAdress][ReciveData].update(adddirc)
+			JsonChannelList[session][ReciveData].update(adddirc)
 		with open(DataBaseJsonLocation, 'w',encoding="UTF-8") as json_file:
 			json_file.write(json.dumps(JsonChannelList,ensure_ascii=False,sort_keys=True, indent=4, separators=(',', ':')))
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"] encrypted MessageList[status]: "+MessageList[status])
 		mutex.release()
+		return status
+	def ResolveMsg(self,message,IPAdress):
+		des = EncryptionAlgorithm.DES(DESKey,DESVector)
+		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
+		if function=="CheckTime":
+			status = self.SolveJsonMessage(session,IPAdress,UserName)
 		return  des.encrypt(str.encode(MessageList[status]))
+	def VerifyMessageIntegrity(self,message,IPAdress):
+		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->recived encrypted message:"+str(message))
+		des = EncryptionAlgorithm.DES(DESKey,DESVector)
+		message = des.decrypt(message)	#decrypt byte message
+		message = bytes.decode(message) #byte to string
+		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
+		if message=="":
+			return  des.encrypt(str.encode(MessageList[0]))
+		MessageDic = json.loads(message)
+		if "session" in MessageDic:
+			session = MessageDic["session"]
+		if "UserName" in MessageDic:
+			UserName = MessageDic["UserName"]
+		if "Function" in MessageDic:
+			function = MessageDic["Function"]
+		return session,UserName,function
 
 if __name__ == "__main__":
 	pass
