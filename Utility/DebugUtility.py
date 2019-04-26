@@ -47,7 +47,7 @@ def ErrorGraph(myNp):
 			ListPortQuantity.append(myNp[i][2])
 			ListErrorRate.append(myNp[i][3])
 			l1 = plt.plot(ListPortQuantity, ListErrorRate,"x-")
-			plt.legend(l1, labels = [ str(1000*i) for i in range(1,11)],loc = 'best')
+			plt.legend(l1, labels = [ str(10*i) for i in range(1,1001)],loc = 'best')
 			ListPortQuantity.clear()
 			ListErrorRate.clear()
 		else:
