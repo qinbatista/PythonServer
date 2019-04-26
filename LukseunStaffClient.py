@@ -155,8 +155,8 @@ if __name__ == '__main__':
 	ct = LukseunClient("workingcat",ServerPortNumber=3)
 	#ct.SendMsg("{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}")
 	# ct.Test_MultMessage("{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",1,100)
-	ProcessNumber = 10
-	for ProccIncreaseIndex in range(1,1001):
+	ProcessNumber = 100
+	for ProccIncreaseIndex in range(1,101):
 		for PortIncreaseIndex in range(1,11):
 			ct = LukseunClient("workingcat",ServerPortNumber=PortIncreaseIndex)
 			ct.Test_MultMessage("{\"MacAddress\":\"ACDE48001122\", \"Function\":\"CheckIn\",\"UserName\":\"abc\", \"Random\":\"774\"}",1,ProcessNumber*ProccIncreaseIndex)
