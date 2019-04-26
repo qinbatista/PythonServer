@@ -40,7 +40,7 @@ class StartServer(threading.Thread):
 					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive illegal data from:"+IPAdress)
 					continue
 				else:
-					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive legal data from:"+IPAdress)
+					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive App data from:"+IPAdress)
 				#solve message information
 				self.MessageSolution(HeaderMessage,cs,IPAdress)
 			except socket.error:
@@ -51,13 +51,22 @@ class StartServer(threading.Thread):
 		HeaderMessage = AnalysisHeader.Header(ra)
 		IPAdress = str(list(address)[0])
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Recived header: "+bytes.decode(ra))
-		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->decrypt header: new.size="+HeaderMessage.size+" new.Legal="+HeaderMessage.Legal+" new.md5="+HeaderMessage.md5)
-		if HeaderMessage.Legal=="":
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->decrypt header: new.size="+HeaderMessage.size+" new.App="+HeaderMessage.App+" new.md5="+HeaderMessage.md5)
+		if HeaderMessage.App=="":
 			return "",IPAdress
 		cs.send(str.encode(HeaderMessage.md5))
-		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->IPAdress="+IPAdress+" pass")
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Send header: "+HeaderMessage.md5)
 		return HeaderMessage,IPAdress
-
+	def ServerHeader(self,header,TestMessage):
+		headertool = AnalysisHeader.Header()
+		return headertool.MakeHeader(header.App,str(len(TestMessage)))
+	def CallBackMsgToClient(self,cs,HeaderMessage,status,IPAdress):
+		cs.send(self.ServerHeader(HeaderMessage,status))
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Send callback header: "+ bytes.decode(self.ServerHeader(HeaderMessage,status)))
+		rs= cs.recv(32)
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->recv callback header: "+ bytes.decode(rs))
+		cs.send(status)
+		LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->sent encrypted message to client:"+ str(status))
 	def MessageSolution(self,HeaderMessage,cs,IPAdress):
 		sizebuffer = int(HeaderMessage.size)
 		reMsg=b""
@@ -70,17 +79,13 @@ class StartServer(threading.Thread):
 				reMsg=reMsg+cs.recv(sizebuffer)
 				sizebuffer = 0
 		#send result message to client
-		if HeaderMessage.Legal =="workingcat":
+		if HeaderMessage.App =="workingcat":
 			myWTR = WorkingTimeRecoder.WorkingTimeRecoderClass()
 			status = myWTR.ResolveMsg(reMsg,IPAdress)
-		if HeaderMessage.Legal =="natasha":
+		if HeaderMessage.App =="natasha":
 			myWTR = WorkingTimeRecoder.WorkingTimeRecoderClass()
 			status = myWTR.ResolveMsg(reMsg,IPAdress)
-		LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->sent encrypted message to client:"+ str(status))
-		cs.send(status)
-
-
-
+		self.CallBackMsgToClient(cs,HeaderMessage, status,IPAdress)
 
 if __name__ == '__main__':
 	main()

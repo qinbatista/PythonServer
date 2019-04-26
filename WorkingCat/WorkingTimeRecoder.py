@@ -12,12 +12,12 @@ import EncryptionAlgorithm
 DESKey = "67891234"
 DESVector = "6789123467891234"
 MessageList=[
-	"{\"status\":\"00\"}",#\"message\":\"get null message\"}",
-	"{\"status\":\"01\"}",#\"message\":\"Check in\"}",
-	"{\"status\":\"02\"}",#\"message\":\"Check out\"}",
-	"{\"status\":\"03\"}",#\"message\":\"Message is illegal\"}",
-	"{\"status\":\"04\"}",#\"message\":\"get null message\"}",
-	"{\"status\":\"05\"}",#\"message\":\"get null message\"}",
+	"{\"status\":\"00\",\"message\":\"get null message\"}",
+	"{\"status\":\"01\",\"message\":\"Check in\"}",
+	"{\"status\":\"02\",\"message\":\"Check out\"}",
+	"{\"status\":\"03\",\"message\":\"Message is illegal\"}",
+	"{\"status\":\"04\",\"message\":\"get null message\"}",
+	"{\"status\":\"05\",\"message\":\"get null message\"}",
 ]
 class WorkingTimeRecoderClass():
 	def SendSQLMessage(self):

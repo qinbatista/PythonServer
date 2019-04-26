@@ -56,7 +56,7 @@ class LukseunClient():
 				s.connect(address)
 				TestMessage = msg
 				self.__SendHeader(s,TestMessage)
-				self.__SendMessage(s,TestMessage)
+				Recdata = self.__SendMessage(s,TestMessage)
 				s.settimeout(None)
 				s.close()
 				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run][Port:"+str(Portvalue)+"][Processes:"+str(TotalProcessesID)+"][Thread:"+str(ThreadID)+"]:Successed","success",True,True)
@@ -69,12 +69,13 @@ class LukseunClient():
 	def __SendHeader(self,s,TestMessage):
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
 		TestMessage = des.encrypt(TestMessage)
-		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->send encrypted message: "+ bytes.decode(TestMessage))
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->send encrypted header: "+ bytes.decode(TestMessage))
 		#send header
 		headertool = AnalysisHeader.Header()
 		message = headertool.MakeHeader(self.header,str(len(TestMessage)))
 		s.send(message)
 		data = s.recv(32)
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->recv encrypted header: "+ bytes.decode(data))
 		return data
 	def __SendMessage(self,s,TestMessage):
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
@@ -88,11 +89,27 @@ class LukseunClient():
 			else:
 				s.send(TestMessage)
 				sizebuffer = 0
-		data = s.recv(1024)
-		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->recived encrypted message: "+str(data))
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->send encrypted msg: "+ bytes.decode(TestMessage))
+		data = s.recv(36)
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->recv encrypted data: "+ bytes.decode(data))
+		headertool = AnalysisHeader.Header(data)
+		sizebuffer = int(headertool.size)
+		reMsg=b""
+		s.send(str.encode("6275e26419211d1f526e674d97110e15"))
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->send encrypted data: "+ bytes.decode(b"6275e26419211d1f526e674d97110e15"))
+		ReciveBufferSize = 1024
+		while sizebuffer!=0:
+			if int(sizebuffer)>ReciveBufferSize:
+				reMsg =reMsg+ s.recv(ReciveBufferSize)
+				sizebuffer=sizebuffer-ReciveBufferSize
+			else:
+				reMsg=reMsg+s.recv(sizebuffer)
+				sizebuffer = 0
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
-		byteData = des.decrypt(data)
-		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]-> decrypted message: "+str(byteData))
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->recived encrypted message: "+str(reMsg))
+		DesMessage = des.decrypt(reMsg)
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]-> decrypted message: "+str(DesMessage))
+		return DesMessage
 	def __MessageConstruction(self):
 		pass
 	"""

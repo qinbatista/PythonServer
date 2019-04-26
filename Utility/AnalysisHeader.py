@@ -8,7 +8,7 @@ class Header:
 		msg = bytes.decode(msg)
 		self.md5 = self.ShowMD5Message(msg)
 		self.size = self.ShowMessageSize(msg)
-		self.Legal = self.isLegalMessage(self.md5)
+		self.App = self.isAPPMessage(self.md5)
 
 	def HideMsgSize(self,data):
 		"""
@@ -41,7 +41,7 @@ class Header:
 		"""
 		MD5Message = data[0:1]+data[2:3]+data[4:5]+data[6:7]+data[8:9]+data[9:]
 		return MD5Message
-	def isLegalMessage(self, md5String):
+	def isAPPMessage(self, md5String):
 		if md5String=="6275e26419211d1f526e674d97110e15":#md5 of string of "natasha"
 			LogRecorder.LogUtility("[AnalysisHeader][isLegalMessage]Get Natasha message, pass")
 			return "natasha"
@@ -69,7 +69,7 @@ if __name__ == "__main__":
 	newMessage = tool.MakeHeader("natasha","24")
 	print(newMessage)
 	my = Header(str.encode(newMessage))
-	print(my.Legal)
+	print(my.App)
 	print(my.md5)
 	print(my.size)
 
