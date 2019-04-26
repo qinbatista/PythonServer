@@ -56,7 +56,7 @@ class LukseunClient():
 				s.connect(address)
 				TestMessage = msg
 				self.__SendHeader(s,TestMessage)
-				Recdata = self.__SendMessage(s,TestMessage)
+				self.__SendMessage(s,TestMessage)
 				s.settimeout(None)
 				s.close()
 				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run][Port:"+str(Portvalue)+"][Processes:"+str(TotalProcessesID)+"][Thread:"+str(ThreadID)+"]:Successed","success",True,True)
@@ -95,8 +95,10 @@ class LukseunClient():
 		headertool = AnalysisHeader.Header(data)
 		sizebuffer = int(headertool.size)
 		reMsg=b""
-		s.send(str.encode("6275e26419211d1f526e674d97110e15"))
-		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->send encrypted data: "+ bytes.decode(b"6275e26419211d1f526e674d97110e15"))
+		en = EncryptionAlgorithm.DES()
+		mytime = en.MD5Encrypt(str(time.time()))
+		s.send(str.encode(mytime))
+		LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]->send encrypted data: "+ str(mytime))
 		ReciveBufferSize = 1024
 		while sizebuffer!=0:
 			if int(sizebuffer)>ReciveBufferSize:

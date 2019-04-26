@@ -54,8 +54,10 @@ class StartServer(threading.Thread):
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->decrypt header: new.size="+HeaderMessage.size+" new.App="+HeaderMessage.App+" new.md5="+HeaderMessage.md5)
 		if HeaderMessage.App=="":
 			return "",IPAdress
-		cs.send(str.encode(HeaderMessage.md5))
-		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Send header: "+HeaderMessage.md5)
+		en = EncryptionAlgorithm.DES()
+		mytime = en.MD5Encrypt(str(time.time()))
+		cs.send(str.encode(mytime))
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Send header:"+mytime)
 		return HeaderMessage,IPAdress
 	def ServerHeader(self,header,TestMessage):
 		headertool = AnalysisHeader.Header()
