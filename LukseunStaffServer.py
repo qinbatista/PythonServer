@@ -5,11 +5,8 @@ import socket
 from time import ctime
 import time
 import json
-import Utility.LogRecorder
-from Utility import LogRecorder
+from Utility import *
 from  WorkingCat import WorkingTimeRecoder
-from Utility import AnalysisHeader
-from Utility import EncryptionAlgorithm
 port1 = 10001
 port2 = 10002
 DESKey = "67891234"

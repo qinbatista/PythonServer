@@ -6,9 +6,7 @@ import codecs
 import threading
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0,sys.path[0]+"/Utility")
-import LogRecorder
-import EncryptionAlgorithm
+from Utility import *
 DESKey = "67891234"
 DESVector = "6789123467891234"
 MessageList=[

@@ -6,7 +6,7 @@ import socket
 # sys.path.insert(0,sys.path[0]+"/Utility")
 # sys.path.append(sys.path[0]+"/Utility")
 import multiprocessing
-from Utility import EncryptionAlgorithm,LogRecorder,AnalysisHeader,DebugUtility
+from Utility import *
 import random
 """
 发送消息内容为：
