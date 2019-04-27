@@ -96,7 +96,7 @@ class WorkingTimeRecoderClass():
 		status=0
 		if function=="CheckTime":
 			status = self.CheckTime_Json(session,IPAdress,UserName)
-		if function =="GetMyAlldata":
+		if function =="GetMyAlldata":# 获取全部数据
 			status = self.GetMyAlldata_Json(session)
 		mutex.release()
 		return  des.encrypt(str.encode(MessageList[status]))
