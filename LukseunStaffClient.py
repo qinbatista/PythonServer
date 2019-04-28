@@ -160,9 +160,9 @@ if __name__ == '__main__':
 	DelCache()
 	message = "{\"session\":\"ACDE48001122\", \"Function\":\"CheckTime\",\"UserName\":\"abc\", \"Random\":\"774\"}"
 	ct = LukseunClient("workingcat",ServerPortNumber=3)
-	#ct.SendMsg(message)
-	#ct.SendMsg(message)
-	ct.Test_MultMessage(message,3,100)
+	ct.SendMsg(message)
+	ct.SendMsg(message)
+	#ct.Test_MultMessage(message,3,500)
 	# ProcessNumber = 100
 	# for ProccIncreaseIndex in range(1,101):
 	# 	for PortIncreaseIndex in range(1,11):
