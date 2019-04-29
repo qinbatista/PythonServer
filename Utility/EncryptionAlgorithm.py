@@ -20,6 +20,9 @@ class DES:
 		d = k.decrypt(base64.decodebytes(data))
 		return d
 	def MD5Encrypt(self, data):
-		m = hashlib.md5()
+		m = hashlib.md5()#用md5加密
 		m.update(data.encode())
+		# print("MD5Encrypt1:",data)
+		# print("MD5Encrypt2:",m)
+		# print("MD5Encrypt3:",m.hexdigest())
 		return m.hexdigest()

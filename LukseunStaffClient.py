@@ -3,12 +3,10 @@ import threading
 import time
 import uuid
 import socket
-sys.path.insert(0,sys.path[0]+"/Utility")
+# sys.path.insert(0,sys.path[0]+"/Utility")
+# sys.path.append(sys.path[0]+"/Utility")
 import multiprocessing
-import EncryptionAlgorithm
-import LogRecorder
-import AnalysisHeader
-import DebugUtility
+from Utility import *
 import random
 """
 发送消息内容为：
@@ -27,7 +25,7 @@ DESVector = "6789123467891234"
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 class LukseunClient():
-	def __init__(self,myHeader,port = 10000,ServerPortNumber=10):
+	def __init__(self,myHeader,port = 10000,ServerPortNumber=10):#软件名字，端口号，服务器端口号
 		self.header = myHeader
 		self.port = port
 		self.ServerPortNumber = ServerPortNumber
@@ -157,7 +155,7 @@ def DelCache():
 	if os.path.isfile(PythonLocation()+"/WorkingCat/ErrorRate"):
 		os.remove(PythonLocation()+"/WorkingCat/ErrorRate")
 if __name__ == '__main__':
-	DelCache()
+	DelCache()#存在文件就删除文件
 	message = "{\"session\":\"ACDE48001122\", \"Function\":\"CheckTime\",\"UserName\":\"abc\", \"Random\":\"774\"}"
 	ct = LukseunClient("workingcat",ServerPortNumber=3)
 	ct.SendMsg(message)
