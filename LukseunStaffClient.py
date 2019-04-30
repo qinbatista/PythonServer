@@ -30,10 +30,10 @@ def PythonLocation():
 
 
 class LukseunClient():
-	def __init__(self, myHeader, port=10000, ServerPortNumber=10):  # 软件名字，端口号，服务器端口号
+	def __init__(self, myHeader, port=10000, port_number=10):  # 软件名字，端口号，服务器端口号
 		self.header = myHeader
 		self.port = port
-		self.ServerPortNumber = ServerPortNumber
+		self.port_number = port_number
 		self.debug_utility = DebugUtility.DebugUtility()
 
 	def __get_mac_address(self):
@@ -43,7 +43,7 @@ class LukseunClient():
 	def __ThreadRunClass(self, TotalProcessesID, msg):
 		threadpool = []
 		for ThreadID in range(0, self.TotalThread):
-			th = threading.Thread(target=self.__run, args=(
+			th = threading.Thread(target=self.__send_tcp_message, args=(
 				msg, TotalProcessesID, ThreadID))
 			threadpool.append(th)
 		for th in threadpool:
@@ -51,22 +51,21 @@ class LukseunClient():
 		for th in threadpool:
 			threading.Thread.join(th)
 		self.debug_utility.record_error_rate(
-			TotalProcessesID, self.TotalThread, self.ServerPortNumber)
+			TotalProcessesID, self.TotalThread, self.port_number)
 
-	def __run(self, msg, TotalProcessesID=1, ThreadID=1):
+	def __send_tcp_message(self, msg, TotalProcessesID=1, ThreadID=1):
 		Finished = True
 		while Finished:
 			s = None
 			DesMessage = ""
 			try:
-				Portvalue = self.port+ThreadID % self.ServerPortNumber
+				Portvalue = self.port+ThreadID % self.port_number
 				address = (host, Portvalue)
 				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 				s.settimeout(5)
 				s.connect(address)
-				TestMessage = msg
-				self.__SendHeader(s, TestMessage)
-				DesMessage = self.__SendMessage(s, TestMessage)
+				self.__send_header(s, msg)
+				DesMessage = self.__SendMessage(s, msg)
 				s.settimeout(None)
 				s.close()
 				self.debug_utility.increase_success_count()
@@ -87,19 +86,18 @@ class LukseunClient():
 	def __HeaderSolution(self):
 		pass
 
-	def __SendHeader(self, s, TestMessage):
+	def __send_header(self, s, TestMessage):
 		des = EncryptionAlgorithm.DES(DESKey, DESVector)
-
 		TestMessage = des.encrypt(TestMessage)
 		# send header
 		headertool = AnalysisHeader.Header()
 		message = headertool.MakeHeader(self.header, str(len(TestMessage)))
 		s.send(message)
 		LogRecorder.LogUtility(
-			"[LukseunClient][LogRecorder][__SendHeader]->send encrypted header: " + bytes.decode(message))
+			"[LukseunClient][LogRecorder][__send_header]->send encrypted header: " + bytes.decode(message))
 		data = s.recv(32)
 		LogRecorder.LogUtility(
-			"[LukseunClient][LogRecorder][__SendHeader]->recv encrypted header: " + bytes.decode(data))
+			"[LukseunClient][LogRecorder][__send_header]->recv encrypted header: " + bytes.decode(data))
 		return data
 
 	def __SendMessage(self, s, TestMessage):
@@ -153,7 +151,7 @@ class LukseunClient():
 	"""
 
 	def SendMsg(self, msg):
-		self.__run(msg)
+		self.__send_tcp_message(msg)
 
 	def Test_MultMessage(self, msg, TotalProcesses=1, TotalThread=1000):
 		self.TotalProcesses = TotalProcesses
@@ -203,12 +201,12 @@ if __name__ == '__main__':
 									"phone_number": "15310568888"
 				}
 				}
-	ct = LukseunClient("workingcat", ServerPortNumber=3)
+	ct = LukseunClient("workingcat", port_number=3)
 	#ct.SendMsg(str(message_dic))
 	#ct.Test_MultMessage(str(message_dic), 1, 200)
 	ProcessNumber = 100
 	for ProccIncreaseIndex in range(1,3):
 		for PortIncreaseIndex in range(1,11):
-			ct = LukseunClient("workingcat",ServerPortNumber=PortIncreaseIndex)
+			ct = LukseunClient("workingcat",port_number=PortIncreaseIndex)
 			ct.Test_MultMessage(str(message_dic),1,ProcessNumber*ProccIncreaseIndex)
 	ct.debug_utility.port_error_graph()
