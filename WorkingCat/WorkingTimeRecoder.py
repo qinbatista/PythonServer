@@ -68,24 +68,17 @@ class WorkingTimeRecoderClass():
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
 		if message=="":
 			session="error"
-			UserName="error"
+			user_name="error"
 			function="error"
-			return session,UserName,function
-		MessageDic = json.loads(message)
-	
-		if "session" in MessageDic:
-			session = MessageDic["session"]
-		else:
-			session =""
-		if "UserName" in MessageDic:
-			UserName = MessageDic["UserName"]
-		else:
-			UserName =""
-		if "Function" in MessageDic:
-			function = MessageDic["Function"]
-		else:
-			function =""
-		return session,UserName,function
+			return session,user_name,function
+		message_dic  = eval(message)
+		if "session" in message_dic.keys():
+			session = message_dic["session"]
+		if "function" in message_dic.keys():
+			function = message_dic["function"]
+		if "data" in message_dic.keys():
+			user_name = message_dic["data"]["user_name"]
+		return session,user_name,function
 	def ResolveMsg(self,message,IPAdress):
 		mutex = threading.Lock()
 		mutex.acquire()
@@ -93,7 +86,7 @@ class WorkingTimeRecoderClass():
 		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
 		status=0
 		if function=="CheckTime":
-			status = self.CheckTime_Json(session,IPAdress,UserName)
+			status = 1#self.CheckTime_Json(session,IPAdress,UserName)
 		if function =="GetMyAlldata":# 获取全部数据
 			status = self.GetMyAlldata_Json(session)
 		mutex.release()

@@ -63,3 +63,34 @@ Make header: Message example:  [Server] md5(ClientName)+size of message->[Client
 [Server]Encrypt("{"status":"01","message":"Check in"}")->[Client]Decrypt("{"status":"01","message":"Check in"}")
 
 Explain same like the client, just message changed
+
+> ## #Client Message Example
+
+#### Working Cat
+
+##### Send [check in] and [check out] message
+
+{
+
+​		"session":"ACDE48001122",
+
+​		"function":"check_time",
+
+​		"random":"774",
+
+​		"data":
+
+​					{
+
+​						"user_name":"yupeng",
+
+​						 "gender":"male",
+
+​		   			  "email":"qin@lukseun.com",
+
+​						 "phone_number":"15310568888"
+
+​					}
+
+}
+
