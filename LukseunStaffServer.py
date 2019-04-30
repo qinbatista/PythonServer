@@ -5,7 +5,7 @@ import socket
 from time import ctime
 import time
 import json
-from Utility import *
+from Utility import LogRecorder,AnalysisHeader,EncryptionAlgorithm
 from  WorkingCat import WorkingTimeRecoder
 port1 = 10001
 port2 = 10002

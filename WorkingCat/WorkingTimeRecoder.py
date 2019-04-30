@@ -6,7 +6,7 @@ import codecs
 import threading
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
-from Utility import *
+from Utility import LogRecorder,EncryptionAlgorithm
 DESKey = "67891234"
 DESVector = "6789123467891234"
 MessageList=[
@@ -86,7 +86,7 @@ class WorkingTimeRecoderClass():
 		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
 		status=0
 		if function=="CheckTime":
-			status = 1#self.CheckTime_Json(session,IPAdress,UserName)
+			status = self.CheckTime_Json(session,IPAdress,UserName)
 		if function =="GetMyAlldata":# 获取全部数据
 			status = self.GetMyAlldata_Json(session)
 		mutex.release()

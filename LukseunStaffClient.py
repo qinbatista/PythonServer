@@ -7,7 +7,7 @@ import socket
 # sys.path.insert(0,sys.path[0]+"/Utility")
 # sys.path.append(sys.path[0]+"/Utility")
 import multiprocessing
-from Utility import *
+from Utility import LogRecorder,DebugUtility,EncryptionAlgorithm,AnalysisHeader
 import random
 """
 发送消息内容为：
@@ -39,9 +39,6 @@ class LukseunClient():
 	def __get_mac_address(self):
 		mac = uuid.UUID(int=uuid.getnode()).hex[-12:]
 		return ":".join([mac[e:e+2] for e in range(0, 11, 2)])
-
-	def __GetErrorRate(self):
-		self.debug_utility.record_error_rate()
 
 	def __ThreadRunClass(self, TotalProcessesID, msg):
 		threadpool = []
@@ -208,7 +205,7 @@ if __name__ == '__main__':
 				}
 	ct = LukseunClient("workingcat", ServerPortNumber=3)
 	#ct.SendMsg(str(message_dic))
-	# ct.Test_MultMessage(str(message_dic), 1, 200)
+	#ct.Test_MultMessage(str(message_dic), 1, 200)
 	ProcessNumber = 100
 	for ProccIncreaseIndex in range(1,3):
 		for PortIncreaseIndex in range(1,11):
