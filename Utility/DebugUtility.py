@@ -14,12 +14,12 @@ class DebugUtility():
 		self.success_count = self.success_count+1
 	def increase_fail_count(self):
 		self.failed_count = self.failed_count+1
-	def record_error_rate(self,TotalProcesses,TotalThread,PortQuantity):
+	def record_error_rate(self,TotalProcesses,TotalThread,PortQuantity,Probability = None):
 		if os.path.isfile(PythonLocation()+'/../WorkingCat/ErrorRate')==False:
 			f=codecs.open(PythonLocation()+'/../WorkingCat/ErrorRate','w', 'UTF-8')
 			f.close()
-		f=open(PythonLocation()+'/../WorkingCat/ErrorRate','a')
-		f.write(str(TotalProcesses)+","+str(TotalThread)+","+str(PortQuantity)+","+str(self.failed_count/self.success_count))
+		f=open(PythonLocation()+'/../WorkingCat/ErrorRate','a+')
+		f.write(str(TotalProcesses)+","+str(TotalThread)+","+str(PortQuantity)+"," + str(Probability) if Probability else str(self.failed_count/self.success_count))
 		f.write('\n')
 		f.close()
 	def port_error_graph(self):

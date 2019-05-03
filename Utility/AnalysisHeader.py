@@ -60,7 +60,7 @@ class Header:
 		MD5 = des.MD5Encrypt(KeyString)#加密软件名字 32个字节
 		#这里保证了数据等长为4
 		DigitsAs4 = "#"*(4-len(StringLength))+StringLength#（4-加密数据的长度的长度）个#字符 + 加密数据的长度
-		ReturnString = self.HideMsgSize(MD5+DigitsAs4)#40 个字符，中间包含了md5算法和详细数据的长度
+		ReturnString = self.HideMsgSize(MD5+DigitsAs4)#36 个字符，中间包含了md5算法和详细数据的长度
 		return str.encode(ReturnString)
 
 

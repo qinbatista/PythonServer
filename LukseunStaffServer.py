@@ -6,13 +6,13 @@ from time import ctime
 import time
 import json
 from Utility import LogRecorder,AnalysisHeader,EncryptionAlgorithm
-from  WorkingCat import WorkingTimeRecoder
+from WorkingCat import WorkingTimeRecoder
 port1 = 10001
 port2 = 10002
 DESKey = "67891234"
 DESVector = "6789123467891234"
 def main():
-	threads = [StartServer(args=((10000+n,""))) for n in range(0,10)]
+	threads = [StartServer(args=((10000 + n, ""))) for n in range(0,10)]
 	for t in threads:
 		t.start()
 	for t in threads:
@@ -30,8 +30,9 @@ class StartServer(threading.Thread):
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][run][]->Server Started, Port:"+str(self._args[0]))
 		while True:
 			try:
+				# 接受TCP连接并返回（conn,address）,其中conn是新的套接字对象，可以用来接收和发送数据。address是连接客户端的地址。
 				cs,address = s.accept()
-				#solve header verification
+				#solve header verification 这个解决头部的验证
 				HeaderMessage,IPAdress = self.HeaderSolution(cs,address)
 				if HeaderMessage== "":
 					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive illegal data from:"+IPAdress)
@@ -44,7 +45,7 @@ class StartServer(threading.Thread):
 				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->connecting failed, restart")
 		cs.close()
 	def HeaderSolution(self,cs,address):
-		ra = cs.recv(36)#先接受36个字节，这是md5加密字符串
+		ra = cs.recv(36)#先接受36个字节，这是md5加密字符串 和数据的长度
 		HeaderMessage = AnalysisHeader.Header(ra)#初始化
 		IPAdress = str(list(address)[0])
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Recived header: "+bytes.decode(ra))

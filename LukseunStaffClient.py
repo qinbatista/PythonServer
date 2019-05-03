@@ -40,31 +40,21 @@ class LukseunClient():
 		mac = uuid.UUID(int=uuid.getnode()).hex[-12:]
 		return ":".join([mac[e:e+2] for e in range(0, 11, 2)])
 
-	def __ThreadRunClass(self, TotalProcessesID, msg):
-		threadpool = []
-		for ThreadID in range(0, self.TotalThread):
-			th = threading.Thread(target=self.__send_tcp_message, args=(
-				msg, TotalProcessesID, ThreadID))
-			threadpool.append(th)
-		for th in threadpool:
-			th.start()
-		for th in threadpool:
-			threading.Thread.join(th)
-		self.debug_utility.record_error_rate(
-			TotalProcessesID, self.TotalThread, self.port_number)
-
-	def __send_tcp_message(self, msg, TotalProcessesID=1, ThreadID=1):
+	def __send_tcp_message(self, msg, TotalProcessesID, ThreadID):# 信息、进程、线程（Information, process, thread）
 		Finished = True
 		while Finished:
 			s = None
 			DesMessage = ""
 			try:
-				Portvalue = self.port+ThreadID % self.port_number
-				address = (host, Portvalue)
-				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-				s.settimeout(5)
-				s.connect(address)
-				self.__send_header(s, msg)
+				Portvalue = self.port + ThreadID % self.port_number#端口号 10003
+				address = (host, Portvalue)#ip、端口
+				# socket.AF_INET： 服务器之间的网络通信  socket.SOCK_STREAM： 流式socket , for TCP这里用TCP
+				# socket.SOCK_DGRAM： 数据报式socket , for UDP后面考虑时间问题会使用UDP
+				# s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)# 创建UDP Socket
+				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# 创建TCP Socket
+				s.settimeout(5)# 设置套接字操作的超时期，超时5秒
+				s.connect(address)# 连接到address处的套接字。一般address的格式为元组（hostname,port），如果连接出错，返回socket.error错误。
+				self.__send_header(s, msg)# 数据的发送和加密
 				DesMessage = self.__SendMessage(s, msg)
 				s.settimeout(None)
 				s.close()
@@ -78,24 +68,23 @@ class LukseunClient():
 					s.close()
 				time.sleep(1)
 			finally:
-				if DesMessage != "":
-					Finished = False
-				else:
-					Finished = True
+				if DesMessage != "":Finished = False
 
 	def __HeaderSolution(self):
 		pass
 
 	def __send_header(self, s, TestMessage):
-		des = EncryptionAlgorithm.DES(DESKey, DESVector)
-		TestMessage = des.encrypt(TestMessage)
+		des = EncryptionAlgorithm.DES(DESKey, DESVector)# 两把钥匙
+		TestMessage = des.encrypt(TestMessage)# 加密好的数据
 		# send header
 		headertool = AnalysisHeader.Header()
-		message = headertool.MakeHeader(self.header, str(len(TestMessage)))
-		s.send(message)
+		message = headertool.MakeHeader(self.header, str(len(TestMessage)))# 字节长度为36  --->  1，3，5，7是长度
+
+		print(len(message),message)##########################################
+		s.send(message)# 发送数据
 		LogRecorder.LogUtility(
 			"[LukseunClient][LogRecorder][__send_header]->send encrypted header: " + bytes.decode(message))
-		data = s.recv(32)
+		data = s.recv(32)# 先接收32个字节，这里是头
 		LogRecorder.LogUtility(
 			"[LukseunClient][LogRecorder][__send_header]->recv encrypted header: " + bytes.decode(data))
 		return data
@@ -150,23 +139,8 @@ class LukseunClient():
 	⬆️above codes are private method
 	"""
 
-	def SendMsg(self, msg):
-		self.__send_tcp_message(msg)
-
-	def Test_MultMessage(self, msg, TotalProcesses=1, TotalThread=1000):
-		self.TotalProcesses = TotalProcesses
-		self.TotalThread = TotalThread
-		print("[LukseunStaffClient][Test_MultMessage]->TotalProcesses=" +
-			str(TotalProcesses)+"  TotalThread="+str(TotalThread))
-		time.sleep(1)
-		start = time.time()
-		pool = multiprocessing.Pool(processes=self.TotalProcesses)
-		for i in range(self.TotalProcesses):
-			pool.apply_async(self.__ThreadRunClass(i, msg))
-		pool.close()
-		pool.join()
-		end = time.time()
-		print("Total time：" + str(end - start))
+	def SendMsg(self, msg, TotalProcessesID=1, ThreadID=1):
+		self.__send_tcp_message(msg, TotalProcessesID=TotalProcessesID, ThreadID=ThreadID)# 发送tcp数据
 
 	def DownloadData(self):
 		pass
@@ -176,6 +150,38 @@ class LukseunClient():
 	"""
 	⬆️above codes are public method
 	"""
+
+def __ThreadRunClass(ct, message, ProcessesID, TotalThread):
+	threadpool = []
+	for ThreadID in range(0, TotalThread):
+		th = threading.Thread(target=ct.SendMsg, args=(message, ProcessesID, ThreadID))
+		threadpool.append(th)
+	for th in threadpool:
+		th.start()
+	for th in threadpool:
+		th.join()
+	return ct.debug_utility.failed_count, ct.debug_utility.success_count
+
+def Test_MultMessage(ct, msg, TotalProcesses=1, TotalThread=1000):
+	print("[LukseunStaffClient][Test_MultMessage]->TotalProcesses=" +
+		str(TotalProcesses)+"  TotalThread="+str(TotalThread))
+	time.sleep(1)
+	start = time.time()
+	pool = multiprocessing.Pool(processes=TotalProcesses)
+	pool_list = []
+	for i in range(TotalProcesses):
+		pool_list.append(pool.apply_async(__ThreadRunClass, (ct, msg, i, TotalThread)))
+		print(i,"-"*100)
+	pool.close()
+	pool.join()
+	end = time.time()
+	failed_count = 0
+	success_count = 0
+	for data in pool_list:
+		failed_count += int(data.get()[0])
+		success_count += int(data.get()[1])
+	ct.debug_utility.record_error_rate(TotalProcesses, TotalThread, ct.port_number, failed_count/success_count)
+	print("Total time：" + str(end - start))
 
 
 def DelCache():
@@ -191,22 +197,24 @@ if __name__ == '__main__':
 
 	DelCache()  # 存在文件就删除文件
 	message_dic = {"session": "ACDE48001122",
-				"function": "check_time",
-				"random": "774",
-				"data":
-				{
-					"user_name": "yupeng",
-					"gender": "male",
-					"email": "qin@lukseun.com",
-									"phone_number": "15310568888"
-				}
-				}
-	ct = LukseunClient("workingcat", port_number=3)
-	#ct.SendMsg(str(message_dic))
-	#ct.Test_MultMessage(str(message_dic), 1, 200)
-	ProcessNumber = 100
-	for ProccIncreaseIndex in range(1,3):
-		for PortIncreaseIndex in range(1,11):
-			ct = LukseunClient("workingcat",port_number=PortIncreaseIndex)
-			ct.Test_MultMessage(str(message_dic),1,ProcessNumber*ProccIncreaseIndex)
-	ct.debug_utility.port_error_graph()
+		"function": "check_time",
+		"random": "774",
+		"data":
+		{
+			"user_name": "yupeng",
+			"gender": "male",
+			"email": "qin@lukseun.com",
+			"phone_number": "15310568888"
+		}
+	}
+	ct = LukseunClient("workingcat", port_number=3)# 设置3个端口
+	# ct.SendMsg(str(message_dic))#发送单个数据
+
+	Test_MultMessage(ct, str(message_dic), 8, 40)
+
+	# ProcessNumber = 100
+	# for ProccIncreaseIndex in range(1,3):
+	# 	for PortIncreaseIndex in range(1,11):
+	# 		ct = LukseunClient("workingcat",port_number=PortIncreaseIndex)
+	# 		ct.Test_MultMessage(str(message_dic),1,ProcessNumber*ProccIncreaseIndex)
+	# ct.debug_utility.port_error_graph()
