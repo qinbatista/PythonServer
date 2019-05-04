@@ -63,7 +63,7 @@ class WorkingTimeRecoderClass():
 	def VerifyMessageIntegrity(self,message,IPAdress):
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->recived encrypted message:"+str(message))
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
-		message = des.decrypt(message)	#decrypt byte message
+		message = des.decrypt(message)  #decrypt byte message
 		message = bytes.decode(message) #byte to string
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
 		if message=="":

@@ -115,7 +115,7 @@ class LukseunClient():
 		s.send(str.encode(mytime))
 		LogRecorder.LogUtility(
 			"[LukseunClient][LogRecorder][__SendMessage]->send encrypted data: " + str(mytime))
-		ReciveBufferSize = 1024
+		ReciveBufferSize = 2048
 		while sizebuffer != 0:
 			if int(sizebuffer) > ReciveBufferSize:
 				reMsg = reMsg + s.recv(ReciveBufferSize)
@@ -171,7 +171,6 @@ def Test_MultMessage(ct, msg, TotalProcesses=1, TotalThread=1000):
 	pool_list = []
 	for i in range(TotalProcesses):
 		pool_list.append(pool.apply_async(__ThreadRunClass, (ct, msg, i, TotalThread)))
-		print(i,"-"*100)
 	pool.close()
 	pool.join()
 	end = time.time()
@@ -180,7 +179,7 @@ def Test_MultMessage(ct, msg, TotalProcesses=1, TotalThread=1000):
 	for data in pool_list:
 		failed_count += int(data.get()[0])
 		success_count += int(data.get()[1])
-	ct.debug_utility.record_error_rate(TotalProcesses, TotalThread, ct.port_number, failed_count/success_count)
+	ct.debug_utility.record_error_rate(TotalProcesses, TotalThread, ct.port_number, 0if failed_count==0 else failed_count/success_count)
 	print("Total time：" + str(end - start))
 
 
@@ -195,7 +194,7 @@ def DelCache():
 
 if __name__ == '__main__':
 
-	DelCache()  # 存在文件就删除文件
+	# DelCache()  # 存在文件就删除文件
 	message_dic = {"session": "ACDE48001122",
 		"function": "check_time",
 		"random": "774",
@@ -210,7 +209,10 @@ if __name__ == '__main__':
 	ct = LukseunClient("workingcat", port_number=3)# 设置3个端口
 	# ct.SendMsg(str(message_dic))#发送单个数据
 
-	Test_MultMessage(ct, str(message_dic), 8, 40)
+	for i in range(10,101,10):
+		for j in range(1,11):
+			ct.port_number = j
+			Test_MultMessage(ct, str(message_dic), 10, i)
 
 	# ProcessNumber = 100
 	# for ProccIncreaseIndex in range(1,3):

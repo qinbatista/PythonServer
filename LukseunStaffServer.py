@@ -71,13 +71,13 @@ class StartServer(threading.Thread):
 	def MessageSolution(self,HeaderMessage,cs,IPAdress):
 		sizebuffer = int(HeaderMessage.size)
 		reMsg=b""# 用于存放所有的信息
-		ReciveBufferSize = 1024
+		ReciveBufferSize = 2048
 		while sizebuffer!=0:
 			if sizebuffer > ReciveBufferSize:# 此条件成立，说明后面还有数据
-				reMsg = reMsg + cs.recv(ReciveBufferSize)# 再拿取1024个字节
+				reMsg += cs.recv(ReciveBufferSize)# 再拿取1024个字节
 				sizebuffer = sizebuffer - ReciveBufferSize# 获取还剩下的字节数
 			else:
-				reMsg = reMsg + cs.recv(sizebuffer)# 获取全部的字节
+				reMsg += cs.recv(sizebuffer)# 获取全部的字节
 				sizebuffer = 0
 		#send result message to client 发送结果到客户端
 		if HeaderMessage.App =="workingcat":
