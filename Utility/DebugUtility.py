@@ -19,7 +19,7 @@ class DebugUtility():
 			f=codecs.open(PythonLocation()+'/../WorkingCat/ErrorRate','w', 'UTF-8')
 			f.close()
 		f=open(PythonLocation()+'/../WorkingCat/ErrorRate','a+')
-		f.write(str(TotalProcesses)+","+str(TotalThread)+","+str(PortQuantity)+"," + str(Probability) if Probability else str(self.failed_count/self.success_count))
+		f.write(str(TotalProcesses)+","+str(TotalThread)+","+str(PortQuantity)+"," + (str(Probability) if Probability else str(0 if self.failed_count==0 else self.failed_count/self.success_count)))
 		f.write('\n')
 		f.close()
 	def port_error_graph(self):
