@@ -118,12 +118,12 @@ class LukseunClient():
 		ReciveBufferSize = 2048
 		while sizebuffer != 0:
 			if int(sizebuffer) > ReciveBufferSize:
-				reMsg = reMsg + s.recv(ReciveBufferSize)
+				reMsg += s.recv(ReciveBufferSize)
 				sizebuffer = sizebuffer-ReciveBufferSize
 			else:
 				LogRecorder.LogUtility(
 					"[LukseunClient][LogRecorder][__SendMessage]->buffersize:"+str(sizebuffer))
-				reMsg = reMsg+s.recv(sizebuffer)
+				reMsg += s.recv(sizebuffer)
 				sizebuffer = 0
 		des = EncryptionAlgorithm.DES(DESKey, DESVector)
 		LogRecorder.LogUtility(
@@ -206,13 +206,13 @@ if __name__ == '__main__':
 			"phone_number": "15310568888"
 		}
 	}
-	ct = LukseunClient("workingcat", port_number=3)# 设置3个端口
-	# ct.SendMsg(str(message_dic))#发送单个数据
+	ct = LukseunClient("workingcat", port_number=8)# 设置3个端口
+	ct.SendMsg(str(message_dic))#发送单个数据
 
-	for i in range(10,101,10):
-		for j in range(1,11):
-			ct.port_number = j
-			Test_MultMessage(ct, str(message_dic), 10, i)
+	# for i in range(10,101,10):
+	# 	for j in range(1,11):
+	# 		ct.port_number = j
+	# 		Test_MultMessage(ct, str(message_dic), 10, i)
 
 	# ProcessNumber = 100
 	# for ProccIncreaseIndex in range(1,3):

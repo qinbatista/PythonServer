@@ -34,26 +34,28 @@ class StartServer(threading.Thread):
 				cs,address = s.accept()
 				#solve header verification 这个解决头部的验证
 				HeaderMessage,IPAdress = self.HeaderSolution(cs,address)
-				if HeaderMessage== "":
+				if HeaderMessage == "":
 					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive illegal data from:"+IPAdress)
 					continue
 				else:
 					LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->Recive App data from:"+IPAdress)#目前没有natasha的相关数据
-				#solve message information
+
+				#solve message information 解决消息信息
 				self.MessageSolution(HeaderMessage,cs,IPAdress)
 			except socket.error:
 				LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->connecting failed, restart")
 		cs.close()
 	def HeaderSolution(self,cs,address):
+		# **** 1 第一次接收客户端发上来的数据，此信息内容包含：1.软件名字  2.消息体的长度 ****
 		ra = cs.recv(36)#先接受36个字节，这是md5加密字符串 和数据的长度
 		HeaderMessage = AnalysisHeader.Header(ra)#初始化
 		IPAdress = str(list(address)[0])
-		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Recived header: "+bytes.decode(ra))
-		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->decrypt header: new.size="+HeaderMessage.size+" new.App="+HeaderMessage.App+" new.md5="+HeaderMessage.md5)
-		if HeaderMessage.App=="":
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Recived header: " + bytes.decode(ra))
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->decrypt header: new.size=" + HeaderMessage.size + " new.App="+HeaderMessage.App+" new.md5="+HeaderMessage.md5)
+		if HeaderMessage.App == "":
 			return "",IPAdress
-		en = EncryptionAlgorithm.DES()# 加密初始化
-		mytime = "6275e26419211d1f526e674d97110e15"#en.MD5Encrypt(str(time.time())) natasha的md5数据
+		mytime = "6275e26419211d1f526e674d97110e15"# 这个字符串只需要保证是32位就没问题
+		# **** 2 第一次向客户端发送数据，此信息内容作废，这次发送的目的是：通知客户端我已经接收到了消息，请求发送消息体 ****
 		cs.send(str.encode(mytime))
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Send header:"+mytime)
 		return HeaderMessage,IPAdress
@@ -62,19 +64,25 @@ class StartServer(threading.Thread):
 		return headertool.MakeHeader(header.App,str(len(TestMessage)))
 	def CallBackMsgToClient(self,cs,HeaderMessage,status,IPAdress):
 		# 客户端接收到的数据要进行相应的字符串的拆分，才知道软件的名字和后面真实数据的长度是多少
-		cs.send(self.ServerHeader(HeaderMessage,status))# 软件名字 给客户端的加密数据--->执行后的结果是 软件名字
+		# **** 4 第二次发送消息给客户端，此信息内容包含：1.软件名字   2.消息体的长度 ****
+		cs.send(self.ServerHeader(HeaderMessage, status))# 软件名字 给客户端的加密数据--->执行后的结果是 软件名字
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Send callback header: "+ bytes.decode(self.ServerHeader(HeaderMessage,status)))
+
+		# **** 5 第三次接收客户端发送的消息，此信息内容作废，这次接收的目的是：知道客户端已经接收到了消息体的长度，要求服务器发送消息体 ****
 		rs = cs.recv(32)#接收客户端的反馈
-		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->recv callback header: "+ bytes.decode(rs))
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->recv callback header: "+ bytes.decode(rs))#这里输出的是没用的数据
+		# 这是一次性发出数据，这里后面过了2048个字节会出现问题，目前可以不纠结
+		# **** 6 第三次发送消息给客户端，此信息内容包含：详细的消息体 ****
 		cs.send(status)# 这次的数据才是真实数据
 		LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->sent encrypted message to client:"+ str(status))
 	def MessageSolution(self,HeaderMessage,cs,IPAdress):
 		sizebuffer = int(HeaderMessage.size)
 		reMsg=b""# 用于存放所有的信息
 		ReciveBufferSize = 2048
-		while sizebuffer!=0:
+		# **** 3 第二次接收客户端发送的消息，此信息内容包含：完整的消息体，但使用了des加密 ****
+		while sizebuffer != 0:
 			if sizebuffer > ReciveBufferSize:# 此条件成立，说明后面还有数据
-				reMsg += cs.recv(ReciveBufferSize)# 再拿取1024个字节
+				reMsg += cs.recv(ReciveBufferSize)# 再拿取2048个字节
 				sizebuffer = sizebuffer - ReciveBufferSize# 获取还剩下的字节数
 			else:
 				reMsg += cs.recv(sizebuffer)# 获取全部的字节
@@ -82,10 +90,11 @@ class StartServer(threading.Thread):
 		#send result message to client 发送结果到客户端
 		if HeaderMessage.App =="workingcat":
 			myWTR = WorkingTimeRecoder.WorkingTimeRecoderClass()
-			status = myWTR.ResolveMsg(reMsg,IPAdress)#客户端发过来的详细数据，IP地址 解析之后传回来的是服务器发送给客户端加密之后的数据
+			status = myWTR.ResolveMsg(reMsg, IPAdress)#客户端发过来的详细数据，IP地址 解析之后传回来的是服务器发送给客户端加密之后的数据
 		if HeaderMessage.App =="natasha":
 			myWTR = WorkingTimeRecoder.WorkingTimeRecoderClass()
 			status = myWTR.ResolveMsg(reMsg,IPAdress)
+		# 后面是服务器给客户端的两次信息 头部和身体
 		self.CallBackMsgToClient(cs,HeaderMessage, status,IPAdress)
 
 if __name__ == '__main__':

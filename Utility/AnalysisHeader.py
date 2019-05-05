@@ -61,6 +61,8 @@ class Header:
 		#这里保证了数据等长为4
 		DigitsAs4 = "#"*(4-len(StringLength))+StringLength#（4-加密数据的长度的长度）个#字符 + 加密数据的长度
 		ReturnString = self.HideMsgSize(MD5+DigitsAs4)#36 个字符，中间包含了md5算法和详细数据的长度
+		print("发送给客户端的详细信息：",ReturnString)
+		print("发送给客户端的详细信息str.encode(ReturnString)：",str.encode(ReturnString))
 		return str.encode(ReturnString)
 
 

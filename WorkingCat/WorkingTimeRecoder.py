@@ -63,6 +63,7 @@ class WorkingTimeRecoderClass():
 	def VerifyMessageIntegrity(self,message,IPAdress):
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->recived encrypted message:"+str(message))
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
+		print("客户端传上来的数据：",message)####################################################
 		message = des.decrypt(message)  #decrypt byte message
 		message = bytes.decode(message) #byte to string
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
@@ -79,7 +80,7 @@ class WorkingTimeRecoderClass():
 		if "data" in message_dic.keys():
 			user_name = message_dic["data"]["user_name"]
 		return session,user_name,function
-	def ResolveMsg(self,message,IPAdress):
+	def ResolveMsg(self, message, IPAdress):# 客户端的数据、IP地址
 		mutex = threading.Lock()
 		mutex.acquire()
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
@@ -88,7 +89,7 @@ class WorkingTimeRecoderClass():
 		if function=="CheckTime":
 			status = self.CheckTime_Json(session,IPAdress,UserName)
 		if function =="GetMyAlldata":# 获取全部数据
-			status = self.GetMyAlldata_Json(session)
+			status = self.GetMyAlldata_Json(session)# 暂时未完善
 		mutex.release()
 		return  des.encrypt(str.encode(MessageList[status]))
 
