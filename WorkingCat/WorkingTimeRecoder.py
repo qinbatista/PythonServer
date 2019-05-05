@@ -85,7 +85,8 @@ class WorkingTimeRecoderClass():
 		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
 		status = 0
 		if function == "CheckTime":
-			status = self.CheckTime_Json(session,IPAdress,UserName)
+			# status = self.CheckTime_Json(session,IPAdress,UserName)#really message
+			status = 2 #test message
 		if function == "GetMyAlldata":# 获取全部数据
 			status = self.GetMyAlldata_Json(session)# 暂时未完善
 		mutex.release()

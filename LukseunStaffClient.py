@@ -41,6 +41,9 @@ class LukseunClient():
 		return ":".join([mac[e:e+2] for e in range(0, 11, 2)])
 
 	def __send_tcp_message(self, msg, TotalProcessesID, ThreadID):# 信息、进程、线程（Information, process, thread）
+		"""
+		send tcp message to server
+		"""
 		Finished = True
 		while Finished:
 			s = None
@@ -48,9 +51,6 @@ class LukseunClient():
 			try:
 				Portvalue = self.port + ThreadID % self.port_number#端口号 10003
 				address = (host, Portvalue)#ip、端口
-				# socket.AF_INET： 服务器之间的网络通信  socket.SOCK_STREAM： 流式socket , for TCP这里用TCP
-				# socket.SOCK_DGRAM： 数据报式socket , for UDP后面考虑时间问题会使用UDP
-				# s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)# 创建UDP Socket
 				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# 创建TCP Socket
 				s.settimeout(5)# 设置套接字操作的超时期，超时5秒
 				s.connect(address)# 连接到address处的套接字。一般address的格式为元组（hostname,port），如果连接出错，返回socket.error错误。
@@ -68,11 +68,19 @@ class LukseunClient():
 				time.sleep(1)
 			finally:
 				if DesMessage != "":Finished = False
+
 	def __send_all_message(self, s, TestMessage):
+		"""
+		send all message to server and get callback
+		"""
 		self.__send_header(s, TestMessage)# send header
 		callback = self.__send_message(s, TestMessage)# send main message
 		return callback
+
 	def __send_header(self, s, TestMessage):
+		"""
+		send header
+		"""
 		des = EncryptionAlgorithm.DES(DESKey, DESVector)# 两把钥匙
 		TestMessage = des.encrypt(TestMessage)# 加密好的数据
 		# send header
@@ -81,11 +89,11 @@ class LukseunClient():
 		s.send(message)# 发送数据
 		LogRecorder.LogUtility(
 			"[LukseunClient][LogRecorder][__send_header]->send encrypted header: " + bytes.decode(message))
-		# data = s.recv(32)# 先接收32个字节，这里是头 [qin]
-		# LogRecorder.LogUtility(
-		# 	"[LukseunClient][LogRecorder][__send_header]->recv encrypted header: " + bytes.decode(data))
-		# return data
+
 	def __send_message(self, s, TestMessage):
+		"""
+		send message
+		"""
 		des = EncryptionAlgorithm.DES(DESKey, DESVector)
 		TestMessage = des.encrypt(TestMessage)
 		sizebuffer = len(TestMessage)
@@ -105,10 +113,6 @@ class LukseunClient():
 		headertool = AnalysisHeader.Header(data)
 		sizebuffer = int(headertool.size)
 		reMsg = b""
-		# mytime = "6275e26419211d1f526e674d97110e15"
-		# s.send(str.encode(mytime))
-		# LogRecorder.LogUtility(
-			# "[LukseunClient][LogRecorder][__SendMessage]->send encrypted data: " + str(mytime))
 		ReciveBufferSize = 2048
 		while sizebuffer != 0:
 			if int(sizebuffer) > ReciveBufferSize:
@@ -127,13 +131,10 @@ class LukseunClient():
 			"[LukseunClient][LogRecorder][__SendMessage]-> decrypted message: "+str(DesMessage))
 		return DesMessage
 
-	def __MessageConstruction(self):
-		pass
-	"""
-	⬆️above codes are private method
-	"""
-
 	def SendMsg(self, msg, TotalProcessesID=1, ThreadID=1):
+		"""
+		public method for users
+		"""
 		self.__send_tcp_message(msg, TotalProcessesID=TotalProcessesID, ThreadID=ThreadID)# 发送tcp数据
 
 	def DownloadData(self):
@@ -141,9 +142,7 @@ class LukseunClient():
 
 	def UploadData(self):
 		pass
-	"""
-	⬆️above codes are public method
-	"""
+
 
 def __ThreadRunClass(ct, message, ProcessesID, TotalThread):
 	threadpool = []
@@ -188,7 +187,7 @@ def DelCache():
 
 if __name__ == '__main__':
 
-	# DelCache()  # 存在文件就删除文件
+	DelCache()  # 存在文件就删除文件
 	message_dic = {"session": "ACDE48001122",
 		"function": "CheckTime",
 		"random": "774",
@@ -200,11 +199,11 @@ if __name__ == '__main__':
 			"phone_number": "15310568888"
 		}
 	}
-	ct = LukseunClient("workingcat", port_number=8)# 设置3个端口
-	ct.SendMsg(str(message_dic))# 发送单个数据
+	ct = LukseunClient("workingcat", port_number=10)# 设置3个端口
+	# ct.SendMsg(str(message_dic))# 发送单个数据
 
-	# for i in range(10,101,10):# 发送多个数据
-	# 	for j in range(1,11):
-	# 		ct.port_number = j
-	# 		Test_MultMessage(ct, str(message_dic), 10, i)
+	for threading_count in range(100,600,100):# 发送多个数据
+		for port_count in range(1,6):
+			ct.port_number = port_count
+			Test_MultMessage(ct, str(message_dic), 1, threading_count)
 
