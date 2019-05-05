@@ -15,8 +15,8 @@ class DebugUtility():
 	def increase_fail_count(self):
 		self.failed_count = self.failed_count+1
 	def record_error_rate(self,TotalProcesses,TotalThread,PortQuantity,Probability = None):
-		if os.path.isfile(PythonLocation()+'/../WorkingCat/ErrorRate')==False:
-			f=codecs.open(PythonLocation()+'/../WorkingCat/ErrorRate','w', 'UTF-8')
+		if not os.path.isfile(PythonLocation()+'/../WorkingCat/ErrorRate'):
+			f=codecs.open(PythonLocation()+'/../WorkingCat/ErrorRate', 'w', 'UTF-8')
 			f.close()
 		f=open(PythonLocation()+'/../WorkingCat/ErrorRate','a+')
 		f.write(str(TotalProcesses)+","+str(TotalThread)+","+str(PortQuantity)+"," + (str(Probability) if Probability else str(0 if self.failed_count==0 else self.failed_count/self.success_count)))
@@ -34,24 +34,24 @@ class DebugUtility():
 			fltLine = list(map(float,curLine)) #map all elements to float()
 			dataMat.append(fltLine)
 		myNp = np.array(dataMat)
-		ListPortQuantity=[]
-		ListErrorRate=[]
+		ListPortQuantity = []
+		ListErrorRate = []
 		Line = []
 		plt.xlabel('Port Number')
 		plt.ylabel('Error Rate')
-		for i in range(0,len(myNp)):
-			if((i+1)%total_port==0 and i!=0):
+		for i in range(0, len(myNp)):
+			if (i+1)%total_port == 0 and i != 0:
 				ListPortQuantity.append(myNp[i][2])
 				ListErrorRate.append(myNp[i][3])
 				l1 = plt.plot(ListPortQuantity, ListErrorRate,"x-")
-				plt.legend(l1, labels = [ str(100*i) for i in range(1,total_port+1)],loc = 'best')
+				plt.legend(l1, labels = [ str(100*i) for i in range(1,total_port+1)], loc = 'best')
 				ListPortQuantity.clear()
 				ListErrorRate.clear()
 			else:
 				ListPortQuantity.append(myNp[i][2])
 				ListErrorRate.append(myNp[i][3])
 		numberList = []
-		for i in range(1,len(Line)+1):
+		for i in range(1, len(Line)+1):
 			numberList.append("Total:"+str(i*1000))
 		plt.show()
 	def port_threading_graph(self):

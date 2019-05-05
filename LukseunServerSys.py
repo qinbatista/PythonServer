@@ -24,9 +24,9 @@ class StartServer(threading.Thread):
 		create a port to get message from client
 		"""
 		s=socket.socket()
-		s.bind(('',self._args[0]))
+		s.bind(('', self._args[0]))
 		s.listen(65535)
-		LogRecorder.LogUtility("[Server][LukseunStaffServer][run][]->Server Started, Port:"+str(self._args[0]))
+		LogRecorder.LogUtility("[Server][LukseunStaffServer][run][]->Server Started, Port:" + str(self._args[0]))
 		while True:
 			try:
 				cs,address = s.accept()
@@ -42,54 +42,54 @@ class StartServer(threading.Thread):
 		"""
 		handle one client message
 		"""
-		header_message,ip_address = self.__get_header(cs,address)
-		if header_message=="":
+		header_message, ip_address = self.__get_header(cs, address)
+		if header_message == "":
 			return False
-		status = self.__get_message(header_message,cs,ip_address)
-		self.__send_callback(cs,header_message,status,ip_address)
+		status = self.__get_message(header_message, cs, ip_address)
+		self.__send_callback(cs, header_message, status,ip_address)
 		return True
 
-	def __get_header(self,cs,address):
+	def __get_header(self, cs, address):
 		"""
 		solve header, if header is illegal, return null string
 		"""
 		ra = cs.recv(HEADER_BUFFER_SIZE)#先接受36个字节，这是md5加密字符串 和数据的长度
-		if len(ra)!=HEADER_BUFFER_SIZE:
-			return "",""
+		if len(ra) != HEADER_BUFFER_SIZE:
+			return "", ""
 		header_message = AnalysisHeader.Header(ra)#初始化
 		ip_address = str(list(address)[0])
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->decrypt header: new.size=" + header_message.size + " new.App="+header_message.App+" new.md5="+header_message.md5)
 		if header_message.App == "":
-			return "",ip_address
-		return header_message,ip_address
+			return "", ip_address
+		return header_message, ip_address
 
-	def __get_message(self,header_message,cs,ip_address):
+	def __get_message(self, header_message, cs, ip_address):
 		"""
 		solve main message
 		"""
 		sizebuffer = int(header_message.size)
-		reMsg=b""# 用于存放客户端发上来的详细信息
+		reMsg = b""# 用于存放客户端发上来的详细信息
 		ReciveBufferSize = 2048
 		while sizebuffer != 0:
 			if sizebuffer > ReciveBufferSize:# 此条件成立，说明后面还有数据
 				reMsg += cs.recv(ReciveBufferSize)# 再拿取2048个字节
-				sizebuffer = sizebuffer - ReciveBufferSize# 获取还剩下的字节数
+				sizebuffer -= ReciveBufferSize# 获取还剩下的字节数
 			else:
 				reMsg += cs.recv(sizebuffer)# 获取全部的字节
 				sizebuffer = 0
-		return self.__app_solution(header_message,reMsg,ip_address)
+		return self.__app_solution(header_message, reMsg, ip_address)
 
-	def __send_callback(self,cs,header_message,status,ip_address):
+	def __send_callback(self, cs, header_message, status, ip_address):
 		"""
 		send callback message to clent
 		"""
 		headertool = AnalysisHeader.Header()
 		header_message = headertool.MakeHeader(header_message.App,str(len(status)))
-		cs.send(header_message+status)
+		cs.send(header_message + status)
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Send callback header: "+bytes.decode(header_message))
 		LogRecorder.LogUtility("["+ip_address+"][LukseunStaffServer][runPort1]->sent encrypted message to client:"+ str(status))
 
-	def __app_solution(self,header_message,reMsg,ip_address):
+	def __app_solution(self, header_message, reMsg, ip_address):
 		"""
 		solve different application data and send status back
 		"""

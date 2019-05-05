@@ -20,8 +20,8 @@ MessageList=[
 class WorkingTimeRecoderClass():
 	def CheckTime_SQL(self):
 		return 3
-	def CheckTime_Json(self,session,IPAdress,UserName):
-		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
+	def CheckTime_Json(self, session, IPAdress, UserName):
+		DataBaseJsonLocation = PythonLocation() + "/DataBase/" + time.strftime("%Y-%m", time.localtime()) + ".json"
 		if not os.path.isfile(DataBaseJsonLocation):
 			f = codecs.open(DataBaseJsonLocation, 'w', 'UTF-8')
 			f.write("{}")
@@ -66,26 +66,26 @@ class WorkingTimeRecoderClass():
 		message = bytes.decode(message) #byte to string
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
 		if message == "":
-			session="error"
-			user_name="error"
-			function="error"
-			return session,user_name,function
-		message_dic  = eval(message)
+			session = "error"
+			user_name = "error"
+			function = "error"
+			return session, user_name, function
+		message_dic = eval(message)
 		if "session" in message_dic.keys():
 			session = message_dic["session"]
 		if "function" in message_dic.keys():
 			function = message_dic["function"]
 		if "data" in message_dic.keys():
 			user_name = message_dic["data"]["user_name"]
-		return session,user_name,function
+		return session, user_name, function
 	def ResolveMsg(self, message, IPAdress):# 客户端的数据、IP地址
 		mutex = threading.Lock()
 		mutex.acquire()
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
-		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
+		session, UserName, function = self.VerifyMessageIntegrity(message, IPAdress)
 		status = 0
 		if function == "CheckTime":
-			status = self.CheckTime_Json(session,IPAdress,UserName)#really message
+			status = self.CheckTime_Json(session, IPAdress, UserName)#really message
 			# status = 2 #test message
 		if function == "GetMyAlldata":# 获取全部数据
 			status = self.GetMyAlldata_Json(session)# 暂时未完善
