@@ -80,7 +80,6 @@ class LukseunClient():
 		headertool = AnalysisHeader.Header()
 		message = headertool.MakeHeader(self.header, str(len(TestMessage)))# 字节长度为36  --->  1，3，5，7是长度
 
-		print(len(message),message)##########################################
 		s.send(message)# 发送数据
 		LogRecorder.LogUtility(
 			"[LukseunClient][LogRecorder][__send_header]->send encrypted header: " + bytes.decode(message))
@@ -109,8 +108,6 @@ class LukseunClient():
 		headertool = AnalysisHeader.Header(data)
 		sizebuffer = int(headertool.size)
 		reMsg = b""
-		en = EncryptionAlgorithm.DES()
-		# en.MD5Encrypt(str(time.time()))
 		mytime = "6275e26419211d1f526e674d97110e15"
 		s.send(str.encode(mytime))
 		LogRecorder.LogUtility(
@@ -118,12 +115,12 @@ class LukseunClient():
 		ReciveBufferSize = 2048
 		while sizebuffer != 0:
 			if int(sizebuffer) > ReciveBufferSize:
-				reMsg = reMsg + s.recv(ReciveBufferSize)
+				reMsg += s.recv(ReciveBufferSize)
 				sizebuffer = sizebuffer-ReciveBufferSize
 			else:
 				LogRecorder.LogUtility(
 					"[LukseunClient][LogRecorder][__SendMessage]->buffersize:"+str(sizebuffer))
-				reMsg = reMsg+s.recv(sizebuffer)
+				reMsg += s.recv(sizebuffer)
 				sizebuffer = 0
 		des = EncryptionAlgorithm.DES(DESKey, DESVector)
 		LogRecorder.LogUtility(
@@ -196,7 +193,7 @@ if __name__ == '__main__':
 
 	# DelCache()  # 存在文件就删除文件
 	message_dic = {"session": "ACDE48001122",
-		"function": "check_time",
+		"function": "CheckTime",
 		"random": "774",
 		"data":
 		{
@@ -206,17 +203,11 @@ if __name__ == '__main__':
 			"phone_number": "15310568888"
 		}
 	}
-	ct = LukseunClient("workingcat", port_number=3)# 设置3个端口
-	# ct.SendMsg(str(message_dic))#发送单个数据
+	ct = LukseunClient("workingcat", port_number=8)# 设置3个端口
+	ct.SendMsg(str(message_dic))# 发送单个数据
 
-	for i in range(10,101,10):
-		for j in range(1,11):
-			ct.port_number = j
-			Test_MultMessage(ct, str(message_dic), 10, i)
+	# for i in range(10,101,10):# 发送多个数据
+	# 	for j in range(1,11):
+	# 		ct.port_number = j
+	# 		Test_MultMessage(ct, str(message_dic), 10, i)
 
-	# ProcessNumber = 100
-	# for ProccIncreaseIndex in range(1,3):
-	# 	for PortIncreaseIndex in range(1,11):
-	# 		ct = LukseunClient("workingcat",port_number=PortIncreaseIndex)
-	# 		ct.Test_MultMessage(str(message_dic),1,ProcessNumber*ProccIncreaseIndex)
-	# ct.debug_utility.port_error_graph()

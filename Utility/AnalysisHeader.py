@@ -29,22 +29,13 @@ class Header:
 		"""
 		get size message from 36 byte message
 		"""
-		# 6275e26419211d1f526e674d97110e152222
-		# 2524
-		# size = data[1] + data[3] + data[5] + data[7]
-		size = data[1:2]
-		size = size+data[3:4]
-		size = size+ data[5:6]
-		size = size+data[7:8]
+		size = data[1] + data[3] + data[5] + data[7]
 		return size.replace("#","")
 	def ShowMD5Message(self,data):
 		"""
 		delete size message from string, only md5 message
 		"""
-		# 6275e26419211d1f526e674d97110e152222
-		# 67e619211d1f526e674d97110e152222
-		# MD5Message = data[0]+data[2]+data[4]+data[6]+data[8:]
-		MD5Message = data[0:1]+data[2:3]+data[4:5]+data[6:7]+data[8:9]+data[9:]
+		MD5Message = data[0]+data[2]+data[4]+data[6]+data[8:]
 		return MD5Message
 	def isAPPMessage(self, md5String):
 		if md5String=="6275e26419211d1f526e674d97110e15":#md5 of string of "natasha"
