@@ -54,7 +54,7 @@ class StartServer(threading.Thread):
 		solve header, if header is illegal, return null string
 		"""
 		ra = cs.recv(HEADER_BUFFER_SIZE)#先接受36个字节，这是md5加密字符串 和数据的长度
-		if ra=="":
+		if len(ra)!=HEADER_BUFFER_SIZE:
 			return "",""
 		header_message = AnalysisHeader.Header(ra)#初始化
 		ip_address = str(list(address)[0])

@@ -23,6 +23,7 @@ class DebugUtility():
 		f.write('\n')
 		f.close()
 	def port_error_graph(self):
+		total_port = 5
 		dataMat = []
 		if os.path.isfile(PythonLocation()+'/../WorkingCat/ErrorRate')==False:
 			print("[DebugUtility][GetErrorRate]->100% success!")
@@ -39,11 +40,11 @@ class DebugUtility():
 		plt.xlabel('Port Number')
 		plt.ylabel('Error Rate')
 		for i in range(0,len(myNp)):
-			if((i+1)%10==0 and i!=0):
+			if((i+1)%total_port==0 and i!=0):
 				ListPortQuantity.append(myNp[i][2])
 				ListErrorRate.append(myNp[i][3])
 				l1 = plt.plot(ListPortQuantity, ListErrorRate,"x-")
-				plt.legend(l1, labels = [ str(100*i) for i in range(1,11)],loc = 'best')
+				plt.legend(l1, labels = [ str(100*i) for i in range(1,total_port+1)],loc = 'best')
 				ListPortQuantity.clear()
 				ListErrorRate.clear()
 			else:
@@ -57,7 +58,7 @@ class DebugUtility():
 		"""
 		each 100 threading as as port
 		"""
-		total_port = 10
+		total_port = 5
 		dataMat = []
 		fr = open(PythonLocation()+'/../WorkingCat/ErrorRate')
 		for line in fr.readlines():
@@ -65,26 +66,25 @@ class DebugUtility():
 			fltLine = list(map(float, curLine))  # map all elements to float()
 			dataMat.append(fltLine)
 		myNp = np.array(dataMat)
-		total_threading = int(len(myNp)/10)
+		total_threading = int(len(myNp)/total_port)
 		ListThreadingQuantity = []
 		ListErrorRate = []
 		Line = []
 		plt.xlabel('threading number')
 		plt.ylabel('error rate')
 		for i in range(0,total_port+1):
-			totalthreading = myNp[0][0]*myNp[0][1]
-		if(totalthreading % 100 == 0):
-			for ten in range(0,total_threading):
-				ListThreadingQuantity.append(totalthreading*(ten+1))
-			if ten == 0:
-				ListErrorRate.append(myNp[ten+i][3])
-			else:
-				ListErrorRate.append(myNp[ten*10-1+i][3])
-		l1 = plt.plot(ListThreadingQuantity, ListErrorRate, "x-")
-		plt.legend(l1, labels=[str(1*i)
-				for i in range(1, total_port+1)], loc='best')
-		ListThreadingQuantity.clear()
-		ListErrorRate.clear()
+			totalthreading = myNp[i][0]*myNp[i][1]
+			if(totalthreading % 100 == 0):
+				for ten in range(0,total_threading):
+					ListThreadingQuantity.append(totalthreading*(ten+1))
+					if ten == 0:
+						ListErrorRate.append(myNp[ten+i][3])
+					else:
+						ListErrorRate.append(myNp[ten*total_port-1+i][3])
+				l1 = plt.plot(ListThreadingQuantity, ListErrorRate, "x-")
+				plt.legend(l1, labels=[str(1*i)for i in range(1, total_port+1)], loc='best')
+				ListThreadingQuantity.clear()
+				ListErrorRate.clear()
 		numberList = []
 		for i in range(1, len(Line)+1):
 			numberList.append("Total:"+str(i*1000))

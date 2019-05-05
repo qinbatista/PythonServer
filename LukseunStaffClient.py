@@ -175,18 +175,11 @@ def Test_MultMessage(ct, msg, TotalProcesses=1, TotalThread=1000):
 	ct.debug_utility.record_error_rate(TotalProcesses, TotalThread, ct.port_number, 0if failed_count==0 else failed_count/success_count)
 	print("Total time：" + str(end - start))
 
-
 def DelCache():
-	if os.path.isfile(PythonLocation()+"/WorkingCat/failed"):
-		os.remove(PythonLocation()+"/WorkingCat/failed")
-	if os.path.isfile(PythonLocation()+"/WorkingCat/success"):
-		os.remove(PythonLocation()+"/WorkingCat/success")
 	if os.path.isfile(PythonLocation()+"/WorkingCat/ErrorRate"):
 		os.remove(PythonLocation()+"/WorkingCat/ErrorRate")
 
-
-if __name__ == '__main__':
-
+def multi_message_test():
 	DelCache()  # 存在文件就删除文件
 	message_dic = {"session": "ACDE48001122",
 		"function": "CheckTime",
@@ -199,11 +192,28 @@ if __name__ == '__main__':
 			"phone_number": "15310568888"
 		}
 	}
-	ct = LukseunClient("workingcat", port_number=10)# 设置3个端口
+	ct = LukseunClient("workingcat")# 设置3个端口
 	# ct.SendMsg(str(message_dic))# 发送单个数据
-
 	for threading_count in range(100,600,100):# 发送多个数据
 		for port_count in range(1,6):
 			ct.port_number = port_count
 			Test_MultMessage(ct, str(message_dic), 1, threading_count)
+def singal_message_test():
+	message_dic = {"session": "ACDE48001122",
+		"function": "CheckTime",
+		"random": "774",
+		"data":
+		{
+			"user_name": "yupeng",
+			"gender": "male",
+			"email": "qin@lukseun.com",
+			"phone_number": "15310568888"
+		}
+	}
+	ct = LukseunClient("workingcat")# 设置3个端口
+	ct.SendMsg(str(message_dic))# 发送单个数据
+
+if __name__ == '__main__':
+	# singal_message_test()#just send 1 message to server
+	multi_message_test()#proccess 1 threading 100-500(increase 100), port 1-5
 
