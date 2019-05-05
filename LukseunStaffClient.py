@@ -23,7 +23,7 @@ ac:de:48:00:11:22,1,覃于澎
 host = "127.0.0.1"
 DESKey = "67891234"
 DESVector = "6789123467891234"
-
+HeaderBufferSize = 36
 
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
@@ -54,41 +54,38 @@ class LukseunClient():
 				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# 创建TCP Socket
 				s.settimeout(5)# 设置套接字操作的超时期，超时5秒
 				s.connect(address)# 连接到address处的套接字。一般address的格式为元组（hostname,port），如果连接出错，返回socket.error错误。
-				self.__send_header(s, msg)# 数据的发送和加密
-				DesMessage = self.__SendMessage(s, msg)
+				callback_message = self.__send_all_message(s, msg)
 				s.settimeout(None)
 				s.close()
 				self.debug_utility.increase_success_count()
 				Finished = False
-				print("[LukseunClient][LogRecorder][run]send success")
+				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]send success, call back="+str(callback_message))
 			except socket.error as e:
-				print("[LukseunClient][LogRecorder][run]error->"+str(e))
+				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run]error->"+str(e))
 				self.debug_utility.increase_fail_count()
 				if s != None:
 					s.close()
 				time.sleep(1)
 			finally:
 				if DesMessage != "":Finished = False
-
-	def __HeaderSolution(self):
-		pass
-
+	def __send_all_message(self, s, TestMessage):
+		self.__send_header(s, TestMessage)# send header
+		callback = self.__send_message(s, TestMessage)# send main message
+		return callback
 	def __send_header(self, s, TestMessage):
 		des = EncryptionAlgorithm.DES(DESKey, DESVector)# 两把钥匙
 		TestMessage = des.encrypt(TestMessage)# 加密好的数据
 		# send header
 		headertool = AnalysisHeader.Header()
 		message = headertool.MakeHeader(self.header, str(len(TestMessage)))# 字节长度为36  --->  1，3，5，7是长度
-
 		s.send(message)# 发送数据
 		LogRecorder.LogUtility(
 			"[LukseunClient][LogRecorder][__send_header]->send encrypted header: " + bytes.decode(message))
-		data = s.recv(32)# 先接收32个字节，这里是头
-		LogRecorder.LogUtility(
-			"[LukseunClient][LogRecorder][__send_header]->recv encrypted header: " + bytes.decode(data))
-		return data
-
-	def __SendMessage(self, s, TestMessage):
+		# data = s.recv(32)# 先接收32个字节，这里是头 [qin]
+		# LogRecorder.LogUtility(
+		# 	"[LukseunClient][LogRecorder][__send_header]->recv encrypted header: " + bytes.decode(data))
+		# return data
+	def __send_message(self, s, TestMessage):
 		des = EncryptionAlgorithm.DES(DESKey, DESVector)
 		TestMessage = des.encrypt(TestMessage)
 		sizebuffer = len(TestMessage)
@@ -102,16 +99,16 @@ class LukseunClient():
 				sizebuffer = 0
 		LogRecorder.LogUtility(
 			"[LukseunClient][LogRecorder][__SendMessage]->send encrypted msg: " + bytes.decode(TestMessage))
-		data = s.recv(36)
+		data = s.recv(HeaderBufferSize)
 		LogRecorder.LogUtility(
 			"[LukseunClient][LogRecorder][__SendMessage]->recv encrypted data: " + bytes.decode(data))
 		headertool = AnalysisHeader.Header(data)
 		sizebuffer = int(headertool.size)
 		reMsg = b""
-		mytime = "6275e26419211d1f526e674d97110e15"
-		s.send(str.encode(mytime))
-		LogRecorder.LogUtility(
-			"[LukseunClient][LogRecorder][__SendMessage]->send encrypted data: " + str(mytime))
+		# mytime = "6275e26419211d1f526e674d97110e15"
+		# s.send(str.encode(mytime))
+		# LogRecorder.LogUtility(
+			# "[LukseunClient][LogRecorder][__SendMessage]->send encrypted data: " + str(mytime))
 		ReciveBufferSize = 2048
 		while sizebuffer != 0:
 			if int(sizebuffer) > ReciveBufferSize:
