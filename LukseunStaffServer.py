@@ -63,13 +63,12 @@ class StartServer(threading.Thread):
 		headertool = AnalysisHeader.Header()
 		return headertool.MakeHeader(header.App,str(len(TestMessage)))
 	def CallBackMsgToClient(self,cs,HeaderMessage,status,IPAdress):
-		# 客户端接收到的数据要进行相应的字符串的拆分，才知道软件的名字和后面真实数据的长度是多少
 		# **** 4 第二次发送消息给客户端，此信息内容包含：1.软件名字   2.消息体的长度 ****
-		cs.send(self.ServerHeader(HeaderMessage, status))# 软件名字 给客户端的加密数据--->执行后的结果是 软件名字
+		cs.send(self.ServerHeader(HeaderMessage, status))
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->Send callback header: "+ bytes.decode(self.ServerHeader(HeaderMessage,status)))
 
 		# **** 5 第三次接收客户端发送的消息，此信息内容作废，这次接收的目的是：知道客户端已经接收到了消息体的长度，要求服务器发送消息体 ****
-		rs = cs.recv(32)#接收客户端的反馈
+		rs = cs.recv(32)
 		LogRecorder.LogUtility("[Server][LukseunStaffServer][runPort1]->recv callback header: "+ bytes.decode(rs))#这里输出的是没用的数据
 		# 这是一次性发出数据，这里后面过了2048个字节会出现问题，目前可以不纠结
 		# **** 6 第三次发送消息给客户端，此信息内容包含：详细的消息体 ****
@@ -77,7 +76,7 @@ class StartServer(threading.Thread):
 		LogRecorder.LogUtility("["+IPAdress+"][LukseunStaffServer][runPort1]->sent encrypted message to client:"+ str(status))
 	def MessageSolution(self,HeaderMessage,cs,IPAdress):
 		sizebuffer = int(HeaderMessage.size)
-		reMsg=b""# 用于存放所有的信息
+		reMsg=b""# 用于存放客户端发上来的详细信息
 		ReciveBufferSize = 2048
 		# **** 3 第二次接收客户端发送的消息，此信息内容包含：完整的消息体，但使用了des加密 ****
 		while sizebuffer != 0:
@@ -90,11 +89,10 @@ class StartServer(threading.Thread):
 		#send result message to client 发送结果到客户端
 		if HeaderMessage.App =="workingcat":
 			myWTR = WorkingTimeRecoder.WorkingTimeRecoderClass()
-			status = myWTR.ResolveMsg(reMsg, IPAdress)#客户端发过来的详细数据，IP地址 解析之后传回来的是服务器发送给客户端加密之后的数据
+			status = myWTR.ResolveMsg(reMsg, IPAdress)#客户端发过来的详细数据，IP地址 ---> 服务器发送给客户端的加密之后的数据
 		if HeaderMessage.App =="natasha":
 			myWTR = WorkingTimeRecoder.WorkingTimeRecoderClass()
 			status = myWTR.ResolveMsg(reMsg,IPAdress)
-		# 后面是服务器给客户端的两次信息 头部和身体
 		self.CallBackMsgToClient(cs,HeaderMessage, status,IPAdress)
 
 if __name__ == '__main__':
