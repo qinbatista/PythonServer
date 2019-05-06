@@ -15,7 +15,7 @@ MessageList=[
 	"{\"status\":\"02\",\"message\":\"Check out\"}",
 	"{\"status\":\"03\",\"message\":\"Message is illegal\"}",
 	"{\"status\":\"04\",\"message\":\"your all personal data\"}",
-	"{\"status\":\"05\",\"message\":\"get null message\"}",
+	"{\"status\":\"05\",\"message\":\"server is busy\"}",
 ]
 class WorkingTimeRecoderClass():
 	def CheckTime_SQL(self):
@@ -30,7 +30,7 @@ class WorkingTimeRecoderClass():
 			readed = json.load(open(DataBaseJsonLocation, 'r',encoding="UTF-8"))
 		except:
 			print("The service is busy. . .")
-			return 0
+			return 5
 		JsonChannelList = readed
 		ReciveTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 		ReciveData = time.strftime("%Y-%m-%d", time.localtime())
@@ -56,9 +56,34 @@ class WorkingTimeRecoderClass():
 		with open(DataBaseJsonLocation, 'w',encoding="UTF-8") as json_file:
 			json_file.write(json.dumps(JsonChannelList,ensure_ascii=False,sort_keys=True, indent=4, separators=(',', ':')))
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"] encrypted MessageList[status]: "+MessageList[status])
-		return status
-	def GetMyAlldata_Json(self,session):
-		return 3
+		return MessageList[status]
+	def get_total_time_Json(self,session):
+		"""
+		通过用户id获取所有月份的工作天数和工作时间
+		工作天数可以通过读取文件下所有json文件的打卡天数
+		工作时间通过每一天的时间差求和计算，返回的结果为
+		 {"status":"04",
+			"message":
+					{
+						"totall_day":"40",
+						"totall_hours":"320"
+					}
+		 }
+		"""
+		return MessageList[3]
+	def get_month_data_Json(self,session,time):
+		"""
+		通过用户id和需要获取的月份，获取工作天数和工作时间，
+		工作天数可以通过读取文件下该月份json文件的打卡天数
+		工作时间通过每一天的时间差求和计算，返回的结果为
+		 {"status":"04",
+			"message":
+					{
+						"month_day":"21",
+						"monyh_hours":"160"
+					}
+		 }
+		"""
 	def VerifyMessageIntegrity(self,message,IPAdress):
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->recived encrypted message:"+str(message))
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
@@ -83,14 +108,13 @@ class WorkingTimeRecoderClass():
 		mutex.acquire()
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
 		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
-		status = 0
 		if function == "CheckTime":
-			status = self.CheckTime_Json(session,IPAdress,UserName)#really message
+			callback_message = self.CheckTime_Json(session,IPAdress,UserName)#really message
 			# status = 2 #test message
 		if function == "GetMyAlldata":# 获取全部数据
-			status = self.GetMyAlldata_Json(session)# 暂时未完善
+			callback_message = self.get_total_time_Json(session)# 暂时未完善
 		mutex.release()
-		return des.encrypt(str.encode(MessageList[status]))
+		return des.encrypt(str.encode(callback_message))
 
 if __name__ == "__main__":
 	pass
