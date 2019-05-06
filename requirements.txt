@@ -1,0 +1,8 @@
+# requirements.txt
+# this file will contain all of the required third-party packages
+# you can install all of these packages by running the following command
+# pip3 install -r requirements.txt
+
+pyDes==2.0.1
+numpy==1.16.3
+matplotlib==3.0.3
