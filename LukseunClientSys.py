@@ -182,7 +182,7 @@ def DelCache():
 def multi_message_test():
 	DelCache()  # 存在文件就删除文件
 	message_dic = {"session": "ACDE48001122",
-		"function": "CheckTime",
+		"function": "GetMyAlldata",
 		"random": "774",
 		"data":
 		{
@@ -193,11 +193,11 @@ def multi_message_test():
 		}
 	}
 	ct = LukseunClient("workingcat")# 设置3个端口
-	# ct.SendMsg(str(message_dic))# 发送单个数据
-	for threading_count in range(100,600,100):# 发送多个数据
-		for port_count in range(1,6):
-			ct.port_number = port_count
-			Test_MultMessage(ct, str(message_dic), 1, threading_count)
+	ct.SendMsg(str(message_dic))# 发送单个数据
+	# for threading_count in range(100,600,100):# 发送多个数据
+	# 	for port_count in range(1,6):
+	# 		ct.port_number = port_count
+	# 		Test_MultMessage(ct, str(message_dic), 1, threading_count)
 def singal_message_test():
 	message_dic = {"session": "ACDE48001122",
 		"function": "CheckTime",
