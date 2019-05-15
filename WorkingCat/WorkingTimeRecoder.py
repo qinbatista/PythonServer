@@ -55,7 +55,7 @@ class WorkingTimeRecoderClass():
 		with open(DataBaseJsonLocation, 'w',encoding="UTF-8") as json_file:
 			json_file.write(json.dumps(JsonChannelList,ensure_ascii=False,sort_keys=True, indent=4, separators=(',', ':')))
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"] encrypted MessageList[status]: "+MessageList[status])
-		return MessageList[status] % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+		return MessageList[status] % (ReciveTime)
 	def get_days_hours_second(self, readed, session):
 		totall_day = 0
 		temp_hours_sum = 0
@@ -170,6 +170,8 @@ class WorkingTimeRecoderClass():
 		mutex.acquire()
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
 		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
+		if function == "GetTime":
+			callback_message = MessageList[6] % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 		if function == "CheckTime":
 			callback_message = self.CheckTime_Json(session,IPAdress,UserName)#really message
 			# status = 2 #test message
