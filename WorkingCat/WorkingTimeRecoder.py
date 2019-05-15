@@ -11,11 +11,12 @@ DESKey = "67891234"
 DESVector = "6789123467891234"
 MessageList=[
 	"{\"status\":\"00\",\"message\":\"get null message\"}",
-	"{\"status\":\"01\",\"message\":\"Check in\"}",
-	"{\"status\":\"02\",\"message\":\"Check out\"}",
+	"{\"status\":\"01\",\"message\":\"Check in\",\"time\":\"%s\",}",
+	"{\"status\":\"02\",\"message\":\"Check out\",\"time\":\"%s\",}",
 	"{\"status\":\"03\",\"message\":\"Message is illegal\"}",
 	"{\"status\":\"04\",\"message\":\"your all personal data\"}",
 	"{\"status\":\"05\",\"message\":\"server is busy\"}",
+	"{\"status\":\"06\",\"message\":\"Update time\",\"time\":\"%s\",}",
 ]
 class WorkingTimeRecoderClass():
 	def CheckTime_SQL(self):
@@ -23,9 +24,7 @@ class WorkingTimeRecoderClass():
 	def CheckTime_Json(self,session,IPAdress,UserName):
 		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
 		if not os.path.isfile(DataBaseJsonLocation):
-			f = codecs.open(DataBaseJsonLocation, 'w', 'UTF-8')
-			f.write("{}")
-			f.close()
+			codecs.open(DataBaseJsonLocation, 'w', 'UTF-8').write("{}")
 		try:
 			readed = json.load(open(DataBaseJsonLocation, 'r',encoding="UTF-8"))
 		except:
@@ -56,7 +55,7 @@ class WorkingTimeRecoderClass():
 		with open(DataBaseJsonLocation, 'w',encoding="UTF-8") as json_file:
 			json_file.write(json.dumps(JsonChannelList,ensure_ascii=False,sort_keys=True, indent=4, separators=(',', ':')))
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"] encrypted MessageList[status]: "+MessageList[status])
-		return MessageList[status]
+		return MessageList[status] % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 	def get_days_hours_second(self, readed, session):
 		totall_day = 0
 		temp_hours_sum = 0
