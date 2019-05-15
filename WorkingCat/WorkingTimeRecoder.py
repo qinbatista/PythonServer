@@ -178,8 +178,9 @@ class WorkingTimeRecoderClass():
 			callback_message = self.get_total_time_Json(session)
 		if function == "GetMyMonthdata":# 获取全部数据
 			callback_message = self.get_month_data_Json(session, 5)
+		retval = des.encrypt(str.encode(str(callback_message)))
 		mutex.release()
-		return des.encrypt(str.encode(callback_message))
+		return retval
 
 if __name__ == "__main__":
 	pass
