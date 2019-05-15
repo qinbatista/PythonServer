@@ -30,7 +30,7 @@ def PythonLocation():
 
 
 class LukseunClient():
-	def __init__(self, myHeader, port=10000, port_number=10):  # 软件名字，端口号，服务器端口号
+	def __init__(self, myHeader, port=8887, port_number=10):  # 软件名字，端口号，服务器端口号
 		self.header = myHeader
 		self.port = port
 		self.port_number = port_number
@@ -49,7 +49,8 @@ class LukseunClient():
 			s = None
 			DesMessage = ""
 			try:
-				Portvalue = self.port + ThreadID % self.port_number#端口号 10003
+				LogRecorder.LogUtility("[LukseunClient][LogRecorder][run] port = "+str(self.port + ThreadID % self.port_number))
+				Portvalue = 8888#self.port + ThreadID % self.port_number#端口号 10003
 				address = (host, Portvalue)#ip、端口
 				s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# 创建TCP Socket
 				s.settimeout(5)# 设置套接字操作的超时期，超时5秒
@@ -193,11 +194,11 @@ def multi_message_test():
 		}
 	}
 	ct = LukseunClient("workingcat")# 设置3个端口
-	ct.SendMsg(str(message_dic))# 发送单个数据
-	# for threading_count in range(100,600,100):# 发送多个数据
-	# 	for port_count in range(1,6):
-	# 		ct.port_number = port_count
-	# 		Test_MultMessage(ct, str(message_dic), 1, threading_count)
+	# ct.SendMsg(str(message_dic))# 发送单个数据
+	for threading_count in range(100,600,100):# 发送多个数据
+		for port_count in range(1,6):
+			ct.port_number = port_count
+			Test_MultMessage(ct, str(message_dic), 1, threading_count)
 def singal_message_test():
 	message_dic = {"session": "ACDE48001122",
 		"function": "CheckTime",
@@ -214,6 +215,6 @@ def singal_message_test():
 	ct.SendMsg(str(message_dic))# 发送单个数据
 
 if __name__ == '__main__':
-	# singal_message_test()#just send 1 message to server
+	#singal_message_test()#just send 1 message to server
 	multi_message_test()#proccess 1 threading 100-500(increase 100), port 1-5
 

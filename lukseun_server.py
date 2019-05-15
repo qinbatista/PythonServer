@@ -58,7 +58,6 @@ class LukseunServer:
 			Log('[lukseun_server.py][_handle_connection] Received illegal data from {}'.format(writer.get_extra_info('peername')))
 		writer.close()
 
-	
 	async def _receive_header(self, reader: asyncio.StreamReader) -> AnalysisHeader.Header:
 		'''
 		_receive_header() reads the first HEADER_BUFFER_SIZE bytes from the client which
