@@ -22,7 +22,7 @@ HEADER_BUFFER_SIZE = 36
 
 
 class LukseunServer:
-	def __init__(self, host: str = '127.0.0.1', port: int = 8888):
+	def __init__(self, host: str = '', port: int = 8888):
 		self._host = host
 		self._port = port
 		self._header_tool = AnalysisHeader.Header()
