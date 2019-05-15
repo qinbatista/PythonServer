@@ -95,7 +95,7 @@ async def test_multiple_message(n: int):
 
 def main() -> None:
 	#asyncio.run(test_single_message())
-	asyncio.run(test_multiple_message(50))
+	asyncio.run(test_multiple_message(int(input('n: '))))
 
 
 if __name__ == '__main__':
