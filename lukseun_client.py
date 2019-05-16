@@ -82,20 +82,18 @@ async def test_single_message():
 
 
 async def test_multiple_message(n: int):
-	client = LukseunClient()
-	d = {'session': 'ACDE48001122', 'function': 'CheckTime', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
-	d = str(d)
-	tasks = [asyncio.create_task(client.send_message(d)) for _ in range(n)]
 	start = time.time()
-	await asyncio.gather(*tasks)
+
+	tasks = [asyncio.ensure_future(test_single_message()) for _ in range(n)]
+	await asyncio.wait(tasks)
+
 	end = time.time()
 	print(f'It took {end - start} seconds to complete {n} messages.')
 
 
 
 def main() -> None:
-	#asyncio.run(test_single_message())
-	asyncio.run(test_multiple_message(50))
+	asyncio.run(test_multiple_message(int(input('How many messages to send: '))))
 
 
 if __name__ == '__main__':
