@@ -12,6 +12,7 @@
 # 4) close the connection
 
 import asyncio
+import concurrent.futures
 from WorkingCat import WorkingTimeRecoder
 from Utility import AnalysisHeader
 from Utility.LogRecorder import LogUtility as Log
@@ -20,6 +21,9 @@ from Utility.LogRecorder import LogUtility as Log
 # the size of the header in bytes that we expect to receive from the client.
 HEADER_BUFFER_SIZE = 36
 
+# some color codes to make log easier to read
+COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m', \
+		'ylw' : '\033[1;33;40m', 'grn' : '\033[1;32;40m'}
 
 class LukseunServer:
 	def __init__(self, host: str = '', port: int = 8888):
@@ -27,7 +31,7 @@ class LukseunServer:
 		self._port = port
 		self._header_tool = AnalysisHeader.Header()
 		self._wtr = WorkingTimeRecoder.WorkingTimeRecoderClass()
-		self._loop = asyncio.get_running_loop()
+		self._pool = concurrent.futures.ProcessPoolExecutor()
 
 
 	async def run(self) -> None:
@@ -40,7 +44,7 @@ class LukseunServer:
 		async with server:
 			await server.serve_forever()
 
-
+	
 	async def _handle_connection(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
 		'''
 		_handle_connection() handles all incoming connections in accordance to the 
@@ -48,15 +52,20 @@ class LukseunServer:
 		'''
 		header = await self._receive_header(reader)
 		if (self._is_valid_header(header)):
-			Log('[lukseun_server.py][_handle_connection] Received valid data from {}'.format(writer.get_extra_info('peername')))
+			Log(COLORS['ylw'] + '[lukseun_server.py][_handle_connection] Received valid data from {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
 			message = await reader.read(int(header.size))
-			status = await self._loop.run_in_executor(None, self._wtr.ResolveMsg, message, writer.get_extra_info('peername')[0])
-			response_header = await self._loop.run_in_executor(None, self._header_tool.MakeHeader, header.App, str(len(status)))
+
+
+			loop = asyncio.get_running_loop()
+			status = await loop.run_in_executor(self._pool, self._wtr.ResolveMsg, message, writer.get_extra_info('peername')[0])
+			response_header = await loop.run_in_executor(self._pool, self._header_tool.MakeHeader, header.App, str(len(status)))
+
+
 			writer.write(response_header + status)
 			await writer.drain()
-			Log('[lukseun_server.py][_handle_connection] Sent response to client {}'.format(writer.get_extra_info('peername')))
+			Log(COLORS['grn'] + '[lukseun_server.py][_handle_connection] Sent response to client {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
 		else:
-			Log('[lukseun_server.py][_handle_connection] Received illegal data from {}'.format(writer.get_extra_info('peername')))
+			Log(COLORS['fail'] + '[lukseun_server.py][_handle_connection] Received illegal data from {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
 		writer.close()
 
 	async def _receive_header(self, reader: asyncio.StreamReader) -> AnalysisHeader.Header:
@@ -65,7 +74,8 @@ class LukseunServer:
 		contains the header. Returns an AnalysisHeader.Header object.
 		'''
 		header_raw = await reader.read(HEADER_BUFFER_SIZE)
-		return await self._loop.run_in_executor(None, AnalysisHeader.Header, header_raw)
+		loop = asyncio.get_running_loop()
+		return await loop.run_in_executor(self._pool, AnalysisHeader.Header, header_raw)
 
 
 	def _is_valid_header(self, header: AnalysisHeader.Header) -> bool:
