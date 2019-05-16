@@ -27,6 +27,7 @@ class LukseunServer:
 		self._port = port
 		self._header_tool = AnalysisHeader.Header()
 		self._wtr = WorkingTimeRecoder.WorkingTimeRecoderClass()
+		self._loop = asyncio.get_running_loop()
 
 
 	async def run(self) -> None:
@@ -49,8 +50,8 @@ class LukseunServer:
 		if (self._is_valid_header(header)):
 			Log('[lukseun_server.py][_handle_connection] Received valid data from {}'.format(writer.get_extra_info('peername')))
 			message = await reader.read(int(header.size))
-			status = self._wtr.ResolveMsg(message, writer.get_extra_info('peername')[0])
-			response_header = self._header_tool.MakeHeader(header.App, str(len(status)))
+			status = await self._loop.run_in_executor(None, self._wtr.ResolveMsg, message, writer.get_extra_info('peername')[0])
+			response_header = await self._loop.run_in_executor(None, self._header_tool.MakeHeader, header.App, str(len(status)))
 			writer.write(response_header + status)
 			await writer.drain()
 			Log('[lukseun_server.py][_handle_connection] Sent response to client {}'.format(writer.get_extra_info('peername')))
@@ -64,7 +65,7 @@ class LukseunServer:
 		contains the header. Returns an AnalysisHeader.Header object.
 		'''
 		header_raw = await reader.read(HEADER_BUFFER_SIZE)
-		return AnalysisHeader.Header(header_raw)
+		return await self._loop.run_in_executor(None, AnalysisHeader.Header, header_raw)
 
 
 	def _is_valid_header(self, header: AnalysisHeader.Header) -> bool:
