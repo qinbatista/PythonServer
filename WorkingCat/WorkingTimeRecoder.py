@@ -19,7 +19,9 @@ MessageList=[
 	"{\"status\":\"06\",\"message\":\"Update time\",\"time\":\"%s\",}",
 ]
 class WorkingTimeRecoderClass():
-	def CheckTime_SQL(self):
+	def __init__(self, *args, **kwargs):
+		pass
+	def CheckTime_SQL(self,session,IPAdress,UserName):
 		return 3
 	def CheckTime_Json(self,session,IPAdress,UserName):
 		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
