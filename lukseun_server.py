@@ -37,7 +37,7 @@ class LukseunServer:
 	async def run(self) -> None:
 		'''
 		run() binds the server to the host and port provided, and begins
-		handling incomming connections.
+		handling incoming connections.
 		'''
 		server = await asyncio.start_server(self._handle_connection, self._host, self._port)
 		Log('[lukseun_server.py][run()] Starting server on {addr}'.format(addr = server.sockets[0].getsockname()))
