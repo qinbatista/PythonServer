@@ -26,18 +26,18 @@ COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m', \
 		'ylw' : '\033[1;33;40m', 'grn' : '\033[1;32;40m'}
 
 class LukseunServer:
-	def __init__(self, host: str = '', port: int = 8888):
+	def __init__(self, host: str = '', port: int = 8888, max_workers: int = None):
 		self._host = host
 		self._port = port
 		self._header_tool = AnalysisHeader.Header()
 		self._wtr = WorkingTimeRecoder.WorkingTimeRecoderClass()
-		self._pool = concurrent.futures.ProcessPoolExecutor()
+		self._pool = concurrent.futures.ProcessPoolExecutor(max_workers = max_workers)
 
 
 	async def run(self) -> None:
 		'''
 		run() binds the server to the host and port provided, and begins
-		handling incomming connections.
+		handling incoming connections.
 		'''
 		server = await asyncio.start_server(self._handle_connection, self._host, self._port)
 		Log('[lukseun_server.py][run()] Starting server on {addr}'.format(addr = server.sockets[0].getsockname()))
@@ -88,7 +88,7 @@ class LukseunServer:
 
 
 async def main() -> None:
-	server = LukseunServer()
+	server = LukseunServer(max_workers = 16)
 	await server.run()
 
 if __name__ == '__main__':
