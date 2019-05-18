@@ -5,33 +5,30 @@
 
 import time
 import asyncio
+import multiprocessing
 from lukseun_client import LukseunClient
 
 COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m'}
 
-async def test_single_message():
+
+def test_multiple_message(n: int):
+	start = time.time()
+	with multiprocessing.Pool() as pool:
+		for _ in pool.imap_unordered(send_single_message, range(n)):
+			pass
+	print(f'It took {time.time() - start} seconds to complete {n} messages.')
+
+
+def send_single_message(message_id: int):
 	client = LukseunClient()
 	d = {'session': 'ACDE48001122', 'function': 'CheckTime', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
-	try:
-		response = await asyncio.wait_for(client.send_message(str(d)), timeout = 5)
-		print(COLORS['pass'] + 'Success! Sent message within timeout' + COLORS['end'])
-	except asyncio.TimeoutError:
-		print(COLORS['fail'] + 'Fail! Did not send message within timeout' + COLORS['end'])
-
-
-async def test_multiple_message(n: int):
 	start = time.time()
-
-	tasks = [asyncio.ensure_future(test_single_message()) for _ in range(n)]
-	for t in asyncio.as_completed(tasks):
-		await t
-	end = time.time()
-	print(f'It took {end - start} seconds to complete {n} messages.')
-
+	asyncio.run(client.send_message(str(d)))
+	print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
 
 
 def main() -> None:
-	asyncio.run(test_multiple_message(int(input('How many messages to send: '))))
+	test_multiple_message(int(input('How many messages to send: ')))
 
 
 if __name__ == '__main__':
