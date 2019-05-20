@@ -6,6 +6,7 @@
 import time
 import asyncio
 import multiprocessing
+import statistics
 from lukseun_client import LukseunClient
 
 COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m'}
@@ -30,25 +31,25 @@ def send_single_message(message_id: int):
 def new_test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
-		for _ in pool.imap_unordered(async_multi_message, range(n)):
-			pass
+		times = []
+		for r in pool.imap_unordered(async_multi_message, range(n)):
+			times.extend(r)
 	print(f'It took {time.time() - start} seconds to complete {n * 10} messages.')
+	print(f'Average response time for messages: {statistics.mean(times)} seconds.')
 
-async def async_send_single_message(message_id: int):
+async def async_send_single_message(message_id: int) -> float:
 	client = LukseunClient()
 	d = {'session': 'ACDE48001122', 'function': 'CheckTime', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
 	start = time.time()
 	await client.send_message(str(d))
-	print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
+	end = time.time()
+	print(f"Message #{message_id} took {COLORS['pass']} {end - start} {COLORS['end']} seconds to complete.")
+	return end - start
 
 def async_multi_message(message_id: int):
-	client = LukseunClient()
-	d = {'session': 'ACDE48001122', 'function': 'CheckTime', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
-	#start = time.time()
 	tasks = [asyncio.ensure_future(async_send_single_message(message_id * i)) for i in range(10)]
 	loop = asyncio.get_event_loop()
-	loop.run_until_complete(asyncio.gather(*tasks))
-	#print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
+	return loop.run_until_complete(asyncio.gather(*tasks))
 
 
 def main() -> None:
