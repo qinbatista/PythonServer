@@ -4,11 +4,17 @@ import time
 import os
 import codecs
 import threading
+import pymysql
+import datetime;
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 from Utility import LogRecorder,EncryptionAlgorithm
 DESKey = "67891234"
 DESVector = "6789123467891234"
+DATABASE_IP = "192.168.1.102"
+DATABASE_ACCOUNT = "root"
+DATABASE_PASSWORD = "lukseun"
+DATABASE_TABLE = "staff"
 MessageList=[
 	"{\"status\":\"00\",\"message\":\"get null message\"}",
 	"{\"status\":\"01\",\"message\":\"Check in\",\"time\":\"%s\",}",
@@ -21,8 +27,27 @@ MessageList=[
 class WorkingTimeRecoderClass():
 	def __init__(self, *args, **kwargs):
 		pass
-	def CheckTime_SQL(self,session,IPAdress,UserName):
-		return 3
+	def _check_time_sql(self,user_id,ip_address,user_name,gender,email,phone_number):
+		"""
+		check in and check out
+		"""
+		if self._is_user_exist(user_id)==False:
+			self._add_new_user(user_id,ip_address,user_name,gender,email,phone_number)
+		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
+		cursor = db.cursor()
+		day = datetime.datetime.now().strftime("%Y-%m-%d")
+		time = datetime.datetime.now().strftime("%H:%M:%S")
+		if self._is_checked_in(user_id,day) == False:
+			sql_command = "INSERT INTO timeinfo(session,check_in,data_time) " + "VALUES (%s,%s,%s)"
+			values = (user_id,time,day)
+			cursor.execute(sql_command, values)
+			db.commit()
+			return MessageList[1] % (time)
+		else:
+			cursor.execute("UPDATE timeinfo SET check_out=%s WHERE data_time=%s", (time,day))
+			db.commit()
+			return MessageList[2] % (time)
+
 	def CheckTime_Json(self,session,IPAdress,UserName):
 		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
 		if not os.path.isfile(DataBaseJsonLocation):
@@ -154,11 +179,6 @@ class WorkingTimeRecoderClass():
 		message = des.decrypt(message)  #decrypt byte message
 		message = bytes.decode(message) #byte to string
 		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
-		if message == "":
-			session="error"
-			user_name="error"
-			function="error"
-			return session,user_name,function
 		message_dic  = eval(message)
 		if "session" in message_dic.keys():
 			session = message_dic["session"]
@@ -166,24 +186,74 @@ class WorkingTimeRecoderClass():
 			function = message_dic["function"]
 		if "data" in message_dic.keys():
 			user_name = message_dic["data"]["user_name"]
-		return session,user_name,function
-	def ResolveMsg(self, message, IPAdress):# 客户端的数据、IP地址
+			gender = message_dic["data"]["gender"]
+			email = message_dic["data"]["email"]
+			phone_number = message_dic["data"]["phone_number"]
+		return session,function,user_name,gender,email,phone_number
+	def ResolveMsg(self, message, ip_address):# 客户端的数据、IP地址
 		mutex = threading.Lock()
 		mutex.acquire()
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
-		session,UserName,function = self.VerifyMessageIntegrity(message,IPAdress)
+		user_id,function,user_name,gender,email,phone_number = self.VerifyMessageIntegrity(message,ip_address)
 		if function == "GetTime":
 			callback_message = MessageList[6] % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 		if function == "CheckTime":
-			callback_message = self.CheckTime_Json(session,IPAdress,UserName)#really message
+			# callback_message = self.CheckTime_Json(user_id,ip_address,user_name)#really message
+			callback_message = self._check_time_sql(user_id,ip_address,user_name,gender,email,phone_number)
+			print("callback_message="+callback_message)
 			# status = 2 #test message
 		if function == "GetMyAlldata":# 获取全部数据
-			callback_message = self.get_total_time_Json(session)
+			callback_message = self.get_total_time_Json(user_id)
 		if function == "GetMyMonthdata":# 获取全部数据
-			callback_message = self.get_month_data_Json(session, 5)
+			callback_message = self.get_month_data_Json(user_id, 5)
 		retval = des.encrypt(str.encode(str(callback_message)))
 		mutex.release()
 		return retval
+	def _is_checked_in(self,user_id,day):
+		"""
+			check if user checked before.
+		"""
+		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
+		cursor = db.cursor()
+		sql = "select check_in from timeinfo where session = '"+user_id+"' and data_time='"+day+"'"
+		cursor.execute(sql)
+		result = cursor.fetchall()
+		if len(result)<=0:
+			return False
+		else:
+			return True
+	def _is_user_exist(self,user_id):
+		"""
+			Verify if that user exists
+		"""
+		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
+		cursor = db.cursor()
+		# 获取数据库主机session信息
+		sql = "select * from userinfo where session='"+user_id+"'"
+		cursor.execute(sql)
+		result = cursor.fetchall()
+		if len(result)<=0:
+			return False
+		else:
+			return True
+	def _add_new_user(self,user_id,ip,user_name,gender,email,phone_number):
+		"""
+			add new user
+		"""
+		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
+		cursor = db.cursor()
+		# 像数据库中插入新的用户信息
+		user = "INSERT INTO userinfo(session,ip,user_name,gender,email,phone_number) " + "VALUES (%s,%s,%s,%s,%s,%s)"
+		values = (user_id,
+				ip,
+				user_name,
+				gender,
+				email,
+				phone_number
+				)
+		cursor.execute(user, values)
+		db.commit()
 
 if __name__ == "__main__":
 	pass
+
