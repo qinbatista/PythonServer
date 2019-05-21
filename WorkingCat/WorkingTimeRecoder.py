@@ -44,7 +44,7 @@ class WorkingTimeRecoderClass():
 			db.commit()
 			return MessageList[1] % (time)
 		else:
-			cursor.execute("UPDATE timeinfo SET check_out=%s WHERE data_time=%s", (time,day))
+			cursor.execute("UPDATE timeinfo SET check_out=%s WHERE data_time=%s and session=%s", (time,day,user_id))
 			db.commit()
 			return MessageList[2] % (time)
 
