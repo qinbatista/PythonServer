@@ -3,7 +3,7 @@ import pymysql
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 def create_database_table():
-	db = pymysql.connect("localhost", "root", "FAeX9ftoXd%_", "staff")
+	db = pymysql.connect("localhost", "root", "lukseun", "staff")
 	cursor = db.cursor()
 	cursor.execute("DROP TABLE IF EXISTS userinfo")
 	cursor.execute("DROP TABLE IF EXISTS timeinfo")
