@@ -9,6 +9,8 @@ import datetime;
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 from Utility import LogRecorder,EncryptionAlgorithm
+from Utility.LogRecorder import LogUtility as Log
+
 DESKey = "67891234"
 DESVector = "6789123467891234"
 DATABASE_IP = "192.168.1.102"
@@ -27,6 +29,29 @@ MessageList=[
 class WorkingTimeRecoderClass():
 	def __init__(self, *args, **kwargs):
 		pass
+	def _get_staff_current_status(self):
+		"""
+		get all staff status in nowdays
+		{
+			"status":"04",
+			"message":
+					[
+						"覃于澎":["10:05:00","19:00:00"],
+						"曲永杰":["10:25:30","18:23:00"]
+					]
+		 }
+		"""
+		day = datetime.datetime.now().strftime("%Y-%m-%d")
+		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
+		cursor = db.cursor()
+		sql = "select user_name,check_in,check_out from timeinfo INNER join userinfo on timeinfo.session = userinfo.session where timeinfo.data_time= '"+day+"'"
+		cursor.execute(sql)
+		result = cursor.fetchall()
+		ss=result
+		message={}
+		message["status"] = "04"
+		message["message"] = list(ss)
+		return str(message)
 	def _check_time_sql(self,user_id,ip_address,user_name,gender,email,phone_number):
 		"""
 		check in and check out
@@ -198,14 +223,16 @@ class WorkingTimeRecoderClass():
 		if function == "GetTime":
 			callback_message = MessageList[6] % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 		if function == "CheckTime":
-			# callback_message = self.CheckTime_Json(user_id,ip_address,user_name)#really message
 			callback_message = self._check_time_sql(user_id,ip_address,user_name,gender,email,phone_number)
-			print("callback_message="+callback_message)
-			# status = 2 #test message
+		if function == "StaffStatus":
+			callback_message = self.get_total_time_Json(user_id)
 		if function == "GetMyAlldata":# 获取全部数据
 			callback_message = self.get_total_time_Json(user_id)
 		if function == "GetMyMonthdata":# 获取全部数据
 			callback_message = self.get_month_data_Json(user_id, 5)
+		if function == "GetStaffCurrentStatus":
+			callback_message = self._get_staff_current_status()
+		Log("[WorkingTimeRecoder][ResolveMsg] callback_message="+callback_message)
 		retval = des.encrypt(str.encode(str(callback_message)))
 		mutex.release()
 		return retval

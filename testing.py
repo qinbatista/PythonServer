@@ -23,7 +23,7 @@ def test_multiple_message(n: int):
 
 def send_single_message(message_id: int):
 	client = LukseunClient()
-	d = {'session': 'ACDE48001122', 'function': 'CheckTime', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
+	d = {'session': 'ACDE48001122', 'function': 'GetStaffCurrentStatus', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
 	start = time.time()
 	asyncio.run(client.send_message(str(d)))
 	print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
@@ -44,7 +44,7 @@ def new_test_multiple_message(n: int):
 
 async def async_send_single_message(message_id: int) -> float:
 	client = LukseunClient()
-	d = {'session': 'ACDE48001122', 'function': 'CheckTime', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
+	d = {'session': 'ACDE48001122', 'function': 'GetStaffCurrentStatus', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
 	start = time.time()
 	await client.send_message(str(d))
 	end = time.time()
