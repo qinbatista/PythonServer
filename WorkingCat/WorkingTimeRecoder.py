@@ -10,13 +10,10 @@ def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 from Utility import LogRecorder,EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
-
+from Utility.sql_manager import working_cat as wcsql
 DESKey = "67891234"
 DESVector = "6789123467891234"
-DATABASE_IP = "192.168.1.102"
-DATABASE_ACCOUNT = "root"
-DATABASE_PASSWORD = "lukseun"
-DATABASE_TABLE = "staff"
+
 MessageList=[
 	"{\"status\":\"00\",\"message\":\"get null message\"}",
 	"{\"status\":\"01\",\"message\":\"Check in\",\"time\":\"%s\",}",
@@ -32,47 +29,51 @@ class WorkingTimeRecoderClass():
 	def _get_staff_current_status(self):
 		"""
 		get all staff status in nowdays
-		{
-			"status":"04",
-			"message":
-					[
-						"覃于澎":["10:05:00","19:00:00"],
-						"曲永杰":["10:25:30","18:23:00"]
-					]
-		 }
 		"""
 		day = datetime.datetime.now().strftime("%Y-%m-%d")
-		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
-		cursor = db.cursor()
-		sql = "select user_name,check_in,check_out from timeinfo INNER join userinfo on timeinfo.session = userinfo.session where timeinfo.data_time= '"+day+"'"
-		cursor.execute(sql)
-		result = cursor.fetchall()
-		ss=result
+		sql = "select timeinfo.unique_id,check_in,check_out from timeinfo INNER join userinfo on timeinfo.unique_id = userinfo.unique_id where timeinfo.data_time= '"+day+"'"
+		ss=wcsql(sql)
 		message={}
 		message["status"] = "04"
 		message["message"] = list(ss)
 		return str(message)
-	def _check_time_sql(self,user_id,ip_address,user_name,gender,email,phone_number):
+	def _check_time_sql(self,message,session):
 		"""
 		check in and check out
 		"""
-		if self._is_user_exist(user_id)==False:
-			self._add_new_user(user_id,ip_address,user_name,gender,email,phone_number)
-		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
-		cursor = db.cursor()
-		day = datetime.datetime.now().strftime("%Y-%m-%d")
-		time = datetime.datetime.now().strftime("%H:%M:%S")
-		if self._is_checked_in(user_id,day) == False:
-			sql_command = "INSERT INTO timeinfo(session,check_in,data_time) " + "VALUES (%s,%s,%s)"
-			values = (user_id,time,day)
-			cursor.execute(sql_command, values)
-			db.commit()
-			return MessageList[1] % (time)
+		result = self._is_user_exist(session)
+		if len(result)>0:
+			day = datetime.datetime.now().strftime("%Y-%m-%d")
+			time = datetime.datetime.now().strftime("%H:%M:%S")
+			if self._is_checked_in(result[0][0],result[0][1],day) == False:
+				wcsql("INSERT INTO timeinfo(account,unique_id,check_in,data_time) " + "VALUES ('"+str(result[0][0])+"','"+str(result[0][1])+"','"+time+"','"+day+"')")
+				return MessageList[1] % (time)
+			else:
+				wcsql("UPDATE timeinfo SET check_out='"+time+"' WHERE data_time='"+day+"' and account ='"+result[0][0]+"' and unique_id ='"+result[0][1]+"'")
+				return MessageList[2] % (time)
+		return ""
+	def _create_session(self,message_info):
+		message_dic  = eval(message_info)
+		session = ""
+		if "data" in message_dic.keys():
+			unique_id = message_dic["data"]["unique_id"]
+			account = message_dic["data"]["account"]
+			password = message_dic["data"]["password"]
+			if account=="":
+				condition = "unique_id='"+unique_id+"'"
+				Log("[WorkingTimeRecoder][_create_session] use unique_id for seesion")
+			else:
+				condition = "account='"+account +"' and password='"+password+"'"
+				Log("[WorkingTimeRecoder][_create_session] use account for seesion")
+			ss=wcsql("select session from userinfo where "+condition)
+			if len(ss)<=0:
+				session = unique_id+"_session"
+				wcsql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('"+unique_id+"','"+account+"','"+password+"','"+session+"')")
+			else:
+				session = str(ss[0])
+			return session
 		else:
-			cursor.execute("UPDATE timeinfo SET check_out=%s WHERE data_time=%s and session=%s", (time,day,user_id))
-			db.commit()
-			return MessageList[2] % (time)
-
+			return ""
 	def CheckTime_Json(self,session,IPAdress,UserName):
 		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
 		if not os.path.isfile(DataBaseJsonLocation):
@@ -209,78 +210,67 @@ class WorkingTimeRecoderClass():
 			session = message_dic["session"]
 		if "function" in message_dic.keys():
 			function = message_dic["function"]
-		if "data" in message_dic.keys():
-			user_name = message_dic["data"]["user_name"]
-			gender = message_dic["data"]["gender"]
-			email = message_dic["data"]["email"]
-			phone_number = message_dic["data"]["phone_number"]
-		return session,function,user_name,gender,email,phone_number
+		return session,function,message
 	def ResolveMsg(self, message, ip_address):# 客户端的数据、IP地址
 		mutex = threading.Lock()
 		mutex.acquire()
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)
-		user_id,function,user_name,gender,email,phone_number = self.VerifyMessageIntegrity(message,ip_address)
-		if function == "GetTime":
+		session,function,msg_data = self.VerifyMessageIntegrity(message,ip_address)
+		callback_message=""
+		if function == "get_time":
 			callback_message = MessageList[6] % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-		if function == "CheckTime":
-			callback_message = self._check_time_sql(user_id,ip_address,user_name,gender,email,phone_number)
-		if function == "StaffStatus":
-			callback_message = self.get_total_time_Json(user_id)
-		if function == "GetMyAlldata":# 获取全部数据
-			callback_message = self.get_total_time_Json(user_id)
-		if function == "GetMyMonthdata":# 获取全部数据
-			callback_message = self.get_month_data_Json(user_id, 5)
-		if function == "GetStaffCurrentStatus":
+		if function == "check_time":
+			callback_message = self._check_time_sql(msg_data,session)
+		# if function == "StaffStatus":
+		# 	callback_message = self.get_total_time_Json(user_id)
+		# if function == "GetMyAlldata":# 获取全部数据
+		# 	callback_message = self.get_total_time_Json(user_id)
+		# if function == "GetMyMonthdata":# 获取全部数据
+		# 	callback_message = self.get_month_data_Json(user_id, 5)
+		if function == "get_staff_current_status":
 			callback_message = self._get_staff_current_status()
+		if function == "get_session":
+			callback_message = self._create_session(msg_data)
 		Log("[WorkingTimeRecoder][ResolveMsg] callback_message="+callback_message)
 		retval = des.encrypt(str.encode(str(callback_message)))
 		mutex.release()
 		return retval
-	def _is_checked_in(self,user_id,day):
+	def _is_checked_in(self,account,unique_id,day):
 		"""
 			check if user checked before.
 		"""
-		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
-		cursor = db.cursor()
-		sql = "select check_in from timeinfo where session = '"+user_id+"' and data_time='"+day+"'"
-		cursor.execute(sql)
-		result = cursor.fetchall()
+		if account=="":
+			result = wcsql("select check_in from timeinfo where unique_id = '"+unique_id+"' and data_time='"+day+"'")
+		else:
+			result = wcsql("select check_in from timeinfo where account = '"+account+"' and data_time='"+day+"'")
 		if len(result)<=0:
+			print("false")
 			return False
 		else:
+			print("true")
 			return True
-	def _is_user_exist(self,user_id):
+	def _is_user_exist(self,session):
 		"""
 			Verify if that user exists
 		"""
-		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
-		cursor = db.cursor()
-		# 获取数据库主机session信息
-		sql = "select * from userinfo where session='"+user_id+"'"
-		cursor.execute(sql)
-		result = cursor.fetchall()
+		result = wcsql("select account,unique_id from userinfo where session='"+session+"'")
+		return result
+	def _add_new_user(self,session,ip,user_name,gender,email,phone_number):
+		"""
+			add new user
+		"""
+		# 像数据库中插入新的用户信息
+		user = "INSERT INTO userinfo(session,ip,user_name,gender,email,phone_number) " + "VALUES ('"+session+"','"+ip+"','"+user_name+"','"+gender+"','"+email+"','"+phone_number+"')"
+		wcsql(user)
+	def _is_visitor(self,session):
+		"""
+			if user have account in server
+		"""
+		result = wcsql("select account from userinfo where session = '"+session+"'")
 		if len(result)<=0:
 			return False
 		else:
 			return True
-	def _add_new_user(self,user_id,ip,user_name,gender,email,phone_number):
-		"""
-			add new user
-		"""
-		db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
-		cursor = db.cursor()
-		# 像数据库中插入新的用户信息
-		user = "INSERT INTO userinfo(session,ip,user_name,gender,email,phone_number) " + "VALUES (%s,%s,%s,%s,%s,%s)"
-		values = (user_id,
-				ip,
-				user_name,
-				gender,
-				email,
-				phone_number
-				)
-		cursor.execute(user, values)
-		db.commit()
-
 if __name__ == "__main__":
 	pass
 
