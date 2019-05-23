@@ -19,7 +19,7 @@ MessageList=[
 	"{\"status\":\"01\",\"message\":\"Check in\",\"time\":\"%s\",}",
 	"{\"status\":\"02\",\"message\":\"Check out\",\"time\":\"%s\",}",
 	"{\"status\":\"03\",\"message\":\"Message is illegal\"}",
-	"{\"status\":\"04\",\"message\":\"your all personal data\"}",
+	"{\"status\":\"04\",\"message\":\"%s\"}",
 	"{\"status\":\"05\",\"message\":\"server is busy\"}",
 	"{\"status\":\"06\",\"message\":\"Update time\",\"time\":\"%s\",}",
 ]
@@ -31,12 +31,21 @@ class WorkingTimeRecoderClass():
 		get all staff status in nowdays
 		"""
 		day = datetime.datetime.now().strftime("%Y-%m-%d")
-		sql = "select timeinfo.unique_id,check_in,check_out from timeinfo INNER join userinfo on timeinfo.unique_id = userinfo.unique_id where timeinfo.data_time= '"+day+"'"
+		sql = "select timeinfo.unique_id,userinfo.user_name,check_in,check_out from timeinfo INNER join userinfo on timeinfo.unique_id = userinfo.unique_id where timeinfo.data_time= '"+day+"'"
 		ss=wcsql(sql)
-		message={}
-		message["status"] = "04"
-		message["message"] = list(ss)
-		return str(message)
+		print("a"*10+str(len(ss)))
+		mystaff = ""
+		for staff in ss:
+			for value in staff:
+				if value==None:
+					value=""
+				if mystaff =="":
+					mystaff=value
+				else:
+					if value!="":
+						mystaff=mystaff+","+value
+		print(MessageList[4]%mystaff)
+		return MessageList[4]%mystaff
 	def _check_time_sql(self,message,session):
 		"""
 		check in and check out
@@ -70,7 +79,7 @@ class WorkingTimeRecoderClass():
 				session = unique_id+"_session"
 				wcsql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('"+unique_id+"','"+account+"','"+password+"','"+session+"')")
 			else:
-				session = str(ss[0])
+				session = str(ss[0][0])
 			return session
 		else:
 			return ""
