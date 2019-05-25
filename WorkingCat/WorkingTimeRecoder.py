@@ -60,7 +60,7 @@ class WorkingTimeRecoderClass():
 			else:
 				wcsql("UPDATE timeinfo SET check_out='"+time+"' WHERE data_time='"+day+"' and account ='"+result[0][0]+"' and unique_id ='"+result[0][1]+"'")
 				return MessageList[2] % (time)
-		return ""
+		return MessageList[2] % ("user is not exist")
 	def _create_session(self,message_info):
 		message_dic  = eval(message_info)
 		session = ""

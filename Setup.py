@@ -26,11 +26,11 @@ def create_database_table():
 	# 创建新的签到时间记录表
 	time_sql = """
 			CREATE TABLE timeinfo(
-			account VARCHAR(128) NULL, -- 计算机用户id
-			unique_id VARCHAR(128) PRIMARY KEY , -- 计算机用户id
-			check_in VARCHAR(16) NULL,                       -- 上班签到时间
-			check_out VARCHAR(20) NULL,                      -- 下班打卡时间
-			data_time VARCHAR(20) NULL                       -- 打卡当天日期
+			account VARCHAR(128) NULL,
+			unique_id VARCHAR(128) NULL,
+			check_in VARCHAR(16) NULL,
+			check_out VARCHAR(20) NULL,
+			data_time VARCHAR(20) NULL
 			)"""
 	cursor.execute(time_sql)
 def get_required_packages():
@@ -38,5 +38,5 @@ def get_required_packages():
 	os.system("pip install -r "+PythonLocation()+"/requirements.txt")
 	os.system("pip.exe install -r "+PythonLocation()+"/requirements.txt")
 if __name__ == "__main__":
-	# get_required_packages()
-	create_database_table()
+	get_required_packages()
+	#create_database_table()
