@@ -56,10 +56,10 @@ class WorkingTimeRecoderClass():
 			time = datetime.datetime.now().strftime("%H:%M:%S")
 			if self._is_checked_in(result[0][0],result[0][1],day) == False:
 				wcsql("INSERT INTO timeinfo(account,unique_id,check_in,data_time) " + "VALUES ('"+str(result[0][0])+"','"+str(result[0][1])+"','"+time+"','"+day+"')")
-				return MessageList[1] % (time)
+				return MessageList[1] % (day+" "+time)
 			else:
 				wcsql("UPDATE timeinfo SET check_out='"+time+"' WHERE data_time='"+day+"' and account ='"+result[0][0]+"' and unique_id ='"+result[0][1]+"'")
-				return MessageList[2] % (time)
+				return MessageList[2] % (day+" "+time)
 		return MessageList[2] % ("user is not exist")
 	def _create_session(self,message_info):
 		message_dic  = eval(message_info)
