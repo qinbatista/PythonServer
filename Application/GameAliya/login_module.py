@@ -47,7 +47,6 @@ class LoginSystemClass():
 		user login only with unique_id
 		"""
 		sql_result=wcsql("select account from userinfo where unique_id='"+unique_id+"'")
-		print("+"*10+sql_result[0][0])
 		if sql_result[0][0]=="":
 			#if account is not exist try to find session
 			sql_result=wcsql("select session from userinfo where unique_id='"+unique_id+"'")
@@ -67,7 +66,6 @@ class LoginSystemClass():
 		user login with account and password
 		"""
 		sql_result=wcsql("select * from userinfo where account='"+account +"' and password='"+password+"'")
-		print(str(sql_result[0]))
 		if len(sql_result)<=0:
 			return "{\"status\":\"0\",\"message\":\"account is not exist\"}"
 		else:
@@ -83,7 +81,9 @@ class LoginSystemClass():
 		"""
 		sql_result=wcsql("select session from userinfo where  account='"+account +"' and password='"+password+"'")
 		if sql_result[0][0]=="":
-			return account+"_session"
+			session= account+"_session"
+			wcsql("UPDATE userinfo SET session='"+session+"' WHERE account='"+account +"' and password='"+password+"'")
+			return session
 		else:
 			return sql_result[0][0]
 if __name__ == "__main__":
