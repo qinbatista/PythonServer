@@ -10,7 +10,6 @@ def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 from Utility import LogRecorder,EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
-from Utility.sql_manager import working_cat as wcsql
 from Application.GameAliya import login_module
 DESKey = "67891234"
 DESVector = "6789123467891234"
@@ -50,6 +49,9 @@ class AliyaSystemClass():
 		if function == "login":
 			login_class = login_module.LoginSystemClass()
 			callback_message = login_class._login(msg_data)
+		if function == "create_account":
+			login_class = login_module.LoginSystemClass()
+			callback_message = login_class._create_account(msg_data)
 		# if function == "check_time":
 		# 	callback_message = self._check_time_sql(msg_data,session)
 		# if function == "get_total_day":

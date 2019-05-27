@@ -54,7 +54,7 @@ class WorkingTimeRecoderClass():
 		result = self._is_user_exist(session)
 		if len(result)>0:
 			day = datetime.datetime.now().strftime("%Y-%m-%d")
-			time = datetime.datetime.now().strftime("%H:%M:%S")
+			time = datetime.datetime.now().strftime("%H:%M:%S %Y-%m-%d")
 			if self._is_checked_in(result[0][0],result[0][1],day) == False:
 				wcsql("INSERT INTO timeinfo(account,unique_id,check_in,data_time) " + "VALUES ('"+str(result[0][0])+"','"+str(result[0][1])+"','"+time+"','"+day+"')")
 				return MessageList[1] % (day+" "+time)

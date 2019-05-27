@@ -11,7 +11,7 @@ def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 from Utility import LogRecorder,EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
-from Utility.sql_manager import working_cat as wcsql
+from Utility.sql_manager import game_aliya as gasql
 DESKey = "67891234"
 DESVector = "6789123467891234"
 
@@ -37,23 +37,46 @@ class LoginSystemClass():
 				return self.__visitor_login(unique_id)
 			else:
 				#if users have account and password, unique id is not usable but keep the value
-
 				Log("[login_system.py][_login] use account for seesion")
 				return self.__account_login(account,password)
 		else:
-			return "{\"status\":\"0\",\"message\":\"data is null\"}"
+			return "{\"status\":\"1\",\"message\":\"data is null\"}"
+	def _create_account(self,message_info):
+		"""
+		create a new account
+		"""
+		message_dic  = eval(message_info)
+		if "data" in message_dic.keys():
+			unique_id = message_dic["data"]["unique_id"]
+			account   = message_dic["data"]["account"]
+			password  = message_dic["data"]["password"]
+			ip        = message_dic["data"]["ip"]
+			user_name = message_dic["data"]["user_name"]
+			gender    = message_dic["data"]["gender"]
+			birth_day = message_dic["data"]["birth_day"]
+			time = datetime.datetime.now().strftime("%H:%M:%S %Y-%m-%d")
+			last_time_login   = time
+			registration_time = time
+			sql_result = gasql("select count from userinfo where account='"+account+"'")
+			if len(sql_result)<=0:
+				gasql("INSERT INTO userinfo(unique_id,account,password,ip,user_name,gender,birth_day,last_time_login,registration_time) VALUES ('"+unique_id+"','"+account+"','"+password+"','"+ip+"','"+user_name+"','"+gender+"','"+birth_day+"','"+last_time_login+"','"+registration_time+"')")
+				return "{\"status\":\"0\",\"message\":\"create success\"}"
+			else:
+				return "{\"status\":\"1\",\"message\":\"user name already exists\"}"
+		else:
+			return "{\"status\":\"1\",\"message\":\"data is null\"}"
 	def __visitor_login(self,unique_id):
 		"""
 		user login only with unique_id
 		"""
-		sql_result=wcsql("select account from userinfo where unique_id='"+unique_id+"'")
+		sql_result=gasql("select account from userinfo where unique_id='"+unique_id+"'")
 		if sql_result[0][0]=="":
 			#if account is not exist try to find session
-			sql_result=wcsql("select session from userinfo where unique_id='"+unique_id+"'")
+			sql_result=gasql("select session from userinfo where unique_id='"+unique_id+"'")
 			if sql_result[0][0]=="":
 				#if session is not exist, it is a new user, createa a account for them
 				session = self.__create_session_by_unique_id(unique_id)
-				wcsql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('"+unique_id+"','"+""+"','"+""+"','"+session+"')")
+				gasql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('"+unique_id+"','"+""+"','"+""+"','"+session+"')")
 			else:
 				#if session is exist, just give them session
 				session = str(sql_result[0][0])
@@ -65,7 +88,7 @@ class LoginSystemClass():
 		"""
 		user login with account and password
 		"""
-		sql_result=wcsql("select * from userinfo where account='"+account +"' and password='"+password+"'")
+		sql_result=gasql("select * from userinfo where account='"+account +"' and password='"+password+"'")
 		if len(sql_result)<=0:
 			return "{\"status\":\"0\",\"message\":\"account is not exist\"}"
 		else:
@@ -79,10 +102,10 @@ class LoginSystemClass():
 		"""
 		return a session to user, right now just add _session with account id, matthew will make really session
 		"""
-		sql_result=wcsql("select session from userinfo where  account='"+account +"' and password='"+password+"'")
+		sql_result=gasql("select session from userinfo where  account='"+account +"' and password='"+password+"'")
 		if sql_result[0][0]=="":
 			session= account+"_session"
-			wcsql("UPDATE userinfo SET session='"+session+"' WHERE account='"+account +"' and password='"+password+"'")
+			gasql("UPDATE userinfo SET session='"+session+"' WHERE account='"+account +"' and password='"+password+"'")
 			return session
 		else:
 			return sql_result[0][0]
