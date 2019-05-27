@@ -11,7 +11,6 @@ def PythonLocation():
 from Utility import LogRecorder,EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import working_cat as wcsql
-
 DESKey = "67891234"
 DESVector = "6789123467891234"
 
@@ -226,7 +225,7 @@ class WorkingTimeRecoderClass():
 		if "function" in message_dic.keys():
 			function = message_dic["function"]
 		return session,function,message
-	def _ResolveMsg(self, message, ip_address):# 客户端的数据、IP地址
+	def ResolveMsg(self, message, ip_address):# 客户端的数据、IP地址
 		mutex = threading.Lock()
 		mutex.acquire()
 		des = EncryptionAlgorithm.DES(DESKey,DESVector)

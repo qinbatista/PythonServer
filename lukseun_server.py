@@ -15,6 +15,7 @@ import asyncio
 import concurrent.futures
 from WorkingCat import WorkingTimeRecoder
 from Utility import AnalysisHeader
+from Utility import message_handler
 from Utility.LogRecorder import LogUtility as Log
 
 
@@ -30,7 +31,7 @@ class LukseunServer:
 		self._host = host
 		self._port = port
 		self._header_tool = AnalysisHeader.Header()
-		self._wtr = WorkingTimeRecoder.WorkingTimeRecoderClass()
+		self._wtr = message_handler.MessageHandlerClass()
 		self._pool = concurrent.futures.ProcessPoolExecutor(max_workers = max_workers)
 
 
@@ -44,7 +45,7 @@ class LukseunServer:
 		async with server:
 			await server.serve_forever()
 
-	
+
 	async def _handle_connection(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
 		'''
 		_handle_connection() handles all incoming connections in accordance to the 
@@ -54,7 +55,7 @@ class LukseunServer:
 		if (self._is_valid_header(header)):
 			Log(COLORS['ylw'] + '[lukseun_server.py][_handle_connection] Received valid data from {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
 			message = await reader.read(int(header.size))
-
+			self._wtr._set_app(header.App)
 			# ResolveMsg and MakeHeader are two CPU intensive, blocking function calls that hamper the speed of the server.
 			# We can use a ProcessPoolExecutor to run these functions concurrently in different processes, while yielding
 			# control back to the main asyncio loop so that it can handle other requests.
