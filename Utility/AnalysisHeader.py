@@ -38,9 +38,9 @@ class Header:
 		MD5Message = data[0]+data[2]+data[4]+data[6]+data[8:]
 		return MD5Message
 	def isAPPMessage(self, md5String):
-		if md5String=="6275e26419211d1f526e674d97110e15":#md5 of string of "natasha"
+		if md5String=="e3cb970693574ea75d091a6049f8a3ff":#md5 of string of "natasha"
 			LogRecorder.LogUtility("[AnalysisHeader][isLegalMessage]Get Natasha message, pass")
-			return "natasha"
+			return "aliya"
 		elif md5String=="7e1bd1f7a5fb2e316fafb6a4bf5d174e":#md5 of string of "natasha"
 			LogRecorder.LogUtility("[AnalysisHeader][isLegalMessage]Get Natasha message, pass")
 			return "workingcat"

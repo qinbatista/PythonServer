@@ -13,7 +13,7 @@ from Utility.LogRecorder import LogUtility as Log
 HEADER_BUFFER_SIZE = 36
 
 class LukseunClient:
-	def __init__(self, client_type: str = 'workingcat', host: str = '192.168.1.183', port: int = 8888):
+	def __init__(self, client_type: str = 'aliya', host: str = '127.0.0.1', port: int = 8888):
 		self._client_type = client_type
 		self._host = host
 		self._port = port

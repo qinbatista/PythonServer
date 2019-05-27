@@ -13,7 +13,7 @@
 
 import asyncio
 import concurrent.futures
-from WorkingCat import WorkingTimeRecoder
+from Application.WorkingCat import WorkingTimeRecoder
 from Utility import AnalysisHeader
 from Utility import message_handler
 from Utility.LogRecorder import LogUtility as Log
@@ -62,7 +62,6 @@ class LukseunServer:
 			loop = asyncio.get_running_loop()
 			status = await loop.run_in_executor(self._pool, self._wtr.ResolveMsg, message, writer.get_extra_info('peername')[0])
 			response_header = await loop.run_in_executor(self._pool, self._header_tool.MakeHeader, header.App, str(len(status)))
-
 			writer.write(response_header + status)
 			await writer.drain()
 			Log(COLORS['grn'] + '[lukseun_server.py][_handle_connection] Sent response to client {}'.format(writer.get_extra_info('peername')) + COLORS['end'])

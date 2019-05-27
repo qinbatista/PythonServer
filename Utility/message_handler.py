@@ -11,8 +11,8 @@ def PythonLocation():
 from Utility import LogRecorder,EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import working_cat as wcsql
-from WorkingCat import WorkingTimeRecoder
-
+from Application.WorkingCat import WorkingTimeRecoder
+from Application.GameAliya import aliya_system
 class MessageHandlerClass():
 	def __init__(self,*args, **kwargs):
 		pass
@@ -28,6 +28,9 @@ class MessageHandlerClass():
 		Log('[message_handler.py][ResolveMsg] app_name='+self.app_name)
 		if self.app_name=="workingcat":
 			resolve_msg_class = WorkingTimeRecoder.WorkingTimeRecoderClass()
+			return resolve_msg_class._ResolveMsg(message,ip_address)
+		if self.app_name=="aliya":
+			resolve_msg_class = aliya_system.AliyaSystemClass()
 			return resolve_msg_class._ResolveMsg(message,ip_address)
 
 if __name__ == "__main__":

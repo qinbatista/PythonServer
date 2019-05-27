@@ -38,5 +38,11 @@ def get_required_packages():
 	os.system("pip install -r "+PythonLocation()+"/requirements.txt")
 	os.system("pip.exe install -r "+PythonLocation()+"/requirements.txt")
 if __name__ == "__main__":
-	get_required_packages()
-	#create_database_table()
+	print("which function you want?")
+	print("1: install all server requried 3rd python package")
+	print("2: create database table for lukseun staff database")
+	s = input()
+	if s =="1":
+		get_required_packages()
+	elif s=="2":
+		create_database_table()
