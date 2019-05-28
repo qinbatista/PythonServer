@@ -5,7 +5,9 @@ import os
 import codecs
 import threading
 import pymysql
-import datetime;
+import datetime
+
+
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 from Utility import LogRecorder,EncryptionAlgorithm
@@ -20,7 +22,7 @@ MessageList=[
 	"{\"status\":\"01\",\"message\":\"Check in\",\"time\":\"%s\",}",
 	"{\"status\":\"02\",\"message\":\"Check out\",\"time\":\"%s\",}",
 	"{\"status\":\"03\",\"message\":\"Message is illegal\"}",
-	"{\"status\":\"04\",\"message\":\"%s\"}",
+	"{\"status\":\"04\",\"message\":%s}",
 	"{\"status\":\"05\",\"message\":\"server is busy\"}",
 	"{\"status\":\"06\",\"message\":\"Update time\",\"time\":\"%s\",}",
 ]
@@ -35,18 +37,26 @@ class WorkingTimeRecoderClass():
 		sql = "SELECT IFNULL(u.user_name,t.unique_id) AS account,t.check_in,t.check_out,t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " +"WHERE t.data_time ='" + day + "';"
 		ss=wcsql(sql)
 		print("a"*10+str(len(ss)))
-		mystaff = ""
+		mystaff = []
+		# mystaff = ""
 		for staff in ss:
-			for value in staff:
-				if value==None:
-					value=""
-				if mystaff =="":
-					mystaff=value
-				else:
-					if value!="":
-						mystaff=mystaff+","+value
-		print(MessageList[4]%mystaff)
-		return MessageList[4]%mystaff
+			temp_dict = {
+				"user_name": "None" if staff[0] is None else staff[0],
+				"check_in": "None" if staff[1] is None else staff[1],
+				"check_out": "None" if staff[2] is None else staff[2],
+				"data_time": "None" if staff[3] is None else staff[3],
+			}
+			mystaff.append(temp_dict)
+			# for value in staff:
+			# 	if value==None:
+			# 		value=""
+			# 	if mystaff =="":
+			# 		mystaff=value
+			# 	else:
+			# 		if value!="":
+			# 			mystaff=mystaff+","+value
+		print((MessageList[4] % mystaff).replace("\'", "\""))
+		return (MessageList[4] % mystaff).replace("\'", "\"")
 	def _check_time_sql(self,message,session):
 		"""
 		check in and check out
@@ -243,6 +253,7 @@ class WorkingTimeRecoderClass():
 		# if function == "GetMyMonthdata":# 获取全部数据
 		# 	callback_message = self.get_month_data_Json(user_id, 5)
 		if function == "get_staff_current_status":
+			print("执行")
 			callback_message = self._get_staff_current_status()
 		if function == "login":
 			callback_message = self._create_session(msg_data)

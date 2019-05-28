@@ -64,5 +64,11 @@ class LukseunClient:
 		response = await reader.read(int(header.size))
 		Log('[lukseun_client.py][_receive_response()] Received response {} from server'.format(bytes.decode(response)))
 		return response
+async def main():
+	lukseun = LukseunClient()
+	await lukseun.send_message("{'session': '', 'function': 'get_staff_current_status', 'random': '744', 'data': {'unique_id': '', 'account': '', 'password': ''}}")
+
+if __name__ == "__main__":
+	asyncio.run(main())
 
 
