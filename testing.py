@@ -22,10 +22,10 @@ def test_multiple_message(n: int):
 
 
 def send_single_message(message_id: int):
-	client = LukseunClient(host="192.168.1.183")
-	# d = {'session': '', 'function': 'get_session', 'random': '744', 'data': {'unique_id': 'ACDE480011228888', 'account': '', 'password': ''}}
+	client = LukseunClient(client_type="workingcat",host="192.168.1.183")
+	d = {'session': '', 'function': 'login', 'random': '744', 'data': {'unique_id': 'ACDE480011228888', 'account': '', 'password': ''}}
 	#d = {'session': 'ACDE480011228888_session', 'function': 'check_time', 'random': '744', 'data': ""}
-	d = {'session': 'ACDE480011228888_session', 'function': 'get_staff_current_status', 'random': '744', 'data': ""}
+	#d = {'session': 'ACDE480011228888_session', 'function': 'get_staff_current_status', 'random': '744', 'data': ""}
 
 	# d = {'session': '', 'function': 'login', 'random': '744', 'data': {'unique_id': 'ACDE480011228888', 'account': 'a', 'password': 'a'}}#aliya login
 	# d = {'session': '', 'function': 'create_account', 'random': '744', 'data': {'unique_id': 'ACDE480011228888', 'account': 'a', 'password': 'a',"ip":"","user_name":"","gender":"","birth_day":"","last_time_login":"","registration_time":""}}#aliya create account
