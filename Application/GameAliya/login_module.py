@@ -70,10 +70,10 @@ class LoginSystemClass():
 		user login only with unique_id
 		"""
 		sql_result=gasql("select account from userinfo where unique_id='"+unique_id+"'")
-		if sql_result[0][0]=="":
+		if len(sql_result)<=0:
 			#if account is not exist try to find session
 			sql_result=gasql("select session from userinfo where unique_id='"+unique_id+"'")
-			if sql_result[0][0]=="":
+			if len(sql_result)<=0:
 				#if session is not exist, it is a new user, createa a account for them
 				session = self.__create_session_by_unique_id(unique_id)
 				gasql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('"+unique_id+"','"+""+"','"+""+"','"+session+"')")

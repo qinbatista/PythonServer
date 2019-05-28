@@ -60,6 +60,8 @@ class AliyaSystemClass():
 		# 	callback_message = self._get_staff_current_status()
 		# if function == "get_session":
 		# 	callback_message = self._create_session(msg_data)
+		if callback_message=="":
+			callback_message="{\"status\":\"1\",\"message\":\"no function->"+function+"\"}"
 		Log("[WorkingTimeRecoder][ResolveMsg] callback_message="+callback_message)
 		retval = des.encrypt(str.encode(str(callback_message)))
 		mutex.release()
