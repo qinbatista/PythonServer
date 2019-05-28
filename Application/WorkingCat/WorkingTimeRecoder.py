@@ -32,7 +32,7 @@ class WorkingTimeRecoderClass():
 		get all staff status in nowdays
 		"""
 		day = datetime.datetime.now().strftime("%Y-%m-%d")
-		sql = "select timeinfo.unique_id,userinfo.user_name,check_in,check_out from timeinfo INNER join userinfo on timeinfo.unique_id = userinfo.unique_id where timeinfo.data_time= '"+day+"'"
+		sql = "SELECT IFNULL(u.user_name,t.unique_id) AS account,t.check_in,t.check_out,t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " +"WHERE t.data_time ='" + day + "';"
 		ss=wcsql(sql)
 		print("a"*10+str(len(ss)))
 		mystaff = ""
@@ -54,7 +54,7 @@ class WorkingTimeRecoderClass():
 		result = self._is_user_exist(session)
 		if len(result)>0:
 			day = datetime.datetime.now().strftime("%Y-%m-%d")
-			time = datetime.datetime.now().strftime("%H:%M:%S %Y-%m-%d")
+			time = datetime.datetime.now().strftime("%H:%M:%S")
 			if self._is_checked_in(result[0][0],result[0][1],day) == False:
 				wcsql("INSERT INTO timeinfo(account,unique_id,check_in,data_time) " + "VALUES ('"+str(result[0][0])+"','"+str(result[0][1])+"','"+time+"','"+day+"')")
 				return MessageList[1] % (day+" "+time)
