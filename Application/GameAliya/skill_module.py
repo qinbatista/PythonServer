@@ -19,7 +19,7 @@ MessageList=[
 	"{\"status\":\"0\",\"message\":\"success\"}",
 	"{\"status\":\"1\",\"message\":\"failed\",\"time\":\"%s\"}"
 ]
-class LoginSystemClass():
+class SkillSystemClass():
 	def __init__(self, *args, **kwargs):
 		pass
 	def _login(self,message_info):
@@ -41,7 +41,7 @@ class LoginSystemClass():
 				return self.__account_login(account,password)
 		else:
 			return "{\"status\":\"1\",\"message\":\"data is null\"}"
-	def _create_account(self,message_info):
+	def _bind_account(self,message_info):
 		"""
 		create a new account
 		"""
@@ -70,7 +70,7 @@ class LoginSystemClass():
 		user login only with unique_id
 		"""
 		sql_result=gasql("select account from userinfo where unique_id='"+unique_id+"'")
-		if len(sql_result)<=0:
+		if sql_result[0][0]=="":
 			#if account is not exist try to find session
 			sql_result=gasql("select session from userinfo where unique_id='"+unique_id+"'")
 			if len(sql_result)<=0:
