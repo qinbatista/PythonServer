@@ -22,5 +22,9 @@ def create_database_table():
 			registration_time VARCHAR(20) NULL
 			)"""
 	cursor.execute(user_sql)
+	add_sql ="ALTER TABLE userinfo " \
+			"ADD head_photo MEDIUMBLOB NULL;"
+	cursor.execute(add_sql)
+	db.commit()
 if __name__ == "__main__":
 	create_database_table()
