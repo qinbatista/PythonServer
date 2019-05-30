@@ -34,7 +34,8 @@ class WorkingTimeRecoderClass():
 		get all staff status in nowdays
 		"""
 		day = datetime.datetime.now().strftime("%Y-%m-%d")
-		sql = "SELECT IFNULL(u.user_name,t.unique_id) AS account,t.check_in,t.check_out,t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " +"WHERE t.data_time ='" + day + "';"
+		# sql = "SELECT IFNULL(u.user_name,t.unique_id) AS account,t.check_in,t.check_out,t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " +"WHERE t.data_time ='" + day + "';"
+		sql = "SELECT u.user_name, t.unique_id, t.check_in, t.check_out, t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " +"WHERE t.data_time ='" + day + "';"
 		ss=wcsql(sql)
 		print("a"*10+str(len(ss)))
 		mystaff = []
@@ -42,9 +43,10 @@ class WorkingTimeRecoderClass():
 		for staff in ss:
 			temp_dict = {
 				"user_name": "None" if staff[0] is None else staff[0],
-				"check_in": "None" if staff[1] is None else staff[1],
-				"check_out": "None" if staff[2] is None else staff[2],
-				"data_time": "None" if staff[3] is None else staff[3],
+				"unique_id": "None" if staff[1] is None else staff[1],
+				"check_in": "None" if staff[2] is None else staff[2],
+				"check_out": "None" if staff[3] is None else staff[3],
+				"data_time": "None" if staff[4] is None else staff[4],
 			}
 			mystaff.append(temp_dict)
 			# for value in staff:
@@ -253,7 +255,6 @@ class WorkingTimeRecoderClass():
 		# if function == "GetMyMonthdata":# 获取全部数据
 		# 	callback_message = self.get_month_data_Json(user_id, 5)
 		if function == "get_staff_current_status":
-			print("执行")
 			callback_message = self._get_staff_current_status()
 		if function == "login":
 			callback_message = self._create_session(msg_data)
