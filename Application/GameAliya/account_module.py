@@ -74,7 +74,7 @@ class LoginSystemClass():
 		user login only with unique_id
 		"""
 		sql_result=gasql("select account from userinfo where unique_id='"+unique_id+"'")
-		if sql_result[0][0]=="":
+		if len(sql_result)==1:
 			#if account is not exist try to find session
 			sql_result=gasql("select session from userinfo where unique_id='"+unique_id+"'")
 			if len(sql_result)<=0:

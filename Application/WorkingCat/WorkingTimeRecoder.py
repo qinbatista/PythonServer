@@ -6,7 +6,7 @@ import codecs
 import threading
 import pymysql
 import datetime
-
+import random
 
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
@@ -93,9 +93,13 @@ class WorkingTimeRecoderClass():
 				wcsql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('"+unique_id+"','"+account+"','"+password+"','"+session+"')")
 			else:
 				session = str(ss[0][0])
-			return session
+			base_data = {
+			"session": session,
+			"random": str(random.randint(-1000, 1000))
+			}
+			return self.MessageConstructor("0","aaaaaa  login as visitor",base_data)
 		else:
-			return ""
+			return "{\"status\":\"1\",\"message\":\"this phone is already binded a account,please login as account\"}"
 	def CheckTime_Json(self,session,IPAdress,UserName):
 		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
 		if not os.path.isfile(DataBaseJsonLocation):
@@ -298,6 +302,21 @@ class WorkingTimeRecoderClass():
 			return False
 		else:
 			return True
+	def MessageConstructor(self,status, message, data=""):
+		w_data = {
+			"status": status,
+			"message": message,
+			"data": data
+		}
+		# 分段保存字符串
+		if not w_data['data']:
+			result = "{" + '"status":"{0}","message":"{1}"'.format(w_data['status'], w_data['message']) + "}"
+			return result
+		else:
+			json_str = json.dumps(data)
+			data_str = '"status":"{0}","message":"{1}",'.format(w_data['status'], w_data['message'])
+			result = "{" + data_str + '"data":' + json_str + "}"
+			return result
 if __name__ == "__main__":
 	pass
 
