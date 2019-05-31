@@ -41,6 +41,10 @@ class LoginSystemClass():
 				return self.__account_login(account,password)
 		else:
 			return "{\"status\":\"1\",\"message\":\"data is null\"}"
+	def _bind_email(self):
+		pass
+	def _bind_phone(self):
+		pass
 	def _bind_account(self,message_info):
 		"""
 		create a new account
