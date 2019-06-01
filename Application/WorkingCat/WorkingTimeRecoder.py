@@ -40,8 +40,7 @@ class WorkingTimeRecoderClass():
 		sql = "SELECT u.user_name, t.unique_id, t.check_in, t.check_out, t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " +"WHERE t.data_time ='" + day + "';"
 		ss=wcsql(sql)
 		print("a"*10+str(len(ss)))
-		mystaff = []
-		# mystaff = ""
+		data = []
 		for staff in ss:
 			temp_dict = {
 				"user_name": "None" if staff[0] is None else staff[0],
@@ -50,17 +49,10 @@ class WorkingTimeRecoderClass():
 				"check_out": "None" if staff[3] is None else staff[3],
 				"data_time": "None" if staff[4] is None else staff[4],
 			}
-			mystaff.append(temp_dict)
-			# for value in staff:
-			# 	if value==None:
-			# 		value=""
-			# 	if mystaff =="":
-			# 		mystaff=value
-			# 	else:
-			# 		if value!="":
-			# 			mystaff=mystaff+","+value
-		print((MessageList[4] % mystaff).replace("\'", "\""))
-		return (MessageList[4] % mystaff).replace("\'", "\"")
+			data.append(temp_dict)
+
+		current_str = mc("0", "当天数据", str(data)).replace("\"[", "[").replace("]\"", "]").replace("'", "\"")
+		return current_str
 
 	def _get_someday_information(self, message_info):
 		message_dic = eval(message_info)
@@ -72,13 +64,14 @@ class WorkingTimeRecoderClass():
 			WHERE u.session = "{session}"
 			AND t.data_time = "{date}";"""
 		staff = wcsql(sql)
-		print("wcsql->data:" + str(staff))
-		if len(staff) == 0: return mc("1","没有记录")
-		data={
-			"checkin":staff[0][0],
-			"checkout":("None" if staff[0][1] is None else staff[0][1])
+		someday_info={
+			"checkin": "None",
+			"checkout": "None"
 		}
-		return mc("0","有记录",data)
+		if len(staff) == 0: return mc("1","没有记录", someday_info)
+		someday_info["checkin"] = staff[0][0]
+		someday_info["checkout"] = ("None" if staff[0][1] is None else staff[0][1])
+		return mc("0", "有记录", someday_info)
 
 	def _check_time_sql(self,message,session):
 		"""
@@ -115,10 +108,10 @@ class WorkingTimeRecoderClass():
 			else:
 				session = str(ss[0][0])
 			base_data = {
-			"session": session,
-			"random": str(random.randint(-1000, 1000))
+				"session": session,
+				"random": str(random.randint(-1000, 1000))
 			}
-			return mc("0","login as visitor",base_data)
+			return mc("0","login as visitor", base_data)
 		else:
 			return mc("1","this phone is already binded a account,please login as account")
 	def CheckTime_Json(self,session,IPAdress,UserName):
