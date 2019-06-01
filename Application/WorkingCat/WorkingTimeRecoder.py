@@ -73,8 +73,12 @@ class WorkingTimeRecoderClass():
 			AND t.data_time = "{date}";"""
 		staff = wcsql(sql)
 		print("wcsql->data:" + str(staff))
-		if len(staff) == 0: return MessageList[7] % ("None", "None")
-		return MessageList[7] % (staff[0][0], ("None" if staff[0][1] is None else staff[0][1]))
+		if len(staff) == 0: return mc("1","没有记录")
+		data={
+			"checkin":staff[0][0],
+			"checkout":("None" if staff[0][1] is None else staff[0][1])
+		}
+		return mc("0","有记录",data)
 
 	def _check_time_sql(self,message,session):
 		"""
