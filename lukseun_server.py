@@ -23,7 +23,7 @@ from Utility.LogRecorder import LogUtility as Log
 HEADER_BUFFER_SIZE = 36
 
 # some color codes to make log easier to read
-COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m', \
+COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m',
 		'ylw' : '\033[1;33;40m', 'grn' : '\033[1;32;40m'}
 
 class LukseunServer:
