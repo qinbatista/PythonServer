@@ -66,7 +66,8 @@ class LukseunClient:
 		return response
 async def main():
 	lukseun = LukseunClient()
-	await lukseun.send_message("{'session': '', 'function': 'get_staff_current_status', 'random': '744', 'data': {'unique_id': '', 'account': '', 'password': ''}}")
+	# await lukseun.send_message("{'session': '', 'function': 'get_staff_current_status', 'random': '744', 'data': {'unique_id': '', 'account': '', 'password': ''}}")
+	await lukseun.send_message("{'session': '989E4221-BFB1-4ED7-B0D4-15164E93F69B', 'function': 'get_someday_information', 'random': '744', 'data': {'date': '2019-05-28'}}")
 
 if __name__ == "__main__":
 	asyncio.run(main())
