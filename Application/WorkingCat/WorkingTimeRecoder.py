@@ -26,6 +26,7 @@ MessageList=[
 	"{\"status\":\"04\",\"message\":%s}",
 	"{\"status\":\"05\",\"message\":\"server is busy\"}",
 	"{\"status\":\"06\",\"message\":\"Update time\",\"time\":\"%s\",}",
+	"{\"status\":\"07\",\"message\":{\"Check in\":\"%s\",\"Check out\":\"%s\"}}",
 ]
 class WorkingTimeRecoderClass():
 	def __init__(self, *args, **kwargs):
@@ -60,6 +61,21 @@ class WorkingTimeRecoderClass():
 			# 			mystaff=mystaff+","+value
 		print((MessageList[4] % mystaff).replace("\'", "\""))
 		return (MessageList[4] % mystaff).replace("\'", "\"")
+
+	def _get_someday_information(self, message_info):
+		message_dic = eval(message_info)
+		session = message_dic["session"]
+		date = message_dic["data"]["date"]
+		sql = f"""
+			SELECT t.check_in,t.check_out
+			FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id
+			WHERE u.session = "{session}"
+			AND t.data_time = "{date}";"""
+		staff = wcsql(sql)
+		print("wcsql->data:" + str(staff))
+		if len(staff) == 0: return MessageList[7] % ("None", "None")
+		return MessageList[7] % (staff[0][0], ("None" if staff[0][1] is None else staff[0][1]))
+
 	def _check_time_sql(self,message,session):
 		"""
 		check in and check out
@@ -261,6 +277,8 @@ class WorkingTimeRecoderClass():
 		# 	callback_message = self.get_month_data_Json(user_id, 5)
 		if function == "get_staff_current_status":
 			callback_message = self._get_staff_current_status()
+		if function == "get_someday_information":
+			callback_message = self._get_someday_information(msg_data)
 		if function == "login":
 			callback_message = self._create_session(msg_data)
 		Log("[WorkingTimeRecoder][ResolveMsg] callback_message="+callback_message)
