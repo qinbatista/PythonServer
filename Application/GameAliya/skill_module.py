@@ -12,13 +12,7 @@ def PythonLocation():
 from Utility import LogRecorder,EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import game_aliya as gasql
-DESKey = "67891234"
-DESVector = "6789123467891234"
-
-MessageList=[
-	"{\"status\":\"0\",\"message\":\"success\"}",
-	"{\"status\":\"1\",\"message\":\"failed\",\"time\":\"%s\"}"
-]
+from Utility.AnalysisHeader import message_constructor as mc
 class SkillSystemClass():
 	def __init__(self, *args, **kwargs):
 		pass

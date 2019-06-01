@@ -2,6 +2,7 @@ import base64
 import pyDes
 import binascii
 from Utility import EncryptionAlgorithm,LogRecorder
+import json
 class Header:
 	def __init__(self, msg=b"6275e26419211d1f526e674d97110e152222"):
 		msg = bytes.decode(msg)
@@ -53,6 +54,21 @@ class Header:
 		DigitsAs4 = "#"*(4-len(StringLength))+StringLength#（4-加密数据的长度的长度）个#字符 + 加密数据的长度
 		ReturnString = self.HideMsgSize(MD5+DigitsAs4)#36 个字符，中间包含了md5算法和详细数据的长度
 		return str.encode(ReturnString)
+def message_constructor(status, message, data=""):
+	w_data = {
+		"status": status,
+		"message": message,
+		"data": data
+	}
+	# 分段保存字符串
+	if not w_data['data']:
+		result = "{" + '"status":"{0}","message":"{1}"'.format(w_data['status'], w_data['message']) + "}"
+		return result
+	else:
+		json_str = json.dumps(data)
+		data_str = '"status":"{0}","message":"{1}",'.format(w_data['status'], w_data['message'])
+		result = "{" + data_str + '"data":' + json_str + "}"
+		return result
 
 
 

@@ -12,6 +12,7 @@ def PythonLocation():
 from Utility import LogRecorder,EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import game_aliya as gasql
+from Utility.AnalysisHeader import message_constructor as mc
 DESKey = "67891234"
 DESVector = "6789123467891234"
 

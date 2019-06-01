@@ -13,6 +13,7 @@ def PythonLocation():
 from Utility import LogRecorder,EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import working_cat as wcsql
+from Utility.AnalysisHeader import message_constructor as mc
 
 DESKey = "67891234"
 DESVector = "6789123467891234"
@@ -97,9 +98,9 @@ class WorkingTimeRecoderClass():
 			"session": session,
 			"random": str(random.randint(-1000, 1000))
 			}
-			return self.MessageConstructor("0","aaaaaa  login as visitor",base_data)
+			return mc("0","login as visitor",base_data)
 		else:
-			return "{\"status\":\"1\",\"message\":\"this phone is already binded a account,please login as account\"}"
+			return mc("1","this phone is already binded a account,please login as account")
 	def CheckTime_Json(self,session,IPAdress,UserName):
 		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
 		if not os.path.isfile(DataBaseJsonLocation):
@@ -302,21 +303,7 @@ class WorkingTimeRecoderClass():
 			return False
 		else:
 			return True
-	def MessageConstructor(self,status, message, data=""):
-		w_data = {
-			"status": status,
-			"message": message,
-			"data": data
-		}
-		# 分段保存字符串
-		if not w_data['data']:
-			result = "{" + '"status":"{0}","message":"{1}"'.format(w_data['status'], w_data['message']) + "}"
-			return result
-		else:
-			json_str = json.dumps(data)
-			data_str = '"status":"{0}","message":"{1}",'.format(w_data['status'], w_data['message'])
-			result = "{" + data_str + '"data":' + json_str + "}"
-			return result
+
 if __name__ == "__main__":
 	pass
 

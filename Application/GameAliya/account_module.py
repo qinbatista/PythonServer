@@ -12,6 +12,7 @@ def PythonLocation():
 from Utility import LogRecorder,EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import game_aliya as gasql
+from Utility.AnalysisHeader import message_constructor as mc
 DESKey = "67891234"
 DESVector = "6789123467891234"
 
@@ -40,7 +41,7 @@ class LoginSystemClass():
 				Log("[login_system.py][_login] use account for seesion")
 				return self.__account_login(account,password)
 		else:
-			return "{\"status\":\"1\",\"message\":\"data is null\"}"
+			return mc("1","data is null")
 	def _bind_email(self):
 		pass
 	def _bind_phone(self):
@@ -64,11 +65,11 @@ class LoginSystemClass():
 			sql_result = gasql("select count from userinfo where account='"+account+"'")
 			if len(sql_result)<=0:
 				gasql("INSERT INTO userinfo(unique_id,account,password,ip,user_name,gender,birth_day,last_time_login,registration_time) VALUES ('"+unique_id+"','"+account+"','"+password+"','"+ip+"','"+user_name+"','"+gender+"','"+birth_day+"','"+last_time_login+"','"+registration_time+"')")
-				return "{\"status\":\"0\",\"message\":\"create success\"}"
+				return mc("0","create success")
 			else:
-				return "{\"status\":\"1\",\"message\":\"user name already exists\"}"
+				return mc("1","user name already exists")
 		else:
-			return "{\"status\":\"1\",\"message\":\"data is null\"}"
+			return mc("1","data is null")
 	def __visitor_login(self,unique_id):
 		"""
 		user login only with unique_id
@@ -84,19 +85,24 @@ class LoginSystemClass():
 			else:
 				#if session is exist, just give them session
 				session = str(sql_result[0][0])
-			return "{\"status\":\"0\",\"message\":\"login as visitor\",\"session\":\""+session+"\",\"random\":\""+str(random.randint(-1000, 1000))+"\"}"
+			data = {
+				"session":session,
+				"random":str(random.randint(-1000, 1000))
+			}
+			return mc("0","login as visitor",data)
 		else:
 			#if account is exist but use visitor login, ask user use account to login
-			return "{\"status\":\"1\",\"message\":\"this phone is already binded a account,please login as account\"}"
+			return mc("1","this phone is already binded a account,please login as account")
 	def __account_login(self, account, password):
 		"""
 		user login with account and password
 		"""
 		sql_result=gasql("select * from userinfo where account='"+account +"' and password='"+password+"'")
 		if len(sql_result)<=0:
-			return "{\"status\":\"0\",\"message\":\"account is not exist\"}"
+			return mc("0","account is not exist")
 		else:
-			return "{\"status\":\"1\",\"message\":\"login as account\",\"session\":\""+self.__create_session_by_account(account,password)+"\",\"random\":\""+str(random.randint(-1000, 1000))+"\"}"
+			data={"session":self.__create_session_by_account(account,password),"random":str(random.randint(-1000, 1000))}
+			return mc("1","login as account",data)
 	def __create_session_by_unique_id(self,unique_id):
 		"""
 		return a session to user, right now just add _session with unique id, matthew will make really session
