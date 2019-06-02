@@ -89,9 +89,9 @@ class WorkingTimeRecoderClass():
 				return MessageList[2] % (day+" "+time)
 		return MessageList[2] % ("user is not exist")
 	def _create_session(self,message_info):
-		message_dic  = eval(message_info)
+		message_dic  = json.loads(s=message_info, encoding="utf-8")
 		session = ""
-		if "data" in message_dic.keys():
+		if "data" in str(list(message_dic.keys())):
 			unique_id = message_dic["data"]["unique_id"]
 			account = message_dic["data"]["account"]
 			password = message_dic["data"]["password"]
