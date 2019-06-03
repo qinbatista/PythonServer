@@ -8,9 +8,12 @@ import pymysql
 import datetime
 import random
 
+
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
-from Utility import LogRecorder,EncryptionAlgorithm
+
+
+from Utility import LogRecorder, EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import working_cat as wcsql
 from Utility.AnalysisHeader import message_constructor as mc
@@ -18,7 +21,7 @@ from Utility.AnalysisHeader import message_constructor as mc
 DESKey = "67891234"
 DESVector = "6789123467891234"
 
-MessageList=[
+MessageList = [
 	"{\"status\":\"00\",\"message\":\"get null message\"}",
 	"{\"status\":\"01\",\"message\":\"Check in\",\"time\":\"%s\",}",
 	"{\"status\":\"02\",\"message\":\"Check out\",\"time\":\"%s\",}",
@@ -28,34 +31,36 @@ MessageList=[
 	"{\"status\":\"06\",\"message\":\"Update time\",\"time\":\"%s\",}",
 	"{\"status\":\"07\",\"message\":{\"Check in\":\"%s\",\"Check out\":\"%s\"}}",
 ]
+
+
 class WorkingTimeRecoderClass():
 	def __init__(self, *args, **kwargs):
 		pass
-	def _get_staff_current_status(self):
+
+	def _get_staff_current_status(self, message_info):
 		"""
 		get all staff status in nowdays
 		"""
-		day = datetime.datetime.now().strftime("%Y-%m-%d")
-		# sql = "SELECT IFNULL(u.user_name,t.unique_id) AS account,t.check_in,t.check_out,t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " +"WHERE t.data_time ='" + day + "';"
-		sql = "SELECT u.user_name, t.unique_id, t.check_in, t.check_out, t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " +"WHERE t.data_time ='" + day + "';"
-		ss=wcsql(sql)
-		print("a"*10+str(len(ss)))
+		message_dic = json.loads(s=message_info, encoding="utf-8")
+		sql = "SELECT u.user_name, t.unique_id, t.check_in, t.check_out, t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " + "WHERE t.data_time ='" + message_dic["data"]["date"] + "';"
+		ss = wcsql(sql)
+		print("a" * 10 + str(len(ss)))
 		data = []
 		for staff in ss:
 			temp_dict = {
-				"user_name": "None" if staff[0] is None else staff[0],
-				"unique_id": "None" if staff[1] is None else staff[1],
-				"check_in": "None" if staff[2] is None else staff[2],
-				"check_out": "None" if staff[3] is None else staff[3],
-				"data_time": "None" if staff[4] is None else staff[4],
+				"user_name": "null" if staff[0] is None else staff[0],
+				"unique_id": "null" if staff[1] is None else staff[1],
+				"check_in": "null" if staff[2] is None else staff[2],
+				"check_out": "null" if staff[3] is None else staff[3],
+				"data_time": "null" if staff[4] is None else staff[4],
 			}
 			data.append(temp_dict)
 
-		current_str = mc("0", "当天数据", str(data)).replace("\"[", "[").replace("]\"", "]").replace("'", "\"")
+		current_str = mc("0", message_dic["data"]["date"] + "打卡数据", str(data)).replace("\"[", "[").replace("]\"", "]").replace("'", "\"")
 		return current_str
 
 	def _get_someday_information(self, message_info):
-		message_dic = eval(message_info)
+		message_dic = json.loads(s=message_info, encoding="utf-8")
 		session = message_dic["session"]
 		date = message_dic["data"]["date"]
 		sql = f"""
@@ -64,62 +69,64 @@ class WorkingTimeRecoderClass():
 			WHERE u.session = "{session}"
 			AND t.data_time = "{date}";"""
 		staff = wcsql(sql)
-		someday_info={
-			"checkin": "None",
-			"checkout": "None"
+		someday_info = {
+			"checkin": "null",
+			"checkout": "null"
 		}
-		if len(staff) == 0: return mc("1","没有记录", someday_info)
+		if len(staff) == 0: return mc("1", date + "没有上班", someday_info)
 		someday_info["checkin"] = staff[0][0]
-		someday_info["checkout"] = ("None" if staff[0][1] is None else staff[0][1])
-		return mc("0", "有记录", someday_info)
+		someday_info["checkout"] = ("null" if staff[0][1] is None else staff[0][1])
+		return mc("0", date + "上班记录", someday_info)
 
-	def _check_time_sql(self,message,session):
+	def _check_time_sql(self, session):
 		"""
 		check in and check out
 		"""
 		result = self._is_user_exist(session)
-		if len(result)>0:
+		if len(result) > 0:
 			day = datetime.datetime.now().strftime("%Y-%m-%d")
 			time = datetime.datetime.now().strftime("%H:%M:%S")
-			if self._is_checked_in(result[0][0],result[0][1],day) == False:
-				wcsql("INSERT INTO timeinfo(account,unique_id,check_in,data_time) " + "VALUES ('"+str(result[0][0])+"','"+str(result[0][1])+"','"+time+"','"+day+"')")
-				return MessageList[1] % (day+" "+time)
+			data = {
+				"time": day + " " + time
+			}
+			if not self._is_checked_in(result[0][0], result[0][1], day):
+				wcsql("INSERT INTO timeinfo(account,unique_id,check_in,data_time) " + "VALUES ('" + str(result[0][0]) + "','" + str(result[0][1]) + "','" + time + "','" + day + "')")
+				return mc("01", "success", data)
 			else:
-				wcsql("UPDATE timeinfo SET check_out='"+time+"' WHERE data_time='"+day+"' and account ='"+result[0][0]+"' and unique_id ='"+result[0][1]+"'")
-				return MessageList[2] % (day+" "+time)
-		return MessageList[2] % ("user is not exist")
-	def _create_session(self,message_info):
-		message_dic  = json.loads(s=message_info, encoding="utf-8")
-		session = ""
-		if "data" in str(list(message_dic.keys())):
+				wcsql("UPDATE timeinfo SET check_out='" + time + "' WHERE data_time='" + day + "' and account ='" + str(result[0][0]) + "' and unique_id ='" + str(result[0][1]) + "'")
+				return mc("02", "success", data)
+		return mc("02", "failure", "user is not exist")
+
+	def _create_session(self, message_info):
+		message_dic = json.loads(s=message_info, encoding="utf-8")
+		if "data" in str(list(message_dic.keys())):# message_dic.keys() 不稳定
 			unique_id = message_dic["data"]["unique_id"]
 			account = message_dic["data"]["account"]
 			password = message_dic["data"]["password"]
-			if account=="":
-				condition = "unique_id='"+unique_id+"'"
+			if account == "":
+				condition = "unique_id='" + unique_id + "'"
 				Log("[WorkingTimeRecoder][_create_session] use unique_id for seesion")
 			else:
-				condition = "account='"+account +"' and password='"+password+"'"
+				condition = "account='" + account + "' and password='" + password + "'"
 				Log("[WorkingTimeRecoder][_create_session] use account for seesion")
-			ss=wcsql("select session from userinfo where "+condition)
-			if len(ss)<=0:
-				session = unique_id+"_session"
-				wcsql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('"+unique_id+"','"+account+"','"+password+"','"+session+"')")
+			ss = wcsql("select session from userinfo where " + condition)
+			if len(ss) <= 0:
+				session = unique_id + "_session"
+				wcsql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('" + unique_id + "','" + account + "','" + password + "','" + session + "')")
 			else:
 				session = str(ss[0][0])
 			base_data = {
-				"session": session,
-				"random": str(random.randint(-1000, 1000))
+				"session": session
 			}
-			return mc("0","login as visitor", base_data)
-		else:
-			return mc("1","this phone is already binded a account,please login as account")
-	def CheckTime_Json(self,session,IPAdress,UserName):
-		DataBaseJsonLocation = PythonLocation()+"/DataBase/"+time.strftime("%Y-%m", time.localtime())+".json"
+			return mc("0", "login as visitor", base_data)
+		return mc("1", "this phone is already binded a account,please login as account")
+
+	def CheckTime_Json(self, session, IPAdress, UserName):
+		DataBaseJsonLocation = PythonLocation() + "/DataBase/" + time.strftime("%Y-%m", time.localtime()) + ".json"
 		if not os.path.isfile(DataBaseJsonLocation):
 			codecs.open(DataBaseJsonLocation, 'w', 'UTF-8').write("{}")
 		try:
-			readed = json.load(open(DataBaseJsonLocation, 'r',encoding="UTF-8"))
+			readed = json.load(open(DataBaseJsonLocation, 'r', encoding="UTF-8"))
 		except:
 			print("The service is busy. . .")
 			return 5
@@ -127,7 +134,7 @@ class WorkingTimeRecoderClass():
 		ReciveTime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 		ReciveData = time.strftime("%Y-%m-%d", time.localtime())
 		if session not in readed:
-			addirc = {session:{ReciveData:{"CheckIn": "", "CheckOut": "", "IP": "", "UserName": ""}}}
+			addirc = {session: {ReciveData: {"CheckIn": "", "CheckOut": "", "IP": "", "UserName": ""}}}
 			JsonChannelList.update(addirc)
 		if ReciveData not in readed[session]:
 			ReciveData = time.strftime("%Y-%m-%d", time.localtime())
@@ -143,12 +150,18 @@ class WorkingTimeRecoderClass():
 				status = 2
 			adddirc["IP"] = IPAdress
 			adddirc["UserName"] = UserName
-			LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->IP:"+IPAdress+" UserName->"+UserName+" status:"+str(status))
+			LogRecorder.LogUtility(
+				"[Server][WorkingTimeRecoder][StaffCheckIn][" + IPAdress + "]->IP:" + IPAdress + " UserName->" + UserName + " status:" + str(
+					status))
 			JsonChannelList[session][ReciveData].update(adddirc)
-		with open(DataBaseJsonLocation, 'w',encoding="UTF-8") as json_file:
-			json_file.write(json.dumps(JsonChannelList,ensure_ascii=False,sort_keys=True, indent=4, separators=(',', ':')))
-		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"] encrypted MessageList[status]: "+MessageList[status])
+		with open(DataBaseJsonLocation, 'w', encoding="UTF-8") as json_file:
+			json_file.write(
+				json.dumps(JsonChannelList, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':')))
+		LogRecorder.LogUtility(
+			"[Server][WorkingTimeRecoder][StaffCheckIn][" + IPAdress + "] encrypted MessageList[status]: " +
+			MessageList[status])
 		return MessageList[status] % (ReciveTime)
+
 	def get_days_hours_second(self, readed, session):
 		totall_day = 0
 		temp_hours_sum = 0
@@ -161,10 +174,9 @@ class WorkingTimeRecoderClass():
 				if session_dict[data]["CheckOut"].replace(" ", "") == "":  # 判断当天有没有签出，就是下班的签到
 					temp_hours_sum += 8  # 没有就默认加8个小时
 				else:  # 有就分割小时、分钟、秒钟
-					CheckInList = (session_dict[data]["CheckIn"][session_dict[data]["CheckIn"].find(" ") + 1:]).split(
-						":")
+					CheckInList = (session_dict[data]["CheckIn"][session_dict[data]["CheckIn"].find(" ") + 1:]).split(":")
 					CheckOutList = (
-					session_dict[data]["CheckOut"][session_dict[data]["CheckOut"].find(" ") + 1:]).split(":")
+						session_dict[data]["CheckOut"][session_dict[data]["CheckOut"].find(" ") + 1:]).split(":")
 					CheckIn_totall_second = int(CheckInList[0]) * 60 * 60 + int(CheckInList[1]) * 60 + int(
 						CheckInList[2])
 					CheckOut_totall_second = int(CheckOutList[0]) * 60 * 60 + int(CheckOutList[1]) * 60 + int(
@@ -173,11 +185,13 @@ class WorkingTimeRecoderClass():
 					temp_hours_sum += temp_second_sum // 3600
 					temp_second_sum = temp_second_sum % 3600
 		return totall_day, temp_hours_sum, temp_second_sum
+
 	def get_total_day_sql(self, session):
-		#1:判断用户的session是否存在，如果不存在返回用户不存在消息
-		#2:如果存在用户id，如果没有用户id返回唯一表示符，用这个标识符来查询用户的所有数据
-		#3:天数进行总计数，有10条数据就累计上班10天
+		# 1:判断用户的session是否存在，如果不存在返回用户不存在消息
+		# 2:如果存在用户id，如果没有用户id返回唯一表示符，用这个标识符来查询用户的所有数据
+		# 3:天数进行总计数，有10条数据就累计上班10天
 		return "10"
+
 	def get_total_time_Json(self, session):
 		"""
 		通过用户id获取所有月份的工作天数和工作时间
@@ -192,10 +206,10 @@ class WorkingTimeRecoderClass():
 		 }
 		"""
 		totall_day = 0
-		hours_sum = 0# 记录的是小时数
-		second_sum = 0# 记录的是秒钟数
+		hours_sum = 0  # 记录的是小时数
+		second_sum = 0  # 记录的是秒钟数
 
-		path = PythonLocation()+"/DataBase/"
+		path = PythonLocation() + "/DataBase/"
 		files = os.listdir(path)
 		file_list = []
 		for file in files:
@@ -209,15 +223,18 @@ class WorkingTimeRecoderClass():
 				hours_sum += temp_hours_sum
 				second_sum += temp_second_sum
 
-				hours_sum += second_sum//3600
-				second_sum = second_sum%3600
-			except:print(path + file + "文件读取有错！！！")
+				hours_sum += second_sum // 3600
+				second_sum = second_sum % 3600
+			except:
+				print(path + file + "文件读取有错！！！")
 		totall_hours = str(hours_sum) + ":" + (str(second_sum // 60) if (second_sum // 60 > 10) else (
 				"0" + str(second_sum // 60))) + ":" + (str(second_sum % 60) if (second_sum % 60 > 10) else (
 				"0" + str(second_sum % 60)))
-		message ="{\"status\":\"04\",\"message\":{\"totall_day\":\"%s\",\"totall_hours\":\"%s\"}}"%(str(totall_day), str(totall_hours))
+		message = "{\"status\":\"04\",\"message\":{\"totall_day\":\"%s\",\"totall_hours\":\"%s\"}}" % (
+		str(totall_day), str(totall_hours))
 		return message
-	def get_month_data_Json(self,session,month):
+
+	def get_month_data_Json(self, session, month):
 		"""
 		通过用户id和需要获取的月份，获取工作天数和工作时间，
 		工作天数可以通过读取文件下该月份json文件的打卡天数
@@ -231,41 +248,48 @@ class WorkingTimeRecoderClass():
 		 }
 		"""
 		totall_day = 0
-		temp_hours_sum = 0# 记录的是小时数
-		temp_second_sum = 0# 记录的是秒钟数
+		temp_hours_sum = 0  # 记录的是小时数
+		temp_second_sum = 0  # 记录的是秒钟数
 		ReciveData = time.strftime("%Y-", time.localtime())
 		ReciveData = (ReciveData + str(month)) if int(month) > 10 else (ReciveData + "0" + str(month))
 		try:
 			readed = json.load(open(PythonLocation() + "/DataBase/" + ReciveData + ".json", "r", encoding="utf-8"))
 			totall_day, temp_hours_sum, temp_second_sum = self.get_days_hours_second(readed, session)
-		except:print("没有%s的信息！" % ReciveData)
+		except:
+			print("没有%s的信息！" % ReciveData)
 		totall_hours = str(temp_hours_sum) + ":" + (str(temp_second_sum // 60) if (temp_second_sum // 60 > 10) else (
-					"0" + str(temp_second_sum // 60))) + ":" + (str(temp_second_sum % 60) if (temp_second_sum % 60 > 10) else (
-					"0" + str(temp_second_sum % 60)))
-		message = "{\"status\":\"04\",\"message\":{\"month_day\":\"%s\",\"month_day\":\"%s\"}}" % (str(totall_day), str(totall_hours))
+				"0" + str(temp_second_sum // 60))) + ":" + (
+			               str(temp_second_sum % 60) if (temp_second_sum % 60 > 10) else (
+					               "0" + str(temp_second_sum % 60)))
+		message = "{\"status\":\"04\",\"message\":{\"month_day\":\"%s\",\"month_day\":\"%s\"}}" % (
+		str(totall_day), str(totall_hours))
 		return message
-	def VerifyMessageIntegrity(self,message,IPAdress):
-		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->recived encrypted message:"+str(message))
-		des = EncryptionAlgorithm.DES(DESKey,DESVector)
-		message = des.decrypt(message)  #decrypt byte message
-		message = bytes.decode(message) #byte to string
-		LogRecorder.LogUtility("[Server][WorkingTimeRecoder][StaffCheckIn]["+IPAdress+"]->decrypted message:"+message)
-		message_dic  = eval(message)
+
+	def VerifyMessageIntegrity(self, message, IPAdress):
+		LogRecorder.LogUtility(
+			"[Server][WorkingTimeRecoder][StaffCheckIn][" + IPAdress + "]->recived encrypted message:" + str(message))
+		des = EncryptionAlgorithm.DES(DESKey, DESVector)
+		message = des.decrypt(message)  # decrypt byte message
+		message = bytes.decode(message)  # byte to string
+		LogRecorder.LogUtility(
+			"[Server][WorkingTimeRecoder][StaffCheckIn][" + IPAdress + "]->decrypted message:" + message)
+		message_dic = eval(message)
 		if "session" in message_dic.keys():
 			session = message_dic["session"]
 		if "function" in message_dic.keys():
 			function = message_dic["function"]
-		return session,function,message
-	def _ResolveMsg(self, message, ip_address):# 客户端的数据、IP地址
+		return session, function, message
+
+	def _ResolveMsg(self, message, ip_address):  # 客户端的数据、IP地址
 		mutex = threading.Lock()
 		mutex.acquire()
-		des = EncryptionAlgorithm.DES(DESKey,DESVector)
-		session,function,msg_data = self.VerifyMessageIntegrity(message,ip_address)
-		callback_message=""
+		des = EncryptionAlgorithm.DES(DESKey, DESVector)
+		session, function, msg_data = self.VerifyMessageIntegrity(message, ip_address)
+		callback_message = ""
 		if function == "get_time":
 			callback_message = MessageList[6] % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 		if function == "check_time":
-			callback_message = self._check_time_sql(msg_data,session)
+			callback_message = self._check_time_sql(session)
 		if function == "get_total_day":
 			callback_message = self.get_total_day_sql(session)
 		# if function == "GetMyAlldata":# 获取全部数据
@@ -273,52 +297,56 @@ class WorkingTimeRecoderClass():
 		# if function == "GetMyMonthdata":# 获取全部数据
 		# 	callback_message = self.get_month_data_Json(user_id, 5)
 		if function == "get_staff_current_status":
-			callback_message = self._get_staff_current_status()
+			callback_message = self._get_staff_current_status(msg_data)
 		if function == "get_someday_information":
 			callback_message = self._get_someday_information(msg_data)
 		if function == "login":
 			callback_message = self._create_session(msg_data)
-		Log("[WorkingTimeRecoder][ResolveMsg] callback_message="+callback_message)
+		Log("[WorkingTimeRecoder][ResolveMsg] callback_message=" + callback_message)
 		retval = des.encrypt(str.encode(str(callback_message)))
 		mutex.release()
 		return retval
-	def _is_checked_in(self,account,unique_id,day):
+
+	def _is_checked_in(self, account, unique_id, day):
 		"""
 			check if user checked before.
 		"""
-		if account=="":
-			result = wcsql("select check_in from timeinfo where unique_id = '"+unique_id+"' and data_time='"+day+"'")
+		if account == "":
+			result = wcsql("select check_in from timeinfo where unique_id = '" + unique_id + "' and data_time='" + day + "'")
 		else:
-			result = wcsql("select check_in from timeinfo where account = '"+account+"' and data_time='"+day+"'")
-		if len(result)<=0:
+			result = wcsql("select check_in from timeinfo where account = '" + str(account) + "' and data_time='" + day + "'")
+		if len(result) <= 0:
 			print("false")
 			return False
 		else:
 			print("true")
 			return True
-	def _is_user_exist(self,session):
+
+	def _is_user_exist(self, session):
 		"""
 			Verify if that user exists
 		"""
-		result = wcsql("select account,unique_id from userinfo where session='"+session+"'")
+		result = wcsql("select account,unique_id from userinfo where session='" + session + "'")
 		return result
-	def _add_new_user(self,session,ip,user_name,gender,email,phone_number):
+
+	def _add_new_user(self, session, ip, user_name, gender, email, phone_number):
 		"""
 			add new user
 		"""
 		# 像数据库中插入新的用户信息
-		user = "INSERT INTO userinfo(session,ip,user_name,gender,email,phone_number) " + "VALUES ('"+session+"','"+ip+"','"+user_name+"','"+gender+"','"+email+"','"+phone_number+"')"
+		user = "INSERT INTO userinfo(session,ip,user_name,gender,email,phone_number) " + "VALUES ('" + session + "','" + ip + "','" + user_name + "','" + gender + "','" + email + "','" + phone_number + "')"
 		wcsql(user)
-	def _is_visitor(self,session):
+
+	def _is_visitor(self, session):
 		"""
 			if user have account in server
 		"""
-		result = wcsql("select account from userinfo where session = '"+session+"'")
-		if len(result)<=0:
+		result = wcsql("select account from userinfo where session = '" + session + "'")
+		if len(result) <= 0:
 			return False
 		else:
 			return True
 
+
 if __name__ == "__main__":
 	pass
-
