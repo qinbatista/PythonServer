@@ -11,8 +11,15 @@ from lukseun_client import LukseunClient
 
 COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m', \
 		'ylw' : '\033[1;33;40m'}
+client_type="aliya"
+host="192.168.1.183"
+#d = {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'aaa', 'account':'aaa', 'password':'ccc'}}
+#d = {'session': 'ACDE480011228888_session', 'function': 'check_time', 'random': '744', 'data': ""}
+#d = {'session': 'ACDE480011228888_session', 'function': 'get_staff_current_status', 'random': '744', 'data': ""}
 
-
+# d = {'session': '', 'function': 'login', 'random': '744', 'data': {'unique_id': 'ACDE480011228888', 'account': 'a', 'password': 'a'}}#aliya login
+# d = {'session': '', 'function': 'create_account', 'random': '744', 'data': {'unique_id': 'ACDE480011228888', 'account': 'a', 'password': 'a',"ip":"","user_name":"","gender":"","birth_day":"","last_time_login":"","registration_time":""}}#aliya create account
+d = {'session':'4E71A852-60CA-51EF-B8CC-C80CD627A180_session', 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1', 'scroll_id':'scroll_skill_ten'}}
 def test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
@@ -22,13 +29,7 @@ def test_multiple_message(n: int):
 
 
 def send_single_message(message_id: int):
-	client = LukseunClient(client_type="aliya",host="192.168.1.183")
-	d = {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'aaa', 'account':'aaa', 'password':'ccc'}}
-	#d = {'session': 'ACDE480011228888_session', 'function': 'check_time', 'random': '744', 'data': ""}
-	#d = {'session': 'ACDE480011228888_session', 'function': 'get_staff_current_status', 'random': '744', 'data': ""}
-
-	# d = {'session': '', 'function': 'login', 'random': '744', 'data': {'unique_id': 'ACDE480011228888', 'account': 'a', 'password': 'a'}}#aliya login
-	# d = {'session': '', 'function': 'create_account', 'random': '744', 'data': {'unique_id': 'ACDE480011228888', 'account': 'a', 'password': 'a',"ip":"","user_name":"","gender":"","birth_day":"","last_time_login":"","registration_time":""}}#aliya create account
+	client = LukseunClient(client_type,host)
 	start = time.time()
 	newstring  =  str(d).replace("'","\"")
 	asyncio.run(client.send_message(newstring))
@@ -49,8 +50,8 @@ def new_test_multiple_message(n: int):
 	print(f"Slowest: {COLORS['fail']} {max(times)} {COLORS['end']} seconds.")
 
 async def async_send_single_message(message_id: int) -> float:
-	client = LukseunClient()
-	d = {'session': 'ACDE48001122', 'function': 'login', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
+	client = LukseunClient(client_type,host)
+	#d = {'session': 'ACDE48001122', 'function': 'login', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
 	start = time.time()
 	await client.send_message(str(d).replace("'","\""))
 	end = time.time()
@@ -64,9 +65,8 @@ def async_multi_message(message_id: int):
 
 
 def main() -> None:
-	#test_multiple_message(int(input('How many messages to send: ')))
-	#new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
-	send_single_message(1)
+	new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
+	#send_single_message(1)
 
 
 if __name__ == '__main__':

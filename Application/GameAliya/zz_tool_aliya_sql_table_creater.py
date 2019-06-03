@@ -30,8 +30,8 @@ def create_skill_table():
 	db = pymysql.connect("localhost", "root", "lukseun", "aliya")
 	cursor = db.cursor()
 	user_sql = """
-			CREATE TABLE userinfo(
-			user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			CREATE TABLE skill(
+			unique_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			m1_level VARCHAR(10) NULL,
 			m11_level VARCHAR(10) NULL,
 			m12_level VARCHAR(10) NULL,
@@ -74,6 +74,7 @@ def create_skill_table():
 			)"""
 	cursor.execute(user_sql)
 	db.commit()
+
 if __name__ == "__main__":
 	create_users_table()
 	create_skill_table()

@@ -46,10 +46,10 @@ class Header:
 
 	def isAPPMessage(self, md5String):
 		if md5String == "e3cb970693574ea75d091a6049f8a3ff":  # md5 of string of "natasha"
-			LogRecorder.LogUtility("[AnalysisHeader][isLegalMessage]Get Natasha message, pass")
+			LogRecorder.LogUtility("[AnalysisHeader][isLegalMessage]Get aliya message, pass")
 			return "aliya"
 		elif md5String == "7e1bd1f7a5fb2e316fafb6a4bf5d174e":  # md5 of string of "natasha"
-			LogRecorder.LogUtility("[AnalysisHeader][isLegalMessage]Get Natasha message, pass")
+			LogRecorder.LogUtility("[AnalysisHeader][isLegalMessage]Get workingcat message, pass")
 			return "workingcat"
 		else:
 			return ""
