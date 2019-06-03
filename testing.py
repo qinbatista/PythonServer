@@ -22,8 +22,9 @@ def test_multiple_message(n: int):
 
 
 def send_single_message(message_id: int):
-	client = LukseunClient(client_type="workingcat",host="192.168.1.183")
-	d = {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'4E71A852-60CA-51EF-B8CC-C80CD627A180', 'account':'', 'password':''}}
+	# client = LukseunClient(client_type="workingcat",host="192.168.1.183")
+	client = LukseunClient(client_type="workingcat",host="127.0.0.1")
+	d = {'session':'BCC0258D-0243-46B7-9F83-9E2D507EABBB_session', 'function':'get_total_day_time', 'random':'-906', 'data':{'unique_id':'4E71A852-60CA-51EF-B8CC-C80CD627A180', 'account':'', 'password':''}}
 	#d = {'session': 'ACDE480011228888_session', 'function': 'check_time', 'random': '744', 'data': ""}
 	#d = {'session': 'ACDE480011228888_session', 'function': 'get_staff_current_status', 'random': '744', 'data': ""}
 

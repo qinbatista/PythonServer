@@ -56,10 +56,19 @@ class WorkingTimeRecoderClass():
 			}
 			data.append(temp_dict)
 
-		current_str = mc("0", message_dic["data"]["date"] + "打卡数据", str(data)).replace("\"[", "[").replace("]\"", "]").replace("'", "\"")
-		return current_str
+		# current_str = mc("0", message_dic["data"]["date"] + "打卡数据", str(data)).replace("\"[", "[").replace("]\"", "]").replace("'", "\"")
+		return mc("0", message_dic["data"]["date"] + "打卡数据", data)
 
-	def _get_someday_information(self, message_info):
+	def _get_someday_information(self, message_info: str) -> str:
+		"""
+		Get my work record for a given date
+		:param message_info:str -> json
+		:return:json -> str
+		"""
+		someday_info = {
+			"checkin": "null",
+			"checkout": "null"
+		}
 		message_dic = json.loads(s=message_info, encoding="utf-8")
 		session = message_dic["session"]
 		date = message_dic["data"]["date"]
@@ -69,10 +78,6 @@ class WorkingTimeRecoderClass():
 			WHERE u.session = "{session}"
 			AND t.data_time = "{date}";"""
 		staff = wcsql(sql)
-		someday_info = {
-			"checkin": "null",
-			"checkout": "null"
-		}
 		if len(staff) == 0: return mc("1", date + "没有上班", someday_info)
 		someday_info["checkin"] = staff[0][0]
 		someday_info["checkout"] = ("null" if staff[0][1] is None else staff[0][1])
@@ -186,11 +191,26 @@ class WorkingTimeRecoderClass():
 					temp_second_sum = temp_second_sum % 3600
 		return totall_day, temp_hours_sum, temp_second_sum
 
-	def get_total_day_sql(self, session):
+	def get_total_day_time_sql(self, session):
 		# 1:判断用户的session是否存在，如果不存在返回用户不存在消息
 		# 2:如果存在用户id，如果没有用户id返回唯一表示符，用这个标识符来查询用户的所有数据
 		# 3:天数进行总计数，有10条数据就累计上班10天
-		return "10"
+		sql = f"""
+			SELECT u.user_name,t.check_in,t.check_out,t.data_time
+			FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id
+			WHERE u.session = "{session}";"""
+		ss = wcsql(sql)
+		print("[WorkingTimeRecoder][get_total_day_time_sql]->ss:" + str(ss))
+		data = []
+		for staff in ss:
+			temp_dict = {
+				"user_name": "null" if staff[0] is None else staff[0],
+				"check_in": "null" if staff[1] is None else staff[1],
+				"check_out": "null" if staff[2] is None else staff[2],
+				"data_time": "null" if staff[3] is None else staff[3]
+			}
+			data.append(temp_dict)
+		return mc("0", "所有信息", data)
 
 	def get_total_time_Json(self, session):
 		"""
@@ -290,8 +310,8 @@ class WorkingTimeRecoderClass():
 			callback_message = MessageList[6] % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 		if function == "check_time":
 			callback_message = self._check_time_sql(session)
-		if function == "get_total_day":
-			callback_message = self.get_total_day_sql(session)
+		if function == "get_total_day_time":
+			callback_message = self.get_total_day_time_sql(session)
 		# if function == "GetMyAlldata":# 获取全部数据
 		# 	callback_message = self.get_total_time_Json(user_id)
 		# if function == "GetMyMonthdata":# 获取全部数据
