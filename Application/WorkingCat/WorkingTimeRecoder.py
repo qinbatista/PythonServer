@@ -37,31 +37,30 @@ class WorkingTimeRecoderClass():
 	def __init__(self, *args, **kwargs):
 		pass
 
-	def _get_staff_current_status(self):
+	def _get_staff_current_status(self, message_info):
 		"""
 		get all staff status in nowdays
 		"""
-		day = datetime.datetime.now().strftime("%Y-%m-%d")
-		# sql = "SELECT IFNULL(u.user_name,t.unique_id) AS account,t.check_in,t.check_out,t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " +"WHERE t.data_time ='" + day + "';"
-		sql = "SELECT u.user_name, t.unique_id, t.check_in, t.check_out, t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " + "WHERE t.data_time ='" + day + "';"
+		message_dic = json.loads(s=message_info, encoding="utf-8")
+		sql = "SELECT u.user_name, t.unique_id, t.check_in, t.check_out, t.data_time " + "FROM timeinfo t JOIN userinfo u ON t.unique_id = u.unique_id " + "WHERE t.data_time ='" + message_dic["data"]["date"] + "';"
 		ss = wcsql(sql)
 		print("a" * 10 + str(len(ss)))
 		data = []
 		for staff in ss:
 			temp_dict = {
-				"user_name": "None" if staff[0] is None else staff[0],
-				"unique_id": "None" if staff[1] is None else staff[1],
-				"check_in": "None" if staff[2] is None else staff[2],
-				"check_out": "None" if staff[3] is None else staff[3],
-				"data_time": "None" if staff[4] is None else staff[4],
+				"user_name": "null" if staff[0] is None else staff[0],
+				"unique_id": "null" if staff[1] is None else staff[1],
+				"check_in": "null" if staff[2] is None else staff[2],
+				"check_out": "null" if staff[3] is None else staff[3],
+				"data_time": "null" if staff[4] is None else staff[4],
 			}
 			data.append(temp_dict)
 
-		current_str = mc("0", day + "打卡数据", str(data)).replace("\"[", "[").replace("]\"", "]").replace("'", "\"")
+		current_str = mc("0", message_dic["data"]["date"] + "打卡数据", str(data)).replace("\"[", "[").replace("]\"", "]").replace("'", "\"")
 		return current_str
 
 	def _get_someday_information(self, message_info):
-		message_dic = eval(message_info)
+		message_dic = json.loads(s=message_info, encoding="utf-8")
 		session = message_dic["session"]
 		date = message_dic["data"]["date"]
 		sql = f"""
@@ -298,7 +297,7 @@ class WorkingTimeRecoderClass():
 		# if function == "GetMyMonthdata":# 获取全部数据
 		# 	callback_message = self.get_month_data_Json(user_id, 5)
 		if function == "get_staff_current_status":
-			callback_message = self._get_staff_current_status()
+			callback_message = self._get_staff_current_status(msg_data)
 		if function == "get_someday_information":
 			callback_message = self._get_someday_information(msg_data)
 		if function == "login":
