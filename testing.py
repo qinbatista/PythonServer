@@ -65,8 +65,8 @@ def async_multi_message(message_id: int):
 
 
 def main() -> None:
-	new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
-	#send_single_message(1)
+	#new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
+	send_single_message(1)
 
 
 if __name__ == '__main__':

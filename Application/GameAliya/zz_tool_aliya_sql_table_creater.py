@@ -2,8 +2,12 @@ import os
 import pymysql
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
+IP = "localhost"
+ACCOUNT="root"
+PASSWROD="lukseun"
+DATABASE = "aliya"
 def create_users_table():
-	db = pymysql.connect("localhost", "root", "lukseun", "aliya")
+	db = pymysql.connect(IP, ACCOUNT, PASSWROD, DATABASE)
 	cursor = db.cursor()
 	user_sql = """
 			CREATE TABLE userinfo(
@@ -27,11 +31,11 @@ def create_users_table():
 	cursor.execute(add_sql)
 	db.commit()
 def create_skill_table():
-	db = pymysql.connect("localhost", "root", "lukseun", "aliya")
+	db = pymysql.connect(IP, ACCOUNT, PASSWROD, DATABASE)
 	cursor = db.cursor()
 	user_sql = """
 			CREATE TABLE skill(
-			unique_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+			unique_id VARCHAR(128) NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			m1_level VARCHAR(10) NULL,
 			m11_level VARCHAR(10) NULL,
 			m12_level VARCHAR(10) NULL,
@@ -74,7 +78,28 @@ def create_skill_table():
 			)"""
 	cursor.execute(user_sql)
 	db.commit()
-
+def create_bag_table():
+	db = pymysql.connect(IP, ACCOUNT, PASSWROD, DATABASE)
+	cursor = db.cursor()
+	user_sql = """
+	CREATE TABLE scorll_bag(
+		unique_id VARCHAR(50) NOT NULL PRIMARY KEY,
+	scroll1 SMALLINT NULL,
+	scroll2 SMALLINT NULL,
+	scroll3 SMALLINT NULL,
+	iron SMALLINT NULL,
+	weapon1 SMALLINT NULL,
+	weapon2 SMALLINT NULL,
+	weapon3 SMALLINT NULL,
+	weapon4 SMALLINT NULL,
+	weapon5 SMALLINT NULL,
+	weapon6 SMALLINT NULL,
+	diamonds SMALLINT NULL,
+	coin SMALLINT NULL
+	)
+	"""
+	cursor.execute(user_sql)
+	db.commit()
 if __name__ == "__main__":
 	create_users_table()
 	create_skill_table()
