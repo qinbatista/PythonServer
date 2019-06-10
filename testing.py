@@ -71,9 +71,9 @@ def async_multi_message(message_id: int):
 def main() -> None:
 	#new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
 	# send_single_message(LOGIN_AS_VISITOR)
-	#send_single_message(SKILL_LEVEL_UP)
-	#send_single_message(GET_SKILL)
-	send_single_message(INCREASE_SCROLL_SKILL_10)
+	# send_single_message(GET_SKILL)
+	send_single_message(SKILL_LEVEL_UP)
+	# send_single_message(INCREASE_SCROLL_SKILL_10)
 
 
 if __name__ == '__main__':
