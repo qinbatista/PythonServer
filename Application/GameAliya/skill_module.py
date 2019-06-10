@@ -38,6 +38,7 @@ class SkillSystemClass():
 			if self.__get_scroll_quantity(scroll_id)==0:
 				return mc("1","don't have enough scroll")
 			if scroll_id=="scroll_skill_10":
+				gasql("UPDATE bag SET "+scroll_id+"= "+scroll_id+"-"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
 				if random.randint(1,10)==10:
 					data = {"data": {"skill_id": skill_id,"skill_level":"2", "scroll_id": scroll_id,"scroll_quantity":"2","upgrade":"0"}}
 				else:
