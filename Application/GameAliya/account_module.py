@@ -65,6 +65,8 @@ class LoginSystemClass():
 			sql_result = gasql("select count from userinfo where account='"+account+"'")
 			if len(sql_result)<=0:
 				gasql("INSERT INTO userinfo(unique_id,account,password,ip,user_name,gender,birth_day,last_time_login,registration_time) VALUES ('"+unique_id+"','"+account+"','"+password+"','"+ip+"','"+user_name+"','"+gender+"','"+birth_day+"','"+last_time_login+"','"+registration_time+"')")
+				gasql("INSERT INTO bag(unique_id) VALUES ('"+unique_id+"'")
+				gasql("INSERT INTO skill(unique_id, VALUES ('"+unique_id+"'")
 				return mc("0","create success")
 			else:
 				return mc("1","user name already exists")
@@ -82,6 +84,8 @@ class LoginSystemClass():
 				#if session is not exist, it is a new user, createa a account for them
 				session = self.__create_session_by_unique_id(unique_id)
 				gasql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('"+unique_id+"','"+""+"','"+""+"','"+session+"')")
+				gasql("INSERT INTO bag(unique_id) VALUES ('"+unique_id+"')")
+				gasql("INSERT INTO skill(unique_id) VALUES ('"+unique_id+"')")
 			else:
 				#if session is exist, just give them session
 				session = str(sql_result[0][0])
@@ -99,10 +103,10 @@ class LoginSystemClass():
 		"""
 		sql_result=gasql("select * from userinfo where account='"+account +"' and password='"+password+"'")
 		if len(sql_result)<=0:
-			return mc("0","account is not exist")
+			return mc("1","account is not exist")
 		else:
 			data={"session":self.__create_session_by_account(account,password),"random":str(random.randint(-1000, 1000))}
-			return mc("1","login as account",data)
+			return mc("0","login as account",data)
 	def __create_session_by_unique_id(self,unique_id):
 		"""
 		return a session to user, right now just add _session with unique id, matthew will make really session
