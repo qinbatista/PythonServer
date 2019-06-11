@@ -25,19 +25,14 @@ class SkillSystemClass():
 			return mc("1","user is not exist")
 		message_dic  = eval(message_info)
 		data={}
-		self.__get_scroll_quantity("scroll_skill_10")
 		try:
-			#1:技能是否大于1级且卷轴数量是否大于1，不满足则返回升级失败
-			#2:卷轴数量减1开始升级技能
-			#3:升级成功技能等级加1，返回技能、技能等级、卷轴、卷轴数量、升级成功标示
-			#4:升级失败，返回技能、技能等级、卷轴、卷轴数量、升级成功标示
 			skill_id = message_dic["data"]["skill_id"]
 			scroll_id = message_dic["data"]["scroll_id"]
 			if self.__get_skill_level(skill_id)==0:
 				return mc("2","skill does't get yet")
 			if self.__get_scroll_quantity(scroll_id)==0:
 				return mc("3","don't have enough scroll")
-			if scroll_id=="scroll_skill_10":
+			if scroll_id=="scroll_skill_10":#level up with 10% scroll
 				gasql("UPDATE bag SET "+scroll_id+"= "+scroll_id+"-"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
 				if random.randint(1,10)==10:
 					gasql("UPDATE skill SET "+skill_id+"="+skill_id+"+"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
@@ -48,6 +43,25 @@ class SkillSystemClass():
 					result_skill_quantity = gasql("select "+skill_id+" from skill where  unique_id='"+self.unique_id + "'")
 					result_scroll_quantity = gasql("select "+scroll_id+" from bag where  unique_id='"+self.unique_id + "'")
 					data = { "value":[skill_id,str(result_skill_quantity[0][0]),scroll_id,str(result_scroll_quantity[0][0])],"upgrade":"1"}
+
+			if scroll_id=="scroll_skill_30":#level up with 30% scroll
+				gasql("UPDATE bag SET "+scroll_id+"= "+scroll_id+"-"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
+				if random.randint(1,10)<=7:
+					gasql("UPDATE skill SET "+skill_id+"="+skill_id+"+"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
+					result_skill_quantity = gasql("select "+skill_id+" from skill where  unique_id='"+self.unique_id + "'")
+					result_scroll_quantity = gasql("select "+scroll_id+" from bag where  unique_id='"+self.unique_id + "'")
+					data = { "value":[skill_id,str(result_skill_quantity[0][0]),scroll_id,str(result_scroll_quantity[0][0])],"upgrade":"0"}
+				else:
+					result_skill_quantity = gasql("select "+skill_id+" from skill where  unique_id='"+self.unique_id + "'")
+					result_scroll_quantity = gasql("select "+scroll_id+" from bag where  unique_id='"+self.unique_id + "'")
+					data = { "value":[skill_id,str(result_skill_quantity[0][0]),scroll_id,str(result_scroll_quantity[0][0])],"upgrade":"1"}
+
+			if scroll_id=="scroll_skill_100":#level up with 100% scroll
+				gasql("UPDATE bag SET "+scroll_id+"= "+scroll_id+"-"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
+				gasql("UPDATE skill SET "+skill_id+"="+skill_id+"+"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
+				result_skill_quantity = gasql("select "+skill_id+" from skill where  unique_id='"+self.unique_id + "'")
+				result_scroll_quantity = gasql("select "+scroll_id+" from bag where  unique_id='"+self.unique_id + "'")
+				data = { "value":[skill_id,str(result_skill_quantity[0][0]),scroll_id,str(result_scroll_quantity[0][0])],"upgrade":"0"}
 		except :
 			return mc("4","client message is incomplete")
 		return mc("0","success",data)
