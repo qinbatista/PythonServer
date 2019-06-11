@@ -43,11 +43,11 @@ class SkillSystemClass():
 					gasql("UPDATE skill SET "+skill_id+"="+skill_id+"+"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
 					result_skill_quantity = gasql("select "+skill_id+" from skill where  unique_id='"+self.unique_id + "'")
 					result_scroll_quantity = gasql("select "+scroll_id+" from bag where  unique_id='"+self.unique_id + "'")
-					data = {"data": { skill_id:str(result_skill_quantity[0][0]), scroll_id : str(result_scroll_quantity[0][0]),"upgrade":"0"}}
+					data = { "value":[skill_id,str(result_skill_quantity[0][0]),scroll_id,str(result_scroll_quantity[0][0])],"upgrade":"0"}
 				else:
 					result_skill_quantity = gasql("select "+skill_id+" from skill where  unique_id='"+self.unique_id + "'")
 					result_scroll_quantity = gasql("select "+scroll_id+" from bag where  unique_id='"+self.unique_id + "'")
-					data = {"data": { skill_id:str(result_skill_quantity[0][0]), scroll_id : str(result_scroll_quantity[0][0]),"upgrade":"1"}}
+					data = { "value":[skill_id,str(result_skill_quantity[0][0]),scroll_id,str(result_scroll_quantity[0][0])],"upgrade":"1"}
 		except :
 			return mc("4","client message is incomplete")
 		return mc("0","success",data)
