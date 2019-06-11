@@ -65,12 +65,15 @@ class AliyaSystemClass():
 		if function =="get_skill":
 			self.skill_class = skill_module.SkillSystemClass(session)
 			callback_message = self.skill_class._get_skill(msg_data)
+		if function =="get_all_skill_level":
+			self.skill_class = skill_module.SkillSystemClass(session)
+			callback_message = self.skill_class._get_all_skill_level(msg_data)
 		if function =="increase_supplies":
 			self.bag_class = bag_module.BagSystemClass(session)
 			callback_message = self.bag_class._increase_supplies(msg_data)
 		if callback_message=="":
 			callback_message=mc("1","no function->"+function)
-		Log("[WorkingTimeRecoder][ResolveMsg] callback_message="+callback_message)
+		Log("[GameAliya][ResolveMsg] callback_message="+callback_message)
 		retval = des.encrypt(str.encode(str(callback_message)))
 		mutex.release()
 		return retval

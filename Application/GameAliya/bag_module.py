@@ -35,6 +35,9 @@ class BagSystemClass():
 		if "scroll_skill_30" in message_dic["data"].keys():
 			scroll_quantity = message_dic["data"]["scroll_skill_30"]
 			return_dic.update (self.__increase_scroll_quantity("scroll_skill_30",scroll_quantity))
+		if "scroll_skill_100" in message_dic["data"].keys():
+			scroll_quantity = message_dic["data"]["scroll_skill_100"]
+			return_dic.update (self.__increase_scroll_quantity("scroll_skill_100",scroll_quantity))
 		return mc("0",return_dic)
 	def __get_unique_id(self,session):
 		sql_result=gasql("select unique_id from userinfo where  session='"+session+"'")
