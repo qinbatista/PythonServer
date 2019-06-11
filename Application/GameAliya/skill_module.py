@@ -34,9 +34,9 @@ class SkillSystemClass():
 			skill_id = message_dic["data"]["skill_id"]
 			scroll_id = message_dic["data"]["scroll_id"]
 			if self.__get_skill_level(skill_id)==0:
-				return mc("1","skill does't get yet")
+				return mc("2","skill does't get yet")
 			if self.__get_scroll_quantity(scroll_id)==0:
-				return mc("1","don't have enough scroll")
+				return mc("3","don't have enough scroll")
 			if scroll_id=="scroll_skill_10":
 				gasql("UPDATE bag SET "+scroll_id+"= "+scroll_id+"-"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
 				if random.randint(1,10)==10:
@@ -49,7 +49,7 @@ class SkillSystemClass():
 					result_scroll_quantity = gasql("select "+scroll_id+" from bag where  unique_id='"+self.unique_id + "'")
 					data = {"data": { skill_id:str(result_skill_quantity[0][0]), scroll_id : str(result_scroll_quantity[0][0]),"upgrade":"1"}}
 		except :
-			return mc("1","client message is incomplete")
+			return mc("4","client message is incomplete")
 		return mc("0","success",data)
 	def _get_all_skill_level(self,session):
 		"""
@@ -82,8 +82,12 @@ class SkillSystemClass():
 		try:
 			message_dic  = eval(message_info)
 			skill_id = message_dic["data"]["skill_id"]
-			gasql("UPDATE skill SET "+skill_id+"="+str(1)+" WHERE unique_id='"+self.unique_id + "'")
-			return mc("0","you owned skill="+skill_id)
+			sql_result=gasql("select "+skill_id+" from skill where  unique_id='"+self.unique_id +"'")
+			if sql_result[0][0]<=0:
+				gasql("UPDATE skill SET "+skill_id+"="+str(1)+" WHERE unique_id='"+self.unique_id + "'")
+			else:
+				return mc("1","you already owned skill="+skill_id)
+			return mc("0","got new skill="+skill_id)
 		except :
 			return mc("1","client message is incomplete")
 if __name__ == "__main__":
