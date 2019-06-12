@@ -15,15 +15,17 @@ client_type="aliya"
 host="192.168.1.183"
 MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'account':'abc', 'password':'123'}},
 				 {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'account':'', 'password':''}},
-				 {'session':'mac_session', 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_10'}},
+				 {'session':'mac_session', 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
 				 {'session':'mac_session', 'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
-				 {'session':'mac_session', 'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'1','scroll_skill_30':'1'}}
+				 {'session':'mac_session', 'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
+				 {'session':'mac_session', 'function':'get_all_skill_level', 'random':'-906', 'data':""}
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
 SKILL_LEVEL_UP = 2
 GET_SKILL = 3
 INCREASE_SCROLL_SKILL_10=4
+GET_ALL_SKILL_LEVEL=5
 def test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
@@ -63,17 +65,18 @@ async def async_send_single_message(message_id: int) -> float:
 	return end - start
 
 def async_multi_message(message_id: int):
-	tasks = [asyncio.ensure_future(async_send_single_message(message_id * i)) for i in range(10)]
+	tasks = [asyncio.ensure_future(async_send_single_message(SKILL_LEVEL_UP)) for i in range(10)]
 	loop = asyncio.get_event_loop()
 	return loop.run_until_complete(asyncio.gather(*tasks))
 
 
 def main() -> None:
-	#new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
+	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
 	# send_single_message(LOGIN_AS_VISITOR)
 	# send_single_message(GET_SKILL)
-	send_single_message(SKILL_LEVEL_UP)
+	# send_single_message(SKILL_LEVEL_UP)
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
+	send_single_message(GET_ALL_SKILL_LEVEL)
 
 
 if __name__ == '__main__':

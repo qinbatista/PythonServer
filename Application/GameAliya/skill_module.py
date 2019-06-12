@@ -34,7 +34,10 @@ class SkillSystemClass():
 			if self.__get_scroll_quantity(scroll_id)==0:
 				return mc("3","don't have enough scroll")
 			if skill_level_result>=10:
-				return mc("5","level is max")
+				result_skill_quantity = gasql("select "+skill_id+" from skill where  unique_id='"+self.unique_id + "'")
+				result_scroll_quantity = gasql("select "+scroll_id+" from bag where  unique_id='"+self.unique_id + "'")
+				data = { "value":[skill_id,str(result_skill_quantity[0][0]),scroll_id,str(result_scroll_quantity[0][0])],"upgrade":"1"}
+				return mc("5","level is max",data)
 			if scroll_id=="scroll_skill_10":#level up with 10% scroll
 				gasql("UPDATE bag SET "+scroll_id+"= "+scroll_id+"-"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
 				if random.randint(1,10)==10:

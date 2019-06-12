@@ -22,7 +22,7 @@ class BagSystemClass():
 		try:
 			gasql("UPDATE bag SET "+scroll_id+"= "+scroll_id+" +"+scroll_quantity+" WHERE unique_id='"+self.unique_id + "'")
 			result_quantity = gasql("select "+scroll_id+" from bag where  unique_id='"+self.unique_id + "'")
-			dc = {scroll_id:result_quantity[0][0]}
+			dc = {"item":[scroll_id,result_quantity[0][0]]}
 			return dc
 		except :
 			return {"scroll_error":"1"}
@@ -38,7 +38,7 @@ class BagSystemClass():
 		if "scroll_skill_100" in message_dic["data"].keys():
 			scroll_quantity = message_dic["data"]["scroll_skill_100"]
 			return_dic.update (self.__increase_scroll_quantity("scroll_skill_100",scroll_quantity))
-		return mc("0",return_dic)
+		return mc("0","increase supplies success",return_dic)
 	def __get_unique_id(self,session):
 		sql_result=gasql("select unique_id from userinfo where  session='"+session+"'")
 		if len(sql_result[0][0])<=0:
