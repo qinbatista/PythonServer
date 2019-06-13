@@ -71,6 +71,12 @@ class AliyaSystemClass():
 		if function =="increase_supplies":
 			self.bag_class = bag_module.BagSystemClass(session)
 			callback_message = self.bag_class._increase_supplies(msg_data)
+		if function =="get_all_supplies":
+			self.bag_class = bag_module.BagSystemClass(session)
+			callback_message = self.bag_class._get_all_supplies(msg_data)
+		if function =="random_gift":
+			self.bag_class = bag_module.BagSystemClass(session)
+			callback_message = self.bag_class._random_gift(msg_data)
 		if callback_message=="":
 			callback_message=mc("1","no function->"+function)
 		Log("[GameAliya][ResolveMsg] callback_message="+callback_message)

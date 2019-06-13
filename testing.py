@@ -18,7 +18,9 @@ MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'un
 				 {'session':'mac_session', 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
 				 {'session':'mac_session', 'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
 				 {'session':'mac_session', 'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
-				 {'session':'mac_session', 'function':'get_all_skill_level', 'random':'-906', 'data':""}
+				 {'session':'mac_session', 'function':'get_all_skill_level', 'random':'-906', 'data':""},
+				{'session':'mac_session', 'function':'get_all_supplies', 'random':'-906', 'data':""},
+				{"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}}
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
@@ -26,6 +28,8 @@ SKILL_LEVEL_UP = 2
 GET_SKILL = 3
 INCREASE_SCROLL_SKILL_10=4
 GET_ALL_SKILL_LEVEL=5
+GET_ALL_SUPPLIES=6
+ALL_SUPPLIES_ADD5= 7
 def test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
@@ -65,7 +69,7 @@ async def async_send_single_message(message_id: int) -> float:
 	return end - start
 
 def async_multi_message(message_id: int):
-	tasks = [asyncio.ensure_future(async_send_single_message(SKILL_LEVEL_UP)) for i in range(10)]
+	tasks = [asyncio.ensure_future(async_send_single_message(ALL_SUPPLIES_ADD5)) for i in range(10)]
 	loop = asyncio.get_event_loop()
 	return loop.run_until_complete(asyncio.gather(*tasks))
 
@@ -76,7 +80,7 @@ def main() -> None:
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
-	send_single_message(GET_ALL_SKILL_LEVEL)
+	send_single_message(ALL_SUPPLIES_ADD5)
 
 
 if __name__ == '__main__':
