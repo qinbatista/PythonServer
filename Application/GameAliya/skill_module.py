@@ -106,8 +106,8 @@ class SkillSystemClass():
 			if sql_result[0][0]<=0:
 				gasql("UPDATE skill SET "+skill_id+"="+str(1)+" WHERE unique_id='"+self.unique_id + "'")
 			else:
-				return str({"skill"+str(self.item_list_count):[skill_id,1]})
-			return str({"skill"+str(self.item_list_count):[skill_id,1]})
+				return {"skill"+str(self.item_list_count):[skill_id,1]}
+			return {"skill"+str(self.item_list_count):[skill_id,1]}
 		except:
 			return mc("1","client message is incomplete")
 	def __get_unique_id(self,session):

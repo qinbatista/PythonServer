@@ -71,19 +71,19 @@ async def async_send_single_message(message_id: int) -> float:
 	return end - start
 
 def async_multi_message(message_id: int):
-	tasks = [asyncio.ensure_future(async_send_single_message(ALL_SUPPLIES_ADD5)) for i in range(10)]
+	tasks = [asyncio.ensure_future(async_send_single_message(RANDOM_GIFT_SKILL)) for i in range(10)]
 	loop = asyncio.get_event_loop()
 	return loop.run_until_complete(asyncio.gather(*tasks))
 
 
 def main() -> None:
-	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
+	new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
 	# send_single_message(LOGIN_AS_VISITOR)
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
-	send_single_message(RANDOM_GIFT_SKILL)
+	# send_single_message(RANDOM_GIFT_SKILL)
 
 
 if __name__ == '__main__':

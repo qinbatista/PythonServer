@@ -67,7 +67,7 @@ class LotterySystemClass():
 		skill_class = skill_module.SkillSystemClass(self.session)
 		sql_result = skill_class._get_skill_level(skill_id)
 		if sql_result<=0:
-			dc = skill_class._get_skill(str({'data':{'skill_id':skill_id}}))
+			dc = skill_class._get_skill(str({"data":{"skill_id":skill_id}}))
 			print(dc)
 			return mc("1","got new skill="+skill_id,dc)
 		else:
