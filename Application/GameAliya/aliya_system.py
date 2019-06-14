@@ -58,33 +58,34 @@ class AliyaSystemClass():
 		if function == "login":
 			login_class = account_module.LoginSystemClass()
 			callback_message = login_class._login(msg_data)
-		if function == "bind_account":
+		elif function == "bind_account":
 			login_class = account_module.LoginSystemClass()
 			callback_message = login_class._bind_account(msg_data)
 
-		if function =="skill_level_up":
+		elif function =="skill_level_up":
 			skill_class = skill_module.SkillSystemClass(session)
 			callback_message = skill_class._skill_level_up(msg_data)
-		if function =="get_skill":
-			skill_class = skill_module.SkillSystemClass(session)
-			callback_message = skill_class._get_skill(msg_data)
-		if function =="get_all_skill_level":
+		elif function =="get_all_skill_level":
 			skill_class = skill_module.SkillSystemClass(session)
 			callback_message = skill_class._get_all_skill_level(msg_data)
 
-		if function =="increase_supplies":
+		elif function =="increase_supplies":
 			bag_class = bag_module.BagSystemClass(session)
 			callback_message = bag_class._increase_supplies(msg_data)
-		if function =="get_all_supplies":
+		elif function =="get_all_supplies":
 			bag_class = bag_module.BagSystemClass(session)
 			callback_message = bag_class._get_all_supplies(msg_data)
 
-		if function =="random_gift_skill":
+		elif function =="random_gift_skill":
 			lottery_class = lottery_module.LotterySystemClass(session)
 			callback_message = lottery_class._random_gift_skill(msg_data)
 
+		elif function =="get_skill":
+			skill_class = skill_module.SkillSystemClass(session)
+			dc = skill_class._get_skill(msg_data)
+			callback_message = mc("0","got new skill success",dc)
 
-		if callback_message=="":
+		elif callback_message=="":
 			callback_message=mc("1","no function->"+function)
 		Log("[GameAliya][ResolveMsg] callback_message="+callback_message)
 		retval = des.encrypt(str.encode(str(callback_message)))
