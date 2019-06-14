@@ -17,6 +17,7 @@ from Utility.AnalysisHeader import message_constructor as mc
 class SkillSystemClass():
 	def __init__(self,session, *args, **kwargs):
 		self.unique_id = self.__get_unique_id(session)
+		self.item_list_count=0
 	def _skill_level_up(self,message_info):
 		"""
 		level up skill, if skill level is 0, can't level up, level up skill need scroll, scroll have probability to level up.
@@ -28,7 +29,7 @@ class SkillSystemClass():
 		try:
 			skill_id = message_dic["data"]["skill_id"]
 			scroll_id = message_dic["data"]["scroll_id"]
-			skill_level_result = self.__get_skill_level(skill_id)
+			skill_level_result = self._get_skill_level(skill_id)
 			if skill_level_result==0:
 				return mc("2","skill does't get yet")
 			if self.__get_scroll_quantity(scroll_id)==0:
@@ -76,18 +77,11 @@ class SkillSystemClass():
 		give all skills' level to client
 		"""
 		table,result=gasql_t("select * from skill where unique_id='"+self.unique_id +"'")
-		# print("ssss="+str(len(table[0])))
 		data_dic={}
 		for i in range(1,len(result[0])):
 			data_dic.update({"skill"+str(i):[table[i][0],result[0][i]]})
 		return mc("0","all skill level",data_dic)
-	def __get_unique_id(self,session):
-		sql_result=gasql("select unique_id from userinfo where  session='"+session+"'")
-		if len(sql_result[0][0])<=0:
-			return ""
-		else:
-			return sql_result[0][0]
-	def __get_skill_level(self,skill_id):
+	def _get_skill_level(self,skill_id):
 		"""
 		get skill level
 		"""
@@ -105,16 +99,28 @@ class SkillSystemClass():
 		pass
 	def _get_skill(self,message_info):
 		try:
+			self.item_list_count=self.item_list_count+1
 			message_dic  = eval(message_info)
 			skill_id = message_dic["data"]["skill_id"]
 			sql_result=gasql("select "+skill_id+" from skill where  unique_id='"+self.unique_id +"'")
 			if sql_result[0][0]<=0:
 				gasql("UPDATE skill SET "+skill_id+"="+str(1)+" WHERE unique_id='"+self.unique_id + "'")
 			else:
-				return mc("1","you already owned skill="+skill_id)
-			return mc("0","got new skill="+skill_id)
-		except :
+				return str({"skill"+str(self.item_list_count):[skill_id,1]})
+			return str({"skill"+str(self.item_list_count):[skill_id,1]})
+		except:
 			return mc("1","client message is incomplete")
+	def __get_unique_id(self,session):
+		sql_result=gasql("select unique_id from userinfo where  session='"+session+"'")
+		if len(sql_result[0][0])<=0:
+			return ""
+		else:
+			self.__check_table(sql_result[0][0])
+			return sql_result[0][0]
+	def __check_table(self, unique_id):
+		sql_result=gasql("select count(unique_id) from skill where  unique_id='"+unique_id+"'")
+		if sql_result[0][0]<=0:
+			gasql("INSERT INTO skill(unique_id) VALUES ('"+unique_id+"')")
 if __name__ == "__main__":
 	pass
 

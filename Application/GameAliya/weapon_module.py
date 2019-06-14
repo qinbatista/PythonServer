@@ -18,7 +18,19 @@ from Utility.AnalysisHeader import message_constructor as mc
 class WeaponSystemClass():
 	def __init__(self, *args, **kwargs):
 		pass
-
+	def __get_unique_id(self,session):
+		sql_result=gasql("select unique_id from userinfo where  session='"+session+"'")
+		if len(sql_result[0][0])<=0:
+			return ""
+		else:
+			self.__check_table(sql_result[0][0])
+			return sql_result[0][0]
+	def __check_table(self, unique_id):
+		sql_result=gasql("select count(unique_id) from weapon_bag where  unique_id='"+unique_id+"'")
+		if len(sql_result)<=0:
+			gasql("INSERT INTO weapon_bag(unique_id, VALUES ('"+unique_id+"')")
+			for i in range(1,40):
+				gasql("INSERT INTO weapon_"+i+"(unique_id) VALUES ('"+unique_id+"')")
 if __name__ == "__main__":
 	pass
 

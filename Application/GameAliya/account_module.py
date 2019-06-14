@@ -65,9 +65,6 @@ class LoginSystemClass():
 			sql_result = gasql("select count from userinfo where account='"+account+"'")
 			if len(sql_result)<=0:
 				gasql("INSERT INTO userinfo(unique_id,account,password,ip,user_name,gender,birth_day,last_time_login,registration_time) VALUES ('"+unique_id+"','"+account+"','"+password+"','"+ip+"','"+user_name+"','"+gender+"','"+birth_day+"','"+last_time_login+"','"+registration_time+"')")
-				gasql("INSERT INTO bag(unique_id) VALUES ('"+unique_id+"'")
-				gasql("INSERT INTO skill(unique_id, VALUES ('"+unique_id+"'")
-				return mc("0","create success")
 			else:
 				return mc("1","user name already exists")
 		else:
@@ -84,8 +81,6 @@ class LoginSystemClass():
 				#if session is not exist, it is a new user, createa a account for them
 				session = self.__create_session_by_unique_id(unique_id)
 				gasql("INSERT INTO userinfo(unique_id,account,password,session) VALUES ('"+unique_id+"','"+""+"','"+""+"','"+session+"')")
-				gasql("INSERT INTO bag(unique_id) VALUES ('"+unique_id+"')")
-				gasql("INSERT INTO skill(unique_id) VALUES ('"+unique_id+"')")
 			else:
 				#if session is exist, just give them session
 				session = str(sql_result[0][0])
