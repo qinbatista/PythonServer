@@ -24,7 +24,8 @@ MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'un
 				 {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
 				 {'session':'mac_session', 'function':'random_gift_skill', 'random':'-906', 'data':""},
 				 {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
-				 {'session':'mac_session', 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_10":"3"}},
+				 {'session':'mac_session', 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
+				 {'session':'mac_session', 'function':'level_up_weapon', 'random':'-906', 'data':{"weapon1":"30"}},
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
@@ -37,6 +38,7 @@ ALL_SUPPLIES_ADD5= 7
 RANDOM_GIFT_SKILL=8
 GET_SKILL = 9
 SCROLL_LEVEL_UP = 10
+LEVEL_UP_WEAPON =11
 def test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
@@ -157,8 +159,8 @@ def main() -> None:
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
-	send_single_message(SCROLL_LEVEL_UP)
-
+	#send_single_message(SCROLL_LEVEL_UP)
+	send_single_message(LEVEL_UP_WEAPON)
 
 if __name__ == '__main__':
 	main()

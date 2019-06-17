@@ -118,7 +118,7 @@ class BagSystemClass():
 			scroll_id_name = "scroll_skill_10"
 			level_up_scroll_name="scroll_skill_30"
 			quantity = message_dic["data"]["scroll_skill_10"]
-		if "scroll_skill_30" in message_dic["data"].keys():
+		elif "scroll_skill_30" in message_dic["data"].keys():
 			scroll_id_name = "scroll_skill_30"
 			level_up_scroll_name="scroll_skill_100"
 			quantity = message_dic["data"]["scroll_skill_30"]

@@ -45,7 +45,7 @@ def create_users_table():
 			birth_day VARCHAR(20)         NULL DEFAULT "",
 			last_time_login VARCHAR(20)   NULL DEFAULT "",
 			registration_time VARCHAR(20) NULL DEFAULT "",
-			head_photo MEDIUMBLOB         NULL DEFAULT(0x0) # 图片为二进制数据
+			head_photo MEDIUMBLOB         NULL DEFAULT(0x0)
 		)
 	"""
     cursor.execute(user_sql)
@@ -136,7 +136,7 @@ def create_weapon_bag():
     bag_sql = """
         CREATE TABLE weapon_bag(
 	        unique_id VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
-	        weapon1  SMALLINT NULL DEFAULT(0),
+	        weapon1  SMALLINT NULL DEFAULT(0,
 	        weapon2  SMALLINT NULL DEFAULT(0),
 	        weapon3  SMALLINT NULL DEFAULT(0),
 	        weapon4  SMALLINT NULL DEFAULT(0),

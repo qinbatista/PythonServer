@@ -18,6 +18,8 @@ from Utility.AnalysisHeader import message_constructor as mc
 class WeaponSystemClass():
 	def __init__(self, *args, **kwargs):
 		pass
+	def _level_up_weapon(self,message):
+		pass
 	def __get_unique_id(self,session):
 		sql_result=gasql("select unique_id from userinfo where  session='"+session+"'")
 		if len(sql_result[0][0])<=0:
