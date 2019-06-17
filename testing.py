@@ -23,7 +23,8 @@ MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'un
 				 {'session':'mac_session', 'function':'get_all_supplies', 'random':'-906', 'data':""},
 				 {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
 				 {'session':'mac_session', 'function':'random_gift_skill', 'random':'-906', 'data':""},
-				 {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}}
+				 {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
+				 {'session':'mac_session', 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_10":"3"}},
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
@@ -34,6 +35,8 @@ GET_ALL_SKILL_LEVEL=5
 GET_ALL_SUPPLIES=6
 ALL_SUPPLIES_ADD5= 7
 RANDOM_GIFT_SKILL=8
+GET_SKILL = 9
+SCROLL_LEVEL_UP = 10
 def test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
@@ -73,7 +76,7 @@ async def async_send_single_message(message_id: int) -> float:
 	return end - start
 
 def async_multi_message(message_id: int):
-	tasks = [asyncio.ensure_future(async_send_single_message(RANDOM_GIFT_SKILL)) for i in range(10)]
+	tasks = [asyncio.ensure_future(async_send_single_message(SCROLL_LEVEL_UP)) for i in range(10)]
 	loop = asyncio.get_event_loop()
 	return loop.run_until_complete(asyncio.gather(*tasks))
 
@@ -146,7 +149,7 @@ def level_up_skill_by_scroll():
 def main() -> None:
 	# get_skill_from_random()
 	# get_skill_from_stack()
-	level_up_skill_by_scroll()
+	# level_up_skill_by_scroll()
 	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
 	# send_single_message(LOGIN_AS_VISITOR)
 	# send_single_message(GET_SKILL)
@@ -154,6 +157,7 @@ def main() -> None:
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
+	send_single_message(SCROLL_LEVEL_UP)
 
 
 if __name__ == '__main__':

@@ -59,12 +59,14 @@ class AliyaSystemClass():
 			login_class = account_module.LoginSystemClass()
 			callback_message = login_class._login(msg_data)
 		elif function == "bind_account":
+
 			login_class = account_module.LoginSystemClass()
 			callback_message = login_class._bind_account(msg_data)
 
 		elif function =="skill_level_up":
 			skill_class = skill_module.SkillSystemClass(session)
 			callback_message = skill_class._skill_level_up(msg_data)
+
 		elif function =="get_all_skill_level":
 			skill_class = skill_module.SkillSystemClass(session)
 			callback_message = skill_class._get_all_skill_level(msg_data)
@@ -72,9 +74,14 @@ class AliyaSystemClass():
 		elif function =="increase_supplies":
 			bag_class = bag_module.BagSystemClass(session)
 			callback_message = bag_class._increase_supplies(msg_data)
+
 		elif function =="get_all_supplies":
 			bag_class = bag_module.BagSystemClass(session)
 			callback_message = bag_class._get_all_supplies(msg_data)
+
+		# elif function == "random_gift":
+		# 	bag_class = bag_module.BagSystemClass(session)
+		# 	callback_message = bag_class._random_gift(msg_data)
 
 		elif function =="random_gift_skill":
 			lottery_class = lottery_module.LotterySystemClass(session)
@@ -84,6 +91,10 @@ class AliyaSystemClass():
 			skill_class = skill_module.SkillSystemClass(session)
 			dc = skill_class._get_skill(msg_data)
 			callback_message = mc("0","got new skill success",dc)
+
+		elif function =="level_up_scroll":
+			bag_class = bag_module.BagSystemClass(session)
+			callback_message = bag_class._level_up_scroll(msg_data)
 
 		elif callback_message=="":
 			callback_message=mc("1","no function->"+function)

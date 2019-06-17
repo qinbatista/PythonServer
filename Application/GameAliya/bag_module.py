@@ -20,14 +20,14 @@ class BagSystemClass():
 		self.unique_id = self.__get_unique_id(session)
 		self.item_list_count=0
 	def _increase_item_quantity(self,item_id, item_quantity):
-		# try:
+		try:
 			self.item_list_count=self.item_list_count+1
 			gasql("UPDATE bag SET "+item_id+"= "+item_id+" +"+item_quantity+" WHERE unique_id='"+self.unique_id + "'")
 			result_quantity = gasql("select "+item_id+" from bag where  unique_id='"+self.unique_id + "'")
 			dc = {"item"+str(self.item_list_count):[item_id,result_quantity[0][0]]}
 			return dc
-		# except :
-		# 	return {"scroll_error":"1"}
+		except :
+			return {"scroll_error":"1"}
 	def _increase_supplies(self,message_info):
 		message_dic  = eval(message_info)
 		return_dic = {}
@@ -83,6 +83,7 @@ class BagSystemClass():
 		if "coin" in message_dic["data"].keys():
 			scroll_quantity = message_dic["data"]["coin"]
 			return_dic.update (self._increase_item_quantity("coin",scroll_quantity))
+		return mc("0","random gift",return_dic)
 	def _get_all_supplies(self,message_info):
 		"""
 		give all skills' level to client
@@ -109,6 +110,30 @@ class BagSystemClass():
 		"""
 		sql_result=gasql("select "+skill_id+" from skill where unique_id='"+self.unique_id +"'")
 		return sql_result[0][0]
+	def _level_up_scroll(self,message_info):
+		message_dic  = eval(message_info)
+		scroll_id_name=""
+		level_up_scroll_name=""
+		if "scroll_skill_10" in message_dic["data"].keys():
+			scroll_id_name = "scroll_skill_10"
+			level_up_scroll_name="scroll_skill_30"
+			quantity = message_dic["data"]["scroll_skill_10"]
+		if "scroll_skill_30" in message_dic["data"].keys():
+			scroll_id_name = "scroll_skill_30"
+			level_up_scroll_name="scroll_skill_100"
+			quantity = message_dic["data"]["scroll_skill_30"]
+		else:
+			return mc("2","illegal scroll level up ")
+		sql_result=gasql("select "+scroll_id_name+","+level_up_scroll_name +" from bag where unique_id='"+self.unique_id +"'")
+		current_scroll = sql_result[0][0]
+		level_up_scroll = sql_result[0][1]
+		if current_scroll<3 or int(quantity)<3:
+			return mc("1","scroll is not eought",{"item1":[str(scroll_id_name),str(current_scroll)],"item2":[str(level_up_scroll_name),str(level_up_scroll)]})
+		else:
+			gasql("UPDATE bag SET "+scroll_id_name+"= "+scroll_id_name+"-"+str(3)+" WHERE unique_id='"+self.unique_id + "'")
+			gasql("UPDATE bag SET "+level_up_scroll_name+"= "+level_up_scroll_name+"+"+str(1)+" WHERE unique_id='"+self.unique_id + "'")
+			return mc("0","level up success",{"item1":[str(scroll_id_name),str(current_scroll-3)],"item2":[str(level_up_scroll_name),str(level_up_scroll+1)]})
+
 if __name__ == "__main__":
 	pass
 
