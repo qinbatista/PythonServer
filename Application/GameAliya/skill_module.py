@@ -112,7 +112,7 @@ class SkillSystemClass():
 			return mc("1","client message is incomplete")
 	def __get_unique_id(self,session):
 		sql_result=gasql("select unique_id from userinfo where  session='"+session+"'")
-		if len(sql_result[0][0])<=0:
+		if len(sql_result[0][0]) <= 0:
 			return ""
 		else:
 			self.__check_table(sql_result[0][0])

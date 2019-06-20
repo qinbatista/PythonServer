@@ -82,7 +82,6 @@ class AliyaSystemClass():
 		# elif function == "random_gift":
 		# 	bag_class = bag_module.BagSystemClass(session)
 		# 	callback_message = bag_class._random_gift(msg_data)
-
 		elif function =="random_gift_skill":
 			lottery_class = lottery_module.LotterySystemClass(session)
 			callback_message = lottery_class._random_gift_skill(msg_data)
@@ -95,6 +94,18 @@ class AliyaSystemClass():
 		elif function =="level_up_scroll":
 			bag_class = bag_module.BagSystemClass(session)
 			callback_message = bag_class._level_up_scroll(msg_data)
+
+		elif function =="level_up_weapon":
+			weapon_class = weapon_module.WeaponSystemClass(session)
+			callback_message = weapon_class._level_up_weapon(msg_data)
+
+		elif function =="passive_skill_upgrade":
+			weapon_class = weapon_module.WeaponSystemClass(session)
+			callback_message = weapon_class._passive_skill_upgrade(msg_data)
+
+		elif function =="reset_skill_point":
+			weapon_class = weapon_module.WeaponSystemClass(session)
+			callback_message = weapon_class._reset_skill_point(msg_data)
 
 		elif callback_message=="":
 			callback_message=mc("1","no function->"+function)
