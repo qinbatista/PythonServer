@@ -30,6 +30,19 @@ def game_aliya(sql_command):
 	db.commit()
 	return cursor.fetchall()
 
+def game_aliya_update(sql_command) -> int:
+	print("[sql_manager][game_aliya_update] -> sql_command:"+sql_command)
+	DATABASE_IP = "localhost"
+	DATABASE_ACCOUNT = "root"
+	DATABASE_PASSWORD = "lukseun"
+	DATABASE_TABLE = "aliya"
+	db = pymysql.connect(DATABASE_IP, DATABASE_ACCOUNT, DATABASE_PASSWORD, DATABASE_TABLE)
+	cursor = db.cursor()
+	sql = sql_command
+	sql_value = cursor.execute(sql)
+	db.commit()
+	return sql_value
+
 def game_aliya_table(sql_command):
 	print("[sql_manager][game_aliya]sql_command:"+sql_command)
 	DATABASE_IP = "localhost"

@@ -136,7 +136,7 @@ def create_weapon_bag():
     bag_sql = """
         CREATE TABLE weapon_bag(
 	        unique_id VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
-	        weapon1  SMALLINT NULL DEFAULT(0,
+	        weapon1  SMALLINT NULL DEFAULT(0),
 	        weapon2  SMALLINT NULL DEFAULT(0),
 	        weapon3  SMALLINT NULL DEFAULT(0),
 	        weapon4  SMALLINT NULL DEFAULT(0),

@@ -10,10 +10,11 @@ import statistics
 import random
 from lukseun_client import LukseunClient
 
-COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m', \
+COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m',
 		'ylw' : '\033[1;33;40m'}
 client_type="aliya"
-host="192.168.1.183"
+# host="192.168.1.183"
+host="127.0.0.1"
 MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'account':'abc', 'password':'123'}},
 				 {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'account':'', 'password':''}},
 				 {'session':'mac_session', 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
@@ -21,11 +22,15 @@ MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'un
 				 {'session':'mac_session', 'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
 				 {'session':'mac_session', 'function':'get_all_skill_level', 'random':'-906', 'data':""},
 				 {'session':'mac_session', 'function':'get_all_supplies', 'random':'-906', 'data':""},
-				 {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
+				 # {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
+				 {"session":"mac_session", "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
 				 {'session':'mac_session', 'function':'random_gift_skill', 'random':'-906', 'data':""},
-				 {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
+				 # {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
+				 {"session":"mac_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {'session':'mac_session', 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
-				 {'session':'mac_session', 'function':'level_up_weapon', 'random':'-906', 'data':{"weapon1":"30"}},
+				 {'session':'mac_session', 'function':'level_up_weapon','random':'-906', 'data':{"weapon1":"1020"}},
+				 {'session':'mac_session', 'function':'passive_skill_upgrade','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},
+				 {'session':'mac_session', 'function':'reset_skill_point','random':'-906', 'data':{"weapon1":"coin"}},
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
@@ -36,9 +41,11 @@ GET_ALL_SKILL_LEVEL=5
 GET_ALL_SUPPLIES=6
 ALL_SUPPLIES_ADD5= 7
 RANDOM_GIFT_SKILL=8
-GET_SKILL = 9
+# GET_SKILL = 9
 SCROLL_LEVEL_UP = 10
 LEVEL_UP_WEAPON =11
+SKILL_UP_WEAPON =12
+RESET_SKILL_POINT = 13
 def test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
@@ -161,6 +168,8 @@ def main() -> None:
 	# send_single_message(RANDOM_GIFT_SKILL)
 	#send_single_message(SCROLL_LEVEL_UP)
 	send_single_message(LEVEL_UP_WEAPON)
+	# send_single_message(SKILL_UP_WEAPON)
+	# send_single_message(RESET_SKILL_POINT)
 
 if __name__ == '__main__':
 	main()
