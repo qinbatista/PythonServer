@@ -107,6 +107,14 @@ class AliyaSystemClass():
 			weapon_class = weapon_module.WeaponSystemClass(session)
 			callback_message = weapon_class._reset_skill_point(msg_data)
 
+		elif function =="upgrade_weapons_stars":
+			weapon_class = weapon_module.WeaponSystemClass(session)
+			callback_message = weapon_class._upgrade_weapons_stars(msg_data)
+
+		elif function =="all_weapon":
+			weapon_class = weapon_module.WeaponSystemClass(session)
+			callback_message = weapon_class._all_weapon()
+
 		elif callback_message=="":
 			callback_message=mc("1","no function->"+function)
 		Log("[GameAliya][ResolveMsg] callback_message="+callback_message)
