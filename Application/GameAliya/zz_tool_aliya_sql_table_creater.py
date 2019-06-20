@@ -120,6 +120,7 @@ def create_bag_table():
             scroll_skill_100 SMALLINT NULL DEFAULT(0),
             iron     SMALLINT NULL DEFAULT(0),
             diamonds SMALLINT NULL DEFAULT(0),
+            experience_potion SMALLINT NULL DEFAULT(0),
             coin     SMALLINT NULL DEFAULT(0)
         )
     """
@@ -247,7 +248,26 @@ def load_avatar():
     with open(save_img_name, "wb") as f:
         f.write(data)
 
-
+def create_user_info():
+    """
+    武器列表
+    """
+    db = POOL.connection()
+    cursor = db.cursor()
+    bag_sql = """
+        CREATE TABLE bag(
+            unique_id VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
+            scroll_skill_10  SMALLINT NULL DEFAULT(0),
+            scroll_skill_30  SMALLINT NULL DEFAULT(0),
+            scroll_skill_100 SMALLINT NULL DEFAULT(0),
+            iron     SMALLINT NULL DEFAULT(0),
+            diamonds SMALLINT NULL DEFAULT(0),
+            experience_potion SMALLINT NULL DEFAULT(0),
+            coin     SMALLINT NULL DEFAULT(0)
+        )
+    """
+    cursor.execute(bag_sql)
+    db.commit()
 if __name__ == '__main__':
     # 创建数据库表
     create_users_table()
