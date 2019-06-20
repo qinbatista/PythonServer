@@ -255,15 +255,16 @@ def create_user_info():
     db = POOL.connection()
     cursor = db.cursor()
     bag_sql = """
-        CREATE TABLE bag(
+        CREATE TABLE player_status(
             unique_id VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
-            scroll_skill_10  SMALLINT NULL DEFAULT(0),
-            scroll_skill_30  SMALLINT NULL DEFAULT(0),
-            scroll_skill_100 SMALLINT NULL DEFAULT(0),
-            iron     SMALLINT NULL DEFAULT(0),
-            diamonds SMALLINT NULL DEFAULT(0),
+            role_type  SMALLINT NULL DEFAULT(0),
+
             experience_potion SMALLINT NULL DEFAULT(0),
-            coin     SMALLINT NULL DEFAULT(0)
+            level  SMALLINT NULL DEFAULT(0),
+            experience SMALLINT NULL DEFAULT(0),
+            stage_level     SMALLINT NULL DEFAULT(0),
+            diamonds SMALLINT NULL DEFAULT(0),
+            energy   SMALLINT NULL DEFAULT(0),
         )
     """
     cursor.execute(bag_sql)
