@@ -100,7 +100,42 @@ class WeaponSystemClass:
 			return mc("2", "insufficient skill points, upgrade failed!!", data=data)
 
 	def _reset_skill_point(self, message):
-		pass
+		print("[WeaponSystemClass][_reset_skill_point]->message:" + message)
+		info = json.loads(message, encoding="utf-8")
+		weapon_kind = list(info["data"].keys())[0]
+		coin = int(list(info["data"].values())[0])
+		bag_coin = self.__get_coin()
+		weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment = self.__get_weapon_level(weapon_kind)
+		self.skill_dict["passive_skill_1_level"] = passive_skill_1_level
+		self.skill_dict["passive_skill_2_level"] = passive_skill_2_level
+		self.skill_dict["passive_skill_3_level"] = passive_skill_3_level
+		self.skill_dict["passive_skill_4_level"] = passive_skill_4_level
+		data = {
+			"weapon_bag1": [weapon_kind, weapon_level, self.skill_dict["passive_skill_1_level"], self.skill_dict["passive_skill_2_level"], self.skill_dict["passive_skill_3_level"], self.skill_dict["passive_skill_4_level"], skill_point, segment]
+		}
+		if self.__get_weapon_star(weapon_kind) == 0:
+			return mc("1", "no weapon!", data=data)
+		elif bag_coin < coin:
+			return mc("9", "there is not enough gold coins to reset!", data=data)
+		else:
+			bag_coin -= coin
+			if self.__set_coin(bag_coin) == 0:
+				return mc("3", "abnormal data!", data=data)
+			self.skill_dict["passive_skill_1_level"] = 0
+			self.skill_dict["passive_skill_2_level"] = 0
+			self.skill_dict["passive_skill_3_level"] = 0
+			self.skill_dict["passive_skill_4_level"] = 0
+			skill_point = weapon_level
+			if self.__set_skill_point(weapon_kind, self.skill_dict["passive_skill_1_level"], self.skill_dict["passive_skill_1_level"], self.skill_dict["passive_skill_1_level"], self.skill_dict["passive_skill_1_level"], skill_point) == 0:
+				bag_coin += coin
+				if self.__set_coin(bag_coin) == 0:
+					# 材料已消耗，重置技能失败，或者技能已经重置过
+					print("[WeaponSystemClass][_reset_skill_point] -> Material has been consumed, reset skill failed")
+				return mc("4", "abnormal data!", data=data)
+
+			data["weapon_bag1"] = [weapon_kind, weapon_level, self.skill_dict["passive_skill_1_level"],self.skill_dict["passive_skill_2_level"], self.skill_dict["passive_skill_3_level"],self.skill_dict["passive_skill_4_level"], skill_point, segment]
+			return mc("0", weapon_kind + " reset skill point success!", data=data)
+
 
 	def __get_weapon_star(self, weapon_kind):
 		sql_result = gasql("select " + weapon_kind + " from weapon_bag where unique_id='" + self.unique_id + "'")
@@ -112,10 +147,23 @@ class WeaponSystemClass:
 		print("[WeaponSystemClass][__get_iron]->sql_result:" + str(sql_result))
 		return sql_result[0][0]
 
+	def __get_coin(self) -> int:
+		sql_result = gasql("select coin from bag where unique_id='" + self.unique_id + "'")
+		print("[WeaponSystemClass][__get_coin]->sql_result:" + str(sql_result))
+		return sql_result[0][0]
+
 	def __get_weapon_level(self, weapon_kind):
 		sql_result = gasql("select weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment from " + weapon_kind + " where unique_id='" + self.unique_id + "'")
 		print("[WeaponSystemClass][__get_weapon_level]->sql_result:" + str(sql_result))
 		return sql_result[0][0], sql_result[0][1], sql_result[0][2], sql_result[0][3], sql_result[0][4], sql_result[0][5], sql_result[0][6]
+
+	def __set_coin(self, coin) -> int:
+		sql_value = gasql_update("UPDATE bag SET coin=" + str(coin) + " where unique_id='" + self.unique_id + "'")
+		return sql_value
+
+	def __set_skill_point(self, weapon_kind, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point) -> int:
+		sql_value = gasql_update("UPDATE " + weapon_kind + " SET passive_skill_1_level=" + str(passive_skill_1_level) + ", passive_skill_2_level=" + str(passive_skill_2_level) + ", passive_skill_3_level=" + str(passive_skill_3_level) + ", passive_skill_4_level=" + str(passive_skill_4_level) + ", skill_point=" + str(skill_point) + " where unique_id='" + self.unique_id + "'")
+		return sql_value
 
 	def __set_skill_level(self, weapon_kind, skill_kind, skill_value, skill_point) -> int:
 		sql_value = gasql_update("UPDATE " + weapon_kind + " SET " + skill_kind + "=" + str(skill_value) + ",skill_point=" + str(skill_point) + " where unique_id='" + self.unique_id + "'")
