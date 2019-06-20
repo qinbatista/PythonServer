@@ -30,7 +30,9 @@ MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'un
 				 {'session':'mac_session', 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
 				 {'session':'mac_session', 'function':'level_up_weapon','random':'-906', 'data':{"weapon1":"1020"}},
 				 {'session':'mac_session', 'function':'passive_skill_upgrade','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},
-				 {'session':'mac_session', 'function':'reset_skill_point','random':'-906', 'data':{"weapon1":"coin"}},
+				 {'session':'mac_session', 'function':'reset_skill_point','random':'-906', 'data':{"weapon1":"100"}},
+				 {'session':'mac_session', 'function':'upgrade_weapons_stars','random':'-906', 'data':"weapon1"},
+				 {'session':'mac_session', 'function':'all_weapon','random':'-906', 'data':"null"},
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
@@ -46,6 +48,8 @@ SCROLL_LEVEL_UP = 10
 LEVEL_UP_WEAPON =11
 SKILL_UP_WEAPON =12
 RESET_SKILL_POINT = 13
+UPGRADE_WEAPONS_STARS = 14
+ALL_WEAPON = 15
 def test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
@@ -167,9 +171,11 @@ def main() -> None:
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	#send_single_message(SCROLL_LEVEL_UP)
-	send_single_message(LEVEL_UP_WEAPON)
+	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(SKILL_UP_WEAPON)
 	# send_single_message(RESET_SKILL_POINT)
+	send_single_message(UPGRADE_WEAPONS_STARS)
+	# send_single_message(ALL_WEAPON)
 
 if __name__ == '__main__':
 	main()

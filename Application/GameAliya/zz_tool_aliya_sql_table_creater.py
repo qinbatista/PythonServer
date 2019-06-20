@@ -189,7 +189,7 @@ def create_weapon_info():
     """
     武器1参数
     """
-    for i in range(1,40):
+    for i in range(1, 41):
         db = POOL.connection()
         cursor = db.cursor()
         bag_sql = "CREATE TABLE weapon"+str(i)+"(\
@@ -271,10 +271,10 @@ def create_user_info():
     db.commit()
 if __name__ == '__main__':
     # 创建数据库表
-    create_users_table()
-    create_skill_table()
-    create_bag_table()
-    create_weapon_bag()
+    # create_users_table()
+    # create_skill_table()
+    # create_bag_table()
+    # create_weapon_bag()
     create_weapon_info()
     # 更新头像
     # update_avatar()
