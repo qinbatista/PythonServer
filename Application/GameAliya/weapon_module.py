@@ -165,8 +165,32 @@ class WeaponSystemClass:
 
 	def _all_weapon(self):
 		data = {}
-		for i in range(self.all_weapon_count):
-			pass
+		col_name_list = self.__get_col_name_list("weapon_bag")
+		weapons_stars_list = self.__get_weapon_bag()
+		for i in range(1, len(col_name_list)):
+			attribute_list = self.__get_weapon_attributes(col_name_list[i])
+			attribute_list[0] = col_name_list[i]
+			attribute_list.append(weapons_stars_list[i])
+			data.update({"weapon_bag" + str(i): attribute_list})
+		return mc(0, "gain success", data=data)
+
+	def __get_weapon_attributes(self, weapon_name):
+		sql_result = gasql("select * from " + weapon_name + " where unique_id='" + self.unique_id + "'")
+		print("[WeaponSystemClass][__get_iron]->sql_result:" + str(sql_result))
+		return list(sql_result[0])
+
+
+	def __get_weapon_bag(self) -> list:
+		sql_result = gasql("select * from weapon_bag where unique_id='" + self.unique_id + "'")
+		print("[WeaponSystemClass][__get_iron]->sql_result:" + str(sql_result))
+		return sql_result[0]
+
+	def __get_col_name_list(self, table_name) -> list:
+		sql_result = gasql("desc " + table_name + ";")
+		col_list = []
+		for col in sql_result:
+			col_list.append(col[0])
+		return col_list
 
 	def __get_weapon_star(self, weapon_kind):
 		sql_result = gasql("select " + weapon_kind + " from weapon_bag where unique_id='" + self.unique_id + "'")
@@ -229,7 +253,7 @@ class WeaponSystemClass:
 		if len(sql_result) <= 0:  # 如果用户的武器背包没有信息，就插入用户武器背包信息
 			gasql("INSERT INTO weapon_bag(unique_id) VALUES ('" + unique_id + "')")
 			gasql("INSERT INTO skill(unique_id) VALUES ('" + unique_id + "')")
-			for i in range(1, 40):  # 在所有的武器表中都插入用户id信息
+			for i in range(1, 41):  # 在所有的武器表中都插入用户id信息
 				gasql("INSERT INTO weapon" + str(i) + "(unique_id) VALUES ('" + unique_id + "')")
 
 if __name__ == "__main__":
