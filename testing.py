@@ -174,8 +174,8 @@ def main() -> None:
 	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(SKILL_UP_WEAPON)
 	# send_single_message(RESET_SKILL_POINT)
-	send_single_message(UPGRADE_WEAPONS_STARS)
-	# send_single_message(ALL_WEAPON)
+	# send_single_message(UPGRADE_WEAPONS_STARS)
+	send_single_message(ALL_WEAPON)
 
 if __name__ == '__main__':
 	main()
