@@ -113,7 +113,8 @@ class WeaponSystemClass:
 		self.skill_dict["passive_skill_3_level"] = passive_skill_3_level
 		self.skill_dict["passive_skill_4_level"] = passive_skill_4_level
 		data = {
-			"weapon_bag1": [weapon_kind, weapon_level, self.skill_dict["passive_skill_1_level"], self.skill_dict["passive_skill_2_level"], self.skill_dict["passive_skill_3_level"], self.skill_dict["passive_skill_4_level"], skill_point, segment]
+			"weapon_bag1": [weapon_kind, weapon_level, self.skill_dict["passive_skill_1_level"], self.skill_dict["passive_skill_2_level"], self.skill_dict["passive_skill_3_level"], self.skill_dict["passive_skill_4_level"], skill_point, segment],
+			"item1": ["coin", bag_coin]
 		}
 		if self.__get_weapon_star(weapon_kind) == 0:
 			return mc("1", "no weapon!", data=data)
@@ -136,6 +137,7 @@ class WeaponSystemClass:
 				return mc("4", "abnormal data!", data=data)
 
 			data["weapon_bag1"] = [weapon_kind, weapon_level, self.skill_dict["passive_skill_1_level"],self.skill_dict["passive_skill_2_level"], self.skill_dict["passive_skill_3_level"],self.skill_dict["passive_skill_4_level"], skill_point, segment]
+			data["item1"] = ["coin", bag_coin]
 			return mc("0", weapon_kind + " reset skill point success!", data=data)
 
 	def _level_up_weapon_star(self, message):
