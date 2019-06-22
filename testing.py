@@ -28,11 +28,11 @@ MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'un
 				 # {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {"session":"mac_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {'session':'mac_session', 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
-				 {'session':'mac_session', 'function':'level_up_weapon','random':'-906', 'data':{"weapon1":"1020"}},
-				 {'session':'mac_session', 'function':'passive_skill_upgrade','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},
-				 {'session':'mac_session', 'function':'reset_skill_point','random':'-906', 'data':{"weapon1":"100"}},
-				 {'session':'mac_session', 'function':'upgrade_weapons_stars','random':'-906', 'data':"weapon1"},
-				 {'session':'mac_session', 'function':'all_weapon','random':'-906', 'data':"null"},
+				 {'session':'mac_session', 'function':'level_up_weapon_level','random':'-906', 'data':{"weapon1":"1020"}},
+				 {'session':'mac_session', 'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},
+				 {'session':'mac_session', 'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon1":"100"}},
+				 {'session':'mac_session', 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"null"}},
+				 {'session':'mac_session', 'function':'get_all_weapon','random':'-906', 'data':"null"},
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1

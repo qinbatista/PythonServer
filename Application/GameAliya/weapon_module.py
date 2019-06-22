@@ -33,7 +33,7 @@ class WeaponSystemClass:
 		self.standard_iron_count = standard_iron_count# 升级武器等级消耗的铁数量要求
 		self.standard_segment_count = standard_segment_count# 升级武器阶数消耗的碎片数量要求
 
-	def _level_up_weapon(self, message) -> str:
+	def _level_up_weapon_level(self, message) -> str:
 		print("[WeaponSystemClass][_level_up_weapon]->message:" + message)
 		info = json.loads(message, encoding="utf-8")
 		weapon_kind = list(info["data"].keys())[0]
@@ -74,7 +74,7 @@ class WeaponSystemClass:
 		else:
 			return mc("2", "insufficient materials, upgrade failed!", data=data)
 
-	def _passive_skill_upgrade(self, message):
+	def _level_up_weapon_passive_skill(self, message):
 		print("[WeaponSystemClass][_passive_skill_upgrade]->message:" + message)
 		info = json.loads(message, encoding="utf-8")
 		weapon_kind = list(info["data"].keys())[0]
@@ -101,7 +101,7 @@ class WeaponSystemClass:
 		else:
 			return mc("2", "insufficient skill points, upgrade failed!", data=data)
 
-	def _reset_skill_point(self, message):
+	def _reset_weapon_skill_point(self, message):
 		print("[WeaponSystemClass][_reset_skill_point]->message:" + message)
 		info = json.loads(message, encoding="utf-8")
 		weapon_kind = list(info["data"].keys())[0]
@@ -138,10 +138,10 @@ class WeaponSystemClass:
 			data["weapon_bag1"] = [weapon_kind, weapon_level, self.skill_dict["passive_skill_1_level"],self.skill_dict["passive_skill_2_level"], self.skill_dict["passive_skill_3_level"],self.skill_dict["passive_skill_4_level"], skill_point, segment]
 			return mc("0", weapon_kind + " reset skill point success!", data=data)
 
-	def _upgrade_weapons_stars(self, message):
+	def _level_up_weapon_star(self, message):
 		print("[WeaponSystemClass][_upgrade_weapons_stars]->message:" + message)
 		info = json.loads(message, encoding="utf-8")
-		weapon_kind = info["data"]
+		weapon_kind = list(info["data"].keys())[0]
 		weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment = self.__get_weapon_level(weapon_kind)
 		weapon_star = self.__get_weapon_star(weapon_kind)
 		data = {
@@ -163,7 +163,7 @@ class WeaponSystemClass:
 			data["weapon_bag1"] = [weapon_kind, weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment, weapon_star]
 			return mc("0", weapon_kind + " upgrade success!", data=data)
 
-	def _all_weapon(self):
+	def _get_all_weapon(self):
 		data = {}
 		col_name_list = self.__get_col_name_list("weapon_bag")
 		weapons_stars_list = self.__get_weapon_bag()
@@ -242,19 +242,26 @@ class WeaponSystemClass:
 
 	def __get_unique_id(self, session):  # 返回session对应的用户id
 		sql_result = gasql("select unique_id from userinfo where  session='" + session + "'")  # 通过session查用户id
-		if len(sql_result) <= 0:  # userinfo表中没得用户就不执行
+		if len(sql_result) == 0:  # userinfo表中没得用户就不执行
 			return ""
 		else:
 			self.__check_table(sql_result[0][0])
 			return sql_result[0][0]
 
 	def __check_table(self, unique_id):  # 通过用户id来查用户的武器背包信息
-		sql_result = gasql("select unique_id from weapon_bag where unique_id='" + unique_id + "'")
-		if len(sql_result) <= 0:  # 如果用户的武器背包没有信息，就插入用户武器背包信息
-			gasql("INSERT INTO weapon_bag(unique_id) VALUES ('" + unique_id + "')")
-			gasql("INSERT INTO skill(unique_id) VALUES ('" + unique_id + "')")
+		if self.__check_info_table(unique_id, "weapon_bag"):
+			self.__check_info_table(unique_id, "bag")
+			self.__check_info_table(unique_id, "skill")
 			for i in range(1, 41):  # 在所有的武器表中都插入用户id信息
-				gasql("INSERT INTO weapon" + str(i) + "(unique_id) VALUES ('" + unique_id + "')")
+				self.__check_info_table(unique_id, "weapon" + str(i))
 
+	def __check_info_table(self, unique_id, table):
+		sql_result = gasql("select * from " + table + " where  unique_id='" + unique_id + "'")  # 通过session查用户id
+		if len(sql_result) == 0:  # userinfo表中没得用户就不执行
+			gasql("INSERT INTO " + table + "(unique_id) VALUES ('" + unique_id + "')")
+			return True
+		else:
+			print("[WeaponSystemClass][__check_info_table] -> sql_result:" + str(sql_result))
+			return False
 if __name__ == "__main__":
 	pass
