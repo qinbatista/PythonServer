@@ -144,6 +144,7 @@ class WeaponSystemClass:
 		print("[WeaponSystemClass][_upgrade_weapons_stars]->message:" + message)
 		info = json.loads(message, encoding="utf-8")
 		weapon_kind = list(info["data"].keys())[0]
+		self.standard_segment_count = int(list(info["data"].values())[0])
 		weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment = self.__get_weapon_level(weapon_kind)
 		weapon_star = self.__get_weapon_star(weapon_kind)
 		data = {
