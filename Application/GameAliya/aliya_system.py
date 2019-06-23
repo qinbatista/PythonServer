@@ -95,30 +95,31 @@ class AliyaSystemClass():
 			bag_class = bag_module.BagSystemClass(session)
 			callback_message = bag_class._level_up_scroll(msg_data)
 
-		elif function =="level_up_weapon":
+		elif function =="level_up_weapon_level":
 			weapon_class = weapon_module.WeaponSystemClass(session)
-			callback_message = weapon_class._level_up_weapon(msg_data)
+			callback_message = weapon_class._level_up_weapon_level(msg_data)
 
-		elif function =="passive_skill_upgrade":
+		elif function =="level_up_weapon_passive_skill":
 			weapon_class = weapon_module.WeaponSystemClass(session)
-			callback_message = weapon_class._passive_skill_upgrade(msg_data)
+			callback_message = weapon_class._level_up_weapon_passive_skill(msg_data)
 
-		elif function =="reset_skill_point":
+		elif function =="reset_weapon_skill_point":
 			weapon_class = weapon_module.WeaponSystemClass(session)
-			callback_message = weapon_class._reset_skill_point(msg_data)
+			callback_message = weapon_class._reset_weapon_skill_point(msg_data)
 
-		elif function =="upgrade_weapons_stars":
+		elif function =="level_up_weapon_star":
 			weapon_class = weapon_module.WeaponSystemClass(session)
-			callback_message = weapon_class._upgrade_weapons_stars(msg_data)
+			callback_message = weapon_class._level_up_weapon_star(msg_data)
 
-		elif function =="all_weapon":
+		elif function =="get_all_weapon":
 			weapon_class = weapon_module.WeaponSystemClass(session)
-			callback_message = weapon_class._all_weapon()
+			callback_message = weapon_class._get_all_weapon()
 
 		elif callback_message=="":
 			callback_message=mc("1","no function->"+function)
 		Log("[GameAliya][ResolveMsg] callback_message="+callback_message)
 		retval = des.encrypt(str.encode(str(callback_message)))
+		print("[GameAliya][ResolveMsg] retval=" + str(retval))
 		mutex.release()
 		return retval
 

@@ -52,7 +52,7 @@ class LukseunServer:
 		protocol defined at the top of the file.
 		'''
 		header = await self._receive_header(reader)
-		if (self._is_valid_header(header)):
+		if self._is_valid_header(header):
 			Log(COLORS['ylw'] + '[lukseun_server.py][_handle_connection] Received valid data from {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
 			message = await reader.read(int(header.size))
 			self._wtr._set_app(header.App)
