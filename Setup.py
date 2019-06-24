@@ -1,5 +1,4 @@
 import os
-import pymysql
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 def get_required_packages():
