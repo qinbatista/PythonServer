@@ -27,8 +27,7 @@ class WeaponSystemClass:
 		"passive_skill_3_level": 0,
 		"passive_skill_4_level": 0,
 	}
-	all_weapon_count = 40
-	def __init__(self, session, standard_iron_count=20, standard_segment_count=100):
+	def __init__(self, session, standard_iron_count=20, standard_segment_count=30):
 		self.unique_id = self.__get_unique_id(session)
 		self.standard_iron_count = standard_iron_count# 升级武器等级消耗的铁数量要求
 		self.standard_segment_count = standard_segment_count# 升级武器阶数消耗的碎片数量要求
@@ -144,9 +143,10 @@ class WeaponSystemClass:
 		print("[WeaponSystemClass][_upgrade_weapons_stars]->message:" + message)
 		info = json.loads(message, encoding="utf-8")
 		weapon_kind = list(info["data"].keys())[0]
-		self.standard_segment_count = int(list(info["data"].values())[0])
+		# self.standard_segment_count = int(list(info["data"].values())[0])
 		weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment = self.__get_weapon_level(weapon_kind)
 		weapon_star = self.__get_weapon_star(weapon_kind)
+		self.standard_segment_count = self.standard_segment_count * (1 + weapon_star)# 根据武器星数增加碎片的消耗数量
 		data = {
 			"weapon_bag1": [weapon_kind, weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment, weapon_star]
 		}
@@ -266,5 +266,6 @@ class WeaponSystemClass:
 		else:
 			print("[WeaponSystemClass][__check_info_table] -> sql_result:" + str(sql_result))
 			return False
+
 if __name__ == "__main__":
 	pass

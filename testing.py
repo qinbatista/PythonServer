@@ -31,7 +31,7 @@ MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'un
 				 {'session':'mac_session', 'function':'level_up_weapon_level','random':'-906', 'data':{"weapon1":"1020"}},
 				 {'session':'mac_session', 'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},
 				 {'session':'mac_session', 'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon1":"100"}},
-				 {'session':'mac_session', 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"null"}},
+				 {'session':'mac_session', 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},
 				 {'session':'mac_session', 'function':'get_all_weapon','random':'-906', 'data':"null"},
 				]
 LOGIN_AS_ACCOUNT = 0
@@ -174,8 +174,8 @@ def main() -> None:
 	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(SKILL_UP_WEAPON)
 	# send_single_message(RESET_SKILL_POINT)
-	# send_single_message(UPGRADE_WEAPONS_STARS)
-	send_single_message(ALL_WEAPON)
+	send_single_message(UPGRADE_WEAPONS_STARS)
+	# send_single_message(ALL_WEAPON)
 
 if __name__ == '__main__':
 	main()
