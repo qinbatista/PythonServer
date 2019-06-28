@@ -92,21 +92,21 @@ class LotterySystemClass():
 			return mc("2","you already have "+skill_id+", got scroll for free", dc)
 
 	def _random_gift_segment(self, message_info):
-		random_int = random.randint(0, 1000)
+		random_int = random.randint(0, 999)
 		all_weapon = self.__get_all_weapon_name()
 		all_weapon_star = self.__get_weapon_bag()
 		# 40% 概率抽中 1-10号武器的碎片 小于400
 		if random_int < 400:
-			weapon_code = random.randint(1, 11)
+			weapon_code = random.randint(1, 10)
 		# 30% 概率抽中 11-20号武器的碎片 大于等于400 且 小于700
 		elif random_int < 700:
-			weapon_code = random.randint(11, 21)
+			weapon_code = random.randint(11, 20)
 		# 20% 概率抽中 21-30号武器的碎片 大于等于700 且 小于900
 		elif random_int < 900:
-			weapon_code = random.randint(21, 31)
+			weapon_code = random.randint(21, 30)
 		# 10% 概率抽中 31-40号武器的碎片 大于等于900
 		else:
-			weapon_code = random.randint(31, 41)
+			weapon_code = random.randint(31, 40)
 		return self.__update_segment_status(all_weapon[weapon_code], all_weapon_star[weapon_code])
 
 	def __update_segment_status(self, weapon_kind, weapon_star):
