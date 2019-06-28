@@ -86,6 +86,10 @@ class AliyaSystemClass():
 			lottery_class = lottery_module.LotterySystemClass(session)
 			callback_message = lottery_class._random_gift_skill(msg_data)
 
+		elif function =="random_gift_segment":
+			lottery_class = lottery_module.LotterySystemClass(session)
+			callback_message = lottery_class._random_gift_segment(msg_data)
+
 		elif function =="get_skill":
 			skill_class = skill_module.SkillSystemClass(session)
 			dc = skill_class._get_skill(msg_data)
