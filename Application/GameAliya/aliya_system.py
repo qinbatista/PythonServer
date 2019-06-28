@@ -119,6 +119,10 @@ class AliyaSystemClass():
 			weapon_class = weapon_module.WeaponSystemClass(session)
 			callback_message = weapon_class._get_all_weapon()
 
+		elif function =="pass_level":
+			level_class = level_module.LevelSystemClass(session)
+			callback_message = level_class._pass_level(msg_data)
+
 		elif callback_message=="":
 			callback_message=mc("1","no function->"+function)
 		Log("[GameAliya][ResolveMsg] callback_message="+callback_message)

@@ -158,7 +158,11 @@ class LotterySystemClass():
 			return sql_result[0][0]
 
 	def __check_table(self, unique_id):
-		gasql("select count(unique_id) from skill where  unique_id='"+unique_id+"'")
+		sql_result = gasql("select * from skill where  unique_id='" + unique_id + "'")
+		if len(sql_result) == 0:  # userinfo表中没得用户就不执行
+			gasql("INSERT INTO skill(unique_id) VALUES ('" + unique_id + "')")
+		else:
+			print("[LotterySystemClass][__check_table] -> sql_result:" + str(sql_result))
 
 if __name__ == "__main__":
 	pass

@@ -269,13 +269,14 @@ def create_user_info():
     """
     cursor.execute(bag_sql)
     db.commit()
+
 if __name__ == '__main__':
     # 创建数据库表
-    create_users_table()
-    create_skill_table()
-    create_bag_table()
+    # create_users_table()
+    # create_skill_table()
+    # create_bag_table()
     create_weapon_bag()
-    create_weapon_info()
+    # create_weapon_info()
     create_user_info()
     # 更新头像
     # update_avatar()

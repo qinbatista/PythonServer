@@ -34,6 +34,7 @@ MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'un
 				 {'session':'mac_session', 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},
 				 {'session':'mac_session', 'function':'get_all_weapon','random':'-906', 'data':"null"},
 				 {'session':'mac_session', 'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
+				 {'session':'mac_session', 'function':'pass_level','random':'-906', 'data':{"customs_clearance_time": "2"}},
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
@@ -52,6 +53,7 @@ RESET_SKILL_POINT = 13
 UPGRADE_WEAPONS_STARS = 14
 ALL_WEAPON = 15
 LOTTERY_SEGMENT = 16
+PASS_LEVEL= 17
 
 def test_multiple_message(n: int):
 	start = time.time()
@@ -179,7 +181,8 @@ def main() -> None:
 	# send_single_message(RESET_SKILL_POINT)
 	# send_single_message(UPGRADE_WEAPONS_STARS)
 	# send_single_message(ALL_WEAPON)
-	send_single_message(LOTTERY_SEGMENT)
+	# send_single_message(LOTTERY_SEGMENT)
+	send_single_message(PASS_LEVEL)
 
 if __name__ == '__main__':
 	main()
