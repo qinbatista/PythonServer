@@ -120,7 +120,7 @@ class LotterySystemClass():
 				data["weapon_bag1"] = [weapon_kind, weapon_star, segment]
 				return mc("0", "get the weapon " + weapon_kind, data=data)
 			else:
-				print("[LotterySystemClass][__get_weapon_segment] -> Data update error!")
+				print("[LotterySystemClass][__update_segment_status] -> Data update error!")
 				return mc("1", "abnormal data", data=data)
 		else:
 			segment += self.reward_fragment_count
@@ -128,7 +128,7 @@ class LotterySystemClass():
 				data["weapon_bag1"] = [weapon_kind, weapon_star, segment]
 				return mc("0", "get " + weapon_kind + " weapon fragments", data=data)
 			else:
-				print("[LotterySystemClass][__get_weapon_segment] -> Weapon fragment update failed!")
+				print("[LotterySystemClass][__update_segment_status] -> Weapon fragment update failed!")
 				return mc("2", "abnormal data", data=data)
 
 	def __get_weapon_segment(self, weapon_kind):
