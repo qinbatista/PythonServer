@@ -27,69 +27,60 @@ class LevelSystemClass():
 
 	coin_basis = 300
 	coin_multiple = 75
-	item_list = [# 经验药水， 玩家经验， 铁， 金币
+	reward_list = [# 经验药水， 玩家经验， 铁， 金币
 		{# 0
-			"item1": ["experience_potion", 0],
-			"item2": ["experience", 0],
-			"item3": ["iron", 0],
-			"item4": ["coin", 0],
-			"item5": ["level", 0],
+			"reward1": ["experience_potion", 0],
+			"reward2": ["experience", 0],
+			"reward3": ["iron", 0],
+			"reward4": ["coin", 0]
 		},
 		{# 1
-			"item1": ["experience_potion", 100],
-			"item2": ["experience", 10],
-			"item3": ["iron", 100],
-			"item4": ["coin", 300],
-			"item5": ["level", 0],
+			"reward1": ["experience_potion", 100],
+			"reward2": ["experience", 10],
+			"reward3": ["iron", 100],
+			"reward4": ["coin", 300]
 		},
 		{# 2
-			"item1": ["experience_potion", 125],
-			"item2": ["experience", 10],
-			"item3": ["iron", 125],
-			"item4": ["coin", 375],
-			"item5": ["level", 0],
+			"reward1": ["experience_potion", 125],
+			"reward2": ["experience", 10],
+			"reward3": ["iron", 125],
+			"reward4": ["coin", 375]
 		},
 		{# 3
-			"item1": ["experience_potion", 150],
-			"item2": ["experience", 10],
-			"item3": ["iron", 150],
-			"item4": ["coin", 450],
-			"item5": ["level", 0],
+			"reward1": ["experience_potion", 150],
+			"reward2": ["experience", 10],
+			"reward3": ["iron", 150],
+			"reward4": ["coin", 450]
 		},
 		{
-			"item1": ["experience_potion", 175],
-			"item2": ["experience", 10],
-			"item3": ["iron", 175],
-			"item4": ["coin", 525],
-			"item5": ["level", 0],
+			"reward1": ["experience_potion", 175],
+			"reward2": ["experience", 10],
+			"reward3": ["iron", 175],
+			"reward4": ["coin", 525]
 		},
 		{
-			"item1": ["experience_potion", 200],
-			"item2": ["experience", 10],
-			"item3": ["iron", 200],
-			"item4": ["coin", 600],
-			"item5": ["level", 0],
+			"reward1": ["experience_potion", 200],
+			"reward2": ["experience", 10],
+			"reward3": ["iron", 200],
+			"reward4": ["coin", 600]
 		},
 		{
-			"item1": ["experience_potion", 225],
-			"item2": ["experience", 10],
-			"item3": ["iron", 225],
-			"item4": ["coin", 675],
-			"item5": ["level", 0],
+			"reward1": ["experience_potion", 225],
+			"reward2": ["experience", 10],
+			"reward3": ["iron", 225],
+			"reward4": ["coin", 675]
 		},
 		{
-			"item1": ["experience_potion", 250],
-			"item2": ["experience", 10],
-			"item3": ["iron", 250],
-			"item4": ["coin", 750],
-			"item5": ["level", 0],
+			"reward1": ["experience_potion", 250],
+			"reward2": ["experience", 10],
+			"reward3": ["iron", 250],
+			"reward4": ["coin", 750]
 		},
 		{
-			"item1": ["experience_potion", 275],
-			"item2": ["experience", 10],
-			"item3": ["iron", 275],
-			"item4": ["coin", 825],
-			"item5": ["level", 0],
+			"reward1": ["experience_potion", 275],
+			"reward2": ["experience", 10],
+			"reward3": ["iron", 275],
+			"reward4": ["coin", 825]
 		}
 	]
 	def __init__(self, session,*args, **kwargs):
@@ -102,38 +93,47 @@ class LevelSystemClass():
 		level, experience_potion, experience = self.__get_level()
 		iron, coin = self.__get_bag_data()
 
-		demo_data = self.item_list[0]
-		demo_data["item1"].append(experience_potion)
-		demo_data["item2"].append(experience)
-		demo_data["item3"].append(iron)
-		demo_data["item4"].append(coin)
-		demo_data["item5"].append(level)
+		item_dict = {
+			"experience_potion": experience_potion,
+			"experience": experience,
+			"iron": iron,
+			"coin": coin,
+			"level": level
+		}
+
+		demo_data = self.reward_list[0]
+		data_len = len(demo_data.keys()) + 1
+		for i in range(1, data_len):
+			reward = "reward" + str(i)
+			key = demo_data[reward][0]
+			demo_data.update({"item" + str(i): [key, item_dict[key]]})
+		demo_data.update({"item" + str(data_len): ["level", item_dict["level"]]})
 		if level_client <= 0 or (level + 1) < level_client:
 			return mc("9", "abnormal data!", data=demo_data)
 
-		data = self.item_list[level_client]
-		experience_potion += data["item1"][1]
-		experience += data["item2"][1]
-		iron += data["item3"][1]
-		coin += data["item4"][1]
-		data["item1"].append(experience_potion)
-		data["item2"].append(experience)
-		data["item3"].append(iron)
-		data["item4"].append(coin)
+		data = self.reward_list[level_client]
+		for i in range(1, data_len):
+			reward = "reward" + str(i)
+			key = data[reward][0]
+			item_dict[key] += data[reward][1]
+			data.update({"item" + str(i): [key, item_dict[key]]})
+		data.update({"item" + str(data_len): ["level", item_dict["level"]]})
 
 		if level + 1 == level_client:# 通过新关卡
-			if gasql_update("UPDATE player_status SET level=" + str(level_client) + ",experience_potion=" + str(experience_potion) + ",experience=" + str(experience) + " where unique_id='" + self.unique_id + "'") == 1\
-				and gasql_update("UPDATE bag SET iron=" + str(iron) + ", coin=" + str(coin) + " where unique_id='" + self.unique_id + "'") == 1:
-				data["item5"][1] = 1
-				data["item5"].append(level_client)
+			item_dict["level"] = level_client
+			if gasql_update("UPDATE player_status SET level=" + str(item_dict["level"]) + ",experience_potion=" + str(item_dict["experience_potion"]) + ",experience=" + str(item_dict["experience"]) + " where unique_id='" + self.unique_id + "'") == 1 \
+				and gasql_update("UPDATE bag SET iron=" + str(item_dict["iron"]) + ", coin=" + str(item_dict["coin"]) + " where unique_id='" + self.unique_id + "'") == 1:
+				data["item" + str(data_len)][1] = item_dict["level"]
 				return mc("0", "pass new level!", data=data)
 			return mc("1", "abnormal data!", data=demo_data)
 		else:# 通过老关卡
-			if gasql_update("UPDATE player_status SET experience_potion=" + str(experience_potion) + ",experience=" + str(experience) + " where unique_id='" + self.unique_id + "'") == 1\
-				and gasql_update("UPDATE bag SET iron=" + str(iron) + ", coin=" + str(coin) + " where unique_id='" + self.unique_id + "'") == 1:
-				data["item5"].append(level)
+			if gasql_update("UPDATE player_status SET experience_potion=" + str(item_dict["experience_potion"]) + ",experience=" + str(item_dict["experience"]) + " where unique_id='" + self.unique_id + "'") == 1\
+				and gasql_update("UPDATE bag SET iron=" + str(item_dict["iron"]) + ", coin=" + str(item_dict["coin"]) + " where unique_id='" + self.unique_id + "'") == 1:
 				return mc("0", "pass old level!", data=data)
 			return mc("2", "abnormal data!", data=demo_data)
+
+	def __get_structure_data(self, data) -> dict:
+		pass
 
 	# def __random_data(self) -> dict:
 	# 	data = {"item1": []}
@@ -154,7 +154,7 @@ class LevelSystemClass():
 	def __get_bag_data(self):
 		sql_result = gasql("select iron, coin from bag where  unique_id='" + self.unique_id + "'")
 		print("[LevelSystemClass][__get_bag_data] -> sql_result:" + str(sql_result))
-		return sql_result[0][0], sql_result[0][1]
+		return sql_result[0]
 
 	def __get_level(self):
 		sql_result = gasql("select level, experience_potion, experience from player_status where  unique_id='" + self.unique_id + "'")

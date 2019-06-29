@@ -91,7 +91,7 @@ class LotterySystemClass():
 				dc = bag_class._increase_item_quantity("scroll_skill_100","1")
 			return mc("2","you already have "+skill_id+", got scroll for free", dc)
 
-	def _random_gift_segment(self, message_info):
+	def _random_gift_segment(self, message_info) :
 		random_int = random.randint(0, 999)
 		all_weapon = self.__get_all_weapon_name()
 		all_weapon_star = self.__get_weapon_bag()
