@@ -6,16 +6,20 @@ import codecs
 import threading
 import pymysql
 import random
+
+
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
-from Utility import LogRecorder,EncryptionAlgorithm
+
+
+from Utility import LogRecorder, EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import game_aliya as gasql
 from Utility.sql_manager import game_aliya_update as gasql_update
 from Utility.AnalysisHeader import message_constructor as mc
 
 
-class LevelSystemClass():
+class LevelSystemClass:
 	experience_potion_basis = 100
 	experience_potion_multiple = 25
 
@@ -27,68 +31,69 @@ class LevelSystemClass():
 
 	coin_basis = 300
 	coin_multiple = 75
-	reward_list = [# 经验药水， 玩家经验， 铁， 金币
-		{# 0
+	reward_list = [  # 经验药水， 玩家经验， 铁， 金币
+		{  # 0
 			"reward1": ["experience_potion", 0],
 			"reward2": ["experience", 0],
 			"reward3": ["iron", 0],
 			"reward4": ["coin", 0]
 		},
-		{# 1
+		{  # 1
 			"reward1": ["experience_potion", 100],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 100],
 			"reward4": ["coin", 300]
 		},
-		{# 2
+		{  # 2
 			"reward1": ["experience_potion", 125],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 125],
 			"reward4": ["coin", 375]
 		},
-		{# 3
+		{  # 3
 			"reward1": ["experience_potion", 150],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 150],
 			"reward4": ["coin", 450]
 		},
-		{
+		{  # 4
 			"reward1": ["experience_potion", 175],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 175],
 			"reward4": ["coin", 525]
 		},
-		{
+		{  # 5
 			"reward1": ["experience_potion", 200],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 200],
 			"reward4": ["coin", 600]
 		},
-		{
+		{  # 6
 			"reward1": ["experience_potion", 225],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 225],
 			"reward4": ["coin", 675]
 		},
-		{
+		{  # 7
 			"reward1": ["experience_potion", 250],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 250],
 			"reward4": ["coin", 750]
 		},
-		{
+		{  # 8
 			"reward1": ["experience_potion", 275],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 275],
 			"reward4": ["coin", 825]
 		}
 	]
-	def __init__(self, session,*args, **kwargs):
+
+	def __init__(self, session, *args, **kwargs):
 		self.unique_id = self.__get_unique_id(session)
 
 	def _pass_level(self, message) -> str:
 		info = json.loads(message, encoding="utf-8")
-		customs_clearance_time = list(info["data"].keys())[0]# 通关时间
+		customs_clearance_time = list(info["data"].keys())[0]  # 通关时间
 		level_client = int(list(info["data"].values())[0])
 		level, experience_potion, experience = self.__get_level()
 		iron, coin = self.__get_bag_data()
@@ -101,39 +106,32 @@ class LevelSystemClass():
 			"level": level
 		}
 
-		demo_data = self.reward_list[0]
-		data_len = len(demo_data.keys()) + 1
-		for i in range(1, data_len):
-			reward = "reward" + str(i)
-			key = demo_data[reward][0]
-			demo_data.update({"item" + str(i): [key, item_dict[key]]})
-		demo_data.update({"item" + str(data_len): ["level", item_dict["level"]]})
+		data_len = len(self.reward_list[0].keys()) + 1
+		self.__structure_data(self.reward_list[0], item_dict, data_len)
 		if level_client <= 0 or (level + 1) < level_client:
-			return mc("9", "abnormal data!", data=demo_data)
+			return mc("9", "abnormal data!", data=self.reward_list[0])
 
 		data = self.reward_list[level_client]
+		self.__structure_data(data, item_dict, data_len)
+
+		if level + 1 == level_client:  # 通过新关卡
+			item_dict["level"] = level_client
+		if gasql_update("UPDATE player_status SET level=" + str(item_dict["level"]) + ",experience_potion=" + str(
+				item_dict["experience_potion"]) + ",experience=" + str(
+				item_dict["experience"]) + " where unique_id='" + self.unique_id + "'") == 1 \
+				and gasql_update("UPDATE bag SET iron=" + str(item_dict["iron"]) + ", coin=" + str(
+			item_dict["coin"]) + " where unique_id='" + self.unique_id + "'") == 1:
+			data["item" + str(data_len)][1] = item_dict["level"]
+			return mc("0", "passed customs!", data=data)
+		return mc("1", "abnormal data!", data=self.reward_list[0])
+
+	def __structure_data(self, data, item_dict, data_len):
 		for i in range(1, data_len):
 			reward = "reward" + str(i)
 			key = data[reward][0]
 			item_dict[key] += data[reward][1]
 			data.update({"item" + str(i): [key, item_dict[key]]})
 		data.update({"item" + str(data_len): ["level", item_dict["level"]]})
-
-		if level + 1 == level_client:# 通过新关卡
-			item_dict["level"] = level_client
-			if gasql_update("UPDATE player_status SET level=" + str(item_dict["level"]) + ",experience_potion=" + str(item_dict["experience_potion"]) + ",experience=" + str(item_dict["experience"]) + " where unique_id='" + self.unique_id + "'") == 1 \
-				and gasql_update("UPDATE bag SET iron=" + str(item_dict["iron"]) + ", coin=" + str(item_dict["coin"]) + " where unique_id='" + self.unique_id + "'") == 1:
-				data["item" + str(data_len)][1] = item_dict["level"]
-				return mc("0", "pass new level!", data=data)
-			return mc("1", "abnormal data!", data=demo_data)
-		else:# 通过老关卡
-			if gasql_update("UPDATE player_status SET experience_potion=" + str(item_dict["experience_potion"]) + ",experience=" + str(item_dict["experience"]) + " where unique_id='" + self.unique_id + "'") == 1\
-				and gasql_update("UPDATE bag SET iron=" + str(item_dict["iron"]) + ", coin=" + str(item_dict["coin"]) + " where unique_id='" + self.unique_id + "'") == 1:
-				return mc("0", "pass old level!", data=data)
-			return mc("2", "abnormal data!", data=demo_data)
-
-	def __get_structure_data(self, data) -> dict:
-		pass
 
 	# def __random_data(self) -> dict:
 	# 	data = {"item1": []}
@@ -161,7 +159,7 @@ class LevelSystemClass():
 		print("[LevelSystemClass][__get_level] -> sql_result:" + str(sql_result))
 		return sql_result[0]
 
-	def __get_unique_id(self,session):
+	def __get_unique_id(self, session):
 		sql_result = gasql("select unique_id from userinfo where  session='" + session + "'")
 		if len(sql_result) == 0:
 			return ""
@@ -179,4 +177,3 @@ class LevelSystemClass():
 
 if __name__ == "__main__":
 	pass
-
