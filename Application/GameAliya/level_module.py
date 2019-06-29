@@ -28,53 +28,68 @@ class LevelSystemClass():
 	coin_basis = 300
 	coin_multiple = 75
 	item_list = [# 经验药水， 玩家经验， 铁， 金币
-		{
+		{# 0
+			"item1": ["experience_potion", 0],
+			"item2": ["experience", 0],
+			"item3": ["iron", 0],
+			"item4": ["coin", 0],
+			"item5": ["level", 0],
+		},
+		{# 1
 			"item1": ["experience_potion", 100],
-			"item2": ["experience", 100],
+			"item2": ["experience", 10],
 			"item3": ["iron", 100],
-			"item4": ["coin", 100],
+			"item4": ["coin", 300],
+			"item5": ["level", 0],
+		},
+		{# 2
+			"item1": ["experience_potion", 125],
+			"item2": ["experience", 10],
+			"item3": ["iron", 125],
+			"item4": ["coin", 375],
+			"item5": ["level", 0],
+		},
+		{# 3
+			"item1": ["experience_potion", 150],
+			"item2": ["experience", 10],
+			"item3": ["iron", 150],
+			"item4": ["coin", 450],
+			"item5": ["level", 0],
 		},
 		{
-			"item1": ["experience_potion", 100],
-			"item2": ["experience", 100],
-			"item3": ["iron", 100],
-			"item4": ["coin", 100],
+			"item1": ["experience_potion", 175],
+			"item2": ["experience", 10],
+			"item3": ["iron", 175],
+			"item4": ["coin", 525],
+			"item5": ["level", 0],
 		},
 		{
-			"item1": ["experience_potion", 100],
-			"item2": ["experience", 100],
-			"item3": ["iron", 100],
-			"item4": ["coin", 100],
+			"item1": ["experience_potion", 200],
+			"item2": ["experience", 10],
+			"item3": ["iron", 200],
+			"item4": ["coin", 600],
+			"item5": ["level", 0],
 		},
 		{
-			"item1": ["experience_potion", 100],
-			"item2": ["experience", 100],
-			"item3": ["iron", 100],
-			"item4": ["coin", 100],
+			"item1": ["experience_potion", 225],
+			"item2": ["experience", 10],
+			"item3": ["iron", 225],
+			"item4": ["coin", 675],
+			"item5": ["level", 0],
 		},
 		{
-			"item1": ["experience_potion", 100],
-			"item2": ["experience", 100],
-			"item3": ["iron", 100],
-			"item4": ["coin", 100],
+			"item1": ["experience_potion", 250],
+			"item2": ["experience", 10],
+			"item3": ["iron", 250],
+			"item4": ["coin", 750],
+			"item5": ["level", 0],
 		},
 		{
-			"item1": ["experience_potion", 100],
-			"item2": ["experience", 100],
-			"item3": ["iron", 100],
-			"item4": ["coin", 100],
-		},
-		{
-			"item1": ["experience_potion", 100],
-			"item2": ["experience", 100],
-			"item3": ["iron", 100],
-			"item4": ["coin", 100],
-		},
-		{
-			"item1": ["experience_potion", 100],
-			"item2": ["experience", 100],
-			"item3": ["iron", 100],
-			"item4": ["coin", 100],
+			"item1": ["experience_potion", 275],
+			"item2": ["experience", 10],
+			"item3": ["iron", 275],
+			"item4": ["coin", 825],
+			"item5": ["level", 0],
 		}
 	]
 	def __init__(self, session,*args, **kwargs):
@@ -86,33 +101,39 @@ class LevelSystemClass():
 		level_client = int(list(info["data"].values())[0])
 		level, experience_potion, experience = self.__get_level()
 		iron, coin = self.__get_bag_data()
-		data = {
-			"item1": ["experience_potion", experience_potion],
-			"item2": ["experience", experience],
-			"item3": ["iron", iron],
-			"item4": ["coin", coin],
-		}
-		if level_client <= 0:
-			return mc("9", "abnormal data!", data=data)
-		experience_potion += self.item_list[level_client - 1]["item1"][1]
-		experience += self.item_list[level_client - 1]["item2"][1]
-		iron += self.item_list[level_client - 1]["item3"][1]
-		coin += self.item_list[level_client - 1]["item4"][1]
-		data["item1"] = ["experience_potion", experience_potion]
-		data["item2"] = ["experience", experience]
-		data["item3"] = ["iron", iron]
-		data["item4"] = ["coin", coin]
+
+		demo_data = self.item_list[0]
+		demo_data["item1"].append(experience_potion)
+		demo_data["item2"].append(experience)
+		demo_data["item3"].append(iron)
+		demo_data["item4"].append(coin)
+		demo_data["item5"].append(level)
+		if level_client <= 0 or (level + 1) < level_client:
+			return mc("9", "abnormal data!", data=demo_data)
+
+		data = self.item_list[level_client]
+		experience_potion += data["item1"][1]
+		experience += data["item2"][1]
+		iron += data["item3"][1]
+		coin += data["item4"][1]
+		data["item1"].append(experience_potion)
+		data["item2"].append(experience)
+		data["item3"].append(iron)
+		data["item4"].append(coin)
+
 		if level + 1 == level_client:# 通过新关卡
 			if gasql_update("UPDATE player_status SET level=" + str(level_client) + ",experience_potion=" + str(experience_potion) + ",experience=" + str(experience) + " where unique_id='" + self.unique_id + "'") == 1\
 				and gasql_update("UPDATE bag SET iron=" + str(iron) + ", coin=" + str(coin) + " where unique_id='" + self.unique_id + "'") == 1:
+				data["item5"][1] = 1
+				data["item5"].append(level_client)
 				return mc("0", "pass new level!", data=data)
-			return mc("1", "abnormal data!", data=data)
-		elif level >= level_client:# 通过老关卡
+			return mc("1", "abnormal data!", data=demo_data)
+		else:# 通过老关卡
 			if gasql_update("UPDATE player_status SET experience_potion=" + str(experience_potion) + ",experience=" + str(experience) + " where unique_id='" + self.unique_id + "'") == 1\
 				and gasql_update("UPDATE bag SET iron=" + str(iron) + ", coin=" + str(coin) + " where unique_id='" + self.unique_id + "'") == 1:
+				data["item5"].append(level)
 				return mc("0", "pass old level!", data=data)
-			return mc("3", "abnormal data!", data=data)
-		return mc("4", "abnormal data!", data=data)# 通过的关卡数超过服务器上的记录数+1
+			return mc("2", "abnormal data!", data=demo_data)
 
 	# def __random_data(self) -> dict:
 	# 	data = {"item1": []}
