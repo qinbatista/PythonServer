@@ -36,55 +36,64 @@ class LevelSystemClass:
 			"reward1": ["experience_potion", 0],
 			"reward2": ["experience", 0],
 			"reward3": ["iron", 0],
-			"reward4": ["coin", 0]
+			"reward4": ["coin", 0],
+			"reward5": ["small_energy_potion", 0]
 		},
 		{  # 1
 			"reward1": ["experience_potion", 100],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 100],
-			"reward4": ["coin", 300]
+			"reward4": ["coin", 300],
+			"reward5": ["small_energy_potion", 1]
 		},
 		{  # 2
 			"reward1": ["experience_potion", 125],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 125],
-			"reward4": ["coin", 375]
+			"reward4": ["small_energy_potion", 1],
+			"reward5": ["coin", 375]
 		},
 		{  # 3
 			"reward1": ["experience_potion", 150],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 150],
-			"reward4": ["coin", 450]
+			"reward4": ["coin", 450],
+			"reward5": ["small_energy_potion", 1]
 		},
 		{  # 4
 			"reward1": ["experience_potion", 175],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 175],
-			"reward4": ["coin", 525]
+			"reward4": ["coin", 525],
+			"reward5": ["small_energy_potion", 1]
 		},
 		{  # 5
 			"reward1": ["experience_potion", 200],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 200],
-			"reward4": ["coin", 600]
+			"reward4": ["coin", 600],
+			"reward5": ["small_energy_potion", 1]
 		},
 		{  # 6
 			"reward1": ["experience_potion", 225],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 225],
-			"reward4": ["coin", 675]
+			"reward4": ["coin", 675],
+			"reward5": ["small_energy_potion", 1]
 		},
 		{  # 7
 			"reward1": ["experience_potion", 250],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 250],
-			"reward4": ["coin", 750]
+			"reward4": ["coin", 750],
+			"reward5": ["small_energy_potion", 1]
 		},
 		{  # 8
 			"reward1": ["experience_potion", 275],
 			"reward2": ["experience", 10],
 			"reward3": ["iron", 275],
-			"reward4": ["coin", 825]
+			"reward4": ["coin", 825],
+			"reward5": ["small_energy_potion", 1]
 		}
 	]
 
@@ -95,35 +104,50 @@ class LevelSystemClass:
 		info = json.loads(message, encoding="utf-8")
 		customs_clearance_time = list(info["data"].keys())[0]  # 通关时间
 		level_client = int(list(info["data"].values())[0])
-		level, experience_potion, experience = self.__get_level()
-		iron, coin = self.__get_bag_data()
 
+		item_dict = self.__structure_item_dict()
+
+		data_len = len(self.reward_list[0].keys()) + 1
+		self.__structure_data(self.reward_list[0], item_dict, data_len)
+		# 异常触发，后续方法不会进行
+		if level_client <= 0 or (item_dict["level"] + 1) < level_client:
+			return mc("9", "abnormal data!", data=self.reward_list[0])
+
+		# 改变所有该变的变量
+		# item_dict["energy"] -= 1
+		if item_dict["level"] + 1 == level_client:  # 通过新关卡
+			item_dict["level"] = level_client
+
+		data = self.reward_list[level_client] # 获得奖励
+		data_len = len(self.reward_list[level_client].keys()) + 1
+		self.__structure_data(data, item_dict, data_len)
+
+		player_status_list = [str(item_dict["level"]), str(item_dict["experience_potion"]),
+			str(item_dict["experience"]), str(item_dict["energy"]), str(item_dict["small_energy_potion"]), self.unique_id]
+		player_status_str = """UPDATE player_status SET level=%s, experience_potion=%s, experience=%s, energy=%s, small_energy_potion=%s
+				where unique_id='%s'""" % tuple(player_status_list)
+
+		bag_list = [str(item_dict["iron"]), str(item_dict["coin"]), self.unique_id]
+		bag_str = """UPDATE bag SET iron=%s, coin=%s where unique_id='%s'""" % tuple(bag_list)
+		if gasql_update(player_status_str) == 1 and gasql_update(bag_str) == 1:
+			data["item" + str(data_len)][1] = item_dict["level"]
+			return mc("0", "passed customs!", data=data)
+		return mc("1", "abnormal data!", data=self.reward_list[0])
+
+	def __structure_item_dict(self) -> dict:
+		level, experience_potion, experience, energy, small_energy_potion = self.__get_level()
+		iron, coin = self.__get_bag_data()
 		item_dict = {
 			"experience_potion": experience_potion,
 			"experience": experience,
 			"iron": iron,
 			"coin": coin,
-			"level": level
+			"level": level,
+			"energy": energy,
+			"small_energy_potion": small_energy_potion
 		}
+		return item_dict
 
-		data_len = len(self.reward_list[0].keys()) + 1
-		self.__structure_data(self.reward_list[0], item_dict, data_len)
-		if level_client <= 0 or (level + 1) < level_client:
-			return mc("9", "abnormal data!", data=self.reward_list[0])
-
-		data = self.reward_list[level_client]
-		self.__structure_data(data, item_dict, data_len)
-
-		if level + 1 == level_client:  # 通过新关卡
-			item_dict["level"] = level_client
-		if gasql_update("UPDATE player_status SET level=" + str(item_dict["level"]) + ",experience_potion=" + str(
-				item_dict["experience_potion"]) + ",experience=" + str(
-				item_dict["experience"]) + " where unique_id='" + self.unique_id + "'") == 1 \
-				and gasql_update("UPDATE bag SET iron=" + str(item_dict["iron"]) + ", coin=" + str(
-			item_dict["coin"]) + " where unique_id='" + self.unique_id + "'") == 1:
-			data["item" + str(data_len)][1] = item_dict["level"]
-			return mc("0", "passed customs!", data=data)
-		return mc("1", "abnormal data!", data=self.reward_list[0])
 
 	def __structure_data(self, data, item_dict, data_len):
 		for i in range(1, data_len):
@@ -132,6 +156,7 @@ class LevelSystemClass:
 			item_dict[key] += data[reward][1]
 			data.update({"item" + str(i): [key, item_dict[key]]})
 		data.update({"item" + str(data_len): ["level", item_dict["level"]]})
+		# data.update({"item" + str(data_len + 1): ["energy", item_dict["energy"]]})
 
 	# def __random_data(self) -> dict:
 	# 	data = {"item1": []}
@@ -155,7 +180,7 @@ class LevelSystemClass:
 		return sql_result[0]
 
 	def __get_level(self):
-		sql_result = gasql("select level, experience_potion, experience from player_status where  unique_id='" + self.unique_id + "'")
+		sql_result = gasql("select level, experience_potion, experience, energy, small_energy_potion from player_status where  unique_id='" + self.unique_id + "'")
 		print("[LevelSystemClass][__get_level] -> sql_result:" + str(sql_result))
 		return sql_result[0]
 

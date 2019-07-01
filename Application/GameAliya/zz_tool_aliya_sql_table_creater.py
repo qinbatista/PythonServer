@@ -1,10 +1,12 @@
 """
     创建数据库用户表，技能表，卷轴表
 """
-
+import json
 import os
 import pymysql  # 数据库连接
 from DBUtils.PooledDB import PooledDB  # 用于数据库连接池
+
+JSON_NAME = "configuration.json"
 
 
 def PythonLocation():
@@ -14,197 +16,254 @@ def PythonLocation():
 # 建立数据库连接池
 POOL = PooledDB(
     pymysql, 5,  # 5为连接池里的最少连接数
-    host='localhost',
-    user='root',
-    passwd='lukseun',
-    db='aliya',
+    host="localhost",
+    user="root",
+    passwd="lukseun",
+    db="aliya",
     port=3306,
-    setsession=['SET AUTOCOMMIT = 1']  # 设置线程池是否打开自动更新的配置，0为False，1为True
+    setsession=["SET AUTOCOMMIT = 1"]  # 设置线程池是否打开自动更新的配置，0为False，1为True
 )
 
 
-def create_users_table():
+def create_users_table() -> None:
     """
     创建用户表
-    :return:
     """
+    table_name = "userinfo"
+    table_attribute = ["count", "account", "password", "unique_id", "session", "ip",
+                       "user_name", "gender", "email","phone_number", "birth_day",
+                       "last_time_login", "registration_time", "head_photo"]
     db = POOL.connection()
     cursor = db.cursor()
-    user_sql = """
-		CREATE TABLE userinfo(
-			count INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			account VARCHAR(128)          NULL DEFAULT "",
-			password VARCHAR(128)         NULL DEFAULT "",
-			unique_id VARCHAR(128)        NULL DEFAULT "",
-			session  VARCHAR(128)         NULL DEFAULT "",
-			ip VARCHAR(16)                NULL DEFAULT "",
-			user_name VARCHAR(20)         NULL DEFAULT "",
-			gender VARCHAR(10)            NULL DEFAULT "",
-			email VARCHAR(50)             NULL DEFAULT "",
-			phone_number VARCHAR(20)      NULL DEFAULT "",
-			birth_day VARCHAR(20)         NULL DEFAULT "",
-			last_time_login VARCHAR(20)   NULL DEFAULT "",
-			registration_time VARCHAR(20) NULL DEFAULT "",
-			head_photo MEDIUMBLOB         NULL DEFAULT(0x0)
-		)
-	"""
+    user_sql = "CREATE TABLE " + table_name + """(
+            %s INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            %s VARCHAR(128) NULL DEFAULT "",
+            %s VARCHAR(128) NULL DEFAULT "",
+            %s VARCHAR(128) NULL DEFAULT "",
+            %s VARCHAR(128) NULL DEFAULT "",
+            %s VARCHAR(16)  NULL DEFAULT "",
+            %s VARCHAR(20)  NULL DEFAULT "",
+            %s VARCHAR(10)  NULL DEFAULT "",
+            %s VARCHAR(50)  NULL DEFAULT "",
+            %s VARCHAR(20)  NULL DEFAULT "",
+            %s VARCHAR(20)  NULL DEFAULT "",
+            %s VARCHAR(20)  NULL DEFAULT "",
+            %s VARCHAR(20)  NULL DEFAULT "",
+            %s MEDIUMBLOB NULL DEFAULT(0x0)
+        );""" % tuple(table_attribute)
     cursor.execute(user_sql)
     db.commit()
+    json_operating(table_name=table_name, table_attribute=table_attribute)
 
 
-def create_skill_table():
+def create_skill_table() -> None:
     """
     创建技能表
-    :return:
     """
+    table_name = "skill"
+    table_attribute = ["unique_id",
+                       "m1_level", "m11_level", "m12_level", "m13_level",
+                       "m111_level", "m112_level", "m113_level",
+                       "m121_level", "m122_level", "m123_level",
+                       "m131_level", "m132_level", "m133_level",
+
+                       "p1_level", "p11_level", "p12_level", "p13_level",
+                       "p111_level", "p112_level", "p113_level",
+                       "p121_level", "p122_level", "p123_level",
+                       "p131_level", "p132_level", "p133_level",
+
+                       "g1_level", "g11_level", "g12_level", "g13_level",
+                       "g111_level", "g112_level", "g113_level",
+                       "g121_level", "g122_level", "g123_level",
+                       "g131_level", "g132_level", "g133_level",
+                       ]
     db = POOL.connection()
     cursor = db.cursor()
-    skill_sql = """
-		CREATE TABLE skill(
-            unique_id VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
-            m1_level   TINYINT NULL DEFAULT(0),
-            m11_level  TINYINT NULL DEFAULT(0),
-            m12_level  TINYINT NULL DEFAULT(0),
-            m13_level  TINYINT NULL DEFAULT(0),
-            m111_level TINYINT NULL DEFAULT(0),
-            m112_level TINYINT NULL DEFAULT(0),
-            m113_level TINYINT NULL DEFAULT(0),
-            m121_level TINYINT NULL DEFAULT(0),
-            m122_level TINYINT NULL DEFAULT(0),
-            m123_level TINYINT NULL DEFAULT(0),
-            m131_level TINYINT NULL DEFAULT(0),
-            m132_level TINYINT NULL DEFAULT(0),
-            m133_level TINYINT NULL DEFAULT(0),
-            p1_level   TINYINT NULL DEFAULT(0),
-            p11_level  TINYINT NULL DEFAULT(0),
-            p12_level  TINYINT NULL DEFAULT(0),
-            p13_level  TINYINT NULL DEFAULT(0),
-            p111_level TINYINT NULL DEFAULT(0),
-            p112_level TINYINT NULL DEFAULT(0),
-            p113_level TINYINT NULL DEFAULT(0),
-            p121_level TINYINT NULL DEFAULT(0),
-            p122_level TINYINT NULL DEFAULT(0),
-            p123_level TINYINT NULL DEFAULT(0),
-            p131_level TINYINT NULL DEFAULT(0),
-            p132_level TINYINT NULL DEFAULT(0),
-            p133_level TINYINT NULL DEFAULT(0),
-            g1_level   TINYINT NULL DEFAULT(0),
-            g11_level  TINYINT NULL DEFAULT(0),
-            g12_level  TINYINT NULL DEFAULT(0),
-            g13_level  TINYINT NULL DEFAULT(0),
-            g111_level TINYINT NULL DEFAULT(0),
-            g112_level TINYINT NULL DEFAULT(0),
-            g113_level TINYINT NULL DEFAULT(0),
-            g121_level TINYINT NULL DEFAULT(0),
-            g122_level TINYINT NULL DEFAULT(0),
-            g123_level TINYINT NULL DEFAULT(0),
-            g131_level TINYINT NULL DEFAULT(0),
-            g132_level TINYINT NULL DEFAULT(0),
-            g133_level TINYINT NULL DEFAULT(0)
-	   	)
-	"""
+    skill_sql = "CREATE TABLE " + table_name + """(
+            %s VARCHAR(50) NOT NULL DEFAULT 'new_id' PRIMARY KEY,
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0),
+            %s TINYINT NULL DEFAULT(0)
+        );""" % tuple(table_attribute)
     cursor.execute(skill_sql)
     db.commit()
+    json_operating(table_name=table_name, table_attribute=table_attribute)
 
-def create_bag_table():
+
+def create_bag_table() -> None:
     """
     武器列表
     """
+    table_name = "bag"
+    table_attribute = ["unique_id", "scroll_skill_10", "scroll_skill_30", "scroll_skill_100", "iron",
+                       "diamonds", "experience_potion", "coin"]
     db = POOL.connection()
     cursor = db.cursor()
-    bag_sql = """
-        CREATE TABLE bag(
-            unique_id VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
-            scroll_skill_10  SMALLINT NULL DEFAULT(0),
-            scroll_skill_30  SMALLINT NULL DEFAULT(0),
-            scroll_skill_100 SMALLINT NULL DEFAULT(0),
-            iron     SMALLINT NULL DEFAULT(0),
-            diamonds SMALLINT NULL DEFAULT(0),
-            experience_potion SMALLINT NULL DEFAULT(0),
-            coin     SMALLINT NULL DEFAULT(0)
-        )
-    """
+    bag_sql = "CREATE TABLE " + table_name + """(
+            %s VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0)
+        );""" % tuple(table_attribute)
     cursor.execute(bag_sql)
     db.commit()
+    json_operating(table_name=table_name, table_attribute=table_attribute)
 
-def create_weapon_bag():
+
+def create_weapon_bag() -> None:
     """
     创建卷轴表
-    :return:
     """
+    table_name = "weapon_bag"
+    table_attribute = ["unique_id"]
+    for i in range(1, 41):
+        table_attribute.append("weapon" + str(i))
+
     db = POOL.connection()
     cursor = db.cursor()
-    bag_sql = """
-        CREATE TABLE weapon_bag(
-	        unique_id VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
-	        weapon1  SMALLINT NULL DEFAULT(0),
-	        weapon2  SMALLINT NULL DEFAULT(0),
-	        weapon3  SMALLINT NULL DEFAULT(0),
-	        weapon4  SMALLINT NULL DEFAULT(0),
-	        weapon5  SMALLINT NULL DEFAULT(0),
-	        weapon6  SMALLINT NULL DEFAULT(0),
-	        weapon7  SMALLINT NULL DEFAULT(0),
-	        weapon8  SMALLINT NULL DEFAULT(0),
-	        weapon9  SMALLINT NULL DEFAULT(0),
-	        weapon10  SMALLINT NULL DEFAULT(0),
+    bag_sql = "CREATE TABLE " + table_name + """(
+            %s VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
 
-            weapon11  SMALLINT NULL DEFAULT(0),
-	        weapon12  SMALLINT NULL DEFAULT(0),
-	        weapon13  SMALLINT NULL DEFAULT(0),
-	        weapon14  SMALLINT NULL DEFAULT(0),
-	        weapon15  SMALLINT NULL DEFAULT(0),
-	        weapon16  SMALLINT NULL DEFAULT(0),
-	        weapon17  SMALLINT NULL DEFAULT(0),
-	        weapon18  SMALLINT NULL DEFAULT(0),
-	        weapon19  SMALLINT NULL DEFAULT(0),
-	        weapon20  SMALLINT NULL DEFAULT(0),
-
-            weapon21  SMALLINT NULL DEFAULT(0),
-	        weapon22  SMALLINT NULL DEFAULT(0),
-	        weapon23  SMALLINT NULL DEFAULT(0),
-	        weapon24  SMALLINT NULL DEFAULT(0),
-	        weapon25  SMALLINT NULL DEFAULT(0),
-	        weapon26  SMALLINT NULL DEFAULT(0),
-	        weapon27  SMALLINT NULL DEFAULT(0),
-	        weapon28  SMALLINT NULL DEFAULT(0),
-	        weapon29  SMALLINT NULL DEFAULT(0),
-	        weapon30  SMALLINT NULL DEFAULT(0),
-
-            weapon31  SMALLINT NULL DEFAULT(0),
-	        weapon32  SMALLINT NULL DEFAULT(0),
-	        weapon33  SMALLINT NULL DEFAULT(0),
-	        weapon34  SMALLINT NULL DEFAULT(0),
-	        weapon35  SMALLINT NULL DEFAULT(0),
-	        weapon36  SMALLINT NULL DEFAULT(0),
-	        weapon37  SMALLINT NULL DEFAULT(0),
-	        weapon38  SMALLINT NULL DEFAULT(0),
-	        weapon39  SMALLINT NULL DEFAULT(0),
-	        weapon40  SMALLINT NULL DEFAULT(0)
-        )
-    """
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+    
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0)
+        );""" % tuple(table_attribute)
     cursor.execute(bag_sql)
     db.commit()
+    json_operating(table_name=table_name, table_attribute=table_attribute)
 
-def create_weapon_info():
+
+def create_weapon_info() -> None:
     """
-    武器1参数
+    武器n参数
     """
     for i in range(1, 41):
+        table_name = "weapon" + str(i)
+        table_attribute = ["unique_id", "weapon_level", "passive_skill_1_level",
+                           "passive_skill_2_level", "passive_skill_3_level",
+                           "passive_skill_4_level", "skill_point", "segment"]
         db = POOL.connection()
         cursor = db.cursor()
-        bag_sql = "CREATE TABLE weapon"+str(i)+"(\
-                unique_id VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,\
-                weapon_level  SMALLINT NULL DEFAULT(0),\
-                passive_skill_1_level SMALLINT NULL DEFAULT(0),\
-                passive_skill_2_level SMALLINT NULL DEFAULT(0),\
-                passive_skill_3_level SMALLINT NULL DEFAULT(0),\
-                passive_skill_4_level SMALLINT NULL DEFAULT(0),\
-                skill_point  SMALLINT NULL DEFAULT(0),\
-                segment  SMALLINT NULL DEFAULT(0)\
-            )\
-        "
+        bag_sql = "CREATE TABLE " + table_name + """(
+                %s VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
+                %s SMALLINT NULL DEFAULT(0),
+                %s SMALLINT NULL DEFAULT(0),
+                %s SMALLINT NULL DEFAULT(0),
+                %s SMALLINT NULL DEFAULT(0),
+                %s SMALLINT NULL DEFAULT(0),
+                %s SMALLINT NULL DEFAULT(0),
+                %s SMALLINT NULL DEFAULT(0)
+            );""" % tuple(table_attribute)
         cursor.execute(bag_sql)
         db.commit()
+        json_operating(table_name=table_name, table_attribute=table_attribute)
+
+
+def create_user_info() -> None:
+    """
+    武器列表
+    """
+    table_name = "player_status"
+    table_attribute = ["unique_id", "role_type", "experience_potion", "level", "experience",
+                       "stage_level", "diamonds", "energy", "small_energy_potion"]
+    db = POOL.connection()
+    cursor = db.cursor()
+    bag_sql = "CREATE TABLE " + table_name + """(
+            %s VARCHAR(50) NOT NULL DEFAULT 'new_id' PRIMARY KEY,
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0),
+            %s SMALLINT NULL DEFAULT(0)
+        );""" % tuple(table_attribute)
+    cursor.execute(bag_sql)
+    db.commit()
+    json_operating(table_name=table_name, table_attribute=table_attribute)
+
 
 def update_avatar():
     """更新用户表中的头像"""
@@ -232,7 +291,6 @@ def update_avatar():
 def load_avatar():
     """
     从数据库中下载头像
-    :return:
     """
     save_img_name = "save.png"
     # save_img_path = "/Users/wankcn/Desktop/PythonCode/Test/data_table/test.png"
@@ -248,35 +306,24 @@ def load_avatar():
     with open(save_img_name, "wb") as f:
         f.write(data)
 
-def create_user_info():
-    """
-    武器列表
-    """
-    db = POOL.connection()
-    cursor = db.cursor()
-    bag_sql = """
-        CREATE TABLE player_status(
-            unique_id VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
-            role_type  SMALLINT NULL DEFAULT(0),
 
-            experience_potion SMALLINT NULL DEFAULT(0),
-            level  SMALLINT NULL DEFAULT(0),
-            experience SMALLINT NULL DEFAULT(0),
-            stage_level     SMALLINT NULL DEFAULT(0),
-            diamonds SMALLINT NULL DEFAULT(0),
-            energy   SMALLINT NULL DEFAULT(0)
-        )
-    """
-    cursor.execute(bag_sql)
-    db.commit()
+def json_operating(table_name: str, table_attribute: list) -> None:
+    if not os.path.exists(JSON_NAME):
+        data = {table_name: table_attribute}
+    else:
+        data = json.load(open(JSON_NAME, encoding="utf-8"))
+        data.update({table_name: table_attribute})
+    with open(JSON_NAME, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
+
 
 if __name__ == '__main__':
     # 创建数据库表
-    # create_users_table()
-    # create_skill_table()
-    # create_bag_table()
+    create_users_table()
+    create_skill_table()
+    create_bag_table()
     create_weapon_bag()
-    # create_weapon_info()
+    create_weapon_info()
     create_user_info()
     # 更新头像
     # update_avatar()

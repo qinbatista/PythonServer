@@ -34,7 +34,7 @@ MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'un
 				 {'session':'mac_session', 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},
 				 {'session':'mac_session', 'function':'get_all_weapon','random':'-906', 'data':"null"},
 				 {'session':'mac_session', 'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
-				 {'session':'mac_session', 'function':'pass_level','random':'-906', 'data':{"customs_clearance_time": "6"}},
+				 {'session':'mac_session', 'function':'pass_level','random':'-906', 'data':{"customs_clearance_time": "2"}},
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
