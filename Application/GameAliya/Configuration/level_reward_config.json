@@ -1,0 +1,61 @@
+{
+	"level0":{
+		"reward1": ["experience_potion", 0],
+		"reward2": ["experience", 0],
+		"reward3": ["iron", 0],
+		"reward4": ["coin", 0],
+		"reward5": ["small_energy_potion", 0]
+	},
+	"level1":{
+		"reward5": ["small_energy_potion", 1]
+	},
+	"level2":{
+		"reward1": ["experience_potion", 125],
+		"reward2": ["experience", 10],
+		"reward3": ["iron", 125],
+		"reward4": ["small_energy_potion", 1],
+		"reward5": ["coin", 375]
+	},
+	"level3":{
+		"reward1": ["experience_potion", 150],
+		"reward2": ["experience", 10],
+		"reward3": ["iron", 150],
+		"reward4": ["coin", 450],
+		"reward5": ["small_energy_potion", 1]
+	},
+	"level4":{
+		"reward1": ["experience_potion", 175],
+		"reward2": ["experience", 10],
+		"reward3": ["iron", 175],
+		"reward4": ["coin", 525],
+		"reward5": ["small_energy_potion", 1]
+	},
+	"level5":{
+		"reward1": ["experience_potion", 200],
+		"reward2": ["experience", 10],
+		"reward3": ["iron", 200],
+		"reward4": ["coin", 600],
+		"reward5": ["small_energy_potion", 1]
+	},
+	"level6":{
+		"reward1": ["experience_potion", 225],
+		"reward2": ["experience", 10],
+		"reward3": ["iron", 225],
+		"reward4": ["coin", 675],
+		"reward5": ["small_energy_potion", 1]
+	},
+	"level7":{
+		"reward1": ["experience_potion", 250],
+		"reward2": ["experience", 10],
+		"reward3": ["iron", 250],
+		"reward4": ["coin", 750],
+		"reward5": ["small_energy_potion", 1]
+	},
+	"level8":{
+		"reward1": ["experience_potion", 275],
+		"reward2": ["experience", 10],
+		"reward3": ["iron", 275],
+		"reward4": ["coin", 825],
+		"reward5": ["small_energy_potion", 1]
+	}
+}

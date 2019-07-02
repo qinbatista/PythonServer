@@ -6,12 +6,12 @@ import os
 import pymysql  # 数据库连接
 from DBUtils.PooledDB import PooledDB  # 用于数据库连接池
 
-JSON_NAME = "configuration.json"
-
 
 def PythonLocation():
     return os.path.dirname(os.path.realpath(__file__))
 
+
+JSON_NAME = PythonLocation() + "/Configuration/mysql_data_config.json"
 
 # 建立数据库连接池
 POOL = PooledDB(
@@ -134,11 +134,12 @@ def create_bag_table() -> None:
     """
     table_name = "bag"
     table_attribute = ["unique_id", "scroll_skill_10", "scroll_skill_30", "scroll_skill_100", "iron",
-                       "diamonds", "experience_potion", "coin"]
+                       "diamonds", "experience_potion", "coin", "small_energy_potion"]
     db = POOL.connection()
     cursor = db.cursor()
     bag_sql = "CREATE TABLE " + table_name + """(
             %s VARCHAR(50) NOT NULL DEFAULT'new_id' PRIMARY KEY,
+            %s SMALLINT NULL DEFAULT(0),
             %s SMALLINT NULL DEFAULT(0),
             %s SMALLINT NULL DEFAULT(0),
             %s SMALLINT NULL DEFAULT(0),
@@ -245,15 +246,12 @@ def create_user_info() -> None:
     武器列表
     """
     table_name = "player_status"
-    table_attribute = ["unique_id", "role_type", "experience_potion", "level", "experience",
-                       "stage_level", "diamonds", "energy", "small_energy_potion"]
+    table_attribute = ["unique_id", "role_type", "level", "experience",
+                       "stage_level", "energy"]
     db = POOL.connection()
     cursor = db.cursor()
     bag_sql = "CREATE TABLE " + table_name + """(
             %s VARCHAR(50) NOT NULL DEFAULT 'new_id' PRIMARY KEY,
-            %s SMALLINT NULL DEFAULT(0),
-            %s SMALLINT NULL DEFAULT(0),
-            %s SMALLINT NULL DEFAULT(0),
             %s SMALLINT NULL DEFAULT(0),
             %s SMALLINT NULL DEFAULT(0),
             %s SMALLINT NULL DEFAULT(0),

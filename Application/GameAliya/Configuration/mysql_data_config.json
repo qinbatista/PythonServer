@@ -45,13 +45,10 @@
     "player_status": [
         "unique_id",
         "role_type",
-        "experience_potion",
         "level",
         "experience",
         "stage_level",
-        "diamonds",
-        "energy",
-        "small_energy_potion"
+        "energy"
     ],
     "weapon1": [
         "unique_id",
@@ -519,6 +516,7 @@
         "iron",
         "diamonds",
         "experience_potion",
-        "coin"
+        "coin",
+        "small_energy_potion"
     ]
 }
