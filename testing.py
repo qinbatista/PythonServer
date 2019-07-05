@@ -172,7 +172,7 @@ def main() -> None:
 	# send_single_message(LOGIN_AS_VISITOR)
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
-	# send_single_message(INCREASE_SCROLL_SKILL_10)
+	send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	#send_single_message(SCROLL_LEVEL_UP)
@@ -182,7 +182,7 @@ def main() -> None:
 	# send_single_message(UPGRADE_WEAPONS_STARS)
 	# send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
-	send_single_message(PASS_LEVEL)
+	# send_single_message(PASS_LEVEL)
 
 if __name__ == '__main__':
 	main()
