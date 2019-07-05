@@ -8,6 +8,7 @@ import pymysql
 import datetime;
 import random
 
+import requests
 
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
@@ -20,6 +21,10 @@ from Utility.AnalysisHeader import message_constructor as mc
 
 DESKey = "67891234"
 DESVector = "6789123467891234"
+
+
+BASE_TOKEN_URL = 'http://localhost:8080'
+
 
 MessageList = [
 	"{\"status\":\"0\",\"message\":\"success\"}",
@@ -87,25 +92,13 @@ class LoginSystemClass():
 		"""
 		user login only with unique_id
 		"""
-		sql_result = gasql("select count(account) from userinfo where unique_id='" + unique_id + "'")
-		if sql_result[0][0] <= 1:
-			# if account is not exist try to find token
-			sql_result = gasql("select token from userinfo where unique_id='" + unique_id + "'")
-			if len(sql_result) <= 0:
-				# if token is not exist, it is a new user, createa a account for them
-				token = self.__create_token_by_unique_id(unique_id)
-				gasql("INSERT INTO userinfo(unique_id,account,password,token) VALUES ('" + unique_id + "','" + "" + "','" + "" + "','" + token + "')")
-			else:
-				# if token is exist, just give them token
-				token = str(sql_result[0][0])
-			data = {
-				"token": token,
-				"random": str(random.randint(-1000, 1000))
-			}
-			return mc("0", "login as visitor", data)
+		r = requests.post(BASE_TOKEN_URL + '/login_unique', data = {'unique_id' : unique_id})
+		if r.status_code == 200:
+			Log('[account_module.py][__visitor_login] unique_id {unique_id} granted token')
+			return mc('0', 'Visitor login', r.json())
 		else:
-			# if account is exist but use visitor login, ask user use account to login
-			return mc("1", "this phone is already binded a account,please login as account")
+			Log('[account_module.py][__visitor_login] unique_id access denied')
+			return mc('1', 'This phone already has a bound account, please login as account')
 
 	def __account_login(self, account, password):
 		"""

@@ -226,7 +226,7 @@ def main() -> None:
 	# get_skill_from_stack()
 	# level_up_skill_by_scroll()
 	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
-	# send_single_message(LOGIN_AS_VISITOR)
+	 send_single_message(LOGIN_AS_VISITOR)
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
 	#send_single_message(INCREASE_SCROLL_SKILL_10)
@@ -240,7 +240,7 @@ def main() -> None:
 	# send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
 	# send_single_message(PASS_LEVEL)
-	test_token_server()
+	#test_token_server()
 
 if __name__ == '__main__':
 	main()
