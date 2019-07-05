@@ -94,3 +94,22 @@ Explain same like the client, just message changed
 
 }
 
+### testing.py文件
+
+##### login方法
+
+```唯一标识符
+unique_id
+```
+
+```识别码：邮件、账户、手机号
+identifier
+```
+
+```用户定义：账号
+value
+```
+
+```密码
+password
+```
