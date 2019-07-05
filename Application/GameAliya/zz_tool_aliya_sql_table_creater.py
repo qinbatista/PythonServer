@@ -36,7 +36,7 @@ def create_users_table():
 			account VARCHAR(128)          NULL DEFAULT "",
 			password VARCHAR(128)         NULL DEFAULT "",
 			unique_id VARCHAR(128)        NULL DEFAULT "",
-			session  VARCHAR(128)         NULL DEFAULT "",
+			token VARCHAR(128)	          NULL DEFAULT "",
 			ip VARCHAR(16)                NULL DEFAULT "",
 			user_name VARCHAR(20)         NULL DEFAULT "",
 			gender VARCHAR(10)            NULL DEFAULT "",
@@ -271,12 +271,12 @@ def create_user_info():
     db.commit()
 
 if __name__ == '__main__':
-    # 创建数据库表
-    # create_users_table()
-    # create_skill_table()
-    # create_bag_table()
-    create_weapon_bag()
-    # create_weapon_info()
-    create_user_info()
-    # 更新头像
-    # update_avatar()
+	# 创建数据库表
+	#create_users_table()
+	#create_skill_table()
+	#create_bag_table()
+#create_weapon_bag()
+#     create_weapon_info()
+	#create_user_info()
+	# 更新头像
+	# update_avatar()

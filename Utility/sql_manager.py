@@ -56,8 +56,9 @@ def game_aliya_table(sql_command):
 	db.commit()
 	return cursor.description,cursor.fetchall()
 if __name__ == "__main__":
-	ss ,aa= game_aliya_table("select * from skill where unique_id='mac'")
+	#ss ,aa= game_aliya_table("select * from skill where unique_id='mac'")
 	# print(ss[0][0])
 	# print(ss[1][0])
-	print(aa[0][0])
-	print(aa[0][1])
+	#print(aa[0][0])
+	#print(aa[0][1])
+	pass
