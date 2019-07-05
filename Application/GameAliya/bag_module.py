@@ -24,17 +24,7 @@ from Utility.AnalysisHeader import message_constructor as mc
 class BagSystemClass():
 	def __init__(self, session, *args, **kwargs):
 		self.unique_id = self.__get_unique_id(session)
-		self.item_list_count = 0
 
-	def _increase_item_quantity(self, item_id, item_quantity):
-		try:
-			self.item_list_count += 1
-			gasql("UPDATE bag SET " + item_id + "=" + item_id + " +" + item_quantity + " WHERE unique_id='" + self.unique_id + "'")
-			result_quantity = gasql("select " + item_id + " from bag where  unique_id='" + self.unique_id + "'")
-			dc = {"item" + str(self.item_list_count): [item_id, result_quantity[0][0]]}
-			return dc
-		except:
-			return {"scroll_error": "1"}
 
 	def _increase_supplies(self, message_info):
 		message_dic = json.loads(message_info, encoding="utf-8")
@@ -53,30 +43,8 @@ class BagSystemClass():
 		return mc("2", "increase supplies failed")
 
 	def _random_gift(self, message_info):
-		message_dic = eval(message_info)
-		return_dic = {}
-		if "scroll_skill_10" in message_dic["data"].keys():
-			scroll_quantity = message_dic["data"]["scroll_skill_10"]
-			return_dic.update(self._increase_item_quantity("scroll_skill_10", scroll_quantity))
-		if "scroll_skill_30" in message_dic["data"].keys():
-			scroll_quantity = message_dic["data"]["scroll_skill_30"]
-			return_dic.update(self._increase_item_quantity("scroll_skill_30", scroll_quantity))
-		if "scroll_skill_100" in message_dic["data"].keys():
-			scroll_quantity = message_dic["data"]["scroll_skill_100"]
-			return_dic.update(self._increase_item_quantity("scroll_skill_100", scroll_quantity))
-		if "iron" in message_dic["data"].keys():
-			scroll_quantity = message_dic["data"]["iron"]
-			return_dic.update(self._increase_item_quantity("iron", scroll_quantity))
-		if "diamonds" in message_dic["data"].keys():
-			scroll_quantity = message_dic["data"]["diamonds"]
-			return_dic.update(self._increase_item_quantity("diamonds", scroll_quantity))
-		if "money" in message_dic["data"].keys():
-			scroll_quantity = message_dic["data"]["money"]
-			return_dic.update(self._increase_item_quantity("money", scroll_quantity))
-		if "coin" in message_dic["data"].keys():
-			scroll_quantity = message_dic["data"]["coin"]
-			return_dic.update(self._increase_item_quantity("coin", scroll_quantity))
-		return mc("0", "random gift", return_dic)
+		print("[BagSystemClass][_random_gift] -> 方法未写！")
+		return mc("9", "random gift")
 
 	def _get_all_supplies(self, message_info):
 		"""

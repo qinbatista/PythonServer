@@ -451,11 +451,10 @@
         "segment"
     ],
     "userinfo": [
-        "count",
+        "unique_id",
         "account",
         "password",
-        "unique_id",
-        "session",
+        "token",
         "ip",
         "user_name",
         "gender",
