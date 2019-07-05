@@ -44,16 +44,17 @@ class LoginSystemClass():
 		message_dic = eval(message_info)
 		if "data" in message_dic.keys():
 			unique_id = message_dic["data"]["unique_id"]
-			account = message_dic["data"]["account"]
+			identifier = message_dic['data']['identifier']
+			value = message_dic['data']['value']
 			password = message_dic["data"]["password"]
-			if account == "":
+			if identifier == "":
 				# if users don't have account, auto visitor login
-				Log("[login_system.py][_login] use unique_id for seesion")
+				Log("[login_system.py][_login] use unique_id for session")
 				return self.__visitor_login(unique_id)
 			else:
 				# if users have account and password, unique id is not usable but keep the value
-				Log("[login_system.py][_login] use account for seesion")
-				return self.__account_login(account, password)
+				Log("[login_system.py][_login] use identifier for session")
+				return self.__registered_login(identifier, value, password)
 		else:
 			return mc("1", "data is null")
 
@@ -100,10 +101,20 @@ class LoginSystemClass():
 			Log('[account_module.py][__visitor_login] unique_id access denied')
 			return mc('1', 'This phone already has a bound account, please login as account')
 
-	def __account_login(self, account, password):
+	def __registered_login(self, identifier, value, password):
 		"""
 		user login with account and password
 		"""
+		r = requests.post(BASE_TOKEN_URL + '/login', data = {'identifier' : identifier, 'value' : value, 'password' : password})
+		if r.status_code == 200:
+			Log('[account_module.py][__registered_login] {identifier} granted token')
+			return mc('0', 'Registered user login', r.json())
+		else:
+			Log('[account_module.py][__registered_login] {identifier} access denied')
+			return mc('1', 'Invalid credentials supplied')
+
+
+
 		sql_result = gasql("select * from userinfo where account='" + account + "' and password='" + password + "'")
 		if len(sql_result) <= 0:
 			return mc("1", "account is not exist")

@@ -16,7 +16,7 @@ COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m',
 client_type="aliya"
 # host="192.168.1.183"
 host="127.0.0.1"
-MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'account':'abc', 'password':'123'}},
+MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keepo'}},
 				 {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'account':'', 'password':''}},
 				 {'session':'mac_session', 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
 				 {'session':'mac_session', 'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
@@ -226,7 +226,7 @@ def main() -> None:
 	# get_skill_from_stack()
 	# level_up_skill_by_scroll()
 	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
-	 send_single_message(LOGIN_AS_VISITOR)
+	 send_single_message(LOGIN_AS_ACCOUNT)
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
 	#send_single_message(INCREASE_SCROLL_SKILL_10)
