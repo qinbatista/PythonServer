@@ -19,8 +19,8 @@ class UserManager:
 	def __init__(self):
 		self._pool = tormysql.ConnectionPool(max_connections = 10, idle_seconds = 7200, wait_connection_timeout = 3, host = '127.0.0.1', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
 
-	async def create_user(self, account: str, password: str) -> None:
-		pass
+	async def register_unique_id(self, unique_id: str) -> None:
+		await self._execute_statement('INSERT INTO userinfo (unique_id) VALUES ("' + str(unique_id) + '");')
 
 	async def validate_credentials(self, password: str, identifier: str, value: str) -> None:
 		'''

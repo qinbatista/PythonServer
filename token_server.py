@@ -26,6 +26,7 @@
 #	
 #	-	POST /login_unique {unique_id: str}
 #		This API call will only return a token if the user has not already bound their account.
+#		If the unique_id can not be found, a new user will be created and a token returned.
 #
 #		200 OK
 #		Returns a new token.
@@ -79,7 +80,11 @@ def run():
 async def _login_unique(request: web.Request) -> web.Response:
 	post = await request.post()
 	try:
-		await USER_MANAGER.check_exists('unique_id', post['unique_id'], raise_error = True)
+		exists = await USER_MANAGER.check_exists('unique_id', post['unique_id'])
+		if not exists:
+			await USER_MANAGER.register_unique_id(post['unique_id'])
+			token = await _issue_new_token(post['unique_id'])
+			return _json_response({'token' : token.decode('utf-8')})
 		bound = await USER_MANAGER.account_is_bound(post['unique_id'])
 		if bound:
 			return _json_response({'message' : 'The account corresponding to this unique_id has already been bound. Please log in using a different method.'}, status = 400)
