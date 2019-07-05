@@ -32,11 +32,10 @@ def create_users_table():
     cursor = db.cursor()
     user_sql = """
 		CREATE TABLE userinfo(
-			count INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			account VARCHAR(128)          NULL DEFAULT "",
-			password VARCHAR(128)         NULL DEFAULT "",
-			unique_id VARCHAR(128)        NULL DEFAULT "",
-			token VARCHAR(128)	          NULL DEFAULT "",
+			unique_id VARCHAR(128) NOT NULL PRIMARY KEY  ,
+			account VARCHAR(128)          NULL DEFAULT NULL,
+			password VARCHAR(128)         NULL DEFAULT NULL,
+			token VARCHAR(255)	          NULL DEFAULT NULL,
 			ip VARCHAR(16)                NULL DEFAULT "",
 			user_name VARCHAR(20)         NULL DEFAULT "",
 			gender VARCHAR(10)            NULL DEFAULT "",
