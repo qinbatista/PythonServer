@@ -12,3 +12,4 @@ pymysql==0.9.3
 tormysql==0.4.2
 aiohttp==3.5.4
 requests==2.22.0
+DBUtils==1.3
