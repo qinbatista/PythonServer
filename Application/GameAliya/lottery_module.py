@@ -17,11 +17,11 @@ from Application.GameAliya import skill_module
 from Application.GameAliya import bag_module
 
 class LotterySystemClass():
-	def __init__(self, session,*args, **kwargs):
-		self.unique_id = self.__get_unique_id(session)
+	def __init__(self, token,*args, **kwargs):
+		self.unique_id = self.__get_unique_id(token)
 		print("[LotterySystemClass][__init__] -> self.unique_id:" + str(self.unique_id))
 		self.item_list_count=0
-		self.session = session
+		self.token = token
 		self.reward_fragment_count = 30# 奖励的碎片数量
 
 	def _random_gift_skill(self,message_info):
@@ -75,14 +75,14 @@ class LotterySystemClass():
 			if random_int==25: skill_id = "g131_level"
 			if random_int==26: skill_id = "g132_level"
 			if random_int==27: skill_id = "g133_level"
-		skill_class = skill_module.SkillSystemClass(self.session)
+		skill_class = skill_module.SkillSystemClass(self.token)
 		sql_result = skill_class._get_skill_level(skill_id)
 		if sql_result<=0:
 			dc = skill_class._get_skill(str({"data":{"skill_id":skill_id}}))
 			print(dc)
 			return mc("1","got new skill="+skill_id,dc)
 		else:
-			bag_class = bag_module.BagSystemClass(self.session)
+			bag_class = bag_module.BagSystemClass(self.token)
 			if level==1:
 				dc = bag_class._increase_item_quantity("scroll_skill_10","1")
 			if level==2:
@@ -149,8 +149,8 @@ class LotterySystemClass():
 		print("[LotterySystemClass][__get_weapon_bag]->sql_result:" + str(sql_result))
 		return sql_result[0]
 
-	def __get_unique_id(self,session):
-		sql_result = gasql("select unique_id from userinfo where  session='"+session+"'")
+	def __get_unique_id(self,token):
+		sql_result = gasql("select unique_id from userinfo where  token='"+token+"'")
 		if len(sql_result) == 0:
 			return ""
 		else:

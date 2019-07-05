@@ -35,8 +35,8 @@ class LevelSystemClass:
 	coin_basis = 300
 	coin_multiple = 75
 
-	def __init__(self, session, *args, **kwargs):
-		self.unique_id = self.__get_unique_id(session)
+	def __init__(self, token, *args, **kwargs):
+		self.unique_id = self.__get_unique_id(token)
 		self.reward_list = read_json_data()
 
 	def _pass_level(self, message) -> str:
@@ -149,8 +149,8 @@ class LevelSystemClass:
 	#
 	# 	return data
 
-	def __get_unique_id(self, session) -> str:
-		sql_result = gasql("select unique_id from userinfo where  session='" + session + "'")
+	def __get_unique_id(self, token) -> str:
+		sql_result = gasql("select unique_id from userinfo where  token='" + token + "'")
 		if len(sql_result) == 0:
 			return ""
 		else:
