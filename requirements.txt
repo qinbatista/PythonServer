@@ -9,3 +9,5 @@ matplotlib==3.0.3
 pymysql==0.9.3
 asyncio==3.4.3
 pymysql==0.9.3
+tormysql==0.4.2
+aiohttp==3.5.4
