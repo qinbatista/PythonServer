@@ -8,6 +8,7 @@ import asyncio
 import multiprocessing
 import statistics
 import random
+import requests
 from lukseun_client import LukseunClient
 
 COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m',
@@ -164,6 +165,62 @@ def level_up_skill_by_scroll():
 			all = all+total
 			continue
 		print("3:scroll_level="+str(scroll_level+1)+"0%" +"  avg test="+str(all/test_time)+"  test time = "+str(test_time)+" max_level="+str(max_level))
+
+
+
+def TEST_EQUAL(test_message: str, lhs, rhs):
+	print(test_message, end='.....')
+	if lhs == rhs:
+		print(COLORS['pass'] + 'OK' + COLORS['end'])
+	else:
+		print(COLORS['fail'] + f'FAIL  expected {rhs} got {lhs}' + COLORS['end'] )
+		
+
+def test_token_server():
+	# ENSURE TOKEN SERVER IS RUNNING
+	# ENSURE USER DATABASE IS RUNNING
+	LOGIN_URL = 'http://localhost:8080/login'
+	LOGIN_UNIQUE_URL = 'http://localhost:8080/login_unique'
+	VALIDATE_URL = 'http://localhost:8080/validate'
+
+	print('TESTING TOKEN SERVER')
+
+
+	r = requests.post(LOGIN_UNIQUE_URL, data = {'unique_id' : '4'})
+	TEST_EQUAL('Testing login with non-bound unique_id', r.status_code, 200)
+	time.sleep(1)
+
+	r = requests.post(LOGIN_UNIQUE_URL, data = {'unique_id' : '2'})
+	TEST_EQUAL('Testing login with bound unique_id', r.status_code, 400)
+	time.sleep(1)
+
+	r = requests.post(LOGIN_URL, data = {'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keepo'})
+	TEST_EQUAL('Testing login with account name and password', r.status_code, 200)
+	time.sleep(1)
+
+	r = requests.post(LOGIN_URL, data = {'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keep232o'})
+	TEST_EQUAL('Testing login with account name and wrong password', r.status_code, 400)
+	time.sleep(1)
+
+	r = requests.post(LOGIN_URL, data = {'identifier' : 'account', 'value' : 'childre232nsucks', 'password' : 'keepo'})
+	TEST_EQUAL('Testing login with wrong account name and password', r.status_code, 400)
+	time.sleep(1)
+
+	r = requests.post(LOGIN_UNIQUE_URL, data = {'unique_id' : '4'})
+	r = requests.get(VALIDATE_URL, headers = {'Authorization' : r.json()['token']})
+	TEST_EQUAL('Can validate with valid token', r.status_code, 200)
+	time.sleep(1)
+
+	r = requests.post(LOGIN_UNIQUE_URL, data = {'unique_id' : '4'})
+	old_token = r.json()['token']
+	r = requests.post(LOGIN_UNIQUE_URL, data = {'unique_id' : '4'})
+	r = requests.get(VALIDATE_URL, headers = {'Authorization' : old_token})
+	TEST_EQUAL('Can not validate with old token', r.status_code, 400)
+
+
+
+
+
 def main() -> None:
 	# get_skill_from_random()
 	# get_skill_from_stack()
@@ -172,9 +229,8 @@ def main() -> None:
 	# send_single_message(LOGIN_AS_VISITOR)
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
-	# send_single_message(INCREASE_SCROLL_SKILL_10)
+	#send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
-	send_single_message(GET_ALL_SUPPLIES)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	#send_single_message(SCROLL_LEVEL_UP)
 	# send_single_message(LEVEL_UP_WEAPON)
@@ -184,6 +240,7 @@ def main() -> None:
 	# send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
 	# send_single_message(PASS_LEVEL)
+	test_token_server()
 
 if __name__ == '__main__':
 	main()

@@ -107,8 +107,10 @@ async def _validate(request: web.Request) -> web.Response:
 	try:
 		_check_invalidated(token)
 		payload = jwt.decode(token, SECRET, algorithms=[ALG])
-	except (jwt.DecodeError, jwt.ExpiredSignatureError, InvalidatedTokenError):
-		return _json_response({'message' : 'Token invalid'}, status = 400)
+	except (jwt.DecodeError, jwt.ExpiredSignatureError):
+		return _json_response({'message' : 'Token expired or could not be decoded'}, status = 400)
+	except InvalidatedTokenError:
+		return _json_response({'message' : 'Invalidated token'}, status = 400)
 	return _json_response({'unique_id' : payload['unique_id']}, status = 200)
 
 
@@ -116,7 +118,6 @@ async def _issue_new_token(unique_id: str) -> str:
 	'''
 	Issues a new token for the unique_id.
 	Records the latest issued token for this user.
-	TODO: Invalidate old issued tokens
 	'''
 	payload = {'exp' : datetime.utcnow() + timedelta(seconds = DELTA), 'unique_id' : unique_id}
 	token = jwt.encode(payload, SECRET, ALG)
@@ -131,7 +132,6 @@ async def _invalidate_previous_token(unique_id: str) -> None:
 	previous_token = await USER_MANAGER.fetch_token(unique_id)
 	if previous_token:
 		INVALIDATED.add(previous_token)
-		print(INVALIDATED)
 
 def _check_invalidated(token: str) -> None:
 	'''
