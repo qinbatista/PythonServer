@@ -27,8 +27,8 @@ class WeaponSystemClass:
 		"passive_skill_3_level": 0,
 		"passive_skill_4_level": 0,
 	}
-	def __init__(self, session, standard_iron_count=20, standard_segment_count=30):
-		self.unique_id = self.__get_unique_id(session)
+	def __init__(self, token, standard_iron_count=20, standard_segment_count=30):
+		self.unique_id = self.__get_unique_id(token)
 		self.standard_iron_count = standard_iron_count# 升级武器等级消耗的铁数量要求
 		self.standard_segment_count = standard_segment_count# 升级武器阶数消耗的碎片数量要求
 
@@ -243,8 +243,8 @@ class WeaponSystemClass:
 		sql_value = gasql_update("UPDATE weapon_bag SET " + weapon_kind + "=" + str(weapon_star) + " where unique_id='" + self.unique_id + "'")
 		return sql_value
 
-	def __get_unique_id(self, session):  # 返回session对应的用户id
-		sql_result = gasql("select unique_id from userinfo where  session='" + session + "'")  # 通过session查用户id
+	def __get_unique_id(self, token):  # 返回token对应的用户id
+		sql_result = gasql("select unique_id from userinfo where  token='" + token + "'")  # 通过token查用户id
 		if len(sql_result) == 0:  # userinfo表中没得用户就不执行
 			return ""
 		else:
@@ -259,7 +259,7 @@ class WeaponSystemClass:
 				self.__check_info_table(unique_id, "weapon" + str(i))
 
 	def __check_info_table(self, unique_id, table):
-		sql_result = gasql("select * from " + table + " where  unique_id='" + unique_id + "'")  # 通过session查用户id
+		sql_result = gasql("select * from " + table + " where  unique_id='" + unique_id + "'")  # 通过token查用户id
 		if len(sql_result) == 0:  # userinfo表中没得用户就不执行
 			gasql("INSERT INTO " + table + "(unique_id) VALUES ('" + unique_id + "')")
 			return True

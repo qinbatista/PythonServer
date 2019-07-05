@@ -22,9 +22,19 @@ from Utility.AnalysisHeader import message_constructor as mc
 
 
 class BagSystemClass():
-	def __init__(self, session, *args, **kwargs):
-		self.unique_id = self.__get_unique_id(session)
+	def __init__(self, token, *args, **kwargs):
+		self.unique_id = self.__get_unique_id(token)
+		self.item_list_count = 0
 
+	def _increase_item_quantity(self, item_id, item_quantity):
+		try:
+			self.item_list_count += 1
+			gasql("UPDATE bag SET " + item_id + "=" + item_id + " +" + item_quantity + " WHERE unique_id='" + self.unique_id + "'")
+			result_quantity = gasql("select " + item_id + " from bag where  unique_id='" + self.unique_id + "'")
+			dc = {"item" + str(self.item_list_count): [item_id, result_quantity[0][0]]}
+			return dc
+		except:
+			return {"scroll_error": "1"}
 
 	def _increase_supplies(self, message_info):
 		message_dic = json.loads(message_info, encoding="utf-8")
@@ -38,7 +48,8 @@ class BagSystemClass():
 			content_list[title_list.index(key)] = value
 			return_dic.update({"item" + str(len(return_dic.keys()) + 1): [key, value]})
 		content_list.pop(title_list.index("unique_id"))
-		if gasql_update(self.__sql_str_operating(table_name="bag", title_list=title_list, content_list=content_list)) == 1:
+		if gasql_update(
+				self.__sql_str_operating(table_name="bag", title_list=title_list, content_list=content_list)) == 1:
 			return mc("0", "increase supplies success", return_dic)
 		return mc("2", "increase supplies failed")
 
@@ -83,8 +94,8 @@ class BagSystemClass():
 		print("[BagSystemClass][__get_table_content] -> sql_result:" + str(sql_result))
 		return list(sql_result[0])
 
-	def __get_unique_id(self, session):
-		sql_result = gasql("select unique_id from userinfo where  session='" + session + "'")
+	def __get_unique_id(self, token):
+		sql_result = gasql("select unique_id from userinfo where  token='" + token + "'")
 		if len(sql_result[0][0]) <= 0:
 			return ""
 		else:
