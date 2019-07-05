@@ -2,29 +2,45 @@
 #
 # The token server should keep a log of all issued tokens until they expire.
 # If a user tries to log in from a different device, any previous tokens issued
-# should be invalidated. A token can be invalidated by quarantining it until it's
+# should be invalidated. A token can be invalidated by quarantining it until its
 # natural expiration time.
 #
 # Tokens are only deemed to be valid if they are both not yet expired, and they
 # have not been invalidated.
 #
-# The server should provide the following API calls:
+# The server provides the following API calls:
 #
-#	-	POST /login {account: str, email: str, password: str, unique_id: str}
+#	-	POST /login {identifier: str, value: str, password: str}
+#		The identifier tells the server which type of credential the client supplied.
+#		Valid identifiers are ONLY the following: 'account', 'email', 'phone_number'.
+#		The value is the value corresponding to the type of identifier supplied. For example,
+#		if the identifier is 'account', then the value would be the account name.
 #		
 #		200 OK
-#		Returns a new token if the email and password could be verified,
-#		or if the email and str are empty but a unique_id was supplied.
-#		Previously issued tokens for the same email / password are invalidated.
+#		Returns a new token if the credentials could be verified.
+#		Previously issued tokens for the corresponding unique_id are invalidated.
 #
 #		400 Bad Request
-#		Occurs when the email or password could not be verified.
+#		The credentials could not be verified.
 #
-#
-#	-	GET /validate with header Authorization: TOKEN
+#	
+#	-	POST /login_unique {unique_id: str}
+#		This API call will only return a token if the user has not already bound their account.
 #
 #		200 OK
-#		The token is valid.
+#		Returns a new token.
+#		Previously issued tokens for the unique_id are invalidated.
+#		
+#		400 Bad Request
+#		The unique_id could not be found, or the unique_id has already been bound.
+#		
+#
+#	-	GET /validate
+#		HEADER		Authorization: <token>
+#		A request to this method should include the token in the Authorization header.
+#
+#		200 OK
+#		The token is valid. Returns the unique_id of the token holder.
 #
 #		400 Bad Request
 #		The token is not valid.
