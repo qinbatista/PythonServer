@@ -13,3 +13,4 @@ tormysql==0.4.2
 aiohttp==3.5.4
 requests==2.22.0
 DBUtils==1.3
+PyJWT==1.7.1
