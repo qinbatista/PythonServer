@@ -250,7 +250,7 @@ def create_user_info() -> None:
     """
     table_name = "player_status"
     table_attribute = ["unique_id", "role_type", "level", "experience",
-                       "stage_level", "energy"]
+                       "stage_level", "energy","energy_recover_time"]
     db = POOL.connection()
     cursor = db.cursor()
     bag_sql = "CREATE TABLE " + table_name + """(
@@ -259,7 +259,8 @@ def create_user_info() -> None:
             %s SMALLINT NULL DEFAULT(0),
             %s SMALLINT NULL DEFAULT(0),
             %s SMALLINT NULL DEFAULT(0),
-            %s SMALLINT NULL DEFAULT(0)
+            %s SMALLINT NULL DEFAULT(10),
+            %s VARCHAR(20)  NULL DEFAULT ""
         );""" % tuple(table_attribute)
     cursor.execute(bag_sql)
     db.commit()

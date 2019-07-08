@@ -16,26 +16,29 @@ COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m',
 client_type="aliya"
 # host="192.168.1.183"
 host="127.0.0.1"
-MESSAGE_LIST = [ {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keepo'}},
-				 {'session':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'account':'', 'password':''}},
-				 {'session':'mac_session', 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
-				 {'session':'mac_session', 'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
-				 {'session':'mac_session', 'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
-				 {'session':'mac_session', 'function':'get_all_skill_level', 'random':'-906', 'data':""},
-				 {'session':'mac_session', 'function':'get_all_supplies', 'random':'-906', 'data':""},
-				 # {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
-				 {"session":"mac_session", "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
-				 {'session':'mac_session', 'function':'random_gift_skill', 'random':'-906', 'data':""},
-				 # {"session":"4E71A852-60CA-51EF-B8CC-C80CD627A180_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
-				 {"session":"mac_session", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
-				 {'session':'mac_session', 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
-				 {'session':'mac_session', 'function':'level_up_weapon_level','random':'-906', 'data':{"weapon1":"1020"}},
-				 {'session':'mac_session', 'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},
-				 {'session':'mac_session', 'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon1":"100"}},
-				 {'session':'mac_session', 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},
-				 {'session':'mac_session', 'function':'get_all_weapon','random':'-906', 'data':"null"},
-				 {'session':'mac_session', 'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
-				 {'session':'mac_session', 'function':'pass_level','random':'-906', 'data':{"customs_clearance_time": "1"}},
+token =""
+MESSAGE_LIST = [ {'token':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keepo'}},
+				 {'token':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'identifier':'', 'value' : '','password':''}},
+				 {'token':token, 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
+				 {'token':token, 'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
+				 {'token':token, 'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
+				 {'token':token, 'function':'get_all_skill_level', 'random':'-906', 'data':""},
+				 {'token':token, 'function':'get_all_supplies', 'random':'-906', 'data':""},
+				 # {"token":"4E71A852-60CA-51EF-B8CC-C80CD627A180_token", "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
+				 {"token":token, "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
+				 {'token':token, 'function':'random_gift_skill', 'random':'-906', 'data':""},
+				 # {"token":"4E71A852-60CA-51EF-B8CC-C80CD627A180_token", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
+				 {"token":token, "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
+				 {'token':token, 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
+				 {'token':token, 'function':'level_up_weapon_level','random':'-906', 'data':{"weapon1":"1020"}},
+				 {'token':token, 'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},
+				 {'token':token, 'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon1":"100"}},
+				 {'token':token, 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},
+				 {'token':token, 'function':'get_all_weapon','random':'-906', 'data':"null"},
+				 {'token':token, 'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
+				 {'token':token, 'function':'pass_level','random':'-906', 'data':{"customs_clearance_time": "1"}},
+				 {'token':token, 'function':'decrease_energy','random':'-906', 'data':{"energy": "1"}},
+				 {'token':token, 'function':'increase_energy','random':'-906', 'data':{"energy": "1"}}
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
@@ -55,6 +58,8 @@ UPGRADE_WEAPONS_STARS = 14
 ALL_WEAPON = 15
 LOTTERY_SEGMENT = 16
 PASS_LEVEL= 17
+DECREASE_ENERGY= 18
+INCREASE_ENERGY= 19
 
 def test_multiple_message(n: int):
 	start = time.time()
@@ -70,6 +75,7 @@ def send_single_message(message_id: int):
 	newstring  =  str(MESSAGE_LIST[message_id]).replace("'","\"")
 	asyncio.run(client.send_message(newstring))
 	print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
+	return client.token
 
 ##########################################################################################3
 def new_test_multiple_message(n: int):
@@ -87,7 +93,7 @@ def new_test_multiple_message(n: int):
 
 async def async_send_single_message(message_id: int) -> float:
 	client = LukseunClient(client_type,host)
-	#d = {'session': 'ACDE48001122', 'function': 'login', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
+	#d = {'token': 'ACDE48001122', 'function': 'login', 'random': '744', 'data': {'user_name': 'yupeng', 'gender': 'male', 'email': 'qin@lukseun.com', 'phone_number': '15310568888'}}
 	start = time.time()
 	await client.send_message(str(MESSAGE_LIST[message_id]).replace("'","\""))
 	end = time.time()
@@ -174,7 +180,7 @@ def TEST_EQUAL(test_message: str, lhs, rhs):
 		print(COLORS['pass'] + 'OK' + COLORS['end'])
 	else:
 		print(COLORS['fail'] + f'FAIL  expected {rhs} got {lhs}' + COLORS['end'] )
-		
+
 
 def test_token_server():
 	# ENSURE TOKEN SERVER IS RUNNING
@@ -217,22 +223,20 @@ def test_token_server():
 	r = requests.get(VALIDATE_URL, headers = {'Authorization' : old_token})
 	TEST_EQUAL('Can not validate with old token', r.status_code, 400)
 
-
-
-
-
 def main() -> None:
+	global token
 	# get_skill_from_random()
 	# get_skill_from_stack()
 	# level_up_skill_by_scroll()
 	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
-	 send_single_message(LOGIN_AS_ACCOUNT)
+	token = send_single_message(LOGIN_AS_VISITOR)
+	MESSAGE_LIST[DECREASE_ENERGY]["token"]=token
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
-	#send_single_message(INCREASE_SCROLL_SKILL_10)
+	# send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
-	#send_single_message(SCROLL_LEVEL_UP)
+	# send_single_message(SCROLL_LEVEL_UP)
 	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(SKILL_UP_WEAPON)
 	# send_single_message(RESET_SKILL_POINT)
@@ -240,7 +244,9 @@ def main() -> None:
 	# send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
 	# send_single_message(PASS_LEVEL)
-	#test_token_server()
+	send_single_message(DECREASE_ENERGY)
+	# send_single_message(INCREASE_ENERGY)
+	# test_token_server()
 
 if __name__ == '__main__':
 	main()
