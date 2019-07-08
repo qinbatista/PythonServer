@@ -39,7 +39,13 @@ MessageList = [
 
 class AliyaSystemClass():
 	def __init__(self, *args, **kwargs):
-		pass
+		self._login_class = account_module.LoginSystemClass()
+		self._skill_class = skill_module.SkillSystemClass()
+		self._bag_class = bag_module.BagSystemClass()
+		self._lottery_class = lottery_module.LotterySystemClass()
+		self._weapon_class = weapon_module.WeaponSystemClass()
+		self._level_class = level_module.LevelSystemClass()
+
 
 	def _login(self, message_info):
 		pass
@@ -67,73 +73,43 @@ class AliyaSystemClass():
 		callback_message = ""
 
 		if function == "login":
-			login_class = account_module.LoginSystemClass()
-			callback_message = login_class._login(msg_data)
+			callback_message = self._login_class._login(msg_data)
 		elif function == "bind_account":
-
-			login_class = account_module.LoginSystemClass()
-			callback_message = login_class._bind_account(msg_data)
-
+			callback_message = self._login_class._bind_account(msg_data)
 		elif function == "skill_level_up":
-			skill_class = skill_module.SkillSystemClass(token)
-			callback_message = skill_class._skill_level_up(msg_data)
+			callback_message = self._skill_class._skill_level_up(msg_data)
 
 		elif function == "get_all_skill_level":
-			skill_class = skill_module.SkillSystemClass(token)
-			callback_message = skill_class._get_all_skill_level(msg_data)
-
+			callback_message = self._skill_class._get_all_skill_level(msg_data)
 		elif function == "increase_supplies":
-			bag_class = bag_module.BagSystemClass(token)
-			callback_message = bag_class._increase_supplies(msg_data)
-
+			callback_message = self._bag_class._increase_supplies(msg_data)
 		elif function == "get_all_supplies":
-			bag_class = bag_module.BagSystemClass(token)
-			callback_message = bag_class._get_all_supplies(msg_data)
+			callback_message = self._bag_class._get_all_supplies(msg_data)
 
 		# elif function == "random_gift":
 		# 	bag_class = bag_module.BagSystemClass(token)
 		# 	callback_message = bag_class._random_gift(msg_data)
 		elif function == "random_gift_skill":
-			lottery_class = lottery_module.LotterySystemClass(token)
-			callback_message = lottery_class._random_gift_skill(msg_data)
-
+			callback_message = self._lottery_class._random_gift_skill(msg_data)
 		elif function == "random_gift_segment":
-			lottery_class = lottery_module.LotterySystemClass(token)
-			callback_message = lottery_class._random_gift_segment(msg_data)
-
+			callback_message = self._lottery_class._random_gift_segment(msg_data)
 		elif function == "get_skill":
-			skill_class = skill_module.SkillSystemClass(token)
-			dc = skill_class._get_skill(msg_data)
+			dc = self._skill_class._get_skill(msg_data)
 			callback_message = mc("0", "got new skill success", dc)
-
 		elif function == "level_up_scroll":
-			bag_class = bag_module.BagSystemClass(token)
-			callback_message = bag_class._level_up_scroll(msg_data)
-
+			callback_message = self._bag_class._level_up_scroll(msg_data)
 		elif function == "level_up_weapon_level":
-			weapon_class = weapon_module.WeaponSystemClass(token)
-			callback_message = weapon_class._level_up_weapon_level(msg_data)
-
+			callback_message = self._weapon_class._level_up_weapon_level(msg_data)
 		elif function == "level_up_weapon_passive_skill":
-			weapon_class = weapon_module.WeaponSystemClass(token)
-			callback_message = weapon_class._level_up_weapon_passive_skill(msg_data)
-
+			callback_message = self._weapon_class._level_up_weapon_passive_skill(msg_data)
 		elif function == "reset_weapon_skill_point":
-			weapon_class = weapon_module.WeaponSystemClass(token)
-			callback_message = weapon_class._reset_weapon_skill_point(msg_data)
-
+			callback_message = self._weapon_class._reset_weapon_skill_point(msg_data)
 		elif function == "level_up_weapon_star":
-			weapon_class = weapon_module.WeaponSystemClass(token)
-			callback_message = weapon_class._level_up_weapon_star(msg_data)
-
+			callback_message = self._weapon_class._level_up_weapon_star(msg_data)
 		elif function == "get_all_weapon":
-			weapon_class = weapon_module.WeaponSystemClass(token)
-			callback_message = weapon_class._get_all_weapon()
-
+			callback_message = self._weapon_class._get_all_weapon()
 		elif function == "pass_level":
-			level_class = level_module.LevelSystemClass(token)
-			callback_message = level_class._pass_level(msg_data)
-
+			callback_message = self.level_class._pass_level(msg_data)
 		elif callback_message == "":
 			callback_message = mc("1", "no function->" + function)
 		Log("[GameAliya][ResolveMsg] callback_message=" + callback_message)

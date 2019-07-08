@@ -3,7 +3,9 @@
 #
 ################################################################################
 
+import json
 import tormysql
+from aiohttp import web
 
 
 # asyncio library used for testing purposes only, can be safely removed
@@ -115,6 +117,54 @@ class UserManager:
 				return data
 
 
+
+##############################################################################################
+#
+#
+# Below this level are public networked API calls for the above class.
+# They are not yet documented.
+# Standard port number also yet to be defined.
+#
+##############################################################################################
+
+ROUTES = web.RouteTableDef()
+MANAGER = UserManager()
+
+
+
+
+def _json_response(body: str = '', **kwargs) -> web.Response:
+	'''
+	A simple wrapped for aiohttp.web.Response where we dumps body to json
+	and assign the correct content_type.
+	'''
+	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
+	kwargs['content_type'] = 'text/json'
+	return web.Response(**kwargs)
+
+
+# TODO API Documentation
+@ROUTES.post('/check_exists')
+async def __check_exists(request: web.Request) -> web.Response:
+	post = await request.post()
+	exists = await MANAGER.check_exists(post['identifier'], post['value'])
+	if exists:
+		return _json_response({'message' : 'True'})
+	return _json_response({'message' : 'False'}, status = 400)
+
+
+
+
+
+def run():
+	app = web.Application()
+	app.add_routes(ROUTES)
+	web.run_app(app, port = 8081)
+
+
+
+
+# TODO refactor testing code to separate module
 async def test_valid_credentials(manager):
 	res1 = await manager.valid_credentials('keepo', account = 'amdsucks')
 	res2 = await manager.valid_credentials('keepo', email = 'matt@gmail.com')
@@ -132,6 +182,6 @@ async def test_valid_credentials(manager):
 	print(f'Test 7 expected True got back: {res7}')
 
 
-
 if __name__ == '__main__':
-	manager = UserManager()
+	#run()
+	pass

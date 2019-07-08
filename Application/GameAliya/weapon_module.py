@@ -27,8 +27,7 @@ class WeaponSystemClass:
 		"passive_skill_3_level": 0,
 		"passive_skill_4_level": 0,
 	}
-	def __init__(self, token, standard_iron_count=20, standard_segment_count=30):
-		self.unique_id = self.__get_unique_id(token)
+	def __init__(self, standard_iron_count=20, standard_segment_count=30):
 		self.standard_iron_count = standard_iron_count# 升级武器等级消耗的铁数量要求
 		self.standard_segment_count = standard_segment_count# 升级武器阶数消耗的碎片数量要求
 
