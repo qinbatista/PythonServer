@@ -166,7 +166,6 @@ def login_required(fn):
 
 
 @ROUTES.post('/get_iron')
-@login_required
 async def __get_iron(request: web.Request) -> web.Response:
 	post = await request.post()
 	iron = await MANAGER.get_iron(post['unique_id'])
@@ -174,7 +173,6 @@ async def __get_iron(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/remove_iron')
-@login_required
 async def __remove_iron(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.remove_iron(post['unique_id'], post['amount'])
@@ -182,7 +180,6 @@ async def __remove_iron(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/try_remove_iron')
-@login_required
 async def __try_remove_iron(request: web.Request) -> web.Response:
 	post = await request.post()
 	current = await MANAGER.get_iron(post['unique_id'])
@@ -193,7 +190,6 @@ async def __try_remove_iron(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/add_iron')
-@login_required
 async def __add_iron(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.add_iron(post['unique_id'], post['amount'])
@@ -201,7 +197,6 @@ async def __add_iron(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/get_diamonds')
-@login_required
 async def __get_diamonds(request: web.Request) -> web.Response:
 	post = await request.post()
 	diamonds = await MANAGER.get_diamonds(post['unique_id'])
@@ -209,7 +204,6 @@ async def __get_diamonds(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/remove_diamonds')
-@login_required
 async def __remove_diamonds(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.remove_diamonds(post['unique_id'], post['amount'])
@@ -217,7 +211,6 @@ async def __remove_diamonds(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/try_remove_diamonds')
-@login_required
 async def __try_remove_diamonds(request: web.Request) -> web.Response:
 	post = await request.post()
 	current = await MANAGER.get_diamonds(post['unique_id'])
@@ -228,7 +221,6 @@ async def __try_remove_diamonds(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/add_diamonds')
-@login_required
 async def __add_diamonds(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.add_diamonds(post['unique_id'], post['amount'])
@@ -236,7 +228,6 @@ async def __add_diamonds(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/get_experience_potion')
-@login_required
 async def __get_experience_potion(request: web.Request) -> web.Response:
 	post = await request.post()
 	potions = await MANAGER.get_experience_potion(post['unique_id'])
@@ -244,7 +235,6 @@ async def __get_experience_potion(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/remove_experience_potions')
-@login_required
 async def __remove_experience_potions(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.remove_experience_potions(post['unique_id'], post['amount'])
@@ -252,7 +242,6 @@ async def __remove_experience_potions(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/add_experience_potions')
-@login_required
 async def __add_experience_potions(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.add_experience_potions(post['unique_id'], post['amount'])
@@ -260,7 +249,6 @@ async def __add_experience_potions(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/get_coin')
-@login_required
 async def __get_coin(request: web.Request) -> web.Response:
 	post = await request.post()
 	coins = await MANAGER.get_coin(post['unique_id'])
@@ -268,7 +256,6 @@ async def __get_coin(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/remove_coins')
-@login_required
 async def __remove_coins(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.remove_coins(post['unique_id'], post['amount'])
@@ -276,7 +263,6 @@ async def __remove_coins(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/try_remove_coins')
-@login_required
 async def __try_remove_coins(request: web.Request) -> web.Response:
 	post = await request.post()
 	current = await MANAGER.get_coin(post['unique_id'])
@@ -287,7 +273,6 @@ async def __try_remove_coins(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/add_coins')
-@login_required
 async def __add_coins(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.add_coins(post['unique_id'], post['amount'])
@@ -295,7 +280,6 @@ async def __add_coins(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/get_small_energy_potion')
-@login_required
 async def __get_small_energy_potion(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.get_small_energy_potion(post['unique_id'])
@@ -303,7 +287,6 @@ async def __get_small_energy_potion(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/remove_small_energy_potions')
-@login_required
 async def __remove_small_energy_potions(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.remove_small_energy_potions(post['unique_id'], post['amount'])
@@ -311,7 +294,6 @@ async def __remove_small_energy_potions(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/try_remove_small_energy_potions')
-@login_required
 async def __try_remove_small_energy_potions(request: web.Request) -> web.Response:
 	post = await request.post()
 	current = await MANAGER.get_small_energy_potion(post['unique_id'])
@@ -322,7 +304,6 @@ async def __try_remove_small_energy_potions(request: web.Request) -> web.Respons
 
 
 @ROUTES.post('/add_small_energy_potions')
-@login_required
 async def __add_small_energy_potions(request: web.Request) -> web.Response:
 	post = await request.post()
 	remaining = await MANAGER.add_small_energy_potions(post['unique_id'], post['amount'])

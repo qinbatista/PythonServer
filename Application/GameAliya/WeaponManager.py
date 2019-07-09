@@ -9,33 +9,73 @@ import tormysql
 from aiohttp import web
 from aiohttp import ClientSession
 
+BAG_MANAGER_BASE_URL = 'http://localhost:8082'
 
-
+class WeaponUpgradeError(Exception):
+	pass
 
 
 class WeaponManager:
-	def __init__(self):
+	def __init__(self, standard_iron_count = 20, standard_segment_count = 30):
+		self._standard_iron_count = standard_iron_count
+		self._standard_segment_count = standard_segment_count
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '127.0.0.1', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
 
 
-
 	# levels up a particular weapon. costs iron.
-	async def level_up_weapon_level(self, token: str, weapon: str):
-		pass
+	async def level_up_weapon_level(self, unique_id: str, weapon: str, iron: int):
+
+		star = await self._get_weapon_star(unique_id, weapon)
+		if star == 0:
+			raise WeaponUpgradeError('User does not have that weapon')
+
+		weapon_level = await self._get_weapon_level(unique_id, weapon)
+		if weapon_level == 100:
+			raise WeaponUpgradeError('Weapon has reached max level!')
+
+		skill_upgrade_number = int(iron) // self._standard_iron_count
+		async with ClientSession() as session:
+			async with session.post(BAG_MANAGER_BASE_URL + '/get_iron', data = {'unique_id' : unique_id}) as resp:
+				resp = await resp.json(content_type='text/json')
+				current_iron = resp['iron']
+		if skill_upgrade_number > 0 and (current_iron // self._standard_iron_count) >= skill_upgrade_number:
+			if (weapon_level + skill_upgrade_number) > 100:
+				skill_upgrade_number = 100 - weapon_level
+			weapon_level += skill_upgrade_number
+
+
+
+
 
 	# levels up a particular passive skill. costs skill points.
-	async def level_up_weapon_passive_skill(self, token: str, weapon: str, passive_skill: str):
+	async def level_up_weapon_passive_skill(self, unique_id: str, weapon: str, passive_skill: str):
 		pass
 
 	# resets all weapon passive skill points. refunds all skill points back. costs coins.
-	async def reset_weapon_skill_points(self, token: str, weapon: str):
+	async def reset_weapon_skill_points(self, unique_id: str, weapon: str):
 		pass
 
 	# levels up the weapon star. costs segments.
-	async def level_up_weapon_star(self, token: str, weapon: str):
+	async def level_up_weapon_star(self, unique_id: str, weapon: str):
 		pass
+
+
+	async def _get_weapon_star(self, unique_id: str, weapon: str) -> int:
+		data = await self._execute_statement("SELECT `" + str(weapon) + "` FROM weapon_bag WHERE unique_id='" + str(unique_id) + "';")
+		if () in data or data == None:
+			return 0
+		return data[0][0]
+
+	async def _get_weapon_level(self, unique_id: str, weapon: str) -> int:
+		data = await self._execute_statement("SELECT weapon_level FROM `" + str(weapon) + "` WHERE unique_id='" + str(unique_id) + "';")
+		if () in data or data == None:
+			return 0
+		return data[0][0]
+
+
+
 
 
 
