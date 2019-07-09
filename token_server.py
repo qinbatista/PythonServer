@@ -61,7 +61,7 @@ from Utility import UserManager
 # SECRET SHOULD BE READ FROM ENVIRONMENT VARIABLE
 SECRET = 'password'
 ALG    = 'HS256'
-DELTA  = 200
+DELTA  = 360
 ROUTES = web.RouteTableDef()
 if __name__ == '__main__':
 	USER_MANAGER = UserManager.UserManager()

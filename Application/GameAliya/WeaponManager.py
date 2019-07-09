@@ -1,40 +1,47 @@
 #
-# An example for an SQL manager server using asyncio programming methods.
-# We will use aiohttp library to network these API calls so that they can be
-# accessed from different physical devices on the network.
-# Additionally, we will be using tormysql library to manage the SQL server pool
-# of connections.
-#
-# All functions that connect to the database should be async. The more async code
-# we use, the faster the entire server becomes.
-#
-#
-# The file has two parts:
-#	- The DefaultManager class
-#	- The aiohttp server bindings for the class methods
+# WeaponManager.py
 #
 ###############################################################################
 
 
-# Some safe default includes. Feel free to add more if you need.
 import json
 import tormysql
 from aiohttp import web
 from aiohttp import ClientSession
 
-# Part (1 / 2)
-class ExampleManager:
+
+
+
+
+class WeaponManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '127.0.0.1', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
 
-	
-	async def public_method(self) -> None:
-		# Something interesting 
-		# await self._execute_statement('STATEMENT')
+
+
+	# levels up a particular weapon. costs iron.
+	async def level_up_weapon_level(self, token: str, weapon: str):
 		pass
 
+	# levels up a particular passive skill. costs skill points.
+	async def level_up_weapon_passive_skill(self, token: str, weapon: str, passive_skill: str):
+		pass
+
+	# resets all weapon passive skill points. refunds all skill points back. costs coins.
+	async def reset_weapon_skill_points(self, token: str, weapon: str):
+		pass
+
+	# levels up the weapon star. costs segments.
+	async def level_up_weapon_star(self, token: str, weapon: str):
+		pass
+
+
+
+
+
+	
 
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
@@ -52,7 +59,7 @@ class ExampleManager:
 
 
 # Part (2 / 2)
-MANAGER = ExampleManager() # we want to define a single instance of the class
+MANAGER = WeaponManager() # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
 
 

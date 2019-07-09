@@ -143,7 +143,6 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 
 
 
-
 # TODO API Documentation
 @ROUTES.post('/register_unique_id')
 async def __register_unique_id(request: web.Request) -> web.Response:

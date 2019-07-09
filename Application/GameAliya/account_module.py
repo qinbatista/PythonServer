@@ -113,16 +113,6 @@ class LoginSystemClass():
 			Log('[account_module.py][__registered_login] {identifier} access denied')
 			return mc('1', 'Invalid credentials supplied')
 
-
-
-		sql_result = gasql("select * from userinfo where account='" + account + "' and password='" + password + "'")
-		if len(sql_result) <= 0:
-			return mc("1", "account is not exist")
-		else:
-			data = {"token": self.__create_token_by_account(account, password),
-			        "random": str(random.randint(-1000, 1000))}
-			return mc("0", "login as account", data)
-
 	def __create_token_by_unique_id(self, unique_id):
 		"""
 		return a token to user, right now just add _token with unique id, matthew will make really token
