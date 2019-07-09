@@ -20,6 +20,7 @@
 import json
 import tormysql
 from aiohttp import web
+from aiohttp import ClientSession
 
 # Part (1 / 2)
 class ExampleManager:
@@ -54,6 +55,7 @@ class ExampleManager:
 MANAGER = ExampleManager() # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
 
+
 # Call this method whenever you return from any of the following functions.
 # This makes it very easy to construct a json response back to the caller.
 def _json_response(body: str = '', **kwargs) -> web.Response:
@@ -65,12 +67,30 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 	return web.Response(**kwargs)
 
 
+# Defines a function decorator that will require a valid token to be
+# presented in the Authorization headers. To make a public facing API call
+# required a valid token, put @login_required above the name of the function.
+def login_required(fn):
+	async def wrapper(request):
+		async with ClientSession() as session:
+			async with session.get('http://localhost:8080/validate', headers = {'authorization' : str(request.headers.get('authorization'))}) as resp:
+				if resp.status == 200:
+					return await fn(request)
+		return _json_response({'message' : 'You need to be logged in to access this resource'}, status = 400)
+	return wrapper
+
+
 # Try running the server and then visiting http://localhost:[PORT]/public_method
 @ROUTES.get('/public_method')
 async def __public_method(request: web.Request) -> web.Response:
 	await MANAGER.public_method()
 	return _json_response({'message' : 'asyncio code is awesome!'}, status = 200)
 
+
+@ROUTES.get('/protected_method')
+@login_required
+async def __protected_method(request: web.Request) -> web.Response:
+	return _json_response({'message' : 'if you can see this, you are logged in!!'})
 
 
 def run(port: int):
