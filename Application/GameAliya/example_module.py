@@ -33,7 +33,7 @@ class LotterySystemClass():
 
 	def __check_table(self, unique_id):
 		sql_result = gasql("select count(unique_id) from level where  unique_id='" + unique_id + "'")
-		if len(sql_result) == 0:
+		if sql_result[0][0] <= 0:
 			gasql("INSERT INTO level(unique_id) VALUES ('" + unique_id + "')")
 
 

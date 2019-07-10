@@ -21,6 +21,7 @@ from Application.GameAliya import skill_module
 from Application.GameAliya import weapon_module
 from Application.GameAliya import bag_module
 from Application.GameAliya import lottery_module
+from Application.GameAliya import player_state_module
 from Utility.AnalysisHeader import message_constructor as mc
 from Utility.sql_manager import game_aliya as gasql
 
@@ -109,7 +110,21 @@ class AliyaSystemClass():
 		elif function == "get_all_weapon":
 			callback_message = self._weapon_class._get_all_weapon()
 		elif function == "pass_level":
+<<<<<<< HEAD
 			callback_message = self.level_class._pass_level(msg_data)
+=======
+			level_class = level_module.LevelSystemClass(token)
+			callback_message = level_class._pass_level(msg_data)
+
+		elif function == "decrease_energy":
+			level_class = player_state_module.PlayerStateSystemClass(token)
+			callback_message = level_class._decrease_energy(msg_data)
+
+		elif function == "increase_energy":
+			level_class = player_state_module.PlayerStateSystemClass(token)
+			callback_message = level_class._increase_energy(msg_data)
+
+>>>>>>> master
 		elif callback_message == "":
 			callback_message = mc("1", "no function->" + function)
 		Log("[GameAliya][ResolveMsg] callback_message=" + callback_message)

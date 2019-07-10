@@ -1,5 +1,6 @@
 #
 # An asynchronous user manager that exposes a simple API to manage users.
+# Currently used exclusively by token_server.py
 #
 ################################################################################
 

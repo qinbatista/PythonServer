@@ -19,7 +19,7 @@ class LukseunClient:
 		self._port = port
 		self._header_tool = AnalysisHeader.Header()
 		self._des = EncryptionAlgorithm.DES()
-
+		self.token=""
 
 	async def send_message(self, message: str) -> bytes:
 		'''
@@ -32,7 +32,14 @@ class LukseunClient:
 		await self._send_message(writer, encrypted_message)
 		response = await self._receive_response(reader)
 		writer.close()
-		return response
+		try:
+			de_message = self._des.decrypt(response)
+			if de_message!="":
+				message_dic = eval(de_message)
+				self.token = message_dic["data"]["token"]
+				return response
+		except:
+			pass
 
 	async def _send_header(self, writer: asyncio.StreamWriter, message_len: int) -> None:
 		'''

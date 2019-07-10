@@ -52,10 +52,11 @@
 import jwt
 import json
 
+import UserManager
+
 from aiohttp import web
 from datetime import datetime, timedelta
 
-from Utility import UserManager
 
 # NOTE THIS IS NOT PRODUCTION READY
 # SECRET SHOULD BE READ FROM ENVIRONMENT VARIABLE
