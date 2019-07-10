@@ -100,11 +100,8 @@ class LevelSystemClass:
 		col_list = []
 		format_list = []
 		for col in sql_result:
-			print("col:" + str(col))########################3
 			col_list.append(col[0])
 			format_list.append(self.format_conversion[col[1][:col[1].find("(")]])# 将smallint(6)截取出smallint，然后用标准转换成字符，用于后面替换成sql的替换
-		print("col_list:" + str(col_list))
-		print("format_list:" + str(format_list))
 		return col_list, format_list
 
 	def __get_content_tuple(self, table_name) -> tuple:
