@@ -19,22 +19,15 @@ from Utility.sql_manager import game_aliya_update as gasql_update
 from Utility.AnalysisHeader import message_constructor as mc
 
 
-JSON_NAME = PythonLocation() + "/Configuration/level_reward_config.json"
+JSON_NAME = PythonLocation() + "/Configuration/1.0/level_reward_config.json"
 
 
 class LevelSystemClass:
-	experience_potion_basis = 100
-	experience_potion_multiple = 25
-
-	experience_basis = 10
-	experience_multiple = 0
-
-	iron_basis = 100
-	iron_multiple = 25
-
-	coin_basis = 300
-	coin_multiple = 75
-
+	format_conversion = {
+		"smallint": "%s",
+		"varchar": "'%s'",
+		"char": "'%s'"
+	}
 	def __init__(self, token, *args, **kwargs):
 		self.unique_id = self.__get_unique_id(token)
 		self.reward_list = read_json_data()
@@ -44,9 +37,9 @@ class LevelSystemClass:
 		customs_clearance_time = list(info["data"].keys())[0]  # 通关时间
 		level_client = int(list(info["data"].values())[0])
 
-		player_status_title_list = self.__get_title_list(table_name="player_status")
+		player_status_title_list, player_status_format_list = self.__get_title_list(table_name="player_status")
 		player_status_content_list = self.__get_content_tuple(table_name="player_status")
-		bag_title_list = self.__get_title_list(table_name="bag")
+		bag_title_list, bag_format_list = self.__get_title_list(table_name="bag")
 		bag_content_tuple = self.__get_content_tuple(table_name="bag")
 		item_dict = self.__structure_item_dict(player_status_title_list, player_status_content_list, bag_title_list, bag_content_tuple)
 
@@ -64,8 +57,8 @@ class LevelSystemClass:
 		data_len = len(data.keys()) + 1
 		data = self.__structure_data(data, item_dict, data_len)
 
-		player_status_str = self.__sql_str_operating(table_name="player_status", title_list=player_status_title_list, item_dict=item_dict)
-		bag_str = self.__sql_str_operating(table_name="bag", title_list=bag_title_list, item_dict=item_dict)
+		player_status_str = self.__sql_str_operating(table_name="player_status", title_list=player_status_title_list, format_list=player_status_format_list, item_dict=item_dict)
+		bag_str = self.__sql_str_operating(table_name="bag", title_list=bag_title_list, format_list=bag_format_list, item_dict=item_dict)
 
 		if gasql_update(player_status_str) == 1 or gasql_update(bag_str) == 1:
 			data["item" + str(data_len)][1] = item_dict["level"]
@@ -84,7 +77,7 @@ class LevelSystemClass:
 
 		return item_dict
 
-	def __sql_str_operating(self, table_name, title_list, item_dict) -> str:
+	def __sql_str_operating(self, table_name, title_list, format_list, item_dict) -> str:
 		heard_str = "UPDATE %s SET " % table_name
 		end_str = " where unique_id='%s'" % self.unique_id
 		result_str = ""
@@ -93,21 +86,23 @@ class LevelSystemClass:
 			if title_list[i] != "unique_id":
 				temp_list.append(item_dict[title_list[i]])
 				if i != len(title_list) - 1:
-					result_str += title_list[i] + "=%s, "
+					result_str += title_list[i] + "=%s, " % format_list[i]
 				else:
-					result_str += title_list[i] + "=%s"
+					result_str += title_list[i] + "=%s" % format_list[i]
 		result_str = heard_str + result_str + end_str
 		print("[LevelSystemClass][__sql_str_operating] -> result_str:" + result_str)
 		print("[LevelSystemClass][__sql_str_operating] -> temp_list:" + str(temp_list))
 
 		return result_str % tuple(temp_list)
 
-	def __get_title_list(self, table_name) -> list:
+	def __get_title_list(self, table_name) -> (list, list):
 		sql_result = gasql("desc " + table_name + ";")
 		col_list = []
+		format_list = []
 		for col in sql_result:
 			col_list.append(col[0])
-		return col_list
+			format_list.append(self.format_conversion[col[1][:col[1].find("(")]])# 将smallint(6)截取出smallint，然后用标准转换成字符，用于后面替换成sql的替换
+		return col_list, format_list
 
 	def __get_content_tuple(self, table_name) -> tuple:
 		sql_result = gasql("select * from " + table_name + " where  unique_id='" + self.unique_id + "'")
