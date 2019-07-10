@@ -80,16 +80,16 @@ class LotterySystemClass():
 		if sql_result<=0:
 			dc = skill_class._get_skill(str({"data":{"skill_id":skill_id}}))
 			print(dc)
-			return mc("1","got new skill="+skill_id,dc)
+			return mc("0","got new skill="+skill_id,dc)
 		else:
 			bag_class = bag_module.BagSystemClass(self.token)
-			if level==1:
+			if level == 1:
 				dc = bag_class._increase_item_quantity("scroll_skill_10","1")
-			if level==2:
+			if level == 2:
 				dc = bag_class._increase_item_quantity("scroll_skill_30","1")
-			if level==3:
+			if level == 3:
 				dc = bag_class._increase_item_quantity("scroll_skill_100","1")
-			return mc("2","you already have "+skill_id+", got scroll for free", dc)
+			return mc("1","you already have "+skill_id+", got scroll for free", dc)
 
 	def _random_gift_segment(self, message_info) :
 		random_int = random.randint(0, 999)
@@ -121,15 +121,15 @@ class LotterySystemClass():
 				return mc("0", "get the weapon " + weapon_kind, data=data)
 			else:
 				print("[LotterySystemClass][__update_segment_status] -> Data update error!")
-				return mc("1", "abnormal data", data=data)
+				return mc("2", "abnormal data", data=data)
 		else:
 			segment += self.reward_fragment_count
 			if gasql_update("UPDATE " + weapon_kind + " SET segment=" + str(segment) + " where unique_id='" + self.unique_id + "'") == 1:
 				data["weapon_bag1"] = [weapon_kind, weapon_star, segment]
-				return mc("0", "get " + weapon_kind + " weapon fragments", data=data)
+				return mc("1", "get " + weapon_kind + " weapon fragments", data=data)
 			else:
 				print("[LotterySystemClass][__update_segment_status] -> Weapon fragment update failed!")
-				return mc("2", "abnormal data", data=data)
+				return mc("3", "abnormal data", data=data)
 
 	def __get_weapon_segment(self, weapon_kind):
 		sql_result = gasql("select segment from " + weapon_kind + " where unique_id='" + self.unique_id + "'")
