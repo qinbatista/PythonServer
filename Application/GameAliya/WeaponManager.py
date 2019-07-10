@@ -33,7 +33,7 @@ class WeaponManager:
 
 	# levels up a particular weapon. costs iron.
 	# returns the data payload
-	async def level_up_weapon_level(self, unique_id: str, weapon: str, iron: int) -> dict:
+	async def level_up_weapon(self, unique_id: str, weapon: str, iron: int) -> dict:
 		async with ClientSession() as session:
 			star = await self._get_weapon_star(unique_id, weapon)
 			if star == 0:
@@ -50,7 +50,6 @@ class WeaponManager:
 			skill_upgrade_number = int(iron) // self._standard_iron_count
 			if skill_upgrade_number == 0 or (current_iron // self._standard_iron_count) < skill_upgrade_number:
 				raise WeaponUpgradeError(2, 'Insufficient materials, upgrade failed!')
-			
 
 			# calculate resulting levels and used iron
 			if (row[1] + skill_upgrade_number) > 100:
@@ -69,11 +68,8 @@ class WeaponManager:
 
 
 
-
-
-
 	# levels up a particular passive skill. costs skill points.
-	async def level_up_weapon_passive_skill(self, unique_id: str, weapon: str, passive_skill: str) -> dict:
+	async def level_up_passive(self, unique_id: str, weapon: str, passive_skill: str) -> dict:
 		weapon_star = await self._get_weapon_star(unique_id, weapon)
 		if weapon_star == 0:
 			raise WeaponUpgradeError(1, 'User does not have that weapon')
@@ -177,17 +173,26 @@ def login_required(fn):
 	return wrapper
 
 
-# Try running the server and then visiting http://localhost:[PORT]/public_method
-@ROUTES.get('/public_method')
-async def __public_method(request: web.Request) -> web.Response:
-	await MANAGER.public_method()
-	return _json_response({'message' : 'asyncio code is awesome!'}, status = 200)
+@ROUTES.post('/level_up_weapon')
+async def __level_up_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	try:
+		data = await MANAGER.level_up_weapon(post['unique_id'], post['weapon'], post['iron'])
+		return _json_response(data)
+	except WeaponUpgradeError as e:
+		return _json_response({'status' : e.code, 'message' : e.message}, status = 400)
 
 
-@ROUTES.get('/protected_method')
-@login_required
-async def __protected_method(request: web.Request) -> web.Response:
-	return _json_response({'message' : 'if you can see this, you are logged in!!'})
+@ROUTES.post('/level_up_passive')
+async def __level_up_passive(request: web.Request) -> web.Response:
+	post = await request.post()
+	try:
+		data = await MANAGER.level_up_passive(post['unique_id'], post['weapon'], post['passive'])
+		return _json_response(data)
+	except WeaponUpgradeError as e:
+		return _json_response({'status' : e.code, 'message' : e.message}, status = 400)
+
+
 
 
 def run(port: int):
@@ -197,4 +202,4 @@ def run(port: int):
 
 
 if __name__ == '__main__':
-	run(8082)
+	run(8083)
