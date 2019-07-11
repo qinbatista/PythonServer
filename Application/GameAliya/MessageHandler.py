@@ -8,20 +8,37 @@ import base64
 DESIv = '67891234'
 DESKey = '6789123467891234'
 
+MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 
+class InvalidHeaderError(Exception):
+	pass
 
 class MessageHandler:
 	def __init__(self):
 		self._functions = FUNCTION_LIST
 		self._k = pyDes.triple_des(DESKey, pyDes.CBC, DESIv, pad=None, padmode=pyDes.PAD_PKCS5)
+	
+	def is_valid_header(self, raw_header: bytes) -> int:
+		'''
+		Decodes the raw header.
+		Returns the message size of the upcoming message.
+		Raises InvalidHeaderError if the header is not valid.
+		'''
+		decoded = raw_header.decode()
+		if decoded[:32] != 'e3cb970693574ea75d091a6049f8a3ff':
+				raise InvalidHeaderError
+		return int(decoded[32:])
+
 
 	def process_message_out(self, server_response: str) -> bytes:
 		'''
 		Called before sending message response to client.
+		Generates a header to prepend to the message.
 		Serializes the dictionary into JSON format, encodes and encrypts the resulting
 		string, and returns a bytes object.
 		'''
-		return base64.encodestring(self._k.encrypt(server_response.encode()))
+		payload = base64.encodebytes(self._k.encrypt(server_response.encode()))
+		return MD5_ALIYA + self._format_message_size(len(payload)) + payload
 
 	def process_message_in(self, message: bytes) -> dict:
 		'''
@@ -43,6 +60,13 @@ class MessageHandler:
 			return await fn(self, message, session)
 		except KeyError:
 			return json.dumps({'status' : 1, 'message' : 'Invalid message format', 'data':{}})
+
+	def _format_message_size(self, size: int) -> bytes:
+		'''
+		0 pads the size of the message and outputs bytes.
+		'''
+		return str(size).zfill(4).encode()
+
 
 	async def _login(self, message: dict, session) -> str:
 		pass

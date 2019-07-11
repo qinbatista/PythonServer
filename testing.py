@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [ {'token':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keepo'}},
-		{'token':'', 'function':'login_unique', 'random':'-906', 'data':{'unique_id':'4444', 'identifier':'', 'value' : '','password':''}},
+		{'token':'', 'function':'login_unique', 'random':'-906', 'data':{'unique_id':'4', 'identifier':'', 'value' : '','password':''}},
 				 {'token':token, 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
 				 {'token':token, 'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
 				 {'token':token, 'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
