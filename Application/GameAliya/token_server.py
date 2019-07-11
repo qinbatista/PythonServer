@@ -88,11 +88,11 @@ async def _login_unique(request: web.Request) -> web.Response:
 			return _json_response({'token' : token.decode('utf-8')})
 		bound = await USER_MANAGER.account_is_bound(post['unique_id'])
 		if bound:
-			return _json_response({'message' : 'The account corresponding to this unique_id has already been bound. Please log in using a different method.'}, status = 400)
+			return _json_response({'status' : 2, 'message' : 'The account corresponding to this unique_id has already been bound. Please log in using a different method.', 'data' : {}}, status = 400)
 		token = await _issue_new_token(post['unique_id'])
 	except (UserManager.CredentialError):
-		return _json_response({'message' : 'Unrecognized unique id'}, status = 400)
-	return _json_response({'token' : token.decode('utf-8')})
+		return _json_response({'status' : 1, 'message' : 'Unrecognized unique id', 'data' : {}}, status = 400)
+	return _json_response({'status': 0, 'message': 'received token from server', 'data' : {'token' : token.decode('utf-8')}})
 
 
 @ROUTES.post('/login')

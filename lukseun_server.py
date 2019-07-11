@@ -33,8 +33,10 @@ class LukseunServer:
 	def __init__(self, host: str = '', port: int = 8880, max_workers: int = None):
 		self._host = host
 		self._port = port
+
 		self._header_tool = AnalysisHeader.Header()
 		self._wtr = message_handler.MessageHandlerClass()
+
 		self._pool = concurrent.futures.ProcessPoolExecutor(max_workers = max_workers)
 		self._clientsession = None
 		self._handler = MessageHandler.MessageHandler()
@@ -50,6 +52,7 @@ class LukseunServer:
 		Log('[lukseun_server.py][run()] Starting server on {addr}'.format(addr = server.sockets[0].getsockname()))
 		async with server:
 			await server.serve_forever()
+		await self._clientsession.close()
 
 
 	async def _handle_connection(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
@@ -68,6 +71,7 @@ class LukseunServer:
 			loop = asyncio.get_running_loop()
 			decoded_message = await loop.run_in_executor(self._pool, self._handler.process_message_in, message)
 			unencoded_response = await self._handler.resolve(decoded_message, self._clientsession)
+			print(unencoded_response)
 			encoded_response = await loop.run_in_executor(self._pool, self._handler.process_message_out, unencoded_response)
 			#status = await loop.run_in_executor(self._pool, self._wtr.ResolveMsg, message, writer.get_extra_info('peername')[0])
 
