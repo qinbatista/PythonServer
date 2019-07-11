@@ -104,8 +104,7 @@ class AliyaSystemClass():
 
 		elif function == "get_skill":
 			skill_class = skill_module.SkillSystemClass(token)
-			dc = skill_class._get_skill(msg_data)
-			callback_message = mc("0", "got new skill success", dc)
+			callback_message = skill_class._get_skill(msg_data)
 
 		elif function == "level_up_scroll":
 			bag_class = bag_module.BagSystemClass(token)

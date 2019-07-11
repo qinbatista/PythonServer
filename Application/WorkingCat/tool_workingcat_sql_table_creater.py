@@ -14,7 +14,7 @@ def create_database_table():
 			account VARCHAR(128) NULL,
 			password VARCHAR(128) NULL,
 			unique_id VARCHAR(128)NULL,
-			session  VARCHAR(128) NULL,
+			token  VARCHAR(128) NULL,
 			ip VARCHAR(16) NULL,
 			user_name VARCHAR(20) NULL,
 			gender VARCHAR(10) NULL,
