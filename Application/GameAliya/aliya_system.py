@@ -110,11 +110,7 @@ class AliyaSystemClass():
 		elif function == "get_all_weapon":
 			callback_message = self._weapon_class._get_all_weapon()
 		elif function == "pass_level":
-<<<<<<< HEAD
-			callback_message = self.level_class._pass_level(msg_data)
-=======
-			level_class = level_module.LevelSystemClass(token)
-			callback_message = level_class._pass_level(msg_data)
+			pass
 
 		elif function == "decrease_energy":
 			level_class = player_state_module.PlayerStateSystemClass(token)
@@ -124,7 +120,6 @@ class AliyaSystemClass():
 			level_class = player_state_module.PlayerStateSystemClass(token)
 			callback_message = level_class._increase_energy(msg_data)
 
->>>>>>> master
 		elif callback_message == "":
 			callback_message = mc("1", "no function->" + function)
 		Log("[GameAliya][ResolveMsg] callback_message=" + callback_message)
