@@ -46,18 +46,22 @@ class PlayerStateSystemClass():
 				else:
 					return mc("1", "energy is not enough")
 			else:
-				if remain_energy-cost_energy_int >=0:
-					y = datetime.strptime(energy_time, '%Y-%m-%d %H:%M:%S')
-					z = datetime.strptime(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), '%Y-%m-%d %H:%M:%S')
-					diff = z-y
-					recover_energy = int(diff.seconds/60/20)
-					total_energy = recover_energy+remain_energy
-					if total_energy>=10:
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(10) + "-" + str(cost_energy) + ", energy_recover_time = '"+""+"' WHERE unique_id='" + self.unique_id + "'")
+				y = datetime.strptime(energy_time, '%Y-%m-%d %H:%M:%S')
+				z = datetime.strptime(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), '%Y-%m-%d %H:%M:%S')
+				diff = z-y
+				recover_energy = int(diff.seconds/60/20)
+				if recover_energy+remain_energy-cost_energy_int >=0:
+					if remain_energy-cost_energy_int>=10:
+						gasql("UPDATE player_status SET " + "energy" + "=" + str(10) + "-" + str(cost_energy) + ", energy_recover_time = '"+"' WHERE unique_id='" + self.unique_id + "'")
 						return mc("0", "energy is over full energy, remove time recoerd")
 					else:
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(total_energy) + "-" + str(cost_energy) + " WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "energy is recovering")
+						total_energy = recover_energy+remain_energy
+						if total_energy>=10:
+							gasql("UPDATE player_status SET " + "energy" + "=" + str(10) + "-" + str(cost_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
+							return mc("0", "energy is full energy, start recoerd time")
+						else:
+							gasql("UPDATE player_status SET " + "energy" + "=" + str(total_energy) + "-" + str(cost_energy) + " WHERE unique_id='" + self.unique_id + "'")
+							return mc("0", "energy is recovering")
 				else:
 					return mc("1", "energy is not enough")
 		else:
