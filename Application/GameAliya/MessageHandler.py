@@ -1,4 +1,3 @@
-
 import json
 import pyDes
 import base64
@@ -9,6 +8,10 @@ DESIv = '67891234'
 DESKey = '6789123467891234'
 
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
+
+
+TOKEN_BASE_URL = 'http://localhost:8080'
+WEAPON_MANAGER_BASE_URL = 'http://localhost:8083'
 
 class InvalidHeaderError(Exception):
 	pass
@@ -40,6 +43,7 @@ class MessageHandler:
 		payload = base64.encodebytes(self._k.encrypt(server_response.encode()))
 		return MD5_ALIYA + self._format_message_size(len(payload)) + payload
 
+
 	def process_message_in(self, message: bytes) -> dict:
 		'''
 		Called upon receiving the message payload from client.
@@ -52,9 +56,9 @@ class MessageHandler:
 		try:
 			fn = self._functions[message['function']]
 			if message['function'] not in DOES_NOT_NEED_TOKEN:
-				async with session.post('http://localhost:8080/validate', headers = {'Authorization' : message['data']['token']}) as resp:
+				async with session.get(TOKEN_BASE_URL + '/validate', headers = {'Authorization' : message['data']['token']}) as resp:
 					if resp.status != 200:
-						return json.dumps({'status' : 2, 'message' : 'Authorization required', 'data' : {}})
+						return json.dumps({'status' : 2, 'message' : 'Authorization required', 'data' : {'bad_token' : message['data']['token']}})
 					token_response = await resp.json(content_type='text/json')
 					message['data']['unique_id'] = token_response['unique_id']
 			return await fn(self, message, session)
@@ -69,11 +73,18 @@ class MessageHandler:
 
 
 	async def _login(self, message: dict, session) -> str:
-		pass
+		async with session.post(TOKEN_BASE_URL + '/login', data = {'identifier' : message['data']['identifier'], 'value' : message['data']['value'], 'password' : message['data']['password']}) as resp:
+			return await resp.text()
 
 	async def _login_unique(self, message: dict, session) -> str:
-		async with session.post('http://localhost:8080/login_unique', data = {'unique_id' : message['data']['unique_id']}) as resp:
+		async with session.post(TOKEN_BASE_URL + '/login_unique', data = {'unique_id' : message['data']['unique_id']}) as resp:
 			return await resp.text()
+
+	
+	async def _level_up_weapon(self, message: dict, session) -> str:
+		async with session.post(WEAPON_MANAGER_BASE_URL + '/level_up_weapon', data = {'unique_id' : message['data']['unique_id'], 'weapon' : message['data']['weapon'], 'iron' : message['data']['iron']}) as resp:
+			return await resp.text()
+
 
 
 
@@ -82,6 +93,7 @@ DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 
 FUNCTION_LIST = {
 				'login' : MessageHandler._login,
-				'login_unique' : MessageHandler._login_unique
+				'login_unique' : MessageHandler._login_unique,
+				'level_up_weapon': MessageHandler._level_up_weapon
 				}
 
