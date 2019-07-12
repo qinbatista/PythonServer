@@ -151,7 +151,7 @@ class SkillSystemClass():
 		pass
 
 	def _get_skill(self, message_info):
-		message_dic = eval(message_info)
+		message_dic = json.loads(message_info, encoding="utf-8")
 		skill_id = message_dic["data"]["skill_id"]
 		sql_result = gasql("select " + skill_id + " from skill where  unique_id='" + self.unique_id + "'")
 		if sql_result[0][0] == 0:

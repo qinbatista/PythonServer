@@ -59,8 +59,9 @@ class LevelSystemClass:
 
 		player_status_str = self.__sql_str_operating(table_name="player_status", title_list=player_status_title_list, format_list=player_status_format_list, item_dict=item_dict)
 		bag_str = self.__sql_str_operating(table_name="bag", title_list=bag_title_list, format_list=bag_format_list, item_dict=item_dict)
-
-		if gasql_update(player_status_str) == 1 or gasql_update(bag_str) == 1:
+		sql_status_player_status_str = gasql_update(player_status_str)
+		sql_status_bag_str = gasql_update(bag_str)
+		if sql_status_player_status_str == 1 or sql_status_bag_str == 1:
 			data["item" + str(data_len)][1] = item_dict["level"]
 			return mc("0", "passed customs!", data=data)
 		return mc("1", "abnormal data!", data=self.reward_list[0])
