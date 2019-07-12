@@ -28,6 +28,7 @@ class WeaponManager:
 
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
+		# TODO verify that this is true :D
 		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '127.0.0.1', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
 
 
@@ -37,19 +38,19 @@ class WeaponManager:
 		async with ClientSession() as session:
 			star = await self._get_weapon_star(unique_id, weapon)
 			if star == 0:
-				raise WeaponUpgradeError(1, 'User does not have that weapon')
+				return {'status' : 1, 'message' : 'user does not have that weapon', 'data' : {}}
 
 			row = await self._get_row_by_id(weapon, unique_id)
 
 			if row[1] == 100:
-				raise WeaponUpgradeError(9, 'Weapon has reached max level!')
+				return {'status' : 9, 'message' : 'weapon has reached max level', 'data' : {}}
 
 			async with session.post(BAG_MANAGER_BASE_URL + '/get_iron', data = {'unique_id' : unique_id}) as resp:
 				resp = await resp.json(content_type='text/json')
 				current_iron = resp['iron']
 			skill_upgrade_number = int(iron) // self._standard_iron_count
 			if skill_upgrade_number == 0 or (current_iron // self._standard_iron_count) < skill_upgrade_number:
-				raise WeaponUpgradeError(2, 'Insufficient materials, upgrade failed!')
+				return {'status' : 2, 'message' : 'insufficient materials, upgrade failed', 'data' : {}}
 
 			# calculate resulting levels and used iron
 			if (row[1] + skill_upgrade_number) > 100:
@@ -64,31 +65,27 @@ class WeaponManager:
 
 			# update the weapon level on the account
 			await self._set_weapon_level_up_data(unique_id, weapon, row[1], row[6])
-			return {'weapon_bag1' : row, 'item1' : ['iron', remaining_iron]}
-
+			return {'status' : 0, 'message' : 'success', 'data' : {'weapon_bag1' : row, 'item1' : ['iron', remaining_iron]}}
 
 
 	# levels up a particular passive skill. costs skill points.
 	async def level_up_passive(self, unique_id: str, weapon: str, passive_skill: str) -> dict:
 		weapon_star = await self._get_weapon_star(unique_id, weapon)
 		if weapon_star == 0:
-			raise WeaponUpgradeError(1, 'User does not have that weapon')
+			return {'status' : 1, 'message' : 'user does not have that weapon', 'data' : {}}
 
 		if passive_skill not in self._valid_passive_skills:
-			raise WeaponUpgradeError(9, 'Passive skill does not exist')
+			return {'status' : 9, 'message' : 'passive skill does not exist', 'data' : {}}
 
 		row = await self._get_row_by_id(weapon, unique_id)
 
 		if row[6] <= 0:
-			raise WeaponUpgradeError(2, 'Insufficient skill points, upgrade failed')
+			return {'status' : 2, 'message' : 'insufficient skill points, upgrade failed', 'data' : {}}
 		row[6] -= 1
 		row[2 + self._valid_passive_skills.index(passive_skill)] += 1
 
 		await self._set_passive_skill_level_up_data(unique_id, weapon, passive_skill, row[2 + self._valid_passive_skills.index(passive_skill)], row[6])
-		return {'weapon_bag1' : row}
-
-
-
+		return {'status' : 0, 'message' : 'success', 'data' : {'weapon_bag1' : row}}
 
 
 	# resets all weapon passive skill points. refunds all skill points back. costs coins.
@@ -126,7 +123,6 @@ class WeaponManager:
 
 
 
-
 	
 
 	# It is helpful to define a private method that you can simply pass
@@ -160,37 +156,18 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 	return web.Response(**kwargs)
 
 
-# Defines a function decorator that will require a valid token to be
-# presented in the Authorization headers. To make a public facing API call
-# required a valid token, put @login_required above the name of the function.
-def login_required(fn):
-	async def wrapper(request):
-		async with ClientSession() as session:
-			async with session.get('http://localhost:8080/validate', headers = {'authorization' : str(request.headers.get('authorization'))}) as resp:
-				if resp.status == 200:
-					return await fn(request)
-		return _json_response({'message' : 'You need to be logged in to access this resource'}, status = 401)
-	return wrapper
-
-
 @ROUTES.post('/level_up_weapon')
 async def __level_up_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
-	try:
-		data = await MANAGER.level_up_weapon(post['unique_id'], post['weapon'], post['iron'])
-		return _json_response(data)
-	except WeaponUpgradeError as e:
-		return _json_response({'status' : e.code, 'message' : e.message}, status = 400)
+	data = await MANAGER.level_up_weapon(post['unique_id'], post['weapon'], post['iron'])
+	return _json_response(data)
 
 
 @ROUTES.post('/level_up_passive')
 async def __level_up_passive(request: web.Request) -> web.Response:
 	post = await request.post()
-	try:
-		data = await MANAGER.level_up_passive(post['unique_id'], post['weapon'], post['passive'])
-		return _json_response(data)
-	except WeaponUpgradeError as e:
-		return _json_response({'status' : e.code, 'message' : e.message}, status = 400)
+	data = await MANAGER.level_up_passive(post['unique_id'], post['weapon'], post['passive'])
+	return _json_response(data)
 
 
 
