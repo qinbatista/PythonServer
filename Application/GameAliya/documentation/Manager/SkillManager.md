@@ -1,6 +1,6 @@
-# LotteryManager
+# SkillManager
 
-The LotteryManager is responsible for handling requests pertaining to the lottery functions of the game.
+The SkillManager is responsible for handling requests pertaining to upgrading and querying skills.
 
 See the General Server documentation for more information on request format.
 
