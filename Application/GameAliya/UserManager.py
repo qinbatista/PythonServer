@@ -97,7 +97,7 @@ class UserManager:
 		'''
 		Returns the password associated with the attribute.
 		'''
-		return await self._execute_statement("SELECT password FROM userinfo WHERE " + str(column_name) + " = '" + str(value) + "';")
+		return await self._execute_statement("SELECT password FROM userinfo WHERE `" + str(column_name) + "` = '" + str(value) + "';")
 
 	async def _check_exists(self, column_name: str, value: str) -> bool:
 		'''
