@@ -85,6 +85,9 @@ class MessageHandler:
 		async with session.post(WEAPON_MANAGER_BASE_URL + '/level_up_weapon', data = {'unique_id' : message['data']['unique_id'], 'weapon' : message['data']['weapon'], 'iron' : message['data']['iron']}) as resp:
 			return await resp.text()
 
+	async def _level_up_passive(self, message: dict, session) -> str:
+		async with session.post(WEAPON_MANAGER_BASE_URL + '/level_up_passive', data = {'unique_id' : message['data']['unique_id'], 'weapon' : message['data']['weapon'], 'passive' : message['data']['passive']}) as resp:
+			return await resp.text()
 
 
 
@@ -95,5 +98,6 @@ FUNCTION_LIST = {
 				'login' : MessageHandler._login,
 				'login_unique' : MessageHandler._login_unique,
 				'level_up_weapon': MessageHandler._level_up_weapon
+				'level_up_passive': MessageHandler._level_up_passive
 				}
 
