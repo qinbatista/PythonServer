@@ -28,7 +28,7 @@ class LukseunClient:
 		self._handler = MessageHandler.MessageHandler()
 		self.token=""
 
-	async def send_message(self, message: str) -> bytes:
+	async def send_message(self, message: str) -> dict:
 		'''
 		send_message() sends the given message to the server and
 		returns the decoded callback response
@@ -41,16 +41,10 @@ class LukseunClient:
 		await self._send_message(writer, encoded_message)
 		response = await self._receive_response(reader)
 		writer.close()
-
-		try:
-			de_message = self._decode_message(response)
-			if de_message!="":
-				message_dic = eval(de_message)
-				self.token = message_dic["data"]["token"]
-		except:
-			pass
-		finally:
-			return response
+		decoded_message = self._decode_message(response)
+		if decoded_message != '':
+			return eval(decoded_message)
+		return None
 
 	async def _send_header(self, writer: asyncio.StreamWriter, header: bytes) -> None:
 		'''
@@ -59,7 +53,7 @@ class LukseunClient:
 		'''
 		writer.write(header)
 		await writer.drain()
-		Log('[lukseun_client.py][_send_header()] Sent header {} to {}'.format(bytes.decode(header), writer.get_extra_info('peername')))
+	#	Log('[lukseun_client.py][_send_header()] Sent header {} to {}'.format(bytes.decode(header), writer.get_extra_info('peername')))
 
 
 	async def _send_message(self, writer: asyncio.StreamWriter, message: bytes) -> None:
@@ -69,7 +63,7 @@ class LukseunClient:
 		'''
 		writer.write(message)
 		await writer.drain()
-		Log('[lukseun_client.py][_send_message()] Sent message {} to {}'.format(bytes.decode(message), writer.get_extra_info('peername')))
+	#	Log('[lukseun_client.py][_send_message()] Sent message {} to {}'.format(bytes.decode(message), writer.get_extra_info('peername')))
 
 
 	async def _receive_response(self, reader: asyncio.StreamReader) -> bytes:
@@ -79,7 +73,7 @@ class LukseunClient:
 		header_raw = await reader.read(HEADER_BUFFER_SIZE)
 		size = self._handler.is_valid_header(header_raw)
 		response = await reader.read(size)
-		Log('[lukseun_client.py][_receive_response()] Received response {} from server'.format(bytes.decode(response)))
+	#	Log('[lukseun_client.py][_receive_response()] Received response {} from server'.format(bytes.decode(response)))
 		return response
 
 	def _make_header(self, message_len: int) -> bytes:
