@@ -18,17 +18,17 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [ {'token':'', 'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keepo'}},
-				 {'token':'', 'function':'login_unique', 'random':'-906', 'data':{'unique_id':'mac', 'identifier':'', 'value' : '','password':''}},
+				 {'token':'', 'function':'login_unique', 'random':'-906', 'data':{'unique_id':'4', 'identifier':'', 'value' : '','password':''}},
 				 {'token':token, 'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
 				 {'token':token, 'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
 				 {'token':token, 'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
 				 {'token':token, 'function':'get_all_supplies', 'random':'-906', 'data':""},
 				 {"token":token, "function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
 				 {'token':token, 'function':'random_gift_skill', 'random':'-906', 'data':""},
-				 {"token":"4E71A852-60CA-51EF-B8CC-C80CD627A180_token", "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
+				 {"token":token, "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {"token":token, "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {'token':token, 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
-				 {'token':token, 'function':'level_up_weapon_level','random':'-906', 'data':{"weapon1":"1020"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
+				 {'token':token, 'function':'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "1020"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
 				 {'token':token, 'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},#data: [weapon1] means which weapons' passive skill  you want to level up, [passive_skill_2_level] means skill id, right now passive skill only can be level up one by one.
 				 {'token':token, 'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon1":"100"}},#data: [weapon1] means which weapon you want to reset skill, [100] means cost resources, right now it is coin in our code,it will be change in furture, make sure it is easy change.
 				 {'token':token, 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
@@ -41,7 +41,7 @@ MESSAGE_LIST = [ {'token':'', 'function':'login', 'random':'-906', 'data':{'uniq
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
 SKILL_LEVEL_UP = 2
-GET_SKILL = 3
+# GET_SKILL = 3
 INCREASE_SCROLL_SKILL_10=4
 GET_ALL_SKILL_LEVEL=5
 GET_ALL_SUPPLIES=6
@@ -70,6 +70,7 @@ def test_multiple_message(n: int):
 def send_single_message(message_id: int):
 	client = LukseunClient(client_type,host, port=8880)
 	start = time.time()
+	MESSAGE_LIST[message_id]['data']['token']=token
 	newstring  =  str(MESSAGE_LIST[message_id]).replace("'","\"")
 	asyncio.run(client.send_message(newstring))
 	print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
@@ -228,15 +229,16 @@ def main() -> None:
 	# level_up_skill_by_scroll()
 	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
 	token = send_single_message(LOGIN_AS_VISITOR)
-	#MESSAGE_LIST[DECREASE_ENERGY]["token"]=token
-	#MESSAGE_LIST[INCREASE_ENERGY]["token"]=token
+	print(f'this is token = {token}')
+	# MESSAGE_LIST[DECREASE_ENERGY]["token"]=token
+	# MESSAGE_LIST[INCREASE_ENERGY]["token"]=token
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(SCROLL_LEVEL_UP)
-	# send_single_message(LEVEL_UP_WEAPON)
+	send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(SKILL_UP_WEAPON)
 	# send_single_message(RESET_SKILL_POINT)
 	# send_single_message(UPGRADE_WEAPONS_STARS)
