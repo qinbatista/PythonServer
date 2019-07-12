@@ -34,42 +34,78 @@ class PlayerStateSystemClass():
 			cost_energy_int = int(cost_energy)
 			if sql_result[0][1]=="":
 				if remain_energy >=0:
-					if remain_energy>=self.full_energy:
+					if remain_energy-cost_energy_int>self.full_energy:
 						# if energy is more than cast, reduce energy,if energy over 10, record time
 						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy>=self.full_energy")
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "-" + str(cost_energy) + " WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "decrease energy success, reamian energy is over full energy")
+						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "-" + str(cost_energy) + ",energy_recover_time='"+""+"' WHERE unique_id='" + self.unique_id + "'")
+						return mc("0", "decrease energy success, reamian energy is over full energy, remove recoerd time")
+					elif remain_energy-cost_energy_int==self.full_energy:
+						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy>=self.full_energy")
+						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "-" + str(cost_energy) + ",energy_recover_time='"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
+						return mc("0", "decrease energy success, reamian energy is full energy, recovering energy")
 					else:
 						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy<=self.full_energy")
 						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "-" + str(cost_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "decrease energy success, remain energy is lessing than full energy, start recovering energy")
+						return mc("0", "decrease energy success,recovering time have problem beacuse it is empty, start recovering energy")
 				else:
-					return mc("1", "energy is not enough")
+					return mc("1", "energy error")
 			else:
 				y = datetime.strptime(energy_time, '%Y-%m-%d %H:%M:%S')
 				z = datetime.strptime(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), '%Y-%m-%d %H:%M:%S')
 				diff = z-y
 				recover_energy = int(diff.seconds/60/20)
 				if recover_energy+remain_energy-cost_energy_int >=0:
-					if remain_energy-cost_energy_int>=10:
+					if recover_energy+remain_energy-cost_energy_int>10:
 						gasql("UPDATE player_status SET " + "energy" + "=" + str(10) + "-" + str(cost_energy) + ", energy_recover_time = '"+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "energy is over full energy, remove time recoerd")
+						return mc("0", "energy is over full energy, remove recoerd time")
+					elif
+						gasql("UPDATE player_status SET " + "energy" + "=" + str(recover_energy+remain_energy) + "-" + str(cost_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
+						return mc("0", "energy is over full energy, start recoerding time")
 					else:
-						total_energy = recover_energy+remain_energy
-						if total_energy>=10:
-							gasql("UPDATE player_status SET " + "energy" + "=" + str(10) + "-" + str(cost_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
-							return mc("0", "energy is full energy, start recoerd time")
-						else:
-							gasql("UPDATE player_status SET " + "energy" + "=" + str(total_energy) + "-" + str(cost_energy) + " WHERE unique_id='" + self.unique_id + "'")
-							return mc("0", "energy is recovering")
+						gasql("UPDATE player_status SET " + "energy" + "=" + str(recover_energy+remain_energy) + "-" + str(cost_energy) + ", energy_recover_time = '"+"' WHERE unique_id='" + self.unique_id + "'")
+						return mc("0", "energy is not full, keep time")
 				else:
-					return mc("1", "energy is not enough")
+					return mc("1", "energy error")
 		else:
 			return mc("1", "data is null")
 
-	def _increase_energy(self,msg):
-		print("_increase_energy")
-		return ""
+	def _increase_energy(self,message_info):
+		message_dic = eval(message_info)
+		if "data" in message_dic.keys():
+			increase_energy = message_dic["data"]["energy"]
+			sql_result = gasql("select energy, energy_recover_time from player_status where unique_id='" + self.unique_id + "'")
+			remain_energy = int(sql_result[0][0])
+			energy_time = sql_result[0][1]
+			increase_energy_int = int(increase_energy)
+			if sql_result[0][1]=="":
+				if remain_energy >=0:
+					if remain_energy+increase_energy_int>=self.full_energy:
+						# if energy is more than cast, reduce energy,if energy over 10, record time
+						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy>=self.full_energy")
+						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "+" + str(increase_energy) + " WHERE unique_id='" + self.unique_id + "'")
+						return mc("0", "increase energy success, reamian energy is over full energy")
+					else:
+						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy<=self.full_energy")
+						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "+" + str(increase_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
+						return mc("0", "increase energy success, remain energy is lessing than full energy, start recovering energy")
+				else:
+					return mc("1", "energy error")
+			else:
+				y = datetime.strptime(energy_time, '%Y-%m-%d %H:%M:%S')
+				z = datetime.strptime(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), '%Y-%m-%d %H:%M:%S')
+				diff = z-y
+				recover_energy = int(diff.seconds/60/20)
+				if recover_energy+remain_energy+increase_energy_int >=0:
+					if recover_energy+remain_energy+increase_energy_int>=self.full_energy:
+						gasql("UPDATE player_status SET " + "energy" + "=" + str(10) + "+" + increase_energy + ", energy_recover_time = '"+"' WHERE unique_id='" + self.unique_id + "'")
+						return mc("0", "energy is over full energy, remove time recoerd")
+					else:
+						gasql("UPDATE player_status SET " + "energy" + "=" + str(recover_energy+remain_energy) + "+" + increase_energy + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
+						return mc("0", "energy is full energy, start recoerd time")
+				else:
+					return mc("1", "energy error")
+		else:
+			return mc("1", "data is null")
 	def __get_unique_id(self, token):
 		sql_result = gasql("select unique_id from userinfo where  token='" + token + "'")
 		if len(sql_result[0][0]) <= 0:

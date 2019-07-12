@@ -229,6 +229,7 @@ def main() -> None:
 	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
 	token = send_single_message(LOGIN_AS_VISITOR)
 	MESSAGE_LIST[DECREASE_ENERGY]["token"]=token
+	MESSAGE_LIST[INCREASE_ENERGY]["token"]=token
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
