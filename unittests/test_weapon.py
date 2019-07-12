@@ -9,17 +9,18 @@ import unittest
 import lukseun_client
 
 
+
+msg = {'function' : 'login_unique', 'data' : {'unique_id' : '4'}}
+response = asyncio.get_event_loop().run_until_complete(lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880).send_message(str(msg).replace("'", "\"")))
+TOKEN = response['data']['token']
+
 class TestWeaponMethods(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
 		super(TestWeaponMethods, cls).setUpClass()
 		cls.db = pymysql.connect('192.168.1.102', 'root', 'lukseun', 'aliya')
 		cls.c = lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
-		msg = {'function' : 'login_unique', 'data' : {'unique_id' : '4'}}
-
-		response = asyncio.get_event_loop().run_until_complete(cls.c.send_message(str(msg).replace("'", "\"")))
-		cls.token = response['data']['token']
-
+		cls.token = TOKEN
 
 	def test_must_be_logged_in(self):
 		msg = {'function' : 'level_up_weapon', 'data' : {'token' : 'muahaah', 'weapon' : 'weapon1', 'iron' : '20'}}

@@ -15,7 +15,7 @@ class TestLoginMethods(unittest.TestCase):
 
 
 	def test_login_unique(self):
-		msg = {'function' : 'login_unique', 'data' : {'unique_id' : '4'}}
+		msg = {'function' : 'login_unique', 'data' : {'unique_id' : 'mac'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
