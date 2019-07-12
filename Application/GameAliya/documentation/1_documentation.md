@@ -23,6 +23,7 @@ Client to Server Request:
 ```json
 {
 	"function" : "The name of the function you want to call",
+  "random":"253",
 	"data" : {
 				"key" : "value"
 			 }
@@ -35,6 +36,7 @@ Server to Client Response:
 {
 	"status" : "status number",
 	"message" : "message of status",
+  "random":"253",
 	"data" : {
 				"key" : "value"
 			 }

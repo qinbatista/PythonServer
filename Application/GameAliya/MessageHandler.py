@@ -80,7 +80,6 @@ class MessageHandler:
 		async with session.post(TOKEN_BASE_URL + '/login_unique', data = {'unique_id' : message['data']['unique_id']}) as resp:
 			return await resp.text()
 
-	
 	async def _level_up_weapon(self, message: dict, session) -> str:
 		async with session.post(WEAPON_MANAGER_BASE_URL + '/level_up_weapon', data = {'unique_id' : message['data']['unique_id'], 'weapon' : message['data']['weapon'], 'iron' : message['data']['iron']}) as resp:
 			return await resp.text()
