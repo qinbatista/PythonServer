@@ -97,7 +97,7 @@ DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 FUNCTION_LIST = {
 				'login' : MessageHandler._login,
 				'login_unique' : MessageHandler._login_unique,
-				'level_up_weapon': MessageHandler._level_up_weapon
+				'level_up_weapon': MessageHandler._level_up_weapon,
 				'level_up_passive': MessageHandler._level_up_passive
 				}
 
