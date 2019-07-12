@@ -32,7 +32,7 @@ class UserManager:
 		master = await self._fetch_password(identifier, value)
 		if (password,) not in master:
 			raise CredentialError('Invalid credentials.')
-	
+
 	async def fetch_token(self, unique_id: str) -> str:
 		'''
 		Returns the str representation of the token issued to the following unique_id.
@@ -92,7 +92,7 @@ class UserManager:
 		'''
 		if password == '':
 			raise CredentialError('Password can not be empty.')
-	
+
 	async def _fetch_password(self, column_name: str, value: str) -> str:
 		'''
 		Returns the password associated with the attribute.

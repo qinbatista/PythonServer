@@ -1,9 +1,11 @@
 # How to add code to server system
+#如何向server system添加代码
 
 Adding code to server system should be a very simple task if you have a good understanding about how the systems work together. If you are not sure, ask Matthew.
+给serever system添加代码是非常容易带事情，如果有谁吗不确定，问一下马修
 
 ## Step 1) Identify which function you want to add to the server.
-
+## 第一步，定义你想给服务器加入方法
 Look at the existing function list, and confirm that the function you need is not already there. We don't want to add duplicate functions, which will clutter the API. Make sure that the public API can't be abused by the client side. For example, don't create an API that runs an SQL request directly from the JSON - that would be very bad.
 
 
