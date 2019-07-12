@@ -2,13 +2,13 @@
 
 trap "kill 0" EXIT
 
-python ../lukseun_server.py &
-python ../Application/GameAliya/token_server.py &
-python ../Application/GameAliya/WeaponManager.py &
-python ../Application/GameAliya/BagManager.py &
+python3 ../lukseun_server.py &
+python3 ../Application/GameAliya/token_server.py &
+python3 ../Application/GameAliya/WeaponManager.py &
+python3 ../Application/GameAliya/BagManager.py &
 
 sleep 3
 
-python -m unittest discover . -v &
+python3 -m unittest discover . -v &
 wait $!
 
