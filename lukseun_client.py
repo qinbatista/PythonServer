@@ -4,9 +4,16 @@
 # Uses asyncio to handle the sending and receipt of messages to the server.
 #
 
+import pyDes
+import base64
 import asyncio
-from Utility import AnalysisHeader, EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
+from Application.GameAliya import MessageHandler
+
+DESIv = '67891234'
+DESKey = '6789123467891234'
+
+MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 
 
 # the size of the header in bytes that we will send to and receive from the server.
@@ -17,8 +24,8 @@ class LukseunClient:
 		self._client_type = client_type
 		self._host = host
 		self._port = port
-		self._header_tool = AnalysisHeader.Header()
-		self._des = EncryptionAlgorithm.DES()
+		self._k = pyDes.triple_des(DESKey, pyDes.CBC, DESIv, pad=None, padmode=pyDes.PAD_PKCS5)
+		self._handler = MessageHandler.MessageHandler()
 		self.token=""
 
 	async def send_message(self, message: str) -> bytes:
@@ -27,26 +34,29 @@ class LukseunClient:
 		returns the decoded callback response
 		'''
 		reader, writer = await asyncio.open_connection(self._host, self._port)
-		encrypted_message = self._des.encrypt(message)
-		await self._send_header(writer, len(encrypted_message))
-		await self._send_message(writer, encrypted_message)
+
+
+		encoded_message = self._encode_message(message)
+		await self._send_header(writer, self._make_header(len(encoded_message)))
+		await self._send_message(writer, encoded_message)
 		response = await self._receive_response(reader)
 		writer.close()
+
 		try:
-			de_message = self._des.decrypt(response)
+			de_message = self._decode_message(response)
 			if de_message!="":
 				message_dic = eval(de_message)
 				self.token = message_dic["data"]["token"]
-				return response
 		except:
 			pass
+		finally:
+			return response
 
-	async def _send_header(self, writer: asyncio.StreamWriter, message_len: int) -> None:
+	async def _send_header(self, writer: asyncio.StreamWriter, header: bytes) -> None:
 		'''
 		_send_header() sends the header to the server which contains the size of the
 		message that we will send next.
 		'''
-		header = self._header_tool.MakeHeader(self._client_type, str(message_len))
 		writer.write(header)
 		await writer.drain()
 		Log('[lukseun_client.py][_send_header()] Sent header {} to {}'.format(bytes.decode(header), writer.get_extra_info('peername')))
@@ -67,10 +77,22 @@ class LukseunClient:
 		_receive_response() receives the callback response from the server.
 		'''
 		header_raw = await reader.read(HEADER_BUFFER_SIZE)
-		header = AnalysisHeader.Header(header_raw)
-		response = await reader.read(int(header.size))
+		size = self._handler.is_valid_header(header_raw)
+		response = await reader.read(size)
 		Log('[lukseun_client.py][_receive_response()] Received response {} from server'.format(bytes.decode(response)))
 		return response
+
+	def _make_header(self, message_len: int) -> bytes:
+		return MD5_ALIYA + str(message_len).zfill(4).encode()
+	
+	def _encode_message(self, message: str) -> bytes:
+		return base64.encodebytes(self._k.encrypt(message.encode()))
+
+	def _decode_message(self, message: bytes) -> str:
+		return self._k.decrypt(base64.decodebytes(message))
+
+
+
 async def main():
 	lukseun = LukseunClient()
 	# await lukseun.send_message("{'session': '', 'function': 'get_staff_current_status', 'random': '744', 'data': {'unique_id': '', 'account': '', 'password': ''}}")

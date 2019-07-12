@@ -1,9 +1,12 @@
 #
 # An asynchronous user manager that exposes a simple API to manage users.
+# Currently used exclusively by token_server.py
 #
 ################################################################################
 
+import json
 import tormysql
+from aiohttp import web
 
 
 # asyncio library used for testing purposes only, can be safely removed
@@ -115,6 +118,118 @@ class UserManager:
 				return data
 
 
+
+##############################################################################################
+#
+#
+# Below this level are public networked API calls for the above class.
+# They are not yet documented.
+# Standard port number also yet to be defined.
+#
+##############################################################################################
+
+ROUTES = web.RouteTableDef()
+MANAGER = UserManager()
+
+
+def _json_response(body: str = '', **kwargs) -> web.Response:
+	'''
+	A simple wrapped for aiohttp.web.Response where we dumps body to json
+	and assign the correct content_type.
+	'''
+	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
+	kwargs['content_type'] = 'text/json'
+	return web.Response(**kwargs)
+
+
+
+
+# TODO API Documentation
+@ROUTES.post('/register_unique_id')
+async def __register_unique_id(request: web.Request) -> web.Response:
+	post = await request.post()
+	await MANAGER.register_unique_id(post['unique_id'])
+	return _json_response({'message' : 'OK'})
+
+
+# TODO API Documentation
+@ROUTES.post('/fetch_token')
+async def __fetch_token(request: web.Request) -> web.Response:
+	post = await request.post()
+	try:
+		token = await MANAGER.fetch_token(post['unique_id'])
+		if not token:
+			return _json_response({'message' : 'The unique_id does not exist'}, status = 400)
+	except CredentialError:
+		return _json_response({'message' : 'The unique_id does not exist'}, status = 400)
+	return _json_response({'token' : token})
+
+
+# TODO API Documentation
+@ROUTES.post('/validate_credentials')
+async def __validate_credentials(request: web.Request) -> web.Response:
+	post = await request.post()
+	try:
+		await MANAGER.validate_credentials(post['password'], post['identifier'], post['value'])
+		return _json_response({'message' : 'Valid credentials'})
+	except CredentialError:
+		return _json_response({'message' : 'Invalid credentials'}, status = 400)
+
+
+# TODO API Documentation
+@ROUTES.post('/update_token')
+async def __update_token(request: web.Request) -> web.Response:
+	post = await request.post()
+	await MANAGER.update_token(post['unique_id'], post['token'])
+	return _json_response({'message' : 'OK'})
+
+
+
+# TODO API Documentation
+@ROUTES.post('/fetch_unique_id')
+async def __fetch_unique_id(request: web.Request) -> web.Response:
+	post = await request.post()
+	try:
+		unique_id = await MANAGER.fetch_unique_id(post['identifier'], post['value'])
+		if not unique_id:
+			return _json_response({'message' : 'Invalid credentials'}, status = 400)
+	except CredentialError:
+		return _json_response({'message' : 'Invalid credentials'}, status = 400)
+	return _json_response({'unique_id' : unique_id})
+
+
+# TODO API Documentation
+@ROUTES.post('/account_is_bound')
+async def __account_is_bound(request: web.Request) -> web.Response:
+	post = await request.post()
+	bound = await MANAGER.account_is_bound(post['unique_id'])
+	if bound:
+		return _json_response({'message' : 'True'})
+	return _json_response({'message' : 'False'})
+
+
+# TODO API Documentation
+@ROUTES.post('/check_exists')
+async def __check_exists(request: web.Request) -> web.Response:
+	post = await request.post()
+	exists = await MANAGER.check_exists(post['identifier'], post['value'])
+	if exists:
+		return _json_response({'message' : 'True'})
+	return _json_response({'message' : 'False'}, status = 400)
+
+
+
+
+
+def run():
+	app = web.Application()
+	app.add_routes(ROUTES)
+	web.run_app(app, port = 8081)
+
+
+
+
+# TODO refactor testing code to separate module
 async def test_valid_credentials(manager):
 	res1 = await manager.valid_credentials('keepo', account = 'amdsucks')
 	res2 = await manager.valid_credentials('keepo', email = 'matt@gmail.com')
@@ -132,6 +247,6 @@ async def test_valid_credentials(manager):
 	print(f'Test 7 expected True got back: {res7}')
 
 
-
 if __name__ == '__main__':
-	manager = UserManager()
+	run()
+	pass
