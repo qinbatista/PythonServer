@@ -21,6 +21,7 @@ import json
 import tormysql
 from aiohttp import web
 from aiohttp import ClientSession
+from Application.GameAliya.ExampleManager import ExampleManager
 
 # Part (1 / 2)
 class SkillManager:
@@ -93,11 +94,11 @@ async def __protected_method(request: web.Request) -> web.Response:
 	return _json_response({'message' : 'if you can see this, you are logged in!!'})
 
 
-def run(port: int):
+def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port = port)
+	web.run_app(app, port=8085)
 
 
 if __name__ == '__main__':
-	run(8084)
+	run()

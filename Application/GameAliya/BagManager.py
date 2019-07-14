@@ -307,11 +307,11 @@ async def __add_small_energy_potions(request: web.Request) -> web.Response:
 	return _json_response({'remaining': remaining})
 
 
-def run(port: int):
+def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=port)
+	web.run_app(app, port=8082)
 
 
 if __name__ == '__main__':
-	run(8088)
+	run()

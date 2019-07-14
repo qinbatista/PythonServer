@@ -161,11 +161,11 @@ async def __level_up_passive(request: web.Request) -> web.Response:
 	return _json_response(data)
 
 
-def run(port: int):
+def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=port)
+	web.run_app(app, port=8084)
 
 
 if __name__ == '__main__':
-	run(8083)
+	run()

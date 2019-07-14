@@ -58,8 +58,7 @@ class PlayerStateSystemClass():
 					if recover_energy+remain_energy-cost_energy_int>10:
 						gasql("UPDATE player_status SET " + "energy" + "=" + str(10) + "-" + str(cost_energy) + ", energy_recover_time = '"+"' WHERE unique_id='" + self.unique_id + "'")
 						return mc("0", "energy is over full energy, remove recoerd time")
-					elif
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(recover_energy+remain_energy) + "-" + str(cost_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
+					elif gasql("UPDATE player_status SET " + "energy" + "=" + str(recover_energy+remain_energy) + "-" + str(cost_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'"):
 						return mc("0", "energy is over full energy, start recoerding time")
 					else:
 						gasql("UPDATE player_status SET " + "energy" + "=" + str(recover_energy+remain_energy) + "-" + str(cost_energy) + ", energy_recover_time = '"+"' WHERE unique_id='" + self.unique_id + "'")
