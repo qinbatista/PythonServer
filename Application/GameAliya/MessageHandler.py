@@ -56,10 +56,11 @@ class MessageHandler:
 		try:
 			fn = self._functions[message['function']]
 			if message['function'] not in DOES_NOT_NEED_TOKEN:
-				async with session.get(TOKEN_BASE_URL + '/validate', headers = {'Authorization' : message['data']['token']}) as resp:
+				async with session.get(TOKEN_BASE_URL + '/validate', headers = {'Authorization' : message['token']}) as resp:
 					if resp.status != 200:
 						return json.dumps({'status' : 11, 'message' : 'Authorization required', 'data' : {'bad_token' : message['data']['token']}})
 					token_response = await resp.json(content_type='text/json')
+					print("[MessageHandler] -> token_response:" + str(token_response))
 					message['data']['unique_id'] = token_response['unique_id']
 			return await fn(self, message, session)
 		except KeyError:
@@ -88,15 +89,19 @@ class MessageHandler:
 		async with session.post(WEAPON_MANAGER_BASE_URL + '/level_up_passive', data = {'unique_id' : message['data']['unique_id'], 'weapon' : message['data']['weapon'], 'passive' : message['data']['passive']}) as resp:
 			return await resp.text()
 
+	async def _reset_weapon_skill_points(self, message: dict, session) -> str:
+		async with session.post(WEAPON_MANAGER_BASE_URL + '/reset_weapon_skill_points', data = {'unique_id' : message['data']['unique_id'], 'weapon' : message['data']['weapon'], 'passive' : message['data']['passive']}) as resp:
+			return await resp.text()
 
 
 
 DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 
 FUNCTION_LIST = {
-				'login' : MessageHandler._login,
-				'login_unique' : MessageHandler._login_unique,
-				'level_up_weapon': MessageHandler._level_up_weapon,
-				'level_up_passive': MessageHandler._level_up_passive
-				}
+	'login' : MessageHandler._login,
+	'login_unique' : MessageHandler._login_unique,
+	'level_up_weapon': MessageHandler._level_up_weapon,
+	'level_up_passive': MessageHandler._level_up_passive,
+	'reset_weapon_skill_points': MessageHandler._reset_weapon_skill_points
+}
 
