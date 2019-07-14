@@ -11,8 +11,14 @@ MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 
 
 TOKEN_BASE_URL = 'http://localhost:8080'
+PLAYER_STATE_MANAGER = 'http://localhost:8081'
+BAG_MANAGER_BASE_URL = 'http://localhost:8082'
 WEAPON_MANAGER_BASE_URL = 'http://localhost:8083'
-
+SKILL_MANAGER_BASE_URL = 'http://localhost:8084'
+LOTTERY_MANAGER_BASE_URL = 'http://localhost:8085'
+LEVEL_MANAGER_BASE_URL = 'http://localhost:8086'
+LEVEL_MANAGER_BASE_URL = 'http://localhost:8087'
+LEVEL_MANAGER_BASE_URL = 'http://localhost:8088'
 class InvalidHeaderError(Exception):
 	pass
 

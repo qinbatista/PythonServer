@@ -23,7 +23,7 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 # Part (1 / 2)
-class ExampleManager:
+class PlayerStateManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
@@ -100,4 +100,4 @@ def run(port: int):
 
 
 if __name__ == '__main__':
-	run(8082)
+	run(8083)
