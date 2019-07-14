@@ -70,8 +70,6 @@ class LukseunServer:
 
 			loop = asyncio.get_running_loop()
 			decoded_message = await loop.run_in_executor(self._pool, self._handler.process_message_in, message)
-			print("[LukseunServer] -> decoded_message:" + str(decoded_message))
-			print("[LukseunServer] -> _clientsession:" + str(self._clientsession))
 			unencoded_response = await self._handler.resolve(decoded_message, self._clientsession)
 			print(f'Sending : {unencoded_response}')
 

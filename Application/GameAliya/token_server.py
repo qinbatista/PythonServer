@@ -52,8 +52,8 @@
 import jwt
 import json
 
-from Application.GameAliya import UserManager
-# import UserManager
+import UserManager
+
 from aiohttp import web
 from datetime import datetime, timedelta
 
@@ -61,8 +61,8 @@ from datetime import datetime, timedelta
 # NOTE THIS IS NOT PRODUCTION READY
 # SECRET SHOULD BE READ FROM ENVIRONMENT VARIABLE
 SECRET = 'password'
-ALG = 'HS256'
-DELTA = 360
+ALG    = 'HS256'
+DELTA  = 360
 ROUTES = web.RouteTableDef()
 if __name__ == '__main__':
 	USER_MANAGER = UserManager.UserManager()

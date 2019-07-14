@@ -86,7 +86,7 @@ class WeaponManager:
 		return {'status': 0, 'message': 'success', 'data': {'weapon_bag1': row}}
 	
 	# resets all weapon passive skill points. refunds all skill points back. costs coins.
-	async def reset_weapon_skill_points(self, unique_id: str, weapon: str) -> dict:
+	async def reset_weapon_skill_points(self, unique_id: str, weapon: str):
 		pass
 	
 	# levels up the weapon star. costs segments.
@@ -95,6 +95,8 @@ class WeaponManager:
 	
 	async def _get_weapon_star(self, unique_id: str, weapon: str) -> int:
 		data = await self._execute_statement("SELECT `" + str(weapon) + "` FROM weapon_bag WHERE unique_id='" + str(unique_id) + "';")
+		print(str(data))
+		print(str(unique_id))
 		if () in data or data is None:
 			return 0
 		return data[0][0]
@@ -148,9 +150,8 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 @ROUTES.post('/level_up_weapon')
 async def __level_up_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
-	print("[WeaponManager][__level_up_weapon] -> post:" + str(post))
-	data = await MANAGER.level_up_weapon(post['unique_id'], post['weapon'], int(post['iron']))
-	return _json_response(str(data))
+	data = await MANAGER.level_up_weapon(post['unique_id'], post['weapon'], post['iron'])
+	return _json_response(data)
 
 
 @ROUTES.post('/level_up_passive')
@@ -159,12 +160,6 @@ async def __level_up_passive(request: web.Request) -> web.Response:
 	data = await MANAGER.level_up_passive(post['unique_id'], post['weapon'], post['passive'])
 	return _json_response(data)
 
-
-@ROUTES.post('/reset_weapon_skill_points')
-async def __reset_weapon_skill_points(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await MANAGER.reset_weapon_skill_points(post['unique_id'], post['weapon'], post['passive'])
-	return _json_response(data)
 
 def run(port: int):
 	app = web.Application()
