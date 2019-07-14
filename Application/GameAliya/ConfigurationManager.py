@@ -23,6 +23,7 @@ from aiohttp import web
 from aiohttp import ClientSession
 from Application.GameAliya.ExampleManager import ExampleManager
 
+
 # Part (1 / 2)
 class ConfigurationManager:
 	def __init__(self):
@@ -30,16 +31,15 @@ class ConfigurationManager:
 		# for as long as this class is alive. 
 		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
 
-
 	async def public_method(self) -> None:
 		# Something interesting 
 		# await self._execute_statement('STATEMENT')
 		pass
+	
 	async def public_method(self) -> None:
 		# Something interesting 
 		# await self._execute_statement('STATEMENT')
 		pass
-
 
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
@@ -53,7 +53,6 @@ class ConfigurationManager:
 				await cursor.execute(statement)
 				data = cursor.fetchall()
 				return data
-
 
 
 # Part (2 / 2)

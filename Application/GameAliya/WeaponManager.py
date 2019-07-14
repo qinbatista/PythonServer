@@ -95,8 +95,6 @@ class WeaponManager:
 
 	async def _get_weapon_star(self, unique_id: str, weapon: str) -> int:
 		data = await self._execute_statement("SELECT `" + str(weapon) + "` FROM weapon_bag WHERE unique_id='" + str(unique_id) + "';")
-		print(str(data))
-		print(str(unique_id))
 		if () in data or data is None:
 			return 0
 		return data[0][0]
@@ -150,7 +148,7 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 @ROUTES.post('/level_up_weapon')
 async def __level_up_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = await MANAGER.level_up_weapon(post['unique_id'], post['weapon'], post['iron'])
+	data = await MANAGER.level_up_weapon(post['unique_id'], post['weapon'], int(post['iron']))
 	return _json_response(data)
 
 

@@ -25,8 +25,10 @@ HEADER_BUFFER_SIZE = 36
 COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m',
 		'ylw' : '\033[1;33;40m', 'grn' : '\033[1;32;40m'}
 
+
 class InvalidHeaderError(Exception):
 	pass
+
 
 class LukseunServer:
 	def __init__(self, host: str = '', port: int = 8880, max_workers: int = None):
@@ -35,7 +37,6 @@ class LukseunServer:
 		self._clientsession = None
 		self._handler = MessageHandler.MessageHandler()
 		self._pool = concurrent.futures.ProcessPoolExecutor(max_workers = max_workers)
-
 
 	async def run(self) -> None:
 		'''
@@ -49,7 +50,6 @@ class LukseunServer:
 			await server.serve_forever()
 		await self._clientsession.close()
 
-
 	async def _handle_connection(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
 		'''
 		_handle_connection() handles all incoming connections in accordance to the 
@@ -62,7 +62,6 @@ class LukseunServer:
 			size = await loop.run_in_executor(self._pool, self._handler.is_valid_header, raw_header)
 			Log(COLORS['ylw'] + '[lukseun_server.py][_handle_connection] Received valid data from {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
 			message = await reader.read(size)
-
 
 			# ResolveMsg and MakeHeader are two CPU intensive, blocking function calls that hamper the speed of the server.
 			# We can use a ProcessPoolExecutor to run these functions concurrently in different processes, while yielding
@@ -85,11 +84,8 @@ class LukseunServer:
 			writer.close()
 
 
-
-
-
 async def main() -> None:
-	server = LukseunServer(max_workers = 16)
+	server = LukseunServer(max_workers=16)
 	await server.run()
 
 if __name__ == '__main__':

@@ -68,7 +68,7 @@ def test_multiple_message(n: int):
 
 
 def send_single_message(message_id: int):
-	client = LukseunClient(client_type,host, port=8880)
+	client = LukseunClient(client_type, host, port=8880)
 	start = time.time()
 	MESSAGE_LIST[message_id]['token']=token
 	newstring  =  str(MESSAGE_LIST[message_id]).replace("'","\"")
