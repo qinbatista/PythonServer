@@ -23,11 +23,11 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 # Part (1 / 2)
-class ExampleManager:
+class PlayerStateManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
-		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '127.0.0.1', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
+		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
 
 	
 	async def public_method(self) -> None:
@@ -100,4 +100,4 @@ def run(port: int):
 
 
 if __name__ == '__main__':
-	run(8082)
+	run(8083)
