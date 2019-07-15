@@ -2,7 +2,7 @@
 
 The Account Manager is responsible for handling requests pertaining to the user's account information. Handles requests for logging in as well as binding accounts.
 
-See the General Server documentation for more information on request format.
+See the General Server documentation for more information on request and response format.
 
 
 ## API Documentation and Sample Requests

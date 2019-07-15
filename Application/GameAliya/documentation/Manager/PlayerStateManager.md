@@ -2,7 +2,7 @@
 
 The PlayerStateManager is responsible for handling requests pertaining to the current player's state. The player state includes the bag, player status, and skills.
 
-See the General Server documentation for more information on request format.
+See the General Server documentation for more information on request and response format.
 
 
 ## API Documentation and Sample Requests

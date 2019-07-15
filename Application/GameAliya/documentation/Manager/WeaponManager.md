@@ -2,7 +2,7 @@
 
 The WeaponManager is responsible for handling requests pertaining to weapons. This includes things such as weapon level ups.
 
-See the General Server documentation for more information on request format.
+See the General Server documentation for more information on request and response format.
 
 
 ## API Documentation and Sample Requests
