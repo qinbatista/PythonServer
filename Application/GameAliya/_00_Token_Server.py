@@ -48,6 +48,7 @@
 #
 #
 #####################################################################################
+import random
 
 import jwt
 import json
@@ -73,6 +74,17 @@ class InvalidatedTokenError(Exception):
 	pass
 
 
+# Format the information
+def message_typesetting(status: int, message: str, data: dict={}) -> dict:
+	result_dict = {
+		"status": status,
+		"message": message,
+		"random": random.randint(-1000, 1000),
+		"data": data
+	}
+	return result_dict
+
+
 def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
@@ -86,12 +98,12 @@ async def _login_unique(request: web.Request) -> web.Response:
 	if not exists:  # create a new account
 		await USER_MANAGER.register_unique_id(post['unique_id'])
 		token = await _issue_new_token(post['unique_id'])
-		return _json_response({'status': 1, 'message': 'new account created', 'data': {'token': token.decode('utf-8')}})
+		return _json_response(message_typesetting(1, "new account created", {'token': token.decode('utf-8')}))
 	bound = await USER_MANAGER.account_is_bound(post['unique_id'])
 	if bound:
-		return _json_response({'status': 2,'message': 'The account corresponding to this unique_id has already been bound. Please log in using a different method.', 'data': {}}, status=400)
+		return _json_response(message_typesetting(2, "The account corresponding to this unique_id has already been bound. Please log in using a different method."), status=400)
 	token = await _issue_new_token(post['unique_id'])
-	return _json_response({'status': 0, 'message': 'success', 'data': {'token': token.decode('utf-8')}})
+	return _json_response(message_typesetting(0, "success", {'token': token.decode('utf-8')}))
 
 
 @ROUTES.post('/login')
@@ -148,7 +160,7 @@ def _check_invalidated(token: str) -> None:
 		raise InvalidatedTokenError
 
 
-def _json_response(body: str = '', **kwargs) -> web.Response:
+def _json_response(body: dict = '', **kwargs) -> web.Response:
 	'''
 	A simple wrapper for aiohttp.web.Response where we dumps body to json
 	and assign the correct content_type.

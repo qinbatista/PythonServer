@@ -9,7 +9,7 @@ import base64
 import asyncio
 import json
 from Utility.LogRecorder import LogUtility as Log
-from Application.GameAliya import MessageHandler
+from Application.GameAliya import _00_Message_Handler as handler
 
 DESIv = '67891234'
 DESKey = '6789123467891234'
@@ -26,7 +26,7 @@ class LukseunClient:
 		self._host = host
 		self._port = port
 		self._k = pyDes.triple_des(DESKey, pyDes.CBC, DESIv, pad=None, padmode=pyDes.PAD_PKCS5)
-		self._handler = MessageHandler.MessageHandler()
+		self._handler = handler.MessageHandler()
 		self.token = ""
 	
 	async def send_message(self, message: str) -> dict:
@@ -42,6 +42,7 @@ class LukseunClient:
 		response = await self._receive_response(reader)
 		writer.close()
 		decoded_message = self._decode_message(response)
+		print(decoded_message)
 		if "token" in str(decoded_message): self.token = json.loads(decoded_message, encoding="utf-8")["data"]["token"]
 		if decoded_message != '':
 			return eval(decoded_message)
