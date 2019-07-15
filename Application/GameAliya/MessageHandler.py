@@ -129,7 +129,7 @@ class MessageHandler:
 			return await resp.text()
 	
 	async def _reset_weapon_skill_point(self, message: dict, session) -> str:
-		async with session.post(WEAPON_MANAGER_BASE_URL + '/reset_weapon_skill_point', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(WEAPON_MANAGER_BASE_URL + '/reset_weapon_skill_point', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
 			return await resp.text()
 	
 	async def _level_up_weapon_star(self, message: dict, session) -> str:
