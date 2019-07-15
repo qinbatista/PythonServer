@@ -32,27 +32,27 @@ Any function call that requires a valid token and does not supply one will recei
 
 
 
-### example api
+### skill level up
 
-Example documentation
+Levels up a skill. If the skill level is 0, the user cannot level up that skill. In order to level up that skill, you need to use a scroll. The scroll gives a probability that the skill will level up.
 
 Status codes and meaning:
 
 - 0 - Success
-- 1 - User does not have that weapon
-- 2 - Insufficient materials, upgrade failed
-- 9 - Weapon already max level
+- 1 - User does not have that skill
+- 2 - User does not have enough scrolls
+- 9 - Skill already at max level
 
-
+The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 depending upon whether or not the skill actually leveled up. A failure here does not mean a failed API call - it means that the scroll skill did not yield a level up. Different levels of scroll skills have different success rates.
 
 ##### Sample Request
 ```json
 {
-	"function" : "level_up_weapon",
+	"function" : "skill_level_up",
 	"data" : {
 				"token" : "valid token here",
-				"weapon" : "WEAPON_NAME_HERE",
-				"iron" : "100"
+				"skill_id" : "skill id here",
+				"scroll_id" : "scroll id here"
 			 }
 }
 ```
@@ -63,9 +63,127 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag ],
-				"item1" : ['iron', remaining_iron_after_upgrade]
+				"skill1": [skill_id, result of skill level],
+				"item1" : [scroll_id, resulting scroll quantity],
+				"upgrade" : "UPGRADE_SUCCESS"
 			 }
 }
 ```
 
+
+
+### get all skill levels
+
+Returns all the current skill levels.
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"function" : "get_all_skill_levels"
+	"data" : {
+				"token" : "valid token here",
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"skill1": [skill_name, skill_value],
+				.
+				.
+				.
+				"skillN" : [skill_name, skill_value]
+			 }
+}
+```
+
+
+
+
+### get skill
+
+Returns the requested skill level.
+
+Status codes and meaning:
+
+- 0 - Success
+- 1 - Invalid skill name
+
+
+##### Sample Request
+```json
+{
+	"function" : "get_skill"
+	"data" : {
+				"token" : "valid token here",
+				"skill_id"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"skill1": [skill_name, skill_value],
+				.
+				.
+				.
+				"skillN" : [skill_name, skill_value]
+			 }
+}
+```
+
+
+
+### random gift skill
+
+Gives a random chance to unlock a new skill if it doesn't already exist. If it does exist, the user gets a free skill scroll.
+
+Status codes and meaning:
+
+- 0 - Success
+- 1 - You already have that skill, you got a new scroll for free!
+
+
+##### Sample Request
+```json
+{
+	"function" : "random_gift_skill"
+	"data" : {
+				"token" : "valid token here",
+			 }
+}
+```
+
+##### Sample Responses
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"skill1": [skill_id, 1]
+			 }
+}
+```
+
+```json
+{
+	"status" : "1",
+	"message": "You already have that skill, you get a new scroll for free1",
+	"data" : {
+				"item1": [scroll_skill_id, scroll_skill_quantity]
+			 }
+}
+```
