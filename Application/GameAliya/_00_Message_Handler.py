@@ -160,7 +160,7 @@ FUNCTION_LIST = {
 	'level_up_weapon_star': MessageHandler._level_up_weapon_star,
 
 	#Manager_weapon
-	'get_level_setting': MessageHandler._get_level_setting,
+	# 'get_level_setting': MessageHandler._get_level_setting,
 
 	#Manager_Level
 	'pass_level': MessageHandler._pass_level,

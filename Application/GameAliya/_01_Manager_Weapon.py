@@ -20,6 +20,16 @@ class WeaponUpgradeError(Exception):
 		self.message = message
 
 
+# Format the information
+def message_typesetting(status: int, message: str, data: dict={}) -> dict:
+	result_dict = {
+		"status": status,
+		"message": message,
+		"random": random.randint(-1000, 1000),
+		"data": data
+	}
+	return result_dict
+
 class WeaponManager:
 	def __init__(self, standard_iron_count=20, standard_segment_count=30, standard_reset_weapon_skill_coin_count=100):
 		self._standard_iron_count = standard_iron_count
@@ -36,16 +46,16 @@ class WeaponManager:
 
 	# levels up a particular weapon. costs iron.
 	# returns the data payload
-	async def level_up_weapon(self, unique_id: str, weapon: str, iron: int) -> str:
+	async def level_up_weapon(self, unique_id: str, weapon: str, iron: int) -> dict:
 		async with ClientSession() as session:
 			star = await self._get_weapon_star(unique_id, weapon)
 			if star == 0:
-				return await self.message_typesetting(1, "user does not have that weapon")
+				return message_typesetting(1, "user does not have that weapon")
 
 			row = await self._get_row_by_id(weapon, unique_id)
 
 			if row[1] == 100:
-				return await self.message_typesetting(3, "weapon has reached max level")  # 9 --> 3
+				return message_typesetting(3, "weapon has reached max level")  # 9 --> 3
 
 			async with session.post(BAG_MANAGER_BASE_URL + '/get_iron', data={'unique_id': unique_id}) as resp:
 				resp = await resp.json(content_type='text/json')
@@ -53,7 +63,7 @@ class WeaponManager:
 
 			skill_upgrade_number = int(iron) // self._standard_iron_count
 			if skill_upgrade_number == 0 or (current_iron // self._standard_iron_count) < skill_upgrade_number:
-				return await self.message_typesetting(2, "insufficient materials, upgrade failed")
+				return message_typesetting(2, "insufficient materials, upgrade failed")
 
 			# calculate resulting levels and used iron
 			if (row[1] + skill_upgrade_number) > 100:
@@ -68,29 +78,29 @@ class WeaponManager:
 
 			# update the weapon level on the account
 			await self.__set_weapon_level_up_data(unique_id, weapon, row[1], row[6])
-			return await self.message_typesetting(0, "success", data={'weapon_bag1': row, 'item1': ['iron', remaining_iron]})
+			return message_typesetting(0, "success", data={'weapon_bag1': row, 'item1': ['iron', remaining_iron]})
 
 	# levels up a particular passive skill. costs skill points.
 	# 提升特定的被动技能。 增加技能点。
-	async def level_up_passive(self, unique_id: str, weapon: str, passive_skill: str) -> str:
+	async def level_up_passive(self, unique_id: str, weapon: str, passive_skill: str) -> dict:
 		weapon_star = await self.__get_weapon_star(unique_id, weapon)
 		if weapon_star == 0:
-			return await self.message_typesetting(1, "user does not have that weapon")
+			return message_typesetting(1, "user does not have that weapon")
 
 		if passive_skill not in self._valid_passive_skills:
-			return await self.message_typesetting(9, "passive skill does not exist")
+			return message_typesetting(9, "passive skill does not exist")
 
 		row = await self._get_row_by_id(weapon, unique_id)
 		if row[6] == 0:
-			return await self.message_typesetting(2, "insufficient skill points, upgrade failed")
+			return message_typesetting(2, "insufficient skill points, upgrade failed")
 		row[6] -= 1
 		row[2 + self._valid_passive_skills.index(passive_skill)] += 1
 		await self._set_passive_skill_level_up_data(unique_id, weapon, passive_skill, row[2 + self._valid_passive_skills.index(passive_skill)], row[6])
 		row[0] = weapon
-		return await self.message_typesetting(0, "success", data={"weapon_bag1": row})
+		return message_typesetting(0, "success", data={"weapon_bag1": row})
 
 	# resets all weapon passive skill points. refunds all skill points back. costs coins.
-	async def reset_weapon_skill_point(self, unique_id: str, weapon: str) -> str:
+	async def reset_weapon_skill_point(self, unique_id: str, weapon: str) -> dict:
 		async with ClientSession() as session:
 			# get the coin from the account
 			async with session.post(BAG_MANAGER_BASE_URL + '/get_coin', data={"unique_id": unique_id}) as resp:
@@ -98,9 +108,9 @@ class WeaponManager:
 				bag_coin = resp["coins"]
 			info_list = await self._get_row_by_id(weapon, unique_id)
 			if self.__get_weapon_star(unique_id=unique_id, weapon=weapon) == 0:
-				return await self.message_typesetting(1, "no weapon!")
+				return message_typesetting(1, "no weapon!")
 			elif bag_coin < self._standard_reset_weapon_skill_coin_count:
-				return await self.message_typesetting(4, "there is not enough gold coins to reset!")  # 9 --> 4
+				return message_typesetting(4, "there is not enough gold coins to reset!")  # 9 --> 4
 			else:
 				info_list[6] = info_list[0]
 				info_list[2] = info_list[3] = info_list[4] = info_list[5] = 0
@@ -108,9 +118,9 @@ class WeaponManager:
 				coin_result = await self.__set_coin(bag_coin)
 				weapon_result = await self.__set_skill_point(unique_id, weapon, skill_point=info_list[6])
 				if coin_result == 0 or weapon_result == 0:
-					return await self.message_typesetting(3, "abnormal data!")
+					return message_typesetting(3, "abnormal data!")
 				info_list[0] = weapon
-				return await self.message_typesetting(0, weapon + " reset skill point success!", data={"weapon_bag1": info_list, "item1": ["coin", bag_coin]})
+				return message_typesetting(0, weapon + " reset skill point success!", data={"weapon_bag1": info_list, "item1": ["coin", bag_coin]})
 
 	# levels up the weapon star. costs segments.
 	async def level_up_weapon_star(self, unique_id: str, weapon: str):
@@ -143,14 +153,6 @@ class WeaponManager:
 	async def _get_row_by_id(self, table_name: str, unique_id: str) -> list:
 		data = await self._execute_statement("SELECT * FROM `" + str(table_name) + "` WHERE unique_id='" + str(unique_id) + "';")
 		return list(data[0])
-
-	# Format the information
-	async def message_typesetting(self, status: int, message: str, data: dict=None) -> str:
-		result = '{"status":"%s","message":"%s","random":"%s","data":{}}' % (
-		status, message, str(random.randint(-1000, 1000)))
-		# 分段保存字符串
-		if data: result = result.replace("{}", json.dumps(data))
-		return result
 
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method

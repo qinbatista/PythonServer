@@ -238,7 +238,7 @@ def main() -> None:
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(SCROLL_LEVEL_UP)
-	send_single_message(LEVEL_UP_WEAPON)
+	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(SKILL_UP_WEAPON)
 	# send_single_message(RESET_SKILL_POINT)
 	# send_single_message(UPGRADE_WEAPONS_STARS)
