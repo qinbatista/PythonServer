@@ -224,7 +224,7 @@ async def __check_exists(request: web.Request) -> web.Response:
 def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port)
+	web.run_app(app, port=port)
 
 
 
