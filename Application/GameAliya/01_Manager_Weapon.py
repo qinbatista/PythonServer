@@ -79,7 +79,7 @@ class WeaponManager:
 
 		if passive_skill not in self._valid_passive_skills:
 			return await self.message_typesetting(9, "passive skill does not exist")
-		
+
 		row = await self._get_row_by_id(weapon, unique_id)
 		if row[6] == 0:
 			return await self.message_typesetting(2, "insufficient skill points, upgrade failed")
@@ -119,13 +119,13 @@ class WeaponManager:
 	async def __get_weapon_info(self, unique_id, weapon) -> list:
 		data = await self._execute_statement("select weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment from " + weapon + " where unique_id='" + unique_id + "';")
 		return list(data[0])
-		
+
 	async def __set_skill_point(self, unique_id, weapon_kind, skill_point) -> int:
 		return await self._execute_statement_update("UPDATE " + weapon_kind + " SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point=" + str(skill_point) + " where unique_id='" + unique_id + "'")
-	
+
 	async def __set_coin(self, coin) -> int:
 		return await self._execute_statement_update("UPDATE bag SET coin=" + str(coin) + " where unique_id='" + self.unique_id + "'")
-	
+
 	async def __get_weapon_star(self, unique_id: str, weapon: str) -> int:
 		data = await self._execute_statement("SELECT " + weapon + " FROM weapon_bag WHERE unique_id='" + str(unique_id) + "'")
 		return data[0][0]
@@ -143,7 +143,7 @@ class WeaponManager:
 	async def _get_row_by_id(self, table_name: str, unique_id: str) -> list:
 		data = await self._execute_statement("SELECT * FROM `" + str(table_name) + "` WHERE unique_id='" + str(unique_id) + "';")
 		return list(data[0])
-	
+
 	# Format the information
 	async def message_typesetting(self, status: int, message: str, data: dict=None) -> str:
 		result = '{"status":"%s","message":"%s","random":"%s","data":{}}' % (
