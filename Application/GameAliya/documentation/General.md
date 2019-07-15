@@ -22,8 +22,8 @@ All messages sent to and from the server follow a standard format:
 Client to Server Request: 
 ```json
 {
-	"function" : "The name of the function you want to call",
-  "random":"253",
+	"function" : "FUNCTION",
+    "random":"RANDOM_NUMBER",
 	"data" : {
 				"key" : "value"
 			 }
@@ -34,9 +34,9 @@ Client to Server Request:
 Server to Client Response: 
 ```json
 {
-	"status" : "status number",
-	"message" : "message of status",
-  "random":"253",
+	"status" : "STATUS_NUMBER",
+	"message" : "MESSAGE",
+    "random":RANDOM_NUMBER",
 	"data" : {
 				"key" : "value"
 			 }
