@@ -36,7 +36,7 @@ Server to Client Response:
 {
 	"status" : "STATUS_NUMBER",
 	"message" : "MESSAGE",
-    "random":RANDOM_NUMBER",
+    "random": "RANDOM_NUMBER",
 	"data" : {
 				"key" : "value"
 			 }
