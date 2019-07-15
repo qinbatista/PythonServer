@@ -113,3 +113,109 @@ Status codes and meaning:
 
 
 
+### reset\_weapon\_skill\_point
+
+Resets all weapon's skill points. All removed skill points are refunded to the user. Costs coins.
+
+Status codes and meaning:
+
+- 0 - Success
+- 1 - User does not have that weapon
+- 2 - Insufficient gold coins, upgrade failed
+
+
+
+##### Sample Request
+```json
+{
+	"function" : "reset_weapon_skill_point"
+	"data" : {
+				"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"weapon_bag1" : [ entire row of weapon bag ],
+				"item1" : ["coin", REMAINING_COINS]
+			 }
+}
+```
+
+
+
+
+### level\_up\_weapon\_star
+
+Levels up the weapon star of the specified weapon. Costs segments.
+
+Status codes and meaning:
+
+- 0 - Success
+- 1 - User does not have that weapon
+- 2 - Insufficient segments, upgrade failed
+
+
+
+##### Sample Request
+```json
+{
+	"function" : "reset_weapon_skill_point"
+	"data" : {
+				"token" : "valid token here",
+				"weapon": "WEAPON"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"weapon_bag1" : [ entire row of weapon bag ]
+			 }
+}
+```
+
+
+
+
+### get\_all\_weapon
+
+Levels up the weapon star of the specified weapon. Costs segments.
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"function" : "reset_weapon_skill_point"
+	"data" : {
+				"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"weapon_bag1" : [ entire row of weapon bag ]
+			 }
+}
+```
+
+
+
