@@ -314,4 +314,4 @@ def run(port: int):
 
 
 if __name__ == '__main__':
-	run(8088)
+	run(8082)
