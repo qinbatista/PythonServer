@@ -94,11 +94,11 @@ async def __protected_method(request: web.Request) -> web.Response:
 	return _json_response({'message' : 'if you can see this, you are logged in!!'})
 
 
-def run():
+def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=8083)
+	web.run_app(app, port)
 
 
 if __name__ == '__main__':
-	run()
+	run(8004)

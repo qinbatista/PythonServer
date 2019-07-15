@@ -15,7 +15,7 @@
 #		Valid identifiers are ONLY the following: 'account', 'email', 'phone_number'.
 #		The value is the value corresponding to the type of identifier supplied. For example,
 #		if the identifier is 'account', then the value would be the account name.
-#		
+#
 #		200 OK
 #		Returns a new token if the credentials could be verified.
 #		Previously issued tokens for the corresponding unique_id are invalidated.
@@ -23,7 +23,7 @@
 #		400 Bad Request
 #		The credentials could not be verified.
 #
-#	
+#
 #	-	POST /login_unique {unique_id: str}
 #		This API call will only return a token if the user has not already bound their account.
 #		If the unique_id can not be found, a new user will be created and a token returned.
@@ -31,10 +31,10 @@
 #		200 OK
 #		Returns a new token.
 #		Previously issued tokens for the unique_id are invalidated.
-#		
+#
 #		400 Bad Request
 #		The unique_id could not be found, or the unique_id has already been bound.
-#		
+#
 #
 #	-	GET /validate
 #		HEADER		Authorization: <token>
@@ -73,10 +73,10 @@ class InvalidatedTokenError(Exception):
 	pass
 
 
-def run():
+def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app)
+	web.run_app(app,port)
 
 
 @ROUTES.post('/login_unique')
@@ -159,4 +159,4 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 
 
 if __name__ == '__main__':
-	run()
+	run(8000)
