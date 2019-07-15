@@ -21,10 +21,9 @@ import json
 import tormysql
 from aiohttp import web
 from aiohttp import ClientSession
-from Application.GameAliya.ExampleManager import ExampleManager
 
 # Part (1 / 2)
-class PlayerStateManager:
+class LevelManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
@@ -53,7 +52,7 @@ class PlayerStateManager:
 
 
 # Part (2 / 2)
-MANAGER = ExampleManager() # we want to define a single instance of the class
+MANAGER = LevelManager() # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
 
 
@@ -97,8 +96,8 @@ async def __protected_method(request: web.Request) -> web.Response:
 def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port)
+	web.run_app(app, port=port)
 
 
 if __name__ == '__main__':
-	run(8004)
+	run(8003)

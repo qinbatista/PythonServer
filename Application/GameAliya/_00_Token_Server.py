@@ -52,7 +52,7 @@
 import jwt
 import json
 
-from Application.GameAliya import UserManager
+from Application.GameAliya import _05_Manager_User as UserManager
 # import UserManager
 
 from aiohttp import web
@@ -76,7 +76,7 @@ class InvalidatedTokenError(Exception):
 def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app,port)
+	web.run_app(app, port=port)
 
 
 @ROUTES.post('/login_unique')
