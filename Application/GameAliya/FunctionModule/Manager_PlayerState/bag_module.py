@@ -143,6 +143,33 @@ class BagSystemClass():
 			return mc("0", "level up success", {"item1": [str(scroll_id_name), str(current_scroll - 3)],
 			                                    "item2": [str(level_up_scroll_name), str(level_up_scroll + 1)]})
 
+def _json_response(body: str = '', **kwargs) -> web.Response:
+	'''
+	A simple wrapper for aiohttp.web.Response return value.
+	'''
+	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
+	kwargs['content_type'] = 'text/json'
+	return web.Response(**kwargs)
+# Part (2 / 2)
+MANAGER = BagSystemClass()  # we want to define a single instance of the class
+ROUTES = web.RouteTableDef()
+@ROUTES.post('/level_up_weapon')
+async def __level_up_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.level_up_weapon(post['unique_id'], post['weapon'], int(post['iron']))
+	return _json_response(data)
+
+@ROUTES.post('/level_up_passive')
+async def __level_up_passive(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.level_up_passive(post['unique_id'], post['weapon'], post['passive'])
+	return _json_response(data)
+
+@ROUTES.post('/reset_weapon_skill_point')
+async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.reset_weapon_skill_point(post['unique_id'], post['weapon'])
+	return _json_response(data)
 
 if __name__ == "__main__":
 	pass
