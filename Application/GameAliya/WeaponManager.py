@@ -45,7 +45,7 @@ class WeaponManager:
 			row = await self._get_row_by_id(weapon, unique_id)
 
 			if row[1] == 100:
-				return await self.message_typesetting(9, "weapon has reached max level")
+				return await self.message_typesetting(3, "weapon has reached max level")  # 9 --> 3
 
 			async with session.post(BAG_MANAGER_BASE_URL + '/get_iron', data={'unique_id': unique_id}) as resp:
 				resp = await resp.json(content_type='text/json')
@@ -67,100 +67,70 @@ class WeaponManager:
 				remaining_iron = resp['remaining']
 
 			# update the weapon level on the account
-			await self._set_weapon_level_up_data(unique_id, weapon, row[1], row[6])
+			await self.__set_weapon_level_up_data(unique_id, weapon, row[1], row[6])
 			return await self.message_typesetting(0, "success", data={'weapon_bag1': row, 'item1': ['iron', remaining_iron]})
 
 	# levels up a particular passive skill. costs skill points.
 	# 提升特定的被动技能。 增加技能点。
 	async def level_up_passive(self, unique_id: str, weapon: str, passive_skill: str) -> str:
-		weapon_star = await self._get_weapon_star(unique_id, weapon)
+		weapon_star = await self.__get_weapon_star(unique_id, weapon)
 		if weapon_star == 0:
 			return await self.message_typesetting(1, "user does not have that weapon")
 
 		if passive_skill not in self._valid_passive_skills:
-			return await self.message_typesetting(9, "passive skill does not exist")\
+			return await self.message_typesetting(9, "passive skill does not exist")
 		
-
 		row = await self._get_row_by_id(weapon, unique_id)
-		if row[6] <= 0:
-			return {'status': 2, 'message': 'insufficient skill points, upgrade failed', 'data': {}}
+		if row[6] == 0:
+			return await self.message_typesetting(2, "insufficient skill points, upgrade failed")
 		row[6] -= 1
 		row[2 + self._valid_passive_skills.index(passive_skill)] += 1
-
 		await self._set_passive_skill_level_up_data(unique_id, weapon, passive_skill, row[2 + self._valid_passive_skills.index(passive_skill)], row[6])
-		return {'status': 0, 'message': 'success', 'data': {'weapon_bag1': row}}
+		row[0] = weapon
+		return await self.message_typesetting(0, "success", data={"weapon_bag1": row})
 
 	# resets all weapon passive skill points. refunds all skill points back. costs coins.
-	async def reset_weapon_skill_points(self, unique_id: str, weapon: str):
-
-		bag_coin = self.__get_coin(unique_id=unique_id)
-		weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment = self.__get_weapon_level(unique_id=unique_id, weapon=weapon)
-		skill_dict = {
-			"passive_skill_1_level": passive_skill_1_level,
-			"passive_skill_2_level": passive_skill_2_level,
-			"passive_skill_3_level": passive_skill_3_level,
-			"passive_skill_4_level": passive_skill_4_level
-		}
-		data = {
-			"weapon_bag1": [weapon, weapon_level, skill_dict["passive_skill_1_level"], skill_dict["passive_skill_2_level"], skill_dict["passive_skill_3_level"], skill_dict["passive_skill_4_level"], skill_point, segment],
-			"item1": ["coin", bag_coin]
-		}
-		if self.__get_weapon_star(unique_id=unique_id, weapon=weapon) == 0:
-			return self.message_typesetting(1, "no weapon!", data=data)
-		elif bag_coin < self._standard_reset_weapon_skill_coin_count:
-			return self.message_typesetting(9, "there is not enough gold coins to reset!", data=data)
-		else:
-			bag_coin -= self._standard_reset_weapon_skill_coin_count
-			if self.__set_coin(bag_coin) == 0:
-				return self.message_typesetting(3, "abnormal data!", data=data)
-			skill_dict["passive_skill_1_level"] = 0
-			skill_dict["passive_skill_2_level"] = 0
-			skill_dict["passive_skill_3_level"] = 0
-			skill_dict["passive_skill_4_level"] = 0
-			skill_point = weapon_level
-			if self.__set_skill_point(unique_id, weapon, skill_dict["passive_skill_1_level"], skill_dict["passive_skill_2_level"], skill_dict["passive_skill_3_level"], skill_dict["passive_skill_4_level"], skill_point) == 0:
-				bag_coin += self._standard_reset_weapon_skill_coin_count
-				if self.__set_coin(bag_coin) == 0:
-					# 材料已消耗，重置技能失败，或者技能已经重置过
-					print("[WeaponSystemClass][_reset_skill_point] -> Material has been consumed, reset skill failed")
-				return self.message_typesetting(4, "abnormal data!", data=data)
-
-			data["weapon_bag1"] = [weapon, weapon_level, skill_dict["passive_skill_1_level"], skill_dict["passive_skill_2_level"], skill_dict["passive_skill_3_level"], skill_dict["passive_skill_4_level"], skill_point, segment]
-			data["item1"] = ["coin", bag_coin]
-			return self.message_typesetting(0, weapon + " reset skill point success!", data=data)
+	async def reset_weapon_skill_point(self, unique_id: str, weapon: str) -> str:
+		async with ClientSession() as session:
+			# get the coin from the account
+			async with session.post(BAG_MANAGER_BASE_URL + '/get_coin', data={"unique_id": unique_id}) as resp:
+				resp = await resp.json(content_type='text/json')
+				bag_coin = resp["coins"]
+			info_list = await self._get_row_by_id(weapon, unique_id)
+			if self.__get_weapon_star(unique_id=unique_id, weapon=weapon) == 0:
+				return await self.message_typesetting(1, "no weapon!")
+			elif bag_coin < self._standard_reset_weapon_skill_coin_count:
+				return await self.message_typesetting(4, "there is not enough gold coins to reset!")  # 9 --> 4
+			else:
+				info_list[6] = info_list[0]
+				info_list[2] = info_list[3] = info_list[4] = info_list[5] = 0
+				bag_coin -= self._standard_reset_weapon_skill_coin_count
+				coin_result = await self.__set_coin(bag_coin)
+				weapon_result = await self.__set_skill_point(unique_id, weapon, skill_point=info_list[6])
+				if coin_result == 0 or weapon_result == 0:
+					return await self.message_typesetting(3, "abnormal data!")
+				info_list[0] = weapon
+				return await self.message_typesetting(0, weapon + " reset skill point success!", data={"weapon_bag1": info_list, "item1": ["coin", bag_coin]})
 
 	# levels up the weapon star. costs segments.
 	async def level_up_weapon_star(self, unique_id: str, weapon: str):
 		pass
 
-	async def __get_coin(self, unique_id) -> int:
-		data = await self._execute_statement("select coin from bag where unique_id='" + unique_id + "';")
-		return data[0][0]
-		
-	async def __get_weapon_level(self, unique_id, weapon):
+	async def __get_weapon_info(self, unique_id, weapon) -> list:
 		data = await self._execute_statement("select weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment from " + weapon + " where unique_id='" + unique_id + "';")
-		return data[0]
-	
-	def __set_skill_point(self, unique_id, weapon_kind, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point) -> int:
-		return await self._execute_statement_update("UPDATE " + weapon_kind + " SET passive_skill_1_level=" + str(
-			passive_skill_1_level) + ", passive_skill_2_level=" + str(
-			passive_skill_2_level) + ", passive_skill_3_level=" + str(
-			passive_skill_3_level) + ", passive_skill_4_level=" + str(
-			passive_skill_4_level) + ", skill_point=" + str(
-			skill_point) + " where unique_id='" + unique_id + "'")
+		return list(data[0])
+		
+	async def __set_skill_point(self, unique_id, weapon_kind, skill_point) -> int:
+		return await self._execute_statement_update("UPDATE " + weapon_kind + " SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point=" + str(skill_point) + " where unique_id='" + unique_id + "'")
 	
 	async def __set_coin(self, coin) -> int:
 		return await self._execute_statement_update("UPDATE bag SET coin=" + str(coin) + " where unique_id='" + self.unique_id + "'")
 	
-	async def __get_weapon_star(self, unique_id, weapon):
-		data = await self._execute_statement("select " + weapon + " from weapon_bag where unique_id='" + unique_id + "'")
+	async def __get_weapon_star(self, unique_id: str, weapon: str) -> int:
+		data = await self._execute_statement("SELECT " + weapon + " FROM weapon_bag WHERE unique_id='" + str(unique_id) + "'")
 		return data[0][0]
 
-	async def _get_weapon_star(self, unique_id: str, weapon: str) -> int:
-		data = await self._execute_statement("SELECT `" + str(weapon) + "` FROM weapon_bag WHERE unique_id='" + str(unique_id) + "';")
-		return data[0][0]
-
-	async def _set_weapon_level_up_data(self, unique_id: str, weapon: str, weapon_level: int, skill_point: int):
+	async def __set_weapon_level_up_data(self, unique_id: str, weapon: str, weapon_level: int, skill_point: int):
 		await self._execute_statement(
 			"UPDATE `" + str(weapon) + "` SET weapon_level='" + str(weapon_level) + "', skill_point='" + str(
 				skill_point) + "' WHERE unique_id='" + str(unique_id) + "';")
@@ -237,7 +207,7 @@ async def __level_up_passive(request: web.Request) -> web.Response:
 @ROUTES.post('/reset_weapon_skill_point')
 async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = await MANAGER.reset_weapon_skill_points(post['unique_id'], post['weapon'])
+	data = await MANAGER.reset_weapon_skill_point(post['unique_id'], post['weapon'])
 	return _json_response(data)
 
 
