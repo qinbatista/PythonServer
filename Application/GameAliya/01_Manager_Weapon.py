@@ -241,11 +241,11 @@ async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
 	return _json_response(data)
 
 
-def run():
+def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=8084)
+	web.run_app(app, port)
 
 
 if __name__ == '__main__':
-	run()
+	run(8001)
