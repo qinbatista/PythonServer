@@ -32,7 +32,7 @@ Any function call that requires a valid token and does not supply one will recei
 
 
 
-### skill level up
+### skill\_level\_up
 
 Levels up a skill. If the skill level is 0, the user cannot level up that skill. In order to level up that skill, you need to use a scroll. The scroll gives a probability that the skill will level up.
 
@@ -72,7 +72,7 @@ The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 dependi
 
 
 
-### get all skill levels
+### get\_all\_skill\_level
 
 Returns all the current skill levels.
 
@@ -84,7 +84,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
-	"function" : "get_all_skill_levels"
+	"function" : "get_all_skill_level"
 	"data" : {
 				"token" : "valid token here",
 			 }
@@ -109,7 +109,7 @@ Status codes and meaning:
 
 
 
-### get skill
+### get\_skill
 
 Returns the requested skill level.
 
@@ -147,7 +147,7 @@ Status codes and meaning:
 
 
 
-### random gift skill
+### random\_gift\_skill
 
 Gives a random chance to unlock a new skill if it doesn't already exist. If it does exist, the user gets a free skill scroll.
 
