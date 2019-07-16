@@ -41,7 +41,8 @@ Status codes and meaning:
 
 - 0 - Success
 - 1 - User does not have that skill
-- 2 - User does not have enough scrolls
+- 2 - Invalid scroll id
+- 4 - User does not have enough scrolls
 - 9 - Skill already at max level
 
 The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 depending upon whether or not the skill actually leveled up. A failure here does not mean a failed API call - it means that the scroll skill did not yield a level up. Different levels of scroll skills have different success rates.
