@@ -130,7 +130,8 @@ Status codes and meaning:
 {
 	"function" : "reset_weapon_skill_point"
 	"data" : {
-				"token" : "valid token here"
+				"token" : "TOKEN",
+				"weapon": "WEAPON NAME HERE"
 			 }
 }
 ```
@@ -165,7 +166,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
-	"function" : "reset_weapon_skill_point"
+	"function" : "level_up_weapon_star"
 	"data" : {
 				"token" : "valid token here",
 				"weapon": "WEAPON"
@@ -180,6 +181,7 @@ Status codes and meaning:
 	"message": "success",
 	"data" : {
 				"weapon_bag1" : [ entire row of weapon bag ]
+				"item1" : [ WEAPON_NAME, WEAPON_STAR ]
 			 }
 }
 ```
@@ -189,7 +191,7 @@ Status codes and meaning:
 
 ### get\_all\_weapon
 
-Levels up the weapon star of the specified weapon. Costs segments.
+Returns the entire row of the weapon bag.
 
 Status codes and meaning:
 
@@ -199,7 +201,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
-	"function" : "reset_weapon_skill_point"
+	"function" : "get_all_weapon"
 	"data" : {
 				"token" : "valid token here"
 			 }
