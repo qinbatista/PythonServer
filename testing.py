@@ -38,7 +38,9 @@ MESSAGE_LIST = [ {'token':'', 'function':'login', 'random':'-906', 'data':{'uniq
 				 {'token':token, 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon": "weapon1"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
 				 # {'token':token, 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
 				 
-				 {'token':token, 'function':'get_all_weapon','random':'-906', 'data':"null"},
+				 {'token':token, 'function':'get_all_weapon','random':'-906', 'data':{}},
+				 # {'token':token, 'function':'get_all_weapon','random':'-906', 'data':"null"},
+     
 				 {'token':token, 'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
 				 {'token':token, 'function':'pass_level','random':'-906', 'data':{"customs_clearance_time": "1"}},
 				 {'token':token, 'function':'decrease_energy','random':'-906', 'data':{"energy": "1"}},
@@ -247,8 +249,8 @@ def main() -> None:
 	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(LEVEL_UP_SKILL)
 	# send_single_message(RESET_SKILL_POINT)
-	send_single_message(LEVEL_UP_WEAPONS_STAR)
-	# send_single_message(ALL_WEAPON)
+	# send_single_message(LEVEL_UP_WEAPONS_STAR)
+	send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
 	# send_single_message(PASS_LEVEL)
 	#send_single_message(DECREASE_ENERGY)
