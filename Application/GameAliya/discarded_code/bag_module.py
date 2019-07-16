@@ -26,14 +26,13 @@ class BagSystemClass:
 		# TODO verify that this is true :D
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
 
-	# It is helpful to define a private method that you can simply pass
-	# an SQL command as a string and it will execute. Call this method
-	# whenever you issue an SQL statement.
 	async def _execute_statement(self, statement: str) -> tuple:
-		'''
+		"""
 		Executes the given statement and returns the result.
 		执行给定的语句并返回结果。
-		'''
+		:param statement: Mysql执行的语句
+		:return: 返回执行后的二维元组表
+		"""
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
 				await cursor.execute(statement)
@@ -41,28 +40,47 @@ class BagSystemClass:
 				return data
 
 	async def _execute_statement_update(self, statement: str) -> int:
-		'''
+		"""
 		Execute the update or set statement and return the result.
 		执行update或set语句并返回结果。
-		'''
+		:param statement: Mysql执行的语句
+		:return: 返回update或者是set执行的结果
+		"""
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
-	# Used to set information such as numeric values
-	# 用于设置数值等信息
 	async def __update_material(self, unique_id: str, material: str, material_value: int) -> int:
+		"""
+		Used to set information such as numeric values
+		用于设置数值等信息
+		:param unique_id:用户唯一识别码
+		:param material:材料名
+		:param material_value:要设置的材料对应的值
+		:return:返回是否更新成功的标识，1为成功，0为失败
+		"""
 		return await self._execute_statement_update("UPDATE player SET " + material + "=" + str(material_value) + " where unique_id='" + unique_id + "'")
 
-	# Used to get numeric or string information
-	# 用于获取数字或字符串信息
 	async def __get_material(self, unique_id: str, material: str) -> int or str:
+		"""
+		Used to get numeric or string information
+		用于获取数字或字符串信息
+		:param unique_id: 用户的唯一标识
+		:param material:材料名
+		:return:返回材料名对应的值
+		"""
 		data = await self._execute_statement("SELECT " + material + " FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return data[0][0]
 
-	# Used to set string information such as user name
-	# 用于设置用户名等字符串信息
 	async def __set_material(self, unique_id: str, material: str, material_value: str) -> int:
+		"""
+		Used to set string information such as user name
+		用于设置用户名等字符串信息
+		:param unique_id:用户的唯一标识
+		:param material:材料名
+		:param material_value:
+		:return:
+		"""
 		return await self._execute_statement_update("UPDATE player SET " + material + "='" + str(material_value) + "' where unique_id='" + unique_id + "'")
 
 	# Internal json formatted information
@@ -70,13 +88,19 @@ class BagSystemClass:
 	def __internal_format(self, status: int, remaining: int) -> dict:
 		return {"status": status, "remaining": remaining}
 
-	# Try to change the database information
-	# A status of 0 is a success and a 1 is a failure.
-	# Return json data format
-	# 尝试更改数据库信息
-	# 状态为0表示成功，1表示失败。
-	# 返回json数据格式
 	async def __try_remove_material(self, unique_id: str,key: str, value: int) -> dict:
+		"""
+		Try to change the database information
+		A status of 0 is a success and a 1 is a failure.
+		Return json data format
+		尝试更改数据库信息
+		状态为0表示成功，1表示失败。
+		返回json数据格式
+		:param unique_id:用户唯一识别码
+		:param key:材料名
+		:param value: 改变的材料值，正数是加运算，负数是减运算，0是给值
+		:return:返回数据格式为 {"status": status, "remaining": remaining}
+		"""
 		num = await self.__get_material(unique_id=unique_id, material=key)
 		if value == 0: return self.__internal_format(0, num)
 		num += value
