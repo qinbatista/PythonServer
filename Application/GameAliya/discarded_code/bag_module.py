@@ -48,28 +48,28 @@ class BagSystemClass:
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
-	
+
 	# Used to set information such as numeric values
 	# 用于设置数值等信息
 	async def __update_material(self, unique_id: str, material: str, material_value: int) -> int:
 		return await self._execute_statement_update("UPDATE player SET " + material + "=" + str(material_value) + " where unique_id='" + unique_id + "'")
-	
+
 	# Used to get numeric or string information
 	# 用于获取数字或字符串信息
 	async def __get_material(self, unique_id: str, material: str) -> int or str:
 		data = await self._execute_statement("SELECT " + material + " FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return data[0][0]
-	
+
 	# Used to set string information such as user name
 	# 用于设置用户名等字符串信息
 	async def __set_material(self, unique_id: str, material: str, material_value: str) -> int:
 		return await self._execute_statement_update("UPDATE player SET " + material + "='" + str(material_value) + "' where unique_id='" + unique_id + "'")
-	
+
 	# Internal json formatted information
 	# 内部json格式化信息
 	def __internal_format(self, status: int, remaining: int) -> dict:
 		return {"status": status, "remaining": remaining}
-	
+
 	# Try to change the database information
 	# A status of 0 is a success and a 1 is a failure.
 	# Return json data format
@@ -87,7 +87,7 @@ class BagSystemClass:
 
 	async def try_remove_coin(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="coin", value=value)
-	
+
 	async def try_remove_iron(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="iron", value=value)
 
@@ -99,22 +99,22 @@ class BagSystemClass:
 
 	async def try_remove_experience(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="experience", value=value)
-	
+
 	async def try_remove_level(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="level", value=value)
-	
+
 	async def try_remove_role(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="role", value=value)
-	
+
 	async def try_remove_stage(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="stage", value=value)
-	
+
 	async def try_remove_skill_scroll_10(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="skill_scroll_10", value=value)
-	
+
 	async def try_remove_skill_scroll_30(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="skill_scroll_30", value=value)
-	
+
 	async def try_remove_skill_scroll_100(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="skill_scroll_100", value=value)
 
@@ -123,53 +123,53 @@ class BagSystemClass:
 
 	async def try_remove_small_energy_potion(self, unique_id: str, value: int) -> dict:
 		return await self.__try_remove_material(unique_id=unique_id, key="small_energy_potion", value=value)
-	
+
 	async def __add_material(self, unique_id: str, key: str, value: int) -> dict:
 		if value <= 0: return message_typesetting(status=1, message="the added material must be greater than 0")
 		material_json = await self.__try_remove_material(unique_id=unique_id, key=key, value=value)
 		if material_json["status"] == 1: return message_typesetting(status=2, message="database operation error")
 		return message_typesetting(status=0, message="get success!", data={"item1": [key, material_json["remaining"]]})
-	
+
 	async def add_coin(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="coin", value=value)
-	
+
 	async def add_iron(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="iron", value=value)
-	
+
 	async def add_diamond(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="diamond", value=value)
-	
+
 	async def add_energy(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="energy", value=value)
-	
+
 	async def add_experience(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="experience", value=value)
-	
+
 	async def add_level(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="level", value=value)
-	
+
 	async def add_role(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="role", value=value)
-	
+
 	async def add_stage(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="stage", value=value)
-	
+
 	async def add_skill_scroll_10(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="skill_scroll_10", value=value)
-	
+
 	async def add_skill_scroll_30(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="skill_scroll_30", value=value)
-	
+
 	async def add_skill_scroll_100(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="skill_scroll_100", value=value)
-	
+
 	async def add_experience_potion(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="experience_potion", value=value)
-	
+
 	async def add_small_energy_potion(self, unique_id: str, value: int) -> dict:
 		return await self.__add_material(unique_id=unique_id, key="small_energy_potion", value=value)
-	
-	
+
+
 	# region 不需要的方法
 	# def _increase_item_quantity(self, item_id, item_quantity):
 	# 	try:
