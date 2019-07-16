@@ -43,6 +43,7 @@ Status codes and meaning:
 - 0 - Success
 - 1 - User does not have that weapon
 - 2 - Insufficient materials, upgrade failed
+- 3 - Database operation error
 - 9 - Weapon already max level
 
 
@@ -52,7 +53,7 @@ Status codes and meaning:
 {
 	"function" : "level_up_weapon",
 	"data" : {
-				"token" : "valid token here",
+    			"token" : "valid token here",
 				"weapon" : "WEAPON_NAME_HERE",
 				"iron" : "100"
 			 }
@@ -65,7 +66,7 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag ],
+				"weapon_bag1" : [ entire row of weapon bag,unique_id replaced with weapon ],
 				"item1" : ['iron', remaining_iron_after_upgrade]
 			 }
 }
@@ -83,6 +84,7 @@ Status codes and meaning:
 - 0 - Success
 - 1 - User does not have that weapon
 - 2 - Insufficient skill points, upgrade failed
+- 3 - Database operation error
 - 9 - passive skill does not exist
 
 
@@ -90,7 +92,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
-	"function" : "level_up_passive"
+	"function" : "level_up_passive",
 	"data" : {
 				"token" : "valid token here",
 				"weapon" : "WEAPON_NAME_HERE",
@@ -105,7 +107,7 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag ]
+				"weapon_bag1" : [ entire row of weapon bag,unique_id replaced with weapon ]
 			 }
 }
 ```
@@ -119,9 +121,10 @@ Resets all weapon's skill points. All removed skill points are refunded to the u
 
 Status codes and meaning:
 
-- 0 - Success
+- 0 -Weapon reset skill point success
 - 1 - User does not have that weapon
 - 2 - Insufficient gold coins, upgrade failed
+- 3 - Database operation error
 
 
 
@@ -160,6 +163,7 @@ Status codes and meaning:
 - 0 - Success
 - 1 - User does not have that weapon
 - 2 - Insufficient segments, upgrade failed
+- 3 - database operation error!
 
 
 
@@ -180,8 +184,7 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag ]
-				"item1" : [ WEAPON_NAME, WEAPON_STAR ]
+				"weapon_bag1" : [ entire row of weapon bag and WEAPON_STAR ]
 			 }
 }
 ```
@@ -195,7 +198,7 @@ Returns the entire row of the weapon bag.
 
 Status codes and meaning:
 
-- 0 - Success
+- 0 - Gain success
 
 
 ##### Sample Request
@@ -214,7 +217,12 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag ]
+				"weapon_bag1" : [ entire row of weapon bag and weapon star ],
+        		"weapon_bag2" : [ entire row of weapon bag and weapon star ],
+        		...
+        		...
+        		...
+        		"weapon_bagN" : [ entire row of weapon bag and weapon star ]
 			 }
 }
 ```
