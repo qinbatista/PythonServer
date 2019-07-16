@@ -6,7 +6,6 @@
 
 import json
 import random
-
 import tormysql
 from aiohttp import web
 from aiohttp import ClientSession
@@ -23,6 +22,7 @@ class WeaponUpgradeError(Exception):
 # Format the information
 def message_typesetting(status: int, message: str, data: dict={}) -> dict:
 	return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
+
 
 class WeaponManager:
 	def __init__(self, standard_iron_count=20, standard_segment_count=30, standard_reset_weapon_skill_coin_count=100):
@@ -64,13 +64,14 @@ class WeaponManager:
 			row[6] += skill_upgrade_number
 			
 			remaining_iron = current_iron - self._standard_iron_count * skill_upgrade_number
+			
 			# update the amount of iron on the backpack
-			if await self.__set_material(unique_id=unique_id, material="iron", material_value=remaining_iron) == 0:
-				return message_typesetting(3, "illegal information")
-
+			code1 = await self.__set_material(unique_id=unique_id, material="iron", material_value=remaining_iron)
 			# update the weapon level on the account
-			if await self.__set_weapon_level_up_data(unique_id, weapon, row[1], row[6]) == 0:
-				return message_typesetting(4, "illegal information")
+			code2 = await self.__set_weapon_level_up_data(unique_id, weapon, row[1], row[6])
+
+			if code1 == 0 or code2 == 0:
+				return message_typesetting(3, "database operation error")
 			
 			row[0] = weapon
 			return message_typesetting(0, "success", data={'weapon_bag1': row, 'item1': ['iron', remaining_iron]})
@@ -92,7 +93,7 @@ class WeaponManager:
 		row[6] -= 1
 		row[2 + self._valid_passive_skills.index(passive_skill)] += 1
 		if await self.__set_passive_skill_level_up_data(unique_id, weapon, passive_skill, row[2 + self._valid_passive_skills.index(passive_skill)], row[6]) == 0:
-			return message_typesetting(3, "illegal information")
+			return message_typesetting(3, "database operation error")
 		
 		row[0] = weapon
 		return message_typesetting(0, "success", data={"weapon_bag1": row})
@@ -106,7 +107,7 @@ class WeaponManager:
 			if await self.__get_weapon_star(unique_id=unique_id, weapon=weapon) == 0:
 				return message_typesetting(1, "no weapon!")
 			elif bag_coin < self._standard_reset_weapon_skill_coin_count:
-				return message_typesetting(9, "there is not enough gold coins to reset!")
+				return message_typesetting(2, "insufficient gold coins, upgrade failed")
 			else:
 				info_list[6] = info_list[1]
 				info_list[2] = info_list[3] = info_list[4] = info_list[5] = 0
@@ -114,7 +115,7 @@ class WeaponManager:
 				coin_result = await self.__set_material(unique_id=unique_id, material="coin", material_value=bag_coin)
 				weapon_result = await self.__set_skill_point(unique_id, weapon, skill_point=info_list[6])
 				if coin_result == 0 or weapon_result == 0:
-					return message_typesetting(3, "abnormal data!")
+					return message_typesetting(3, "database operation error!")
 				info_list[0] = weapon
 				return message_typesetting(0, weapon + " reset skill point success!", data={"weapon_bag1": info_list, "item1": ["coin", bag_coin]})
 
@@ -124,16 +125,17 @@ class WeaponManager:
 		row = await self.__get_row_by_id(table_name=weapon, unique_id=unique_id)
 		weapon_star = await self.__get_weapon_star(unique_id=unique_id, weapon=weapon)
 		segment_count = self._standard_segment_count * (1 + weapon_star)  # 根据武器星数增加碎片的消耗数量
-		
-		if row[7] < segment_count:
-			return message_typesetting(1, "fragmentation insufficient!")
+		if weapon_star == 0:
+			return message_typesetting(1, "no weapon!")
+		elif row[7] < segment_count:
+			return message_typesetting(2, "insufficient segments, upgrade failed!")
 		else:
 			row[7] -= segment_count
 			weapon_star += 1
 			code1 = await self.__set_segment_by_id(unique_id=unique_id, weapon=weapon, segment=row[7])
 			code2 = await self.__set_weapon_star(unique_id=unique_id, weapon=weapon, weapon_value=weapon_star)
 			if code1 == 0 or code2 == 0:
-				return message_typesetting(2, "abnormal data!")
+				return message_typesetting(3, "database operation error!")
 			
 			row[0] = weapon
 			row.append(weapon_star)
@@ -231,7 +233,6 @@ class WeaponManager:
 		if len(await self._execute_statement("select * from " + table + " where unique_id='" + unique_id + "'")) == 0:
 			await self._execute_statement_update("INSERT INTO " + table + "(unique_id) VALUES ('" + unique_id + "')")
 		
-
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
