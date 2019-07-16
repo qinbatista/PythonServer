@@ -18,7 +18,7 @@ JSON_NAME = PythonLocation() + "/Configuration/mysql_data_config.json"
 # 建立数据库连接池
 POOL = PooledDB(
     pymysql, 5,  # 5为连接池里的最少连接数
-    host="localhost",
+    host="192.168.1.102",
     user="root",
     passwd="lukseun",
     db="aliya",
@@ -322,10 +322,10 @@ def json_operating(table_name: str, table_attribute: list) -> None:
 if __name__ == '__main__':
     # 创建数据库表
 	#create_users_table()
-    create_skill_table()
-    create_bag_table()
-    create_weapon_bag()
+    # create_skill_table()
+    # create_bag_table()
+    # create_weapon_bag()
     create_weapon_info()
-	#create_user_info()
+    # create_user_info()
     # 更新头像
     # update_avatar()

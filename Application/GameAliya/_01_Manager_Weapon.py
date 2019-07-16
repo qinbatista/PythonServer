@@ -22,13 +22,7 @@ class WeaponUpgradeError(Exception):
 
 # Format the information
 def message_typesetting(status: int, message: str, data: dict={}) -> dict:
-	result_dict = {
-		"status": status,
-		"message": message,
-		"random": random.randint(-1000, 1000),
-		"data": data
-	}
-	return result_dict
+	return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
 class WeaponManager:
 	def __init__(self, standard_iron_count=20, standard_segment_count=30, standard_reset_weapon_skill_coin_count=100):
@@ -125,6 +119,7 @@ class WeaponManager:
 				return message_typesetting(0, weapon + " reset skill point success!", data={"weapon_bag1": info_list, "item1": ["coin", bag_coin]})
 
 	# levels up the weapon star. costs segments.
+	# 升级武器星数。 成本是碎片。
 	async def level_up_weapon_star(self, unique_id: str, weapon: str) -> dict:
 		row = await self.__get_row_by_id(table_name=weapon, unique_id=unique_id)
 		weapon_star = await self.__get_weapon_star(unique_id=unique_id, weapon=weapon)
@@ -144,6 +139,53 @@ class WeaponManager:
 			row.append(weapon_star)
 			return message_typesetting(0, weapon + " upgrade success!", data={"weapon_bag1": row})
 
+	# Get details of all weapons
+	# Currently operating the database to get the weapon details, will not give a failure
+	# 获取所有武器的详细信息
+	# 目前操作数据库获取武器详细信息，不会给定失败的情况
+	async def get_all_weapon(self, unique_id: str):
+		data = {}
+		col_name_list = await self.__get_col_name_list(table="weapon_bag")
+		weapons_stars_list = await self.__get_weapon_bag(unique_id=unique_id)
+		# The 0 position stores the unique_id,
+		# so the column header does not traverse the 0 position.
+		# The 0 position obtained by the __get_weapon_attributes method below is also unique_id,
+		# so it will be replaced by the weapon name and
+		# the star number will be added to the last position of the replacement list.
+		# 0位置存储unique_id，因此列标题不会遍历0位置。下面的__get_weapon_attributes方法获得的0位置也是unique_id，
+		# 因此它将被武器名称替换，并且星数将被添加到替换列表的最后位置。
+		for i in range(1, len(col_name_list)):
+			await self.__check_table(unique_id=unique_id, table=col_name_list[i])
+			attribute_list = await self.__get_weapon_attributes(unique_id=unique_id, weapon=col_name_list[i])
+			attribute_list[0] = col_name_list[i]
+			attribute_list.append(weapons_stars_list[i])
+			data.update({"weapon_bag" + str(i): attribute_list})
+		return message_typesetting(0, "gain success", data=data)
+	
+	# Get table properties, column headers
+	# 获取表属性，列标题
+	async def __get_col_name_list(self, table) -> list:
+		sql_result = await self._execute_statement("desc " + table + ";")
+		col_list = []
+		for col in sql_result:
+			col_list.append(col[0])
+		return col_list
+	
+	# Get the content corresponding to the unique_id in the weapon backpack table.
+	# This content is the star number of the weapon.
+	# 获取武器背包表中unique_id对应的内容。
+	# 这个内容是武器的星数。
+	async def __get_weapon_bag(self, unique_id) -> list:
+		sql_result = await self._execute_statement("select * from weapon_bag where unique_id='" + unique_id + "'")
+		return list(sql_result[0])
+	
+	# Get the content corresponding to unique_id in the weapon table
+	# This content is part of the weapon details
+	# 获取武器表中unique_id对应的内容，此内容是武器的部分详细信息
+	async def __get_weapon_attributes(self, unique_id, weapon) -> list:
+		sql_result = await self._execute_statement("select * from " + weapon + " where unique_id='" + unique_id + "'")
+		return list(sql_result[0])
+	
 	async def __get_weapon_info(self, unique_id, weapon) -> list:
 		data = await self._execute_statement("select weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment from " + weapon + " where unique_id='" + unique_id + "';")
 		return list(data[0])
@@ -175,7 +217,6 @@ class WeaponManager:
 			"UPDATE `" + str(weapon) + "` SET " + passive_skill + "='" + str(skill_level) + "', skill_point='" + str(
 				skill_points) + "' WHERE unique_id='" + str(unique_id) + "';")
 
-
 	async def __set_segment_by_id(self, unique_id: str, weapon: str, segment: int):
 		return await self._execute_statement_update(
 			"UPDATE `" + str(weapon) + "` SET segment=" + str(segment) + " WHERE unique_id='" + str(unique_id) + "';")
@@ -184,12 +225,20 @@ class WeaponManager:
 		data = await self._execute_statement("SELECT * FROM `" + str(table_name) + "` WHERE unique_id='" + str(unique_id) + "';")
 		return list(data[0])
 
+	# Used to check user records, create if they don't exist
+	# 用于检查用户记录，如果不存在则创建
+	async def __check_table(self, unique_id: str, table: str) -> None:
+		if len(await self._execute_statement("select * from " + table + " where unique_id='" + unique_id + "'")) == 0:
+			await self._execute_statement_update("INSERT INTO " + table + "(unique_id) VALUES ('" + unique_id + "')")
+		
+
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
 	async def _execute_statement(self, statement: str) -> tuple:
 		'''
 		Executes the given statement and returns the result.
+		执行给定的语句并返回结果。
 		'''
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
@@ -200,10 +249,12 @@ class WeaponManager:
 	async def _execute_statement_update(self, statement: str) -> int:
 		'''
 		Execute the update or set statement and return the result.
+		执行update或set语句并返回结果。
 		'''
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
+
 
 # Part (2 / 2)
 MANAGER = WeaponManager()  # we want to define a single instance of the class
@@ -246,6 +297,13 @@ async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
 async def __level_up_weapon_star(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER.level_up_weapon_star(post['unique_id'], post['weapon'])
+	return _json_response(data)
+
+
+@ROUTES.post('/get_all_weapon')
+async def __get_all_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.get_all_weapon(post['unique_id'])
 	return _json_response(data)
 
 
