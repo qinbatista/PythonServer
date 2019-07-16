@@ -22,7 +22,6 @@ def PythonLocation():
 class BagSystemClass():
 	def __init__(self):
 		pass
-
 	async def increase_item_quantity(self, item_id, item_quantity):
 		try:
 			self.item_list_count += 1
@@ -32,7 +31,6 @@ class BagSystemClass():
 			return dc
 		except:
 			return {"scroll_error": "1"}
-
 	async def increase_supplies(self, message_info):
 		message_dic = json.loads(message_info, encoding="utf-8")
 		title_list = self.__get_title_list("bag")
@@ -106,27 +104,6 @@ class BagSystemClass():
 		sql_result = gasql("select " + skill_id + " from skill where unique_id='" + self.unique_id + "'")
 		return sql_result[0][0]
 
-	# It is helpful to define a private method that you can simply pass
-	# an SQL command as a string and it will execute. Call this method
-	# whenever you issue an SQL statement.
-	async def _execute_statement(self, statement: str) -> tuple:
-		'''
-		Executes the given statement and returns the result.
-		'''
-		async with await self._pool.Connection() as conn:
-			async with conn.cursor() as cursor:
-				await cursor.execute(statement)
-				data = cursor.fetchall()
-				return data
-
-	async def _execute_statement_update(self, statement: str) -> int:
-		'''
-		Executes the given statement and returns the result.
-		'''
-		async with await self._pool.Connection() as conn:
-			async with conn.cursor() as cursor:
-				data = await cursor.execute(statement)
-				return data
 
 	def sql_str_operating(self, table_name, title_list, content_list) -> str:
 		heard_str = "UPDATE %s SET " % table_name
@@ -148,6 +125,27 @@ class BagSystemClass():
 		for col in sql_result:
 			col_list.append(col[0])
 		return col_list
+	# It is helpful to define a private method that you can simply pass
+	# an SQL command as a string and it will execute. Call this method
+	# whenever you issue an SQL statement.
+	async def _execute_statement(self, statement: str) -> tuple:
+		'''
+		Executes the given statement and returns the result.
+		'''
+		async with await self._pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				await cursor.execute(statement)
+				data = cursor.fetchall()
+				return data
+
+	async def _execute_statement_update(self, statement: str) -> int:
+		'''
+		Executes the given statement and returns the result.
+		'''
+		async with await self._pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				data = await cursor.execute(statement)
+				return data
 
 	def message_typesetting(self, status: int, message: str, data: dict=None) -> str:
 		result = '{"status":"%s","message":"%s","random":"%s","data":{}}' % (
@@ -190,7 +188,6 @@ async def __level_up_scroll(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER.level_up_scroll(post['unique_id'], post['scroll_id'])
 	return _json_response(data)
-
 if __name__ == "__main__":
 	app = web.Application()
 	app.add_routes(ROUTES)
