@@ -10,8 +10,6 @@ import tormysql
 from aiohttp import web
 from aiohttp import ClientSession
 
-BAG_MANAGER_BASE_URL = 'http://localhost:8082'
-
 
 class WeaponUpgradeError(Exception):
 	def __init__(self, code: int, message: str = ''):
