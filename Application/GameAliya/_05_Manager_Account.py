@@ -30,10 +30,10 @@ from aiohttp import ClientSession
 class AccountManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
-		# for as long as this class is alive. 
+		# for as long as this class is alive.
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
-	
-	
+
+
 	async def login(self, identifier: str, value: str, password: str) -> dict:
 		valid = await self._valid_credentials(identifier, value, password)
 		if valid:
@@ -65,7 +65,7 @@ class AccountManager:
 		return data[0][0]
 
 
-		
+
 	async def _execute_statement(self, statement: str) -> tuple:
 		'''
 		Executes the given statement and returns the result.
