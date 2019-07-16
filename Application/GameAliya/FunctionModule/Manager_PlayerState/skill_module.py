@@ -1,186 +1,178 @@
-import sys
+#
+# An example for an SQL manager server using asyncio programming methods.
+# We will use aiohttp library to network these API calls so that they can be
+# accessed from different physical devices on the network.
+# Additionally, we will be using tormysql library to manage the SQL server pool
+# of connections.
+#
+# All functions that connect to the database should be async. The more async code
+# we use, the faster the entire server becomes.
+#
+#
+# The file has two parts:
+#	- The DefaultManager class
+#	- The aiohttp server bindings for the class methods
+#
+###############################################################################
+
+
+# Some safe default includes. Feel free to add more if you need.
 import json
-import time
-import os
-import codecs
-import threading
-import pymysql
 import random
+import tormysql
+from aiohttp import web
+from aiohttp import ClientSession
+
+PLAYERSTATE_BASE_URL = 'http://localhost:8090'
 
 
-def PythonLocation():
-	return os.path.dirname(os.path.realpath(__file__))
+# Part (1 / 2)
+class SkillManager:
+	def __init__(self):
+		# This is the connection pool to the SQL server. These connections stay open
+		# for as long as this class is alive. 
+		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
+	
+	async def level_up_skill(self, unique_id: str, skill_id: str, scroll_id: str) -> dict:
+		# 0 - Success
+		# 1 - User does not have that skill
+		# 4 - User does not have enough scrolls
+		# 9 - Skill already at max level
+		async with ClientSession() as session:
+			skill_level = await self._get_skill_level(unique_id, skill_id)
+			if skill_level == 0:
+				return self.message_typesetting(1, 'User does not have that skill')
+			if skill_level >= 10:
+				return self.message_typesetting(9, 'Skill already max level')
+			async with session.post(PLAYERSTATE_BASE_URL + '/get_scroll', data = {'unique_id' : unique_id, 'scroll_id' : scroll_id}) as resp:
+				resp = await resp.json(content_type='text/json')
+				scroll_quantity = resp['scroll']
+			if scroll_quantity == 0:
+				return self.message_typesetting(4, 'User does not have enough scrolls')
 
+			async with session.post(PLAYERSTATE_BASE_URL + '/remove_skill_scroll', data = {'unique_id' : unique_id, 'scroll_id' : scroll_id, 'amount' : 1}) as resp:
+				await resp.json(content_text='text/json')
 
-from Utility import LogRecorder, EncryptionAlgorithm
-from Utility.LogRecorder import LogUtility as Log
-from Utility.sql_manager import game_aliya as gasql
-from Utility.sql_manager import game_aliya_table as gasql_t
-from Utility.AnalysisHeader import message_constructor as mc
+			
+			if not self._roll_for_upgrade(scroll_id):
+				return self.message_typesetting(0, 'success', {'skill1' : [skill_id, skill_level], 'item1' : [scroll_id, scroll_quantity - 1], 'upgrade' : '1'})
+			await self._execute_statement('UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
+			return self.message_typesetting(0, 'success', {'skill1' : [skill_id, skill_level + 1], 'item1' : [scroll_id, scroll_quantity - 1], 'upgrade' : '0'})
 
+			
 
-class SkillSystemClass():
-	def __init__(self, token, *args, **kwargs):
-		self.unique_id = self.__get_unique_id(token)
-		self.item_list_count = 0
-
-	def _skill_level_up(self, message_info):
-		"""
-		level up skill, if skill level is 0, can't level up, level up skill need scroll, scroll have probability to level up.
-		"""
-		if self.unique_id == "":
-			return mc("1", "user is not exist")
-		message_dic = eval(message_info)
+	async def get_all_skill_level(self, unique_id: str) -> dict:
+		# 0 - Success
+		names = await self._execute_statement('DESCRIBE skill;')
+		values = await self._execute_statement('SELECT * from skill WHERE unique_id = "' + str(unique_id) + '";')
 		data = {}
+		for num, val in enumerate(zip(names[1:], values[0][1:])):
+			data['skill' + str(num + 1)] = [ val[0][0] , val[1] ]
+		return self.message_typesetting(0, 'success', data)
+
+
+	async def get_skill(self, unique_id: str, skill_id: str) -> dict:
+		# 0 - Success
+		# 1 - invalid skill name
 		try:
-			skill_id = message_dic["data"]["skill_id"]  # 某个技能
-			scroll_id = message_dic["data"]["scroll_id"]  # 消耗的是哪种卷轴
-			skill_level_result = self._get_skill_level(skill_id)
-			if skill_level_result == 0:
-				return mc("2", "skill does't get yet")
-			if self.__get_scroll_quantity(scroll_id) == 0:
-				return mc("3", "don't have enough scroll")
-			if skill_level_result >= 10:
-				result_skill_quantity = gasql(
-					"select " + skill_id + " from skill where  unique_id='" + self.unique_id + "'")
-				result_scroll_quantity = gasql(
-					"select " + scroll_id + " from bag where  unique_id='" + self.unique_id + "'")
-				data = {
-					"value": [skill_id, str(result_skill_quantity[0][0]), scroll_id, str(result_scroll_quantity[0][0])],
-					"upgrade": "1"
-				}
-				return mc("5", "level is max", data)
-			if scroll_id == "scroll_skill_10":  # level up with 10% scroll
-				gasql("UPDATE bag SET " + scroll_id + "= " + scroll_id + "-" + str(
-					1) + " WHERE unique_id='" + self.unique_id + "'")
-				if random.randint(1, 10) == 10:
-					gasql("UPDATE skill SET " + skill_id + "=" + skill_id + "+" + str(
-						1) + " WHERE unique_id='" + self.unique_id + "'")
-					result_skill_quantity = gasql(
-						"select " + skill_id + " from skill where  unique_id='" + self.unique_id + "'")
-					result_scroll_quantity = gasql(
-						"select " + scroll_id + " from bag where  unique_id='" + self.unique_id + "'")
-					data = {
-						"skill1": [skill_id, str(result_skill_quantity[0][0])],
-						"item1": [scroll_id, str(result_scroll_quantity[0][0])],
-						"upgrade": "0"
-					}
-				else:
-					result_skill_quantity = gasql(
-						"select " + skill_id + " from skill where  unique_id='" + self.unique_id + "'")
-					result_scroll_quantity = gasql(
-						"select " + scroll_id + " from bag where  unique_id='" + self.unique_id + "'")
-					data = {
-						"skill1": [skill_id, str(result_skill_quantity[0][0])],
-						"item1": [scroll_id, str(result_scroll_quantity[0][0])],
-						"upgrade": "1"
-					}
+			level = await self._get_skill_level(unique_id, skill_id)
+			return self.message_typesetting(0, 'success', {'skill1' : [skill_id, level]})
+		except:
+			return self.message_typesetting(1, 'invalid skill name')
 
-			if scroll_id == "scroll_skill_30":  # level up with 30% scroll
-				gasql("UPDATE bag SET " + scroll_id + "= " + scroll_id + "-" + str(
-					1) + " WHERE unique_id='" + self.unique_id + "'")
-				if random.randint(1, 10) <= 7:
-					gasql("UPDATE skill SET " + skill_id + "=" + skill_id + "+" + str(
-						1) + " WHERE unique_id='" + self.unique_id + "'")
-					result_skill_quantity = gasql(
-						"select " + skill_id + " from skill where  unique_id='" + self.unique_id + "'")
-					result_scroll_quantity = gasql(
-						"select " + scroll_id + " from bag where  unique_id='" + self.unique_id + "'")
-					data = {
-						"skill1": [skill_id, str(result_skill_quantity[0][0])],
-						"item1": [scroll_id, str(result_scroll_quantity[0][0])],
-						"upgrade": "0"
-					}
-				else:
-					result_skill_quantity = gasql(
-						"select " + skill_id + " from skill where  unique_id='" + self.unique_id + "'")
-					result_scroll_quantity = gasql(
-						"select " + scroll_id + " from bag where  unique_id='" + self.unique_id + "'")
-					data = {
-						"skill1": [skill_id, str(result_skill_quantity[0][0])],
-						"item1": [scroll_id, str(result_scroll_quantity[0][0])],
-						"upgrade": "1"
-					}
 
-			if scroll_id == "scroll_skill_100":  # level up with 100% scroll
-				gasql("UPDATE bag SET " + scroll_id + "= " + scroll_id + "-" + str(
-					1) + " WHERE unique_id='" + self.unique_id + "'")
-				gasql("UPDATE skill SET " + skill_id + "=" + skill_id + "+" + str(
-					1) + " WHERE unique_id='" + self.unique_id + "'")
-				result_skill_quantity = gasql(
-					"select " + skill_id + " from skill where  unique_id='" + self.unique_id + "'")
-				result_scroll_quantity = gasql(
-					"select " + scroll_id + " from bag where  unique_id='" + self.unique_id + "'")
-				data = {
-					"skill1": [skill_id, str(result_skill_quantity[0][0])],
-					"item1": [scroll_id, str(result_scroll_quantity[0][0])],
-					"upgrade": "0"
-				}
-		except Exception as e:
-			return mc("4", "client message is incomplete e=" + str(e))
-		return mc("0", "success", data)
 
-	def _get_all_skill_level(self, token):
-		"""
-		give all skills' level to client
-		"""
-		table, result = gasql_t("select * from skill where unique_id='" + self.unique_id + "'")
-		data_dic = {}
-		for i in range(1, len(result[0])):
-			data_dic.update({"skill" + str(i): [table[i][0], result[0][i]]})
-		return mc("0", "all skill level", data_dic)
 
-	def _get_skill_level(self, skill_id):
-		"""
-		get skill level
-		"""
-		sql_result = gasql("select " + skill_id + " from skill where  unique_id='" + self.unique_id + "'")
-		return sql_result[0][0]
 
-	def __get_scroll_quantity(self, scroll_id):
-		"""
-		get scroll level
-		"""
-		sql_result = gasql("select " + scroll_id + " from bag where unique_id='" + self.unique_id + "'")
-		return sql_result[0][0]
+			####################################
+			#          P R I V A T E		   #
+			####################################
+		
+		
+	async def _get_skill_level(self, unique_id: str, skill_id: str) -> int:
+		data = await self._execute_statement('SELECT `' + skill_id + '` FROM skill WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
 
-	def __set_skill_level(self, skill_id, level):
-		pass
 
-	def __set_scroll_quantity(self, scroll_id):
-		pass
-
-	def _get_skill(self, message_info):
-		message_dic = json.loads(message_info, encoding="utf-8")
-		skill_id = message_dic["data"]["skill_id"]
-		sql_result = gasql("select " + skill_id + " from skill where  unique_id='" + self.unique_id + "'")
-		if sql_result[0][0] == 0:
-			gasql("UPDATE skill SET " + skill_id + "=" + str(1) + " WHERE unique_id='" + self.unique_id + "'")
-		else:
-			return mc("1", "this skill already exists", {"skill1": [skill_id, 1]})
-		return mc("0", "got new skill success", {"skill1": [skill_id, 1]})
-
-	def __get_unique_id(self, token):
-		sql_result = gasql("select unique_id from userinfo where  token='" + token + "'")
-		if len(sql_result) == 0:
-			return ""
-		else:
-			self.__check_table(sql_result[0][0])
-			return sql_result[0][0]
-
-	def __check_table(self, unique_id):
-		self.__check_info_table(unique_id=unique_id, table="bag")
-		self.__check_info_table(unique_id=unique_id, table="skill")
-
-	def __check_info_table(self, unique_id, table):
-		sql_result = gasql("select * from " + table + " where  unique_id='" + unique_id + "'")  # 通过token查用户id
-		if len(sql_result) == 0:  # userinfo表中没得用户就不执行
-			gasql("INSERT INTO " + table + "(unique_id) VALUES ('" + unique_id + "')")
-			return True
-		else:
-			print("[SkillSystemClass][__check_info_table] -> sql_result:" + str(sql_result))
+	def _roll_for_upgrade(self, scroll_id: str) -> bool:
+		UPGRADE = { 'scroll_skill_10' : 0.10, 'scroll_skill_30' : 0.30, 'scroll_skill_100' : 1 }
+		try:
+			return random.random() < UPGRADE[scroll_id]
+		except KeyError:
 			return False
 
 
-if __name__ == "__main__":
-	pass
+	# It is helpful to define a private method that you can simply pass
+	# an SQL command as a string and it will execute. Call this method
+	# whenever you issue an SQL statement.
+	async def _execute_statement(self, statement: str) -> tuple:
+		'''
+		Executes the given statement and returns the result.
+		'''
+		async with await self._pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				await cursor.execute(statement)
+				data = cursor.fetchall()
+				return data
+
+	def message_typesetting(self, status: int, message: str, data: dict={}) -> dict:
+		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
+
+
+
+
+
+
+
+# Part (2 / 2)
+MANAGER = SkillManager()  # we want to define a single instance of the class
+ROUTES = web.RouteTableDef()
+
+
+# Call this method whenever you return from any of the following functions.
+# This makes it very easy to construct a json response back to the caller.
+def _json_response(body: str = '', **kwargs) -> web.Response:
+	'''
+	A simple wrapper for aiohttp.web.Response return value.
+	'''
+	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
+	kwargs['content_type'] = 'text/json'
+	return web.Response(**kwargs)
+
+
+@ROUTES.post('/level_up_skill')
+async def __get_all_skill_level(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.level_up_skill(post['unique_id'], post['skill_id'], post['scroll_id'])
+	return _json_response(data)
+
+
+@ROUTES.post('/get_all_skill_level')
+async def __get_all_skill_level(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.get_all_skill_level(post['unique_id'])
+	return _json_response(data)
+
+
+@ROUTES.post('/get_skill')
+async def __get_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.get_skill(post['unique_id'], post['skill_id'])
+	return _json_response(data)
+
+
+
+
+
+
+
+
+
+def run(port: int):
+	app = web.Application()
+	app.add_routes(ROUTES)
+	web.run_app(app, port=port)
+
+
+if __name__ == '__main__':
+	run(8089)
