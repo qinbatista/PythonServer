@@ -227,25 +227,5 @@ def run(port):
 	web.run_app(app, port=port)
 
 
-
-
-# TODO refactor testing code to separate module
-async def test_valid_credentials(manager):
-	res1 = await manager.valid_credentials('keepo', account = 'amdsucks')
-	res2 = await manager.valid_credentials('keepo', email = 'matt@gmail.com')
-	res3 = await manager.valid_credentials('keepo', phone = '222')
-	res4 = await manager.valid_credentials('keepo2', account = 'childrensucks')
-	res5 = await manager.valid_credentials('keepo', account = 'childrensucks2')
-	res6 = await manager.valid_credentials('keepo')
-	res7 = await manager.valid_credentials('keepo', account = 'childrensucks', email = 'matt@gmail.com', phone = '455636')
-	print(f'Test 1 expected True got back: {res1}')
-	print(f'Test 2 expected True got back: {res2}')
-	print(f'Test 3 expected True got back: {res3}')
-	print(f'Test 4 expected False got back: {res4}')
-	print(f'Test 5 expected False got back: {res5}')
-	print(f'Test 6 expected False got back: {res6}')
-	print(f'Test 7 expected True got back: {res7}')
-
-
 if __name__ == '__main__':
 	run(8005)
