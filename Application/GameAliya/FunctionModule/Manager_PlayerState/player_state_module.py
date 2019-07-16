@@ -118,6 +118,17 @@ class PlayerStateSystemClass():
 		if sql_result[0][0] <= 0:
 			gasql("INSERT INTO player_status(unique_id) VALUES ('" + unique_id + "')")
 
+@ROUTES.post('/decrease_energy')
+async def __decrease_energy(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.decrease_energy(post['unique_id'], post['weapon'])
+	return _json_response(data)
+
+@ROUTES.post('/increase_energy')
+async def __increase_energy(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.increase_energy(post['unique_id'], post['weapon'])
+	return _json_response(data)
 
 if __name__ == "__main__":
 	pass

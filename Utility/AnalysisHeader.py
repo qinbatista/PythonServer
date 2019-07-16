@@ -64,10 +64,10 @@ class Header:
 
 
 def message_constructor(status, message, data=None):
-	result = '{"status":"%s","message":"%s","random":"%s","data":"null"}' % (
+	result = '{"status":"%s","message":"%s","random":"%s","data":{}}' % (
 	status, message, str(random.randint(-1000, 1000)))
 	# 分段保存字符串
-	if data: result = result.replace('"null"', json.dumps(data))
+	if data: result = result.replace('{}', json.dumps(data))
 	return result
 
 

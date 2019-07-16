@@ -22,20 +22,19 @@ import tormysql
 from aiohttp import web
 from aiohttp import ClientSession
 
+
 # Part (1 / 2)
-class SkillManager:
+class ExampleManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
-		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
-
+		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
 	
 	async def public_method(self) -> None:
 		# Something interesting 
 		# await self._execute_statement('STATEMENT')
 		pass
-
-
+	
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
@@ -50,9 +49,8 @@ class SkillManager:
 				return data
 
 
-
 # Part (2 / 2)
-MANAGER = ExampleManager() # we want to define a single instance of the class
+MANAGER = ExampleManager()  # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
 
 
@@ -73,31 +71,60 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 def login_required(fn):
 	async def wrapper(request):
 		async with ClientSession() as session:
-			async with session.get('http://localhost:8080/validate', headers = {'authorization' : str(request.headers.get('authorization'))}) as resp:
+			async with session.get('http://localhost:8080/validate', headers={'authorization': str(request.headers.get('authorization'))}) as resp:
 				if resp.status == 200:
 					return await fn(request)
-		return _json_response({'message' : 'You need to be logged in to access this resource'}, status = 401)
+		return _json_response({'message': 'You need to be logged in to access this resource'}, status=401)
 	return wrapper
 
+	# It is helpful to define a private method that you can simply pass
+	# an SQL command as a string and it will execute. Call this method
+	# whenever you issue an SQL statement.
+	async def _execute_statement(self, statement: str) -> tuple:
+		'''
+		Executes the given statement and returns the result.
+		'''
+		async with await self._pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				await cursor.execute(statement)
+				data = cursor.fetchall()
+				return data
+
+	async def _execute_statement_update(self, statement: str) -> int:
+		'''
+		Executes the given statement and returns the result.
+		'''
+		async with await self._pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				data = await cursor.execute(statement)
+				return data
+	def message_typesetting(self, status: int, message: str, data: dict=None) -> str:
+		'''
+		make structure of message
+		'''
+		result = '{"status":"%s","message":"%s","random":"%s","data":{}}' % (
+		status, message, str(random.randint(-1000, 1000)))
+		# 分段保存字符串
+		if data: result = result.replace("{}", json.dumps(data))
+		return result
 
 # Try running the server and then visiting http://localhost:[PORT]/public_method
 @ROUTES.get('/public_method')
 async def __public_method(request: web.Request) -> web.Response:
 	await MANAGER.public_method()
-	return _json_response({'message' : 'asyncio code is awesome!'}, status = 200)
-
+	return _json_response({'message': 'asyncio code is awesome!'}, status=200)
 
 @ROUTES.get('/protected_method')
 @login_required
 async def __protected_method(request: web.Request) -> web.Response:
-	return _json_response({'message' : 'if you can see this, you are logged in!!'})
+	return _json_response({'message': 'if you can see this, you are logged in!!'})
 
 
 def run(port: int):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port = port)
+	web.run_app(app, port=port)
 
 
 if __name__ == '__main__':
-	run(8084)
+	run(8089)

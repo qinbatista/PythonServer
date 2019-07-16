@@ -21,20 +21,25 @@ import json
 import tormysql
 from aiohttp import web
 from aiohttp import ClientSession
+from Application.GameAliya.ExampleManager import ExampleManager
+
 
 # Part (1 / 2)
-class PlayerStateManager:
+class ConfigurationManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
 
+	async def public_method(self) -> None:
+		# Something interesting 
+		# await self._execute_statement('STATEMENT')
+		pass
 	
 	async def public_method(self) -> None:
 		# Something interesting 
 		# await self._execute_statement('STATEMENT')
 		pass
-
 
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
@@ -48,7 +53,6 @@ class PlayerStateManager:
 				await cursor.execute(statement)
 				data = cursor.fetchall()
 				return data
-
 
 
 # Part (2 / 2)
@@ -93,11 +97,11 @@ async def __protected_method(request: web.Request) -> web.Response:
 	return _json_response({'message' : 'if you can see this, you are logged in!!'})
 
 
-def run(port: int):
+def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port = port)
+	web.run_app(app, port=port)
 
 
 if __name__ == '__main__':
-	run(8083)
+	run(8002)

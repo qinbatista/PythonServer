@@ -26,12 +26,12 @@ from aiohttp import ClientSession
 class LevelManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
-		# for as long as this class is alive. 
+		# for as long as this class is alive.
 		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
 
-	
+
 	async def public_method(self) -> None:
-		# Something interesting 
+		# Something interesting
 		# await self._execute_statement('STATEMENT')
 		pass
 
@@ -52,7 +52,7 @@ class LevelManager:
 
 
 # Part (2 / 2)
-MANAGER = ExampleManager() # we want to define a single instance of the class
+MANAGER = LevelManager() # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
 
 
@@ -93,11 +93,11 @@ async def __protected_method(request: web.Request) -> web.Response:
 	return _json_response({'message' : 'if you can see this, you are logged in!!'})
 
 
-def run(port: int):
+def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port = port)
+	web.run_app(app, port=port)
 
 
 if __name__ == '__main__':
-	run(8086)
+	run(8003)

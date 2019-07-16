@@ -30,7 +30,7 @@ MESSAGE_LIST = [ {'token':'', 'function':'login', 'random':'-906', 'data':{'uniq
 				 {'token':token, 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
 				 {'token':token, 'function':'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "1020"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
 				 {'token':token, 'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},#data: [weapon1] means which weapons' passive skill  you want to level up, [passive_skill_2_level] means skill id, right now passive skill only can be level up one by one.
-				 {'token':token, 'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon1":"100"}},#data: [weapon1] means which weapon you want to reset skill, [100] means cost resources, right now it is coin in our code,it will be change in furture, make sure it is easy change.
+				 {'token':token, 'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon": "weapon1"}},#data: [weapon1] means which weapon you want to reset skill, [100] means cost resources, right now it is coin in our code,it will be change in furture, make sure it is easy change.
 				 {'token':token, 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
 				 {'token':token, 'function':'get_all_weapon','random':'-906', 'data':"null"},
 				 {'token':token, 'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
@@ -68,9 +68,9 @@ def test_multiple_message(n: int):
 
 
 def send_single_message(message_id: int):
-	client = LukseunClient(client_type,host, port=8880)
+	client = LukseunClient(client_type, host, port=8880)
 	start = time.time()
-	MESSAGE_LIST[message_id]['data']['token']=token
+	MESSAGE_LIST[message_id]['token']=token
 	newstring  =  str(MESSAGE_LIST[message_id]).replace("'","\"")
 	asyncio.run(client.send_message(newstring))
 	print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
@@ -238,7 +238,7 @@ def main() -> None:
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(SCROLL_LEVEL_UP)
-	send_single_message(LEVEL_UP_WEAPON)
+	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(SKILL_UP_WEAPON)
 	# send_single_message(RESET_SKILL_POINT)
 	# send_single_message(UPGRADE_WEAPONS_STARS)

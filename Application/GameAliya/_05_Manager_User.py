@@ -221,10 +221,10 @@ async def __check_exists(request: web.Request) -> web.Response:
 
 
 
-def run():
+def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port = 8081)
+	web.run_app(app, port=port)
 
 
 
@@ -248,5 +248,4 @@ async def test_valid_credentials(manager):
 
 
 if __name__ == '__main__':
-	run()
-	pass
+	run(8005)
