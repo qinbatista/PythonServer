@@ -29,9 +29,15 @@ MESSAGE_LIST = [ {'token':'', 'function':'login', 'random':'-906', 'data':{'uniq
 				 {"token":token, "function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {'token':token, 'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
 				 {'token':token, 'function':'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "1020"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
-				 {'token':token, 'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},#data: [weapon1] means which weapons' passive skill  you want to level up, [passive_skill_2_level] means skill id, right now passive skill only can be level up one by one.
+				 
+				 {'token':token, 'function':'level_up_passive','random':'-906', 'data':{"weapon":"weapon1", "passive": "passive_skill_4_level"}},
+				 # {'token':token, 'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},#data: [weapon1] means which weapons' passive skill  you want to level up, [passive_skill_2_level] means skill id, right now passive skill only can be level up one by one.
+				 
 				 {'token':token, 'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon": "weapon1"}},#data: [weapon1] means which weapon you want to reset skill, [100] means cost resources, right now it is coin in our code,it will be change in furture, make sure it is easy change.
-				 {'token':token, 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
+				 
+				 {'token':token, 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon": "weapon1"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
+				 # {'token':token, 'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
+				 
 				 {'token':token, 'function':'get_all_weapon','random':'-906', 'data':"null"},
 				 {'token':token, 'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
 				 {'token':token, 'function':'pass_level','random':'-906', 'data':{"customs_clearance_time": "1"}},
@@ -50,9 +56,9 @@ RANDOM_GIFT_SKILL=8
 GET_SKILL = 9
 SCROLL_LEVEL_UP = 10
 LEVEL_UP_WEAPON =11
-SKILL_UP_WEAPON =12
+LEVEL_UP_SKILL = 12
 RESET_SKILL_POINT = 13
-UPGRADE_WEAPONS_STARS = 14
+LEVEL_UP_WEAPONS_STAR = 14
 ALL_WEAPON = 15
 LOTTERY_SEGMENT = 16
 PASS_LEVEL= 17
@@ -239,9 +245,9 @@ def main() -> None:
 	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(SCROLL_LEVEL_UP)
 	# send_single_message(LEVEL_UP_WEAPON)
-	# send_single_message(SKILL_UP_WEAPON)
+	# send_single_message(LEVEL_UP_SKILL)
 	# send_single_message(RESET_SKILL_POINT)
-	# send_single_message(UPGRADE_WEAPONS_STARS)
+	send_single_message(LEVEL_UP_WEAPONS_STAR)
 	# send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
 	# send_single_message(PASS_LEVEL)

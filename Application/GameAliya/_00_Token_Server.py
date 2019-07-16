@@ -114,8 +114,8 @@ async def _login(request: web.Request) -> web.Response:
 		unique_id = await USER_MANAGER.fetch_unique_id(post['identifier'], post['value'])
 		token = await _issue_new_token(unique_id)
 	except UserManager.CredentialError:
-		return _json_response({'status': 1, 'message': 'Invalid credentials', 'data': {}}, status=400)
-	return _json_response({'status': 0, 'message': 'success', 'data': {'token': token.decode('utf-8')}})
+		return _json_response(message_typesetting(1, "Invalid credentials"), status=400)
+	return _json_response(message_typesetting(0, "success", {'token': token.decode('utf-8')}))
 
 
 @ROUTES.get('/validate')

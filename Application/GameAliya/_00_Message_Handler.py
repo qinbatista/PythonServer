@@ -115,27 +115,29 @@ class MessageHandler:
 	async def _level_up_scroll(self, message: dict, session) -> str:
 		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/level_up_scroll', data={'unique_id': message['data']['unique_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
-
+	
+	# region _01_Manager_Weapon.py
 	async def _level_up_weapon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/level_up_weapon', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'iron': message['data']['iron']}) as resp:
+		async with session.post(MANAGER_WEAPON_BASE_URL + '/level_up_weapon', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'iron': message['data']['iron']}) as resp:
 			return await resp.text()
 
 	async def _level_up_passive(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/level_up_passive', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'passive': message['data']['passive']}) as resp:
+		async with session.post(MANAGER_WEAPON_BASE_URL + '/level_up_passive', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'passive': message['data']['passive']}) as resp:
 			return await resp.text()
 
 	async def _reset_weapon_skill_point(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/reset_weapon_skill_point', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
+		async with session.post(MANAGER_WEAPON_BASE_URL + '/reset_weapon_skill_point', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
 			return await resp.text()
 
 	async def _level_up_weapon_star(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/level_up_weapon_star', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
+		async with session.post(MANAGER_WEAPON_BASE_URL + '/level_up_weapon_star', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
 			return await resp.text()
 
 	async def _get_all_weapon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/get_all_weapon', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_WEAPON_BASE_URL + '/get_all_weapon', data={'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
-
+	# endregion
+	
 	async def _pass_level(self, message: dict, session) -> str:
 		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/pass_level', data={'unique_id': message['data']['unique_id'], 'level_id': message['data']['level_id']}) as resp:
 			return await resp.text()
