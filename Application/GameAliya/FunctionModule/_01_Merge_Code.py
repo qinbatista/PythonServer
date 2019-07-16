@@ -72,7 +72,6 @@ def get_class_method(file_path):
 				class_method_code.append(i)
 		elif is_find_key==True and i.find("\t")!=0 and i != "\n" and i != "\r":
 			break
-	print(class_method_code)
 	return class_method_code
 def start_merge(_path):
 	file_list = FindAll(_path)
@@ -85,8 +84,7 @@ def start_merge(_path):
 	with open(PythonLocation()+"/class_method_list.py", 'w',encoding="utf-8") as json_file:
 		for i in class_method_list:
 			json_file.writelines(i)
-	print(PythonLocation()+"/route_list.py")
-	print(PythonLocation()+"/class_method_list.py")
+
 def merge_code():
 	list_folder = FindAllInFolder(PythonLocation())
 	for i in list_folder:
