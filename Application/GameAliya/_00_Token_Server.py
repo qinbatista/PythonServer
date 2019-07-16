@@ -48,13 +48,13 @@
 #
 #
 #####################################################################################
-import random
 
 import jwt
 import json
+import random
+import configparser
 
-from Application.GameAliya import _05_Manager_User as UserManager
-# import UserManager
+import _05_Manager_User as UserManager
 
 from aiohttp import web
 from datetime import datetime, timedelta
@@ -85,10 +85,14 @@ def message_typesetting(status: int, message: str, data: dict={}) -> dict:
 	return result_dict
 
 
-def run(port):
+def run():
+
+	config = configparser.ConfigParser()
+	config.read('server.conf')
+
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=port)
+	web.run_app(app, port=int(config['TokenServer']['port']))
 
 
 @ROUTES.post('/login_unique')
@@ -170,5 +174,12 @@ def _json_response(body: dict = '', **kwargs) -> web.Response:
 	return web.Response(**kwargs)
 
 
+
 if __name__ == '__main__':
-	run(8000)
+	run()
+
+
+
+
+
+
