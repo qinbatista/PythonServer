@@ -22,6 +22,9 @@ def message_typesetting(status: int, message: str, data: dict={}) -> dict:
 	return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
 
+MANAGER_BAG_BASE_URL = 'http://localhost:9999'
+
+
 class WeaponManager:
 	def __init__(self, standard_iron_count=20, standard_segment_count=30, standard_reset_weapon_skill_coin_count=100):
 		self._standard_iron_count = standard_iron_count
@@ -49,7 +52,13 @@ class WeaponManager:
 			if row[1] == 100:
 				return message_typesetting(9, "weapon has reached max level")
 
-			current_iron = await self.__get_material(unique_id=unique_id, material="iron")
+			if self.__class__.__name__ == "WeaponManager":
+				current_iron = await self.__get_material(unique_id=unique_id, material="iron")
+				print("WeaponManager current_iron:" + str(current_iron))
+			else:
+				async with session.post(MANAGER_BAG_BASE_URL + '/try_iron', data={'unique_id': unique_id, "value": 0}) as resp:
+					current_iron = json.loads(await resp.text())['remaining']
+					print("async current_iron:" + str(current_iron))
 
 			skill_upgrade_number = int(iron) // self._standard_iron_count
 			if skill_upgrade_number == 0 or (current_iron // self._standard_iron_count) < skill_upgrade_number:
@@ -204,7 +213,7 @@ class WeaponManager:
 		return await self._execute_statement_update("UPDATE bag SET " + material + "=" + str(material_value) + " where unique_id='" + unique_id + "'")
 
 	async def __get_material(self, unique_id: str, material: str) -> int:
-		data = await self._execute_statement("SELECT " + material + " FROM bag WHERE unique_id='" + str(unique_id) + "'")
+		data = await self._execute_statement("SELECT " + material + " FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return data[0][0]
 
 	async def __set_weapon_level_up_data(self, unique_id: str, weapon: str, weapon_level: int, skill_point: int):
