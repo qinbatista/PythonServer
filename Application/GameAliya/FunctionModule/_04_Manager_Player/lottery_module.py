@@ -6,12 +6,6 @@ import codecs
 import threading
 import pymysql
 import random
-
-
-def PythonLocation():
-	return os.path.dirname(os.path.realpath(__file__))
-
-
 from Utility import LogRecorder, EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import game_aliya as gasql
@@ -173,6 +167,9 @@ class LotterySystemClass:
 			gasql("INSERT INTO skill(unique_id) VALUES ('" + unique_id + "')")
 		else:
 			print("[LotterySystemClass][__check_table] -> sql_result:" + str(sql_result))
+
+def PythonLocation():
+	return os.path.dirname(os.path.realpath(__file__))
 
 
 if __name__ == "__main__":

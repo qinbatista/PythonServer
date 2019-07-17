@@ -29,6 +29,7 @@ def CurrentPlatform():
 		return "None"
 routes_code = []
 class_method_code = []
+import_code = []
 def get_routes(file_path):
 	file_object = open(file_path,encoding="utf-8")
 	global routes_code
@@ -82,6 +83,22 @@ def get_class_method(file_path):
 		elif is_find_key==True and i.find("\t")!=0 and i != "\n" and i != "\r":
 			break
 	return class_method_code
+def get_import(file_path):
+	file_object = open(file_path,encoding="utf-8")
+	global import_code
+	import_code = []
+	all_the_text = file_object.readlines()
+	is_find_import_insert_key=False
+	for i in all_the_text:
+		if is_find_import_insert_key == False and i.find("import")==0:
+			import_code.append(i)
+			is_find_import_insert_key=True
+		elif is_find_import_insert_key == True:
+			if i.find("class ")==0:
+				break
+			import_code.append(i)
+	return import_code
+
 def merge_content_to_manager(file_name):
 	file_object = open(PythonLocation()+"/../"+file_name+".py",encoding="utf-8")
 	print(PythonLocation()+"/../"+file_name+".py")
@@ -89,6 +106,7 @@ def merge_content_to_manager(file_name):
 	all_the_text = file_object.readlines()
 	is_find_class_insert_key=False
 	is_find_route_insert_key=False
+	is_find_import_insert_key =False
 	for i in all_the_text:
 		if is_find_class_insert_key == False and i.find("class")==0:
 			new_file_content.append(i)
@@ -98,13 +116,16 @@ def merge_content_to_manager(file_name):
 			new_file_content = new_file_content+routes_code
 			is_find_route_insert_key=True
 			new_file_content.append(i)
+		elif is_find_import_insert_key == False and i.find("import")==0:
+			new_file_content = new_file_content+import_code
+			is_find_import_insert_key=True
+			new_file_content.append(i)
 		else:
 			new_file_content.append(i)
 	with open(PythonLocation()+"/../"+file_name+".py", 'w',encoding="utf-8") as json_file:
 		for i in new_file_content:
 			json_file.writelines(i)
-def get_import(file_name):
-	pass
+
 def search_merge_content(_path):
 	file_list = FindAll(_path)
 	for file_name in file_list:

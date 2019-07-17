@@ -19,8 +19,10 @@
 # Some safe default includes. Feel free to add more if you need.
 import json
 import tormysql
+import random
 from aiohttp import web
 from aiohttp import ClientSession
+
 
 # Part (1 / 2)
 class PlayerStateManager:
@@ -34,14 +36,13 @@ class PlayerStateManager:
 		# await self._execute_statement('STATEMENT')
 		pass
 
-
-	# It is helpful to define a private method that you can simply pass
-	# an SQL command as a string and it will execute. Call this method
-	# whenever you issue an SQL statement.
 	async def _execute_statement(self, statement: str) -> tuple:
-		'''
+		"""
 		Executes the given statement and returns the result.
-		'''
+		执行给定的语句并返回结果。
+		:param statement: Mysql执行的语句
+		:return: 返回执行后的二维元组表
+		"""
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
 				await cursor.execute(statement)
@@ -49,13 +50,26 @@ class PlayerStateManager:
 				return data
 
 	async def _execute_statement_update(self, statement: str) -> int:
-		'''
-		Executes the given statement and returns the result.
-		'''
+		"""
+		Execute the update or set statement and return the result.
+		执行update或set语句并返回结果。
+		:param statement: Mysql执行的语句
+		:return: 返回update或者是set执行的结果
+		"""
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
-				data = await cursor.execute(statement)
-				return data
+				return await cursor.execute(statement)
+
+	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
+		"""
+		Format the information
+		:param message:说明语句
+		:param data:json数据
+		:return:返回客户端需要的json数据
+		"""
+		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
+
+
 
 # Part (2 / 2)
 MANAGER = PlayerStateManager()  # we want to define a single instance of the class
@@ -64,7 +78,7 @@ ROUTES = web.RouteTableDef()
 
 # Call this method whenever you return from any of the following functions.
 # This makes it very easy to construct a json response back to the caller.
-def _json_response(body: str = '', **kwargs) -> web.Response:
+def _json_response(body: dict = "", **kwargs) -> web.Response:
 	'''
 	A simple wrapper for aiohttp.web.Response return value.
 	'''
