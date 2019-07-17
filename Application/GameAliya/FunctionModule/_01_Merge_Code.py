@@ -98,6 +98,7 @@ def get_import(file_path):
 			import_code.append(Re_check_import(i))
 	return import_code
 def Re_check_import(string_line):
+	#_04_Manager_Player module
 	if string_line.find("CONFIG['bag_manager']")!=-1:
 		string_line = string_line.replace("CONFIG['bag_manager']","CONFIG['_04_Manager_Player']")
 	if string_line.find("CONFIG['lottery_module']")!=-1:
@@ -108,6 +109,8 @@ def Re_check_import(string_line):
 		string_line = string_line.replace("CONFIG['skill_module']","CONFIG['_04_Manager_Player']")
 	if string_line.find("CONFIG['stage_module']")!=-1:
 		string_line = string_line.replace("CONFIG['stage_module']","CONFIG['_04_Manager_Player']")
+
+	#set all module configuration setting as local setting
 	if string_line.find("../../Configuration")!=-1:
 		string_line = string_line.replace("../../Configuration","./Configuration")
 	return string_line
