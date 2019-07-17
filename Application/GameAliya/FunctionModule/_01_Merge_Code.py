@@ -104,6 +104,12 @@ def Re_check_import(string_line):
 		string_line = string_line.replace("../../Configuration/server.conf","../Configuration/server.conf")
 	return string_line
 def merge_content_to_manager(file_name):
+
+	file_path = PythonLocation()+"/../"+file_name+".py"
+	if os.path.exists(PythonLocation()+"/../_04_Manager_Player.py"):
+		os.remove(PythonLocation()+"/../_04_Manager_Player.py")
+	shutil.copy(PythonLocation()+"/ExampleManager.py",file_path)
+
 	file_object = open(PythonLocation()+"/../"+file_name+".py",encoding="utf-8")
 	print(PythonLocation()+"/../"+file_name+".py")
 	new_file_content = []
@@ -126,8 +132,7 @@ def merge_content_to_manager(file_name):
 			new_file_content.append(i)
 		else:
 			new_file_content.append(i)
-	file_path = PythonLocation()+"/../"+file_name
-	shutil.copy(PythonLocation()+"/ExampleManager.py",PythonLocation()+"/../_04_Manager_Player.py")
+
 	with open(PythonLocation()+"/../"+file_name+".py", 'w',encoding="utf-8") as json_file:
 		for i in new_file_content:
 			json_file.writelines(i)
