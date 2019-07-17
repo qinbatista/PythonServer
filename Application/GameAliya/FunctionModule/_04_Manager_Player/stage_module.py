@@ -36,8 +36,8 @@ class StageSystemClass:
 				async with session.post(MANAGER_BAG_BASE_URL + '/get_all_material', data={'unique_id': unique_id}) as resp:
 					content_tuple = json.loads(await resp.text())["remaining"]
 			else:
-				data_head_tuple = await self.get_all_head()
-				content_tuple = await self.get_all_material(unique_id=unique_id)
+				data_head_tuple = (await self.get_all_head())["remaining"]
+				content_tuple = (await self.get_all_material(unique_id=unique_id))["remaining"]
 			head_list, format_list = self.__get_head_list(data_head_tuple=data_head_tuple)
 			item_dict = self.__structure_item_dict(head_list, content_tuple)
 
@@ -57,7 +57,7 @@ class StageSystemClass:
 				async with session.post(MANAGER_BAG_BASE_URL + '/set_all_material', data={"statement": sql_str}) as resp:
 					sql_result = json.loads(await resp.text())
 			else:
-				sql_result = json.loads(await self.set_all_material(statement=sql_str))
+				sql_result = await self.set_all_material(statement=sql_str)
 			if int(sql_result["status"]) == 1:
 				return self.message_typesetting(1, "abnormal data!")
 			return self.message_typesetting(0, "passed customs!", data=data)

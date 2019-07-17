@@ -66,7 +66,7 @@ class PlayerStateManager:
 				return self.message_typesetting(0, 'decrease success, remaining energy full, recovering energy', {'energy' : current_energy - amount})
 			else:
 				await self._execute_statement('UPDATE player SET energy = "' + str(current_energy - amount) + '", recover_time = "' + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) + '" WHERE unique_id = "' + unique_id + '";')
-				return self.message_typesetting(0, 'decrease success, start recovering energy', {'energy' : current - amount})
+				return self.message_typesetting(0, 'decrease success, start recovering energy', {'energy' : current_energy - amount})
 		else:
 			delta_time = datetime.strptime(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
 			recovered_energy = int(delta_time.seconds / 60 / 20)

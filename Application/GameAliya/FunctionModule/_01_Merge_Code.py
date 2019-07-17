@@ -100,8 +100,8 @@ def get_import(file_path):
 def Re_check_import(string_line):
 	if string_line.find("CONFIG['bag_manager']")!=-1:
 		string_line = string_line.replace("CONFIG['bag_manager']","CONFIG['_04_Manager_Player']")
-	if string_line.find("../../Configuration/server.conf")!=-1:
-		string_line = string_line.replace("../../Configuration/server.conf","../Configuration/server.conf")
+	if string_line.find("../../Configuration")!=-1:
+		string_line = string_line.replace("../../Configuration","./Configuration")
 	return string_line
 def merge_content_to_manager(file_name):
 

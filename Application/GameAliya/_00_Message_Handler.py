@@ -1,18 +1,24 @@
 import json
 import pyDes
 import base64
+import configparser
 
-DESIv = '67891234'
-DESKey = '6789123467891234'
+# DESIv = '67891234'
+# DESKey = '6789123467891234'
+#
+# MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 
-MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
-
-TOKEN_BASE_URL = 'http://localhost:8000'
-MANAGER_WEAPON_BASE_URL = 'http://localhost:8001'
-MANAGER_CONFIGURATION_BASE_URL = 'http://localhost:8002'
-MANAGER_LEVEL_BASE_URL = 'http://localhost:8003'
-MANAGER_PLAYERSTATE_BASE_URL = 'http://localhost:8004'
-MANAGER_USER_BASE_URL = 'http://localhost:8005'
+CONFIG = configparser.ConfigParser()
+CONFIG.read('./Configuration/server/1.0/server.conf')
+MANAGER_BAG_BASE_URL = 'http://localhost:' + CONFIG['_04_Manager_Player']['port']
+DESIv = CONFIG['_00_Message_Handler']['DESIv']
+DESKey = CONFIG['_00_Message_Handler']['DESKey']
+MD5_ALIYA = CONFIG['_00_Message_Handler']['MD5_ALIYA']
+TOKEN_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_00_Token_Server']['port']
+MANAGER_WEAPON_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_01_Manager_Weapon']['port']
+MANAGER_LEVEL_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_03_Manager_Level']['port']
+MANAGER_PLAYERSTATE_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_04_Manager_Player']['port']
+MANAGER_ACCOUNT_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_05_Manager_Account']['port']
 
 
 class InvalidHeaderError(Exception):
