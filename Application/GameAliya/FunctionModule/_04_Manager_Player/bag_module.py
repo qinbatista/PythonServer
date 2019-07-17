@@ -8,7 +8,7 @@ import tormysql
 from aiohttp import web
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read('../../Configuration/server.conf')
+CONFIG.read('../../Configuration/server/1.0/server.conf')
 
 
 class BagSystemClass:
@@ -49,6 +49,7 @@ class BagSystemClass:
 			print("[set_all_material] -> mysql注入语句：" + statement)
 			return self.__internal_format(status=1, remaining=statement)
 		data = await self._execute_statement_update(statement=statement)
+		data = 1 - data  # 0, 1反转
 		return self.__internal_format(status=data, remaining=data)
 
 	async def __update_material(self, unique_id: str, material: str, material_value: int) -> int:

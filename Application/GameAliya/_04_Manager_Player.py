@@ -66,22 +66,7 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read('../Configuration/server.conf')
 
 
-import sys
-import json
-import time
-import os
-import codecs
-import threading
-import pymysql
-import random
-from Utility import LogRecorder, EncryptionAlgorithm
-from Utility.LogRecorder import LogUtility as Log
-from Utility.sql_manager import game_aliya as gasql
-from Utility.sql_manager import game_aliya_update as gasql_update
-from Utility.AnalysisHeader import message_constructor as mc
-
-
-JSON_NAME = PythonLocation() + "/Configuration/1.0/level_reward_config.json"
+JSON_NAME = "../Configuration/1.0/stage_reward_config.json"
 
 
 import json

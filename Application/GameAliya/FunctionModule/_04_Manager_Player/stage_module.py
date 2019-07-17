@@ -7,18 +7,18 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 
-JSON_NAME = "../../Configuration/1.0/level_reward_config.json"
+JSON_NAME = "../../Configuration/1.0/stage_reward_config.json"
 format_sql = {
 	"smallint": "%s",
 	"varchar": "'%s'",
 	"char": "'%s'"
 }
 CONFIG = configparser.ConfigParser()
-CONFIG.read('../../Configuration/server.conf')
+CONFIG.read('../../Configuration/server/1.0/server.conf')
 MANAGER_BAG_BASE_URL = 'http://localhost:' + CONFIG['bag_manager']['port']
 
 
-class LevelSystemClass:
+class StageSystemClass:
 	def __init__(self, *args, **kwargs):
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
@@ -26,10 +26,11 @@ class LevelSystemClass:
 		# TODO verify that this is true :D
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
 
-	async def pass_level(self, unique_id: str, level_client: int) -> dict:
+	async def pass_stage(self, unique_id: str, stage_client: int) -> dict:
 		reward_list = self.__read_json_data()
+		print("reward_list:" + str(reward_list))
 		async with ClientSession() as session:
-			if self.__class__.__name__ == "LevelSystemClass":
+			if self.__class__.__name__ == "StageSystemClass":
 				async with session.post(MANAGER_BAG_BASE_URL + '/get_all_head') as resp:
 					data_head_tuple = json.loads(await resp.text())["remaining"]
 				async with session.post(MANAGER_BAG_BASE_URL + '/get_all_material', data={'unique_id': unique_id}) as resp:
@@ -40,19 +41,19 @@ class LevelSystemClass:
 			head_list, format_list = self.__get_head_list(data_head_tuple=data_head_tuple)
 			item_dict = self.__structure_item_dict(head_list, content_tuple)
 
-			if level_client <= 0 or (item_dict["level"] + 1) < level_client:
+			if stage_client <= 0 or (item_dict["stage"] + 1) < stage_client:
 				return self.message_typesetting(9, "abnormal data!")
 
 			# 改变所有该变的变量
-			if item_dict["level"] + 1 == level_client:  # 通过新关卡
-				item_dict["level"] = level_client
+			if item_dict["stage"] + 1 == stage_client:  # 通过新关卡
+				item_dict["stage"] = stage_client
 
-			reward_data = reward_list[level_client]  # 获得奖励
+			reward_data = reward_list[stage_client]  # 获得奖励
 			reward_data_len = len(reward_data.keys()) + 1
 			data = self.__structure_data(reward_data=reward_data, item_dict=item_dict, reward_data_len=reward_data_len)
 
 			sql_str = self.__sql_str_operating(unique_id=unique_id, table_name="player", head_list=head_list, format_list=format_list, item_dict=item_dict)
-			if self.__class__.__name__ == "LevelSystemClass":
+			if self.__class__.__name__ == "StageSystemClass":
 				async with session.post(MANAGER_BAG_BASE_URL + '/set_all_material', data={"statement": sql_str}) as resp:
 					sql_result = json.loads(await resp.text())
 			else:
@@ -67,7 +68,7 @@ class LevelSystemClass:
 			data_dict = json.load(open(JSON_NAME, encoding="utf-8"))
 			for key in data_dict.keys():
 				data.append(data_dict[key])
-		print("[level_module.py][read_json_data] -> data:" + str(data))
+		print("[stage_module.py][read_json_data] -> data:" + str(data))
 		return data
 
 	def __get_head_list(self, data_head_tuple: tuple) -> (list, list):
@@ -105,7 +106,7 @@ class LevelSystemClass:
 			key = data[reward][0]
 			item_dict[key] += data[reward][1]
 			data.update({"item" + str(i): [key, item_dict[key]]})
-		data.update({"item" + str(reward_data_len): ["level", item_dict["level"]]})
+		data.update({"item" + str(reward_data_len): ["stage", item_dict["stage"]]})
 		return data
 
 	def __structure_item_dict(self, head_list, content_tuple) -> dict:
@@ -113,6 +114,23 @@ class LevelSystemClass:
 		for i in range(len(head_list)):
 			item_dict.update({head_list[i]: content_tuple[i]})
 		return item_dict
+
+	def __sql_str_operating(self, unique_id: str, table_name: str, head_list: list, format_list: list, item_dict: dict) -> str:
+		heard_str = "UPDATE %s SET " % table_name
+		end_str = " where unique_id='%s'" % unique_id
+		result_str = ""
+		temp_list = []
+		for i in range(len(head_list)):
+			if head_list[i] != "unique_id":
+				temp_list.append(item_dict[head_list[i]])
+				if i != len(head_list) - 1:
+					result_str += head_list[i] + "=%s, " % format_list[i]
+				else:
+					result_str += head_list[i] + "=%s" % format_list[i]
+		result_str = heard_str + result_str + end_str
+		print("[StageSystemClass][__sql_str_operating] -> result_str:" + result_str)
+		print("[StageSystemClass][__sql_str_operating] -> temp_list:" + str(temp_list))
+		return result_str % tuple(temp_list)
 
 	async def _execute_statement(self, statement: str) -> tuple:
 		"""
@@ -148,7 +166,7 @@ class LevelSystemClass:
 		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
 
-MANAGER = LevelSystemClass()
+MANAGER = StageSystemClass()
 ROUTES = web.RouteTableDef()
 
 
@@ -163,17 +181,17 @@ def _json_response(body: dict = '', **kwargs) -> web.Response:
 	return web.Response(**kwargs)
 
 
-@ROUTES.post('/pass_level')
+@ROUTES.post('/pass_stage')
 async def __try_coin(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.pass_level(unique_id=post['unique_id'], level_client=int(post['level']))
+	result = await MANAGER.pass_stage(unique_id=post['unique_id'], stage_client=int(post['stage']))
 	return _json_response(result)
 
 
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=CONFIG.getint('level_manager', 'port'))
+	web.run_app(app, port=CONFIG.getint('stage_manager', 'port'))
 
 
 if __name__ == "__main__":
