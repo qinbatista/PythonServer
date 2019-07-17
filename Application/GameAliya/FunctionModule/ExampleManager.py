@@ -19,44 +19,66 @@
 # Some safe default includes. Feel free to add more if you need.
 import json
 import tormysql
+import random
 from aiohttp import web
 from aiohttp import ClientSession
 
 
 # Part (1 / 2)
-class ExampleManager:
+class PlayerStateManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
-		# for as long as this class is alive. 
-		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
-	
+		# for as long as this class is alive.
+		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
+
 	async def public_method(self) -> None:
-		# Something interesting 
+		# Something interesting
 		# await self._execute_statement('STATEMENT')
 		pass
-	
-	# It is helpful to define a private method that you can simply pass
-	# an SQL command as a string and it will execute. Call this method
-	# whenever you issue an SQL statement.
+
 	async def _execute_statement(self, statement: str) -> tuple:
-		'''
+		"""
 		Executes the given statement and returns the result.
-		'''
+		执行给定的语句并返回结果。
+		:param statement: Mysql执行的语句
+		:return: 返回执行后的二维元组表
+		"""
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
 				await cursor.execute(statement)
 				data = cursor.fetchall()
 				return data
 
+	async def _execute_statement_update(self, statement: str) -> int:
+		"""
+		Execute the update or set statement and return the result.
+		执行update或set语句并返回结果。
+		:param statement: Mysql执行的语句
+		:return: 返回update或者是set执行的结果
+		"""
+		async with await self._pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				return await cursor.execute(statement)
+
+	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
+		"""
+		Format the information
+		:param message:说明语句
+		:param data:json数据
+		:return:返回客户端需要的json数据
+		"""
+		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
+
+
 
 # Part (2 / 2)
-MANAGER = ExampleManager()  # we want to define a single instance of the class
+MANAGER = PlayerStateManager()  # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
 
 
 # Call this method whenever you return from any of the following functions.
 # This makes it very easy to construct a json response back to the caller.
-def _json_response(body: str = '', **kwargs) -> web.Response:
+def _json_response(body: dict = "", **kwargs) -> web.Response:
 	'''
 	A simple wrapper for aiohttp.web.Response return value.
 	'''
@@ -71,60 +93,31 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 def login_required(fn):
 	async def wrapper(request):
 		async with ClientSession() as session:
-			async with session.get('http://localhost:8080/validate', headers={'authorization': str(request.headers.get('authorization'))}) as resp:
+			async with session.get('http://localhost:8080/validate', headers = {'authorization' : str(request.headers.get('authorization'))}) as resp:
 				if resp.status == 200:
 					return await fn(request)
-		return _json_response({'message': 'You need to be logged in to access this resource'}, status=401)
+		return _json_response({'message' : 'You need to be logged in to access this resource'}, status = 401)
 	return wrapper
 
-	# It is helpful to define a private method that you can simply pass
-	# an SQL command as a string and it will execute. Call this method
-	# whenever you issue an SQL statement.
-	async def _execute_statement(self, statement: str) -> tuple:
-		'''
-		Executes the given statement and returns the result.
-		'''
-		async with await self._pool.Connection() as conn:
-			async with conn.cursor() as cursor:
-				await cursor.execute(statement)
-				data = cursor.fetchall()
-				return data
-
-	async def _execute_statement_update(self, statement: str) -> int:
-		'''
-		Executes the given statement and returns the result.
-		'''
-		async with await self._pool.Connection() as conn:
-			async with conn.cursor() as cursor:
-				data = await cursor.execute(statement)
-				return data
-	def message_typesetting(self, status: int, message: str, data: dict=None) -> str:
-		'''
-		make structure of message
-		'''
-		result = '{"status":"%s","message":"%s","random":"%s","data":{}}' % (
-		status, message, str(random.randint(-1000, 1000)))
-		# 分段保存字符串
-		if data: result = result.replace("{}", json.dumps(data))
-		return result
 
 # Try running the server and then visiting http://localhost:[PORT]/public_method
 @ROUTES.get('/public_method')
 async def __public_method(request: web.Request) -> web.Response:
 	await MANAGER.public_method()
-	return _json_response({'message': 'asyncio code is awesome!'}, status=200)
+	return _json_response({'message' : 'asyncio code is awesome!'}, status = 200)
+
 
 @ROUTES.get('/protected_method')
 @login_required
 async def __protected_method(request: web.Request) -> web.Response:
-	return _json_response({'message': 'if you can see this, you are logged in!!'})
+	return _json_response({'message' : 'if you can see this, you are logged in!!'})
 
 
-def run(port: int):
+def run(port):
 	app = web.Application()
 	app.add_routes(ROUTES)
 	web.run_app(app, port=port)
 
 
 if __name__ == '__main__':
-	run(8089)
+	run(8004)

@@ -1,5 +1,5 @@
 import os,platform
-
+import shutil
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 def FindAllInFolder(_path):
@@ -126,6 +126,8 @@ def merge_content_to_manager(file_name):
 			new_file_content.append(i)
 		else:
 			new_file_content.append(i)
+	file_path = PythonLocation()+"/../"+file_name
+	shutil.copy(PythonLocation()+"/ExampleManager.py",PythonLocation()+"/../_04_Manager_Player.py")
 	with open(PythonLocation()+"/../"+file_name+".py", 'w',encoding="utf-8") as json_file:
 		for i in new_file_content:
 			json_file.writelines(i)
