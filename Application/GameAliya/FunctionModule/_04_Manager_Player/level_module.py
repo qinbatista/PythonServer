@@ -14,7 +14,7 @@ format_sql = {
 	"char": "'%s'"
 }
 CONFIG = configparser.ConfigParser()
-CONFIG.read('Configuration/server.conf')
+CONFIG.read('../../Configuration/server.conf')
 MANAGER_BAG_BASE_URL = 'http://localhost:' + CONFIG['bag_manager']['port']
 
 
