@@ -173,7 +173,7 @@ async def __try_coin(request: web.Request) -> web.Response:
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=CONFIG.getint('bag_manager', 'port'))
+	web.run_app(app, port=CONFIG.getint('level_manager', 'port'))
 
 
 if __name__ == "__main__":
