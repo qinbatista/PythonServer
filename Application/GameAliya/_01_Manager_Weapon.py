@@ -17,9 +17,15 @@ class WeaponUpgradeError(Exception):
 		self.message = message
 
 
+IS_MAIN_CLASS = False
+
+
 # Format the information
 def message_typesetting(status: int, message: str, data: dict={}) -> dict:
 	return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
+
+
+MANAGER_BAG_BASE_URL = 'http://localhost:9999'
 
 
 class WeaponManager:
@@ -49,7 +55,12 @@ class WeaponManager:
 			if row[1] == 100:
 				return message_typesetting(9, "weapon has reached max level")
 
-			current_iron = await self.__get_material(unique_id=unique_id, material="iron")
+			if IS_MAIN_CLASS:
+				current_iron = await self.__get_material(unique_id=unique_id, material="iron")
+			else:
+				async with session.post(MANAGER_BAG_BASE_URL + '/try_iron', data={'unique_id': unique_id, "value": 0}) as resp:
+					current_iron = json.loads(await resp.text())['remaining']
+					print("async current_iron:" + str(current_iron))
 
 			skill_upgrade_number = int(iron) // self._standard_iron_count
 			if skill_upgrade_number == 0 or (current_iron // self._standard_iron_count) < skill_upgrade_number:
