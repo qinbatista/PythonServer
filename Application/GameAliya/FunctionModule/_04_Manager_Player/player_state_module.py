@@ -1,21 +1,9 @@
-import sys
 import json
-import os
-import codecs
-import threading
-import pymysql
 import random
 import time
 from datetime import datetime
 
-def PythonLocation():
-	return os.path.dirname(os.path.realpath(__file__))
 
-
-from Utility import LogRecorder, EncryptionAlgorithm
-from Utility.LogRecorder import LogUtility as Log
-from Utility.sql_manager import game_aliya as gasql
-from Utility.AnalysisHeader import message_constructor as mc
 
 
 class PlayerStateSystemClass():
