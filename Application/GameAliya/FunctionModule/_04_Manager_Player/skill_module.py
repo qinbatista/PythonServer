@@ -42,23 +42,30 @@ class SkillManager:
 		# 1 - User does not have that skill
 		# 4 - User does not have enough scrolls
 		# 9 - Skill already at max level
-		async with ClientSession() as session:
-			skill_level = await self._get_skill_level(unique_id, skill_id)
-			if skill_level == 0:
-				return self.message_typesetting(1, 'User does not have that skill')
-			if skill_level >= 10:
-				return self.message_typesetting(9, 'Skill already max level')
-			async with session.post(BAG_BASE_URL + '/try_'+scroll_id, data = {'unique_id' : unique_id, 'value' : -1}) as resp:
-				resp = await resp.json(content_type='text/json')
-				if resp['status'] == 1:
-					return self.message_typesetting(4, 'User does not have enough scrolls')
-				scroll_quantity = resp['remaining']
-			
-			if not await self._roll_for_upgrade(scroll_id):
-				return self.message_typesetting(0, 'success', {'skill1' : [skill_id, skill_level], 'item1' : [scroll_id, scroll_quantity], 'upgrade' : '1'})
+		skill_level = await self._get_skill_level(unique_id, skill_id)
+		if skill_level == 0:
+			return self.message_typesetting(1, 'User does not have that skill')
+		if skill_level >= 10:
+			return self.message_typesetting(9, 'Skill already max level')
 
-			await self._execute_statement('UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
-			return self.message_typesetting(0, 'success', {'skill1' : [skill_id, skill_level + 1], 'item1' : [scroll_id, scroll_quantity], 'upgrade' : '0'})
+		if self.__class__.__name__ == 'PlayerManager':
+			fn = {'skill_scroll_10' : self.try_skill_scroll_10, 'skill_scroll_30' : self.try_skill_scroll_30, 'skill_scroll_100' : self.try_skill_scroll_100}
+			f = fn[scroll_id]
+			resp = await f(unique_id, -1)
+			scroll_quantity = resp['remaining']
+		else:
+			async with ClientSession() as session:
+				async with session.post(BAG_BASE_URL + '/try_'+scroll_id, data = {'unique_id' : unique_id, 'value' : -1}) as resp:
+					resp = await resp.json(content_type='text/json')
+					if resp['status'] == 1:
+						return self.message_typesetting(4, 'User does not have enough scrolls')
+					scroll_quantity = resp['remaining']
+			
+		if not await self._roll_for_upgrade(scroll_id):
+			return self.message_typesetting(0, 'success', {'skill1' : [skill_id, skill_level], 'item1' : [scroll_id, scroll_quantity], 'upgrade' : '1'})
+
+		await self._execute_statement('UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
+		return self.message_typesetting(0, 'success', {'skill1' : [skill_id, skill_level + 1], 'item1' : [scroll_id, scroll_quantity], 'upgrade' : '0'})
 
 			
 
