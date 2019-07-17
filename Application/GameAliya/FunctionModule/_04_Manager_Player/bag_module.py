@@ -14,11 +14,6 @@ from Utility.sql_manager import game_aliya_table as gasql_t
 from Utility.AnalysisHeader import message_constructor as mc
 
 
-# Format the information
-def message_typesetting(status: int, message: str, data: dict={}) -> dict:
-	return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
-
-
 class BagSystemClass:
 	def __init__(self, *args, **kwargs):
 		# This is the connection pool to the SQL server. These connections stay open
@@ -50,6 +45,15 @@ class BagSystemClass:
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
+
+	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
+		"""
+		Format the information
+		:param message:说明语句
+		:param data:json数据
+		:return:返回客户端需要的json数据
+		"""
+		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
 	async def __update_material(self, unique_id: str, material: str, material_value: int) -> int:
 		"""
