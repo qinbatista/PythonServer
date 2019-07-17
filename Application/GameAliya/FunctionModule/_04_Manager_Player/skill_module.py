@@ -20,10 +20,15 @@
 import json
 import random
 import tormysql
+import configparser
 from aiohttp import web
 from aiohttp import ClientSession
 
-PLAYERSTATE_BASE_URL = 'http://localhost:8090'
+CONFIG = configparser.ConfigParser()
+CONFIG.read('../../Configuration/server.conf')
+
+
+PLAYERSTATE_BASE_URL = 'http://localhost:' + CONFIG['_04_Manager_Player']['port']
 
 
 # Part (1 / 2)
@@ -163,16 +168,11 @@ async def __get_skill(request: web.Request) -> web.Response:
 
 
 
-
-
-
-
-
-def run(port: int):
+def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=port)
+	web.run_app(app, port=CONFIG.getint('skill_manager', 'port'))
 
 
 if __name__ == '__main__':
-	run(8089)
+	run()

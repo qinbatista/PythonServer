@@ -1,17 +1,14 @@
+
+
+
 import random
 import json
-import os
+import configparser
 import tormysql
 from aiohttp import web
 
-
-def PythonLocation():
-	return os.path.dirname(os.path.realpath(__file__))
-
-from Utility.sql_manager import game_aliya as gasql
-from Utility.sql_manager import game_aliya_update as gasql_update
-from Utility.sql_manager import game_aliya_table as gasql_t
-from Utility.AnalysisHeader import message_constructor as mc
+CONFIG = configparser.ConfigParser()
+CONFIG.read('../../Configuration/server.conf')
 
 
 # Format the information
@@ -261,11 +258,11 @@ async def __try_coin(request: web.Request) -> web.Response:
 	return _json_response(result)
 
 
-def run(port):
+def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=port)
+	web.run_app(app, port=CONFIG.getint('bag_manager', 'port'))
 
 
 if __name__ == "__main__":
-	run(9999)
+	run()
