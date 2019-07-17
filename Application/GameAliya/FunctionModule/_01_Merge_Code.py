@@ -86,7 +86,6 @@ def get_class_method(file_path):
 def get_import(file_path):
 	file_object = open(file_path,encoding="utf-8")
 	global import_code
-	import_code = []
 	all_the_text = file_object.readlines()
 	is_find_import_insert_key=False
 	for i in all_the_text:

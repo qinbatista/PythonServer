@@ -8,10 +8,6 @@ import random
 import time
 from datetime import datetime
 
-def PythonLocation():
-	return os.path.dirname(os.path.realpath(__file__))
-
-
 from Utility import LogRecorder, EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import game_aliya as gasql
@@ -117,6 +113,8 @@ class PlayerStateSystemClass():
 		sql_result = gasql("select count(unique_id) from player_status where  unique_id='" + unique_id + "'")
 		if sql_result[0][0] <= 0:
 			gasql("INSERT INTO player_status(unique_id) VALUES ('" + unique_id + "')")
+def PythonLocation():
+	return os.path.dirname(os.path.realpath(__file__))
 
 @ROUTES.post('/decrease_energy')
 async def __decrease_energy(request: web.Request) -> web.Response:
