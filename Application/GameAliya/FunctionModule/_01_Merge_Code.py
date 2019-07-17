@@ -90,14 +90,19 @@ def get_import(file_path):
 	is_find_import_insert_key=False
 	for i in all_the_text:
 		if is_find_import_insert_key == False and i.find("import")==0:
-			import_code.append(i)
+			import_code.append(Re_check_import(i))
 			is_find_import_insert_key=True
 		elif is_find_import_insert_key == True:
 			if i.find("class ")==0:
 				break
-			import_code.append(i)
+			import_code.append(Re_check_import(i))
 	return import_code
-
+def Re_check_import(string_line):
+	if string_line.find("CONFIG['bag_manager']")!=-1:
+		string_line = string_line.replace("CONFIG['bag_manager']","CONFIG['_04_Manager_Player']")
+	if string_line.find("../../Configuration/server.conf")!=-1:
+		string_line = string_line.replace("../../Configuration/server.conf","../Configuration/server.conf")
+	return string_line
 def merge_content_to_manager(file_name):
 	file_object = open(PythonLocation()+"/../"+file_name+".py",encoding="utf-8")
 	print(PythonLocation()+"/../"+file_name+".py")
