@@ -68,7 +68,7 @@ def get_class_method(file_path):
 			is_find_key = True
 			class_method_code.append(i)
 		elif is_find_key==True and i.find("\t")==0:
-			if i.find("async def _execute_statement")!=-1 or i.find("message_typesetting")!=-1:
+			if i.find("async def _execute_statement")!=-1 or i.find("def message_typesetting")!=-1:
 				start_continue = True
 				# class_method_code.append(i)
 			elif start_continue == True:
@@ -103,11 +103,14 @@ def merge_content_to_manager(file_name):
 	with open(PythonLocation()+"/../"+file_name+".py", 'w',encoding="utf-8") as json_file:
 		for i in new_file_content:
 			json_file.writelines(i)
+def get_import(file_name):
+	pass
 def search_merge_content(_path):
 	file_list = FindAll(_path)
 	for file_name in file_list:
 		route_list = get_routes(file_name)
 		class_method_list = get_class_method(file_name)
+		import_list = get_import(file_name)
 	# with open(PythonLocation()+"/route_list.py", 'w',encoding="utf-8") as json_file:
 	# 	for i in route_list:
 	# 		json_file.writelines(i)
