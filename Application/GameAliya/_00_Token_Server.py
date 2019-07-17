@@ -69,7 +69,7 @@ def run():
 	app['MANAGER'] = TokenServer()
 
 	config = configparser.ConfigParser()
-	config.read('Configuration/server.conf')
+	config.read('Configuration/server/1.0/server.conf')
 
 	web.run_app(app, port = config.getint('_00_Token_Server', 'port'))
 
