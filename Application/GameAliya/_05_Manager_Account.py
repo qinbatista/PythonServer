@@ -103,7 +103,7 @@ class AccountManager:
 		'''
 		data = await self._execute_statement('SELECT unique_id FROM userinfo WHERE `' + identifier + '` = "' + value + '";')
 		if data == () or (None,) in data or ('',) in data:
-			return None
+			return ""
 		return data[0][0]
 
 	async def _execute_statement(self, statement: str) -> tuple:
@@ -129,7 +129,7 @@ ROUTES = web.RouteTableDef()
 
 # Call this method whenever you return from any of the following functions.
 # This makes it very easy to construct a json response back to the caller.
-def _json_response(body: str = '', **kwargs) -> web.Response:
+def _json_response(body: dict = '', **kwargs) -> web.Response:
 	'''
 	A simple wrapper for aiohttp.web.Response return value.
 	'''
