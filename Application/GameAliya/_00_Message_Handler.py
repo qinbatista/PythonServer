@@ -13,15 +13,14 @@ def PythonLocation():
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read(PythonLocation() + './Configuration/server/1.0/server.conf')
-MANAGER_BAG_BASE_URL = 'http://localhost:' + CONFIG['_04_Manager_Player']['port']
 DESIv = CONFIG['_00_Message_Handler']['DESIv']
 DESKey = CONFIG['_00_Message_Handler']['DESKey']
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
-TOKEN_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_00_Token_Server']['port']
-MANAGER_WEAPON_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_01_Manager_Weapon']['port']
-MANAGER_LEVEL_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_03_Manager_Level']['port']
-MANAGER_PLAYERSTATE_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_04_Manager_Player']['port']
-MANAGER_ACCOUNT_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_05_Manager_Account']['port']
+TOKEN_BASE_URL = CONFIG['_00_Token_Server']['address'] + ":" + CONFIG['_00_Token_Server']['port']
+MANAGER_WEAPON_BASE_URL = CONFIG['_01_Manager_Weapon']['address'] + ":" + CONFIG['_01_Manager_Weapon']['port']
+MANAGER_LEVEL_BASE_URL = CONFIG['_03_Manager_Level']['address'] + ":" + CONFIG['_03_Manager_Level']['port']
+MANAGER_PLAYER_BASE_URL = CONFIG['_04_Manager_Player']['address'] + ":" + CONFIG['_04_Manager_Player']['port']
+MANAGER_ACCOUNT_BASE_URL = CONFIG['_05_Manager_Account']['address'] + ":" + CONFIG['_05_Manager_Account']['port']
 
 
 class InvalidHeaderError(Exception):
@@ -90,39 +89,39 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _bind_account(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/bind_account', data={'unique_id': message['data']['unique_id'], 'account': message["data"]["account"], 'password': message['data']['password']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/bind_account', data={'unique_id': message['data']['unique_id'], 'account': message["data"]["account"], 'password': message['data']['password']}) as resp:
 			return await resp.text()
 
 	async def _skill_level_up(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/skill_level_up', data={'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/skill_level_up', data={'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
 
 	async def _get_all_skill_level(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/get_all_skill_level', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/get_all_skill_level', data={'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _increase_supplies(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/increase_supplies', data={'unique_id': message['data']['unique_id'], 'supplies': message['data']['supplies'], 'amount': message['data']['amount']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/increase_supplies', data={'unique_id': message['data']['unique_id'], 'supplies': message['data']['supplies'], 'amount': message['data']['amount']}) as resp:
 			return await resp.text()
 
 	async def _get_all_supplies(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/get_all_supplies', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/get_all_supplies', data={'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _random_gift_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/random_gift_skill', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/random_gift_skill', data={'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _random_gift_segment(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/random_gift_segment', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/random_gift_segment', data={'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/get_skill', data={'unique_id': message['data']['unique_id'], 'skill_id': message["data"]["skill_id"]}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/get_skill', data={'unique_id': message['data']['unique_id'], 'skill_id': message["data"]["skill_id"]}) as resp:
 			return await resp.text()
 
 	async def _level_up_scroll(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/level_up_scroll', data={'unique_id': message['data']['unique_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/level_up_scroll', data={'unique_id': message['data']['unique_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
 	
 	# region _01_Manager_Weapon.py
@@ -148,15 +147,15 @@ class MessageHandler:
 	# endregion
 	
 	async def _pass_stage(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/pass_stage', data={'unique_id': message['data']['unique_id'], 'stage': message['data']['stage']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/pass_stage', data={'unique_id': message['data']['unique_id'], 'stage': message['data']['stage']}) as resp:
 			return await resp.text()
 
 	async def _decrease_energy(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/decrease_energy', data={'unique_id': message['data']['unique_id'], 'energy': message['data']['energy']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/decrease_energy', data={'unique_id': message['data']['unique_id'], 'energy': message['data']['energy']}) as resp:
 			return await resp.text()
 
 	async def _increase_energy(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/increase_energy', data={'unique_id': message['data']['unique_id'], 'energy': message['data']['energy']}) as resp:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/increase_energy', data={'unique_id': message['data']['unique_id'], 'energy': message['data']['energy']}) as resp:
 			return await resp.text()
 
 

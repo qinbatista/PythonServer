@@ -15,7 +15,7 @@ format_sql = {
 }
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf')
-MANAGER_BAG_BASE_URL = 'http://localhost:' + CONFIG['bag_manager']['port']
+MANAGER_BAG_BASE_URL = CONFIG['bag_manager']['address'] + ":" + CONFIG['bag_manager']['port']
 
 
 class StageSystemClass:
