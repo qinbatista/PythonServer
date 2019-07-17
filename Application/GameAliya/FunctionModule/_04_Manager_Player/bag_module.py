@@ -19,6 +19,38 @@ class BagSystemClass:
 		# TODO verify that this is true :D
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
 
+	async def get_all_head(self) -> dict:
+		"""
+		Used to get information such as the title of the database
+		用于获取数据库的标题等信息
+		:return:返回所有数据库的标题等信息，json数据
+		"""
+		data = await self._execute_statement("desc player;")
+		return self.__internal_format(status=0, remaining=data)
+
+	async def get_all_material(self, unique_id: str) -> dict:
+		"""
+		Used to get all numeric or string information
+		用于获取所有的数字或字符串信息
+		:param unique_id: 用户的唯一标识
+		:return:返回所有材料名对应的值，json数据
+		"""
+		data = await self._execute_statement("SELECT * FROM player WHERE unique_id='" + str(unique_id) + "'")
+		return self.__internal_format(status=0, remaining=data[0])
+
+	async def set_all_material(self, statement: str) -> dict:
+		"""
+		Perform all material update operations
+		执行所有材料的更新操作
+		:param statement:mysql执行语句
+		:return:返回json数据， status：0成功，1失败
+		"""
+		if ",unique_id=" in statement.replace(" ", "").lower() or "setunique_id=" in statement.replace(" ", "").lower():
+			print("[set_all_material] -> mysql注入语句：" + statement)
+			return self.__internal_format(status=1, remaining=statement)
+		data = await self._execute_statement_update(statement=statement)
+		return self.__internal_format(status=data, remaining=data)
+
 	async def __update_material(self, unique_id: str, material: str, material_value: int) -> int:
 		"""
 		Used to set information such as numeric values
@@ -52,7 +84,7 @@ class BagSystemClass:
 		"""
 		return await self._execute_statement_update("UPDATE player SET " + material + "='" + str(material_value) + "' where unique_id='" + unique_id + "'")
 
-	def __internal_format(self, status: int, remaining: int) -> dict:
+	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
 		"""
 		Internal json formatted information
 		内部json格式化信息
@@ -62,7 +94,7 @@ class BagSystemClass:
 		"""
 		return {"status": status, "remaining": remaining}
 
-	async def __try_material(self, unique_id: str,key: str, value: int) -> dict:
+	async def __try_material(self, unique_id: str, key: str, value: int) -> dict:
 		"""
 		Try to change the database information
 		A status of 0 is a success and a 1 is a failure.
@@ -259,6 +291,26 @@ async def __try_coin(request: web.Request) -> web.Response:
 async def __try_coin(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_small_energy_potion(unique_id=post['unique_id'], value=int(post['value']))
+	return _json_response(result)
+
+
+@ROUTES.post('/get_all_head')
+async def __get_all_head(request: web.Request) -> web.Response:
+	result = await MANAGER.get_all_head()
+	return _json_response(result)
+
+
+@ROUTES.post('/get_all_material')
+async def __get_all_material(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.get_all_material(unique_id=post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/set_all_material')
+async def __set_all_material(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.set_all_material(statement=post['statement'])
 	return _json_response(result)
 
 

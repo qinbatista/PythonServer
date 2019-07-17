@@ -70,7 +70,6 @@ class PlayerStateManager:
 		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
 
-
 # Part (2 / 2)
 MANAGER = PlayerStateManager()  # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
