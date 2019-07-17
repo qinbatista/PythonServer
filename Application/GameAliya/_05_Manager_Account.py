@@ -25,6 +25,12 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 
+CONFIG = configparser.ConfigParser()
+CONFIG.read('Configuration/server.conf')
+
+
+TOKEN_SERVER_BASE_URL = 'http://localhost:' + CONFIG['_00_Token_Server']['port']
+
 
 # Part (1 / 2)
 class AccountManager:
@@ -36,11 +42,24 @@ class AccountManager:
 
 	async def login(self, identifier: str, value: str, password: str) -> dict:
 		valid = await self._valid_credentials(identifier, value, password)
-		if valid:
-			unique_id = await self._get_unique_id(identifier, value)
+		if not valid:
+			return self.message_typesetting(1, 'Invalid credentials')
+		unique_id = await self._get_unique_id(identifier, value)
+		resp = await self._request_new_token(unique_id, await self._get_prev_token(identifier, value))
+		await self._register_token(unique_id, resp['token'])
+		return self.message_typesetting(0, 'success', resp)
 
-	async def login_unique(self, identifier: str, value: str, password: str) -> dict:
-		pass
+	async def login_unique(self, unique_id: str) -> dict:
+		if not await self._check_exists('unique_id', unique_id):
+			await self._create_new_user(unique_id)
+			prev_token = ''
+		elif await self._account_is_bound(unique_id):
+			return self.message_typesetting(2, 'account already bound')
+		else:
+			prev_token = await self._get_prev_token('unique_id', unique_id)
+		resp = await self._request_new_token(unique_id, prev_token)
+		await self._register_token(unique_id, resp['token'])
+		return self.message_typesetting(0, 'success', resp)
 
 
 
@@ -49,10 +68,33 @@ class AccountManager:
 			#          P R I V A T E		   #
 			####################################
 
+	async def _check_exists(self, identifier: str, value: str) -> bool:
+		data = await self._execute_statement('SELECT `' + identifier + '` FROM userinfo WHERE `' + identifier + '` = "' + value + '";')
+		if () == data or ('',) in data or (None,) in data:
+			return False
+		return True
+
+	async def _account_is_bound(self, unique_id: str) -> bool:
+		data = await self._execute_statement('SELECT account FROM userinfo WHERE unique_id = "' + unique_id + '";')
+		if ('',) in data or () == data or (None,) in data:
+			return False
+		return True
+
+	async def _register_token(self, unique_id: str, token: str) -> None:
+		await self._execute_statement('UPDATE userinfo SET token = "' + token + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _get_prev_token(self, identifier: str, value: str) -> str:
+		data = await self._execute_statement('SELECT token FROM userinfo WHERE `' + identifier + '` = "' + value + '";')
+		return data[0][0]
 
 	async def _valid_credentials(self, identifier: str, value: str, password: str) -> bool:
 		p = await self._execute_statement('SELECT password FROM userinfo WHERE `' + identifier + '` = "' + value + '";')
 		return (password,) in p
+
+	async def _request_new_token(self, unique_id: str, prev_token: str = ''):
+		async with ClientSession() as session:
+			async with session.post(TOKEN_SERVER_BASE_URL + '/issue_token', data = {'unique_id' : unique_id, 'prev_token' : prev_token}) as resp:
+				return await resp.json(content_type = 'text/json')
 
 
 	async def _get_unique_id(self, identifier: str, value: str) -> str:
@@ -63,8 +105,6 @@ class AccountManager:
 		if data == () or (None,) in data or ('',) in data:
 			return None
 		return data[0][0]
-
-
 
 	async def _execute_statement(self, statement: str) -> tuple:
 		'''
@@ -78,9 +118,6 @@ class AccountManager:
 
 	def message_typesetting(self, status: int, message: str, data: dict={}) -> dict:
 		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
-
-
-
 
 
 
@@ -101,14 +138,18 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 	return web.Response(**kwargs)
 
 
-@ROUTES.post('/level_up_skill')
-async def __get_all_skill_level(request: web.Request) -> web.Response:
+@ROUTES.post('/login')
+async def __login(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = await MANAGER.level_up_skill(post['unique_id'], post['skill_id'], post['scroll_id'])
+	data = await MANAGER.login(post['identifier'], post['value'], post['password'])
 	return _json_response(data)
 
 
-
+@ROUTES.post('/login_unique')
+async def __login(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.login_unique(post['unique_id'])
+	return _json_response(data)
 
 
 
@@ -116,7 +157,7 @@ async def __get_all_skill_level(request: web.Request) -> web.Response:
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port = 8888)
+	web.run_app(app, port = CONFIG.getint('_05_Manager_Account', 'port'))
 
 
 if __name__ == '__main__':
