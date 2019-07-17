@@ -24,9 +24,6 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 
-IS_MAIN_CLASS = True
-
-
 # Part (1 / 2)
 class PlayerStateManager:
 	def __init__(self):

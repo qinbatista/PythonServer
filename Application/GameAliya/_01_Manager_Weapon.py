@@ -17,9 +17,6 @@ class WeaponUpgradeError(Exception):
 		self.message = message
 
 
-IS_MAIN_CLASS = False
-
-
 # Format the information
 def message_typesetting(status: int, message: str, data: dict={}) -> dict:
 	return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
@@ -55,8 +52,9 @@ class WeaponManager:
 			if row[1] == 100:
 				return message_typesetting(9, "weapon has reached max level")
 
-			if IS_MAIN_CLASS:
+			if self.__class__.__name__ == "WeaponManager":
 				current_iron = await self.__get_material(unique_id=unique_id, material="iron")
+				print("WeaponManager current_iron:" + str(current_iron))
 			else:
 				async with session.post(MANAGER_BAG_BASE_URL + '/try_iron', data={'unique_id': unique_id, "value": 0}) as resp:
 					current_iron = json.loads(await resp.text())['remaining']
@@ -215,7 +213,7 @@ class WeaponManager:
 		return await self._execute_statement_update("UPDATE bag SET " + material + "=" + str(material_value) + " where unique_id='" + unique_id + "'")
 
 	async def __get_material(self, unique_id: str, material: str) -> int:
-		data = await self._execute_statement("SELECT " + material + " FROM bag WHERE unique_id='" + str(unique_id) + "'")
+		data = await self._execute_statement("SELECT " + material + " FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return data[0][0]
 
 	async def __set_weapon_level_up_data(self, unique_id: str, weapon: str, weapon_level: int, skill_point: int):
