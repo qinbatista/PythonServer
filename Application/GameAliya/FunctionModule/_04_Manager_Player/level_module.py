@@ -6,12 +6,6 @@ import codecs
 import threading
 import pymysql
 import random
-
-
-def PythonLocation():
-	return os.path.dirname(os.path.realpath(__file__))
-
-
 from Utility import LogRecorder, EncryptionAlgorithm
 from Utility.LogRecorder import LogUtility as Log
 from Utility.sql_manager import game_aliya as gasql
@@ -161,6 +155,8 @@ class LevelSystemClass:
 			print("[LevelSystemClass][__check_table] -> sql_result:" + str(sql_result))
 
 
+def PythonLocation():
+	return os.path.dirname(os.path.realpath(__file__))
 def read_json_data() -> list:
 	data = []
 	if os.path.exists(JSON_NAME):
