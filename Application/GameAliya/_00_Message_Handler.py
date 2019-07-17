@@ -2,18 +2,21 @@ import json
 import pyDes
 import base64
 import configparser
+import os
 
 # DESIv = '67891234'
 # DESKey = '6789123467891234'
 #
 # MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
+def PythonLocation():
+    return os.path.dirname(os.path.realpath(__file__))
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read('./Configuration/server/1.0/server.conf')
+CONFIG.read(PythonLocation() + './Configuration/server/1.0/server.conf')
 MANAGER_BAG_BASE_URL = 'http://localhost:' + CONFIG['_04_Manager_Player']['port']
 DESIv = CONFIG['_00_Message_Handler']['DESIv']
 DESKey = CONFIG['_00_Message_Handler']['DESKey']
-MD5_ALIYA = CONFIG['_00_Message_Handler']['MD5_ALIYA']
+MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 TOKEN_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_00_Token_Server']['port']
 MANAGER_WEAPON_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_01_Manager_Weapon']['port']
 MANAGER_LEVEL_BASE_URL = CONFIG['_00_Message_Handler']['IP'] + CONFIG['_03_Manager_Level']['port']
@@ -79,11 +82,11 @@ class MessageHandler:
 		return str(size).zfill(4).encode()
 #
 	async def _login(self, message: dict, session) -> str:
-		async with session.post(TOKEN_BASE_URL + '/login', data={'identifier': message['data']['identifier'], 'value': message['data']['value'], 'password': message['data']['password']}) as resp:
+		async with session.post(MANAGER_ACCOUNT_BASE_URL + '/login', data={'identifier': message['data']['identifier'], 'value': message['data']['value'], 'password': message['data']['password']}) as resp:
 			return await resp.text()
 
 	async def _login_unique(self, message: dict, session) -> str:
-		async with session.post(TOKEN_BASE_URL + '/login_unique', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_ACCOUNT_BASE_URL + '/login_unique', data={'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _bind_account(self, message: dict, session) -> str:
@@ -144,8 +147,8 @@ class MessageHandler:
 			return await resp.text()
 	# endregion
 	
-	async def _pass_level(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/pass_level', data={'unique_id': message['data']['unique_id'], 'level_id': message['data']['level_id']}) as resp:
+	async def _pass_stage(self, message: dict, session) -> str:
+		async with session.post(MANAGER_PLAYERSTATE_BASE_URL + '/pass_stage', data={'unique_id': message['data']['unique_id'], 'stage': message['data']['stage']}) as resp:
 			return await resp.text()
 
 	async def _decrease_energy(self, message: dict, session) -> str:
@@ -171,7 +174,7 @@ FUNCTION_LIST = {
 	# 'get_level_setting': MessageHandler._get_level_setting,
 
 	#Manager_Level
-	'pass_level': MessageHandler._pass_level,
+	'pass_stage': MessageHandler._pass_stage,
 
 	#Manager_PlayerState(player_state_module.py,bag_module.py,lottery_module,skill_module)
 	'get_all_supplies': MessageHandler._get_all_supplies,
