@@ -27,7 +27,7 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read('../../Configuration/server.conf')
+CONFIG.read('../../Configuration/server/1.0/server.conf')
 
 BAG_BASE_URL = 'http://localhost:' + CONFIG['bag_manager']['port']
 

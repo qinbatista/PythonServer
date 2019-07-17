@@ -26,7 +26,7 @@ from aiohttp import ClientSession
 
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read('Configuration/server.conf')
+CONFIG.read('Configuration/server/1.0/server.conf')
 
 
 TOKEN_SERVER_BASE_URL = 'http://localhost:' + CONFIG['_00_Token_Server']['port']
