@@ -1,168 +1,43 @@
-# A token server based on the JWT token standard, with a few modifications.
-#
-# The token server should keep a log of all issued tokens until they expire.
-# If a user tries to log in from a different device, any previous tokens issued
-# should be invalidated. A token can be invalidated by quarantining it until its
-# natural expiration time.
-#
-# Tokens are only deemed to be valid if they are both not yet expired, and they
-# have not been invalidated.
-#
-# The server provides the following API calls:
-#
-#	-	POST /login {identifier: str, value: str, password: str}
-#		The identifier tells the server which type of credential the client supplied.
-#		Valid identifiers are ONLY the following: 'account', 'email', 'phone_number'.
-#		The value is the value corresponding to the type of identifier supplied. For example,
-#		if the identifier is 'account', then the value would be the account name.
-#
-#		200 OK
-#		Returns a new token if the credentials could be verified.
-#		Previously issued tokens for the corresponding unique_id are invalidated.
-#
-#		400 Bad Request
-#		The credentials could not be verified.
-#
-#
-#	-	POST /login_unique {unique_id: str}
-#		This API call will only return a token if the user has not already bound their account.
-#		If the unique_id can not be found, a new user will be created and a token returned.
-#
-#		200 OK
-#		Returns a new token.
-#		Previously issued tokens for the unique_id are invalidated.
-#
-#		400 Bad Request
-#		The unique_id could not be found, or the unique_id has already been bound.
-#
-#
-#	-	GET /validate
-#		HEADER		Authorization: <token>
-#		A request to this method should include the token in the Authorization header.
-#
-#		200 OK
-#		The token is valid. Returns the unique_id of the token holder.
-#
-#		400 Bad Request
-#		The token is not valid.
-#
-#
-#####################################################################################
-
 import jwt
 import json
 import random
 import configparser
 
-import _05_Manager_User as UserManager
 
 from aiohttp import web
 from datetime import datetime, timedelta
 
 # NOTE THIS IS NOT PRODUCTION READY
 # SECRET SHOULD BE READ FROM ENVIRONMENT VARIABLE
-SECRET = 'password'
-ALG = 'HS256'
-DELTA = 360
-ROUTES = web.RouteTableDef()
-if __name__ == '__main__':
-	USER_MANAGER = UserManager.UserManager()
-INVALIDATED = set()
+
+class TokenServer:
+	def __init__(self):
+		self._invalidated = set()
+		self._secret = 'password'
+		self._alg = 'HS256'
+		self._delta = 500
+
+	
+	async def issue_token(self, unique_id: str, prev_token: str) -> dict:
+		self._invalidated.add(prev_token)
+		payload = {'exp': datetime.utcnow() + timedelta(seconds=self._delta), 'unique_id': unique_id}
+		token = jwt.encode(payload, self._secret, self._alg)
+		return {'token' : token.decode('utf-8')}
 
 
-class InvalidatedTokenError(Exception):
-	pass
+	async def validate(self, token: str) -> dict:
+		if token in self._invalidated:
+			return self._message_typesetting(1, 'invalid token')
+		try:
+			payload = jwt.decode(token, self._secret, algorithms = [self._alg])
+		except (jwt.DecodeError, jwt.ExpiredSignatureError):
+			return self._message_typesetting(1, 'invalid token')
+		else:
+			return self._message_typesetting(0, 'authorized', {'unique_id' : payload['unique_id']})
 
 
-# Format the information
-def message_typesetting(status: int, message: str, data: dict={}) -> dict:
-	result_dict = {
-		"status": status,
-		"message": message,
-		"random": random.randint(-1000, 1000),
-		"data": data
-	}
-	return result_dict
-
-
-def run():
-
-	config = configparser.ConfigParser()
-	config.read('server.conf')
-
-	app = web.Application()
-	app.add_routes(ROUTES)
-	web.run_app(app, port=int(config['TokenServer']['port']))
-
-
-@ROUTES.post('/login_unique')
-async def _login_unique(request: web.Request) -> web.Response:
-	post = await request.post()
-	exists = await USER_MANAGER.check_exists('unique_id', post['unique_id'])
-	if not exists:  # create a new account
-		await USER_MANAGER.register_unique_id(post['unique_id'])
-		token = await _issue_new_token(post['unique_id'])
-		return _json_response(message_typesetting(1, "new account created", {'token': token.decode('utf-8')}))
-	bound = await USER_MANAGER.account_is_bound(post['unique_id'])
-	if bound:
-		return _json_response(message_typesetting(2, "The account corresponding to this unique_id has already been bound. Please log in using a different method."), status=400)
-	token = await _issue_new_token(post['unique_id'])
-	return _json_response(message_typesetting(0, "success", {'token': token.decode('utf-8')}))
-
-
-@ROUTES.post('/login')
-async def _login(request: web.Request) -> web.Response:
-	post = await request.post()
-	try:
-		await USER_MANAGER.validate_credentials(post['password'], post['identifier'], post['value'])
-		unique_id = await USER_MANAGER.fetch_unique_id(post['identifier'], post['value'])
-		token = await _issue_new_token(unique_id)
-	except UserManager.CredentialError:
-		return _json_response(message_typesetting(1, "Invalid credentials"), status=400)
-	return _json_response(message_typesetting(0, "success", {'token': token.decode('utf-8')}))
-
-
-@ROUTES.get('/validate')
-async def _validate(request: web.Request) -> web.Response:
-	token = request.headers.get('authorization', None)
-	try:
-		_check_invalidated(token)
-		payload = jwt.decode(token, SECRET, algorithms=[ALG])
-	except (jwt.DecodeError, jwt.ExpiredSignatureError):
-		return _json_response({'message': 'Token expired or could not be decoded'}, status=400)
-	except InvalidatedTokenError:
-		return _json_response({'message': 'Invalidated token'}, status=400)
-	return _json_response({'unique_id': payload['unique_id']}, status=200)
-
-
-async def _issue_new_token(unique_id: str) -> str:
-	'''
-	Issues a new token for the unique_id.
-	Records the latest issued token for this user.
-	'''
-	payload = {'exp': datetime.utcnow() + timedelta(seconds=DELTA), 'unique_id': unique_id}
-	token = jwt.encode(payload, SECRET, ALG)
-	await _invalidate_previous_token(unique_id)
-	await USER_MANAGER.update_token(unique_id, token.decode('utf-8'))
-	return token
-
-
-async def _invalidate_previous_token(unique_id: str) -> None:
-	'''
-	Invalidates the most recently issued token for the unique_id.
-	'''
-	previous_token = await USER_MANAGER.fetch_token(unique_id)
-	if previous_token:
-		INVALIDATED.add(previous_token)
-
-
-def _check_invalidated(token: str) -> None:
-	'''
-	Raises InvalidatedTokenError if the token has been invalidated.
-	'''
-	if token in INVALIDATED:
-		raise InvalidatedTokenError
-
+	def _message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
+		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
 
 def _json_response(body: dict = '', **kwargs) -> web.Response:
 	'''
@@ -173,7 +48,30 @@ def _json_response(body: dict = '', **kwargs) -> web.Response:
 	kwargs['content_type'] = 'text/json'
 	return web.Response(**kwargs)
 
+ROUTES = web.RouteTableDef()
+@ROUTES.post('/issue_token')
+async def __issue_token(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await (request.app['MANAGER']).issue_token(post['unique_id'], post['prev_token'])
+	return _json_response(data)
 
+
+@ROUTES.post('/validate')
+async def __issue_token(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await (request.app['MANAGER']).validate(post['token'])
+	return _json_response(data)
+
+
+def run():
+	app = web.Application()
+	app.add_routes(ROUTES)
+	app['MANAGER'] = TokenServer()
+
+	config = configparser.ConfigParser()
+	config.read('Configuration/server.conf')
+
+	web.run_app(app, port = config.getint('_00_Token_Server', 'port'))
 
 if __name__ == '__main__':
 	run()
