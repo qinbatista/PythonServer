@@ -1,122 +1,146 @@
-import json
-import random
+#
+# An example for an SQL manager server using asyncio programming methods.
+# We will use aiohttp library to network these API calls so that they can be
+# accessed from different physical devices on the network.
+# Additionally, we will be using tormysql library to manage the SQL server pool
+# of connections.
+#
+# All functions that connect to the database should be async. The more async code
+# we use, the faster the entire server becomes.
+#
+#
+# The file has two parts:
+#	- The DefaultManager class
+#	- The aiohttp server bindings for the class methods
+#
+###############################################################################
+
+
+# Some safe default includes. Feel free to add more if you need.
 import time
 from datetime import datetime
+import json
+import random
+import tormysql
+import configparser
+from aiohttp import web
+from aiohttp import ClientSession
+
+CONFIG = configparser.ConfigParser()
+CONFIG.read('../../Configuration/server.conf')
+
+BAG_BASE_URL = 'http://localhost:' + CONFIG['bag_manager']['port']
 
 
+# Part (1 / 2)
+class PlayerStateManager:
+	def __init__(self):
+		# This is the connection pool to the SQL server. These connections stay open
+		# for as long as this class is alive. 
+		self._pool = tormysql.ConnectionPool(max_connections=10, host=CONFIG['database']['ip'], user='root', passwd='lukseun', db='aliya', charset='utf8')
+		self._recover_time = 30
+		self._full_energy = 10
+	
+
+	async def try_energy(self, unique_id: str, amount: int) -> dict:
+		if amount > 0:
+			return await self._decrease_energy(unique_id, -1 * amount)
+		elif amount < 0:
+			return await self._decrease_energy(unique_id, amount)
+		else:
+			energy, last_time = await self._get_energy_information(unique_id)
+			return self.message_typesetting(0, 'success', {'energy' : energy, 'recover_time' : last_time})
 
 
-class PlayerStateSystemClass():
-	def __init__(self, token, *args, **kwargs):
-		self.unique_id = self.__get_unique_id(token)
-		self.item_list_count = 0
-		self.recover_time = 30
-		self.full_energy = 10
-	def _decrease_energy(self,message_info):
-		message_dic = eval(message_info)
-		if "data" in message_dic.keys():
-			cost_energy = message_dic["data"]["energy"]
-			sql_result = gasql("select energy, energy_recover_time from player_status where unique_id='" + self.unique_id + "'")
-			remain_energy = int(sql_result[0][0])
-			energy_time = sql_result[0][1]
-			cost_energy_int = int(cost_energy)
-			if sql_result[0][1]=="":
-				if remain_energy >=0:
-					if remain_energy-cost_energy_int>self.full_energy:
-						# if energy is more than cast, reduce energy,if energy over 10, record time
-						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy>=self.full_energy")
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "-" + str(cost_energy) + ",energy_recover_time='"+""+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "decrease energy success, reamian energy is over full energy, remove recoerd time")
-					elif remain_energy-cost_energy_int==self.full_energy:
-						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy>=self.full_energy")
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "-" + str(cost_energy) + ",energy_recover_time='"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "decrease energy success, reamian energy is full energy, recovering energy")
-					else:
-						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy<=self.full_energy")
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "-" + str(cost_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "decrease energy success,recovering time have problem beacuse it is empty, start recovering energy")
-				else:
-					return mc("1", "energy error")
+			####################################
+			#          P R I V A T E		   #
+			####################################
+	async def _decrease_energy(self, unique_id: str, amount: int) -> dict:
+		current_energy, recover_time = await self._get_energy_information(unique_id)
+		if recover_time == '':
+			if current_energy - amount > self._full_energy:
+				await self._execute_statement('UPDATE player SET energy = "' + str(current_energy - amount) + '", recover_time = "" WHERE unique_id = "' + unique_id + '";')
+				return self.message_typesetting(0, 'decrease success, remaining energy is over full energy, removed recover time', {'energy' : current_energy - amount})
+			elif current_energy - amount == self._full_energy:
+				await self._execute_statement('UPDATE player SET energy = "' + str(current_energy - amount) + '", recover_time = "' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '" WHERE unique_id = "' + unique_id + '";')
+				return self.message_typesetting(0, 'decrease success, remaining energy full, recovering energy', {'energy' : current_energy - amount})
 			else:
-				y = datetime.strptime(energy_time, '%Y-%m-%d %H:%M:%S')
-				z = datetime.strptime(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), '%Y-%m-%d %H:%M:%S')
-				diff = z-y
-				recover_energy = int(diff.seconds/60/20)
-				if recover_energy+remain_energy-cost_energy_int >=0:
-					if recover_energy+remain_energy-cost_energy_int>10:
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(10) + "-" + str(cost_energy) + ", energy_recover_time = '"+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "energy is over full energy, remove recoerd time")
-					elif gasql("UPDATE player_status SET " + "energy" + "=" + str(recover_energy+remain_energy) + "-" + str(cost_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'"):
-						return mc("0", "energy is over full energy, start recoerding time")
-					else:
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(recover_energy+remain_energy) + "-" + str(cost_energy) + ", energy_recover_time = '"+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "energy is not full, keep time")
-				else:
-					return mc("1", "energy error")
+				await self._execute_statement('UPDATE player SET energy = "' + str(current_energy - amount) + '", recover_time = "' + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) + '" WHERE unique_id = "' + unique_id + '";')
+				return self.message_typesetting(0, 'decrease success, start recovering energy', {'energy' : current - amount})
 		else:
-			return mc("1", "data is null")
-
-	def _increase_energy(self,message_info):
-		message_dic = eval(message_info)
-		if "data" in message_dic.keys():
-			increase_energy = message_dic["data"]["energy"]
-			sql_result = gasql("select energy, energy_recover_time from player_status where unique_id='" + self.unique_id + "'")
-			remain_energy = int(sql_result[0][0])
-			energy_time = sql_result[0][1]
-			increase_energy_int = int(increase_energy)
-			if sql_result[0][1]=="":
-				if remain_energy >=0:
-					if remain_energy+increase_energy_int>=self.full_energy:
-						# if energy is more than cast, reduce energy,if energy over 10, record time
-						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy>=self.full_energy")
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "+" + str(increase_energy) + " WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "increase energy success, reamian energy is over full energy")
-					else:
-						Log("[PlayerStateSystemClass][_decrease_energy] remain_energy<=self.full_energy")
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(remain_energy) + "+" + str(increase_energy) + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "increase energy success, remain energy is lessing than full energy, start recovering energy")
+			delta_time = datetime.strptime(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
+			recovered_energy = int(delta_time.seconds / 60 / 20)
+			if recovered_energy + current_energy - amount >= 0:
+				if recovered_energy + current_energy - amount > 10:
+					await self._execute_statement('UPDATE player SET energy = "' + str(10 - amount) + '", recover_time = "" WHERE unique_id = "' + unique_id + '";')
+					return self.message_typesetting(0, 'energy over full energy, remove record time', {'energy' : 10 - amount})
 				else:
-					return mc("1", "energy error")
-			else:
-				y = datetime.strptime(energy_time, '%Y-%m-%d %H:%M:%S')
-				z = datetime.strptime(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), '%Y-%m-%d %H:%M:%S')
-				diff = z-y
-				recover_energy = int(diff.seconds/60/20)
-				if recover_energy+remain_energy+increase_energy_int >=0:
-					if recover_energy+remain_energy+increase_energy_int>=self.full_energy:
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(10) + "+" + increase_energy + ", energy_recover_time = '"+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "energy is over full energy, remove time recoerd")
-					else:
-						gasql("UPDATE player_status SET " + "energy" + "=" + str(recover_energy+remain_energy) + "+" + increase_energy + ", energy_recover_time = '"+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())+"' WHERE unique_id='" + self.unique_id + "'")
-						return mc("0", "energy is full energy, start recoerd time")
-				else:
-					return mc("1", "energy error")
-		else:
-			return mc("1", "data is null")
-	def __get_unique_id(self, token):
-		sql_result = gasql("select unique_id from userinfo where  token='" + token + "'")
-		if len(sql_result[0][0]) <= 0:
-			return ""
-		else:
-			self.__check_table(sql_result[0][0])
-			return sql_result[0][0]
+					await self._execute_statement('UPDATE player SET energy = "' + str(recovered_energy + current_energy - amount) + '", recover_time = "' + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) + '" WHERE unique_id = "' + unique_id + '";')
+					return self.message_typesetting(0, 'success, recovering energy', {'energy' : recovered_energy + current_energy - amount})
+		return self.message_typesetting(1, 'energy error')
 
-	def __check_table(self, unique_id):
-		sql_result = gasql("select count(unique_id) from player_status where  unique_id='" + unique_id + "'")
-		if sql_result[0][0] <= 0:
-			gasql("INSERT INTO player_status(unique_id) VALUES ('" + unique_id + "')")
 
-@ROUTES.post('/decrease_energy')
+
+
+
+
+	async def _get_energy_information(self, unique_id: str) -> tuple:
+		data = await self._execute_statement('SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
+		return (data[0][0], data[0][1])
+		
+		
+
+	# It is helpful to define a private method that you can simply pass
+	# an SQL command as a string and it will execute. Call this method
+	# whenever you issue an SQL statement.
+	async def _execute_statement(self, statement: str) -> tuple:
+		'''
+		Executes the given statement and returns the result.
+		'''
+		async with await self._pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				await cursor.execute(statement)
+				data = cursor.fetchall()
+				return data
+
+	def message_typesetting(self, status: int, message: str, data: dict={}) -> dict:
+		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
+
+
+
+
+
+
+
+# Part (2 / 2)
+MANAGER = PlayerStateManager()  # we want to define a single instance of the class
+ROUTES = web.RouteTableDef()
+
+
+# Call this method whenever you return from any of the following functions.
+# This makes it very easy to construct a json response back to the caller.
+def _json_response(body: str = '', **kwargs) -> web.Response:
+	'''
+	A simple wrapper for aiohttp.web.Response return value.
+	'''
+	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
+	kwargs['content_type'] = 'text/json'
+	return web.Response(**kwargs)
+
+
+@ROUTES.post('/try_energy')
 async def __decrease_energy(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = await MANAGER.decrease_energy(post['unique_id'], post['weapon'])
+	data = await MANAGER.try_energy(post['unique_id'], int(post['amount']))
 	return _json_response(data)
 
-@ROUTES.post('/increase_energy')
-async def __increase_energy(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await MANAGER.increase_energy(post['unique_id'], post['weapon'])
-	return _json_response(data)
 
-if __name__ == "__main__":
-	pass
+
+def run():
+	app = web.Application()
+	app.add_routes(ROUTES)
+	web.run_app(app, port=CONFIG.getint('player_state_manager', 'port'))
+
+
+if __name__ == '__main__':
+	run()
