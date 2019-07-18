@@ -102,7 +102,7 @@ from aiohttp import ClientSession
 
 
 # Part (1 / 2)
-class PlayerStateManager:
+class PlayerManager:
 	async def get_all_head(self) -> dict:
 		"""
 		Used to get information such as the title of the database
@@ -274,7 +274,6 @@ class PlayerStateManager:
 	async def random_gift_segment(self, unique_id: str) -> dict:
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
-		
 		async with ClientSession() as session:
 			async with session.post(WEAPON_BASE_URL + '/try_unlock_weapon', data = {'unique_id' : unique_id, 'weapon' : gift_weapon}) as resp:
 				return await resp.json(content_type = 'text/json')
@@ -282,7 +281,7 @@ class PlayerStateManager:
 			#          P R I V A T E		   #
 			####################################
 		
-	def _read_lottery_configuration(self, conf: str = '../../Configuration/server/1.0/lottery.conf'):
+	def _read_lottery_configuration(self, conf: str = './Configuration/server/1.0/lottery.conf'):
 		config = configparser.ConfigParser()
 		config.read(conf)
 		self._skill_tier_names = eval(config['skills']['names'])
@@ -521,7 +520,13 @@ class PlayerStateManager:
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
 		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
-
+		self._skill_tier_names = []
+		self._skill_tier_weights = []
+		self._skill_items = {}
+		self._weapon_tier_names = []
+		self._weapon_tier_weights = []
+		self._weapon_items = {}
+		self._read_lottery_configuration()
 	async def public_method(self) -> None:
 		# Something interesting
 		# await self._execute_statement('STATEMENT')
@@ -573,7 +578,7 @@ class PlayerStateManager:
 
 
 # Part (2 / 2)
-MANAGER = PlayerStateManager()  # we want to define a single instance of the class
+MANAGER = PlayerManager()  # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
 
 
@@ -682,7 +687,7 @@ async def __set_all_material(request: web.Request) -> web.Response:
 	result = await MANAGER.set_all_material(statement=post['statement'])
 	return _json_response(result)
 @ROUTES.post('/random_gift_skill')
-async def __random_gift_segment(request: web.Request) -> web.Response:
+async def __random_gift_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER.random_gift_skill(post['unique_id'])
 	return _json_response(data)
