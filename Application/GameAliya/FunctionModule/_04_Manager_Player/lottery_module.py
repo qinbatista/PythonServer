@@ -38,24 +38,38 @@ class LotteryManager:
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
+		self.tiers = []
+		self.weights = []
+		self.items = {}
+		self._read_lottery_configuration()
 	
 
 	async def random_gift_skill(self, unique_id: str) -> dict:
-		roll = random.randint(1, 10)
-		if 1 <= roll <= 6:
-			level = 1
-			skill_id = SKILL_ID_LIST[random.randint(0,2)]
-		elif 7 <= roll <= 9:
-			level = 2
-			skill_id = SKILL_ID_LIST[random.randint(3, 11)]
-		else:
-			level = 3
-			skill_id = SKILL_ID_LIST[random.randint(12, 38)]
+		tier_choice = (random.choices(self.tiers, self.weights))[0]
+		gift_skill = (random.choices(self.items[tier_choice]))[0]
 
 		if self.__class__.__name__ == 'PlayerManager':
-			pass
+			resp = await self.try_unlock_skill(unique_id, gift_skill)
+			if resp['status'] == 2:
+				if tier_choice == 'skilltier1':
+					data = await self.try_skill_scroll_10(unique_id, 1)
+				elif tier_choice == 'skilltier2':
+					data = await self.try_skill_scroll_30(unique_id, 1)
+				else:
+					data = await self.try_skill_scroll_100(unique_id, 1)
+				return self.message_typesetting(1, 'You received a free scroll', data['data'])
+			else:
+				return resp
 		else:
-			pass
+			async with ClientSession() as session:
+				async with session.post(SKILL_BASE_URL + '/try_unlock_skill', data = {'unique_id' : unique_id, 'skill_id' : gift_skill}) as resp:
+					data = await resp.json(content_type = 'text/json')
+				if data['status'] == 2:
+					return self.message_typesetting(1, 'you received a free scroll')
+				else:
+					return data
+					
+						
 
 
 		
@@ -68,6 +82,18 @@ class LotteryManager:
 			#          P R I V A T E		   #
 			####################################
 		
+
+	def _read_lottery_configuration(self, conf: str = '../../Configuration/server/1.0/lottery.con'):
+		config = configparser.ConfigParser()
+		config.read(conf)
+		for tier in conf:
+			if tier != 'DEFAULT':
+				self.tiers.append(tier)
+				self.weights.append(float(config[tier]['weight']))
+				self.items[tier] = eval(config[tier]['items'])
+
+			
+
 		
 
 	# It is helpful to define a private method that you can simply pass
@@ -106,6 +132,14 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
 	kwargs['content_type'] = 'text/json'
 	return web.Response(**kwargs)
+
+
+
+@ROUTES.post('/random_gift_skill')
+async def __random_gift_segment(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.random_gift_skill(post['unique_id'])
+	return _json_response(data)
 
 
 

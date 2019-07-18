@@ -89,6 +89,19 @@ class SkillManager:
 			return self.message_typesetting(1, 'invalid skill name')
 
 
+	async def try_unlock_skill(self, unique_id: str, skill_id: str) -> dict:
+		# 0 - Success
+		# 1 - invalid skill name
+		# 2 - Skill already unlocked
+		level = await self.get_skill(unique_id, skill_id)
+		if level['status'] == 1:
+			return level
+		elif level['data']['skill1'][1] != 0:
+			return self.message_typesetting(2, 'skill already unlocked')
+		await self._execute_statement('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";')
+		return self.message_typesetting(0, 'success, unlocked new skill', {'skill_id' : skill_id})
+
+
 
 
 
@@ -170,6 +183,11 @@ async def __get_skill(request: web.Request) -> web.Response:
 	return _json_response(data)
 
 
+@ROUTES.post('/try_unlock_skill')
+async def __try_unlock_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.try_unlock_skill(post['unique_id'], post['skill_id'])
+	return _json_response(data)
 
 
 def run():
