@@ -27,9 +27,9 @@ from aiohttp import ClientSession
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf')
 
-BAG_BASE_URL = 'http://localhost:' + CONFIG['bag_manager']['port']
-SKILL_BASE_URL = 'http://localhost:' + CONFIG['skill_manager']['port']
-WEAPON_BASE_URL = 'http://localhost:' + CONFIG['_01_Manager_Weapon']['port']
+BAG_BASE_URL = CONFIG['bag_manager']['address'] + ':' + CONFIG['bag_manager']['port']
+SKILL_BASE_URL = CONFIG['skill_manager']['address'] + ':' + CONFIG['skill_manager']['port']
+WEAPON_BASE_URL = CONFIG['_01_Manager_Weapon']['address'] + ':' + CONFIG['_01_Manager_Weapon']['port']
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
 
