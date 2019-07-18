@@ -69,7 +69,7 @@ def get_class_method(file_path):
 			is_find_key = True
 			class_method_code.append(i)
 		elif is_find_key==True and i.find("\t")==0:
-			if i.find("async def _execute_statement")!=-1 or i.find("def message_typesetting")!=-1:
+			if i.find("async def _execute_statement")!=-1 or i.find("def message_typesetting")!=-1 or i.find("def __internal_format")!=-1:
 				start_continue = True
 				# class_method_code.append(i)
 			elif start_continue == True:
