@@ -65,12 +65,19 @@ class LotteryManager:
 				async with session.post(SKILL_BASE_URL + '/try_unlock_skill', data = {'unique_id' : unique_id, 'skill_id' : gift_skill}) as resp:
 					data = await resp.json(content_type = 'text/json')
 				if data['status'] == 2:
+					if tier_choice == 'skilltier1':
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_10', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
+							resp = await resp.json(content_type = 'text/json')
+					elif tier_choice == 'skilltier2':
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_30', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
+							resp = await resp.json(content_type = 'text/json')
+					else:
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_100', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
+							resp = await resp.json(content_type = 'text/json')
 					return self.message_typesetting(1, 'you received a free scroll')
 				else:
 					return data
 					
-						
-
 
 		
 
@@ -83,10 +90,10 @@ class LotteryManager:
 			####################################
 		
 
-	def _read_lottery_configuration(self, conf: str = '../../Configuration/server/1.0/lottery.con'):
+	def _read_lottery_configuration(self, conf: str = '../../Configuration/server/1.0/lottery.conf'):
 		config = configparser.ConfigParser()
 		config.read(conf)
-		for tier in conf:
+		for tier in config:
 			if tier != 'DEFAULT':
 				self.tiers.append(tier)
 				self.weights.append(float(config[tier]['weight']))
