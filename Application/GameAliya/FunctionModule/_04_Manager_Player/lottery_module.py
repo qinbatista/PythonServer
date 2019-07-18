@@ -71,10 +71,10 @@ class LotteryManager:
 					data = await self.try_skill_scroll_100(unique_id, 1)
 				if data["status"] == 0:
 					return self.message_typesetting(status=0, message='you received a free scroll', data={'skill_scroll_id': skill_scroll_id, 'value': data["remaining"]})
-				return self.message_typesetting(status=2, message='database operation error')
+				return self.message_typesetting(status=3, message='database operation error')
 			elif status == 0:  # success
 				return self.message_typesetting(status=status, message=data['remaining'][status], data={"skill_id": gift_skill, "value": 1})
-			else:  # 2、3
+			else:  # 2
 				return self.message_typesetting(status=status, message=data['remaining'][status])
 		else:
 			async with ClientSession() as session:
@@ -101,11 +101,9 @@ class LotteryManager:
 					return self.message_typesetting(status=status, message=data['remaining'][status], data={"skill_id": gift_skill, "value": 1})
 				else:  # 2
 					return self.message_typesetting(status=status, message=data['remaining'][status])
-					
 
-		
 
-	async def random_gift_weapon(self, unique_id: str) -> dict:
+	async def random_gift_segment(self, unique_id: str) -> dict:
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
 		
@@ -183,10 +181,10 @@ async def __random_gift_segment(request: web.Request) -> web.Response:
 	return _json_response(data)
 
 
-@ROUTES.post('/random_gift_weapon')
+@ROUTES.post('/random_gift_segment')
 async def __random_gift_segment(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = await MANAGER.random_gift_weapon(post['unique_id'])
+	data = await MANAGER.random_gift_segment(post['unique_id'])
 	return _json_response(data)
 
 
