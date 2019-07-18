@@ -38,15 +38,15 @@ class LotteryManager:
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
-		self.tiers = []
-		self.weights = []
-		self.items = {}
+		self._skill_tier_names = []
+		self._skill_tier_weights = []
+		self._skill_items = {}
 		self._read_lottery_configuration()
 	
 
 	async def random_gift_skill(self, unique_id: str) -> dict:
-		tier_choice = (random.choices(self.tiers, self.weights))[0]
-		gift_skill = (random.choices(self.items[tier_choice]))[0]
+		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
+		gift_skill = (random.choices(self._skill_items[tier_choice]))[0]
 
 		if self.__class__.__name__ == 'PlayerManager':
 			resp = await self.try_unlock_skill(unique_id, gift_skill)
@@ -93,11 +93,10 @@ class LotteryManager:
 	def _read_lottery_configuration(self, conf: str = '../../Configuration/server/1.0/lottery.conf'):
 		config = configparser.ConfigParser()
 		config.read(conf)
-		for tier in config:
-			if tier != 'DEFAULT':
-				self.tiers.append(tier)
-				self.weights.append(float(config[tier]['weight']))
-				self.items[tier] = eval(config[tier]['items'])
+		self._skill_tier_names = eval(config['skills']['names'])
+		self._skill_tier_weights = eval(config['skills']['weights'])
+		self._skill_items = eval(config['skills']['items'])
+
 
 			
 
