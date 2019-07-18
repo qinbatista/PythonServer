@@ -84,22 +84,25 @@ class SkillManager:
 		# 1 - invalid skill name
 		try:
 			level = await self._get_skill_level(unique_id, skill_id)
-			return self.message_typesetting(0, 'success', {'skill1' : [skill_id, level]})
+			return self.message_typesetting(0, 'success', {'skill': skill_id, 'value': level})
 		except:
 			return self.message_typesetting(1, 'invalid skill name')
 
 
 	async def try_unlock_skill(self, unique_id: str, skill_id: str) -> dict:
-		# 0 - Success
-		# 1 - invalid skill name
-		# 2 - Skill already unlocked
-		level = await self.get_skill(unique_id, skill_id)
-		if level['status'] == 1:
-			return level
-		elif level['data']['skill1'][1] != 0:
-			return self.message_typesetting(2, 'skill already unlocked')
-		await self._execute_statement('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";')
-		return self.message_typesetting(0, 'success, unlocked new skill', {'skill_id' : skill_id})
+		# 0 - success, unlocked new skill
+		# 1 - skill already unlocked
+		# 2 - invalid skill name
+		# json ===> {"status": status, "remaining": remaining} ===> status 0、1、2、3
+		table_tuple = ("success, unlocked new skill", "skill already unlocked", "invalid skill name")
+		try:  # 0、1、2
+			level = await self._get_skill_level(unique_id, skill_id)
+			if level == 0 and await self._execute_statement_update('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";') == 0:
+				return self.__internal_format(status=0, remaining=table_tuple)  # success, unlocked new skill
+			return self.__internal_format(status=1, remaining=table_tuple)  # skill already unlocked
+		except:
+			return self.__internal_format(status=2, remaining=table_tuple)  # invalid skill name
+
 
 
 
@@ -111,9 +114,8 @@ class SkillManager:
 		
 		
 	async def _get_skill_level(self, unique_id: str, skill_id: str) -> int:
-		data = await self._execute_statement('SELECT `' + skill_id + '` FROM skill WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement('SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
-
 
 	async def _roll_for_upgrade(self, scroll_id: str) -> bool:
 		UPGRADE = { 'skill_scroll_10' : 0.10, 'skill_scroll_30' : 0.30, 'skill_scroll_100' : 1 }
@@ -122,7 +124,6 @@ class SkillManager:
 			return roll < UPGRADE[scroll_id]
 		except KeyError:
 			return False
-
 
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
@@ -136,6 +137,27 @@ class SkillManager:
 				await cursor.execute(statement)
 				data = cursor.fetchall()
 				return data
+
+	async def _execute_statement_update(self, statement: str) -> int:
+		"""
+		Execute the update or set statement and return the result.
+		执行update或set语句并返回结果。
+		:param statement: Mysql执行的语句
+		:return: 返回update或者是set执行的结果
+		"""
+		async with await self._pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				return await cursor.execute(statement)
+
+	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
+		"""
+		Internal json formatted information
+		内部json格式化信息
+		:param status:状态标识0：成功，1：失败
+		:param remaining:改变后的结果
+		:return:json格式：{"status": status, "remaining": remaining}
+		"""
+		return {"status": status, "remaining": remaining}
 
 	def message_typesetting(self, status: int, message: str, data: dict={}) -> dict:
 		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}

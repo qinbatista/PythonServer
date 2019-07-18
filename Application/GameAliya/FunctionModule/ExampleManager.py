@@ -60,6 +60,16 @@ class PlayerStateManager:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
+	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
+		"""
+		Internal json formatted information
+		内部json格式化信息
+		:param status:状态标识0：成功，1：失败
+		:param remaining:改变后的结果
+		:return:json格式：{"status": status, "remaining": remaining}
+		"""
+		return {"status": status, "remaining": remaining}
+
 	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
 		"""
 		Format the information

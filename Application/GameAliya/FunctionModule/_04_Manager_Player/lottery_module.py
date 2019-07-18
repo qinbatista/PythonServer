@@ -49,38 +49,58 @@ class LotteryManager:
 	
 
 	async def random_gift_skill(self, unique_id: str) -> dict:
+		# 0 - skill ======== success, unlocked new skill 或 skill scroll ======== you received a free scroll
+		# {"skill_id": skill_id, "value": value} 或 {"skill_scroll_id": skill_scroll_id, "value": value}
+		# 2 - invalid skill name
+		# 3 - database operation error
 		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
 		gift_skill = (random.choices(self._skill_items[tier_choice]))[0]
-
+		print("gift_skill:" + str(gift_skill))
 		if self.__class__.__name__ == 'PlayerManager':
-			resp = await self.try_unlock_skill(unique_id, gift_skill)
-			if resp['status'] == 2:
+			data = await self.try_unlock_skill(unique_id, gift_skill)
+			status = data["status"]
+			if data['status'] == 1:  # skill already unlocked
 				if tier_choice == 'skilltier1':
+					skill_scroll_id = "skill_scroll_10"
 					data = await self.try_skill_scroll_10(unique_id, 1)
 				elif tier_choice == 'skilltier2':
+					skill_scroll_id = "skill_scroll_30"
 					data = await self.try_skill_scroll_30(unique_id, 1)
 				else:
+					skill_scroll_id = "skill_scroll_100"
 					data = await self.try_skill_scroll_100(unique_id, 1)
-				return self.message_typesetting(1, 'You received a free scroll', data['data'])
-			else:
-				return resp
+				if data["status"] == 0:
+					return self.message_typesetting(status=0, message='you received a free scroll', data={'skill_scroll_id': skill_scroll_id, 'value': data["remaining"]})
+				return self.message_typesetting(status=2, message='database operation error')
+			elif status == 0:  # success
+				return self.message_typesetting(status=status, message=data['remaining'][status], data={"skill_id": gift_skill, "value": 1})
+			else:  # 2、3
+				return self.message_typesetting(status=status, message=data['remaining'][status])
 		else:
 			async with ClientSession() as session:
 				async with session.post(SKILL_BASE_URL + '/try_unlock_skill', data = {'unique_id' : unique_id, 'skill_id' : gift_skill}) as resp:
 					data = await resp.json(content_type = 'text/json')
-				if data['status'] == 2:
+				status = int(data['status'])
+				if status == 1:
 					if tier_choice == 'skilltier1':
-						async with session.post(BAG_BASE_URL + '/try_skill_scroll_10', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
-							resp = await resp.json(content_type = 'text/json')
+						skill_scroll_id = "skill_scroll_10"
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_10', data={'unique_id': unique_id, 'value': 1}) as resp:
+							json_data = await resp.json(content_type='text/json')
 					elif tier_choice == 'skilltier2':
-						async with session.post(BAG_BASE_URL + '/try_skill_scroll_30', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
-							resp = await resp.json(content_type = 'text/json')
+						skill_scroll_id = "skill_scroll_30"
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_30', data={'unique_id': unique_id, 'value': 1}) as resp:
+							json_data = await resp.json(content_type='text/json')
 					else:
-						async with session.post(BAG_BASE_URL + '/try_skill_scroll_100', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
-							resp = await resp.json(content_type = 'text/json')
-					return self.message_typesetting(1, 'you received a free scroll')
-				else:
-					return data
+						skill_scroll_id = "skill_scroll_100"
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_100', data={'unique_id': unique_id, 'value': 1}) as resp:
+							json_data = await resp.json(content_type='text/json')
+					if json_data["status"] == 0:
+						return self.message_typesetting(status=0, message='you received a free scroll', data={'skill_scroll_id': skill_scroll_id, 'value': json_data["remaining"]})
+					return self.message_typesetting(status=3, message='database operation error')
+				elif status == 0:  # success
+					return self.message_typesetting(status=status, message=data['remaining'][status], data={"skill_id": gift_skill, "value": 1})
+				else:  # 2
+					return self.message_typesetting(status=status, message=data['remaining'][status])
 					
 
 		
