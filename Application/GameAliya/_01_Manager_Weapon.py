@@ -170,6 +170,24 @@ class WeaponManager:
 			attribute_list.append(weapons_stars_list[i])
 			data.update({"weapon_bag" + str(i): attribute_list})
 		return message_typesetting(0, "gain success", data=data)
+
+
+	async def try_unlock_weapon(self, unique_id: str, weapon: str) -> dict:
+		star = await self.__get_weapon_star(unique_id, weapon)
+		if star != 0:
+			segment = await self.__get_segment(unique_id, weapon)
+			await self.__set_segment_by_id(unique_id, weapon, segment + 1)
+			return message_typesetting(1, 'Weapon already unlocked, got free segment', {'weapon' : weapon, 'segment' : segment + 1})
+		await self.__set_weapon_star(unique_id, weapon, 1)
+		return message_typesetting(0, 'Unlocked new weapon!', {'weapon' : weapon})
+
+
+
+
+
+
+
+
 	
 	# Get table properties, column headers
 	# 获取表属性，列标题
@@ -226,9 +244,13 @@ class WeaponManager:
 			"UPDATE `" + str(weapon) + "` SET " + passive_skill + "='" + str(skill_level) + "', skill_point='" + str(
 				skill_points) + "' WHERE unique_id='" + str(unique_id) + "';")
 
+	async def __get_segment(self, unique_id: str, weapon: str) -> int:
+		data = await self._execute_statement('SELECT segment FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
+
 	async def __set_segment_by_id(self, unique_id: str, weapon: str, segment: int):
 		return await self._execute_statement_update(
-			"UPDATE `" + str(weapon) + "` SET segment=" + str(segment) + " WHERE unique_id='" + str(unique_id) + "';")
+			"UPDATE `" + str(weapon) + '` SET segment="' + str(segment) + '" WHERE unique_id="' + str(unique_id) + '";')
 	
 	async def __get_row_by_id(self, table_name: str, unique_id: str) -> list:
 		data = await self._execute_statement("SELECT * FROM `" + str(table_name) + "` WHERE unique_id='" + str(unique_id) + "';")
@@ -312,6 +334,12 @@ async def __level_up_weapon_star(request: web.Request) -> web.Response:
 async def __get_all_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER.get_all_weapon(post['unique_id'])
+	return _json_response(data)
+
+@ROUTES.post('/try_unlock_weapon')
+async def __try_unlock_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.try_unlock_weapon(post['unique_id'], post['weapon'])
 	return _json_response(data)
 
 

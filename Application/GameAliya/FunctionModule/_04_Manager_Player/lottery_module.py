@@ -29,6 +29,7 @@ CONFIG.read('../../Configuration/server/1.0/server.conf')
 
 BAG_BASE_URL = 'http://localhost:' + CONFIG['bag_manager']['port']
 SKILL_BASE_URL = 'http://localhost:' + CONFIG['skill_manager']['port']
+WEAPON_BASE_URL = 'http://localhost:' + CONFIG['_01_Manager_Weapon']['port']
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
 
@@ -41,6 +42,9 @@ class LotteryManager:
 		self._skill_tier_names = []
 		self._skill_tier_weights = []
 		self._skill_items = {}
+		self._weapon_tier_names = []
+		self._weapon_tier_weights = []
+		self._weapon_items = {}
 		self._read_lottery_configuration()
 	
 
@@ -81,8 +85,16 @@ class LotteryManager:
 
 		
 
-	async def random_gift_segment(self, unique_id: str) -> dict:
-		pass
+	async def random_gift_weapon(self, unique_id: str) -> dict:
+		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
+		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
+		
+		async with ClientSession() as session:
+			async with session.post(WEAPON_BASE_URL + '/try_unlock_weapon', data = {'unique_id' : unique_id, 'weapon' : gift_weapon}) as resp:
+				return await resp.json(content_type = 'text/json')
+
+
+
 
 
 			####################################
@@ -96,6 +108,9 @@ class LotteryManager:
 		self._skill_tier_names = eval(config['skills']['names'])
 		self._skill_tier_weights = eval(config['skills']['weights'])
 		self._skill_items = eval(config['skills']['items'])
+		self._weapon_tier_names = eval(config['weapons']['names'])
+		self._weapon_tier_weights = eval(config['weapons']['weights'])
+		self._weapon_items = eval(config['weapons']['items'])
 
 
 			
@@ -148,6 +163,11 @@ async def __random_gift_segment(request: web.Request) -> web.Response:
 	return _json_response(data)
 
 
+@ROUTES.post('/random_gift_weapon')
+async def __random_gift_segment(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.random_gift_weapon(post['unique_id'])
+	return _json_response(data)
 
 
 
