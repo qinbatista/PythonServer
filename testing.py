@@ -28,7 +28,7 @@ MESSAGE_LIST = [ {'function':'login', 'random':'-906', 'data':{'unique_id':'mac'
 				 {"function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {"function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
-				 {'function':'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "1020"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
+				 {'function':'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "20"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
 				 
 				 {'function':'level_up_passive','random':'-906', 'data':{"weapon":"weapon1", "passive": "passive_skill_4_level"}},
 				 # {'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},#data: [weapon1] means which weapons' passive skill  you want to level up, [passive_skill_2_level] means skill id, right now passive skill only can be level up one by one.
@@ -246,13 +246,13 @@ def main() -> None:
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(SCROLL_LEVEL_UP)
-	# send_single_message(LEVEL_UP_WEAPON)
+	send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(LEVEL_UP_SKILL)
 	# send_single_message(RESET_SKILL_POINT)
 	# send_single_message(LEVEL_UP_WEAPONS_STAR)
 	# send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
-	send_single_message(PASS_STAGE)
+	#send_single_message(PASS_STAGE)
 	#send_single_message(DECREASE_ENERGY)
 	# send_single_message(INCREASE_ENERGY)
 	# test_token_server()

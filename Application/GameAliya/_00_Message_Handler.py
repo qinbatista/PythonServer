@@ -12,7 +12,7 @@ def PythonLocation():
     return os.path.dirname(os.path.realpath(__file__))
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read(PythonLocation() + './Configuration/server/1.0/server.conf')
+CONFIG.read(PythonLocation() + '/Configuration/server/1.0/server.conf')
 DESIv = CONFIG['_00_Message_Handler']['DESIv']
 DESKey = CONFIG['_00_Message_Handler']['DESKey']
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
@@ -65,11 +65,11 @@ class MessageHandler:
 		try:
 			fn = self._functions[message['function']]
 			if message['function'] not in DOES_NOT_NEED_TOKEN:
-				async with session.get(TOKEN_BASE_URL + '/validate', headers={'Authorization': message['data']['token']}) as resp:
-					if resp.status != 200:
+				async with session.post(TOKEN_BASE_URL + '/validate', data = {'token' : message['data']['token']}) as resp:
+					data = await resp.json(content_type = 'text/json')
+					if data['status'] != 0:
 						return json.dumps({'status': 11, 'message': 'Authorization required', 'data': {'bad_token': message['data']['token']}})
-					token_response = await resp.json(content_type='text/json')
-					message['data']['unique_id'] = token_response['unique_id']
+					message['data']['unique_id'] = data['data']['unique_id']
 			return await fn(self, message, session)
 		except KeyError:
 			return json.dumps({'status': 10, 'message': 'Invalid message format', 'data': {}})
