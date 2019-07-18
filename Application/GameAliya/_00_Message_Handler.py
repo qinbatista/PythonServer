@@ -92,8 +92,8 @@ class MessageHandler:
 		async with session.post(MANAGER_PLAYER_BASE_URL + '/bind_account', data={'unique_id': message['data']['unique_id'], 'account': message["data"]["account"], 'password': message['data']['password']}) as resp:
 			return await resp.text()
 
-	async def _skill_level_up(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYER_BASE_URL + '/skill_level_up', data={'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
+	async def _level_up_skill(self, message: dict, session) -> str:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/level_up_skill', data={'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
 
 	async def _get_all_skill_level(self, message: dict, session) -> str:
@@ -175,6 +175,9 @@ FUNCTION_LIST = {
 	#Manager_Level
 	'pass_stage': MessageHandler._pass_stage,
 
+	#Manager_skill
+	'level_up_skill': MessageHandler._level_up_skill
+
 	#Manager_PlayerState(player_state_module.py,bag_module.py,lottery_module,skill_module)
 	'get_all_supplies': MessageHandler._get_all_supplies,
 	'increase_supplies': MessageHandler._increase_supplies,
@@ -183,7 +186,7 @@ FUNCTION_LIST = {
 	'decrease_energy': MessageHandler._decrease_energy,
 	'increase_energy': MessageHandler._increase_energy,
 
-	# *UserManager* it should be in UserManager, right now it is working in token_server
+	#Manager_account
 	'login': MessageHandler._login,
 	'login_unique': MessageHandler._login_unique,
 	'bind_account': MessageHandler._bind_account,
