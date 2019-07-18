@@ -26,7 +26,8 @@ from aiohttp import ClientSession
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf')
-
+LOTTERY = configparser.ConfigParser()
+LOTTERY.read('../../Configuration/server/1.0/lottery.conf')
 BAG_BASE_URL = CONFIG['bag_manager']['address'] + ':' + CONFIG['bag_manager']['port']
 SKILL_BASE_URL = CONFIG['skill_manager']['address'] + ':' + CONFIG['skill_manager']['port']
 WEAPON_BASE_URL = CONFIG['_01_Manager_Weapon']['address'] + ':' + CONFIG['_01_Manager_Weapon']['port']
@@ -119,15 +120,13 @@ class LotteryManager:
 			####################################
 		
 
-	def _read_lottery_configuration(self, conf: str = '../../Configuration/server/1.0/lottery.conf'):
-		config = configparser.ConfigParser()
-		config.read(conf)
-		self._skill_tier_names = eval(config['skills']['names'])
-		self._skill_tier_weights = eval(config['skills']['weights'])
-		self._skill_items = eval(config['skills']['items'])
-		self._weapon_tier_names = eval(config['weapons']['names'])
-		self._weapon_tier_weights = eval(config['weapons']['weights'])
-		self._weapon_items = eval(config['weapons']['items'])
+	def _read_lottery_configuration(self):
+		self._skill_tier_names = eval(LOTTERY['skills']['names'])
+		self._skill_tier_weights = eval(LOTTERY['skills']['weights'])
+		self._skill_items = eval(LOTTERY['skills']['items'])
+		self._weapon_tier_names = eval(LOTTERY['weapons']['names'])
+		self._weapon_tier_weights = eval(LOTTERY['weapons']['weights'])
+		self._weapon_items = eval(LOTTERY['weapons']['items'])
 
 
 			
