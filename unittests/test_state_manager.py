@@ -26,10 +26,16 @@ class TestPlayerStateMethods(unittest.TestCase):
 
 
 	def test_can_level_up_skill(self):
-		pass
+		cursor = self.db.cursor()
+		cursor.execute('UPDATE player SET skill_scroll_10 = "10" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'function' : 'level_up_skill', 'data' : {'token' : self.token, 'skill_id' : 'invalid skill id', 'scroll_id' : 'scroll_skill_10'}}
+
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 1)
 
 	def test_can_not_level_up_skill_invalid_skill_id(self):
-		msg = {'function' : 'skill_level_up', 'data' : {'token' : self.token, 'skill_id' : 'invalid skill id', 'scroll_id' : 'scroll_skill_10'}}
+		msg = {'function' : 'level_up_skill', 'data' : {'token' : self.token, 'skill_id' : 'invalid skill id', 'scroll_id' : 'scroll_skill_10'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 1)
@@ -38,13 +44,13 @@ class TestPlayerStateMethods(unittest.TestCase):
 		cursor = self.db.cursor()
 		cursor.execute('UPDATE skill SET m12_level = "0" WHERE unique_id = "4";')
 		self.db.commit()
-		msg = {'function' : 'skill_level_up', 'data' : {'token' : self.token, 'skill_id' : 'm12_level', 'scroll_id' : 'scroll_skill_10'}}
+		msg = {'function' : 'level_up_skill', 'data' : {'token' : self.token, 'skill_id' : 'm12_level', 'scroll_id' : 'scroll_skill_10'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 1)
 
 	def test_can_not_level_up_skill_invalid_scroll_id(self):
-		msg = {'function' : 'skill_level_up', 'data' : {'token' : self.token, 'skill_id' : 'm12_level', 'scroll_id' : 'invalid scroll id'}}
+		msg = {'function' : 'level_up_skill', 'data' : {'token' : self.token, 'skill_id' : 'm12_level', 'scroll_id' : 'invalid scroll id'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 2)
