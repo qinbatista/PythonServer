@@ -230,6 +230,7 @@ def test_token_server():
 	r = requests.get(VALIDATE_URL, headers = {'Authorization' : old_token})
 	TEST_EQUAL('Can not validate with old token', r.status_code, 400)
 
+
 def main() -> None:
 	global token
 	# get_skill_from_random()
@@ -246,16 +247,17 @@ def main() -> None:
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(SCROLL_LEVEL_UP)
-	send_single_message(LEVEL_UP_WEAPON)
+	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(LEVEL_UP_SKILL)
 	# send_single_message(RESET_SKILL_POINT)
 	# send_single_message(LEVEL_UP_WEAPONS_STAR)
 	# send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
-	#send_single_message(PASS_STAGE)
+	send_single_message(PASS_STAGE)
 	#send_single_message(DECREASE_ENERGY)
 	# send_single_message(INCREASE_ENERGY)
 	# test_token_server()
+
 
 if __name__ == '__main__':
 	main()

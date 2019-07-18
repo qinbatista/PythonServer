@@ -37,8 +37,9 @@ from aiohttp import ClientSession
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 
-BAG_BASE_URL = 'http://localhost:' + CONFIG['_04_Manager_Player']['port']
-SKILL_BASE_URL = 'http://localhost:' + CONFIG['skill_manager']['port']
+BAG_BASE_URL = CONFIG['_04_Manager_Player']['address'] + ':' + CONFIG['_04_Manager_Player']['port']
+SKILL_BASE_URL = CONFIG['skill_manager']['address'] + ':' + CONFIG['skill_manager']['port']
+WEAPON_BASE_URL = CONFIG['_01_Manager_Weapon']['address'] + ':' + CONFIG['_01_Manager_Weapon']['port']
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
 
@@ -69,7 +70,7 @@ from aiohttp import ClientSession
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 
-BAG_BASE_URL = 'http://localhost:' + CONFIG['_04_Manager_Player']['port']
+BAG_BASE_URL = CONFIG['_04_Manager_Player']['address'] + ':' + CONFIG['_04_Manager_Player']['port']
 
 
 # Part (1 / 2)
@@ -82,7 +83,6 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 
-JSON_NAME = "./Configuration/1.0/stage_reward_config.json"
 format_sql = {
 	"smallint": "%s",
 	"varchar": "'%s'",
@@ -90,7 +90,8 @@ format_sql = {
 }
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
-MANAGER_BAG_BASE_URL = 'http://localhost:' + CONFIG['_04_Manager_Player']['port']
+MANAGER_BAG_BASE_URL = CONFIG['_04_Manager_Player']['address'] + ":" + CONFIG['_04_Manager_Player']['port']
+JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
 
 
 import json
@@ -218,27 +219,60 @@ class PlayerStateManager:
 	async def try_small_energy_potion(self, unique_id: str, value: int) -> dict:
 		return await self.__try_material(unique_id=unique_id, key="small_energy_potion", value=value)
 	async def random_gift_skill(self, unique_id: str) -> dict:
-		roll = random.randint(1, 10)
-		if 1 <= roll <= 6:
-			level = 1
-			skill_id = SKILL_ID_LIST[random.randint(0,2)]
-		elif 7 <= roll <= 9:
-			level = 2
-			skill_id = SKILL_ID_LIST[random.randint(3, 11)]
-		else:
-			level = 3
-			skill_id = SKILL_ID_LIST[random.randint(12, 38)]
+		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
+		gift_skill = (random.choices(self._skill_items[tier_choice]))[0]
 		if self.__class__.__name__ == 'PlayerManager':
-			pass
+			resp = await self.try_unlock_skill(unique_id, gift_skill)
+			if resp['status'] == 2:
+				if tier_choice == 'skilltier1':
+					data = await self.try_skill_scroll_10(unique_id, 1)
+				elif tier_choice == 'skilltier2':
+					data = await self.try_skill_scroll_30(unique_id, 1)
+				else:
+					data = await self.try_skill_scroll_100(unique_id, 1)
+				return self.message_typesetting(1, 'You received a free scroll', data['data'])
+			else:
+				return resp
 		else:
-			pass
+			async with ClientSession() as session:
+				async with session.post(SKILL_BASE_URL + '/try_unlock_skill', data = {'unique_id' : unique_id, 'skill_id' : gift_skill}) as resp:
+					data = await resp.json(content_type = 'text/json')
+				if data['status'] == 2:
+					if tier_choice == 'skilltier1':
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_10', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
+							resp = await resp.json(content_type = 'text/json')
+					elif tier_choice == 'skilltier2':
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_30', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
+							resp = await resp.json(content_type = 'text/json')
+					else:
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_100', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
+							resp = await resp.json(content_type = 'text/json')
+					return self.message_typesetting(1, 'you received a free scroll')
+				else:
+					return data
+					
 		
-	async def random_gift_segment(self, unique_id: str) -> dict:
-		pass
+	async def random_gift_weapon(self, unique_id: str) -> dict:
+		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
+		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
+		
+		async with ClientSession() as session:
+			async with session.post(WEAPON_BASE_URL + '/try_unlock_weapon', data = {'unique_id' : unique_id, 'weapon' : gift_weapon}) as resp:
+				return await resp.json(content_type = 'text/json')
 			####################################
 			#          P R I V A T E		   #
 			####################################
 		
+	def _read_lottery_configuration(self, conf: str = '../../Configuration/server/1.0/lottery.conf'):
+		config = configparser.ConfigParser()
+		config.read(conf)
+		self._skill_tier_names = eval(config['skills']['names'])
+		self._skill_tier_weights = eval(config['skills']['weights'])
+		self._skill_items = eval(config['skills']['items'])
+		self._weapon_tier_names = eval(config['weapons']['names'])
+		self._weapon_tier_weights = eval(config['weapons']['weights'])
+		self._weapon_items = eval(config['weapons']['items'])
+			
 		
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
@@ -329,6 +363,17 @@ class PlayerStateManager:
 			return self.message_typesetting(0, 'success', {'skill1' : [skill_id, level]})
 		except:
 			return self.message_typesetting(1, 'invalid skill name')
+	async def try_unlock_skill(self, unique_id: str, skill_id: str) -> dict:
+		# 0 - Success
+		# 1 - invalid skill name
+		# 2 - Skill already unlocked
+		level = await self.get_skill(unique_id, skill_id)
+		if level['status'] == 1:
+			return level
+		elif level['data']['skill1'][1] != 0:
+			return self.message_typesetting(2, 'skill already unlocked')
+		await self._execute_statement('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";')
+		return self.message_typesetting(0, 'success, unlocked new skill', {'skill_id' : skill_id})
 			####################################
 			#          P R I V A T E		   #
 			####################################
@@ -596,6 +641,16 @@ async def __set_all_material(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.set_all_material(statement=post['statement'])
 	return _json_response(result)
+@ROUTES.post('/random_gift_skill')
+async def __random_gift_segment(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.random_gift_skill(post['unique_id'])
+	return _json_response(data)
+@ROUTES.post('/random_gift_weapon')
+async def __random_gift_segment(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.random_gift_weapon(post['unique_id'])
+	return _json_response(data)
 @ROUTES.post('/try_energy')
 async def __decrease_energy(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -615,6 +670,11 @@ async def __get_all_skill_level(request: web.Request) -> web.Response:
 async def __get_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER.get_skill(post['unique_id'], post['skill_id'])
+	return _json_response(data)
+@ROUTES.post('/try_unlock_skill')
+async def __try_unlock_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.try_unlock_skill(post['unique_id'], post['skill_id'])
 	return _json_response(data)
 @ROUTES.post('/pass_stage')
 async def __try_coin(request: web.Request) -> web.Response:
