@@ -26,7 +26,6 @@ MESSAGE_LIST = [ {'function':'login', 'random':'-906', 'data':{'unique_id':'mac'
 				 {"function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
 				 {'function':'random_gift_skill', 'random':'-906', 'data':{}},
 				 {"function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
-				 {"function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
 				 {'function':'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "20"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
 				 
