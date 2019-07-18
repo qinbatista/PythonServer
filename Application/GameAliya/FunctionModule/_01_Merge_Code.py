@@ -30,6 +30,7 @@ def CurrentPlatform():
 routes_code = []
 class_method_code = []
 import_code = []
+init_code = []
 def get_routes(file_path):
 	file_object = open(file_path,encoding="utf-8")
 	global routes_code
@@ -97,6 +98,22 @@ def get_import(file_path):
 				break
 			import_code.append(Re_check_import(i))
 	return import_code
+
+def get_init(file_path):
+	file_object = open(file_path,encoding="utf-8")
+	global init_code
+	all_the_text = file_object.readlines()
+	is_find_import_insert_key=False
+	for i in all_the_text:
+		if is_find_import_insert_key == False and i.find("\tdef __init__")==0:
+			is_find_import_insert_key=True
+		elif is_find_import_insert_key == True:
+			if i.find("\tasync def")==0:
+				break
+			if i.find("self._pool = tormysql.ConnectionPool")!=-1:
+				continue
+			init_code.append(Re_check_import(i))
+	return init_code
 def Re_check_import(string_line):
 	#_04_Manager_Player module
 	if string_line.find("CONFIG['bag_manager']")!=-1:
@@ -128,6 +145,7 @@ def merge_content_to_manager(file_name):
 	is_find_class_insert_key=False
 	is_find_route_insert_key=False
 	is_find_import_insert_key =False
+	is_find_init_inser_key = False
 	for i in all_the_text:
 		if is_find_class_insert_key == False and i.find("class")==0:
 			new_file_content.append(i)
@@ -141,6 +159,10 @@ def merge_content_to_manager(file_name):
 			new_file_content = new_file_content+import_code
 			is_find_import_insert_key=True
 			new_file_content.append(i)
+		elif is_find_init_inser_key == False and i.find("\tdef __init__")==0:
+			new_file_content.append(i)
+			new_file_content = new_file_content+init_code
+			is_find_init_inser_key=True
 		else:
 			new_file_content.append(i)
 
@@ -154,6 +176,8 @@ def search_merge_content(_path):
 		route_list = get_routes(file_name)
 		class_method_list = get_class_method(file_name)
 		import_list = get_import(file_name)
+		init_list = get_init(file_name)
+		pass
 	# with open(PythonLocation()+"/route_list.py", 'w',encoding="utf-8") as json_file:
 	# 	for i in route_list:
 	# 		json_file.writelines(i)
