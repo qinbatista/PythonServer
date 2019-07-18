@@ -106,7 +106,6 @@ class LotteryManager:
 	async def random_gift_segment(self, unique_id: str) -> dict:
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
-		
 		async with ClientSession() as session:
 			async with session.post(WEAPON_BASE_URL + '/try_unlock_weapon', data = {'unique_id' : unique_id, 'weapon' : gift_weapon}) as resp:
 				return await resp.json(content_type = 'text/json')
@@ -175,7 +174,7 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 
 
 @ROUTES.post('/random_gift_skill')
-async def __random_gift_segment(request: web.Request) -> web.Response:
+async def __random_gift_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER.random_gift_skill(post['unique_id'])
 	return _json_response(data)

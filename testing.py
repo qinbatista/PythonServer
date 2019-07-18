@@ -24,7 +24,7 @@ MESSAGE_LIST = [ {'function':'login', 'random':'-906', 'data':{'unique_id':'mac'
 				 {'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
 				 {'function':'get_all_supplies', 'random':'-906', 'data':""},
 				 {"function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
-				 {'function':'random_gift_skill', 'random':'-906', 'data':""},
+				 {'function':'random_gift_skill', 'random':'-906', 'data':{}},
 				 {"function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {"function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
@@ -54,7 +54,7 @@ INCREASE_SCROLL_SKILL_10=4
 GET_ALL_SKILL_LEVEL=5
 GET_ALL_SUPPLIES=6
 ALL_SUPPLIES_ADD5= 7
-RANDOM_GIFT_SKILL=8
+RANDOM_GIFT_SKILL=7
 GET_SKILL = 9
 SCROLL_LEVEL_UP = 10
 LEVEL_UP_WEAPON =11
@@ -245,14 +245,14 @@ def main() -> None:
 	# send_single_message(SKILL_LEVEL_UP)
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
-	# send_single_message(RANDOM_GIFT_SKILL)
+	send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(SCROLL_LEVEL_UP)
 	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(LEVEL_UP_SKILL)
 	# send_single_message(RESET_SKILL_POINT)
 	# send_single_message(LEVEL_UP_WEAPONS_STAR)
 	# send_single_message(ALL_WEAPON)
-	send_single_message(LOTTERY_SEGMENT)
+	# send_single_message(LOTTERY_SEGMENT)
 	# send_single_message(PASS_STAGE)
 	#send_single_message(DECREASE_ENERGY)
 	# send_single_message(INCREASE_ENERGY)

@@ -178,9 +178,9 @@ class WeaponManager:
 	async def try_unlock_weapon(self, unique_id: str, weapon: str) -> dict:
 		star = await self.__get_weapon_star(unique_id, weapon)
 		if star != 0:
-			segment = await self.__get_segment(unique_id, weapon)
-			await self.__set_segment_by_id(unique_id, weapon, segment + 1)
-			return self.message_typesetting(status=1, message='Weapon already unlocked, got free segment', data={'weapon' : weapon, 'segment': segment + 1})
+			segment = await self.__get_segment(unique_id, weapon) + 30
+			await self.__set_segment_by_id(unique_id, weapon, segment)
+			return self.message_typesetting(status=1, message='Weapon already unlocked, got free segment', data={'weapon' : weapon, 'segment': segment})
 		await self.__set_weapon_star(unique_id, weapon, 1)
 		return self.message_typesetting(status=0, message='Unlocked new weapon!', data={'weapon' : weapon})
 
