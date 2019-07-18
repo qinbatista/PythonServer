@@ -9,6 +9,8 @@ MANAGER_WEAPON_BASE_URL = 'http://localhost:' + CONFIG['_01_Manager_Weapon']['po
 MANAGER_PLAYER_BASE_URL = 'http://localhost:' + CONFIG['_04_Manager_Player']['port']
 MANAGER_LEVEL_BASE_URL = 'http://localhost:' + CONFIG['stage_manager']['port']
 MANAGER_SKILL_BASE_URL = 'http://localhost:' + CONFIG['skill_manager']['port']
+MANAGER_LOTTERY_BASE_URL = 'http://localhost:' + CONFIG['lottery_manager']['port']
+
 
 
 def try_coin():
@@ -53,9 +55,20 @@ def get_all_skill_level():
 
 def level_up_skill():
 	result = requests.post(MANAGER_SKILL_BASE_URL + '/level_up_skill', data={'unique_id': "4", "skill_id": "m1_level",  "scroll_id": "skill_scroll_10"})
-	# result = requests.post(MANAGER_PLAYER_BASE_URL + '/get_all_skill_level', data={'unique_id': "4"})
+	# result = requests.post(MANAGER_PLAYER_BASE_URL + '/level_up_skill', data={'unique_id': "4"})
 	print(str(result.text))
 
+
+def random_gift_skill():
+	result = requests.post(MANAGER_LOTTERY_BASE_URL + '/random_gift_skill', data={'unique_id': "4"})
+	# result = requests.post(MANAGER_PLAYER_BASE_URL + '/random_gift_skill', data={'unique_id': "4"})
+	print(str(result.text))
+
+
+def random_gift_weapon():
+	result = requests.post(MANAGER_LOTTERY_BASE_URL + '/random_gift_weapon', data={'unique_id': "4"})
+	# result = requests.post(MANAGER_PLAYER_BASE_URL + '/random_gift_skill', data={'unique_id': "4"})
+	print(str(result.text))
 
 if __name__ == "__main__":
 	# try_remove_coin()
@@ -65,4 +78,6 @@ if __name__ == "__main__":
 	# pass_stage()
 	# get_skill()
 	# get_all_skill_level()
-	level_up_skill()
+	# level_up_skill()
+	random_gift_skill()
+	# random_gift_weapon()

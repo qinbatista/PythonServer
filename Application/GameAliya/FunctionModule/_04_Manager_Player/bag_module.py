@@ -82,16 +82,6 @@ class BagSystemClass:
 		"""
 		return await self._execute_statement_update("UPDATE player SET " + material + "='" + str(material_value) + "' where unique_id='" + unique_id + "'")
 
-	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
-		"""
-		Internal json formatted information
-		内部json格式化信息
-		:param status:状态标识0：成功，1：失败
-		:param remaining:改变后的结果
-		:return:json格式：{"status": status, "remaining": remaining}
-		"""
-		return {"status": status, "remaining": remaining}
-
 	async def __try_material(self, unique_id: str, key: str, value: int) -> dict:
 		"""
 		Try to change the database information
@@ -175,6 +165,16 @@ class BagSystemClass:
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
+
+	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
+		"""
+		Internal json formatted information
+		内部json格式化信息
+		:param status:状态标识0：成功，1：失败
+		:param remaining:改变后的结果
+		:return:json格式：{"status": status, "remaining": remaining}
+		"""
+		return {"status": status, "remaining": remaining}
 
 	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
 		"""
