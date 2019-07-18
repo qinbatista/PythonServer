@@ -56,7 +56,7 @@ from aiohttp import ClientSession
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 
-BAG_BASE_URL = 'http://localhost:' + CONFIG['_04_Manager_Player']['port']
+BAG_BASE_URL = CONFIG['_04_Manager_Player']['address'] + CONFIG['_04_Manager_Player']['port']
 
 
 # Part (1 / 2)
@@ -163,15 +163,6 @@ class PlayerStateManager:
 		:return:update的状态返回量，1：成功，0：失败（未改变数据统一返回0）
 		"""
 		return await self._execute_statement_update("UPDATE player SET " + material + "='" + str(material_value) + "' where unique_id='" + unique_id + "'")
-	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
-		"""
-		Internal json formatted information
-		内部json格式化信息
-		:param status:状态标识0：成功，1：失败
-		:param remaining:改变后的结果
-		:return:json格式：{"status": status, "remaining": remaining}
-		"""
-		return {"status": status, "remaining": remaining}
 	async def __try_material(self, unique_id: str, key: str, value: int) -> dict:
 		"""
 		Try to change the database information
@@ -218,41 +209,69 @@ class PlayerStateManager:
 		return await self.__try_material(unique_id=unique_id, key="experience_potion", value=value)
 	async def try_small_energy_potion(self, unique_id: str, value: int) -> dict:
 		return await self.__try_material(unique_id=unique_id, key="small_energy_potion", value=value)
+	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
+		"""
+		Internal json formatted information
+		内部json格式化信息
+		:param status:状态标识0：成功，1：失败
+		:param remaining:改变后的结果
+		:return:json格式：{"status": status, "remaining": remaining}
+		"""
+		return {"status": status, "remaining": remaining}
 	async def random_gift_skill(self, unique_id: str) -> dict:
+		# 0 - skill ======== success, unlocked new skill 或 skill scroll ======== you received a free scroll
+		# {"skill_id": skill_id, "value": value} 或 {"skill_scroll_id": skill_scroll_id, "value": value}
+		# 2 - invalid skill name
+		# 3 - database operation error
 		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
 		gift_skill = (random.choices(self._skill_items[tier_choice]))[0]
+		print("gift_skill:" + str(gift_skill))
 		if self.__class__.__name__ == 'PlayerManager':
-			resp = await self.try_unlock_skill(unique_id, gift_skill)
-			if resp['status'] == 2:
+			data = await self.try_unlock_skill(unique_id, gift_skill)
+			status = data["status"]
+			if data['status'] == 1:  # skill already unlocked
 				if tier_choice == 'skilltier1':
+					skill_scroll_id = "skill_scroll_10"
 					data = await self.try_skill_scroll_10(unique_id, 1)
 				elif tier_choice == 'skilltier2':
+					skill_scroll_id = "skill_scroll_30"
 					data = await self.try_skill_scroll_30(unique_id, 1)
 				else:
+					skill_scroll_id = "skill_scroll_100"
 					data = await self.try_skill_scroll_100(unique_id, 1)
-				return self.message_typesetting(1, 'You received a free scroll', data['data'])
-			else:
-				return resp
+				if data["status"] == 0:
+					return self.message_typesetting(status=0, message='you received a free scroll', data={'skill_scroll_id': skill_scroll_id, 'value': data["remaining"]})
+				return self.message_typesetting(status=3, message='database operation error')
+			elif status == 0:  # success
+				return self.message_typesetting(status=status, message=data['remaining'][status], data={"skill_id": gift_skill, "value": 1})
+			else:  # 2
+				return self.message_typesetting(status=status, message=data['remaining'][status])
 		else:
 			async with ClientSession() as session:
 				async with session.post(SKILL_BASE_URL + '/try_unlock_skill', data = {'unique_id' : unique_id, 'skill_id' : gift_skill}) as resp:
 					data = await resp.json(content_type = 'text/json')
-				if data['status'] == 2:
+				status = int(data['status'])
+				if status == 1:
 					if tier_choice == 'skilltier1':
-						async with session.post(BAG_BASE_URL + '/try_skill_scroll_10', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
-							resp = await resp.json(content_type = 'text/json')
+						skill_scroll_id = "skill_scroll_10"
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_10', data={'unique_id': unique_id, 'value': 1}) as resp:
+							json_data = await resp.json(content_type='text/json')
 					elif tier_choice == 'skilltier2':
-						async with session.post(BAG_BASE_URL + '/try_skill_scroll_30', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
-							resp = await resp.json(content_type = 'text/json')
+						skill_scroll_id = "skill_scroll_30"
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_30', data={'unique_id': unique_id, 'value': 1}) as resp:
+							json_data = await resp.json(content_type='text/json')
 					else:
-						async with session.post(BAG_BASE_URL + '/try_skill_scroll_100', data = {'unique_id' : unique_id, 'value' : 1}) as resp:
-							resp = await resp.json(content_type = 'text/json')
-					return self.message_typesetting(1, 'you received a free scroll')
-				else:
-					return data
-					
-		
-	async def random_gift_weapon(self, unique_id: str) -> dict:
+						skill_scroll_id = "skill_scroll_100"
+						async with session.post(BAG_BASE_URL + '/try_skill_scroll_100', data={'unique_id': unique_id, 'value': 1}) as resp:
+							json_data = await resp.json(content_type='text/json')
+					if json_data["status"] == 0:
+						return self.message_typesetting(status=0, message='you received a free scroll', data={'skill_scroll_id': skill_scroll_id, 'value': json_data["remaining"]})
+					return self.message_typesetting(status=3, message='database operation error')
+				elif status == 0:  # success
+					return self.message_typesetting(status=status, message=data['remaining'][status], data={"skill_id": gift_skill, "value": 1})
+				else:  # 2
+					return self.message_typesetting(status=status, message=data['remaining'][status])
+	async def random_gift_segment(self, unique_id: str) -> dict:
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
 		
@@ -360,27 +379,29 @@ class PlayerStateManager:
 		# 1 - invalid skill name
 		try:
 			level = await self._get_skill_level(unique_id, skill_id)
-			return self.message_typesetting(0, 'success', {'skill1' : [skill_id, level]})
+			return self.message_typesetting(0, 'success', {'skill': skill_id, 'value': level})
 		except:
 			return self.message_typesetting(1, 'invalid skill name')
 	async def try_unlock_skill(self, unique_id: str, skill_id: str) -> dict:
-		# 0 - Success
-		# 1 - invalid skill name
-		# 2 - Skill already unlocked
-		level = await self.get_skill(unique_id, skill_id)
-		if level['status'] == 1:
-			return level
-		elif level['data']['skill1'][1] != 0:
-			return self.message_typesetting(2, 'skill already unlocked')
-		await self._execute_statement('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";')
-		return self.message_typesetting(0, 'success, unlocked new skill', {'skill_id' : skill_id})
+		# 0 - success, unlocked new skill
+		# 1 - skill already unlocked
+		# 2 - invalid skill name
+		# json ===> {"status": status, "remaining": remaining} ===> status 0、1、2、3
+		table_tuple = ("success, unlocked new skill", "skill already unlocked", "invalid skill name")
+		try:  # 0、1、2
+			level = await self._get_skill_level(unique_id, skill_id)
+			if level == 0 and await self._execute_statement_update('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";') == 0:
+				return self.__internal_format(status=0, remaining=table_tuple)  # success, unlocked new skill
+			return self.__internal_format(status=1, remaining=table_tuple)  # skill already unlocked
+		except:
+			return self.__internal_format(status=2, remaining=table_tuple)  # invalid skill name
 			####################################
 			#          P R I V A T E		   #
 			####################################
 		
 		
 	async def _get_skill_level(self, unique_id: str, skill_id: str) -> int:
-		data = await self._execute_statement('SELECT `' + skill_id + '` FROM skill WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement('SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
 	async def _roll_for_upgrade(self, scroll_id: str) -> bool:
 		UPGRADE = { 'skill_scroll_10' : 0.10, 'skill_scroll_30' : 0.30, 'skill_scroll_100' : 1 }
@@ -392,6 +413,15 @@ class PlayerStateManager:
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
+	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
+		"""
+		Internal json formatted information
+		内部json格式化信息
+		:param status:状态标识0：成功，1：失败
+		:param remaining:改变后的结果
+		:return:json格式：{"status": status, "remaining": remaining}
+		"""
+		return {"status": status, "remaining": remaining}
 	async def pass_stage(self, unique_id: str, stage_client: int) -> dict:
 		reward_list = self.__read_json_data()
 		print("reward_list:" + str(reward_list))
@@ -521,6 +551,16 @@ class PlayerStateManager:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
+	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
+		"""
+		Internal json formatted information
+		内部json格式化信息
+		:param status:状态标识0：成功，1：失败
+		:param remaining:改变后的结果
+		:return:json格式：{"status": status, "remaining": remaining}
+		"""
+		return {"status": status, "remaining": remaining}
+
 	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
 		"""
 		Format the information
@@ -646,10 +686,10 @@ async def __random_gift_segment(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER.random_gift_skill(post['unique_id'])
 	return _json_response(data)
-@ROUTES.post('/random_gift_weapon')
+@ROUTES.post('/random_gift_segment')
 async def __random_gift_segment(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = await MANAGER.random_gift_weapon(post['unique_id'])
+	data = await MANAGER.random_gift_segment(post['unique_id'])
 	return _json_response(data)
 @ROUTES.post('/try_energy')
 async def __decrease_energy(request: web.Request) -> web.Response:
