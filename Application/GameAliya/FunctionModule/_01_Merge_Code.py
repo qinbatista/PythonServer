@@ -1,5 +1,5 @@
 import os,platform
-
+import shutil
 def PythonLocation():
 	return os.path.dirname(os.path.realpath(__file__))
 def FindAllInFolder(_path):
@@ -86,20 +86,41 @@ def get_class_method(file_path):
 def get_import(file_path):
 	file_object = open(file_path,encoding="utf-8")
 	global import_code
-	import_code = []
 	all_the_text = file_object.readlines()
 	is_find_import_insert_key=False
 	for i in all_the_text:
 		if is_find_import_insert_key == False and i.find("import")==0:
-			import_code.append(i)
+			import_code.append(Re_check_import(i))
 			is_find_import_insert_key=True
 		elif is_find_import_insert_key == True:
 			if i.find("class ")==0:
 				break
-			import_code.append(i)
+			import_code.append(Re_check_import(i))
 	return import_code
+def Re_check_import(string_line):
+	#_04_Manager_Player module
+	if string_line.find("CONFIG['bag_manager']")!=-1:
+		string_line = string_line.replace("CONFIG['bag_manager']","CONFIG['_04_Manager_Player']")
+	if string_line.find("CONFIG['lottery_module']")!=-1:
+		string_line = string_line.replace("CONFIG['lottery_module']","CONFIG['_04_Manager_Player']")
+	if string_line.find("CONFIG['player_state_module']")!=-1:
+		string_line = string_line.replace("CONFIG['player_state_module']","CONFIG['_04_Manager_Player']")
+	if string_line.find("CONFIG['skill_module']")!=-1:
+		string_line = string_line.replace("CONFIG['skill_module']","CONFIG['_04_Manager_Player']")
+	if string_line.find("CONFIG['stage_module']")!=-1:
+		string_line = string_line.replace("CONFIG['stage_module']","CONFIG['_04_Manager_Player']")
 
+	#set all module configuration setting as local setting
+	if string_line.find("../../Configuration")!=-1:
+		string_line = string_line.replace("../../Configuration","./Configuration")
+	return string_line
 def merge_content_to_manager(file_name):
+
+	file_path = PythonLocation()+"/../"+file_name+".py"
+	if os.path.exists(PythonLocation()+"/../_04_Manager_Player.py"):
+		os.remove(PythonLocation()+"/../_04_Manager_Player.py")
+	shutil.copy(PythonLocation()+"/ExampleManager.py",file_path)
+
 	file_object = open(PythonLocation()+"/../"+file_name+".py",encoding="utf-8")
 	print(PythonLocation()+"/../"+file_name+".py")
 	new_file_content = []
@@ -122,6 +143,7 @@ def merge_content_to_manager(file_name):
 			new_file_content.append(i)
 		else:
 			new_file_content.append(i)
+
 	with open(PythonLocation()+"/../"+file_name+".py", 'w',encoding="utf-8") as json_file:
 		for i in new_file_content:
 			json_file.writelines(i)
