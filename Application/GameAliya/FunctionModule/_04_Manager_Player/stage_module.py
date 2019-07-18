@@ -7,7 +7,6 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 
-JSON_NAME = "../../Configuration/1.0/stage_reward_config.json"
 format_sql = {
 	"smallint": "%s",
 	"varchar": "'%s'",
@@ -16,6 +15,7 @@ format_sql = {
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf')
 MANAGER_BAG_BASE_URL = CONFIG['bag_manager']['address'] + ":" + CONFIG['bag_manager']['port']
+JSON_NAME = "../../Configuration/client/1.0/stage_reward_config.json"
 
 
 class StageSystemClass:
