@@ -180,9 +180,9 @@ class WeaponManager:
 		if star != 0:
 			segment = await self.__get_segment(unique_id, weapon) + 30
 			await self.__set_segment_by_id(unique_id, weapon, segment)
-			return self.message_typesetting(status=1, message='Weapon already unlocked, got free segment', data={'weapon' : weapon, 'segment': segment})
+			return self.message_typesetting(status=1, message='Weapon already unlocked, got free segment', data={"keys": ['weapon', 'segment'], "values": [weapon, segment]})
 		await self.__set_weapon_star(unique_id, weapon, 1)
-		return self.message_typesetting(status=0, message='Unlocked new weapon!', data={'weapon' : weapon})
+		return self.message_typesetting(status=0, message='Unlocked new weapon!', data={"keys": ["weapon"], "values": [weapon]})
 
 	# Format the information
 	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:

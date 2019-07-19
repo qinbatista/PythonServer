@@ -71,10 +71,10 @@ class LotteryManager:
 					skill_scroll_id = "skill_scroll_100"
 					data = await self.try_skill_scroll_100(unique_id, 1)
 				if data["status"] == 0:
-					return self.message_typesetting(status=0, message='you received a free scroll', data={'skill_scroll_id': skill_scroll_id, 'value': data["remaining"]})
+					return self.message_typesetting(status=0, message='you received a free scroll', data={"keys": [skill_scroll_id], "values": [data["remaining"]]})
 				return self.message_typesetting(status=3, message='database operation error')
 			elif status == 0:  # success
-				return self.message_typesetting(status=status, message=data['remaining'][status], data={"skill_id": gift_skill, "value": 1})
+				return self.message_typesetting(status=status, message=data['remaining'][status], data={"keys": [gift_skill], "values": [1]})
 			else:  # 2
 				return self.message_typesetting(status=status, message=data['remaining'][status])
 		else:
@@ -96,10 +96,10 @@ class LotteryManager:
 						async with session.post(BAG_BASE_URL + '/try_skill_scroll_100', data={'unique_id': unique_id, 'value': 1}) as resp:
 							json_data = await resp.json(content_type='text/json')
 					if json_data["status"] == 0:
-						return self.message_typesetting(status=0, message='you received a free scroll', data={'skill_scroll_id': skill_scroll_id, 'value': json_data["remaining"]})
+						return self.message_typesetting(status=0, message='you received a free scroll', data={"keys": [skill_scroll_id], "values": [data["remaining"]]})
 					return self.message_typesetting(status=3, message='database operation error')
 				elif status == 0:  # success
-					return self.message_typesetting(status=status, message=data['remaining'][status], data={"skill_id": gift_skill, "value": 1})
+					return self.message_typesetting(status=status, message=data['remaining'][status], data={"keys": [gift_skill], "values": [1]})
 				else:  # 2
 					return self.message_typesetting(status=status, message=data['remaining'][status])
 
