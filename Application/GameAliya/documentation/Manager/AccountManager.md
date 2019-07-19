@@ -87,7 +87,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
-	"function" : "login",
+	"function" : "login_unique",
 	"data" : {
 				"unique_id" : "UNIQUE_ID"
 			 }
