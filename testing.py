@@ -22,11 +22,11 @@ MESSAGE_LIST = [ {'function':'login', 'random':'-906', 'data':{'unique_id':'mac'
 				 {'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
 				 {'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
 				 {'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
-				 {'function':'get_all_supplies', 'random':'-906', 'data':""},
+				 {'function':'get_all_supplies', 'random':'-906', 'data':{}},
 				 {"function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
 				 {'function':'random_gift_skill', 'random':'-906', 'data':{}},
 				 {"function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
-				 {'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_skill_30":"3"}},
+				 {'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_id": "skill_scroll_10"}},
 				 {'function':'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "20"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
 				 
 				 {'function':'level_up_passive','random':'-906', 'data':{"weapon":"weapon1", "passive": "passive_skill_4_level"}},
@@ -47,16 +47,14 @@ MESSAGE_LIST = [ {'function':'login', 'random':'-906', 'data':{'unique_id':'mac'
 				 {'function':'increase_energy','random':'-906', 'data':{"energy": "1"}}
 				]
 LOGIN_AS_ACCOUNT = 0
-LOGIN_AS_VISITOR = 1
 SKILL_LEVEL_UP = 2
 # GET_SKILL = 3
 INCREASE_SCROLL_SKILL_10=4
 GET_ALL_SKILL_LEVEL=5
-GET_ALL_SUPPLIES=6
 ALL_SUPPLIES_ADD5= 7
 RANDOM_GIFT_SKILL=7
-GET_SKILL = 9
-SCROLL_LEVEL_UP = 10
+LEVEL_UP_SCROLL = 9
+GET_SKILL = 10
 LEVEL_UP_WEAPON =11
 LEVEL_UP_SKILL = 12
 RESET_SKILL_POINT = 13
@@ -67,6 +65,10 @@ PASS_STAGE= 17
 DECREASE_ENERGY= 18
 INCREASE_ENERGY= 19
 
+
+
+LOGIN_AS_VISITOR = 1
+GET_ALL_SUPPLIES=5
 def test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
@@ -108,7 +110,7 @@ async def async_send_single_message(message_id: int) -> float:
 	return end - start
 
 def async_multi_message(message_id: int):
-	tasks = [asyncio.ensure_future(async_send_single_message(SCROLL_LEVEL_UP)) for i in range(10)]
+	tasks = [asyncio.ensure_future(async_send_single_message(LEVEL_UP_SCROLL)) for i in range(10)]
 	loop = asyncio.get_event_loop()
 	return loop.run_until_complete(asyncio.gather(*tasks))
 
@@ -243,6 +245,8 @@ def main() -> None:
 	# MESSAGE_LIST[INCREASE_ENERGY]["token"]=token
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
+	# send_single_message(GET_ALL_SUPPLIES)
+	send_single_message(LEVEL_UP_SCROLL)
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
@@ -253,7 +257,7 @@ def main() -> None:
 	# send_single_message(LEVEL_UP_WEAPONS_STAR)
 	# send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
-	send_single_message(PASS_STAGE)
+	# send_single_message(PASS_STAGE)
 	#send_single_message(DECREASE_ENERGY)
 	# send_single_message(INCREASE_ENERGY)
 	# test_token_server()

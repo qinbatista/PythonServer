@@ -111,7 +111,7 @@ class PlayerManager:
 		用于获取数据库的标题等信息
 		:return:返回所有数据库的标题等信息，json数据
 		"""
-		data = await self._execute_statement("desc player;")
+		data = list(await self._execute_statement("desc player;"))
 		return self.__internal_format(status=0, remaining=data)
 	async def get_all_material(self, unique_id: str) -> dict:
 		"""
@@ -122,6 +122,44 @@ class PlayerManager:
 		"""
 		data = await self._execute_statement("SELECT * FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return self.__internal_format(status=0, remaining=data[0])
+	async def get_all_supplies(self, unique_id: str) -> dict:
+		data_tuple = (await self.get_all_head())["remaining"]
+		heads = []
+		for col in data_tuple:
+			heads.append(col[0])
+		content = list((await self.get_all_material(unique_id=unique_id))["remaining"])
+		heads.pop(0)
+		content.pop(0)
+		return self.message_typesetting(status=0, message="get supplies success", data={"key": heads, "value": content})
+	async def level_up_scroll(self, unique_id: str, scroll_id: str) -> dict:
+		# 0 success
+		# 1 advanced reels are not upgradeable
+		# 2 insufficient scroll
+		# 3 unexpected parameter
+		# 4 parameter error
+		# 9 database operation error
+		print("scroll_id：" + scroll_id)
+		if scroll_id == "skill_scroll_100": return self.message_typesetting(status=1, message="advanced reels are not upgradeable!")
+		try:
+			scroll_id_count = await self.__get_material(unique_id=unique_id, material=scroll_id)
+			if scroll_id_count < 3:
+				return self.message_typesetting(status=2, message="Insufficient scroll")
+			elif scroll_id == "skill_scroll_10":
+				dict1 = await self.try_skill_scroll_10(unique_id=unique_id, value=-3)
+				dict2 = await self.try_skill_scroll_30(unique_id=unique_id, value=1)
+				if dict1["status"] == 1 or dict2["status"] == 1:
+					return self.message_typesetting(status=9, message="database operation error!")
+				return self.message_typesetting(status=0, message="level up scroll success!", data={"keys":["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
+			elif scroll_id == "skill_scroll_30":
+				dict1 = await self.try_skill_scroll_30(unique_id=unique_id, value=-3)
+				dict2 = await self.try_skill_scroll_100(unique_id=unique_id, value=1)
+				if dict1["status"] == 1 or dict2["status"] == 1:
+					return self.message_typesetting(status=9, message="database operation error!")
+				return self.message_typesetting(status=0, message="level up scroll success!", data={"keys":["skill_scroll_30", "skill_scroll_100"], "values": [dict1["remaining"], dict2["remaining"]]})
+			else:
+				return self.message_typesetting(status=3, message="unexpected parameter --> " + scroll_id)
+		except:
+			return self.message_typesetting(status=9, message="parameter error!")
 	async def try_all_material(self, unique_id: str, stage: int) -> dict:
 		sql_stage = await self.__get_material(unique_id=unique_id, material="stage")
 		if stage <= 0 or sql_stage + 1 < stage:
@@ -137,19 +175,6 @@ class PlayerManager:
 		remaining = list(await self._execute_statement(statement=select_str))  # 数据库设置后的值
 		# 通过新关卡有关卡数据的返回，老关卡没有关卡数据的返回
 		return self.__internal_format(status=data, remaining=[material_dict, remaining[0]])  # 0 成功， 1 失败
-	def __sql_str_operating(self, unique_id: str, material_dict: dict) -> (str, str):
-		update_str = "UPDATE player SET "
-		update_end_str = " where unique_id='%s'" % unique_id
-		select_str = "SELECT "
-		select_end_str = " FROM player WHERE unique_id='%s'" % unique_id
-		for key in material_dict.keys():
-			update_str += "%s=%s+%s, " % (key, key, material_dict[key])
-			select_str += "%s, " % key
-		update_str = update_str[: len(update_str) - 2] + update_end_str
-		select_str = select_str[: len(select_str) - 2] + select_end_str
-		print("[__sql_str_operating] -> update_str:" + update_str)
-		print("[__sql_str_operating] -> select_str:" + select_str)
-		return update_str, select_str
 	async def __update_material(self, unique_id: str, material: str, material_value: int) -> int:
 		"""
 		Used to set information such as numeric values
@@ -199,7 +224,7 @@ class PlayerManager:
 		if num < 0: return self.__internal_format(1, num)
 		if await self.__update_material(unique_id=unique_id, material=key, material_value=num) == 0:
 			return self.__internal_format(1, num)
-		return self.__internal_format(0, num)
+		return self.__internal_format(status=0, remaining=num)
 	async def try_coin(self, unique_id: str, value: int) -> dict:
 		return await self.__try_material(unique_id=unique_id, key="coin", value=value)
 	async def try_iron(self, unique_id: str, value: int) -> dict:
@@ -226,6 +251,27 @@ class PlayerManager:
 		return await self.__try_material(unique_id=unique_id, key="experience_potion", value=value)
 	async def try_small_energy_potion(self, unique_id: str, value: int) -> dict:
 		return await self.__try_material(unique_id=unique_id, key="small_energy_potion", value=value)
+	def __read_json_data(self) -> list:
+		data = []
+		if os.path.exists(JSON_NAME):
+			data_dict = json.load(open(JSON_NAME, encoding="utf-8"))
+			for key in data_dict.keys():
+				data.append(data_dict[key])
+		print("[__read_json_data] -> data:" + str(data))
+		return data
+	def __sql_str_operating(self, unique_id: str, material_dict: dict) -> (str, str):
+		update_str = "UPDATE player SET "
+		update_end_str = " where unique_id='%s'" % unique_id
+		select_str = "SELECT "
+		select_end_str = " FROM player WHERE unique_id='%s'" % unique_id
+		for key in material_dict.keys():
+			update_str += "%s=%s+%s, " % (key, key, material_dict[key])
+			select_str += "%s, " % key
+		update_str = update_str[: len(update_str) - 2] + update_end_str
+		select_str = select_str[: len(select_str) - 2] + select_end_str
+		print("[__sql_str_operating] -> update_str:" + update_str)
+		print("[__sql_str_operating] -> select_str:" + select_str)
+		return update_str, select_str
 	async def random_gift_skill(self, unique_id: str) -> dict:
 		# 0 - skill ======== success, unlocked new skill 或 skill scroll ======== you received a free scroll
 		# {"skill_id": skill_id, "value": value} 或 {"skill_scroll_id": skill_scroll_id, "value": value}
@@ -444,15 +490,6 @@ class PlayerManager:
 		# TODO verify that this is true :D
 		self.reward_list = self.__read_json_data()
 
-	def __read_json_data(self) -> list:
-		data = []
-		if os.path.exists(JSON_NAME):
-			data_dict = json.load(open(JSON_NAME, encoding="utf-8"))
-			for key in data_dict.keys():
-				data.append(data_dict[key])
-		print("[__read_json_data] -> data:" + str(data))
-		return data
-
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._skill_tier_names = []
@@ -641,6 +678,16 @@ async def __get_all_head(request: web.Request) -> web.Response:
 async def __get_all_material(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.get_all_material(unique_id=post['unique_id'])
+	return _json_response(result)
+@ROUTES.post('/get_all_supplies')
+async def __get_all_supplies(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.get_all_supplies(unique_id=post['unique_id'])
+	return _json_response(result)
+@ROUTES.post('/level_up_scroll')
+async def __level_up_scroll(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.level_up_scroll(unique_id=post['unique_id'], scroll_id=post["scroll_id"])
 	return _json_response(result)
 @ROUTES.post('/random_gift_skill')
 async def __random_gift_skill(request: web.Request) -> web.Response:
