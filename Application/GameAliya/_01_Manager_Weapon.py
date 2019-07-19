@@ -45,6 +45,11 @@ class WeaponManager:
 	# levels up a particular weapon. costs iron.
 	# returns the data payload
 	async def level_up_weapon(self, unique_id: str, weapon: str, iron: int) -> dict:
+		# - 0 - Success
+		# - 1 - User does not have that weapon
+		# - 2 - Insufficient materials, upgrade failed
+		# - 3 - Database operation error
+		# - 9 - Weapon already max level
 		async with ClientSession() as session:
 			star = await self.__get_weapon_star(unique_id, weapon)
 			if star == 0:
@@ -89,6 +94,11 @@ class WeaponManager:
 	# levels up a particular passive skill. costs skill points.
 	# 提升特定的被动技能。 增加技能点。
 	async def level_up_passive(self, unique_id: str, weapon: str, passive_skill: str) -> dict:
+		# - 0 - Success
+		# - 1 - User does not have that weapon
+		# - 2 - Insufficient materials, upgrade failed
+		# - 3 - Database operation error
+		# - 9 - Weapon already max level
 		weapon_star = await self.__get_weapon_star(unique_id, weapon)
 		if weapon_star == 0:
 			return self.message_typesetting(status=1, message="user does not have that weapon")
@@ -110,6 +120,11 @@ class WeaponManager:
 
 	# resets all weapon passive skill points. refunds all skill points back. costs coins.
 	async def reset_weapon_skill_point(self, unique_id: str, weapon: str) -> dict:
+		# - 0 - Success
+		# - 1 - no weapon
+		# - 2 - insufficient gold coins, upgrade failed
+		# - 3 - database operation error!
+		# - 9 - Weapon reset skill point success
 		async with ClientSession() as session:
 			# get the coin from the account
 			bag_coin = await self.__get_material(unique_id=unique_id, material="coin")
@@ -132,6 +147,10 @@ class WeaponManager:
 	# levels up the weapon star. costs segments.
 	# 升级武器星数。 成本是碎片。
 	async def level_up_weapon_star(self, unique_id: str, weapon: str) -> dict:
+		# - 0 - Weapon upgrade success
+		# - 1 - no weapon
+		# - 2 - insufficient gold coins, upgrade failed
+		# - 3 - database operation error!
 		row = await self.__get_row_by_id(table_name=weapon, unique_id=unique_id)
 		weapon_star = await self.__get_weapon_star(unique_id=unique_id, weapon=weapon)
 		segment_count = self._standard_segment_count * (1 + weapon_star)  # 根据武器星数增加碎片的消耗数量
@@ -156,6 +175,7 @@ class WeaponManager:
 	# 获取所有武器的详细信息
 	# 目前操作数据库获取武器详细信息，不会给定失败的情况
 	async def get_all_weapon(self, unique_id: str):
+		# - 0 - gain success
 		data = {}
 		col_name_list = await self.__get_col_name_list(table="weapon_bag")
 		weapons_stars_list = await self.__get_weapon_bag(unique_id=unique_id)
