@@ -131,6 +131,12 @@ class PlayerManager:
 		heads.pop(0)
 		content.pop(0)
 		return self.message_typesetting(status=0, message="get supplies success", data={"key": heads, "value": content})
+	async def add_supplies(self, unique_id: str, key: str, value: int):
+		if value <= 0: return self.message_typesetting(status=9, message="not a positive number")
+		json_data = await self.__try_material(unique_id=unique_id, key=key, value=value)
+		if json_data["status"] == 0:
+			return self.message_typesetting(status=0, message="success", data={"keys": [key], "values": [json_data["remaining"]]})
+		return self.message_typesetting(status=1, message="failure")
 	async def level_up_scroll(self, unique_id: str, scroll_id: str) -> dict:
 		# 0 success
 		# 1 advanced reels are not upgradeable
@@ -390,7 +396,7 @@ class PlayerManager:
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
 	async def level_up_skill(self, unique_id: str, skill_id: str, scroll_id: str) -> dict:
-		# 0 - Success
+		# 0 - Success upgrade=0 升级成功， upgrade=1升级失败
 		# 1 - User does not have that skill
 		# 4 - User does not have enough scrolls
 		# 9 - Skill already at max level
@@ -688,6 +694,11 @@ async def __get_all_supplies(request: web.Request) -> web.Response:
 async def __level_up_scroll(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.level_up_scroll(unique_id=post['unique_id'], scroll_id=post["scroll_id"])
+	return _json_response(result)
+@ROUTES.post('/add_supplies')
+async def __add_supplies(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.add_supplies(unique_id=post['unique_id'], key=post["key"], value=int(post["value"]))
 	return _json_response(result)
 @ROUTES.post('/random_gift_skill')
 async def __random_gift_skill(request: web.Request) -> web.Response:

@@ -158,6 +158,11 @@ class MessageHandler:
 		async with session.post(MANAGER_PLAYER_BASE_URL + '/increase_energy', data={'unique_id': message['data']['unique_id'], 'energy': message['data']['energy']}) as resp:
 			return await resp.text()
 
+	# 以后会删除这个方法
+	async def _add_supplies(self, message: dict, session) -> str:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/add_supplies', data={'unique_id': message['data']['unique_id'], 'key': message['data']['key'], 'value': message['data']['value']}) as resp:
+			return await resp.text()
+
 
 DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 
@@ -186,6 +191,8 @@ FUNCTION_LIST = {
 	'level_up_scroll': MessageHandler._level_up_scroll,
 	'increase_supplies': MessageHandler._increase_supplies,
 	'pass_stage': MessageHandler._pass_stage,
+
+	'add_supplies': MessageHandler._add_supplies,
 
 	#Manager_account
 	'login': MessageHandler._login,

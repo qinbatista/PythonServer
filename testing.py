@@ -37,8 +37,8 @@ MESSAGE_LIST = [ {'function':'login', 'random':'-906', 'data':{'unique_id':'mac'
 				 {'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
 				 {'function':'pass_stage','random':'-906', 'data':{"stage":1}},
 				# 16 --- 17
-				 {'function':'decrease_energy','random':'-906', 'data':{"energy": "1"}},
-				 {'function':'increase_energy','random':'-906', 'data':{"energy": "1"}}
+				 {'function':'add_supplies','random':'-906', 'data':{"key": "coin", "value": 30}},
+				 {'function':'add_supplies','random':'-906', 'data':{"key": "iron", "value": 10}}
 				]
 LOGIN_AS_ACCOUNT = 0
 LOGIN_AS_VISITOR = 1
@@ -60,8 +60,8 @@ GET_ALL_WEAPON = 13
 RANDOM_GIFT_SEGMENT = 14
 PASS_STAGE = 15
 
-DECREASE_ENERGY = 16
-INCREASE_ENERGY = 17
+ADD_COIN = 16
+ADD_IRON = 17
 
 
 
@@ -247,14 +247,15 @@ def main() -> None:
 	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(LEVEL_UP_SCROLL)
 	# send_single_message(LEVEL_UP_WEAPON)
-	send_single_message(LEVEL_UP_SKILL)
+	# send_single_message(LEVEL_UP_SKILL)
 	# send_single_message(LEVEL_UP_PASSIVE)
 	# send_single_message(RESET_WEAPON_SKILL_POINT)
 	# send_single_message(LEVEL_UP_WEAPON_STAR)
 	# send_single_message(GET_ALL_WEAPON)
 	# send_single_message(RANDOM_GIFT_SEGMENT)
 	# send_single_message(PASS_STAGE)
-	# send_single_message(DECREASE_ENERGY)
+	# send_single_message(ADD_COIN)
+	send_single_message(ADD_IRON)
 
 	# test_token_server()
 
