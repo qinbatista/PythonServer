@@ -18,7 +18,6 @@ class BagSystemClass:
 		# TODO verify that this is true :D
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
 		self.reward_list = self.__read_json_data()
-		print("reward_list:" + str(self.reward_list))
 
 	def __read_json_data(self) -> list:
 		data = []

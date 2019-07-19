@@ -176,7 +176,7 @@ FUNCTION_LIST = {
 	'pass_stage': MessageHandler._pass_stage,
 
 	#Manager_skill
-	'level_up_skill': MessageHandler._level_up_skill
+	'level_up_skill': MessageHandler._level_up_skill,
 
 	#Manager_PlayerState(player_state_module.py,bag_module.py,lottery_module,skill_module)
 	'get_all_supplies': MessageHandler._get_all_supplies,

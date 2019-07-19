@@ -31,7 +31,7 @@ class StageSystemClass:
 		# 1 : database operation error
 		# 9 : abnormal data!
 		if self.__class__.__name__ == "PlayerManager":
-			json_data = self.try_all_material(unique_id=unique_id, stage=stage)
+			json_data = await self.try_all_material(unique_id=unique_id, stage=stage)
 		else:
 			async with ClientSession() as session:
 				async with session.post(MANAGER_BAG_BASE_URL + '/try_all_material', data = {'unique_id' : unique_id, 'stage': stage}) as resp:

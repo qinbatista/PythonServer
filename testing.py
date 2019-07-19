@@ -42,6 +42,7 @@ MESSAGE_LIST = [ {'function':'login', 'random':'-906', 'data':{'unique_id':'mac'
      
 				 {'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
 				 {'function':'pass_stage','random':'-906', 'data':{"stage":1}},
+				 {'function':'pass_stage','random':'-906', 'data':{"stage":1}},
 				 {'function':'decrease_energy','random':'-906', 'data':{"energy": "1"}},
 				 {'function':'increase_energy','random':'-906', 'data':{"energy": "1"}}
 				]
@@ -244,7 +245,7 @@ def main() -> None:
 	# send_single_message(SKILL_LEVEL_UP)
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
-	send_single_message(RANDOM_GIFT_SKILL)
+	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(SCROLL_LEVEL_UP)
 	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(LEVEL_UP_SKILL)
@@ -252,7 +253,7 @@ def main() -> None:
 	# send_single_message(LEVEL_UP_WEAPONS_STAR)
 	# send_single_message(ALL_WEAPON)
 	# send_single_message(LOTTERY_SEGMENT)
-	# send_single_message(PASS_STAGE)
+	send_single_message(PASS_STAGE)
 	#send_single_message(DECREASE_ENERGY)
 	# send_single_message(INCREASE_ENERGY)
 	# test_token_server()

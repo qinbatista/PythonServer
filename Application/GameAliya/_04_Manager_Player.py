@@ -17,6 +17,18 @@
 
 
 # Some safe default includes. Feel free to add more if you need.
+import random
+import json
+import os
+import configparser
+import tormysql
+from aiohttp import web
+
+CONFIG = configparser.ConfigParser()
+CONFIG.read('./Configuration/server/1.0/server.conf')
+JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
+
+
 import json
 import random
 import tormysql
@@ -52,6 +64,20 @@ BAG_BASE_URL = CONFIG['_04_Manager_Player']['address'] + CONFIG['_04_Manager_Pla
 
 # Part (1 / 2)
 import json
+import random
+import tormysql
+import configparser
+from aiohttp import web
+from aiohttp import ClientSession
+
+CONFIG = configparser.ConfigParser()
+CONFIG.read('./Configuration/server/1.0/server.conf')
+
+BAG_BASE_URL = CONFIG['_04_Manager_Player']['address'] + ':' + CONFIG['_04_Manager_Player']['port']
+
+
+# Part (1 / 2)
+import json
 import tormysql
 import os
 import configparser
@@ -68,31 +94,6 @@ format_sql = {
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 MANAGER_BAG_BASE_URL = CONFIG['_04_Manager_Player']['address'] + ":" + CONFIG['_04_Manager_Player']['port']
-JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
-
-
-import json
-import random
-import tormysql
-import configparser
-from aiohttp import web
-from aiohttp import ClientSession
-
-CONFIG = configparser.ConfigParser()
-CONFIG.read('./Configuration/server/1.0/server.conf')
-
-BAG_BASE_URL = CONFIG['_04_Manager_Player']['address'] + ':' + CONFIG['_04_Manager_Player']['port']
-
-
-# Part (1 / 2)
-import random
-import json
-import configparser
-import tormysql
-from aiohttp import web
-
-CONFIG = configparser.ConfigParser()
-CONFIG.read('./Configuration/server/1.0/server.conf')
 
 
 import json
@@ -104,6 +105,127 @@ from aiohttp import ClientSession
 
 # Part (1 / 2)
 class PlayerManager:
+	async def get_all_head(self) -> dict:
+		"""
+		Used to get information such as the title of the database
+		用于获取数据库的标题等信息
+		:return:返回所有数据库的标题等信息，json数据
+		"""
+		data = await self._execute_statement("desc player;")
+		return self.__internal_format(status=0, remaining=data)
+	async def get_all_material(self, unique_id: str) -> dict:
+		"""
+		Used to get all numeric or string information
+		用于获取所有的数字或字符串信息
+		:param unique_id: 用户的唯一标识
+		:return:返回所有材料名对应的值，json数据
+		"""
+		data = await self._execute_statement("SELECT * FROM player WHERE unique_id='" + str(unique_id) + "'")
+		return self.__internal_format(status=0, remaining=data[0])
+	async def try_all_material(self, unique_id: str, stage: int) -> dict:
+		sql_stage = await self.__get_material(unique_id=unique_id, material="stage")
+		if stage <= 0 or sql_stage + 1 < stage:
+			print("[try_all_material] -> stage:" + str(stage))
+			return self.__internal_format(status=9, remaining=0)  # abnormal data!
+		if sql_stage + 1 == stage:  # 通过新关卡
+			material_dict = dict(self.reward_list[stage])
+			material_dict.update({"stage": 1})
+		else:  # 老关卡
+			material_dict = dict(self.reward_list[sql_stage])
+		update_str, select_str = self.__sql_str_operating(unique_id=unique_id, material_dict=material_dict)
+		data = 1 - await self._execute_statement_update(statement=update_str)  # 0, 1反转
+		remaining = list(await self._execute_statement(statement=select_str))  # 数据库设置后的值
+		# 通过新关卡有关卡数据的返回，老关卡没有关卡数据的返回
+		return self.__internal_format(status=data, remaining=[material_dict, remaining[0]])  # 0 成功， 1 失败
+	def __sql_str_operating(self, unique_id: str, material_dict: dict) -> (str, str):
+		update_str = "UPDATE player SET "
+		update_end_str = " where unique_id='%s'" % unique_id
+		select_str = "SELECT "
+		select_end_str = " FROM player WHERE unique_id='%s'" % unique_id
+		for key in material_dict.keys():
+			update_str += "%s=%s+%s, " % (key, key, material_dict[key])
+			select_str += "%s, " % key
+		update_str = update_str[: len(update_str) - 2] + update_end_str
+		select_str = select_str[: len(select_str) - 2] + select_end_str
+		print("[__sql_str_operating] -> update_str:" + update_str)
+		print("[__sql_str_operating] -> select_str:" + select_str)
+		return update_str, select_str
+	async def __update_material(self, unique_id: str, material: str, material_value: int) -> int:
+		"""
+		Used to set information such as numeric values
+		用于设置数值等信息
+		:param unique_id:用户唯一识别码
+		:param material:材料名
+		:param material_value:要设置的材料对应的值
+		:return:返回是否更新成功的标识，1为成功，0为失败
+		"""
+		return await self._execute_statement_update("UPDATE player SET " + material + "=" + str(material_value) + " where unique_id='" + unique_id + "'")
+	async def __get_material(self, unique_id: str, material: str) -> int or str:
+		"""
+		Used to get numeric or string information
+		用于获取数字或字符串信息
+		:param unique_id: 用户的唯一标识
+		:param material:材料名
+		:return:返回材料名对应的值
+		"""
+		data = await self._execute_statement("SELECT " + material + " FROM player WHERE unique_id='" + str(unique_id) + "'")
+		return data[0][0]
+	async def __set_material(self, unique_id: str, material: str, material_value: str) -> int:
+		"""
+		Used to set string information such as user name
+		用于设置用户名等字符串信息
+		:param unique_id:用户的唯一标识
+		:param material:材料名
+		:param material_value:要存入数据库的值
+		:return:update的状态返回量，1：成功，0：失败（未改变数据统一返回0）
+		"""
+		return await self._execute_statement_update("UPDATE player SET " + material + "='" + str(material_value) + "' where unique_id='" + unique_id + "'")
+	async def __try_material(self, unique_id: str, key: str, value: int) -> dict:
+		"""
+		Try to change the database information
+		A status of 0 is a success and a 1 is a failure.
+		Return json data format
+		尝试更改数据库信息
+		状态为0表示成功，1表示失败。
+		返回json数据格式
+		:param unique_id:用户唯一识别码
+		:param key:材料名
+		:param value: 改变的材料值，正数是加运算，负数是减运算，0是给值
+		:return:返回数据格式为 {"status": status, "remaining": remaining}
+		"""
+		num = await self.__get_material(unique_id=unique_id, material=key)
+		if value == 0: return self.__internal_format(0, num)
+		num += value
+		if num < 0: return self.__internal_format(1, num)
+		if await self.__update_material(unique_id=unique_id, material=key, material_value=num) == 0:
+			return self.__internal_format(1, num)
+		return self.__internal_format(0, num)
+	async def try_coin(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="coin", value=value)
+	async def try_iron(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="iron", value=value)
+	async def try_diamond(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="diamond", value=value)
+	async def try_energy(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="energy", value=value)
+	async def try_experience(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="experience", value=value)
+	async def try_level(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="level", value=value)
+	async def try_role(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="role", value=value)
+	async def try_stage(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="stage", value=value)
+	async def try_skill_scroll_10(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="skill_scroll_10", value=value)
+	async def try_skill_scroll_30(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="skill_scroll_30", value=value)
+	async def try_skill_scroll_100(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="skill_scroll_100", value=value)
+	async def try_experience_potion(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="experience_potion", value=value)
+	async def try_small_energy_potion(self, unique_id: str, value: int) -> dict:
+		return await self.__try_material(unique_id=unique_id, key="small_energy_potion", value=value)
 	async def random_gift_skill(self, unique_id: str) -> dict:
 		# 0 - skill ======== success, unlocked new skill 或 skill scroll ======== you received a free scroll
 		# {"skill_id": skill_id, "value": value} 或 {"skill_scroll_id": skill_scroll_id, "value": value}
@@ -221,101 +343,6 @@ class PlayerManager:
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
-	async def pass_stage(self, unique_id: str, stage_client: int) -> dict:
-		reward_list = self.__read_json_data()
-		print("reward_list:" + str(reward_list))
-		async with ClientSession() as session:
-			if self.__class__.__name__ == "StageSystemClass":
-				async with session.post(MANAGER_BAG_BASE_URL + '/get_all_head') as resp:
-					data_head_tuple = json.loads(await resp.text())["remaining"]
-				async with session.post(MANAGER_BAG_BASE_URL + '/get_all_material', data={'unique_id': unique_id}) as resp:
-					content_tuple = json.loads(await resp.text())["remaining"]
-			else:
-				data_head_tuple = (await self.get_all_head())["remaining"]
-				content_tuple = (await self.get_all_material(unique_id=unique_id))["remaining"]
-			head_list, format_list = self.__get_head_list(data_head_tuple=data_head_tuple)
-			item_dict = self.__structure_item_dict(head_list, content_tuple)
-			if stage_client <= 0 or (item_dict["stage"] + 1) < stage_client:
-				return self.message_typesetting(9, "abnormal data!")
-			# 改变所有该变的变量
-			if item_dict["stage"] + 1 == stage_client:  # 通过新关卡
-				item_dict["stage"] = stage_client
-			reward_data = reward_list[stage_client]  # 获得奖励
-			reward_data_len = len(reward_data.keys()) + 1
-			data = self.__structure_data(reward_data=reward_data, item_dict=item_dict, reward_data_len=reward_data_len)
-			sql_str = self.__sql_str_operating(unique_id=unique_id, table_name="player", head_list=head_list, format_list=format_list, item_dict=item_dict)
-			if self.__class__.__name__ == "StageSystemClass":
-				async with session.post(MANAGER_BAG_BASE_URL + '/set_all_material', data={"statement": sql_str}) as resp:
-					sql_result = json.loads(await resp.text())
-			else:
-				sql_result = await self.set_all_material(statement=sql_str)
-			if int(sql_result["status"]) == 1:
-				return self.message_typesetting(1, "abnormal data!")
-			return self.message_typesetting(0, "passed customs!", data=data)
-	def __read_json_data(self) -> list:
-		data = []
-		if os.path.exists(JSON_NAME):
-			data_dict = json.load(open(JSON_NAME, encoding="utf-8"))
-			for key in data_dict.keys():
-				data.append(data_dict[key])
-		print("[stage_module.py][read_json_data] -> data:" + str(data))
-		return data
-	def __get_head_list(self, data_head_tuple: tuple) -> (list, list):
-		"""
-		获取到列标题列表
-		获取构造mysql语句的单字符
-		:param data_head_tuple:二维元组
-		:return:列标题列表，格式列表
-		"""
-		head_list = []
-		format_list = []
-		for col in data_head_tuple:
-			head_list.append(col[0])
-			format_list.append(format_sql[col[1][:col[1].find("(")]])  # 将smallint(6)截取出smallint，然后用标准转换成字符，用于后面替换成sql的替换
-		return head_list, format_list
-	def __structure_data(self, reward_data: dict, item_dict: dict, reward_data_len: int) -> dict:
-		"""
-		构造一个返回给客户端的通关奖励与设置字典，包含奖励与设置项
-		:param reward_data:奖励的字典
-		:param item_dict:所有的字段对应的字典
-		:param reward_data_len:奖励的字典的长度
-		:return:返回的是一个字典，包含奖励与设置
-		"""
-		temp_list = []
-		data = {}
-		for key in reward_data.keys():
-			temp_list.append(reward_data[key])  # [key, value]
-		for i in range(1, reward_data_len):
-			reward = "reward" + str(i)
-			data.update({reward: temp_list[i - 1]})
-		for i in range(1, reward_data_len):
-			reward = "reward" + str(i)
-			key = data[reward][0]
-			item_dict[key] += data[reward][1]
-			data.update({"item" + str(i): [key, item_dict[key]]})
-		data.update({"item" + str(reward_data_len): ["stage", item_dict["stage"]]})
-		return data
-	def __structure_item_dict(self, head_list, content_tuple) -> dict:
-		item_dict = {}
-		for i in range(len(head_list)):
-			item_dict.update({head_list[i]: content_tuple[i]})
-		return item_dict
-	def __sql_str_operating(self, unique_id: str, table_name: str, head_list: list, format_list: list, item_dict: dict) -> str:
-		heard_str = "UPDATE %s SET " % table_name
-		end_str = " where unique_id='%s'" % unique_id
-		result_str = ""
-		temp_list = []
-		for i in range(len(head_list)):
-			if head_list[i] != "unique_id":
-				temp_list.append(item_dict[head_list[i]])
-				if i != len(head_list) - 1:
-					result_str += head_list[i] + "=%s, " % format_list[i]
-				else:
-					result_str += head_list[i] + "=%s" % format_list[i]
-		result_str = heard_str + result_str + end_str
-		print("[StageSystemClass][__sql_str_operating] -> result_str:" + result_str)
-		print("[StageSystemClass][__sql_str_operating] -> temp_list:" + str(temp_list))
-		return result_str % tuple(temp_list)
 	async def level_up_skill(self, unique_id: str, skill_id: str, scroll_id: str) -> dict:
 		# 0 - Success
 		# 1 - User does not have that skill
@@ -391,113 +418,41 @@ class PlayerManager:
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
-	async def get_all_head(self) -> dict:
-		"""
-		Used to get information such as the title of the database
-		用于获取数据库的标题等信息
-		:return:返回所有数据库的标题等信息，json数据
-		"""
-		data = await self._execute_statement("desc player;")
-		return self.__internal_format(status=0, remaining=data)
-	async def get_all_material(self, unique_id: str) -> dict:
-		"""
-		Used to get all numeric or string information
-		用于获取所有的数字或字符串信息
-		:param unique_id: 用户的唯一标识
-		:return:返回所有材料名对应的值，json数据
-		"""
-		data = await self._execute_statement("SELECT * FROM player WHERE unique_id='" + str(unique_id) + "'")
-		return self.__internal_format(status=0, remaining=data[0])
-	async def set_all_material(self, statement: str) -> dict:
-		"""
-		Perform all material update operations
-		执行所有材料的更新操作
-		:param statement:mysql执行语句
-		:return:返回json数据， status：0成功，1失败
-		"""
-		if ",unique_id=" in statement.replace(" ", "").lower() or "setunique_id=" in statement.replace(" ", "").lower():
-			print("[set_all_material] -> mysql注入语句：" + statement)
-			return self.__internal_format(status=1, remaining=statement)
-		data = await self._execute_statement_update(statement=statement)
-		data = 1 - data  # 0, 1反转
-		return self.__internal_format(status=data, remaining=data)
-	async def __update_material(self, unique_id: str, material: str, material_value: int) -> int:
-		"""
-		Used to set information such as numeric values
-		用于设置数值等信息
-		:param unique_id:用户唯一识别码
-		:param material:材料名
-		:param material_value:要设置的材料对应的值
-		:return:返回是否更新成功的标识，1为成功，0为失败
-		"""
-		return await self._execute_statement_update("UPDATE player SET " + material + "=" + str(material_value) + " where unique_id='" + unique_id + "'")
-	async def __get_material(self, unique_id: str, material: str) -> int or str:
-		"""
-		Used to get numeric or string information
-		用于获取数字或字符串信息
-		:param unique_id: 用户的唯一标识
-		:param material:材料名
-		:return:返回材料名对应的值
-		"""
-		data = await self._execute_statement("SELECT " + material + " FROM player WHERE unique_id='" + str(unique_id) + "'")
-		return data[0][0]
-	async def __set_material(self, unique_id: str, material: str, material_value: str) -> int:
-		"""
-		Used to set string information such as user name
-		用于设置用户名等字符串信息
-		:param unique_id:用户的唯一标识
-		:param material:材料名
-		:param material_value:要存入数据库的值
-		:return:update的状态返回量，1：成功，0：失败（未改变数据统一返回0）
-		"""
-		return await self._execute_statement_update("UPDATE player SET " + material + "='" + str(material_value) + "' where unique_id='" + unique_id + "'")
-	async def __try_material(self, unique_id: str, key: str, value: int) -> dict:
-		"""
-		Try to change the database information
-		A status of 0 is a success and a 1 is a failure.
-		Return json data format
-		尝试更改数据库信息
-		状态为0表示成功，1表示失败。
-		返回json数据格式
-		:param unique_id:用户唯一识别码
-		:param key:材料名
-		:param value: 改变的材料值，正数是加运算，负数是减运算，0是给值
-		:return:返回数据格式为 {"status": status, "remaining": remaining}
-		"""
-		num = await self.__get_material(unique_id=unique_id, material=key)
-		if value == 0: return self.__internal_format(0, num)
-		num += value
-		if num < 0: return self.__internal_format(1, num)
-		if await self.__update_material(unique_id=unique_id, material=key, material_value=num) == 0:
-			return self.__internal_format(1, num)
-		return self.__internal_format(0, num)
-	async def try_coin(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="coin", value=value)
-	async def try_iron(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="iron", value=value)
-	async def try_diamond(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="diamond", value=value)
-	async def try_energy(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="energy", value=value)
-	async def try_experience(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="experience", value=value)
-	async def try_level(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="level", value=value)
-	async def try_role(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="role", value=value)
-	async def try_stage(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="stage", value=value)
-	async def try_skill_scroll_10(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="skill_scroll_10", value=value)
-	async def try_skill_scroll_30(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="skill_scroll_30", value=value)
-	async def try_skill_scroll_100(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="skill_scroll_100", value=value)
-	async def try_experience_potion(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="experience_potion", value=value)
-	async def try_small_energy_potion(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="small_energy_potion", value=value)
+	async def pass_stage(self, unique_id: str, stage: int) -> dict:
+		# 0 : passed customs ===> success
+		# 1 : database operation error
+		# 9 : abnormal data!
+		if self.__class__.__name__ == "PlayerManager":
+			json_data = await self.try_all_material(unique_id=unique_id, stage=stage)
+		else:
+			async with ClientSession() as session:
+				async with session.post(MANAGER_BAG_BASE_URL + '/try_all_material', data = {'unique_id' : unique_id, 'stage': stage}) as resp:
+					json_data = json.loads(await resp.text())
+		status = int(json_data["status"])
+		if status == 9:
+			return self.message_typesetting(status=9, message="abnormal data!")
+		elif status == 1:
+			return self.message_typesetting(status=1, message="database operation error")
+		else:
+			material_dict = json_data["remaining"][0]
+			data = {"key": list(material_dict.keys()), "reward": list(material_dict.values()), "item": json_data["remaining"][1]}
+			return self.message_typesetting(status=0, message="passed customs!", data=data)
 	def __init__(self):
+		# This is the connection pool to the SQL server. These connections stay open
+		# for as long as this class is alive.
+		# 这是SQL服务器的连接池。 只要这个类还活着，这些连接就会保持打开状态。
+		# TODO verify that this is true :D
+		self.reward_list = self.__read_json_data()
+
+	def __read_json_data(self) -> list:
+		data = []
+		if os.path.exists(JSON_NAME):
+			data_dict = json.load(open(JSON_NAME, encoding="utf-8"))
+			for key in data_dict.keys():
+				data.append(data_dict[key])
+		print("[__read_json_data] -> data:" + str(data))
+		return data
+
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._skill_tier_names = []
@@ -516,17 +471,13 @@ class PlayerManager:
 	
 
 		# This is the connection pool to the SQL server. These connections stay open
-		# for as long as this class is alive.
-		# 这是SQL服务器的连接池。 只要这个类还活着，这些连接就会保持打开状态。
-		# TODO verify that this is true :D
-
-		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 	
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
 		# 这是SQL服务器的连接池。 只要这个类还活着，这些连接就会保持打开状态。
 		# TODO verify that this is true :D
+
 
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
@@ -561,7 +512,7 @@ class PlayerManager:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
-	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
+	def __internal_format(self, status: int, remaining: int or tuple or list) -> dict:
 		"""
 		Internal json formatted information
 		内部json格式化信息
@@ -612,46 +563,6 @@ def login_required(fn):
 
 
 # Try running the server and then visiting http://localhost:[PORT]/public_method
-@ROUTES.post('/random_gift_skill')
-async def __random_gift_skill(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await MANAGER.random_gift_skill(post['unique_id'])
-	return _json_response(data)
-@ROUTES.post('/random_gift_segment')
-async def __random_gift_segment(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await MANAGER.random_gift_segment(post['unique_id'])
-	return _json_response(data)
-@ROUTES.post('/try_energy')
-async def __decrease_energy(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await MANAGER.try_energy(post['unique_id'], int(post['amount']))
-	return _json_response(data)
-@ROUTES.post('/pass_stage')
-async def __try_coin(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await MANAGER.pass_stage(unique_id=post['unique_id'], stage_client=int(post['stage']))
-	return _json_response(result)
-@ROUTES.post('/level_up_skill')
-async def __get_all_skill_level(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await MANAGER.level_up_skill(post['unique_id'], post['skill_id'], post['scroll_id'])
-	return _json_response(data)
-@ROUTES.post('/get_all_skill_level')
-async def __get_all_skill_level(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await MANAGER.get_all_skill_level(post['unique_id'])
-	return _json_response(data)
-@ROUTES.post('/get_skill')
-async def __get_skill(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await MANAGER.get_skill(post['unique_id'], post['skill_id'])
-	return _json_response(data)
-@ROUTES.post('/try_unlock_skill')
-async def __try_unlock_skill(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await MANAGER.try_unlock_skill(post['unique_id'], post['skill_id'])
-	return _json_response(data)
 @ROUTES.post('/try_coin')
 async def __try_coin(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -717,6 +628,11 @@ async def __try_coin(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_small_energy_potion(unique_id=post['unique_id'], value=int(post['value']))
 	return _json_response(result)
+@ROUTES.post('/try_all_material')
+async def __try_all_material(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.try_all_material(unique_id=post['unique_id'], stage=int(post['stage']))
+	return _json_response(result)
 @ROUTES.post('/get_all_head')
 async def __get_all_head(request: web.Request) -> web.Response:
 	result = await MANAGER.get_all_head()
@@ -726,10 +642,45 @@ async def __get_all_material(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.get_all_material(unique_id=post['unique_id'])
 	return _json_response(result)
-@ROUTES.post('/set_all_material')
-async def __set_all_material(request: web.Request) -> web.Response:
+@ROUTES.post('/random_gift_skill')
+async def __random_gift_skill(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.set_all_material(statement=post['statement'])
+	data = await MANAGER.random_gift_skill(post['unique_id'])
+	return _json_response(data)
+@ROUTES.post('/random_gift_segment')
+async def __random_gift_segment(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.random_gift_segment(post['unique_id'])
+	return _json_response(data)
+@ROUTES.post('/try_energy')
+async def __decrease_energy(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.try_energy(post['unique_id'], int(post['amount']))
+	return _json_response(data)
+@ROUTES.post('/level_up_skill')
+async def __get_all_skill_level(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.level_up_skill(post['unique_id'], post['skill_id'], post['scroll_id'])
+	return _json_response(data)
+@ROUTES.post('/get_all_skill_level')
+async def __get_all_skill_level(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.get_all_skill_level(post['unique_id'])
+	return _json_response(data)
+@ROUTES.post('/get_skill')
+async def __get_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.get_skill(post['unique_id'], post['skill_id'])
+	return _json_response(data)
+@ROUTES.post('/try_unlock_skill')
+async def __try_unlock_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.try_unlock_skill(post['unique_id'], post['skill_id'])
+	return _json_response(data)
+@ROUTES.post('/pass_stage')
+async def __try_coin(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.pass_stage(unique_id=post['unique_id'], stage=int(post['stage']))
 	return _json_response(result)
 @ROUTES.get('/public_method')
 async def __public_method(request: web.Request) -> web.Response:
