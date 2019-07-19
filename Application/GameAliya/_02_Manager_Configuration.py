@@ -21,16 +21,16 @@ import json
 import tormysql
 from aiohttp import web
 from aiohttp import ClientSession
-from Application.GameAliya.ExampleManager import ExampleManager
-
-
+import os
+import time
+import threading
 # Part (1 / 2)
 class ConfigurationManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
-
+		self.config_timer()
 	async def public_method(self) -> None:
 		# Something interesting 
 		# await self._execute_statement('STATEMENT')
@@ -53,10 +53,27 @@ class ConfigurationManager:
 				await cursor.execute(statement)
 				data = cursor.fetchall()
 				return data
+	def PythonLocation(self):
+		return os.path.dirname(os.path.realpath(__file__))
+
+	def set_server_config(self):
+		json_content = json.load(open(self.PythonLocation()+"/configuration/config_timer_setting.json", 'r', encoding="UTF-8"))
+		time_list = json_content.keys()
+		for config_time in time_list:
+			my_time = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+			if my_time>=config_time:
+				setting_time = config_time
+		print(setting_time)
+		return setting_time
+	def config_timer(self):
+		self.set_server_config()
+		timer = threading.Timer(10, self.set_server_config)
+		timer.start()
+
 
 
 # Part (2 / 2)
-MANAGER = ExampleManager() # we want to define a single instance of the class
+MANAGER = ConfigurationManager() # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
 
 
