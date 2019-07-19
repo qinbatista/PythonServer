@@ -36,8 +36,8 @@ def level_up_weapon():
 
 
 def pass_stage():
-	# result = requests.post(MANAGER_LEVEL_BASE_URL + '/pass_stage', data={'unique_id': "4", "stage": 1})
-	result = requests.post(MANAGER_PLAYER_BASE_URL + '/pass_stage', data={'unique_id': "4", "stage": 1})
+	result = requests.post(MANAGER_LEVEL_BASE_URL + '/pass_stage', data={'unique_id': "4", "stage": 2})
+	# result = requests.post(MANAGER_PLAYER_BASE_URL + '/pass_stage', data={'unique_id': "4", "stage": 1})
 	print(str(result.text))
 
 
@@ -75,9 +75,9 @@ if __name__ == "__main__":
 	# try_remove_iron()
 	# try_remove_diamond()
 	# level_up_weapon()
-	# pass_stage()
+	pass_stage()
 	# get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
-	random_gift_skill()
+	# random_gift_skill()
 	# random_gift_weapon()

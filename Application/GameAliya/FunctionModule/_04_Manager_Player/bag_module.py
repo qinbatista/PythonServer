@@ -1,11 +1,13 @@
 import random
 import json
+import os
 import configparser
 import tormysql
 from aiohttp import web
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf')
+JSON_NAME = "../../Configuration/client/1.0/stage_reward_config.json"
 
 
 class BagSystemClass:
@@ -15,6 +17,17 @@ class BagSystemClass:
 		# 这是SQL服务器的连接池。 只要这个类还活着，这些连接就会保持打开状态。
 		# TODO verify that this is true :D
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
+		self.reward_list = self.__read_json_data()
+		print("reward_list:" + str(self.reward_list))
+
+	def __read_json_data(self) -> list:
+		data = []
+		if os.path.exists(JSON_NAME):
+			data_dict = json.load(open(JSON_NAME, encoding="utf-8"))
+			for key in data_dict.keys():
+				data.append(data_dict[key])
+		print("[__read_json_data] -> data:" + str(data))
+		return data
 
 	async def get_all_head(self) -> dict:
 		"""
@@ -35,19 +48,35 @@ class BagSystemClass:
 		data = await self._execute_statement("SELECT * FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return self.__internal_format(status=0, remaining=data[0])
 
-	async def set_all_material(self, statement: str) -> dict:
-		"""
-		Perform all material update operations
-		执行所有材料的更新操作
-		:param statement:mysql执行语句
-		:return:返回json数据， status：0成功，1失败
-		"""
-		if ",unique_id=" in statement.replace(" ", "").lower() or "setunique_id=" in statement.replace(" ", "").lower():
-			print("[set_all_material] -> mysql注入语句：" + statement)
-			return self.__internal_format(status=1, remaining=statement)
-		data = await self._execute_statement_update(statement=statement)
-		data = 1 - data  # 0, 1反转
-		return self.__internal_format(status=data, remaining=data)
+	async def try_all_material(self, unique_id: str, stage: int) -> dict:
+		sql_stage = await self.__get_material(unique_id=unique_id, material="stage")
+		if stage <= 0 or sql_stage + 1 < stage:
+			print("[try_all_material] -> stage:" + str(stage))
+			return self.__internal_format(status=9, remaining=0)  # abnormal data!
+		if sql_stage + 1 == stage:  # 通过新关卡
+			material_dict = dict(self.reward_list[stage])
+			material_dict.update({"stage": 1})
+		else:  # 老关卡
+			material_dict = dict(self.reward_list[sql_stage])
+		update_str, select_str = self.__sql_str_operating(unique_id=unique_id, material_dict=material_dict)
+		data = 1 - await self._execute_statement_update(statement=update_str)  # 0, 1反转
+		remaining = list(await self._execute_statement(statement=select_str))  # 数据库设置后的值
+		# 通过新关卡有关卡数据的返回，老关卡没有关卡数据的返回
+		return self.__internal_format(status=data, remaining=[material_dict, remaining[0]])  # 0 成功， 1 失败
+
+	def __sql_str_operating(self, unique_id: str, material_dict: dict) -> (str, str):
+		update_str = "UPDATE player SET "
+		update_end_str = " where unique_id='%s'" % unique_id
+		select_str = "SELECT "
+		select_end_str = " FROM player WHERE unique_id='%s'" % unique_id
+		for key in material_dict.keys():
+			update_str += "%s=%s+%s, " % (key, key, material_dict[key])
+			select_str += "%s, " % key
+		update_str = update_str[: len(update_str) - 2] + update_end_str
+		select_str = select_str[: len(select_str) - 2] + select_end_str
+		print("[__sql_str_operating] -> update_str:" + update_str)
+		print("[__sql_str_operating] -> select_str:" + select_str)
+		return update_str, select_str
 
 	async def __update_material(self, unique_id: str, material: str, material_value: int) -> int:
 		"""
@@ -166,7 +195,7 @@ class BagSystemClass:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
-	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
+	def __internal_format(self, status: int, remaining: int or tuple or list) -> dict:
 		"""
 		Internal json formatted information
 		内部json格式化信息
@@ -292,6 +321,13 @@ async def __try_coin(request: web.Request) -> web.Response:
 	return _json_response(result)
 
 
+@ROUTES.post('/try_all_material')
+async def __try_all_material(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.try_all_material(unique_id=post['unique_id'], stage=int(post['stage']))
+	return _json_response(result)
+
+
 @ROUTES.post('/get_all_head')
 async def __get_all_head(request: web.Request) -> web.Response:
 	result = await MANAGER.get_all_head()
@@ -302,13 +338,6 @@ async def __get_all_head(request: web.Request) -> web.Response:
 async def __get_all_material(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.get_all_material(unique_id=post['unique_id'])
-	return _json_response(result)
-
-
-@ROUTES.post('/set_all_material')
-async def __set_all_material(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await MANAGER.set_all_material(statement=post['statement'])
 	return _json_response(result)
 
 

@@ -60,7 +60,7 @@ class PlayerManager:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
-	def __internal_format(self, status: int, remaining: int or tuple) -> dict:
+	def __internal_format(self, status: int, remaining: int or tuple or list) -> dict:
 		"""
 		Internal json formatted information
 		内部json格式化信息
