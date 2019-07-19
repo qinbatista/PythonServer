@@ -21,54 +21,50 @@ MESSAGE_LIST = [ {'function':'login', 'random':'-906', 'data':{'unique_id':'mac'
 				 {'function':'login_unique', 'random':'-906', 'data':{'unique_id':'4', 'identifier':'', 'value' : '','password':''}},
 				 {'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
 				 {'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
+				# 4 --- 7
 				 {'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
 				 {'function':'get_all_supplies', 'random':'-906', 'data':{}},
-				 {"function":"increase_supplies", "random":"603", "data":{"scroll_skill_10":"5", "scroll_skill_30":"5", "scroll_skill_100":"5", "iron":"5", "diamonds":"5", "coin":"5", "weapon1_segment":"5", "weapon2_segment":"5", "weapon3_segment":"5", "weapon4_segment":"5", "weapon5_segment":"5", "weapon6_segment":"5"}},
 				 {'function':'random_gift_skill', 'random':'-906', 'data':{}},
-				 {"function":"get_skill", "random":"973", "data":{"skill_id":"m11"}},
 				 {'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_id": "skill_scroll_10"}},
+				# 8 --- 11
 				 {'function':'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "20"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
-				 
+				 {'function':'level_up_skill','random':'-906', 'data':{"skill_id":"m1_level", "scroll_id": "skill_scroll_10"}},
 				 {'function':'level_up_passive','random':'-906', 'data':{"weapon":"weapon1", "passive": "passive_skill_4_level"}},
-				 # {'function':'level_up_weapon_passive_skill','random':'-906', 'data':{"weapon1":"passive_skill_2_level"}},#data: [weapon1] means which weapons' passive skill  you want to level up, [passive_skill_2_level] means skill id, right now passive skill only can be level up one by one.
-				 
 				 {'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon": "weapon1"}},#data: [weapon1] means which weapon you want to reset skill, [100] means cost resources, right now it is coin in our code,it will be change in furture, make sure it is easy change.
-				 
+				# 12 --- 15
 				 {'function':'level_up_weapon_star','random':'-906', 'data':{"weapon": "weapon1"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
-				 # {'function':'level_up_weapon_star','random':'-906', 'data':{"weapon1":"30"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
-				 
 				 {'function':'get_all_weapon','random':'-906', 'data':{}},
-				 # {'function':'get_all_weapon','random':'-906', 'data':"null"},
-     
 				 {'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
 				 {'function':'pass_stage','random':'-906', 'data':{"stage":1}},
-				 {'function':'pass_stage','random':'-906', 'data':{"stage":1}},
+				# 16 --- 17
 				 {'function':'decrease_energy','random':'-906', 'data':{"energy": "1"}},
 				 {'function':'increase_energy','random':'-906', 'data':{"energy": "1"}}
 				]
 LOGIN_AS_ACCOUNT = 0
-SKILL_LEVEL_UP = 2
-# GET_SKILL = 3
-INCREASE_SCROLL_SKILL_10=4
-GET_ALL_SKILL_LEVEL=5
-ALL_SUPPLIES_ADD5= 7
-RANDOM_GIFT_SKILL=7
-LEVEL_UP_SCROLL = 9
-GET_SKILL = 10
-LEVEL_UP_WEAPON =11
-LEVEL_UP_SKILL = 12
-RESET_SKILL_POINT = 13
-LEVEL_UP_WEAPONS_STAR = 14
-ALL_WEAPON = 15
-RANDOM_GIFT_SEGMENT = 15
-LOTTERY_SEGMENT = 16
-PASS_STAGE= 17
-DECREASE_ENERGY= 18
-INCREASE_ENERGY= 19
-
-
-
 LOGIN_AS_VISITOR = 1
+SKILL_LEVEL_UP = 2
+GET_SKILL = 3
+
+INCREASE_SUPPLIES = 4
+GET_ALL_SKILL_LEVEL = 5
+RANDOM_GIFT_SKILL = 6
+LEVEL_UP_SCROLL = 7
+
+LEVEL_UP_WEAPON = 8
+LEVEL_UP_SKILL = 9
+LEVEL_UP_PASSIVE = 10
+RESET_WEAPON_SKILL_POINT = 11
+
+LEVEL_UP_WEAPON_STAR = 12
+GET_ALL_WEAPON = 13
+RANDOM_GIFT_SEGMENT = 14
+PASS_STAGE = 15
+
+DECREASE_ENERGY = 16
+INCREASE_ENERGY = 17
+
+
+
 GET_ALL_SUPPLIES=5
 def test_multiple_message(n: int):
 	start = time.time()
@@ -240,28 +236,26 @@ def main() -> None:
 	# get_skill_from_stack()
 	# level_up_skill_by_scroll()
 	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
+
+	# send_single_message(LOGIN_AS_ACCOUNT)
 	token = send_single_message(LOGIN_AS_VISITOR)
 	print(f'this is token = {token}')
-	# MESSAGE_LIST[DECREASE_ENERGY]["token"]=token
-	# MESSAGE_LIST[INCREASE_ENERGY]["token"]=token
-	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
-	# send_single_message(GET_ALL_SUPPLIES)
-	# send_single_message(LEVEL_UP_SCROLL)
-	# send_single_message(INCREASE_SCROLL_SKILL_10)
-	# send_single_message(ALL_SUPPLIES_ADD5)
+	# send_single_message(GET_SKILL)
+	# send_single_message(INCREASE_SUPPLIES)
+	# send_single_message(GET_ALL_SKILL_LEVEL)
 	# send_single_message(RANDOM_GIFT_SKILL)
-	send_single_message(RANDOM_GIFT_SEGMENT)
-	# send_single_message(SCROLL_LEVEL_UP)
+	# send_single_message(LEVEL_UP_SCROLL)
 	# send_single_message(LEVEL_UP_WEAPON)
-	# send_single_message(LEVEL_UP_SKILL)
-	# send_single_message(RESET_SKILL_POINT)
-	# send_single_message(LEVEL_UP_WEAPONS_STAR)
-	# send_single_message(ALL_WEAPON)
-	# send_single_message(LOTTERY_SEGMENT)
+	send_single_message(LEVEL_UP_SKILL)
+	# send_single_message(LEVEL_UP_PASSIVE)
+	# send_single_message(RESET_WEAPON_SKILL_POINT)
+	# send_single_message(LEVEL_UP_WEAPON_STAR)
+	# send_single_message(GET_ALL_WEAPON)
+	# send_single_message(RANDOM_GIFT_SEGMENT)
 	# send_single_message(PASS_STAGE)
-	#send_single_message(DECREASE_ENERGY)
-	# send_single_message(INCREASE_ENERGY)
+	# send_single_message(DECREASE_ENERGY)
+
 	# test_token_server()
 
 

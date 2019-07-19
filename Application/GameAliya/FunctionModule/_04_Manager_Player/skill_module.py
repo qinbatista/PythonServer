@@ -38,7 +38,7 @@ class SkillManager:
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
 	
 	async def level_up_skill(self, unique_id: str, skill_id: str, scroll_id: str) -> dict:
-		# 0 - Success
+		# 0 - Success upgrade=0 升级成功， upgrade=1升级失败
 		# 1 - User does not have that skill
 		# 4 - User does not have enough scrolls
 		# 9 - Skill already at max level
