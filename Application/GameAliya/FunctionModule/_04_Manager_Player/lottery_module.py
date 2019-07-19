@@ -34,6 +34,7 @@ WEAPON_BASE_URL = CONFIG['_01_Manager_Weapon']['address'] + ':' + CONFIG['_01_Ma
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
 
+
 # Part (1 / 2)
 class LotteryManager:
 	def __init__(self):
@@ -103,8 +104,8 @@ class LotteryManager:
 				else:  # 2
 					return self.message_typesetting(status=status, message=data['remaining'][status])
 
-
 	async def random_gift_segment(self, unique_id: str) -> dict:
+		#
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
 		async with ClientSession() as session:
@@ -129,9 +130,7 @@ class LotteryManager:
 		self._weapon_items = eval(LOTTERY['weapons']['items'])
 
 
-			
 
-		
 
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method

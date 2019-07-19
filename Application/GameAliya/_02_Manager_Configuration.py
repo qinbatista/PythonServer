@@ -62,7 +62,7 @@ class ConfigurationManager:
 		'''
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
-				await cursor.execute(statemen∏t)
+				await cursor.execute(statement)
 				data = cursor.fetchall()
 				return data
 
