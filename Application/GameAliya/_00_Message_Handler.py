@@ -178,13 +178,12 @@ FUNCTION_LIST = {
 	'level_up_skill': MessageHandler._level_up_skill,
 
 	#Manager_PlayerState(player_state_module.py,bag_module.py,lottery_module,skill_module)
-	'get_all_supplies': MessageHandler._get_all_supplies,
-	'random_gift_skill': MessageHandler._random_gift_skill,
-	'random_gift_segment': MessageHandler._random_gift_segment,
-	'level_up_scroll': MessageHandler._level_up_scroll,
 	'decrease_energy': MessageHandler._decrease_energy,
 	'increase_energy': MessageHandler._increase_energy,
 
+	'random_gift_skill': MessageHandler._random_gift_skill,
+	'random_gift_segment': MessageHandler._random_gift_segment,
+	'level_up_scroll': MessageHandler._level_up_scroll,
 	'increase_supplies': MessageHandler._increase_supplies,
 	'pass_stage': MessageHandler._pass_stage,
 

@@ -60,6 +60,7 @@ LEVEL_UP_SKILL = 12
 RESET_SKILL_POINT = 13
 LEVEL_UP_WEAPONS_STAR = 14
 ALL_WEAPON = 15
+RANDOM_GIFT_SEGMENT = 15
 LOTTERY_SEGMENT = 16
 PASS_STAGE= 17
 DECREASE_ENERGY= 18
@@ -246,10 +247,11 @@ def main() -> None:
 	# send_single_message(GET_SKILL)
 	# send_single_message(SKILL_LEVEL_UP)
 	# send_single_message(GET_ALL_SUPPLIES)
-	send_single_message(LEVEL_UP_SCROLL)
+	# send_single_message(LEVEL_UP_SCROLL)
 	# send_single_message(INCREASE_SCROLL_SKILL_10)
 	# send_single_message(ALL_SUPPLIES_ADD5)
 	# send_single_message(RANDOM_GIFT_SKILL)
+	send_single_message(RANDOM_GIFT_SEGMENT)
 	# send_single_message(SCROLL_LEVEL_UP)
 	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(LEVEL_UP_SKILL)
