@@ -25,19 +25,31 @@ import os
 import time
 import threading
 # Part (1 / 2)
+
+
 class ConfigurationManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
-		# for as long as this class is alive. 
-		self._pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
+		# for as long as this class is alive.
+		self._pool = tormysql.ConnectionPool(
+			max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
 		self.config_timer()
+		# client setting
+		self.level_enemy_layouts_config = ""
+		self.monster_config = ""
+		self.stage_reward_config = ""
+		# server setting
+		self.lottery.conf = ""
+		self.mysql_data_config.json = ""
+		self.server.conf = ""
+
 	async def public_method(self) -> None:
-		# Something interesting 
+		# Something interesting
 		# await self._execute_statement('STATEMENT')
 		pass
-	
+
 	async def public_method(self) -> None:
-		# Something interesting 
+		# Something interesting
 		# await self._execute_statement('STATEMENT')
 		pass
 
@@ -50,30 +62,33 @@ class ConfigurationManager:
 		'''
 		async with await self._pool.Connection() as conn:
 			async with conn.cursor() as cursor:
-				await cursor.execute(statement)
+				await cursor.execute(statemen∏t)
 				data = cursor.fetchall()
 				return data
+
 	def PythonLocation(self):
 		return os.path.dirname(os.path.realpath(__file__))
 
 	def set_server_config(self):
-		json_content = json.load(open(self.PythonLocation()+"/configuration/config_timer_setting.json", 'r', encoding="UTF-8"))
+		json_content = json.load(open(self.PythonLocation(
+		)+"/configuration/config_timer_setting.json", 'r', encoding="UTF-8"))
 		time_list = json_content.keys()
 		for config_time in time_list:
-			my_time = time.strftime('%Y-%m-%d',time.localtime(time.time()))
-			if my_time>=config_time:
+			my_time = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+			if my_time >= config_time:
 				setting_time = config_time
 		print(setting_time)
 		return setting_time
+
 	def config_timer(self):
 		self.set_server_config()
-		timer = threading.Timer(10, self.set_server_config)
+		timer = threading.Timer(600, self.set_server_config)
 		timer.start()
 
 
-
 # Part (2 / 2)
-MANAGER = ConfigurationManager() # we want to define a single instance of the class
+# we want to define a single instance of the class
+MANAGER = ConfigurationManager()
 ROUTES = web.RouteTableDef()
 
 
@@ -94,10 +109,10 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 def login_required(fn):
 	async def wrapper(request):
 		async with ClientSession() as session:
-			async with session.get('http://localhost:8080/validate', headers = {'authorization' : str(request.headers.get('authorization'))}) as resp:
+			async with session.get('http://localhost:8080/validate', headers={'authorization': str(request.headers.get('authorization'))}) as resp:
 				if resp.status == 200:
 					return await fn(request)
-		return _json_response({'message' : 'You need to be logged in to access this resource'}, status = 401)
+		return _json_response({'message': 'You need to be logged in to access this resource'}, status=401)
 	return wrapper
 
 
@@ -105,13 +120,13 @@ def login_required(fn):
 @ROUTES.get('/public_method')
 async def __public_method(request: web.Request) -> web.Response:
 	await MANAGER.public_method()
-	return _json_response({'message' : 'asyncio code is awesome!'}, status = 200)
+	return _json_response({'message': 'asyncio code is awesome!'}, status=200)
 
 
 @ROUTES.get('/protected_method')
 @login_required
 async def __protected_method(request: web.Request) -> web.Response:
-	return _json_response({'message' : 'if you can see this, you are logged in!!'})
+	return _json_response({'message': 'if you can see this, you are logged in!!'})
 
 
 def run(port):
