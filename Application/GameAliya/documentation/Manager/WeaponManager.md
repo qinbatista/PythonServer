@@ -145,7 +145,7 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag ],
+				"weapon_bag1" : [ entire row of weapon bag，unique_id replaced with weapon ],
 				"item1" : ["coin", REMAINING_COINS]
 			 }
 }
@@ -160,7 +160,7 @@ Levels up the weapon star of the specified weapon. Costs segments.
 
 Status codes and meaning:
 
-- 0 - Success
+- 0 - Weapon upgrade success
 - 1 - User does not have that weapon
 - 2 - Insufficient segments, upgrade failed
 - 3 - database operation error!
@@ -215,7 +215,7 @@ Status codes and meaning:
 ```json
 {
 	"status" : "0",
-	"message": "success",
+	"message": "gain success",
 	"data" : {
 				"weapon_bag1" : [ entire row of weapon bag and weapon star ],
         		"weapon_bag2" : [ entire row of weapon bag and weapon star ],

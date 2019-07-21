@@ -39,7 +39,7 @@ Consume a skill scroll for a chance to level up the given skill. The skill must 
 
 Status codes and meaning:
 
-- 0 - Success
+- 0 - Success  （upgrade=0 升级成功， upgrade=1升级失败）
 - 1 - User does not have that skill
 - 2 - Invalid scroll id
 - 4 - User does not have enough scrolls
