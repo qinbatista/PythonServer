@@ -17,51 +17,58 @@ client_type="aliya"
 # host="192.168.1.183"
 host="127.0.0.1"
 token =""
-MESSAGE_LIST = [ {'function':'login', 'random':'-906', 'data':{'unique_id':'mac', 'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keepo'}},
-				 {'function':'login_unique', 'random':'-906', 'data':{'unique_id':'4', 'identifier':'', 'value' : '','password':''}},
-				 {'function':'skill_level_up', 'random':'-906', 'data':{'skill_id':'m1_level', 'scroll_id':'scroll_skill_30'}},
-				 {'function':'get_skill', 'random':'-906', 'data':{'skill_id':'m1_level'}},
+MESSAGE_LIST = [ {'function': 'login', 'random': '-906', 'data':{'unique_id':'mac', 'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keepo'}},
+				 {'function': 'login_unique', 'random': '-906', 'data':{'unique_id':'4', 'identifier':'', 'value' : '','password':''}},
+				 {'function': 'FUNCTION1', 'random': '-906', 'data':{}},
+				 {'function': 'get_skill', 'random': '-906', 'data':{'skill_id':'m1_level'}},
 				# 4 --- 7
-				 {'function':'increase_supplies', 'random':'-906', 'data':{'scroll_skill_10':'10','scroll_skill_30':'1'}},
-				 {'function':'get_all_supplies', 'random':'-906', 'data':{}},
-				 {'function':'random_gift_skill', 'random':'-906', 'data':{}},
-				 {'function':'level_up_scroll', 'random':'-906', 'data':{"scroll_id": "skill_scroll_10"}},
+				 {'function': 'FUNCTION2', 'random':'-906', 'data':{}},
+				 {'function': 'get_all_skill_level', 'random':'-906', 'data':{}},
+				 {'function': 'random_gift_skill', 'random':'-906', 'data':{}},
+				 {'function': 'level_up_scroll', 'random':'-906', 'data':{"scroll_id": "skill_scroll_10"}},
 				# 8 --- 11
-				 {'function':'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "20"}},#data: [weapon1] means which weapon you want to level up, [1020] means how much iron you want to cast, we set 20 iron to level up in server, if you send 1020 iron, server will level up weapon to 51.(max weapon level is 100)
-				 {'function':'level_up_skill','random':'-906', 'data':{"skill_id":"m1_level", "scroll_id": "skill_scroll_10"}},
-				 {'function':'level_up_passive','random':'-906', 'data':{"weapon":"weapon1", "passive": "passive_skill_4_level"}},
-				 {'function':'reset_weapon_skill_point','random':'-906', 'data':{"weapon": "weapon1"}},#data: [weapon1] means which weapon you want to reset skill, [100] means cost resources, right now it is coin in our code,it will be change in furture, make sure it is easy change.
+				 {'function': 'pass_stage','random':'-906', 'data':{"stage":1}},
+				 {'function': 'level_up_skill','random':'-906', 'data':{"skill_id":"m1_level", "scroll_id": "skill_scroll_10"}},
+				 {'function': 'random_gift_segment', 'random': '-906', 'data': {"weapon_kind": "100"}},
+				 {'function': 'reset_weapon_skill_point','random':'-906', 'data':{"weapon": "weapon1"}},
 				# 12 --- 15
-				 {'function':'level_up_weapon_star','random':'-906', 'data':{"weapon": "weapon1"}},# data: [weapon1] means which weapon you want to increase star, [30] means how much weapon segment weapon need to level up, it's just reference, server will handle really message, righ now level up weapon start cost 30 segment, every level increase 30 segment(1:30,2:60,3:90), make sure the cost segment value can be change easily(star also means number of this weapon).
-				 {'function':'get_all_weapon','random':'-906', 'data':{}},
-				 {'function':'random_gift_segment','random':'-906', 'data':{"weapon_kind": "100"}},
-				 {'function':'pass_stage','random':'-906', 'data':{"stage":1}},
-				# 16 --- 17
-				 {'function':'add_supplies','random':'-906', 'data':{"key": "coin", "value": 30}},
-				 {'function':'add_supplies','random':'-906', 'data':{"key": "iron", "value": 10}}
+				 {'function': 'level_up_weapon_star','random':'-906', 'data':{"weapon": "weapon1"}},
+				 {'function': 'get_all_weapon','random':'-906', 'data':{}},
+				 {'function': 'level_up_passive','random':'-906', 'data':{"weapon":"weapon1", "passive": "passive_skill_4_level"}},
+				 {'function': 'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "20"}},
+				# 16 --- 20
+				 {'function': 'add_supplies','random':'-906', 'data':{"key": "coin", "value": 30}},
+				 {'function': 'add_supplies','random':'-906', 'data':{"key": "iron", "value": 10}},
+				 {'function': 'add_supplies','random':'-906', 'data':{"key": "skill_scroll_10", "value": 10}},
+				 {'function': 'add_supplies','random':'-906', 'data':{"key": "skill_scroll_30", "value": 10}},
+				 {'function': 'add_supplies','random':'-906', 'data':{"key": "skill_scroll_100", "value": 10}}
 				]
-LOGIN_AS_ACCOUNT = 0
-LOGIN_AS_VISITOR = 1
-SKILL_LEVEL_UP = 2
-GET_SKILL = 3
+LOGIN = 0 # 新方法替换
+LOGIN_UNIQUE = 1  # ----------------------------------------------
+FUNCTION1 = 2  # 新方法替换
+GET_SKILL = 3  # ----------------------------------------------
 
-INCREASE_SUPPLIES = 4
-GET_ALL_SKILL_LEVEL = 5
-RANDOM_GIFT_SKILL = 6
-LEVEL_UP_SCROLL = 7
+FUNCTION2 = 4  # ----------------------------------------------
+GET_ALL_SKILL_LEVEL = 5  # ----------------------------------------------
+RANDOM_GIFT_SKILL = 6  # ----------------------------------------------
+LEVEL_UP_SCROLL = 7  # ----------------------------------------------
 
-LEVEL_UP_WEAPON = 8
-LEVEL_UP_SKILL = 9
-LEVEL_UP_PASSIVE = 10
-RESET_WEAPON_SKILL_POINT = 11
+PASS_STAGE = 8  # ----------------------------------------------
+LEVEL_UP_SKILL = 9  # ----------------------------------------------
+RANDOM_GIFT_SEGMENT = 10  # ----------------------------------------------
+RESET_WEAPON_SKILL_POINT = 11  # ----------------------------------------------
 
-LEVEL_UP_WEAPON_STAR = 12
-GET_ALL_WEAPON = 13
-RANDOM_GIFT_SEGMENT = 14
-PASS_STAGE = 15
+LEVEL_UP_WEAPON_STAR = 12  # ----------------------------------------------
+GET_ALL_WEAPON = 13  # ----------------------------------------------
+LEVEL_UP_PASSIVE = 14  # ----------------------------------------------
+LEVEL_UP_WEAPON = 15  # ----------------------------------------------
 
-ADD_COIN = 16
-ADD_IRON = 17
+# ========   add_supplies方法集合  ======== #
+ADD_COIN = 16  # ----------------------------------------------
+ADD_IRON = 17  # ----------------------------------------------
+ADD_SCROLL_10 = 18  # ----------------------------------------------
+ADD_SCROLL_30 = 19  # ----------------------------------------------
+ADD_SCROLL_100 = 20  # ----------------------------------------------
 
 
 
@@ -238,24 +245,27 @@ def main() -> None:
 	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
 
 	# send_single_message(LOGIN_AS_ACCOUNT)
-	token = send_single_message(LOGIN_AS_VISITOR)
+	token = send_single_message(LOGIN_UNIQUE)
 	print(f'this is token = {token}')
-	# send_single_message(SKILL_LEVEL_UP)
-	# send_single_message(GET_SKILL)
+	# send_single_message(FUNCTION1)
+	send_single_message(GET_SKILL)
 	# send_single_message(INCREASE_SUPPLIES)
-	# send_single_message(GET_ALL_SKILL_LEVEL)
+	send_single_message(GET_ALL_SKILL_LEVEL)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(LEVEL_UP_SCROLL)
-	# send_single_message(LEVEL_UP_WEAPON)
+	# send_single_message(PASS_STAGE)
 	# send_single_message(LEVEL_UP_SKILL)
-	# send_single_message(LEVEL_UP_PASSIVE)
+	# send_single_message(RANDOM_GIFT_SEGMENT)
 	# send_single_message(RESET_WEAPON_SKILL_POINT)
 	# send_single_message(LEVEL_UP_WEAPON_STAR)
 	# send_single_message(GET_ALL_WEAPON)
-	# send_single_message(RANDOM_GIFT_SEGMENT)
-	# send_single_message(PASS_STAGE)
+	# send_single_message(LEVEL_UP_PASSIVE)
+	# send_single_message(LEVEL_UP_WEAPON)
 	# send_single_message(ADD_COIN)
-	send_single_message(ADD_IRON)
+	# send_single_message(ADD_IRON)
+	# send_single_message(ADD_SCROLL_10)
+	# send_single_message(ADD_SCROLL_30)
+	# send_single_message(ADD_SCROLL_100)
 
 	# test_token_server()
 

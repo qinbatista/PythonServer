@@ -100,10 +100,6 @@ class MessageHandler:
 		async with session.post(MANAGER_PLAYER_BASE_URL + '/get_all_skill_level', data={'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
-	async def _increase_supplies(self, message: dict, session) -> str:
-		async with session.post(MANAGER_PLAYER_BASE_URL + '/increase_supplies', data={'unique_id': message['data']['unique_id'], 'supplies': message['data']['supplies'], 'amount': message['data']['amount']}) as resp:
-			return await resp.text()
-
 	async def _get_all_supplies(self, message: dict, session) -> str:
 		async with session.post(MANAGER_PLAYER_BASE_URL + '/get_all_supplies', data={'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
@@ -169,10 +165,10 @@ DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 FUNCTION_LIST = {
 	#Manager_Weapon
 	'get_all_weapon': MessageHandler._get_all_weapon,
-	'level_up_weapon': MessageHandler._level_up_weapon,
 	'level_up_passive': MessageHandler._level_up_passive,
 	'reset_weapon_skill_point': MessageHandler._reset_weapon_skill_point,
 	'level_up_weapon_star': MessageHandler._level_up_weapon_star,
+	'level_up_weapon': MessageHandler._level_up_weapon,
 
 	#Manager_weapon
 	# 'get_level_setting': MessageHandler._get_level_setting,
@@ -189,8 +185,10 @@ FUNCTION_LIST = {
 	'random_gift_segment': MessageHandler._random_gift_segment,
 	'level_up_skill': MessageHandler._level_up_skill,
 	'level_up_scroll': MessageHandler._level_up_scroll,
-	'increase_supplies': MessageHandler._increase_supplies,
 	'pass_stage': MessageHandler._pass_stage,
+
+	'get_all_skill_level': MessageHandler._get_all_skill_level,
+	'get_skill': MessageHandler._get_skill,
 
 	'add_supplies': MessageHandler._add_supplies,
 

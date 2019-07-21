@@ -65,8 +65,8 @@ The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 dependi
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"skill1": [skill_id, result of skill level],
-				"item1" : [scroll_id, resulting scroll quantity],
+				"keys": [skill_id, scroll_id],
+				"values" : [skill_level, scroll_quantity],
 				"upgrade" : "UPGRADE_SUCCESS"
 			 }
 }
@@ -99,11 +99,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"skill1": [skill_name, skill_value],
-				.
-				.
-				.
-				"skillN" : [skill_name, skill_value]
+				"keys": [skill_name1, skill_name2, ......, skill_nameN],
+        		"values": [skill_value1, skill_value2, ......, skill_valueN]
 		 }
 }
 ```
@@ -124,7 +121,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
-	"function" : "get_skill"
+	"function" : "get_skill",
 	"data" : {
 				"token" : "TOKEN",
 				"skill_id" : "SKILL_ID"
@@ -138,7 +135,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"skill1": [skill_name, skill_value],
+				"keys": [skill_id], 
+        		"values": [level]
 			 }
 }
 ```
@@ -151,8 +149,9 @@ Gives a chance to unlock a new skill if it doesn't already exist. If it does exi
 
 Status codes and meaning:
 
-- 0 - Success
-- 1 - You already have that skill, you got a new scroll for free!
+- 0 - Success  或者 You already have that skill, you got a new scroll for free!
+- 2 - invalid skill name
+- 3 - database operation error
 
 
 ##### Sample Request
@@ -171,22 +170,28 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"skill1": [skill_id, 1]
+				"keys": [skill_id],
+				"values": [skill_value]
 			 }
 }
 ```
 
 ```json
 {
-	"status" : "1",
+	"status" : "0",
 	"message": "You already have that skill, you get a new scroll for free",
 	"data" : {
-				"item1": [scroll_skill_id, scroll_skill_quantity]
+        		"keys": [skill_scroll_id],
+				"values": [scroll_skill_quantity]
 			 }
 }
 ```
 
+====================================================================
 
+### 下面是写lottery_module的random_gift_segment方法
+
+====================================================================
 
 
 #### DANGEROUS increase\_energy

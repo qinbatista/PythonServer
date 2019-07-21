@@ -40,6 +40,7 @@ class SkillManager:
 	async def level_up_skill(self, unique_id: str, skill_id: str, scroll_id: str) -> dict:
 		# 0 - Success upgrade=0 升级成功， upgrade=1升级失败
 		# 1 - User does not have that skill
+		# 2 - Invalid scroll id
 		# 4 - User does not have enough scrolls
 		# 9 - Skill already at max level
 		skill_level = await self._get_skill_level(unique_id, skill_id)
@@ -47,13 +48,18 @@ class SkillManager:
 			return self.message_typesetting(1, 'User does not have that skill')
 		if skill_level >= 10:
 			return self.message_typesetting(9, 'Skill already max level')
-
+		fn = {'skill_scroll_10': self.try_skill_scroll_10, 'skill_scroll_30': self.try_skill_scroll_30, 'skill_scroll_100': self.try_skill_scroll_100}
 		if self.__class__.__name__ == 'PlayerManager':
-			fn = {'skill_scroll_10' : self.try_skill_scroll_10, 'skill_scroll_30' : self.try_skill_scroll_30, 'skill_scroll_100' : self.try_skill_scroll_100}
+			if scroll_id not in fn.keys():
+				return self.message_typesetting(status=2, message="Invalid scroll id")
 			f = fn[scroll_id]
 			resp = await f(unique_id, -1)
+			if resp['status'] == 1:
+				return self.message_typesetting(4, 'User does not have enough scrolls')
 			scroll_quantity = resp['remaining']
 		else:
+			if scroll_id not in fn.keys():
+				return self.message_typesetting(status=2, message="Invalid scroll id")
 			async with ClientSession() as session:
 				async with session.post(BAG_BASE_URL + '/try_'+scroll_id, data = {'unique_id' : unique_id, 'value' : -1}) as resp:
 					resp = await resp.json(content_type='text/json')
@@ -62,32 +68,30 @@ class SkillManager:
 					scroll_quantity = resp['remaining']
 			
 		if not await self._roll_for_upgrade(scroll_id):
-			return self.message_typesetting(0, 'success', {'skill1' : [skill_id, skill_level], 'item1' : [scroll_id, scroll_quantity], 'upgrade' : 1})
+			return self.message_typesetting(0, 'success', {'keys': [skill_id, scroll_id], 'values': [skill_level, scroll_quantity], 'upgrade': 1})
 
 		await self._execute_statement('UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
-		return self.message_typesetting(0, 'success', {'skill1' : [skill_id, skill_level + 1], 'item1' : [scroll_id, scroll_quantity], 'upgrade' : 0})
-
-			
+		return self.message_typesetting(0, 'success', {'keys': [skill_id, scroll_id], 'values': [skill_level + 1, scroll_quantity], 'upgrade': 0})
 
 	async def get_all_skill_level(self, unique_id: str) -> dict:
 		# 0 - Success
 		names = await self._execute_statement('DESCRIBE skill;')
 		values = await self._execute_statement('SELECT * from skill WHERE unique_id = "' + str(unique_id) + '";')
-		data = {}
+		key_list = []
+		value_list = []
 		for num, val in enumerate(zip(names[1:], values[0][1:])):
-			data['skill' + str(num + 1)] = [ val[0][0] , val[1] ]
-		return self.message_typesetting(0, 'success', data)
-
+			key_list.append(val[0][0])
+			value_list.append(val[1])
+		return self.message_typesetting(0, 'success', data={"keys": key_list, "values": value_list})
 
 	async def get_skill(self, unique_id: str, skill_id: str) -> dict:
 		# 0 - Success
 		# 1 - invalid skill name
 		try:
 			level = await self._get_skill_level(unique_id, skill_id)
-			return self.message_typesetting(0, 'success', {'skill': skill_id, 'value': level})
+			return self.message_typesetting(0, 'success', {'keys': [skill_id], 'values': [level]})
 		except:
 			return self.message_typesetting(1, 'invalid skill name')
-
 
 	async def try_unlock_skill(self, unique_id: str, skill_id: str) -> dict:
 		# 0 - success, unlocked new skill
