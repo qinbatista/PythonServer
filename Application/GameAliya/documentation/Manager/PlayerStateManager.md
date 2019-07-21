@@ -187,30 +187,27 @@ Status codes and meaning:
 }
 ```
 
-====================================================================
-
-### 下面是写lottery_module的random_gift_segment方法
-
-====================================================================
 
 
-#### DANGEROUS increase\_energy
 
-Increases the user's energy by the given amount.
+#### DANGEROUS add_supplies  ===> coin or iron or diamond or ...
+
+Increases the user's material by the given amount.
 
 Status codes and meaning:
 
 - 0 - Success
-- 1 - Energy error
+- 1 - Failure
 
 
 ##### Sample Request
 ```json
 {
-	"function" : "increase_energy"
+	"function" : "increase_energy",
 	"data" : {
 				"token" : "TOKEN",
-				"energy": "ENERGY"
+				"key": "key",
+        		"value": "value"
 			 }
 }
 ```
@@ -221,7 +218,9 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-			 }
+        		"keys": [key],
+        		"values": [remaining]
+    		 }
 }
 ```
 
@@ -248,7 +247,14 @@ Status codes and meaning:
 }
 ```
 
+======================================================
+
+======================================================
+
+======================================================
+
 ##### Sample Response
+
 ```json
 {
 	"status" : "0",
@@ -339,7 +345,7 @@ Gives the user a chance at getting random segments, or a new weapon.
 
 Status codes and meaning:
 
-- 0 - Success, gained weapon segments
+- 0 - Success,Unlocked new weapon!或者Weapon already unlocked, got free segment!
 - 1 - Success, gained a new weapon
 
 
@@ -353,16 +359,25 @@ Status codes and meaning:
 }
 ```
 
-##### Sample Response
+##### Sample Response 1
 ```json
 {
 	"status" : "0",
-	"message": "success",
-	"data" : {
-				"weapon_bag1" : [ weapon_kind, weapon_star, segment ]
-			 }
+	"message": "Unlocked new weapon!",
+	"data" : {"keys": ["weapon"], "values": [weapon]}
 }
 ```
+
+##### Sample Response 2
+
+```json
+{
+	"status" : "0",
+	"message": "Weapon already unlocked, got free segment!",
+	"data" : {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+}
+```
+
 
 
 #### get\_all\_supplies

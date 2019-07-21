@@ -46,9 +46,10 @@ WEAPON_BASE_URL = CONFIG['_01_Manager_Weapon']['address'] + ':' + CONFIG['_01_Ma
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
 
+
 # Part (1 / 2)
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import random
 import tormysql
@@ -332,6 +333,9 @@ class PlayerManager:
 				else:  # 2
 					return self.message_typesetting(status=status, message=data['remaining'][status])
 	async def random_gift_segment(self, unique_id: str) -> dict:
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		#  或者 Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 1 - no weapon!
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
 		async with ClientSession() as session:
@@ -348,50 +352,64 @@ class PlayerManager:
 		self._weapon_tier_names = eval(LOTTERY['weapons']['names'])
 		self._weapon_tier_weights = eval(LOTTERY['weapons']['weights'])
 		self._weapon_items = eval(LOTTERY['weapons']['items'])
-			
-		
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
-	async def try_energy(self, unique_id: str, amount: int) -> dict:
-		if amount > 0:
-			return await self._decrease_energy(unique_id, -1 * amount)
-		elif amount < 0:
-			return await self._decrease_energy(unique_id, amount)
-		else:
-			energy, last_time = await self._get_energy_information(unique_id)
-			return self.message_typesetting(0, 'success', {'energy' : energy, 'recover_time' : last_time})
+	async def try_energy(self, unique_id: str, amount: int) -> dict:  # amount > 0
+		# - 0 - 获取能量成功
+		# - 0 - 能量已消耗，能量值及恢复时间更新成功
+		# - 0 - 能量已恢复，获取能量成功
+		# - 0 - 能量刷新后已消耗，能量值及恢复时间更新成功
+		# - 0 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功
+		# - 1 - 参数错误
+		# - 2 - 无足够能量消耗
+		if amount < 0 or amount > self._full_energy:
+			return self.message_typesetting(status=1, message="参数错误")
+		return await self._decrease_energy(unique_id=unique_id, amount=amount)
 			####################################
 			#          P R I V A T E		   #
 			####################################
 	async def _decrease_energy(self, unique_id: str, amount: int) -> dict:
 		current_energy, recover_time = await self._get_energy_information(unique_id)
-		if recover_time == '':
-			if current_energy - amount > self._full_energy:
-				await self._execute_statement('UPDATE player SET energy = "' + str(current_energy - amount) + '", recover_time = "" WHERE unique_id = "' + unique_id + '";')
-				return self.message_typesetting(0, 'decrease success, remaining energy is over full energy, removed recover time', {'energy' : current_energy - amount})
-			elif current_energy - amount == self._full_energy:
-				await self._execute_statement('UPDATE player SET energy = "' + str(current_energy - amount) + '", recover_time = "' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '" WHERE unique_id = "' + unique_id + '";')
-				return self.message_typesetting(0, 'decrease success, remaining energy full, recovering energy', {'energy' : current_energy - amount})
-			else:
-				await self._execute_statement('UPDATE player SET energy = "' + str(current_energy - amount) + '", recover_time = "' + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) + '" WHERE unique_id = "' + unique_id + '";')
-				return self.message_typesetting(0, 'decrease success, start recovering energy', {'energy' : current_energy - amount})
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if recover_time == '':  # 此时 current_energy == self._full_energy 成立
+			if amount == 0:  # 成功1：如果没有恢复时间且是获取能量值，则直接拿取数据库的值给客户端
+				return self.message_typesetting(status=0, message='获取能量成功', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+			current_energy -= amount
+			# 成功2：如果没有恢复时间且是消耗能量值，则直接用数据库的值减去消耗的能量值，
+			# 然后存入消耗之后的能量值，以及将当前的时间存入 恢复时间项
+			await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
+			return self.message_typesetting(0, '能量已消耗，能量值及恢复时间更新成功', {"keys": ['energy', 'recover_time'], "values": [current_energy, current_time]})
 		else:
-			delta_time = datetime.strptime(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
-			recovered_energy = int(delta_time.seconds / 60 / 20)
-			if recovered_energy + current_energy - amount >= 0:
-				if recovered_energy + current_energy - amount > 10:
-					await self._execute_statement('UPDATE player SET energy = "' + str(10 - amount) + '", recover_time = "" WHERE unique_id = "' + unique_id + '";')
-					return self.message_typesetting(0, 'energy over full energy, remove record time', {'energy' : 10 - amount})
-				else:
-					await self._execute_statement('UPDATE player SET energy = "' + str(recovered_energy + current_energy - amount) + '", recover_time = "' + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()) + '" WHERE unique_id = "' + unique_id + '";')
-					return self.message_typesetting(0, 'success, recovering energy', {'energy' : recovered_energy + current_energy - amount})
-		return self.message_typesetting(1, 'energy error')
-	async def _get_energy_information(self, unique_id: str) -> tuple:
+			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
+			recovered_energy = delta_time.seconds // 60 // self._recover_time
+			if amount == 0:
+				# 成功3：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
+				# - 1 - 满足上限的情况：直接将满能量值和空字符串分别存入能量值项和恢复时间项
+				# - 2 - 不满足上限的情况：将能恢复的能量值计算出来，并且计算恢复后的能量值current_energy
+				#       和恢复时间与恢复能量消耗的时间相减的恢复时间值
+				recover_time, current_energy = ("", self._full_energy) if (current_energy + recovered_energy >= self._full_energy) else ((datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._recover_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy)
+				await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
+				return self.message_typesetting(status=0, message='能量已恢复，获取能量成功', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+			if recovered_energy + current_energy >= self._full_energy:
+				# 成功4：如果有恢复时间且是消耗能量
+				# 满足上限的情况是用上限能量值减去要消耗的能量值，然后设置减去之后的能量值和当前的时间分别存入能量值项和恢复时间项
+				current_energy = self._full_energy - amount
+				await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
+				return self.message_typesetting(0, '能量刷新后已消耗，能量值及恢复时间更新成功', {"keys": ['energy', 'recover_time'], "values": [current_energy, current_time]})
+			elif recovered_energy + current_energy - amount >= 0:
+				# 成功5：如果有恢复时间且是消耗能量
+				# 不满足上限的情况是用当前数据库的能量值和当前恢复的能量值相加然后减去消耗的能量值为要存入数据库的能量值项
+				# 数据库中的恢复时间与恢复能量消耗的时间相减的恢复时间值存入到数据库的恢复时间项
+				current_energy = recovered_energy + current_energy - amount
+				recover_time = (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._recover_time)).strftime("%Y-%m-%d %H:%M:%S")
+				await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
+				return self.message_typesetting(0, '能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功', {"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+			else:  # 发生的情况是当前能量值和恢复能量值相加比需要消耗的能量值少
+				return self.message_typesetting(status=2, message="无足够能量消耗")
+	async def _get_energy_information(self, unique_id: str) -> (int, str):
 		data = await self._execute_statement('SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
-		return (data[0][0], data[0][1])
-		
-		
+		return int(data[0][0]), data[0][1]
 	# It is helpful to define a private method that you can simply pass
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
@@ -517,9 +535,8 @@ class PlayerManager:
 
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
-		self._recover_time = 30
+		self._recover_time = 10  # 10分钟恢复一点体力
 		self._full_energy = 10
-	
 
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 

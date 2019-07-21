@@ -105,7 +105,9 @@ class LotteryManager:
 					return self.message_typesetting(status=status, message=data['remaining'][status])
 
 	async def random_gift_segment(self, unique_id: str) -> dict:
-		#
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		#  或者 Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 1 - no weapon!
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
 		async with ClientSession() as session:
