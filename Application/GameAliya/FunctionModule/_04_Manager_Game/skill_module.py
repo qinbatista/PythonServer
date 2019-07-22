@@ -101,7 +101,7 @@ class SkillManager:
 		table_tuple = ("success, unlocked new skill", "skill already unlocked", "invalid skill name")
 		try:  # 0、1、2
 			level = await self._get_skill_level(unique_id, skill_id)
-			if level == 0 and await self._execute_statement_update('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";') == 0:
+			if level == 0 and await self._execute_statement_update('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";') == 1:
 				return self.__internal_format(status=0, remaining=table_tuple)  # success, unlocked new skill
 			return self.__internal_format(status=1, remaining=table_tuple)  # skill already unlocked
 		except:

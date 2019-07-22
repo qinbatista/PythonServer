@@ -18,20 +18,13 @@ CONFIG.read('../../Configuration/server/1.0/server.conf')
 MANAGER_PLAYER_BASE_URL = CONFIG['_04_Manager_Game']['address'] + ":" + CONFIG['_04_Manager_Game']['port']
 
 
-class WeaponUpgradeError(Exception):
-	def __init__(self, code: int, message: str = ''):
-		self.code = code
-		self.message = message
-
-
 class WeaponManager:
-	def __init__(self, standard_iron_count=20, standard_segment_count=30, standard_reset_weapon_skill_coin_count=100):
-		self._standard_iron_count = standard_iron_count
-		self._standard_segment_count = standard_segment_count
+	def __init__(self):
+		self._standard_iron_count = CONFIG['_01_Manager_Weapon']['standard_iron_count']
+		self._standard_segment_count = CONFIG['_01_Manager_Weapon']['standard_segment_count']
 		# Reset the amount of gold coins consumed by weapon skills
-		self._standard_reset_weapon_skill_coin_count = standard_reset_weapon_skill_coin_count
-
-		self._valid_passive_skills = ['passive_skill_1_level', 'passive_skill_2_level', 'passive_skill_3_level', 'passive_skill_4_level']
+		self._standard_reset_weapon_skill_coin_count = CONFIG['_01_Manager_Weapon']['standard_reset_weapon_skill_coin_count']
+		self._valid_passive_skills = CONFIG['_01_Manager_Weapon']['_valid_passive_skills']
 
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
