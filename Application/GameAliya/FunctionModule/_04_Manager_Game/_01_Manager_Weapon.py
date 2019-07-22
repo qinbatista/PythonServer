@@ -20,10 +20,10 @@ MANAGER_PLAYER_BASE_URL = CONFIG['_04_Manager_Game']['address'] + ":" + CONFIG['
 
 class WeaponManager:
 	def __init__(self):
-		self._standard_iron_count = CONFIG['_01_Manager_Weapon']['standard_iron_count']
-		self._standard_segment_count = CONFIG['_01_Manager_Weapon']['standard_segment_count']
+		self._standard_iron_count = int(CONFIG['_01_Manager_Weapon']['standard_iron_count'])
+		self._standard_segment_count = int(CONFIG['_01_Manager_Weapon']['standard_segment_count'])
 		# Reset the amount of gold coins consumed by weapon skills
-		self._standard_reset_weapon_skill_coin_count = CONFIG['_01_Manager_Weapon']['standard_reset_weapon_skill_coin_count']
+		self._standard_reset_weapon_skill_coin_count = int(CONFIG['_01_Manager_Weapon']['standard_reset_weapon_skill_coin_count'])
 		self._valid_passive_skills = CONFIG['_01_Manager_Weapon']['_valid_passive_skills']
 
 		# This is the connection pool to the SQL server. These connections stay open
@@ -36,8 +36,9 @@ class WeaponManager:
 	async def level_up_weapon(self, unique_id: str, weapon: str, iron: int) -> dict:
 		# - 0 - Success
 		# - 1 - User does not have that weapon
-		# - 2 - Insufficient materials, upgrade failed
-		# - 3 - Database operation error
+		# - 2 - Incoming materials are not upgraded enough
+		# - 3 - Insufficient materials, upgrade failed
+		# - 4 - Database operation error
 		# - 9 - Weapon already max level
 		async with ClientSession() as session:
 			if await self.__get_weapon_star(unique_id, weapon) == 0:
@@ -65,7 +66,7 @@ class WeaponManager:
 			row[point_count] += skill_upgrade_number
 
 			if skill_upgrade_number == 0:
-				return self.message_typesetting(status=2, message="insufficient materials, upgrade failed")
+				return self.message_typesetting(status=2, message="Incoming materials are not upgraded enough")
 			if self.__class__.__name__ == "PlayerManager":
 				json_data = await self.try_iron(unique_id=unique_id, value=-skill_upgrade_number * self._standard_iron_count)
 			else:
@@ -73,7 +74,7 @@ class WeaponManager:
 					json_data = json.loads(await resp.text())
 
 			if int(json_data["status"]) == 1:
-				return self.message_typesetting(status=2, message="insufficient materials, upgrade failed")
+				return self.message_typesetting(status=3, message="insufficient materials, upgrade failed")
 			remaining_iron = int(json_data["remaining"])
 
 			# update the weapon level on the account
@@ -180,10 +181,10 @@ class WeaponManager:
 			weapon_star = await self.__get_weapon_star(unique_id=unique_id, weapon=weapon)
 			segment_count = self._standard_segment_count * (1 + weapon_star)  # 根据武器星数增加碎片的消耗数量
 
-			if row[head.index("segment")] < segment_count:
+			if int(row[head.index("segment")]) < segment_count:
 				return self.message_typesetting(status=2, message="insufficient segments, upgrade failed!")
 			else:
-				row[head.index("segment")] -= segment_count
+				row[head.index("segment")] = int(row[head.index("segment")]) - segment_count
 				weapon_star += 1
 				code1 = await self.__set_segment_by_id(unique_id=unique_id, weapon=weapon, segment=row[head.index("segment")])
 				code2 = await self.__set_weapon_star(unique_id=unique_id, weapon=weapon, star=weapon_star)
@@ -231,8 +232,8 @@ class WeaponManager:
 
 	async def try_unlock_weapon(self, unique_id: str, weapon: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		# - 0 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 1 - no weapon!
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
 		try:
 			star = await self.__get_weapon_star(unique_id, weapon)
 			if star != 0:
@@ -240,9 +241,9 @@ class WeaponManager:
 				await self.__set_segment_by_id(unique_id, weapon, segment)
 				return self.message_typesetting(status=0, message='Weapon already unlocked, got free segment!', data={"keys": ['weapon', 'segment'], "values": [weapon, segment]})
 			await self.__set_weapon_star(unique_id, weapon, 1)
-			return self.message_typesetting(status=0, message='Unlocked new weapon!', data={"keys": ["weapon"], "values": [weapon]})
+			return self.message_typesetting(status=1, message='Unlocked new weapon!', data={"keys": ["weapon"], "values": [weapon]})
 		except:
-			return self.message_typesetting(status=1, message='no weapon!')
+			return self.message_typesetting(status=2, message='no weapon!')
 
 	# Format the information
 	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
