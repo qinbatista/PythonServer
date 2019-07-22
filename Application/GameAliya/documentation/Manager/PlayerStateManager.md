@@ -32,118 +32,11 @@ Any function call that requires a valid token and does not supply one will recei
 
 ---
 
-#### skill\_level\_up
-
-Consume a skill scroll for a chance to level up the given skill. The skill must already be unlocked (not level 0). Different tiers of skill scrolls provide different chances to successfully level up the skill. 
 
 
-Status codes and meaning:
+## DANGEROUS 
 
-- 0 - Success  （upgrade=0 升级成功， upgrade=1升级失败）
-- 1 - User does not have that skill
-- 2 - Invalid scroll id
-- 4 - User does not have enough scrolls
-- 9 - Skill already at max level
-
-The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 depending upon whether or not the skill actually leveled up. A failure here does not mean a failed API call - it means that the scroll skill did not yield a level up. Different levels of scroll skills have different success rates.
-
-##### Sample Request
-```json
-{
-	"function" : "skill_level_up",
-	"data" : {
-				"token" : "TOKEN",
-				"skill_id" : "SKILL ID",
-				"scroll_id" : "SCROLL ID"
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-				"keys": [skill_id, scroll_id],
-				"values" : [skill_level, scroll_quantity],
-				"upgrade" : "UPGRADE_SUCCESS"
-			 }
-}
-```
-
-
-
-#### get\_all\_skill\_level
-
-Returns all the current skill levels.
-
-Status codes and meaning:
-
-- 0 - Success
-
-
-##### Sample Request
-```json
-{
-	"function" : "get_all_skill_level"
-	"data" : {
-				"token" : "TOKEN",
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-				"keys": [skill_name1, skill_name2, ......, skill_nameN],
-        		"values": [skill_value1, skill_value2, ......, skill_valueN]
-		 }
-}
-```
-
-
-
-
-#### get\_skill
-
-Returns the requested skill level.
-
-Status codes and meaning:
-
-- 0 - Success
-- 1 - Invalid skill name
-
-
-##### Sample Request
-```json
-{
-	"function" : "get_skill",
-	"data" : {
-				"token" : "TOKEN",
-				"skill_id" : "SKILL_ID"
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-				"keys": [skill_id], 
-        		"values": [level]
-			 }
-}
-```
-
-
-
-#### DANGEROUS random\_gift\_skill
+## ========   random\_gift\_skill   ========
 
 Gives a chance to unlock a new skill if it doesn't already exist. If it does exist, the user gets a free skill scroll instead.
 
@@ -153,18 +46,20 @@ Status codes and meaning:
 - 2 - invalid skill name
 - 3 - database operation error
 
-
 ##### Sample Request
+
 ```json
 {
 	"function" : "random_gift_skill"
 	"data" : {
+    			"world" : "str 1 or 2 or 3....",
 				"token" : "TOKEN",
 			 }
 }
 ```
 
 ##### Sample Responses
+
 ```json
 {
 	"status" : "0",
@@ -189,8 +84,361 @@ Status codes and meaning:
 
 
 
+## DANGEROUS
 
-#### DANGEROUS add_supplies  ===> coin or iron or diamond or ...
+## ========   random\_gift\_segment   ========
+
+Gives the user a chance at getting random segments, or a new weapon.
+
+Status codes and meaning:
+
+- 0 - Unlocked new weapon
+- 0 - Weapon already unlocked, got free segment!
+- 1 - no weapon
+
+##### Sample Request
+
+```json
+{
+	"function" : "random_gift_segment"
+	"data" : {
+    			"world" : "str 1 or 2 or 3....",
+				"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response 1
+
+```json
+{
+	"status" : "0",
+	"message": "Unlocked new weapon!",
+	"data" : {
+        		"keys": ["weapon"],
+              	"values": [weapon]
+             }
+}
+```
+
+##### Sample Response 2
+
+```json
+{
+	"status" : "0",
+	"message": "Weapon already unlocked, got free segment!",
+	"data" : {
+                "keys": ['weapon', 'segment'], 
+                "values": [weapon, segment]
+    		 }
+}
+```
+
+
+
+## ========   level_up_skill   ========
+
+Consume a skill scroll for a chance to level up the given skill. The skill must already be unlocked (not level 0). Different tiers of skill scrolls provide different chances to successfully level up the skill. 
+
+
+Status codes and meaning:
+
+- 0 - Success  （upgrade=0 升级成功， upgrade=1升级失败）
+- 1 - User does not have that skill
+- 2 - Invalid scroll id
+- 4 - User does not have enough scrolls
+- 9 - Skill already at max level
+
+The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 depending upon whether or not the skill actually leveled up. A failure here does not mean a failed API call - it means that the scroll skill did not yield a level up. Different levels of scroll skills have different success rates.
+
+##### Sample Request
+```json
+{
+	"function" : "level_up_skill",
+	"data" : {
+    			"world" : "str 1 or 2 or 3....",
+				"token" : "TOKEN",
+				"skill_id" : "SKILL ID",
+				"scroll_id" : "SCROLL ID"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys": [skill_id, scroll_id],
+				"values" : [skill_level, scroll_quantity],
+				"upgrade" : "UPGRADE_SUCCESS"
+			 }
+}
+```
+
+
+
+## ========   level\_up\_scroll ========
+
+Combine several existing low level scrolls to make one higher level scroll.
+
+(3) 10% skill scrolls -> (1) 30% skill scroll
+
+(3) 30% skill scrolls -> (1) 100% skill scroll
+
+Status codes and meaning:
+
+- 0 - level up scroll success
+- 1 - advanced reels are not upgradeable
+- 2 - insufficient scroll
+- 3 - unexpected parameter --> scroll_id
+- 4 - parameter error
+- 9 - database operation error
+
+##### Sample Request
+
+```json
+{
+	"function" : "level_up_scroll"
+	"data" : {
+    			"world" : "str 1 or 2 or 3....",
+				"token" : "valid token here",
+				"scroll_id" : "SCROLL_ID"
+			 }
+}
+```
+
+##### Sample Response 1
+
+```json
+{
+	"status" : "0",
+	"message": "level up scroll success",
+	"data" : {
+				"keys" : [ "skill_scroll_10", "skill_scroll_30" ],
+				"values" : [ "value10", "value30" ]
+			 }
+}
+```
+
+##### Sample Response 2
+
+```json
+{
+	"status" : "0",
+	"message": "level up scroll success",
+	"data" : {
+				"keys" : [ "skill_scroll_30", "skill_scroll_100" ],
+				"values" : [ "value30", "value100" ]
+			 }
+}
+```
+
+
+
+## ========   pass_stage   ========
+
+Let the player enter the next stage and give the reward.
+
+Status codes and meaning:
+
+- 0 - passed customs
+- 1 - database operation error
+- 9 - abnormal data!
+
+##### Sample Request
+
+```json
+{
+	"function" : "pass_stage"
+	"data" : {
+    			"world" : "str 1 or 2 or 3....",
+				"token" : "TOKEN",
+    			"stage" : "int"
+			 }
+}
+```
+
+##### Sample Response
+
+```json
+{
+	"status" : "0",
+	"message": "passed customs",
+	"data" : {
+        		"keys": [], 
+        		"values": [], 
+        		"rewards": []
+			 }
+}
+```
+
+
+
+## ========   get\_all\_skill\_level   ========
+
+Returns all the current skill levels.
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"function" : "get_all_skill_level"
+	"data" : {
+    			"world" : "str 1 or 2 or 3....",
+				"token" : "TOKEN",
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys": [skill_name1, skill_name2, ......, skill_nameN],
+        		"values": [skill_value1, skill_value2, ......, skill_valueN]
+		 }
+}
+```
+
+
+
+## ========   get\_skill   ========
+
+Returns the requested skill level.
+
+Status codes and meaning:
+
+- 0 - Success
+- 1 - Invalid skill name
+
+
+##### Sample Request
+```json
+{
+	"function" : "get_skill",
+	"data" : {
+    			"world" : "str 1 or 2 or 3....",
+				"token" : "TOKEN",
+				"skill_id" : "SKILL_ID"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys": [skill_id], 
+        		"values": [level]
+			 }
+}
+```
+
+
+
+## ========   update_energy   ========
+
+Get the energy value or the energy consumption value.
+
+Status codes and meaning:
+
+- 0 - 获取能量成功 
+  - Get energy successfully
+- 0 - 能量已消耗，能量值及恢复时间更新成功 
+  - Energy has been consumed, energy value and recovery time updated successfully
+- 0 - 能量已恢复，获取能量成功 
+  -  Energy has been recovered and energy is successfully acquired
+
+- 0 - 能量刷新后已消耗，能量值及恢复时间更新成功
+  - After refreshing the energy, the energy value and recovery time are successfully updated.
+- 0 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功
+  - Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully
+
+- 1 - 参数错误 
+  - Parameter error
+- 2 - 无足够能量消耗 
+  - Not enough energy consumption
+
+##### Sample Request
+
+```json
+{
+	"function" : "update_energy",
+	"data" : {
+    			"world" : "str 1 or 2 or 3....",
+				"token" : "TOKEN",
+				"amount" : "int"
+			 }
+}
+```
+
+##### Sample Response
+
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys": ['energy', 'recover_time'], 
+        		"values": [current_energy, recover_time]
+			 }
+}
+```
+
+
+
+
+
+## ========   get_all_supplies   ========
+
+获取player表中的所有属性及值，包括energy和recover_time，
+
+获取到的数据发送到客户端，客户端再详细筛选
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"function" : "get_all_supplies",
+	"data" : {
+    			"world" : "str 1 or 2 or 3....",
+				"token" : "TOKEN"
+			 }
+}
+```
+
+##### Sample Response
+
+```json
+{
+	"status" : "0",
+	"message": "get supplies success",
+	"data" : {
+        		"keys": [heads],
+              	"values": [content]
+    		 }
+}
+```
+
+
+
+## DANGEROUS 
+
+## ========   add_supplies   ========
+
+#### add_supplies  => coin or iron or diamond or ...
 
 Increases the user's material by the given amount.
 
@@ -203,123 +451,12 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
-	"function" : "increase_energy",
+	"function" : "add_supplies"
 	"data" : {
-				"token" : "TOKEN",
-				"key": "key",
-        		"value": "value"
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-        		"keys": [key],
-        		"values": [remaining]
-    		 }
-}
-```
-
-
-
-#### decrease\_energy
-
-Decreases the user's energy.
-
-Status codes and meaning:
-
-- 0 - Success
-- 1 - Energy error
-
-
-##### Sample Request
-```json
-{
-	"function" : "decrease_energy"
-	"data" : {
-				"token" : "TOKEN",
-				"energy": "ENERGY"
-			 }
-}
-```
-
-======================================================
-
-======================================================
-
-======================================================
-
-##### Sample Response
-
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-			 }
-}
-```
-
-
-
-#### pass\_level
-
-Advances the player to the next level.
-
-Status codes and meaning:
-
-- 0 - Success
-- 1 - Invalid state - the server could not confirm player beat the level
-
-
-##### Sample Request
-```json
-{
-	"function" : "pass_level"
-	"data" : {
-				"token" : "TOKEN"
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-			 }
-}
-```
-
-
-
-
-#### level\_up\_scroll
-
-Combine several existing low level scrolls to make one higher level scroll.
-
-(3) 10% skill scrolls -> (1) 30% skill scroll
-
-(3) 30% skill scrolls -> (1) 100% skill scroll
-
-Status codes and meaning:
-
-- 0 - Success
-- 1 - Not enough scrolls to complete conversion
-
-
-##### Sample Request
-```json
-{
-	"function" : "level_up_scroll"
-	"data" : {
+    			"world" : "str 1 or 2 or 3....",
 				"token" : "valid token here",
-				"scroll_id" : "SCROLL_ID"
+				"key" : "material_name",
+				"value" : "material_value"
 			 }
 }
 ```
@@ -330,121 +467,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"item1" : [ scroll_id, remaining_amount ],
-				"item2" : [ converted_scroll_id, resulting_amount ]
-			 }
-}
-```
-
-
-
-
-#### DANGEROUS random\_gift\_segment
-
-Gives the user a chance at getting random segments, or a new weapon.
-
-Status codes and meaning:
-
-- 0 - Success,Unlocked new weapon!或者Weapon already unlocked, got free segment!
-- 1 - Success, gained a new weapon
-
-
-##### Sample Request
-```json
-{
-	"function" : "random_gift_segment"
-	"data" : {
-				"token" : "valid token here"
-			 }
-}
-```
-
-##### Sample Response 1
-```json
-{
-	"status" : "0",
-	"message": "Unlocked new weapon!",
-	"data" : {"keys": ["weapon"], "values": [weapon]}
-}
-```
-
-##### Sample Response 2
-
-```json
-{
-	"status" : "0",
-	"message": "Weapon already unlocked, got free segment!",
-	"data" : {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-}
-```
-
-
-
-#### get\_all\_supplies
-
-Returns all the supplies in the user's bag.
-
-Status codes and meaning:
-
-- 0 - Success
-
-
-##### Sample Request
-```json
-{
-	"function" : "get\_all\_supplies"
-	"data" : {
-				"token" : "valid token here"
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-				"item1" : [item_name, item_quantity],
-				.
-				.
-				"itemN" : [item_name, item_quantity]
-			 }
-}
-```
-
-
-
-
-#### DANGEROUS increase\_supplies
-
-Increases the quantity of the given supplies.
-
-Status codes and meaning:
-
-- 0 - Success
-
-
-##### Sample Request
-```json
-{
-	"function" : "increase_supplies"
-	"data" : {
-				"token" : "valid token here",
-				"supplies" : [supply0, supply1, ..., supplyN],
-				"amount" : [amount0, amount1, ..., amountN]
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-				"supplies" : [supply0, supply1, ..., supplyN],
-				"amount" : [amount0, amount1, ..., amountN]
+				"keys" : [key],
+				"values" : [value]
 			 }
 }
 ```

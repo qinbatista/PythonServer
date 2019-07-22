@@ -43,7 +43,7 @@ class StageSystemClass:
 			return self.message_typesetting(status=1, message="database operation error")
 		else:
 			material_dict = json_data["remaining"][0]
-			data = {"key": list(material_dict.keys()), "reward": list(material_dict.values()), "item": json_data["remaining"][1]}
+			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
 			return self.message_typesetting(status=0, message="passed customs!", data=data)
 
 	async def _execute_statement(self, statement: str) -> tuple:

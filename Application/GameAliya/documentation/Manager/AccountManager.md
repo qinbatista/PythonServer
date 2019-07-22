@@ -52,6 +52,7 @@ Status codes and meaning:
 {
 	"function" : "login",
 	"data" : {
+    			"world" : "str 1 or 2 or 3....",
 				"identifier" : "IDENTIFIER",
 				"value" : "VALUE_OF_IDENTIFIER",
 				"password" : "PASSWORD"
@@ -89,6 +90,7 @@ Status codes and meaning:
 {
 	"function" : "login_unique",
 	"data" : {
+    			"world" : "str 1 or 2 or 3....",
 				"unique_id" : "UNIQUE_ID"
 			 }
 }
@@ -126,6 +128,7 @@ Status codes and meaning:
 {
 	"function" : "login",
 	"data" : {
+    			"world" : "str 1 or 2 or 3....",
 				"token" : "TOKEN",
 				"account" : "ACCOUNT_NAME",
 				"password" : "PASSWORD"

@@ -197,7 +197,7 @@ class WeaponManager:
 
 	async def try_unlock_weapon(self, unique_id: str, weapon: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		#  或者 Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 0 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
 		# - 1 - no weapon!
 		try:
 			star = await self.__get_weapon_star(unique_id, weapon)
