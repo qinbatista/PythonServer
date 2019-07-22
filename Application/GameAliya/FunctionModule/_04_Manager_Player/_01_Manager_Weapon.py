@@ -140,22 +140,33 @@ class WeaponManager:
 		# - 9 - Weapon reset skill point success
 		async with ClientSession() as session:
 			# get the coin from the account
-			bag_coin = await self.__get_material(unique_id=unique_id, material="coin")
-			info_list = await self.__get_row_by_id(weapon, unique_id)
 			if await self.__get_weapon_star(unique_id=unique_id, weapon=weapon) == 0:
 				return self.message_typesetting(status=1, message="no weapon!")
-			elif bag_coin < self._standard_reset_weapon_skill_coin_count:
-				return self.message_typesetting(status=2, message="insufficient gold coins, upgrade failed")
+			if self.__class__.__name__ == "PlayerManager":
+				json_data = await self.try_coin(unique_id=unique_id, value=-self._standard_reset_weapon_skill_coin_count)
+				data_tuple = (await self.get_all_head(table=weapon))["remaining"]
 			else:
-				info_list[6] = info_list[1]
-				info_list[2] = info_list[3] = info_list[4] = info_list[5] = 0
-				bag_coin -= self._standard_reset_weapon_skill_coin_count
-				coin_result = await self.__set_material(unique_id=unique_id, material="coin", material_value=bag_coin)
-				weapon_result = await self.__set_skill_point(unique_id, weapon, skill_point=info_list[6])
-				if coin_result == 0 or weapon_result == 0:
-					return self.message_typesetting(status=3, message="database operation error!")
-				info_list[0] = weapon
-				return self.message_typesetting(status=0, message=weapon + " reset skill point success!", data={"weapon_bag1": info_list, "item1": ["coin", bag_coin]})
+				async with session.post(MANAGER_PLAYER_BASE_URL + '/try_coin', data={"unique_id": unique_id, "value": -self._standard_reset_weapon_skill_coin_count}) as resp:
+					json_data = json.loads(await resp.text())
+				async with session.post(MANAGER_PLAYER_BASE_URL + '/get_all_head', data={'table': weapon}) as resp:
+					data_tuple = json.loads(await resp.text())['remaining']
+			if int(json_data["status"]) == 1:
+				return self.message_typesetting(status=2, message="insufficient gold coins, upgrade failed")
+			head = []
+			for col in data_tuple:
+				head.append(col[0])
+			row = await self.__get_row_by_id(table_name=weapon, unique_id=unique_id)
+
+			row[head.index("skill_point")] = row[head.index("weapon_level")]
+			row[head.index("passive_skill_1_level")] = row[head.index("passive_skill_2_level")] = row[head.index("passive_skill_3_level")] = row[head.index("passive_skill_4_level")] = 0
+			if await self.__set_skill_point(unique_id=unique_id, weapon=weapon, skill_point=str(row[head.index("skill_point")])) == 0:
+				return self.message_typesetting(status=3, message="database operation error!")
+
+			head[0] = "weapon"
+			row[0] = weapon
+			head.append("coin")
+			row.append(json_data["remaining"])
+			return self.message_typesetting(status=0, message=weapon + " reset skill point success!", data={"keys": head, "values": row})
 
 	# levels up the weapon star. costs segments.
 	# 升级武器星数。 成本是碎片。
@@ -261,8 +272,8 @@ class WeaponManager:
 		data = await self._execute_statement("select weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment from " + weapon + " where unique_id='" + unique_id + "';")
 		return list(data[0])
 
-	async def __set_skill_point(self, unique_id, weapon_kind, skill_point) -> int:
-		return await self._execute_statement_update("UPDATE " + weapon_kind + " SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point=" + str(skill_point) + " where unique_id='" + unique_id + "'")
+	async def __set_skill_point(self, unique_id: str, weapon: str, skill_point: str) -> int:
+		return await self._execute_statement_update("UPDATE " + weapon + " SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point=" + skill_point + " where unique_id='" + unique_id + "'")
 
 	async def __set_weapon_star(self, unique_id: str, weapon: str, weapon_value: int) -> int:
 		return await self._execute_statement_update("UPDATE weapon_bag SET " + weapon + "=" + str(weapon_value) + " where unique_id='" + unique_id + "'")
