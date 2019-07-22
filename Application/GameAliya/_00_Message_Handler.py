@@ -116,6 +116,10 @@ class MessageHandler:
 		async with session.post(MANAGER_PLAYER_BASE_URL + '/get_skill', data={'unique_id': message['data']['unique_id'], 'skill_id': message["data"]["skill_id"]}) as resp:
 			return await resp.text()
 
+	async def _update_energy(self, message: dict, session) -> str:
+		async with session.post(MANAGER_PLAYER_BASE_URL + '/try_energy', data={'unique_id': message['data']['unique_id'], 'amount': message["data"]["amount"]}) as resp:
+			return await resp.text()
+
 	async def _level_up_scroll(self, message: dict, session) -> str:
 		async with session.post(MANAGER_PLAYER_BASE_URL + '/level_up_scroll', data={'unique_id': message['data']['unique_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
@@ -189,6 +193,8 @@ FUNCTION_LIST = {
 
 	'get_all_skill_level': MessageHandler._get_all_skill_level,
 	'get_skill': MessageHandler._get_skill,
+	'update_energy': MessageHandler._update_energy,
+	'get_all_supplies': MessageHandler._get_all_supplies,
 
 	'add_supplies': MessageHandler._add_supplies,
 

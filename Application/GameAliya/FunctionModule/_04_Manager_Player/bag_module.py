@@ -46,7 +46,7 @@ class BagSystemClass:
 		content = list((await self.get_all_material(unique_id=unique_id))["remaining"])
 		heads.pop(0)
 		content.pop(0)
-		return self.message_typesetting(status=0, message="get supplies success", data={"key": heads, "value": content})
+		return self.message_typesetting(status=0, message="get supplies success", data={"keys": heads, "values": content})
 
 	async def add_supplies(self, unique_id: str, key: str, value: int):
 		if value <= 0: return self.message_typesetting(status=9, message="not a positive number")
@@ -73,7 +73,7 @@ class BagSystemClass:
 				dict2 = await self.try_skill_scroll_30(unique_id=unique_id, value=1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
 					return self.message_typesetting(status=9, message="database operation error!")
-				return self.message_typesetting(status=0, message="level up scroll success!", data={"keys":["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
+				return self.message_typesetting(status=0, message="level up scroll success!", data={"keys": ["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
 			elif scroll_id == "skill_scroll_30":
 				dict1 = await self.try_skill_scroll_30(unique_id=unique_id, value=-3)
 				dict2 = await self.try_skill_scroll_100(unique_id=unique_id, value=1)
@@ -163,9 +163,6 @@ class BagSystemClass:
 
 	async def try_diamond(self, unique_id: str, value: int) -> dict:
 		return await self.__try_material(unique_id=unique_id, key="diamond", value=value)
-
-	async def try_energy(self, unique_id: str, value: int) -> dict:
-		return await self.__try_material(unique_id=unique_id, key="energy", value=value)
 
 	async def try_experience(self, unique_id: str, value: int) -> dict:
 		return await self.__try_material(unique_id=unique_id, key="experience", value=value)
@@ -294,13 +291,6 @@ async def __try_coin(request: web.Request) -> web.Response:
 async def __try_coin(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_diamond(unique_id=post['unique_id'], value=int(post['value']))
-	return _json_response(result)
-
-
-@ROUTES.post('/try_energy')
-async def __try_coin(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await MANAGER.try_energy(unique_id=post['unique_id'], value=int(post['value']))
 	return _json_response(result)
 
 

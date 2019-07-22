@@ -19,10 +19,10 @@ host="127.0.0.1"
 token =""
 MESSAGE_LIST = [ {'function': 'login', 'random': '-906', 'data':{'unique_id':'mac', 'identifier' : 'account', 'value' : 'childrensucks', 'password' : 'keepo'}},
 				 {'function': 'login_unique', 'random': '-906', 'data':{'unique_id':'4', 'identifier':'', 'value' : '','password':''}},
-				 {'function': 'FUNCTION1', 'random': '-906', 'data':{}},
+				 {'function': 'update_energy', 'random': '-906', 'data':{'amount': 0}},
 				 {'function': 'get_skill', 'random': '-906', 'data':{'skill_id':'m1_level'}},
 				# 4 --- 7
-				 {'function': 'FUNCTION2', 'random':'-906', 'data':{}},
+				 {'function': 'get_all_supplies', 'random':'-906', 'data':{}},
 				 {'function': 'get_all_skill_level', 'random':'-906', 'data':{}},
 				 {'function': 'random_gift_skill', 'random':'-906', 'data':{}},
 				 {'function': 'level_up_scroll', 'random':'-906', 'data':{"scroll_id": "skill_scroll_10"}},
@@ -36,19 +36,20 @@ MESSAGE_LIST = [ {'function': 'login', 'random': '-906', 'data':{'unique_id':'ma
 				 {'function': 'get_all_weapon','random':'-906', 'data':{}},
 				 {'function': 'level_up_passive','random':'-906', 'data':{"weapon":"weapon1", "passive": "passive_skill_4_level"}},
 				 {'function': 'level_up_weapon','random':'-906', 'data':{"weapon":"weapon1", "iron": "20"}},
-				# 16 --- 20
+				# 16 --- 19
 				 {'function': 'add_supplies','random':'-906', 'data':{"key": "coin", "value": 30}},
 				 {'function': 'add_supplies','random':'-906', 'data':{"key": "iron", "value": 10}},
 				 {'function': 'add_supplies','random':'-906', 'data':{"key": "skill_scroll_10", "value": 10}},
 				 {'function': 'add_supplies','random':'-906', 'data':{"key": "skill_scroll_30", "value": 10}},
+				# 20 ---
 				 {'function': 'add_supplies','random':'-906', 'data':{"key": "skill_scroll_100", "value": 10}}
 				]
-LOGIN = 0 # 新方法替换
+LOGIN = 0
 LOGIN_UNIQUE = 1  # ----------------------------------------------
-FUNCTION1 = 2  # 新方法替换
+UPDATE_ENERGY = 2  # ----------------------------------------------
 GET_SKILL = 3  # ----------------------------------------------
 
-FUNCTION2 = 4  # ----------------------------------------------
+GET_ALL_SUPPLIES = 4  # ----------------------------------------------
 GET_ALL_SKILL_LEVEL = 5  # ----------------------------------------------
 RANDOM_GIFT_SKILL = 6  # ----------------------------------------------
 LEVEL_UP_SCROLL = 7  # ----------------------------------------------
@@ -68,11 +69,9 @@ ADD_COIN = 16  # ----------------------------------------------
 ADD_IRON = 17  # ----------------------------------------------
 ADD_SCROLL_10 = 18  # ----------------------------------------------
 ADD_SCROLL_30 = 19  # ----------------------------------------------
+
 ADD_SCROLL_100 = 20  # ----------------------------------------------
 
-
-
-GET_ALL_SUPPLIES=5
 def test_multiple_message(n: int):
 	start = time.time()
 	with multiprocessing.Pool() as pool:
@@ -247,10 +246,10 @@ def main() -> None:
 	# send_single_message(LOGIN_AS_ACCOUNT)
 	token = send_single_message(LOGIN_UNIQUE)
 	print(f'this is token = {token}')
-	# send_single_message(FUNCTION1)
-	send_single_message(GET_SKILL)
+	send_single_message(UPDATE_ENERGY)
+	# send_single_message(GET_SKILL)
 	# send_single_message(INCREASE_SUPPLIES)
-	send_single_message(GET_ALL_SKILL_LEVEL)
+	# send_single_message(GET_ALL_SKILL_LEVEL)
 	# send_single_message(RANDOM_GIFT_SKILL)
 	# send_single_message(LEVEL_UP_SCROLL)
 	# send_single_message(PASS_STAGE)
@@ -266,6 +265,7 @@ def main() -> None:
 	# send_single_message(ADD_SCROLL_10)
 	# send_single_message(ADD_SCROLL_30)
 	# send_single_message(ADD_SCROLL_100)
+	# send_single_message(GET_ALL_SUPPLIES)
 
 	# test_token_server()
 

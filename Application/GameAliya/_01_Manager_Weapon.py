@@ -196,13 +196,19 @@ class WeaponManager:
 
 
 	async def try_unlock_weapon(self, unique_id: str, weapon: str) -> dict:
-		star = await self.__get_weapon_star(unique_id, weapon)
-		if star != 0:
-			segment = await self.__get_segment(unique_id, weapon) + 30
-			await self.__set_segment_by_id(unique_id, weapon, segment)
-			return self.message_typesetting(status=1, message='Weapon already unlocked, got free segment', data={"keys": ['weapon', 'segment'], "values": [weapon, segment]})
-		await self.__set_weapon_star(unique_id, weapon, 1)
-		return self.message_typesetting(status=0, message='Unlocked new weapon!', data={"keys": ["weapon"], "values": [weapon]})
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		# - 0 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 1 - no weapon!
+		try:
+			star = await self.__get_weapon_star(unique_id, weapon)
+			if star != 0:
+				segment = await self.__get_segment(unique_id, weapon) + 30
+				await self.__set_segment_by_id(unique_id, weapon, segment)
+				return self.message_typesetting(status=0, message='Weapon already unlocked, got free segment!', data={"keys": ['weapon', 'segment'], "values": [weapon, segment]})
+			await self.__set_weapon_star(unique_id, weapon, 1)
+			return self.message_typesetting(status=0, message='Unlocked new weapon!', data={"keys": ["weapon"], "values": [weapon]})
+		except:
+			return self.message_typesetting(status=1, message='no weapon!')
 
 	# Format the information
 	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
