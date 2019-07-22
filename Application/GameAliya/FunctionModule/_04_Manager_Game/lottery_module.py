@@ -60,8 +60,8 @@ class LotteryManager:
 		print("gift_skill:" + str(gift_skill))
 		if self.__class__.__name__ == 'PlayerManager':
 			data = await self.try_unlock_skill(unique_id, gift_skill)
-			status = data["status"]
-			if data['status'] == 1:  # skill already unlocked
+			status = int(data["status"])
+			if status == 1:  # skill already unlocked
 				if tier_choice == 'skilltier1':
 					skill_scroll_id = "skill_scroll_10"
 					data = await self.try_skill_scroll_10(unique_id, 1)
