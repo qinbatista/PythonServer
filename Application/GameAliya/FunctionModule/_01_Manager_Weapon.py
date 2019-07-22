@@ -172,27 +172,36 @@ class WeaponManager:
 	# 升级武器星数。 成本是碎片。
 	async def level_up_weapon_star(self, unique_id: str, weapon: str) -> dict:
 		# - 0 - Weapon upgrade success
-		# - 1 - no weapon
 		# - 2 - insufficient gold coins, upgrade failed
 		# - 3 - database operation error!
-		row = await self.__get_row_by_id(table_name=weapon, unique_id=unique_id)
-		weapon_star = await self.__get_weapon_star(unique_id=unique_id, weapon=weapon)
-		segment_count = self._standard_segment_count * (1 + weapon_star)  # 根据武器星数增加碎片的消耗数量
-		if weapon_star == 0:
-			return self.message_typesetting(status=1, message="no weapon!")
-		elif row[7] < segment_count:
-			return self.message_typesetting(status=2, message="insufficient segments, upgrade failed!")
-		else:
-			row[7] -= segment_count
-			weapon_star += 1
-			code1 = await self.__set_segment_by_id(unique_id=unique_id, weapon=weapon, segment=row[7])
-			code2 = await self.__set_weapon_star(unique_id=unique_id, weapon=weapon, weapon_value=weapon_star)
-			if code1 == 0 or code2 == 0:
-				return self.message_typesetting(status=3, message="database operation error!")
+		async with ClientSession() as session:
+			if self.__class__.__name__ == "PlayerManager":
+				data_tuple = (await self.get_all_head(table=weapon))["remaining"]
+			else:
+				async with session.post(MANAGER_PLAYER_BASE_URL + '/get_all_head', data={'table': weapon}) as resp:
+					data_tuple = json.loads(await resp.text())['remaining']
+			head = []
+			for col in data_tuple:
+				head.append(col[0])
+			row = await self.__get_row_by_id(table_name=weapon, unique_id=unique_id)
+			weapon_star = await self.__get_weapon_star(unique_id=unique_id, weapon=weapon)
+			segment_count = self._standard_segment_count * (1 + weapon_star)  # 根据武器星数增加碎片的消耗数量
 
-			row[0] = weapon
-			row.append(weapon_star)
-			return self.message_typesetting(status=0, message=weapon + " upgrade success!", data={"weapon_bag1": row})
+			if row[head.index("segment")] < segment_count:
+				return self.message_typesetting(status=2, message="insufficient segments, upgrade failed!")
+			else:
+				row[head.index("segment")] -= segment_count
+				weapon_star += 1
+				code1 = await self.__set_segment_by_id(unique_id=unique_id, weapon=weapon, segment=row[head.index("segment")])
+				code2 = await self.__set_weapon_star(unique_id=unique_id, weapon=weapon, star=weapon_star)
+				if code1 == 0 or code2 == 0:
+					return self.message_typesetting(status=3, message="database operation error!")
+
+				head[0] = "weapon"
+				row[0] = weapon
+				head.append("star")
+				row.append(weapon_star)
+				return self.message_typesetting(status=0, message=weapon + " upgrade success!", data={"keys": head, "values": row})
 
 	# Get details of all weapons
 	# Currently operating the database to get the weapon details, will not give a failure
@@ -200,22 +209,31 @@ class WeaponManager:
 	# 目前操作数据库获取武器详细信息，不会给定失败的情况
 	async def get_all_weapon(self, unique_id: str):
 		# - 0 - gain success
-		col_name_list = await self.__get_col_name_list(table="weapon_bag")
-		weapons_stars_list = await self.__get_weapon_bag(unique_id=unique_id)
-		# The 0 position stores the UNIQUE_ID, so the column header does not traverse the 0 position.
-		# The 0 position obtained by the __get_weapon_attributes method below is also UNIQUE_ID.
-		# So it will be replaced by the number of weapons stars.
-		# 0位置存储unique_id，因此列标题不会遍历0位置。下面的__get_weapon_attributes方法获得的0位置也是unique_id，
-		# 因此它将被武器星数替换。
-		keys = []
-		values = []
-		for i in range(1, len(col_name_list)):
-			# await self.__check_table(unique_id=unique_id, table=col_name_list[i])
-			attribute_list = await self.__get_weapon_attributes(unique_id=unique_id, weapon=col_name_list[i])
-			keys.append(col_name_list[i])
-			attribute_list[0] = weapons_stars_list[i]
-			values.append(attribute_list)
-		return self.message_typesetting(status=0, message="gain success", data={"keys": keys, "values": values})
+		async with ClientSession() as session:
+			if self.__class__.__name__ == "PlayerManager":
+				data_tuple = (await self.get_all_head(table="weapon_bag"))["remaining"]
+			else:
+				async with session.post(MANAGER_PLAYER_BASE_URL + '/get_all_head', data={'table': "weapon_bag"}) as resp:
+					data_tuple = json.loads(await resp.text())['remaining']
+			col_name_list = []
+			for col in data_tuple:
+				col_name_list.append(col[0])
+			print("col_name_list:" + str(col_name_list))
+			weapons_stars_list = await self.__get_weapon_bag(unique_id=unique_id)
+			# The 0 position stores the UNIQUE_ID, so the column header does not traverse the 0 position.
+			# The 0 position obtained by the __get_weapon_attributes method below is also UNIQUE_ID.
+			# So it will be replaced by the number of weapons stars.
+			# 0位置存储unique_id，因此列标题不会遍历0位置。下面的__get_weapon_attributes方法获得的0位置也是unique_id，
+			# 因此它将被武器星数替换。
+			keys = []
+			values = []
+			for i in range(1, len(col_name_list)):
+				# await self.__check_table(unique_id=unique_id, table=col_name_list[i])
+				attribute_list = await self.__get_weapon_attributes(unique_id=unique_id, weapon=col_name_list[i])
+				keys.append(col_name_list[i])
+				attribute_list[0] = weapons_stars_list[i]
+				values.append(attribute_list)
+			return self.message_typesetting(status=0, message="gain success", data={"keys": keys, "values": values})
 
 
 	async def try_unlock_weapon(self, unique_id: str, weapon: str) -> dict:
@@ -275,8 +293,8 @@ class WeaponManager:
 	async def __set_skill_point(self, unique_id: str, weapon: str, skill_point: str) -> int:
 		return await self._execute_statement_update("UPDATE " + weapon + " SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point=" + skill_point + " where unique_id='" + unique_id + "'")
 
-	async def __set_weapon_star(self, unique_id: str, weapon: str, weapon_value: int) -> int:
-		return await self._execute_statement_update("UPDATE weapon_bag SET " + weapon + "=" + str(weapon_value) + " where unique_id='" + unique_id + "'")
+	async def __set_weapon_star(self, unique_id: str, weapon: str, star: int) -> int:
+		return await self._execute_statement_update("UPDATE weapon_bag SET " + weapon + "=" + str(star) + " where unique_id='" + unique_id + "'")
 
 	async def __get_weapon_star(self, unique_id: str, weapon: str) -> int:
 		data = await self._execute_statement("SELECT " + weapon + " FROM weapon_bag WHERE unique_id='" + str(unique_id) + "'")

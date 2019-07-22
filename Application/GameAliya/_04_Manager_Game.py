@@ -106,13 +106,13 @@ from aiohttp import ClientSession
 
 # Part (1 / 2)
 class PlayerManager:
-	async def get_all_head(self) -> dict:
+	async def get_all_head(self, table: str) -> dict:
 		"""
 		Used to get information such as the title of the database
 		用于获取数据库的标题等信息
 		:return:返回所有数据库的标题等信息，json数据
 		"""
-		data = list(await self._execute_statement("desc player;"))
+		data = list(await self._execute_statement("desc %s;" % table))
 		return self.__internal_format(status=0, remaining=data)
 	async def get_all_material(self, unique_id: str) -> dict:
 		"""
@@ -124,7 +124,7 @@ class PlayerManager:
 		data = await self._execute_statement("SELECT * FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return self.__internal_format(status=0, remaining=data[0])
 	async def get_all_supplies(self, unique_id: str) -> dict:
-		data_tuple = (await self.get_all_head())["remaining"]
+		data_tuple = (await self.get_all_head(table="player"))["remaining"]
 		heads = []
 		for col in data_tuple:
 			heads.append(col[0])
@@ -156,7 +156,7 @@ class PlayerManager:
 				dict2 = await self.try_skill_scroll_30(unique_id=unique_id, value=1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
 					return self.message_typesetting(status=9, message="database operation error!")
-				return self.message_typesetting(status=0, message="level up scroll success!", data={"keys":["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
+				return self.message_typesetting(status=0, message="level up scroll success!", data={"keys": ["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
 			elif scroll_id == "skill_scroll_30":
 				dict1 = await self.try_skill_scroll_30(unique_id=unique_id, value=-3)
 				dict2 = await self.try_skill_scroll_100(unique_id=unique_id, value=1)
@@ -287,8 +287,8 @@ class PlayerManager:
 		print("gift_skill:" + str(gift_skill))
 		if self.__class__.__name__ == 'PlayerManager':
 			data = await self.try_unlock_skill(unique_id, gift_skill)
-			status = data["status"]
-			if data['status'] == 1:  # skill already unlocked
+			status = int(data["status"])
+			if status == 1:  # skill already unlocked
 				if tier_choice == 'skilltier1':
 					skill_scroll_id = "skill_scroll_10"
 					data = await self.try_skill_scroll_10(unique_id, 1)
@@ -332,7 +332,7 @@ class PlayerManager:
 					return self.message_typesetting(status=status, message=data['remaining'][status])
 	async def random_gift_segment(self, unique_id: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		#  或者 Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 0 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
 		# - 1 - no weapon!
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
@@ -511,7 +511,7 @@ class PlayerManager:
 			return self.message_typesetting(status=1, message="database operation error")
 		else:
 			material_dict = json_data["remaining"][0]
-			data = {"key": list(material_dict.keys()), "reward": list(material_dict.values()), "item": json_data["remaining"][1]}
+			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
 			return self.message_typesetting(status=0, message="passed customs!", data=data)
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
@@ -696,7 +696,8 @@ async def __try_all_material(request: web.Request) -> web.Response:
 	return _json_response(result)
 @ROUTES.post('/get_all_head')
 async def __get_all_head(request: web.Request) -> web.Response:
-	result = await MANAGER.get_all_head()
+	post = await request.post()
+	result = await MANAGER.get_all_head(table=post["table"])
 	return _json_response(result)
 @ROUTES.post('/get_all_material')
 async def __get_all_material(request: web.Request) -> web.Response:

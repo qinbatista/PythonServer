@@ -166,7 +166,8 @@ def merge_content_to_manager(file_name):
 		else:
 			new_file_content.append(i)
 
-	with open(PythonLocation()+"/../"+file_name+".py", 'w',encoding="utf-8") as json_file:
+	# with open(PythonLocation()+"/../"+file_name+".py", 'w',encoding="utf-8") as json_file:
+	with open(PythonLocation()+"/../_04_Manager_Game.py", 'w',encoding="utf-8") as json_file:
 		for i in new_file_content:
 			json_file.writelines(i)
 
