@@ -37,7 +37,7 @@ class AccountManager:
 	def __init__(self):
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
-		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
+		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='user', charset='utf8')
 
 
 	async def login(self, identifier: str, value: str, password: str) -> dict:
@@ -68,27 +68,31 @@ class AccountManager:
 			#          P R I V A T E		   #
 			####################################
 
+	#TODO return success or failure
+	async def _create_new_user(self, unique_id: str):
+		await self._execute_statement('INSERT INTO info (unique_id) VALUES ("' + unique_id + '");')
+
 	async def _check_exists(self, identifier: str, value: str) -> bool:
-		data = await self._execute_statement('SELECT `' + identifier + '` FROM userinfo WHERE `' + identifier + '` = "' + value + '";')
+		data = await self._execute_statement('SELECT `' + identifier + '` FROM info WHERE `' + identifier + '` = "' + value + '";')
 		if () == data or ('',) in data or (None,) in data:
 			return False
 		return True
 
 	async def _account_is_bound(self, unique_id: str) -> bool:
-		data = await self._execute_statement('SELECT account FROM userinfo WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement('SELECT account FROM info WHERE unique_id = "' + unique_id + '";')
 		if ('',) in data or () == data or (None,) in data:
 			return False
 		return True
 
 	async def _register_token(self, unique_id: str, token: str) -> None:
-		await self._execute_statement('UPDATE userinfo SET token = "' + token + '" WHERE unique_id = "' + unique_id + '";')
+		await self._execute_statement('UPDATE info SET token = "' + token + '" WHERE unique_id = "' + unique_id + '";')
 
 	async def _get_prev_token(self, identifier: str, value: str) -> str:
-		data = await self._execute_statement('SELECT token FROM userinfo WHERE `' + identifier + '` = "' + value + '";')
+		data = await self._execute_statement('SELECT token FROM info WHERE `' + identifier + '` = "' + value + '";')
 		return data[0][0]
 
 	async def _valid_credentials(self, identifier: str, value: str, password: str) -> bool:
-		p = await self._execute_statement('SELECT password FROM userinfo WHERE `' + identifier + '` = "' + value + '";')
+		p = await self._execute_statement('SELECT password FROM info WHERE `' + identifier + '` = "' + value + '";')
 		return (password,) in p
 
 	async def _request_new_token(self, unique_id: str, prev_token: str = ''):
@@ -101,7 +105,7 @@ class AccountManager:
 		'''
 		Returns unique_id associated with the identifier. None if identifier invalid.
 		'''
-		data = await self._execute_statement('SELECT unique_id FROM userinfo WHERE `' + identifier + '` = "' + value + '";')
+		data = await self._execute_statement('SELECT unique_id FROM info WHERE `' + identifier + '` = "' + value + '";')
 		if data == () or (None,) in data or ('',) in data:
 			return ""
 		return data[0][0]
