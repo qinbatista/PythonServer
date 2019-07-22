@@ -15,7 +15,7 @@ from aiohttp import ClientSession
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf')
-MANAGER_PLAYER_BASE_URL = CONFIG['_04_Manager_Player']['address'] + ":" + CONFIG['_04_Manager_Player']['port']
+MANAGER_PLAYER_BASE_URL = CONFIG['_04_Manager_Game']['address'] + ":" + CONFIG['_04_Manager_Game']['port']
 
 
 class WeaponUpgradeError(Exception):

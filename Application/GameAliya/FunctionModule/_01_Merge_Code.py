@@ -115,17 +115,17 @@ def get_init(file_path):
 			init_code.append(Re_check_import(i))
 	return init_code
 def Re_check_import(string_line):
-	#_04_Manager_Player module
+	#_04_Manager_Game module
 	if string_line.find("CONFIG['bag_manager']")!=-1:
-		string_line = string_line.replace("CONFIG['bag_manager']","CONFIG['_04_Manager_Player']")
+		string_line = string_line.replace("CONFIG['bag_manager']","CONFIG['_04_Manager_Game']")
 	if string_line.find("CONFIG['lottery_module']")!=-1:
-		string_line = string_line.replace("CONFIG['lottery_module']","CONFIG['_04_Manager_Player']")
+		string_line = string_line.replace("CONFIG['lottery_module']","CONFIG['_04_Manager_Game']")
 	if string_line.find("CONFIG['player_state_module']")!=-1:
-		string_line = string_line.replace("CONFIG['player_state_module']","CONFIG['_04_Manager_Player']")
+		string_line = string_line.replace("CONFIG['player_state_module']","CONFIG['_04_Manager_Game']")
 	if string_line.find("CONFIG['skill_module']")!=-1:
-		string_line = string_line.replace("CONFIG['skill_module']","CONFIG['_04_Manager_Player']")
+		string_line = string_line.replace("CONFIG['skill_module']","CONFIG['_04_Manager_Game']")
 	if string_line.find("CONFIG['stage_module']")!=-1:
-		string_line = string_line.replace("CONFIG['stage_module']","CONFIG['_04_Manager_Player']")
+		string_line = string_line.replace("CONFIG['stage_module']","CONFIG['_04_Manager_Game']")
 
 	#set all module configuration setting as local setting
 	if string_line.find("../../Configuration")!=-1:
@@ -166,8 +166,7 @@ def merge_content_to_manager(file_name):
 		else:
 			new_file_content.append(i)
 
-	# with open(PythonLocation()+"/../"+file_name+".py", 'w',encoding="utf-8") as json_file:
-	with open(PythonLocation()+"/../_04_Manager_Game.py", 'w',encoding="utf-8") as json_file:
+	with open(PythonLocation()+"/../"+file_name+".py", 'w',encoding="utf-8") as json_file:
 		for i in new_file_content:
 			json_file.writelines(i)
 
