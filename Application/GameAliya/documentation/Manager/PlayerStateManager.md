@@ -50,9 +50,9 @@ Status codes and meaning:
 
 ```json
 {
-	"function" : "random_gift_skill"
+	"function" : "random_gift_skill"，
+    "world" : "str 1 or 2 or 3....",
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
 				"token" : "TOKEN",
 			 }
 }

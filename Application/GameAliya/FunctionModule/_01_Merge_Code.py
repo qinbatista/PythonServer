@@ -134,8 +134,8 @@ def Re_check_import(string_line):
 def merge_content_to_manager(file_name):
 
 	file_path = PythonLocation()+"/../"+file_name+".py"
-	if os.path.exists(PythonLocation()+"/../_04_Manager_Player.py"):
-		os.remove(PythonLocation()+"/../_04_Manager_Player.py")
+	if os.path.exists(PythonLocation()+"/../_04_Manager_Game.py"):
+		os.remove(PythonLocation()+"/../_04_Manager_Game.py")
 	shutil.copy(PythonLocation()+"/ExampleManager.py",file_path)
 
 	file_object = open(PythonLocation()+"/../"+file_name+".py",encoding="utf-8")

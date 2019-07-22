@@ -13,12 +13,8 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 
-def PythonLocation():
-    return os.path.dirname(os.path.realpath(__file__))
-
-
 CONFIG = configparser.ConfigParser()
-CONFIG.read(PythonLocation() + '/Configuration/server/1.0/server.conf')
+CONFIG.read('../../Configuration/server/1.0/server.conf')
 MANAGER_PLAYER_BASE_URL = CONFIG['_04_Manager_Player']['address'] + ":" + CONFIG['_04_Manager_Player']['port']
 
 
@@ -54,42 +50,49 @@ class WeaponManager:
 			star = await self.__get_weapon_star(unique_id, weapon)
 			if star == 0:
 				return self.message_typesetting(status=1, message="user does not have that weapon")
-
+			head = []
+			if self.__class__.__name__ == "PlayerManager":
+				data_tuple = (await self.get_all_head(table=weapon))["remaining"]
+			else:
+				async with session.post(MANAGER_PLAYER_BASE_URL + '/get_all_head', data={'table': weapon}) as resp:
+					data_tuple = json.loads(await resp.text())['remaining']
+			for col in data_tuple:
+				head.append(col[0])
 			row = await self.__get_row_by_id(weapon, unique_id)
 
 			if row[1] == 100:
 				return self.message_typesetting(status=9, message="weapon has reached max level")
 
-			if self.__class__.__name__ == "WeaponManager":
-				current_iron = await self.__get_material(unique_id=unique_id, material="iron")
-				print("WeaponManager current_iron:" + str(current_iron))
-			else:
-				async with session.post(MANAGER_PLAYER_BASE_URL + '/try_iron', data={'unique_id': unique_id, "value": 0}) as resp:
-					current_iron = json.loads(await resp.text())['remaining']
-					print("async current_iron:" + str(current_iron))
-
 			skill_upgrade_number = int(iron) // self._standard_iron_count
-			if skill_upgrade_number == 0 or (current_iron // self._standard_iron_count) < skill_upgrade_number:
-				return self.message_typesetting(status=2, message="insufficient materials, upgrade failed")
-
+			level_count = head.index("weapon_level")
+			point_count = head.index("skill_point")
 			# calculate resulting levels and used iron
-			if (row[1] + skill_upgrade_number) > 100:
-				skill_upgrade_number = 100 - row[1]
-			row[1] += skill_upgrade_number
-			row[6] += skill_upgrade_number
+			if (row[level_count] + skill_upgrade_number) > 100:
+				skill_upgrade_number = 100 - row[level_count]
+			row[level_count] += skill_upgrade_number
+			row[point_count] += skill_upgrade_number
 
-			remaining_iron = current_iron - self._standard_iron_count * skill_upgrade_number
+			if skill_upgrade_number == 0:
+				return self.message_typesetting(status=2, message="insufficient materials, upgrade failed")
+			if self.__class__.__name__ == "PlayerManager":
+				json_data = await self.try_iron(unique_id=unique_id, value=-skill_upgrade_number * self._standard_iron_count)
+			else:
+				async with session.post(MANAGER_PLAYER_BASE_URL + '/try_iron', data={"unique_id": unique_id, "value": -skill_upgrade_number * self._standard_iron_count}) as resp:
+					json_data = json.loads(await resp.text())
 
-			# update the amount of iron on the backpack
-			code1 = await self.__set_material(unique_id=unique_id, material="iron", material_value=remaining_iron)
+			if int(json_data["status"]) == 1:
+				return self.message_typesetting(status=2, message="insufficient materials, upgrade failed")
+			remaining_iron = int(json_data["remaining"])
+
 			# update the weapon level on the account
-			code2 = await self.__set_weapon_level_up_data(unique_id, weapon, row[1], row[6])
-
-			if code1 == 0 or code2 == 0:
+			if await self.__set_weapon_level_up_data(unique_id=unique_id, weapon=weapon, weapon_level=row[level_count], skill_point=row[point_count]) == 0:
 				return self.message_typesetting(status=3, message="database operation error")
 
+			head[0] = "weapon"
 			row[0] = weapon
-			return self.message_typesetting(status=0, message="success", data={'weapon_bag1': row, 'item1': ['iron', remaining_iron]})
+			head.append("iron")
+			row.append(remaining_iron)
+			return self.message_typesetting(status=0, message="success", data={'keys': head, 'values': row})
 
 	# levels up a particular passive skill. costs skill points.
 	# 提升特定的被动技能。 增加技能点。
@@ -176,23 +179,22 @@ class WeaponManager:
 	# 目前操作数据库获取武器详细信息，不会给定失败的情况
 	async def get_all_weapon(self, unique_id: str):
 		# - 0 - gain success
-		data = {}
 		col_name_list = await self.__get_col_name_list(table="weapon_bag")
 		weapons_stars_list = await self.__get_weapon_bag(unique_id=unique_id)
-		# The 0 position stores the unique_id,
-		# so the column header does not traverse the 0 position.
-		# The 0 position obtained by the __get_weapon_attributes method below is also unique_id,
-		# so it will be replaced by the weapon name and
-		# the star number will be added to the last position of the replacement list.
+		# The 0 position stores the UNIQUE_ID, so the column header does not traverse the 0 position.
+		# The 0 position obtained by the __get_weapon_attributes method below is also UNIQUE_ID.
+		# So it will be replaced by the number of weapons stars.
 		# 0位置存储unique_id，因此列标题不会遍历0位置。下面的__get_weapon_attributes方法获得的0位置也是unique_id，
-		# 因此它将被武器名称替换，并且星数将被添加到替换列表的最后位置。
+		# 因此它将被武器星数替换。
+		keys = []
+		values = []
 		for i in range(1, len(col_name_list)):
-			await self.__check_table(unique_id=unique_id, table=col_name_list[i])
+			# await self.__check_table(unique_id=unique_id, table=col_name_list[i])
 			attribute_list = await self.__get_weapon_attributes(unique_id=unique_id, weapon=col_name_list[i])
-			attribute_list[0] = col_name_list[i]
-			attribute_list.append(weapons_stars_list[i])
-			data.update({"weapon_bag" + str(i): attribute_list})
-		return self.message_typesetting(status=0, message="gain success", data=data)
+			keys.append(col_name_list[i])
+			attribute_list[0] = weapons_stars_list[i]
+			values.append(attribute_list)
+		return self.message_typesetting(status=0, message="gain success", data={"keys": keys, "values": values})
 
 
 	async def try_unlock_weapon(self, unique_id: str, weapon: str) -> dict:

@@ -19,13 +19,13 @@ class BagSystemClass:
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
 		self.reward_list = self.__read_json_data()
 
-	async def get_all_head(self) -> dict:
+	async def get_all_head(self, table: str) -> dict:
 		"""
 		Used to get information such as the title of the database
 		用于获取数据库的标题等信息
 		:return:返回所有数据库的标题等信息，json数据
 		"""
-		data = list(await self._execute_statement("desc player;"))
+		data = list(await self._execute_statement("desc %s;" % table))
 		return self.__internal_format(status=0, remaining=data)
 
 	async def get_all_material(self, unique_id: str) -> dict:
@@ -39,7 +39,7 @@ class BagSystemClass:
 		return self.__internal_format(status=0, remaining=data[0])
 
 	async def get_all_supplies(self, unique_id: str) -> dict:
-		data_tuple = (await self.get_all_head())["remaining"]
+		data_tuple = (await self.get_all_head(table="player"))["remaining"]
 		heads = []
 		for col in data_tuple:
 			heads.append(col[0])
@@ -366,7 +366,8 @@ async def __try_all_material(request: web.Request) -> web.Response:
 
 @ROUTES.post('/get_all_head')
 async def __get_all_head(request: web.Request) -> web.Response:
-	result = await MANAGER.get_all_head()
+	post = await request.post()
+	result = await MANAGER.get_all_head(table=post["table"])
 	return _json_response(result)
 
 
