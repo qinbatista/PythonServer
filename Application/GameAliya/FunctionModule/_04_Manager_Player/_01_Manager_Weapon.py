@@ -47,8 +47,7 @@ class WeaponManager:
 		# - 3 - Database operation error
 		# - 9 - Weapon already max level
 		async with ClientSession() as session:
-			star = await self.__get_weapon_star(unique_id, weapon)
-			if star == 0:
+			if await self.__get_weapon_star(unique_id, weapon) == 0:
 				return self.message_typesetting(status=1, message="user does not have that weapon")
 			head = []
 			if self.__class__.__name__ == "PlayerManager":
@@ -99,27 +98,38 @@ class WeaponManager:
 	async def level_up_passive(self, unique_id: str, weapon: str, passive_skill: str) -> dict:
 		# - 0 - Success
 		# - 1 - User does not have that weapon
-		# - 2 - Insufficient materials, upgrade failed
+		# - 2 - Insufficient skill points, upgrade failed
 		# - 3 - Database operation error
 		# - 9 - Weapon already max level
-		weapon_star = await self.__get_weapon_star(unique_id, weapon)
-		if weapon_star == 0:
-			return self.message_typesetting(status=1, message="user does not have that weapon")
+		async with ClientSession() as session:
+			if await self.__get_weapon_star(unique_id, weapon) == 0:
+				return self.message_typesetting(status=1, message="user does not have that weapon")
 
-		if passive_skill not in self._valid_passive_skills:
-			return self.message_typesetting(status=9, message="passive skill does not exist")
+			if passive_skill not in self._valid_passive_skills:
+				return self.message_typesetting(status=9, message="passive skill does not exist")
 
-		row = await self.__get_row_by_id(weapon, unique_id)
-		if row[6] == 0:
-			return self.message_typesetting(status=2, message="insufficient skill points, upgrade failed")
+			head = []
+			if self.__class__.__name__ == "PlayerManager":
+				data_tuple = (await self.get_all_head(table=weapon))["remaining"]
+			else:
+				async with session.post(MANAGER_PLAYER_BASE_URL + '/get_all_head', data={'table': weapon}) as resp:
+					data_tuple = json.loads(await resp.text())['remaining']
+			for col in data_tuple:
+				head.append(col[0])
+			row = await self.__get_row_by_id(weapon, unique_id)
+			point_count = head.index("skill_point")
+			passive_count = head.index(passive_skill)
+			if row[point_count] == 0:
+				return self.message_typesetting(status=2, message="Insufficient skill points, upgrade failed")
 
-		row[6] -= 1
-		row[2 + self._valid_passive_skills.index(passive_skill)] += 1
-		if await self.__set_passive_skill_level_up_data(unique_id, weapon, passive_skill, row[2 + self._valid_passive_skills.index(passive_skill)], row[6]) == 0:
-			return self.message_typesetting(status=3, message="database operation error")
+			row[point_count] -= 1
+			row[passive_count] += 1
+			if await self.__set_passive_skill_level_up_data(unique_id=unique_id, weapon=weapon, passive_skill=passive_skill, skill_level=row[passive_count], skill_points=row[point_count]) == 0:
+				return self.message_typesetting(status=3, message="database operation error")
 
-		row[0] = weapon
-		return self.message_typesetting(status=0, message="success", data={"weapon_bag1": row})
+			head[0] = "weapon"
+			row[0] = weapon
+			return self.message_typesetting(status=0, message="success", data={"keys": head, "values": row})
 
 	# resets all weapon passive skill points. refunds all skill points back. costs coins.
 	async def reset_weapon_skill_point(self, unique_id: str, weapon: str) -> dict:
@@ -215,7 +225,6 @@ class WeaponManager:
 	# Format the information
 	def message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
 		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
-
 
 
 

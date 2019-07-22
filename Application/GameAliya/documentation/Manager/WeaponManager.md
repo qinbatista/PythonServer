@@ -66,8 +66,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag,unique_id replaced with weapon ],
-				"item1" : ['iron', remaining_iron_after_upgrade]
+				"keys" : head is list,
+				"values" : row is list
 			 }
 }
 ```
@@ -107,7 +107,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag,unique_id replaced with weapon ]
+				"keys": head is list, 
+        		"values": row is list
 			 }
 }
 ```
