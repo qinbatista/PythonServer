@@ -38,12 +38,13 @@ Used to level up a particular weapon.
 Currently only supports leveling up a single weapon at a time.
 The "iron" field should provide the amount of iron that the client is willing to spend on leveling up their weapon. It currently takes 20 iron to level up a single time. If the client makes a request with '100' iron, they will attempt to level up 5 total times. The max level per weapon is level 100.
 
-Status codes and meaning:
+Status codes and meaning (**success 0**):
 
 - 0 - Success
 - 1 - User does not have that weapon
-- 2 - Insufficient materials, upgrade failed
-- 3 - Database operation error
+- 2 - Incoming materials are not upgraded enough
+- 3 - Insufficient materials, upgrade failed
+- 4 - Database operation error
 - 9 - Weapon already max level
 
 

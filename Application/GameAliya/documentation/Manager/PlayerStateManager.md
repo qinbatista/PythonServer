@@ -40,9 +40,10 @@ Any function call that requires a valid token and does not supply one will recei
 
 Gives a chance to unlock a new skill if it doesn't already exist. If it does exist, the user gets a free skill scroll instead.
 
-Status codes and meaning:
+Status codes and meaning (**success 0 and 1**):
 
-- 0 - Success  或者 You already have that skill, you got a new scroll for free!
+- 0 - success unlocked new skill
+- 1 - you received a free scroll 
 - 2 - invalid skill name
 - 3 - database operation error
 
@@ -58,12 +59,12 @@ Status codes and meaning:
 }
 ```
 
-##### Sample Responses
+##### Sample Responses1
 
 ```json
 {
 	"status" : "0",
-	"message": "success",
+	"message": "success unlocked new skill",
 	"data" : {
 				"keys": [skill_id],
 				"values": [skill_value]
@@ -71,10 +72,12 @@ Status codes and meaning:
 }
 ```
 
-```json
+##### Sample Responses2
+
+```
 {
-	"status" : "0",
-	"message": "You already have that skill, you get a new scroll for free",
+	"status" : "1",
+	"message": "you received a free scroll",
 	"data" : {
         		"keys": [skill_scroll_id],
 				"values": [scroll_skill_quantity]
@@ -90,17 +93,17 @@ Status codes and meaning:
 
 Gives the user a chance at getting random segments, or a new weapon.
 
-Status codes and meaning:
+Status codes and meaning (**success 0 and 1**):
 
 - 0 - Unlocked new weapon
-- 0 - Weapon already unlocked, got free segment!
-- 1 - no weapon
+- 1 - Weapon already unlocked, got free segment!
+- 2 - no weapon
 
 ##### Sample Request
 
 ```json
 {
-	"function" : "random_gift_segment"
+	"function" : "random_gift_segment",
 	"data" : {
     			"world" : "str 1 or 2 or 3....",
 				"token" : "valid token here"
@@ -116,7 +119,7 @@ Status codes and meaning:
 	"message": "Unlocked new weapon!",
 	"data" : {
         		"keys": ["weapon"],
-              	"values": [weapon]
+              	"values": ["weapon value"]
              }
 }
 ```
@@ -125,7 +128,7 @@ Status codes and meaning:
 
 ```json
 {
-	"status" : "0",
+	"status" : "1",
 	"message": "Weapon already unlocked, got free segment!",
 	"data" : {
                 "keys": ['weapon', 'segment'], 
@@ -141,11 +144,12 @@ Status codes and meaning:
 Consume a skill scroll for a chance to level up the given skill. The skill must already be unlocked (not level 0). Different tiers of skill scrolls provide different chances to successfully level up the skill. 
 
 
-Status codes and meaning:
+Status codes and meaning (**success 0 and 1**):
 
-- 0 - Success  （upgrade=0 升级成功， upgrade=1升级失败）
-- 1 - User does not have that skill
-- 2 - Invalid scroll id
+- 0 - upgrade success
+- 1 - upgrade unsuccessful
+- 2 - User does not have that skill
+- 3 - Invalid scroll id
 - 4 - User does not have enough scrolls
 - 9 - Skill already at max level
 
@@ -171,8 +175,7 @@ The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 dependi
 	"message": "success",
 	"data" : {
 				"keys": [skill_id, scroll_id],
-				"values" : [skill_level, scroll_quantity],
-				"upgrade" : "UPGRADE_SUCCESS"
+				"values" : [skill_level, scroll_quantity]
 			 }
 }
 ```
@@ -187,7 +190,7 @@ Combine several existing low level scrolls to make one higher level scroll.
 
 (3) 30% skill scrolls -> (1) 100% skill scroll
 
-Status codes and meaning:
+Status codes and meaning (**success 0**):
 
 - 0 - level up scroll success
 - 1 - advanced reels are not upgradeable
@@ -241,7 +244,7 @@ Status codes and meaning:
 
 Let the player enter the next stage and give the reward.
 
-Status codes and meaning:
+Status codes and meaning (**success 0**):
 
 - 0 - passed customs
 - 1 - database operation error
@@ -280,7 +283,7 @@ Status codes and meaning:
 
 Returns all the current skill levels.
 
-Status codes and meaning:
+Status codes and meaning (**success 0**):
 
 - 0 - Success
 
@@ -314,7 +317,7 @@ Status codes and meaning:
 
 Returns the requested skill level.
 
-Status codes and meaning:
+Status codes and meaning (**success 0**):
 
 - 0 - Success
 - 1 - Invalid skill name
@@ -350,23 +353,23 @@ Status codes and meaning:
 
 Get the energy value or the energy consumption value.
 
-Status codes and meaning:
+Status codes and meaning (**success 0 , 1 , 2 , 3 , 4 , 5**):
 
 - 0 - 获取能量成功 
   - Get energy successfully
-- 0 - 能量已消耗，能量值及恢复时间更新成功 
+- 1 - 能量已消耗，能量值及恢复时间更新成功 
   - Energy has been consumed, energy value and recovery time updated successfully
-- 0 - 能量已恢复，获取能量成功 
-  -  Energy has been recovered and energy is successfully acquired
-
-- 0 - 能量刷新后已消耗，能量值及恢复时间更新成功
+- 2 - 能量已完全恢复，能量更新成功 
+  -  Energy has been fully restored, successful energy update
+- 3 - 能量尚未完全恢复，能量更新成功 
+  - Energy has not fully recovered, successful energy update
+- 4 - 能量刷新后已消耗，能量值及恢复时间更新成功
   - After refreshing the energy, the energy value and recovery time are successfully updated.
-- 0 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功
+- 5 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功
   - Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully
-
-- 1 - 参数错误 
+- 6 - 参数错误 
   - Parameter error
-- 2 - 无足够能量消耗 
+- 7 - 无足够能量消耗 
   - Not enough energy consumption
 
 ##### Sample Request
@@ -405,6 +408,8 @@ Status codes and meaning:
 
 获取到的数据发送到客户端，客户端再详细筛选
 
+Status codes and meaning  (**success 0**):
+
 - 0 - Success
 
 
@@ -442,7 +447,7 @@ Status codes and meaning:
 
 Increases the user's material by the given amount.
 
-Status codes and meaning:
+Status codes and meaning  (**success 0**):
 
 - 0 - Success
 - 1 - Failure

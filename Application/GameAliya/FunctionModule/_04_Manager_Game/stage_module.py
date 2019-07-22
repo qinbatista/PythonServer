@@ -27,6 +27,7 @@ class StageSystemClass:
 
 
 	async def pass_stage(self, unique_id: str, stage: int) -> dict:
+		# success ===> 0
 		# 0 : passed customs ===> success
 		# 1 : database operation error
 		# 9 : abnormal data!

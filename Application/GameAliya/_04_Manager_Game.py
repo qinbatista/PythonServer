@@ -138,6 +138,7 @@ class PlayerManager:
 		data = await self._execute_statement("SELECT * FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return self.__internal_format(status=0, remaining=data[0])
 	async def get_all_supplies(self, unique_id: str) -> dict:
+		# success ===> 0
 		data_tuple = (await self.get_all_head(table="player"))["remaining"]
 		heads = []
 		for col in data_tuple:
@@ -147,6 +148,7 @@ class PlayerManager:
 		content.pop(0)
 		return self.message_typesetting(status=0, message="get supplies success", data={"keys": heads, "values": content})
 	async def add_supplies(self, unique_id: str, key: str, value: int):
+		# success ===> 0
 		if value <= 0: return self.message_typesetting(status=9, message="not a positive number")
 		json_data = await self.__try_material(unique_id=unique_id, key=key, value=value)
 		if json_data["status"] == 0:
@@ -180,7 +182,7 @@ class PlayerManager:
 			else:
 				return self.message_typesetting(status=3, message="unexpected parameter --> " + scroll_id)
 		except:
-			return self.message_typesetting(status=9, message="parameter error!")
+			return self.message_typesetting(status=4, message="parameter error!")
 	async def try_all_material(self, unique_id: str, stage: int) -> dict:
 		sql_stage = await self.__get_material(unique_id=unique_id, material="stage")
 		if stage <= 0 or sql_stage + 1 < stage:
@@ -292,13 +294,13 @@ class PlayerManager:
 		print("[__sql_str_operating] -> select_str:" + select_str)
 		return update_str, select_str
 	async def random_gift_skill(self, unique_id: str) -> dict:
-		# 0 - skill ======== success, unlocked new skill 或 skill scroll ======== you received a free scroll
-		# {"skill_id": skill_id, "value": value} 或 {"skill_scroll_id": skill_scroll_id, "value": value}
+		# success ===> 0 and 1
+		# 0 - unlocked new skill            {"skill_id": skill_id, "value": value}
+		# 1 - you received a free scroll    {"skill_scroll_id": skill_scroll_id, "value": value}
 		# 2 - invalid skill name
 		# 3 - database operation error
 		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
 		gift_skill = (random.choices(self._skill_items[tier_choice]))[0]
-		print("gift_skill:" + str(gift_skill))
 		if self.__class__.__name__ == 'PlayerManager':
 			data = await self.try_unlock_skill(unique_id, gift_skill)
 			status = int(data["status"])
@@ -313,7 +315,7 @@ class PlayerManager:
 					skill_scroll_id = "skill_scroll_100"
 					data = await self.try_skill_scroll_100(unique_id, 1)
 				if data["status"] == 0:
-					return self.message_typesetting(status=0, message='you received a free scroll', data={"keys": [skill_scroll_id], "values": [data["remaining"]]})
+					return self.message_typesetting(status=1, message='you received a free scroll', data={"keys": [skill_scroll_id], "values": [data["remaining"]]})
 				return self.message_typesetting(status=3, message='database operation error')
 			elif status == 0:  # success
 				return self.message_typesetting(status=status, message=data['remaining'][status], data={"keys": [gift_skill], "values": [1]})
@@ -345,14 +347,18 @@ class PlayerManager:
 				else:  # 2
 					return self.message_typesetting(status=status, message=data['remaining'][status])
 	async def random_gift_segment(self, unique_id: str) -> dict:
+		# success ===> 0 and 1
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		# - 0 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 1 - no weapon!
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
-		async with ClientSession() as session:
-			async with session.post(WEAPON_BASE_URL + '/try_unlock_weapon', data = {'unique_id' : unique_id, 'weapon' : gift_weapon}) as resp:
-				return await resp.json(content_type = 'text/json')
+		if self.__class__.__name__ == 'PlayerManager':
+			return await self.try_unlock_weapon(unique_id=unique_id, weapon=gift_weapon)
+		else:
+			async with ClientSession() as session:
+				async with session.post(WEAPON_BASE_URL + '/try_unlock_weapon', data = {'unique_id' : unique_id, 'weapon' : gift_weapon}) as resp:
+					return await resp.json(content_type = 'text/json')
 			####################################
 			#          P R I V A T E		   #
 			####################################
@@ -368,15 +374,17 @@ class PlayerManager:
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
 	async def try_energy(self, unique_id: str, amount: int) -> dict:  # amount > 0
+		# success ===> 0 , 1 , 2 , 3 , 4 , 5
 		# - 0 - 获取能量成功 === Get energy successfully
-		# - 0 - 能量已消耗，能量值及恢复时间更新成功 === Energy has been consumed, energy value and recovery time updated successfully
-		# - 0 - 能量已恢复，获取能量成功 === Energy has been recovered and energy is successfully acquired
-		# - 0 - 能量刷新后已消耗，能量值及恢复时间更新成功 === After refreshing the energy, the energy value and recovery time are successfully updated.
-		# - 0 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功 === Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully
-		# - 1 - 参数错误 === Parameter error
-		# - 2 - 无足够能量消耗 === Not enough energy consumption
+		# - 1 - 能量已消耗，能量值及恢复时间更新成功 === Energy has been consumed, energy value and recovery time updated successfully
+		# - 2 - 能量已完全恢复，能量更新成功 === Energy has been fully restored, successful energy update
+		# - 3 - 能量尚未完全恢复，能量更新成功 === Energy has not fully recovered, successful energy update
+		# - 4 - 能量刷新后已消耗，能量值及恢复时间更新成功 === After refreshing the energy, the energy value and recovery time are successfully updated.
+		# - 5 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功 === Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully
+		# - 6 - 参数错误 === Parameter error
+		# - 7 - 无足够能量消耗 === Not enough energy consumption
 		if amount < 0 or amount > self._full_energy:
-			return self.message_typesetting(status=1, message="Parameter error")
+			return self.message_typesetting(status=6, message="Parameter error")
 		return await self._decrease_energy(unique_id=unique_id, amount=amount)
 			####################################
 			#          P R I V A T E		   #
@@ -391,7 +399,7 @@ class PlayerManager:
 			# 成功2：如果没有恢复时间且是消耗能量值，则直接用数据库的值减去消耗的能量值，
 			# 然后存入消耗之后的能量值，以及将当前的时间存入 恢复时间项
 			await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
-			return self.message_typesetting(0, 'Energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time'], "values": [current_energy, current_time]})
+			return self.message_typesetting(1, 'Energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time'], "values": [current_energy, current_time]})
 		else:
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
 			recovered_energy = delta_time.seconds // 60 // self._recover_time
@@ -400,15 +408,23 @@ class PlayerManager:
 				# - 1 - 满足上限的情况：直接将满能量值和空字符串分别存入能量值项和恢复时间项
 				# - 2 - 不满足上限的情况：将能恢复的能量值计算出来，并且计算恢复后的能量值current_energy
 				#       和恢复时间与恢复能量消耗的时间相减的恢复时间值
-				recover_time, current_energy = ("", self._full_energy) if (current_energy + recovered_energy >= self._full_energy) else ((datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._recover_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy)
-				await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
-				return self.message_typesetting(status=0, message='Energy has been recovered and energy is successfully acquired', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+				if current_energy + recovered_energy >= self._full_energy:
+					recover_time, current_energy = "", self._full_energy
+					await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
+					return self.message_typesetting(status=2, message='Energy has been fully restored, successful energy update', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+				else:
+					recover_time, current_energy = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._recover_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy
+					await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
+					return self.message_typesetting(status=3, message='Energy has not fully recovered, successful energy update', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+				# recover_time, current_energy = ("", self._full_energy) if (current_energy + recovered_energy >= self._full_energy) else ((datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._recover_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy)
+				# await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
+				# return self.message_typesetting(status=0, message='Energy has been recovered and energy is successfully acquired', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
 			if recovered_energy + current_energy >= self._full_energy:
 				# 成功4：如果有恢复时间且是消耗能量
 				# 满足上限的情况是用上限能量值减去要消耗的能量值，然后设置减去之后的能量值和当前的时间分别存入能量值项和恢复时间项
 				current_energy = self._full_energy - amount
 				await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
-				return self.message_typesetting(0, 'After refreshing the energy, the energy value and recovery time are successfully updated.', {"keys": ['energy', 'recover_time'], "values": [current_energy, current_time]})
+				return self.message_typesetting(4, 'After refreshing the energy, the energy value and recovery time are successfully updated.', {"keys": ['energy', 'recover_time'], "values": [current_energy, current_time]})
 			elif recovered_energy + current_energy - amount >= 0:
 				# 成功5：如果有恢复时间且是消耗能量
 				# 不满足上限的情况是用当前数据库的能量值和当前恢复的能量值相加然后减去消耗的能量值为要存入数据库的能量值项
@@ -416,9 +432,9 @@ class PlayerManager:
 				current_energy = recovered_energy + current_energy - amount
 				recover_time = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._recover_time)).strftime("%Y-%m-%d %H:%M:%S")
 				await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
-				return self.message_typesetting(0, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+				return self.message_typesetting(5, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
 			else:  # 发生的情况是当前能量值和恢复能量值相加比需要消耗的能量值少
-				return self.message_typesetting(status=2, message="Not enough energy consumption")
+				return self.message_typesetting(status=7, message="Not enough energy consumption")
 	async def _get_energy_information(self, unique_id: str) -> (int, str):
 		data = await self._execute_statement('SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0]), data[0][1]
@@ -426,20 +442,22 @@ class PlayerManager:
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
 	async def level_up_skill(self, unique_id: str, skill_id: str, scroll_id: str) -> dict:
-		# 0 - Success upgrade=0 升级成功， upgrade=1升级失败
-		# 1 - User does not have that skill
-		# 2 - Invalid scroll id
+		# success ===> 0 and 1
+		# 0 - upgrade success
+		# 1 - upgrade unsuccessful
+		# 2 - User does not have that skill
+		# 3 - Invalid scroll id
 		# 4 - User does not have enough scrolls
 		# 9 - Skill already at max level
 		skill_level = await self._get_skill_level(unique_id, skill_id)
 		if skill_level == 0:
-			return self.message_typesetting(1, 'User does not have that skill')
+			return self.message_typesetting(2, 'User does not have that skill')
 		if skill_level >= 10:
 			return self.message_typesetting(9, 'Skill already max level')
 		fn = {'skill_scroll_10': self.try_skill_scroll_10, 'skill_scroll_30': self.try_skill_scroll_30, 'skill_scroll_100': self.try_skill_scroll_100}
 		if self.__class__.__name__ == 'PlayerManager':
 			if scroll_id not in fn.keys():
-				return self.message_typesetting(status=2, message="Invalid scroll id")
+				return self.message_typesetting(status=3, message="Invalid scroll id")
 			f = fn[scroll_id]
 			resp = await f(unique_id, -1)
 			if resp['status'] == 1:
@@ -456,10 +474,11 @@ class PlayerManager:
 					scroll_quantity = resp['remaining']
 			
 		if not await self._roll_for_upgrade(scroll_id):
-			return self.message_typesetting(0, 'success', {'keys': [skill_id, scroll_id], 'values': [skill_level, scroll_quantity], 'upgrade': 1})
+			return self.message_typesetting(1, 'upgrade unsuccessful', {'keys': [skill_id, scroll_id], 'values': [skill_level, scroll_quantity]})
 		await self._execute_statement('UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
-		return self.message_typesetting(0, 'success', {'keys': [skill_id, scroll_id], 'values': [skill_level + 1, scroll_quantity], 'upgrade': 0})
+		return self.message_typesetting(0, 'upgrade success', {'keys': [skill_id, scroll_id], 'values': [skill_level + 1, scroll_quantity]})
 	async def get_all_skill_level(self, unique_id: str) -> dict:
+		# success ===> 0
 		# 0 - Success
 		names = await self._execute_statement('DESCRIBE skill;')
 		values = await self._execute_statement('SELECT * from skill WHERE unique_id = "' + str(unique_id) + '";')
@@ -470,6 +489,7 @@ class PlayerManager:
 			value_list.append(val[1])
 		return self.message_typesetting(0, 'success', data={"keys": key_list, "values": value_list})
 	async def get_skill(self, unique_id: str, skill_id: str) -> dict:
+		# success ===> 0
 		# 0 - Success
 		# 1 - invalid skill name
 		try:
@@ -478,11 +498,12 @@ class PlayerManager:
 		except:
 			return self.message_typesetting(1, 'invalid skill name')
 	async def try_unlock_skill(self, unique_id: str, skill_id: str) -> dict:
-		# 0 - success, unlocked new skill
+		# success ===> 0 and 1
+		# 0 - success unlocked new skill
 		# 1 - skill already unlocked
 		# 2 - invalid skill name
 		# json ===> {"status": status, "remaining": remaining} ===> status 0、1、2、3
-		table_tuple = ("success, unlocked new skill", "skill already unlocked", "invalid skill name")
+		table_tuple = ("success unlocked new skill", "skill already unlocked", "invalid skill name")
 		try:  # 0、1、2
 			level = await self._get_skill_level(unique_id, skill_id)
 			if level == 0 and await self._execute_statement_update('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";') == 1:
@@ -509,6 +530,7 @@ class PlayerManager:
 	# an SQL command as a string and it will execute. Call this method
 	# whenever you issue an SQL statement.
 	async def pass_stage(self, unique_id: str, stage: int) -> dict:
+		# success ===> 0
 		# 0 : passed customs ===> success
 		# 1 : database operation error
 		# 9 : abnormal data!
@@ -530,8 +552,9 @@ class PlayerManager:
 	async def level_up_weapon(self, unique_id: str, weapon: str, iron: int) -> dict:
 		# - 0 - Success
 		# - 1 - User does not have that weapon
-		# - 2 - Insufficient materials, upgrade failed
-		# - 3 - Database operation error
+		# - 2 - Incoming materials are not upgraded enough
+		# - 3 - Insufficient materials, upgrade failed
+		# - 4 - Database operation error
 		# - 9 - Weapon already max level
 		async with ClientSession() as session:
 			if await self.__get_weapon_star(unique_id, weapon) == 0:
@@ -556,14 +579,14 @@ class PlayerManager:
 			row[level_count] += skill_upgrade_number
 			row[point_count] += skill_upgrade_number
 			if skill_upgrade_number == 0:
-				return self.message_typesetting(status=2, message="insufficient materials, upgrade failed")
+				return self.message_typesetting(status=2, message="Incoming materials are not upgraded enough")
 			if self.__class__.__name__ == "PlayerManager":
 				json_data = await self.try_iron(unique_id=unique_id, value=-skill_upgrade_number * self._standard_iron_count)
 			else:
 				async with session.post(MANAGER_PLAYER_BASE_URL + '/try_iron', data={"unique_id": unique_id, "value": -skill_upgrade_number * self._standard_iron_count}) as resp:
 					json_data = json.loads(await resp.text())
 			if int(json_data["status"]) == 1:
-				return self.message_typesetting(status=2, message="insufficient materials, upgrade failed")
+				return self.message_typesetting(status=3, message="insufficient materials, upgrade failed")
 			remaining_iron = int(json_data["remaining"])
 			# update the weapon level on the account
 			if await self.__set_weapon_level_up_data(unique_id=unique_id, weapon=weapon, weapon_level=row[level_count], skill_point=row[point_count]) == 0:
@@ -658,10 +681,10 @@ class PlayerManager:
 			row = await self.__get_row_by_id(table_name=weapon, unique_id=unique_id)
 			weapon_star = await self.__get_weapon_star(unique_id=unique_id, weapon=weapon)
 			segment_count = self._standard_segment_count * (1 + weapon_star)  # 根据武器星数增加碎片的消耗数量
-			if row[head.index("segment")] < segment_count:
+			if int(row[head.index("segment")]) < segment_count:
 				return self.message_typesetting(status=2, message="insufficient segments, upgrade failed!")
 			else:
-				row[head.index("segment")] -= segment_count
+				row[head.index("segment")] = int(row[head.index("segment")]) - segment_count
 				weapon_star += 1
 				code1 = await self.__set_segment_by_id(unique_id=unique_id, weapon=weapon, segment=row[head.index("segment")])
 				code2 = await self.__set_weapon_star(unique_id=unique_id, weapon=weapon, star=weapon_star)
@@ -705,8 +728,8 @@ class PlayerManager:
 			return self.message_typesetting(status=0, message="gain success", data={"keys": keys, "values": values})
 	async def try_unlock_weapon(self, unique_id: str, weapon: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		# - 0 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 1 - no weapon!
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
 		try:
 			star = await self.__get_weapon_star(unique_id, weapon)
 			if star != 0:
@@ -714,9 +737,9 @@ class PlayerManager:
 				await self.__set_segment_by_id(unique_id, weapon, segment)
 				return self.message_typesetting(status=0, message='Weapon already unlocked, got free segment!', data={"keys": ['weapon', 'segment'], "values": [weapon, segment]})
 			await self.__set_weapon_star(unique_id, weapon, 1)
-			return self.message_typesetting(status=0, message='Unlocked new weapon!', data={"keys": ["weapon"], "values": [weapon]})
+			return self.message_typesetting(status=1, message='Unlocked new weapon!', data={"keys": ["weapon"], "values": [weapon]})
 		except:
-			return self.message_typesetting(status=1, message='no weapon!')
+			return self.message_typesetting(status=2, message='no weapon!')
 	# Format the information
 	# Get table properties, column headers
 	# 获取表属性，列标题
@@ -811,10 +834,10 @@ class PlayerManager:
 		# TODO verify that this is true :D
 
 
-		self._standard_iron_count = CONFIG['_01_Manager_Weapon']['standard_iron_count']
-		self._standard_segment_count = CONFIG['_01_Manager_Weapon']['standard_segment_count']
+		self._standard_iron_count = int(CONFIG['_01_Manager_Weapon']['standard_iron_count'])
+		self._standard_segment_count = int(CONFIG['_01_Manager_Weapon']['standard_segment_count'])
 		# Reset the amount of gold coins consumed by weapon skills
-		self._standard_reset_weapon_skill_coin_count = CONFIG['_01_Manager_Weapon']['standard_reset_weapon_skill_coin_count']
+		self._standard_reset_weapon_skill_coin_count = int(CONFIG['_01_Manager_Weapon']['standard_reset_weapon_skill_coin_count'])
 		self._valid_passive_skills = CONFIG['_01_Manager_Weapon']['_valid_passive_skills']
 
 		# This is the connection pool to the SQL server. These connections stay open

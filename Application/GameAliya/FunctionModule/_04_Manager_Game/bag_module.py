@@ -39,6 +39,7 @@ class BagSystemClass:
 		return self.__internal_format(status=0, remaining=data[0])
 
 	async def get_all_supplies(self, unique_id: str) -> dict:
+		# success ===> 0
 		data_tuple = (await self.get_all_head(table="player"))["remaining"]
 		heads = []
 		for col in data_tuple:
@@ -49,6 +50,7 @@ class BagSystemClass:
 		return self.message_typesetting(status=0, message="get supplies success", data={"keys": heads, "values": content})
 
 	async def add_supplies(self, unique_id: str, key: str, value: int):
+		# success ===> 0
 		if value <= 0: return self.message_typesetting(status=9, message="not a positive number")
 		json_data = await self.__try_material(unique_id=unique_id, key=key, value=value)
 		if json_data["status"] == 0:
@@ -83,7 +85,7 @@ class BagSystemClass:
 			else:
 				return self.message_typesetting(status=3, message="unexpected parameter --> " + scroll_id)
 		except:
-			return self.message_typesetting(status=9, message="parameter error!")
+			return self.message_typesetting(status=4, message="parameter error!")
 
 	async def try_all_material(self, unique_id: str, stage: int) -> dict:
 		sql_stage = await self.__get_material(unique_id=unique_id, material="stage")
