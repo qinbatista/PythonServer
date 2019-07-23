@@ -6,7 +6,7 @@ import tormysql
 from aiohttp import web
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read('../../Configuration/server/1.0/server.conf')
+CONFIG.read('../../Configuration/server/1.0/server.conf', encoding="utf-8")
 JSON_NAME = "../../Configuration/client/1.0/stage_reward_config.json"
 
 
@@ -92,11 +92,9 @@ class BagSystemClass:
 		if stage <= 0 or sql_stage + 1 < stage:
 			print("[try_all_material] -> stage:" + str(stage))
 			return self.__internal_format(status=9, remaining=0)  # abnormal data!
+		material_dict = dict(self.reward_list[stage])
 		if sql_stage + 1 == stage:  # 通过新关卡
-			material_dict = dict(self.reward_list[stage])
 			material_dict.update({"stage": 1})
-		else:  # 老关卡
-			material_dict = dict(self.reward_list[sql_stage])
 		update_str, select_str = self.__sql_str_operating(unique_id=unique_id, material_dict=material_dict)
 		data = 1 - await self._execute_statement_update(statement=update_str)  # 0, 1反转
 		remaining = list(await self._execute_statement(statement=select_str))  # 数据库设置后的值
