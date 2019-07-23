@@ -107,7 +107,7 @@ def try_all_material():
 
 
 def try_energy():
-	result = requests.post(PLAYER_STATE_BASE_URL + '/try_energy', data={'unique_id': "4", "amount": "1"})
+	result = requests.post(PLAYER_STATE_BASE_URL + '/try_energy', data={'unique_id': "4", "amount": "0"})
 	# result = requests.post(MANAGER_PLAYER_BASE_URL + '/random_gift_skill', data={'unique_id': "4"})
 	print(str(result.text))
 
