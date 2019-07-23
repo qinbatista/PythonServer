@@ -61,12 +61,33 @@ class AccountManager:
 		await self._register_token(unique_id, resp['token'])
 		return self.message_typesetting(0, 'success', resp)
 
+	# TODO run check_exists as a task
+	async def bind_account(self, unique_id: str, password: str, account: str, email: str, phone: str) -> dict:
+		is_bound = await self._account_is_bound(unique_id)
+		account_exists = await self._check_exists('account', account)
+		email_exists = await self._check_exists('email', email)
+		phone_exists = await self._check_exists('phone_number', phone)
+		if is_bound:
+			return self.message_typesetting(1, 'account already bound before')
+		if account_exists:
+			return self.message_typesetting(2, 'account name already exists')
+		if email_exists:
+			return self.message_typesetting(3, 'email already exists')
+		if phone_exists:
+			return self.message_typesetting(4, 'phone number already exists')
+		await self._bind_account(unique_id, password, account, email, phone)
+		return self.message_typesetting(0, 'success')
+
 
 
 
 			####################################
 			#          P R I V A T E		   #
 			####################################
+
+	#TODO return success or failure
+	async def _bind_account(self, unique_id: str, password: str, account: str, email: str, phone: str):
+		await self._execute_statement('UPDATE `info` SET password = "' + password + '", account = "' + account + '", email = "' + email + '", phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
 
 	#TODO return success or failure
 	async def _create_new_user(self, unique_id: str):
@@ -155,6 +176,11 @@ async def __login(request: web.Request) -> web.Response:
 	data = await MANAGER.login_unique(post['unique_id'])
 	return _json_response(data)
 
+@ROUTES.post('/bind_account')
+async def __login(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await MANAGER.bind_account(post['unique_id'], post['password'], post['account'], post['email'], post['phone_number'])
+	return _json_response(data)
 
 
 

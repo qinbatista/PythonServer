@@ -112,26 +112,28 @@ Status codes and meaning:
 
 ### bind\_account
 
-Binds the account specified with the unique\_id to the provided account name and password.
+Binds the account specified with the unique\_id to the provided information.
 
 Status codes and meaning:
 
 - 0 - Success
-- 1 - Account name already exists
-- 2 - The account has already been bound before
-- 3 - Need to be logged in
+- 1 - The account has already been bound before
+- 2 - Account name already exists
+- 3 - Email already exists
+- 4 - Phone number already exists
 
 
 
 ##### Sample Request
 ```json
 {
-	"function" : "login",
+	"function" : "bind_account",
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
 				"token" : "TOKEN",
 				"account" : "ACCOUNT_NAME",
-				"password" : "PASSWORD"
+				"password" : "PASSWORD",
+				"email" : "EMAIL",
+				"phone_number" : "PHONE_NUMBER"
 			 }
 }
 ```
