@@ -115,17 +115,17 @@ def get_init(file_path):
 			init_code.append(Re_check_import(i))
 	return init_code
 def Re_check_import(string_line):
-	#_04_Manager_Game module
+	#_02_Manager_Game module
 	if string_line.find("CONFIG['bag_manager']")!=-1:
-		string_line = string_line.replace("CONFIG['bag_manager']","CONFIG['_04_Manager_Game']")
+		string_line = string_line.replace("CONFIG['bag_manager']","CONFIG['_02_Manager_Game']")
 	if string_line.find("CONFIG['lottery_module']")!=-1:
-		string_line = string_line.replace("CONFIG['lottery_module']","CONFIG['_04_Manager_Game']")
+		string_line = string_line.replace("CONFIG['lottery_module']","CONFIG['_02_Manager_Game']")
 	if string_line.find("CONFIG['player_state_module']")!=-1:
-		string_line = string_line.replace("CONFIG['player_state_module']","CONFIG['_04_Manager_Game']")
+		string_line = string_line.replace("CONFIG['player_state_module']","CONFIG['_02_Manager_Game']")
 	if string_line.find("CONFIG['skill_module']")!=-1:
-		string_line = string_line.replace("CONFIG['skill_module']","CONFIG['_04_Manager_Game']")
+		string_line = string_line.replace("CONFIG['skill_module']","CONFIG['_02_Manager_Game']")
 	if string_line.find("CONFIG['stage_module']")!=-1:
-		string_line = string_line.replace("CONFIG['stage_module']","CONFIG['_04_Manager_Game']")
+		string_line = string_line.replace("CONFIG['stage_module']","CONFIG['_02_Manager_Game']")
 
 	#set all module configuration setting as local setting
 	if string_line.find("../../Configuration")!=-1:
@@ -134,8 +134,8 @@ def Re_check_import(string_line):
 def merge_content_to_manager(file_name):
 
 	file_path = PythonLocation()+"/../"+file_name+".py"
-	if os.path.exists(PythonLocation()+"/../_04_Manager_Game.py"):
-		os.remove(PythonLocation()+"/../_04_Manager_Game.py")
+	if os.path.exists(PythonLocation()+"/../_02_Manager_Game.py"):
+		os.remove(PythonLocation()+"/../_02_Manager_Game.py")
 	shutil.copy(PythonLocation()+"/ExampleManager.py",file_path)
 
 	file_object = open(PythonLocation()+"/../"+file_name+".py",encoding="utf-8")

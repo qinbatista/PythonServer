@@ -34,6 +34,7 @@ class ConfigurationManager:
 		# for as long as this class is alive.
 		self._pool = tormysql.ConnectionPool(
 			max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
+		self.Path = os.path.dirname(os.path.realpath(__file__))
 		# client setting
 		self.level_enemy_layouts_config = ""
 		self.monster_config = ""
@@ -43,10 +44,6 @@ class ConfigurationManager:
 		self.server_conf = configparser.ConfigParser()
 		self.mysql_data_config = ""
 		self.config_timer()
-	async def public_method(self) -> None:
-		# Something interesting
-		# await self._execute_statement('STATEMENT')
-		pass
 
 	async def public_method(self) -> None:
 		# Something interesting
@@ -65,23 +62,27 @@ class ConfigurationManager:
 				await cursor.execute(statement)
 				data = cursor.fetchall()
 				return data
-	def PythonLocation(self):
-		return os.path.dirname(os.path.realpath(__file__))
-	async def _get_client_level_enemy_layouts_config(self):
+
+	async def _get_client_level_enemy_layouts_config(self) -> object:
 		return self.level_enemy_layouts_config
-	async def _get_client_monster_config(self):
+
+	async def _get_client_monster_config(self) -> object:
 		return self.monster_config
-	async def _get_client_stage_reward_config(self):
-	 	return self.stage_reward_config
-	async def _get_server_lottery_conf(self):
-	 	return self.lottery_conf
-	async def _get_server_server_conf(self):
-	 	return self.server_conf
-	async def _get_server_mysql_data_config(self):
-	 	return self.mysql_data_config
+
+	async def _get_client_stage_reward_config(self) -> object:
+		return self.stage_reward_config
+
+	async def _get_server_lottery_conf(self) -> object:
+		return self.lottery_conf
+
+	async def _get_server_server_conf(self) -> object:
+		return self.server_conf
+
+	async def _get_server_mysql_data_config(self) -> object:
+		return self.mysql_data_config
+
 	def set_server_config(self):
-		json_content = json.load(open(self.PythonLocation(
-		)+"/configuration/config_timer_setting.json", 'r', encoding="UTF-8"))
+		json_content = json.load(open(self.Path+"/configuration/config_timer_setting.json", 'r', encoding="UTF-8"))
 		time_list = json_content.keys()
 		for config_time in time_list:
 			my_time = time.strftime('%Y-%m-%d', time.localtime(time.time()))
@@ -90,19 +91,16 @@ class ConfigurationManager:
 		version = json_content[setting_time]["client"]
 
 		# client side
-		self.level_enemy_layouts_config = json.load(open(self.PythonLocation(
-		)+"/configuration/client/"+version+"/level_enemy_layouts_config.json", 'r', encoding="UTF-8"))
-		self.monster_config = json.load(open(self.PythonLocation(
-		)+"/configuration/client/"+version+"/monster_config.json", 'r', encoding="UTF-8"))
-		self.stage_reward_config = json.load(open(self.PythonLocation(
-		)+"/configuration/client/"+version+"/stage_reward_config.json", 'r', encoding="UTF-8"))
+		self.level_enemy_layouts_config = json.load(open(self.Path+"/configuration/client/"+version+"/level_enemy_layouts_config.json", 'r', encoding="UTF-8"))
+		self.monster_config = json.load(open(self.Path+"/configuration/client/"+version+"/monster_config.json", 'r', encoding="UTF-8"))
+		self.stage_reward_config = json.load(open(self.Path+"/configuration/client/"+version+"/stage_reward_config.json", 'r', encoding="UTF-8"))
 
 		# server side
-		location  = self.PythonLocation()+"/configuration/server/" + version+"/server.conf"
-		self.mysql_data_config = json.load(open(self.PythonLocation(
-		)+"/configuration/server/"+version+"/mysql_data_config.json", 'r', encoding="UTF-8"))
-		self.server_conf.read(self.PythonLocation()+"/configuration/server/" + version+"/server.conf")
-		self.lottery_conf.read(self.PythonLocation()+"/configuration/server/" + version+"/lottery.conf")
+		location  = self.Path+"/configuration/server/" + version+"/server.conf"
+		self.mysql_data_config = json.load(open(self.Path+"/configuration/server/"+version+"/mysql_data_config.json", 'r', encoding="UTF-8"))
+		self.server_conf.read(self.Path+"/configuration/server/" + version+"/server.conf")
+		self.lottery_conf.read(self.Path+"/configuration/server/" + version+"/lottery.conf")
+
 	def config_timer(self):
 		self.set_server_config()
 		timer = threading.Timer(10, self.set_server_config)
@@ -145,11 +143,13 @@ async def __get_client_level_enemy_layouts_config(request: web.Request) -> web.R
 	data = await MANAGER._get_client_level_enemy_layouts_config()
 	return _json_response(data)
 
+
 @ROUTES.post('/_get_client_monster_config')
 async def _get_client_monster_config(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER._get_client_monster_config()
 	return _json_response(data)
+
 
 @ROUTES.post('/_get_client_stage_reward_config')
 async def _get_client_stage_reward_config(request: web.Request) -> web.Response:
@@ -157,11 +157,13 @@ async def _get_client_stage_reward_config(request: web.Request) -> web.Response:
 	data = await MANAGER._get_client_stage_reward_config()
 	return _json_response(data)
 
+
 @ROUTES.post('/_get_server_lottery_conf')
 async def _get_server_lottery_conf(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER._get_server_lottery_conf()
 	return _json_response(data)
+
 
 @ROUTES.post('/_get_server_server_conf')
 async def _get_server_server_conf(request: web.Request) -> web.Response:
@@ -169,11 +171,13 @@ async def _get_server_server_conf(request: web.Request) -> web.Response:
 	data = await MANAGER._get_server_server_conf()
 	return _json_response(data)
 
+
 @ROUTES.post('/_get_server_mysql_data_config')
 async def _get_server_mysql_data_config(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = await MANAGER._get_server_mysql_data_config()
 	return _json_response(data)
+
 
 def run(port):
 	app = web.Application()
@@ -182,4 +186,4 @@ def run(port):
 
 
 if __name__ == '__main__':
-	run(8002)
+	run(port=8002)

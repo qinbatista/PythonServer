@@ -106,11 +106,9 @@ class GameManager:
 		sql_stage = await self._get_material(world, unique_id, "stage")
 		if stage <= 0 or sql_stage + 1 < stage:
 			return self._internal_format(status=9, remaining=0)  # abnormal data!
+		material_dict = dict(self._reward_list[stage])
 		if sql_stage + 1 == stage:  # 通过新关卡
-			material_dict = dict(self._reward_list[stage])
 			material_dict.update({"stage": 1})
-		else:  # 老关卡
-			material_dict = dict(self._reward_list[sql_stage])
 		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
 		data = 1 - await self._execute_statement_update(world, update_str)  # 0, 1反转
 		remaining = list(await self._execute_statement(world, select_str))  # 数据库设置后的值

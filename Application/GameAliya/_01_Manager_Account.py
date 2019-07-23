@@ -187,7 +187,7 @@ async def __login(request: web.Request) -> web.Response:
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port = CONFIG.getint('_05_Manager_Account', 'port'))
+	web.run_app(app, port = CONFIG.getint('_01_Manager_Account', 'port'))
 
 
 if __name__ == '__main__':

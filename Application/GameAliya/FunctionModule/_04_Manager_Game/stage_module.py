@@ -7,11 +7,6 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 
-format_sql = {
-	"smallint": "%s",
-	"varchar": "'%s'",
-	"char": "'%s'"
-}
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf')
 MANAGER_BAG_BASE_URL = CONFIG['bag_manager']['address'] + ":" + CONFIG['bag_manager']['port']
@@ -24,7 +19,11 @@ class StageSystemClass:
 		# 这是SQL服务器的连接池。 只要这个类还活着，这些连接就会保持打开状态。
 		# TODO verify that this is true :D
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
-
+		self.format_sql = {
+			"smallint": "%s",
+			"varchar": "'%s'",
+			"char": "'%s'"
+		}
 
 	async def pass_stage(self, unique_id: str, stage: int) -> dict:
 		# success ===> 0
