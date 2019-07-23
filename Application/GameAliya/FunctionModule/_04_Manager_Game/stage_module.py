@@ -1,6 +1,7 @@
 import json
 import tormysql
-import os
+import time
+import datetime
 import configparser
 import random
 from aiohttp import web
@@ -46,6 +47,28 @@ class StageSystemClass:
 			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
 			return self.message_typesetting(status=0, message="passed customs!", data=data)
 
+#  ############################# 2019-7-23 16:18 header #############################
+	async def start_hang_up(self, unique_id: str, stage: int):
+		# success ===> 0 , 1 , 2 , 3 , 4 , 5
+		hang_up_time = self._get_hang_up_time(unique_id=unique_id)
+		if hang_up_time == "":
+			hang_up_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+			if self._set_hang_up_time(unique_id=unique_id, hang_up_time=hang_up_time) == 0:
+				return self.message_typesetting(status=1, message="database operating error")
+			return self.message_typesetting(status=0, message="hang up success", data={"hang_up_time": hang_up_time})
+		return self.message_typesetting(status=2, message="repeat hang up")
+
+	async def _set_hang_up_time(self, unique_id: str, hang_up_time: str) -> str:
+		return await self._execute_statement_update("update player set hang_up_time = '" + hang_up_time + "' where unique_id=%s" % unique_id)
+
+	async def _get_hang_up_time(self, unique_id: str) -> str:
+		data = await self._execute_statement("select hang_up_time from player where unique_id=%s" % unique_id)
+		return data[0][0]
+
+
+
+#  ############################# 2019-7-23 16:18   end  #############################
+
 	async def _execute_statement(self, statement: str) -> tuple:
 		"""
 		Executes the given statement and returns the result.
@@ -78,6 +101,7 @@ class StageSystemClass:
 		:return:返回客户端需要的json数据
 		"""
 		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
+
 
 
 MANAGER = StageSystemClass()

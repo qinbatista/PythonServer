@@ -27,7 +27,7 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read('../../Configuration/server/1.0/server.conf')
+CONFIG.read('../../Configuration/server/1.0/server.conf', encoding="utf-8")
 BAG_BASE_URL = CONFIG['bag_manager']['address'] + CONFIG['bag_manager']['port']
 
 
@@ -37,7 +37,7 @@ class PlayerStateManager:
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._pool = tormysql.ConnectionPool(max_connections=10, host=CONFIG['database']['ip'], user='root', passwd='lukseun', db='aliya', charset='utf8')
-		self._recover_time = CONFIG.getint("player_state_manager", "recover_time")  # 10分钟恢复一点体力
+		self._cooling_time = CONFIG.getint("player_state_manager", "cooling_time")  # 10分钟恢复一点体力
 		self._full_energy = CONFIG.getint("player_state_manager", "full_energy")
 
 	async def try_energy(self, unique_id: str, amount: int) -> dict:  # amount > 0
@@ -62,45 +62,52 @@ class PlayerStateManager:
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		if recover_time == '':  # 此时 current_energy == self._full_energy 成立
 			if amount == 0:  # 成功1：如果没有恢复时间且是获取能量值，则直接拿取数据库的值给客户端
-				return self.message_typesetting(status=0, message='Get energy successfully', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+				return self.message_typesetting(status=0, message='Get energy successfully', data={"keys": ['energy', 'cooling_time'], "values": [current_energy, -1]})
 			current_energy -= amount
 			# 成功2：如果没有恢复时间且是消耗能量值，则直接用数据库的值减去消耗的能量值，
 			# 然后存入消耗之后的能量值，以及将当前的时间存入 恢复时间项
+			cooling_time = self._cooling_time * 60
 			await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
-			return self.message_typesetting(1, 'Energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time'], "values": [current_energy, current_time]})
+			return self.message_typesetting(1, 'Energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'cooling_time'], "values": [current_energy, cooling_time]})
 		else:
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
-			recovered_energy = delta_time.seconds // 60 // self._recover_time
+			recovered_energy = delta_time.seconds // 60 // self._cooling_time
 			if amount == 0:
 				# 成功3：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
-				# - 1 - 满足上限的情况：直接将满能量值和空字符串分别存入能量值项和恢复时间项
-				# - 2 - 不满足上限的情况：将能恢复的能量值计算出来，并且计算恢复后的能量值current_energy
-				#       和恢复时间与恢复能量消耗的时间相减的恢复时间值
+				# 满足上限的情况：直接将满能量值和空字符串分别存入能量值项和恢复时间项
 				if current_energy + recovered_energy >= self._full_energy:
-					recover_time, current_energy = "", self._full_energy
+					recover_time, current_energy, cooling_time = "", self._full_energy, -1
 					await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
-					return self.message_typesetting(status=2, message='Energy has been fully restored, successful energy update', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+					return self.message_typesetting(status=2, message='Energy has been fully restored, successful energy update', data={"keys": ['energy', 'cooling_time'], "values": [current_energy, cooling_time]})
+				# 成功4：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
+				# 不满足上限的情况：将能恢复的能量值计算出来，并且计算恢复后的能量值current_energy
+				# 和恢复时间与恢复能量消耗的时间相减的恢复时间值
 				else:
-					recover_time, current_energy = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._recover_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy
+					recover_time, current_energy = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy
+					delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
+					cooling_time = 60 * self._cooling_time - delta_time.seconds
 					await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
-					return self.message_typesetting(status=3, message='Energy has not fully recovered, successful energy update', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
-				# recover_time, current_energy = ("", self._full_energy) if (current_energy + recovered_energy >= self._full_energy) else ((datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._recover_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy)
+					return self.message_typesetting(status=3, message='Energy has not fully recovered, successful energy update', data={"keys": ['energy', 'cooling_time'], "values": [current_energy, cooling_time]})
+				# recover_time, current_energy = ("", self._full_energy) if (current_energy + recovered_energy >= self._full_energy) else ((datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy)
 				# await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
 				# return self.message_typesetting(status=0, message='Energy has been recovered and energy is successfully acquired', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
 			if recovered_energy + current_energy >= self._full_energy:
-				# 成功4：如果有恢复时间且是消耗能量
+				# 成功5：如果有恢复时间且是消耗能量
 				# 满足上限的情况是用上限能量值减去要消耗的能量值，然后设置减去之后的能量值和当前的时间分别存入能量值项和恢复时间项
 				current_energy = self._full_energy - amount
+				cooling_time = self._cooling_time * 60
 				await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
-				return self.message_typesetting(4, 'After refreshing the energy, the energy value and recovery time are successfully updated.', {"keys": ['energy', 'recover_time'], "values": [current_energy, current_time]})
+				return self.message_typesetting(4, 'After refreshing the energy, the energy value and recovery time are successfully updated.', {"keys": ['energy', 'cooling_time'], "values": [current_energy, cooling_time]})
 			elif recovered_energy + current_energy - amount >= 0:
-				# 成功5：如果有恢复时间且是消耗能量
+				# 成功6：如果有恢复时间且是消耗能量
 				# 不满足上限的情况是用当前数据库的能量值和当前恢复的能量值相加然后减去消耗的能量值为要存入数据库的能量值项
 				# 数据库中的恢复时间与恢复能量消耗的时间相减的恢复时间值存入到数据库的恢复时间项
 				current_energy = recovered_energy + current_energy - amount
-				recover_time = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._recover_time)).strftime("%Y-%m-%d %H:%M:%S")
+				recover_time = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
+				delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
+				cooling_time = 60 * self._cooling_time - delta_time.seconds
 				await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
-				return self.message_typesetting(5, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+				return self.message_typesetting(5, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'cooling_time'], "values": [current_energy, cooling_time]})
 			else:  # 发生的情况是当前能量值和恢复能量值相加比需要消耗的能量值少
 				return self.message_typesetting(status=7, message="Not enough energy consumption")
 
