@@ -64,24 +64,46 @@ class ConfigurationManager:
 				return data
 
 	async def _get_client_level_enemy_layouts_config(self) -> object:
+		'''
+		return enemy layouts config, this config contain where monster come from, how many waves,
+		how lang to generate time
+		'''
 		return self.level_enemy_layouts_config
 
 	async def _get_client_monster_config(self) -> object:
+		'''
+		return all the monsters' configuration, such as hp, mp, attchk and so on
+		'''
 		return self.monster_config
 
-	async def _get_client_stage_reward_config(self) -> object:
+	async def _get_server_stage_reward_config(self) -> object:
+		'''
+		return a result of all reward of stages, so users can get different resource after we change server
+		'''
 		return self.stage_reward_config
 
-	async def _get_server_lottery_conf(self) -> object:
+	async def _get_server_lottery_config(self) -> object:
+		'''
+		get all probability of everythings in lottery
+		'''
 		return self.lottery_conf
 
-	async def _get_server_server_conf(self) -> object:
+	async def _get_server_server_config(self) -> object:
+		'''
+		get server config, those config include server's ip address, how many server want to create and what's game setting
+		'''
 		return self.server_conf
 
 	async def _get_server_mysql_data_config(self) -> object:
+		'''
+		there have some functions need to know talbe detal info in our server, give detail when request
+		'''
 		return self.mysql_data_config
 
 	def set_server_config(self):
+		"""
+		read all config in memory, it will be excute in every 10 mins
+		"""
 		json_content = json.load(open(self.Path+"/configuration/config_timer_setting.json", 'r', encoding="UTF-8"))
 		time_list = json_content.keys()
 		for config_time in time_list:
@@ -102,8 +124,11 @@ class ConfigurationManager:
 		self.lottery_conf.read(self.Path+"/configuration/server/" + version+"/lottery.conf")
 
 	def config_timer(self):
+		"""
+		server will refresh configration every 10 mins
+		"""
 		self.set_server_config()
-		timer = threading.Timer(10, self.set_server_config)
+		timer = threading.Timer(600, self.set_server_config)
 		timer.start()
 
 
