@@ -256,15 +256,6 @@ class WeaponManager:
 
 
 
-	# Get table properties, column headers
-	# 获取表属性，列标题
-	async def __get_col_name_list(self, table) -> list:
-		sql_result = await self._execute_statement("desc " + table + ";")
-		col_list = []
-		for col in sql_result:
-			col_list.append(col[0])
-		return col_list
-
 	# Get the content corresponding to the unique_id in the weapon backpack table.
 	# This content is the star number of the weapon.
 	# 获取武器背包表中unique_id对应的内容。
@@ -280,10 +271,6 @@ class WeaponManager:
 		sql_result = await self._execute_statement("select * from " + weapon + " where unique_id='" + unique_id + "'")
 		return list(sql_result[0])
 
-	async def __get_weapon_info(self, unique_id, weapon) -> list:
-		data = await self._execute_statement("select weapon_level, passive_skill_1_level, passive_skill_2_level, passive_skill_3_level, passive_skill_4_level, skill_point, segment from " + weapon + " where unique_id='" + unique_id + "';")
-		return list(data[0])
-
 	async def __set_skill_point(self, unique_id: str, weapon: str, skill_point: str) -> int:
 		return await self._execute_statement_update("UPDATE " + weapon + " SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point=" + skill_point + " where unique_id='" + unique_id + "'")
 
@@ -292,13 +279,6 @@ class WeaponManager:
 
 	async def __get_weapon_star(self, unique_id: str, weapon: str) -> int:
 		data = await self._execute_statement("SELECT " + weapon + " FROM weapon_bag WHERE unique_id='" + str(unique_id) + "'")
-		return data[0][0]
-
-	async def __set_material(self, unique_id: str, material: str, material_value: int) -> int:
-		return await self._execute_statement_update("UPDATE player SET " + material + "=" + str(material_value) + " where unique_id='" + unique_id + "'")
-
-	async def __get_material(self, unique_id: str, material: str) -> int:
-		data = await self._execute_statement("SELECT " + material + " FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return data[0][0]
 
 	async def __set_weapon_level_up_data(self, unique_id: str, weapon: str, weapon_level: int, skill_point: int):

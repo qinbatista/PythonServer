@@ -28,7 +28,6 @@ from aiohttp import ClientSession
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf')
-
 BAG_BASE_URL = CONFIG['bag_manager']['address'] + CONFIG['bag_manager']['port']
 
 
@@ -38,8 +37,8 @@ class PlayerStateManager:
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive. 
 		self._pool = tormysql.ConnectionPool(max_connections=10, host=CONFIG['database']['ip'], user='root', passwd='lukseun', db='aliya', charset='utf8')
-		self._recover_time = 10  # 10分钟恢复一点体力
-		self._full_energy = 10
+		self._recover_time = CONFIG.getint("player_state_manager", "recover_time")  # 10分钟恢复一点体力
+		self._full_energy = CONFIG.getint("player_state_manager", "full_energy")
 
 	async def try_energy(self, unique_id: str, amount: int) -> dict:  # amount > 0
 		# success ===> 0 , 1 , 2 , 3 , 4 , 5
