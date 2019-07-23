@@ -40,7 +40,7 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 LOTTERY = configparser.ConfigParser()
 LOTTERY.read('./Configuration/server/1.0/lottery.conf')
-BAG_BASE_URL = CONFIG['_04_Manager_Game']['address'] + ':' + CONFIG['_04_Manager_Game']['port']
+BAG_BASE_URL = CONFIG['_02_Manager_Game']['address'] + ':' + CONFIG['_02_Manager_Game']['port']
 SKILL_BASE_URL = CONFIG['skill_manager']['address'] + ':' + CONFIG['skill_manager']['port']
 WEAPON_BASE_URL = CONFIG['_01_Manager_Weapon']['address'] + ':' + CONFIG['_01_Manager_Weapon']['port']
 
@@ -60,7 +60,7 @@ from aiohttp import ClientSession
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 
-BAG_BASE_URL = CONFIG['_04_Manager_Game']['address'] + CONFIG['_04_Manager_Game']['port']
+BAG_BASE_URL = CONFIG['_02_Manager_Game']['address'] + CONFIG['_02_Manager_Game']['port']
 
 
 # Part (1 / 2)
@@ -74,7 +74,7 @@ from aiohttp import ClientSession
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 
-BAG_BASE_URL = CONFIG['_04_Manager_Game']['address'] + ':' + CONFIG['_04_Manager_Game']['port']
+BAG_BASE_URL = CONFIG['_02_Manager_Game']['address'] + ':' + CONFIG['_02_Manager_Game']['port']
 
 
 # Part (1 / 2)
@@ -94,7 +94,7 @@ format_sql = {
 }
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
-MANAGER_BAG_BASE_URL = CONFIG['_04_Manager_Game']['address'] + ":" + CONFIG['_04_Manager_Game']['port']
+MANAGER_BAG_BASE_URL = CONFIG['_02_Manager_Game']['address'] + ":" + CONFIG['_02_Manager_Game']['port']
 
 
 import json
@@ -108,7 +108,7 @@ from aiohttp import ClientSession
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
-MANAGER_PLAYER_BASE_URL = CONFIG['_04_Manager_Game']['address'] + ":" + CONFIG['_04_Manager_Game']['port']
+MANAGER_PLAYER_BASE_URL = CONFIG['_02_Manager_Game']['address'] + ":" + CONFIG['_02_Manager_Game']['port']
 
 
 import json

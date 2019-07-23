@@ -17,10 +17,8 @@ DESIv = CONFIG['_00_Message_Handler']['DESIv']
 DESKey = CONFIG['_00_Message_Handler']['DESKey']
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 TOKEN_BASE_URL = CONFIG['_00_Token_Server']['address'] + ":" + CONFIG['_00_Token_Server']['port']
-MANAGER_WEAPON_BASE_URL = CONFIG['_01_Manager_Weapon']['address'] + ":" + CONFIG['_01_Manager_Weapon']['port']
-MANAGER_LEVEL_BASE_URL = CONFIG['_03_Manager_Level']['address'] + ":" + CONFIG['_03_Manager_Level']['port']
-MANAGER_GAME_BASE_URL = CONFIG['_04_Manager_Game']['address'] + ":" + CONFIG['_04_Manager_Game']['port']
-MANAGER_ACCOUNT_BASE_URL = CONFIG['_05_Manager_Account']['address'] + ":" + CONFIG['_05_Manager_Account']['port']
+MANAGER_ACCOUNT_BASE_URL = CONFIG['_01_Manager_Account']['address'] + ":" + CONFIG['_01_Manager_Account']['port']
+MANAGER_GAME_BASE_URL = CONFIG['_02_Manager_Game']['address'] + ":" + CONFIG['_02_Manager_Game']['port']
 
 
 class InvalidHeaderError(Exception):
