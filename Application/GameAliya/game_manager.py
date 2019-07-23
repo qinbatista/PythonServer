@@ -32,9 +32,13 @@ class GameManager:
 		self._pools = [tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')]
 
 		self._reward_list = self._read_json_data()
+		self._skill_scroll_functions = {'skill_scroll_10' : self.try_skill_scroll_10, 'skill_scroll_30' : self.try_skill_scroll_30, 'skill_scroll_100' : self.try_skill_scroll_100}
+		self._upgrade_chance = {'skill_scroll_10' : 0.10, 'skill_scroll_30' : 0.30, 'skill_scroll_100' : 1}
 
 
-	### Bag Module Functions
+#############################################################################
+#						 Bag Module Functions								#
+#############################################################################
 	async def get_all_head(self, world: int, table: str) -> dict:
 		"""
 		Used to get information such as the title of the database
@@ -151,13 +155,109 @@ class GameManager:
 	async def try_small_energy_potion(self, world: int, unique_id: str, value: int) -> dict:
 		return await self._try_material(world, unique_id, 'small_energy_potion', value)
 
-	### End Bag Module Functions
+#############################################################################
+#						End Bag Module Functions							#
+#############################################################################
+
+
+
+#############################################################################
+#						 Skill Module Functions								#
+#############################################################################
+
+	# TODO ensure SQL UPDATE statement succeeds
+	# TODO error checking for valid skill_id?
+	async def level_up_skill(self, world: int, unique_id: str, skill_id: str, scroll_id: str):
+		# success ===> 0 and 1
+		# 0 - upgrade success
+		# 1 - upgrade unsuccessful
+		# 2 - User does not have that skill
+		# 3 - Invalid scroll id
+		# 4 - User does not have enough scrolls
+		# 9 - Skill already at max level
+		skill_level = await self._get_skill_level(world, unique_id, skill_id)
+		if skill_level == 0:
+			return self._message_typesetting(2, 'User does not have that skill')
+		elif skill_level >= 10:
+			return self._message_typesetting(9, 'Skill already max level')
+		elif scroll_id not in self._skill_scroll_functions.keys():
+			return self._message_typesetting(3, 'Invalid scroll id')
+		resp = await self._skill_scroll_functions[scroll_id](world, unique_id, -1)
+		if resp['status'] == 1:
+			return self._message_typesetting(4, 'User does not have enough scrolls')
+		if not self._roll_for_upgrade(scroll_id):
+			return self._message_typesetting(1, 'upgrade unsuccessful', {'keys' : [skill_id, scroll_id], 'values' : [skill_level, resp['remaining']]})
+		await self._execute_statement(world, 'UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
+		return self._message_typesetting(0, 'upgrade success', {'keys' : [skill_id, scroll_id], 'values' : [skill_level + 1, resp['remaining']]})
+
+
+
+	async def get_all_skill_level(self, world: int, unique_id: str) -> dict:
+		# success ===> 0
+		# 0 - Success
+		names = await self._execute_statement(world, 'DESCRIBE skill;')
+		values = await self._execute_statement(world, 'SELECT * from skill WHERE unique_id = "' + str(unique_id) + '";')
+		key_list = []
+		value_list = []
+		for num, val in enumerate(zip(names[1:], values[0][1:])):
+			key_list.append(val[0][0])
+			value_list.append(val[1])
+		return self._message_typesetting(0, 'success', {"keys": key_list, "values": value_list})
+
+
+	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
+		# success ===> 0
+		# 0 - Success
+		# 1 - invalid skill name
+		try:
+			level = await self._get_skill_level(world, unique_id, skill_id)
+			return self._message_typesetting(0, 'success', {'keys': [skill_id], 'values': [level]})
+		except:
+			return self._message_typesetting(1, 'invalid skill name')
+
+	async def try_unlock_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
+		# success ===> 0 and 1
+		# 0 - success unlocked new skill
+		# 1 - skill already unlocked
+		# 2 - invalid skill name
+		# json ===> {"status": status, "remaining": remaining} ===> status 0、1、2、3
+		try:  # 0、1、2
+			level = await self._get_skill_level(world, unique_id, skill_id)
+			if level == 0 and await self._execute_statement_update(world, 'UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";') == 1:
+				return self._internal_format(0, 'success, new skill unlocked')
+			return self._internal_format(1, 'Skill already unlocked')
+		except:
+			return self._internal_format(2, 'Invalid skill name')
+
+
+#############################################################################
+#						End Skill Module Functions							#
+#############################################################################
+
+
+
+
+
+
+
+
+
+
+
 
 			####################################
 			#          P R I V A T E		   #
 			####################################
 
-	
+
+	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> dict:
+		data = await self._execute_statement(world, 'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
+
+
+	def _roll_for_upgrade(self, scroll_id: str) -> bool:
+		return random.random() < self._upgrade_chance[scroll_id]
+
 	async def _try_material(self, world: int, unique_id: str, material: str, value: int) -> dict:
 		"""
 		Try to change the database information
@@ -392,6 +492,30 @@ async def __try_experience_potion(request: web.Request) -> web.Response:
 async def __try_small_energy_potion(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_small_energy_potion(int(post['world']), post['unique_id'], int(post['value']))
+	return _json_response(result)
+
+@ROUTES.post('/level_up_skill')
+async def __level_up_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.level_up_skill(int(post['world']), post['unique_id'], post['skill_id'], post['scroll_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_skill_level')
+async def __get_all_skill_level(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.get_all_skill_level(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_skill')
+async def __get_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.get_skill(int(post['world']), post['unique_id'], post['skill_id'])
+	return _json_response(result)
+
+@ROUTES.post('/try_unlock_skill')
+async def __try_unlock_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.try_unlock_skill(int(post['world']), post['unique_id'], post['skill_id'])
 	return _json_response(result)
 
 def run():
