@@ -62,6 +62,9 @@ class MessageHandler:
 		return json.loads(decoded)
 
 	async def resolve(self, message: dict, session) -> str:
+		'''
+		Resolves the message included in the request. If required, ensures that a valid token is present.
+		'''
 		try:
 			fn = self._functions[message['function']]
 			if message['function'] not in DOES_NOT_NEED_TOKEN:
