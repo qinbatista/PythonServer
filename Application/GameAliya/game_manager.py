@@ -35,6 +35,12 @@ class GameManager:
 		self._skill_scroll_functions = {'skill_scroll_10' : self.try_skill_scroll_10, 'skill_scroll_30' : self.try_skill_scroll_30, 'skill_scroll_100' : self.try_skill_scroll_100}
 		self._upgrade_chance = {'skill_scroll_10' : 0.10, 'skill_scroll_30' : 0.30, 'skill_scroll_100' : 1}
 
+		self._standard_iron_count = 20
+		self._standard_segment_count = 30
+		self._standard_reset_weapon_skill_coin_count = 100
+
+		self._valid_passive_skills = {'passive_skill_1_level', 'passive_skill_2_level', 'passive_skill_3_level', 'passive_skill_4_level'}
+
 
 #############################################################################
 #						 Bag Module Functions								#
@@ -235,6 +241,154 @@ class GameManager:
 #############################################################################
 
 
+#############################################################################
+#						Weapon Module Functions								#
+#############################################################################
+
+
+	async def level_up_weapon(self, world: int, unique_id: str, weapon: str, iron: int) -> dict:
+		# - 0 - Success
+		# - 1 - User does not have that weapon
+		# - 2 - Incoming materials are not upgraded enough
+		# - 3 - Insufficient materials, upgrade failed
+		# - 4 - Database operation error
+		# - 9 - Weapon already max level
+		if await self._get_weapon_star(world, unique_id, weapon) == 0:
+			return self._message_typesetting(1, 'User does not have that weapon')
+		row = await self._get_row_by_id(world, weapon, unique_id)
+		if row[1] == 100:
+			return self._message_typesetting(9, 'Weapon already max level')
+		skill_upgrade_number = iron // self._standard_iron_count
+		data_tuple = (await self.get_all_head(world, weapon))['remaining']
+		head = [x[0] for x in data_tuple]
+		level_count = head.index('weapon_level')
+		point_count = head.index('skill_point')
+		if (row[level_count] + skill_upgrade_number) > 100:
+			skill_upgrade_number = 100 - row[level_count]
+		row[level_count] += skill_upgrade_number
+		row[point_count] += skill_upgrade_number
+
+		if skill_upgrade_number == 0:
+			return self._message_typesetting(2, 'Incoming materials are not upgraded enough')
+		data = await self.try_iron(world, unique_id, -1 * skill_upgrade_number * self._standard_iron_count)
+		if int(data['status']) == 1:
+			return self._message_typesetting(3, 'Insufficient materials, upgrade failed')
+		if await self._set_weapon_level_up_data(world, unique_id, weapon, row[level_count], row[point_count]) == 0:
+			return self._message_typesetting(3, 'Database operation error')
+		head[0] = 'weapon'
+		row[0] = weapon
+		head.append('iron')
+		row.append(data['remaining'])
+		return self._message_typesetting(0, 'success', {'keys' : head, 'values' : row })
+
+
+	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str):
+		# - 0 - Success
+		# - 1 - User does not have that weapon
+		# - 2 - Insufficient skill points, upgrade failed
+		# - 3 - Database operation error
+		# - 9 - Weapon already max level
+		if await self._get_weapon_star(world, unique_id, weapon) == 0:
+			return self._message_typesetting(1, "User does not have that weapon")
+		if passive not in self._valid_passive_skills:
+			return self._message_typesetting(9, "Passive skill does not exist")
+		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
+		head = [x[0] for x in data_tuple]
+		row = await self._get_row_by_id(world, weapon, unique_id)
+		point_count = head.index("skill_point")
+		passive_count = head.index(passive)
+		if row[point_count] == 0:
+			return self._message_typesetting(2, "Insufficient skill points, upgrade failed")
+		row[point_count] -= 1
+		row[passive_count] += 1
+		if await self._set_passive_skill_level_up_data(world, unique_id, weapon, passive, row[passive_count], row[point_count]) == 0:
+			return self._message_typesetting(3, "Database operation error")
+		head[0] = "weapon"
+		row[0] = weapon
+		return self._message_typesetting(0, "success", {"keys": head, "values": row})
+
+	async def level_up_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
+		# - 0 - Weapon upgrade success
+		# - 2 - insufficient gold coins, upgrade failed
+		# - 3 - database operation error!
+		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
+		head = [x[0] for x in data_tuple]
+		row = await self._get_row_by_id(world, weapon, unique_id)
+		weapon_star = await self._get_weapon_star(world, unique_id, weapon)
+		segment_count = self._standard_segment_count * (1 + weapon_star)  # 根据武器星数增加碎片的消耗数量
+
+		if int(row[head.index("segment")]) < segment_count:
+			return self._message_typesetting(2, "Insufficient segments, upgrade failed!")
+
+		row[head.index("segment")] = int(row[head.index("segment")]) - segment_count
+		weapon_star += 1
+		code1 = await self._set_segment_by_id(world, unique_id, weapon, row[head.index("segment")])
+		code2 = await self._set_weapon_star(world, unique_id, weapon, weapon_star)
+		if code1 == 0 or code2 == 0:
+			return self._message_typesetting(3, "Database operation error!")
+		head[0] = "weapon"
+		row[0] = weapon
+		head.append("star")
+		row.append(weapon_star)
+		return self._message_typesetting(0, weapon + " upgrade success!", {"keys": head, "values": row})
+
+	async def reset_weapon_skill_point(self, world: int, unique_id: str, weapon: str) -> dict:
+		# - 0 - Success
+		# - 1 - no weapon
+		# - 2 - insufficient gold coins, upgrade failed
+		# - 3 - database operation error!
+		# - 9 - Weapon reset skill point success
+
+		if await self._get_weapon_star(world, unique_id, weapon) == 0:
+			return self._message_typesetting(1, "no weapon!")
+		data = await self.try_coin(world, unique_id, -1 * self._standard_reset_weapon_skill_coin_count)
+		if int(data["status"]) == 1:
+			return self._message_typesetting(2, "Insufficient gold coins, upgrade failed")
+
+		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
+		head = [x[0] for x in data_tuple]
+
+		row = await self._get_row_by_id(world, weapon, unique_id)
+
+		row[head.index("skill_point")] = row[head.index("weapon_level")]
+		row[head.index("passive_skill_1_level")] = row[head.index("passive_skill_2_level")] = row[head.index("passive_skill_3_level")] = row[head.index("passive_skill_4_level")] = 0
+		if await self._reset_skill_point(world, unique_id, weapon, row[head.index("skill_point")]) == 0:
+			return self._message_typesetting(3, "Database operation error!")
+
+		head[0] = "weapon"
+		row[0] = weapon
+		head.append("coin")
+		row.append(data["remaining"])
+		return self._message_typesetting(0, weapon + " reset skill point success!", {"keys": head, "values": row})
+
+	# TODO CHECK FOR SPEED IMPROVEMENTS
+	async def get_all_weapon(self, world: int, unique_id: str):
+		# - 0 - gain success
+		data_tuple = (await self.get_all_head(world, "weapon_bag"))["remaining"]
+		col_name_list = [x[0] for x in data_tuple]
+		weapons_stars_list = await self._get_weapon_bag(world, unique_id)
+		# The 0 position stores the UNIQUE_ID, so the column header does not traverse the 0 position.
+		# The 0 position obtained by the __get_weapon_attributes method below is also UNIQUE_ID.
+		# So it will be replaced by the number of weapons stars.
+		# 0位置存储unique_id，因此列标题不会遍历0位置。下面的__get_weapon_attributes方法获得的0位置也是unique_id，
+		# 因此它将被武器星数替换。
+		keys = []
+		values = []
+		for i in range(1, len(col_name_list)):
+			attribute_list = await self._get_weapon_attributes(world, unique_id, col_name_list[i])
+			keys.append(col_name_list[i])
+			attribute_list[0] = weapons_stars_list[i]
+			values.append(attribute_list)
+		return self._message_typesetting(0, "gain success", {"keys": keys, "values": values})
+
+
+
+
+
+
+#############################################################################
+#						End Weapon Module Functions							#
+#############################################################################
 
 
 
@@ -248,6 +402,37 @@ class GameManager:
 			####################################
 			#          P R I V A T E		   #
 			####################################
+
+	async def _get_weapon_bag(self, world: int, unique_id: str):
+		data = await self._execute_statement(world, 'SELECT * FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
+		return list(data[0])
+
+	async def _get_weapon_attributes(self, world: int, unique_id: str, weapon: str):
+		data = await self._execute_statement(world, 'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		return list(data[0])
+
+	async def _reset_skill_point(self, world: int, unique_id: str, weapon: str, skill_point: int):
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
+		return await self._execute_statement_update(world, 'UPDATE weapon_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";') 
+
+	async def _set_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _get_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
+		data = await self._execute_statement(world, 'SELECT ' + weapon + ' FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
+
+	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> dict:
+		data = await self._execute_statement(world, 'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		return list(data[0])
+
+	async def _set_passive_skill_level_up_data(self, world: int, unique_id: str, weapon: str, passive: str, skill_level: int, skill_point: int) -> dict:
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET ' + passive + ' = "' + str(skill_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _set_weapon_level_up_data(self, world: int, unique_id: str, weapon: str, weapon_level: int, skill_point: int) -> dict:
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET weapon_level = "' + str(weapon_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
 
 	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> dict:
@@ -518,8 +703,43 @@ async def __try_unlock_skill(request: web.Request) -> web.Response:
 	result = await MANAGER.try_unlock_skill(int(post['world']), post['unique_id'], post['skill_id'])
 	return _json_response(result)
 
+@ROUTES.post('/level_up_weapon')
+async def __level_up_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.level_up_weapon(int(post['world']), post['unique_id'], post['weapon'], int(post['iron']))
+	return _json_response(result)
+
+@ROUTES.post('/level_up_passive')
+async def __level_up_passive(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.level_up_passive(int(post['world']), post['unique_id'], post['weapon'], post['passive'])
+	return _json_response(result)
+
+
+@ROUTES.post('/level_up_weapon_star')
+async def __level_up_weapon_star(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.level_up_weapon_star(int(post['world']), post['unique_id'], post['weapon'])
+	return _json_response(result)
+
+@ROUTES.post('/reset_weapon_skill_point')
+async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_weapon')
+async def __get_all_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.get_all_weapon(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+
 def run():
 	print('REMINDER: NEED TO READ PORT FROM CONFIG FILE')
+	print('REMINDER: NEED TO READ WEAPON_COST_INFO FROM CONFIG FILE')
+	print('REMINDER: NEED TO READ VALID PASSIVE SKILLS FROM CONFIG FILE')
 	app = web.Application()
 	app.add_routes(ROUTES)
 	web.run_app(app, port=8004)
