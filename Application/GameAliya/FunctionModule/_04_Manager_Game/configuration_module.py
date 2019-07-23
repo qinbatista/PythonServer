@@ -139,17 +139,6 @@ def login_required(fn):
 	return wrapper
 
 
-# Try running the server and then visiting http://localhost:[PORT]/public_method
-@ROUTES.get('/public_method')
-async def __public_method(request: web.Request) -> web.Response:
-	await MANAGER.public_method()
-	return _json_response({'message': 'asyncio code is awesome!'}, status=200)
-
-@ROUTES.get('/protected_method')
-@login_required
-async def __protected_method(request: web.Request) -> web.Response:
-	return _json_response({'message': 'if you can see this, you are logged in!!'})
-
 @ROUTES.post('/_get_client_level_enemy_layouts_config')
 async def __get_client_level_enemy_layouts_config(request: web.Request) -> web.Response:
 	post = await request.post()
