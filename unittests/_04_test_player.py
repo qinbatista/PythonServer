@@ -76,6 +76,12 @@ def level_up_scroll():
 	# result = requests.post(MANAGER_PLAYER_BASE_URL + '/random_gift_skill', data={'unique_id': "4"})
 	print(str(result.text))
 
+
+def get_all_weapon():
+	result = requests.post(MANAGER_WEAPON_BASE_URL + '/get_all_weapon', data={'unique_id': "4"})
+	# result = requests.post(MANAGER_PLAYER_BASE_URL + '/random_gift_skill', data={'unique_id': "4"})
+	print(str(result.text))
+
 if __name__ == "__main__":
 	# try_remove_coin()
 	# try_remove_iron()
@@ -87,4 +93,5 @@ if __name__ == "__main__":
 	# level_up_skill()
 	# random_gift_skill()
 	# random_gift_weapon()
-	level_up_scroll()
+	# level_up_scroll()
+	get_all_weapon()

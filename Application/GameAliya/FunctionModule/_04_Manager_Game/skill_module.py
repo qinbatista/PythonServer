@@ -38,20 +38,22 @@ class SkillManager:
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
 	
 	async def level_up_skill(self, unique_id: str, skill_id: str, scroll_id: str) -> dict:
-		# 0 - Success upgrade=0 升级成功， upgrade=1升级失败
-		# 1 - User does not have that skill
-		# 2 - Invalid scroll id
+		# success ===> 0 and 1
+		# 0 - upgrade success
+		# 1 - upgrade unsuccessful
+		# 2 - User does not have that skill
+		# 3 - Invalid scroll id
 		# 4 - User does not have enough scrolls
 		# 9 - Skill already at max level
 		skill_level = await self._get_skill_level(unique_id, skill_id)
 		if skill_level == 0:
-			return self.message_typesetting(1, 'User does not have that skill')
+			return self.message_typesetting(2, 'User does not have that skill')
 		if skill_level >= 10:
 			return self.message_typesetting(9, 'Skill already max level')
 		fn = {'skill_scroll_10': self.try_skill_scroll_10, 'skill_scroll_30': self.try_skill_scroll_30, 'skill_scroll_100': self.try_skill_scroll_100}
 		if self.__class__.__name__ == 'PlayerManager':
 			if scroll_id not in fn.keys():
-				return self.message_typesetting(status=2, message="Invalid scroll id")
+				return self.message_typesetting(status=3, message="Invalid scroll id")
 			f = fn[scroll_id]
 			resp = await f(unique_id, -1)
 			if resp['status'] == 1:
@@ -68,12 +70,13 @@ class SkillManager:
 					scroll_quantity = resp['remaining']
 			
 		if not await self._roll_for_upgrade(scroll_id):
-			return self.message_typesetting(0, 'success', {'keys': [skill_id, scroll_id], 'values': [skill_level, scroll_quantity], 'upgrade': 1})
+			return self.message_typesetting(1, 'upgrade unsuccessful', {'keys': [skill_id, scroll_id], 'values': [skill_level, scroll_quantity]})
 
 		await self._execute_statement('UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
-		return self.message_typesetting(0, 'success', {'keys': [skill_id, scroll_id], 'values': [skill_level + 1, scroll_quantity], 'upgrade': 0})
+		return self.message_typesetting(0, 'upgrade success', {'keys': [skill_id, scroll_id], 'values': [skill_level + 1, scroll_quantity]})
 
 	async def get_all_skill_level(self, unique_id: str) -> dict:
+		# success ===> 0
 		# 0 - Success
 		names = await self._execute_statement('DESCRIBE skill;')
 		values = await self._execute_statement('SELECT * from skill WHERE unique_id = "' + str(unique_id) + '";')
@@ -85,6 +88,7 @@ class SkillManager:
 		return self.message_typesetting(0, 'success', data={"keys": key_list, "values": value_list})
 
 	async def get_skill(self, unique_id: str, skill_id: str) -> dict:
+		# success ===> 0
 		# 0 - Success
 		# 1 - invalid skill name
 		try:
@@ -94,14 +98,15 @@ class SkillManager:
 			return self.message_typesetting(1, 'invalid skill name')
 
 	async def try_unlock_skill(self, unique_id: str, skill_id: str) -> dict:
-		# 0 - success, unlocked new skill
+		# success ===> 0 and 1
+		# 0 - success unlocked new skill
 		# 1 - skill already unlocked
 		# 2 - invalid skill name
 		# json ===> {"status": status, "remaining": remaining} ===> status 0、1、2、3
-		table_tuple = ("success, unlocked new skill", "skill already unlocked", "invalid skill name")
+		table_tuple = ("success unlocked new skill", "skill already unlocked", "invalid skill name")
 		try:  # 0、1、2
 			level = await self._get_skill_level(unique_id, skill_id)
-			if level == 0 and await self._execute_statement_update('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";') == 0:
+			if level == 0 and await self._execute_statement_update('UPDATE skill SET `' + skill_id + '` = 1 WHERE unique_id = "' + unique_id + '";') == 1:
 				return self.__internal_format(status=0, remaining=table_tuple)  # success, unlocked new skill
 			return self.__internal_format(status=1, remaining=table_tuple)  # skill already unlocked
 		except:

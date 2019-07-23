@@ -51,17 +51,17 @@ class LotteryManager:
 	
 
 	async def random_gift_skill(self, unique_id: str) -> dict:
-		# 0 - skill ======== success, unlocked new skill 或 skill scroll ======== you received a free scroll
-		# {"skill_id": skill_id, "value": value} 或 {"skill_scroll_id": skill_scroll_id, "value": value}
+		# success ===> 0 and 1
+		# 0 - unlocked new skill            {"skill_id": skill_id, "value": value}
+		# 1 - you received a free scroll    {"skill_scroll_id": skill_scroll_id, "value": value}
 		# 2 - invalid skill name
 		# 3 - database operation error
 		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
 		gift_skill = (random.choices(self._skill_items[tier_choice]))[0]
-		print("gift_skill:" + str(gift_skill))
 		if self.__class__.__name__ == 'PlayerManager':
 			data = await self.try_unlock_skill(unique_id, gift_skill)
-			status = data["status"]
-			if data['status'] == 1:  # skill already unlocked
+			status = int(data["status"])
+			if status == 1:  # skill already unlocked
 				if tier_choice == 'skilltier1':
 					skill_scroll_id = "skill_scroll_10"
 					data = await self.try_skill_scroll_10(unique_id, 1)
@@ -72,7 +72,7 @@ class LotteryManager:
 					skill_scroll_id = "skill_scroll_100"
 					data = await self.try_skill_scroll_100(unique_id, 1)
 				if data["status"] == 0:
-					return self.message_typesetting(status=0, message='you received a free scroll', data={"keys": [skill_scroll_id], "values": [data["remaining"]]})
+					return self.message_typesetting(status=1, message='you received a free scroll', data={"keys": [skill_scroll_id], "values": [data["remaining"]]})
 				return self.message_typesetting(status=3, message='database operation error')
 			elif status == 0:  # success
 				return self.message_typesetting(status=status, message=data['remaining'][status], data={"keys": [gift_skill], "values": [1]})
@@ -105,14 +105,18 @@ class LotteryManager:
 					return self.message_typesetting(status=status, message=data['remaining'][status])
 
 	async def random_gift_segment(self, unique_id: str) -> dict:
+		# success ===> 0 and 1
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		# - 0 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 1 - no weapon!
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
 		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
 		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
-		async with ClientSession() as session:
-			async with session.post(WEAPON_BASE_URL + '/try_unlock_weapon', data = {'unique_id' : unique_id, 'weapon' : gift_weapon}) as resp:
-				return await resp.json(content_type = 'text/json')
+		if self.__class__.__name__ == 'PlayerManager':
+			return await self.try_unlock_weapon(unique_id=unique_id, weapon=gift_weapon)
+		else:
+			async with ClientSession() as session:
+				async with session.post(WEAPON_BASE_URL + '/try_unlock_weapon', data = {'unique_id' : unique_id, 'weapon' : gift_weapon}) as resp:
+					return await resp.json(content_type = 'text/json')
 
 
 
