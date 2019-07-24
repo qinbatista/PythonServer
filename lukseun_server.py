@@ -15,7 +15,7 @@ import aiohttp
 import asyncio
 import concurrent.futures
 from Utility.LogRecorder import LogUtility as Log
-from Application.GameAliya import _00_Message_Handler as handler
+from Application.GameAliya import message_handler as handler
 
 # the size of the header in bytes that we expect to receive from the client.
 HEADER_BUFFER_SIZE = 36
