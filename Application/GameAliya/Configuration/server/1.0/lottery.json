@@ -1,15 +1,33 @@
 {
 	"skills" : {
+		"cost":{
+			"diamond":"100",
+			"basic_summon_scroll":"1"
+		},
 		"names" : ["skilltier1", "skilltier2", "skilltier3"],
-		"weights" : [0.60, 0.30, 0.10],
+		"weights":
+		{
+				"basic":[0.60, 0.30, 0.10],
+				"pro":[0.30, 0.50, 0.20],
+				"friend":[0.50, 0.40, 0.10]
+		},
 		"items" : {
 			"skilltier1" : ["m1_level", "p1_level", "g1_level"],
 			"skilltier2" : ["m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level"],
 			"skilltier3" : ["m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]}
 	},
 	"weapons" : {
+		"cost":{
+			"diamond":"100",
+			"basic_summon_scroll":"1"
+		},
 		"names" : ["weapontier1", "weapontier2", "weapontier3", "weapontier4"],
-		"weights" : [0.40, 0.30, 0.20, 0.10],
+		"weights":
+		{
+			"basic":[0.4, 0.5, 0.1, 0],
+			"pro":[0.4, 0.5, 0.1, 0],
+			"friend":[0.4, 0.5, 0.1, 0]
+		},
 		"items" : {
 			"weapontier1" : ["weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10"],
 			"weapontier2" : ["weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20"],
