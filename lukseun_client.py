@@ -42,10 +42,9 @@ class LukseunClient:
 		response = await self._receive_response(reader)
 		writer.close()
 		decoded_message = self._decode_message(response)
-		print(decoded_message)
 		if "token" in str(decoded_message): self.token = json.loads(decoded_message, encoding="utf-8")["data"]["token"]
 		if decoded_message != '':
-			return eval(decoded_message)
+			return json.loads(decoded_message, encoding='utf-8')
 		return {}
 	
 	async def _send_header(self, writer: asyncio.StreamWriter, header: bytes) -> None:

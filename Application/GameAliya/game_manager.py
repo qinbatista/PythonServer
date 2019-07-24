@@ -56,7 +56,7 @@ class GameManager:
 		data_tuple = (await self.get_all_head(world, table="player"))["remaining"]
 		heads = []
 		for col in data_tuple:
-				heads.append(col[0])
+			heads.append(col[0])
 		content = list((await self.get_all_material(world, unique_id=unique_id))["remaining"])
 		heads.pop(0)
 		content.pop(0)
@@ -67,7 +67,7 @@ class GameManager:
 		if value <= 0: return self._message_typesetting(9, "not a positive number")
 		data = await self._try_material(world, unique_id, supply, value)
 		if data["status"] == 0:
-				return self._message_typesetting(0, "success", {"keys": [supply], "values": [data["remaining"]]})
+			return self._message_typesetting(0, "success", {"keys": [supply], "values": [data["remaining"]]})
 		return self._message_typesetting(1, "failure")
 
 	async def level_up_scroll(self, world: int, unique_id: str, scroll_id: str) -> dict:
