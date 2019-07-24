@@ -9,7 +9,7 @@ import base64
 import asyncio
 import json
 from Utility.LogRecorder import LogUtility as Log
-from Application.GameAliya import _00_Message_Handler as handler
+from Application.GameAliya import message_handler as handler
 
 DESIv = '67891234'
 DESKey = '6789123467891234'

@@ -15,7 +15,9 @@ from datetime import datetime, timedelta
 
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read('./Configuration/server/1.0/server.conf')
+r = requests.get('http://localhost:8000/get_server_version')
+version = r.json()['version']
+CONFIG.read(f'./Configuration/server/{version}/server.conf')
 
 
 
@@ -23,7 +25,7 @@ class GameManager:
 	def __init__(self):
 		self._pools = [tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')]
 		self._refresh_configuration()
-		self._start_timer()
+		self._start_timer(600)
 
 
 
@@ -273,7 +275,7 @@ class GameManager:
 		# - 1 - User does not have that weapon
 		# - 2 - Insufficient skill points, upgrade failed
 		# - 3 - Database operation error
-		# - 9 - Weapon already max level
+		# - 9 - Passive skill does not exist
 		if await self._get_weapon_star(world, unique_id, weapon) == 0:
 			return self._message_typesetting(1, "User does not have that weapon")
 		if passive not in self._valid_passive_skills:
@@ -323,7 +325,6 @@ class GameManager:
 		# - 1 - no weapon
 		# - 2 - insufficient gold coins, upgrade failed
 		# - 3 - database operation error!
-		# - 9 - Weapon reset skill point success
 
 		if await self._get_weapon_star(world, unique_id, weapon) == 0:
 			return self._message_typesetting(1, "no weapon!")
@@ -636,7 +637,7 @@ class GameManager:
 
 
 	def _refresh_configuration(self):
-		r = requests.get('http://localhost:8002/get_game_manager_configuration')
+		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
 		self._reward_list = d['reward_list']
 		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
