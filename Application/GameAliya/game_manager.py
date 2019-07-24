@@ -504,6 +504,11 @@ class GameManager:
 #							Private Functions								#
 #############################################################################
 
+	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
+		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0]), data[0][1]
+
+
 	async def _get_weapon_bag(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
 		return list(data[0])
@@ -885,10 +890,9 @@ async def __random_gift_segment(request: web.Request) -> web.Response:
 
 
 def run():
-	print('REMINDER: NEED TO READ PORT FROM CONFIG FILE')
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=8004)
+	web.run_app(app, port=CONFIG.getint('game_manager', 'port'))
 
 
 if __name__ == '__main__':
