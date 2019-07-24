@@ -1,17 +1,5 @@
 #
-# An example for an SQL manager server using asyncio programming methods.
-# We will use aiohttp library to network these API calls so that they can be
-# accessed from different physical devices on the network.
-# Additionally, we will be using tormysql library to manage the SQL server pool
-# of connections.
-#
-# All functions that connect to the database should be async. The more async code
-# we use, the faster the entire server becomes.
-#
-#
-# The file has two parts:
-#	- The DefaultManager class
-#	- The aiohttp server bindings for the class methods
+# account manager
 #
 ###############################################################################
 
@@ -29,7 +17,7 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read('Configuration/server/1.0/server.conf')
 
 
-TOKEN_SERVER_BASE_URL = 'http://localhost:' + CONFIG['_00_Token_Server']['port']
+TOKEN_SERVER_BASE_URL = 'http://localhost:' + CONFIG['token_server']['port']
 
 
 # Part (1 / 2)
@@ -187,7 +175,7 @@ async def __login(request: web.Request) -> web.Response:
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port = CONFIG.getint('_01_Manager_Account', 'port'))
+	web.run_app(app, port = CONFIG.getint('account_manager', 'port'))
 
 
 if __name__ == '__main__':

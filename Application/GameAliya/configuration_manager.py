@@ -10,7 +10,11 @@ import configparser
 from aiohttp import web
 
 
+MONSTER = './Configuration/client/1.0/monster_config.json'
 REWARD_LIST = './Configuration/client/1.0/stage_reward_config.json'
+ENEMY_LAYOUT = './Configuration/client/1.0/level_enemy_layouts_config.json'
+
+
 LOTTERY = './Configuration/server/1.0/lottery.json'
 WEAPON = './Configuration/server/1.0/weapon.json'
 SKILL = './Configuration/server/1.0/skill.json'
@@ -21,22 +25,34 @@ class ConfigurationManager:
 		self._start_timer(600)
 
 
-	
-	async def get_game_manager_configuration(self):
-		return self.game_manager_config
-
-
-
 	def _refresh_configurations(self):
-		self._read_game_manager_configuration()
+		self._read_game_manager_config()
+		self._read_level_enemy_layouts_config()
+		self._read_monster_config()
+	
+	async def get_game_manager_config(self):
+		return self._game_manager_config
 
-	def _read_game_manager_configuration(self):
+	async def get_level_enemy_layouts_config(self):
+		return self._level_enemy_layouts_config
+
+	async def get_monster_config(self):
+		return self._monster_config
+
+
+
+	def _read_game_manager_config(self):
 		reward_list = [v for v in (json.load(open(REWARD_LIST, encoding = 'utf-8'))).values()]
 		lottery = json.load(open(LOTTERY, encoding = 'utf-8'))
 		weapon = json.load(open(WEAPON, encoding = 'utf-8'))
 		skill = json.load(open(SKILL, encoding = 'utf-8'))
-		self.game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill}
+		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill}
 
+	def _read_level_enemy_layouts_config(self):
+		self._level_enemy_layouts_config = json.load(open(ENEMY_LAYOUT, encoding = 'utf-8'))
+
+	def _read_monster_config(self):
+		self._monster_config = json.load(open(MONSTER, encoding = 'utf-8'))
 
 	def _start_timer(self, seconds: int):
 		threading.Timer(seconds, self._refresh_configurations).start()
@@ -61,9 +77,19 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 
 
 
-@ROUTES.get('/get_game_manager_configuration')
-async def __get_game_manager_configuration(request: web.Request) -> web.Response:
+@ROUTES.get('/get_game_manager_config')
+async def __get_game_manager_config(request: web.Request) -> web.Response:
 	data = await MANAGER.get_game_manager_configuration()
+	return _json_response(data)
+
+@ROUTES.get('/get_level_enemy_layouts_config')
+async def __get_level_enemy_layouts_config(request: web.Request) -> web.Response:
+	data = await MANAGER.get_level_enemy_layouts_config()
+	return _json_response(data)
+
+@ROUTES.get('/get_monster_config')
+async def __get_monster_config(request: web.Request) -> web.Response:
+	data = await MANAGER.get_monster_config()
 	return _json_response(data)
 
 
