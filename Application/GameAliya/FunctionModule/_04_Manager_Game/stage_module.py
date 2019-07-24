@@ -14,6 +14,7 @@ CONFIG.read('../../Configuration/server/1.0/server.conf')
 MANAGER_BAG_BASE_URL = CONFIG['bag_manager']['address'] + ":" + CONFIG['bag_manager']['port']
 HANG_JSON_NAME = "../../Configuration/client/1.0/stage_reward_config.json"
 
+
 class StageSystemClass:
 	def __init__(self, *args, **kwargs):
 		# This is the connection pool to the SQL server. These connections stay open
@@ -59,7 +60,7 @@ class StageSystemClass:
 		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
 		"""
 		hang_up_time = self._get_hang_up_time(unique_id=unique_id)
-		material_dict = {}
+		material_dict = self.stage_reward_list[stage]
 		if hang_up_time == "":
 			hang_up_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 			if self._set_hang_up_time(unique_id=unique_id, hang_up_time=hang_up_time) == 0:
@@ -68,6 +69,7 @@ class StageSystemClass:
 		update_str, select_str = self.__sql_str_operating(unique_id=unique_id, material_dict=material_dict)
 		return self.message_typesetting(status=2, message="repeat hang up")
 
+	# 同bag_module下的__read_json_data
 	def __read_json_data(self, path: str) -> list:
 		data = []
 		if os.path.exists(path):
@@ -77,6 +79,7 @@ class StageSystemClass:
 		print("[__read_json_data] -> data:" + str(data))
 		return data
 
+	# 同bag_module下的__sql_str_operating
 	def __sql_str_operating(self, unique_id: str, material_dict: dict) -> (str, str):
 		update_str = "UPDATE player SET "
 		update_end_str = " where unique_id='%s'" % unique_id
