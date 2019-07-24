@@ -71,7 +71,7 @@ def run():
 	config = configparser.ConfigParser()
 	config.read('Configuration/server/1.0/server.conf')
 
-	web.run_app(app, port = config.getint('_00_Token_Server', 'port'))
+	web.run_app(app, port = config.getint('token_server', 'port'))
 
 if __name__ == '__main__':
 	run()
