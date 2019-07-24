@@ -19,8 +19,11 @@ LOTTERY.read('./Configuration/server/1.0/lottery.conf')
 
 STAGE_JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
 HANG_JSON_NAME = "./Configuration/client/1.0/hang_reward_config.json"
+WEAPON_JSON_NAME = "./Configuration/server/1.0/weapon.json"
+LOTTERY_JSON_NAME = "./Configuration/server/1.0/lottery.json"
 #  houyao 2019-07-24 12:26:00 修改了JSON_NAME ===> STAGE_JSON_NAME
 #  houyao 2019-07-24 12:26:00 添加了HANG_JSON_NAME
+#  houyao 2019-07-24 17:14:00 添加了WEAPON_JSON_NAME
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level",
                  "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level",
@@ -44,11 +47,12 @@ class GameManager:
 		self._skill_scroll_functions = {'skill_scroll_10': self.try_skill_scroll_10, 'skill_scroll_30': self.try_skill_scroll_30, 'skill_scroll_100': self.try_skill_scroll_100}
 		self._upgrade_chance = {'skill_scroll_10': 0.10, 'skill_scroll_30': 0.30, 'skill_scroll_100': 1}
 
-		self._standard_iron_count = CONFIG.getint('_01_Manager_Weapon', 'standard_iron_count')
-		self._standard_segment_count = CONFIG.getint('_01_Manager_Weapon', 'standard_segment_count')
-		self._standard_reset_weapon_skill_coin_count = CONFIG.getint('_01_Manager_Weapon', 'standard_reset_weapon_skill_coin_count')
+		weapon_data = json.load(open(WEAPON_JSON_NAME, encoding="utf-8"))
+		self._standard_iron_count = weapon_data["standard_iron_count"]
+		self._standard_segment_count = weapon_data["standard_segment_count"]
+		self._standard_reset_weapon_skill_coin_count = weapon_data["standard_reset_weapon_skill_coin_count"]
 
-		self._valid_passive_skills = eval(CONFIG['_01_Manager_Weapon']['_valid_passive_skills'])
+		self._valid_passive_skills = weapon_data['valid_passive_skills']
 
 		self._read_lottery_configuration()
 
@@ -654,12 +658,13 @@ class GameManager:
 		return []
 
 	def _read_lottery_configuration(self):
-		self._skill_tier_names = eval(LOTTERY['skills']['names'])
-		self._skill_tier_weights = eval(LOTTERY['skills']['weights'])
-		self._skill_items = eval(LOTTERY['skills']['items'])
-		self._weapon_tier_names = eval(LOTTERY['weapons']['names'])
-		self._weapon_tier_weights = eval(LOTTERY['weapons']['weights'])
-		self._weapon_items = eval(LOTTERY['weapons']['items'])
+		lottery_data = json.load(open(LOTTERY_JSON_NAME, encoding="utf-8"))
+		self._skill_tier_names = lottery_data["skills"]["names"]
+		self._skill_tier_weights = lottery_data['skills']['weights']
+		self._skill_items = lottery_data['skills']['items']
+		self._weapon_tier_names = lottery_data['weapons']['names']
+		self._weapon_tier_weights = lottery_data['weapons']['weights']
+		self._weapon_items = lottery_data['weapons']['items']
 
 	#  ##################################################################################
 	#  #########                                                                 ########
