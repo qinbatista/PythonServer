@@ -13,12 +13,14 @@ def PythonLocation():
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read(PythonLocation() + '/Configuration/server/1.0/server.conf')
-DESIv = CONFIG['_00_Message_Handler']['DESIv']
-DESKey = CONFIG['_00_Message_Handler']['DESKey']
+
+DESIv = CONFIG['message_handler']['DESIv']
+DESKey = CONFIG['message_handler']['DESKey']
+
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 TOKEN_BASE_URL = CONFIG['token_server']['address'] + ":" + CONFIG['token_server']['port']
-MANAGER_ACCOUNT_BASE_URL = CONFIG['_01_Manager_Account']['address'] + ":" + CONFIG['_01_Manager_Account']['port']
-MANAGER_GAME_BASE_URL = CONFIG['_02_Manager_Game']['address'] + ":" + CONFIG['_02_Manager_Game']['port']
+MANAGER_ACCOUNT_BASE_URL = CONFIG['account_manager']['address'] + ":" + CONFIG['account_manager']['port']
+MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager']['port']
 
 
 class InvalidHeaderError(Exception):

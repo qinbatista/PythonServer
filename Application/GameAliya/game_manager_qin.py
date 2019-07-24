@@ -7,8 +7,6 @@ import time
 import json
 import random
 import tormysql
-import requests
-import threading
 import configparser
 from aiohttp import web
 from datetime import datetime, timedelta
@@ -17,14 +15,36 @@ from datetime import datetime, timedelta
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 
+LOTTERY = configparser.ConfigParser()
+LOTTERY.read('./Configuration/server/1.0/lottery.conf')
 
+JSON_NAME = './Configuration/client/1.0/stage_reward_config.json'
+
+
+SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
+
+
+format_sql = {
+	"smallint": "%s",
+	"varchar": "'%s'",
+	"char": "'%s'"
+}
 
 class GameManager:
 	def __init__(self):
 		self._pools = [tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')]
-		self._refresh_configuration()
-		self._start_timer()
 
+		self._reward_list = self._read_json_data()
+		self._skill_scroll_functions = {'skill_scroll_10' : self.try_skill_scroll_10, 'skill_scroll_30' : self.try_skill_scroll_30, 'skill_scroll_100' : self.try_skill_scroll_100}
+		self._upgrade_chance = {'skill_scroll_10' : 0.10, 'skill_scroll_30' : 0.30, 'skill_scroll_100' : 1}
+
+		self._standard_iron_count = CONFIG.getint('_01_Manager_Weapon', 'standard_iron_count')
+		self._standard_segment_count = CONFIG.getint('_01_Manager_Weapon', 'standard_segment_count')
+		self._standard_reset_weapon_skill_coin_count = CONFIG.getint('_01_Manager_Weapon', 'standard_reset_weapon_skill_coin_count')
+
+		self._valid_passive_skills = eval(CONFIG['_01_Manager_Weapon']['_valid_passive_skills'])
+
+		self._read_lottery_configuration()
 
 
 #############################################################################
@@ -171,10 +191,9 @@ class GameManager:
 			return self._message_typesetting(2, 'User does not have that skill')
 		elif skill_level >= 10:
 			return self._message_typesetting(9, 'Skill already max level')
-		elif scroll_id not in self._skill_scroll_functions:
+		elif scroll_id not in self._skill_scroll_functions.keys():
 			return self._message_typesetting(3, 'Invalid scroll id')
-		resp = await eval('self.try_' + scroll_id + '(world, unique_id, -1)')
-		#resp = await self._skill_scroll_functions[scroll_id](world, unique_id, -1)
+		resp = await self._skill_scroll_functions[scroll_id](world, unique_id, -1)
 		if resp['status'] == 1:
 			return self._message_typesetting(4, 'User does not have enough scrolls')
 		if not self._roll_for_upgrade(scroll_id):
@@ -431,14 +450,24 @@ class GameManager:
 #						Lottery Module Functions							#
 #############################################################################
 
-	async def random_gift_skill(self, world: int, unique_id: str) -> dict:
+	#2019-07-24 12:24:50
+	async def random_gift_skill(self, world: int, unique_id: str, kind:str) -> dict:
 		# success ===> 0 and 1
 		# 0 - unlocked new skill            {"skill_id": skill_id, "value": value}
 		# 1 - you received a free scroll    {"skill_scroll_id": skill_scroll_id, "value": value}
 		# 2 - invalid skill name
 		# 3 - database operation error
-		tier_choice = (random.choices(self._lottery['skill']['names'], self._lottery['skill']['weights']))[0]
-		gift_skill  = (random.choices(self._lottery['skill']['items'][tier_choice]))[0]
+		if kind=="basic":
+			#choice tier
+			pass
+		elif kind =="pro":
+			#choice tier
+			pass
+		elsif kind =="friend"
+			#choice tier
+			pass
+		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
+		gift_skill  = (random.choices(self._skill_items[tier_choice]))[0]
 		data = await self.try_unlock_skill(world, unique_id, gift_skill)
 		status = int(data['status'])
 		if status == 0:
@@ -459,18 +488,88 @@ class GameManager:
 		else:
 			return self._message_typesetting(2, 'Invalid skill name')
 
-
 	async def random_gift_segment(self, world: int, unique_id: str) -> dict:
 		# success ===> 0 and 1
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
 		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
 		# - 2 - no weapon!
-		tier_choice = (random.choices(self._lottery['weapon']['names'], self._lottery['weapon']['weights']))[0]
-		gift_weapon = (random.choices(self._lottery['weapon']['items'][tier_choice]))[0]
-		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
+		if kind=="basic":
+			#choice tier
+			pass
+		elif kind =="pro":
+			#choice tier
+			pass
+		elsif kind =="friend"
+			#choice tier
+			pass
+		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
+		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
+		result = await self.try_unlock_weapon(world,unique_id,gift_weapon) #
 
+	async def basic_summon(self, world: int, unique_id: str, cost_item: str) -> dict:
+		# success ===> 0 and 1
+		# 0 - unlocked new skill or Unlocked new weapon!   {"skill_id": skill_id, "value": value} or {"keys": ["weapon"], "values": [weapon]}
+		# 1 - you received a free scroll or  Weapon already unlocked, got free segment   {"skill_scroll_id": skill_scroll_id, "value": value},  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - Insufficient material
+		summon_kind = "basic"
+		if cost_item =="diamond":
+			result = await self.try_diamond(world,unique_id,-100) #100 diamond should read from configuration
+		elif cost_item == "basic_summon_scroll":
+			result = await self.try_basic_summon_scroll(world,unique_id,-1) #basic_summon_scroll is not in table yet, will add in furture
+		elif cost_item == "basic_summon_scroll_10_times":
+			result = await self.try_basic_summon_scroll(world,unique_id,-10) #basic_summon_scroll is not in table yet, will add in furture
+		if result["status"]!=0:
+			return self._message_typesetting(1, 'Insufficient material')
+		else:
+			if random.choice(["weapon","skill"])=="skill":
+				return await self.random_gift_skill(world,unique_id,summon_kind)
+			else:
+				return await self.random_gift_segment(world,unique_id,summon_kind)
+	async def pro_summon(self, world: int, unique_id: str) -> dict:
+		# success ===> 0 and 1
+		# 0 - unlocked new skill or Unlocked new weapon!   {"skill_id": skill_id, "value": value} or {"keys": ["weapon"], "values": [weapon]}
+		# 1 - you received a free scroll or  Weapon already unlocked, got free segment   {"skill_scroll_id": skill_scroll_id, "value": value},  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - Insufficient material
+		summon_kind = "pro"
+		if cost_item =="diamond":
+			result = await self.try_diamond(world,unique_id,-100) #100 diamond should read from configuration
+		elif cost_item == "pro_summon_scroll":
+			result = await self.try_basic_summon_scroll(world,unique_id,-1) #basic_summon_scroll is not in table yet, will add in furture
+		elif cost_item == "pro_summon_scroll_10_times":
+			result = await self.try_basic_summon_scroll(world,unique_id,-10) #basic_summon_scroll is not in table yet, will add in furture
+		if result["status"]!=0:
+			return self._message_typesetting(1, 'Insufficient material')
+		else:
+			if random.choice(["weapon","skill"])=="skill":
+				return await self.random_gift_skill(world,unique_id,summon_kind)
+			else:
+				return await self.random_gift_segment(world,unique_id,summon_kind)
 
-
+	async def friend_summon(self, world: int, unique_id: str) -> dict:
+		# success ===> 0 and 1
+		# 0 - unlocked new skill or Unlocked new weapon!   {"skill_id": skill_id, "value": value} or {"keys": ["weapon"], "values": [weapon]}
+		# 1 - you received a free scroll or  Weapon already unlocked, got free segment   {"skill_scroll_id": skill_scroll_id, "value": value},  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - Insufficient material
+		summon_kind = "friend"
+		if cost_item =="diamond":
+			result = await self.try_diamond(world,unique_id,-100) #100 diamond should read from configuration
+		elif cost_item == "frind_gift":
+			result = await self.try_basic_summon_scroll(world,unique_id,-1) #basic_summon_scroll is not in table yet, will add in furture
+		elif cost_item == "frind_gift_10_times":
+			result = await self.try_basic_summon_scroll(world,unique_id,-10) #basic_summon_scroll is not in table yet, will add in furture
+		if result["status"]!=0:
+			return self._message_typesetting(1, 'Insufficient material')
+		else:
+			if random.choice(["weapon","skill"])=="skill":
+				return await self.random_gift_skill(world,unique_id,summon_kind)
+			else:
+				return await self.random_gift_segment(world,unique_id,summon_kind)
 
 
 #############################################################################
@@ -634,21 +733,19 @@ class GameManager:
 		"""
 		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
+	def _read_json_data(self) -> list:
+		if os.path.exists(JSON_NAME):
+			data_dict = json.load(open(JSON_NAME, encoding = 'utf-8'))
+			return [v for v in data_dict.values()]
+		return []
 
-	def _refresh_configuration(self):
-		r = requests.get('http://localhost:8002/get_game_manager_configuration')
-		d = r.json()
-		self._reward_list = d['reward_list']
-		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
-		self._upgrade_chance = d['skill']['upgrade_chance']
-		self._standard_iron_count = d['weapon']['standard_iron_count']
-		self._standard_segment_count = d['weapon']['standard_segment_count']
-		self._standard_reset_weapon_skill_coin_count = d['weapon']['standard_reset_weapon_skill_coin_count']
-		self._valid_passive_skills = d['weapon']['valid_passive_skills']
-		self.lottery = d['lottery']
-
-	def _start_timer(self, seconds: int):
-		threading.Timer(seconds, self._refresh_configuration).start()
+	def _read_lottery_configuration(self):
+		self._skill_tier_names = eval(LOTTERY['skills']['names'])
+		self._skill_tier_weights = eval(LOTTERY['skills']['weights'])
+		self._skill_items = eval(LOTTERY['skills']['items'])
+		self._weapon_tier_names = eval(LOTTERY['weapons']['names'])
+		self._weapon_tier_weights = eval(LOTTERY['weapons']['weights'])
+		self._weapon_items = eval(LOTTERY['weapons']['items'])
 
 
 
