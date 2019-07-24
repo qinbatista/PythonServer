@@ -1,0 +1,6 @@
+{
+	"standard_iron_count" : 20,
+	"standard_segment_count" : 30,
+	"standard_reset_weapon_skill_coin_count" : 100,
+	"valid_passive_skills" : ["passive_skill_1_level", "passive_skill_2_level", "passive_skill_3_level", "passive_skill_4_level"]
+}
