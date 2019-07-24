@@ -11,11 +11,14 @@ import configparser
 from aiohttp import web
 from datetime import datetime, timedelta
 
+
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 
-JSON_NAME = './Configuration/client/1.0/stage_reward_config.json'
+LOTTERY = configparser.ConfigParser()
+LOTTERY.read('./Configuration/server/1.0/lottery.conf')
 
+JSON_NAME = './Configuration/client/1.0/stage_reward_config.json'
 
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
@@ -40,6 +43,8 @@ class GameManager:
 		self._standard_reset_weapon_skill_coin_count = CONFIG.getint('_01_Manager_Weapon', 'standard_reset_weapon_skill_coin_count')
 
 		self._valid_passive_skills = eval(CONFIG['_01_Manager_Weapon']['_valid_passive_skills'])
+
+		self._read_lottery_configuration()
 
 
 #############################################################################
@@ -441,6 +446,56 @@ class GameManager:
 
 
 
+#############################################################################
+#						Lottery Module Functions							#
+#############################################################################
+
+	async def random_gift_skill(self, world: int, unique_id: str) -> dict:
+		# success ===> 0 and 1
+		# 0 - unlocked new skill            {"skill_id": skill_id, "value": value}
+		# 1 - you received a free scroll    {"skill_scroll_id": skill_scroll_id, "value": value}
+		# 2 - invalid skill name
+		# 3 - database operation error
+		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
+		gift_skill  = (random.choices(self._skill_items[tier_choice]))[0]
+		data = await self.try_unlock_skill(world, unique_id, gift_skill)
+		status = int(data['status'])
+		if status == 0:
+			return self._message_typesetting(0, 'unlocked new skill', {'keys' : [gift_skill], 'values': [1]})
+		elif status == 1:  # skill already unlocked
+			if tier_choice == 'skilltier1':
+				skill_scroll_id = 'skill_scroll_10'
+				data = await self.try_skill_scroll_10(world, unique_id, 1)
+			elif tier_choice == 'skilltier2':
+				skill_scroll_id = 'skill_scroll_30'
+				data = await self.try_skill_scroll_30(world, unique_id, 1)
+			else:
+				skill_scroll_id = 'skill_scroll_100'
+				data = await self.try_skill_scroll_100(world, unique_id, 1)
+			if data['status'] != 0:
+				return self._message_typesetting(3, 'Database operation error')
+			return self._message_typesetting(1, 'You received a free scroll', {'keys' : [skill_scroll_id], 'values' : [data['remaining']]})
+		else:
+			return self._message_typesetting(2, 'Invalid skill name')
+
+
+	async def random_gift_segment(self, world: int, unique_id: str) -> dict:
+		# success ===> 0 and 1
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
+		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
+		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
+		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
+
+
+
+
+
+#############################################################################
+#						End Lottery Module Functions						#
+#############################################################################
+
 
 
 
@@ -598,6 +653,14 @@ class GameManager:
 			data_dict = json.load(open(JSON_NAME, encoding = 'utf-8'))
 			return [v for v in data_dict.values()]
 		return []
+
+	def _read_lottery_configuration(self):
+		self._skill_tier_names = eval(LOTTERY['skills']['names'])
+		self._skill_tier_weights = eval(LOTTERY['skills']['weights'])
+		self._skill_items = eval(LOTTERY['skills']['items'])
+		self._weapon_tier_names = eval(LOTTERY['weapons']['names'])
+		self._weapon_tier_weights = eval(LOTTERY['weapons']['weights'])
+		self._weapon_items = eval(LOTTERY['weapons']['items'])
 
 
 
@@ -797,8 +860,18 @@ async def __pass_stage(request: web.Request) -> web.Response:
 	return _json_response(result)
 
 
+@ROUTES.post('/random_gift_skill')
+async def __random_gift_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.random_gift_skill(int(post['world']), post['unique_id'])
+	return _json_response(result)
 
 
+@ROUTES.post('/random_gift_segment')
+async def __random_gift_segment(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.random_gift_segment(int(post['world']), post['unique_id'])
+	return _json_response(result)
 
 
 
