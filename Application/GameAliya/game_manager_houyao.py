@@ -681,7 +681,7 @@ class GameManager:
 		minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
 		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
 		"""
-		if stage <= 0:
+		if stage <= 0 or stage > int(await self._get_material(world=world,  unique_id=unique_id, material="stage")):
 			return self._message_typesetting(status=9, message="Parameter error")
 		hang_up_time = await self._get_material(world=world, unique_id=unique_id, material="hang_up_time")
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -722,6 +722,43 @@ class GameManager:
 
 			# print("values:" + str(values))
 			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
+
+	async def get_hang_up_reward(self, world: int, unique_id: str, stage: int) -> dict:
+		"""
+		success ===> 0 , 1
+		# 0 - hang up success
+		# 1 - Repeated hang up successfully
+		# 2 - database operating error
+		"""
+		if stage <= 0 or stage > int(await self._get_material(world=world,  unique_id=unique_id, material="stage")):
+			return self._message_typesetting(status=9, message="Parameter error")
+		hang_up_time = await self._get_material(world=world, unique_id=unique_id, material="hang_up_time")
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if hang_up_time == "":
+			return self._message_typesetting(status=1, message="Temporarily no on-hook record")
+		else:
+			material_dict = self._hang_reward_list[stage]
+			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
+			minute = delta_time.seconds // 60
+			print("before hang_up_time:" + hang_up_time)
+			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+			print("after  hang_up_time:" + hang_up_time)
+			material_dict.update({"hang_up_time": hang_up_time})
+			key_word = ["hang_up_time"]
+			keys, hang_rewards = list(material_dict.keys()), []
+			for key in material_dict.keys():
+				if key not in key_word:
+					material_dict[key] = int(material_dict[key]) * minute
+				hang_rewards.append(material_dict[key])
+			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
+			await self._execute_statement_update(world=world, statement=update_str)
+			data = await self._execute_statement(world=world, statement=select_str)
+			values = list(data[0])
+
+			# print("values:" + str(values))
+			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
+
+		return self._message_typesetting(status=0, message="")
 	#  ##################################################################################
 	#  #########                                                                 ########
 	#  #########              houyao 2019-7-24 16:51 end                         ########
