@@ -275,7 +275,7 @@ class GameManager:
 		# - 1 - User does not have that weapon
 		# - 2 - Insufficient skill points, upgrade failed
 		# - 3 - Database operation error
-		# - 9 - Weapon already max level
+		# - 9 - Passive skill does not exist
 		if await self._get_weapon_star(world, unique_id, weapon) == 0:
 			return self._message_typesetting(1, "User does not have that weapon")
 		if passive not in self._valid_passive_skills:
@@ -325,7 +325,6 @@ class GameManager:
 		# - 1 - no weapon
 		# - 2 - insufficient gold coins, upgrade failed
 		# - 3 - database operation error!
-		# - 9 - Weapon reset skill point success
 
 		if await self._get_weapon_star(world, unique_id, weapon) == 0:
 			return self._message_typesetting(1, "no weapon!")
