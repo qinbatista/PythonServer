@@ -27,7 +27,7 @@ class StageSystemClass:
 			"varchar": "'%s'",
 			"char": "'%s'"
 		}
-		self.stage_reward_list = self.__read_json_data(path=HANG_JSON_NAME)
+		self._hang_reward_list = self.__read_json_data(path=HANG_JSON_NAME)
 
 	async def pass_stage(self, unique_id: str, stage: int) -> dict:
 		# success ===> 0

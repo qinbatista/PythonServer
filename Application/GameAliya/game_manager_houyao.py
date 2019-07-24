@@ -14,12 +14,20 @@ from datetime import datetime, timedelta
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 
-JSON_NAME = './Configuration/client/1.0/stage_reward_config.json'
+LOTTERY = configparser.ConfigParser()
+LOTTERY.read('./Configuration/server/1.0/lottery.conf')
 
+STAGE_JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
+HANG_JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
+#  2019-07-24 12:26:00 修改了JSON_NAME ===> STAGE_JSON_NAME
+#  2019-07-24 12:26:00 添加了HANG_JSON_NAME
 
-
-SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
-
+SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level",
+                 "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level",
+                 "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level",
+                 "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level",
+                 "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level",
+                 "g131_level", "g132_level", "g133_level"]
 
 format_sql = {
 	"smallint": "%s",
@@ -27,24 +35,30 @@ format_sql = {
 	"char": "'%s'"
 }
 
+
 class GameManager:
 	def __init__(self):
-		self._pools = [tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')]
+		self._pools = [tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')]
 
-		self._reward_list = self._read_json_data()
-		self._skill_scroll_functions = {'skill_scroll_10' : self.try_skill_scroll_10, 'skill_scroll_30' : self.try_skill_scroll_30, 'skill_scroll_100' : self.try_skill_scroll_100}
-		self._upgrade_chance = {'skill_scroll_10' : 0.10, 'skill_scroll_30' : 0.30, 'skill_scroll_100' : 1}
+		self._stage_reward_list = self._read_json_data(path=STAGE_JSON_NAME)
+		self._skill_scroll_functions = {'skill_scroll_10': self.try_skill_scroll_10, 'skill_scroll_30': self.try_skill_scroll_30, 'skill_scroll_100': self.try_skill_scroll_100}
+		self._upgrade_chance = {'skill_scroll_10': 0.10, 'skill_scroll_30': 0.30, 'skill_scroll_100': 1}
 
-		self._standard_iron_count = 20
-		self._standard_segment_count = 30
-		self._standard_reset_weapon_skill_coin_count = 100
+		self._standard_iron_count = CONFIG.getint('_01_Manager_Weapon', 'standard_iron_count')
+		self._standard_segment_count = CONFIG.getint('_01_Manager_Weapon', 'standard_segment_count')
+		self._standard_reset_weapon_skill_coin_count = CONFIG.getint('_01_Manager_Weapon', 'standard_reset_weapon_skill_coin_count')
 
-		self._valid_passive_skills = {'passive_skill_1_level', 'passive_skill_2_level', 'passive_skill_3_level', 'passive_skill_4_level'}
+		self._valid_passive_skills = eval(CONFIG['_01_Manager_Weapon']['_valid_passive_skills'])
 
+		self._read_lottery_configuration()
 
-#############################################################################
-#						 Bag Module Functions								#
-#############################################################################
+		self._hang_reward_list = self._read_json_data(path=HANG_JSON_NAME)
+		#  2019-07-24 12:26:00 修改了self._stage_reward_list
+		#  2019-07-24 12:26:00 添加了self._hang_reward_list
+
+	#############################################################################
+	#						 Bag Module Functions								#
+	#############################################################################
 	async def get_all_head(self, world: int, table: str) -> dict:
 		"""
 		Used to get information such as the title of the database
@@ -69,7 +83,7 @@ class GameManager:
 		data_tuple = (await self.get_all_head(world, table="player"))["remaining"]
 		heads = []
 		for col in data_tuple:
-				heads.append(col[0])
+			heads.append(col[0])
 		content = list((await self.get_all_material(world, unique_id=unique_id))["remaining"])
 		heads.pop(0)
 		content.pop(0)
@@ -80,7 +94,7 @@ class GameManager:
 		if value <= 0: return self._message_typesetting(9, "not a positive number")
 		data = await self._try_material(world, unique_id, supply, value)
 		if data["status"] == 0:
-				return self._message_typesetting(0, "success", {"keys": [supply], "values": [data["remaining"]]})
+			return self._message_typesetting(0, "success", {"keys": [supply], "values": [data["remaining"]]})
 		return self._message_typesetting(1, "failure")
 
 	async def level_up_scroll(self, world: int, unique_id: str, scroll_id: str) -> dict:
@@ -100,13 +114,17 @@ class GameManager:
 				dict2 = await self.try_skill_scroll_30(world, unique_id, 1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
 					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
+				return self._message_typesetting(0, "level up scroll success!",
+				                                 {"keys": ["skill_scroll_10", "skill_scroll_30"],
+				                                  "values": [dict1["remaining"], dict2["remaining"]]})
 			elif scroll_id == "skill_scroll_30":
 				dict1 = await self.try_skill_scroll_30(world, unique_id, -3)
 				dict2 = await self.try_skill_scroll_100(world, unique_id, 1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
 					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_30", "skill_scroll_100"], "values": [dict1["remaining"], dict2["remaining"]]})
+				return self._message_typesetting(0, "level up scroll success!",
+				                                 {"keys": ["skill_scroll_30", "skill_scroll_100"],
+				                                  "values": [dict1["remaining"], dict2["remaining"]]})
 			else:
 				return self._message_typesetting(3, message="unexpected parameter --> " + scroll_id)
 		except:
@@ -116,7 +134,7 @@ class GameManager:
 		sql_stage = await self._get_material(world, unique_id, "stage")
 		if stage <= 0 or sql_stage + 1 < stage:
 			return self._internal_format(status=9, remaining=0)  # abnormal data!
-		material_dict = dict(self._reward_list[stage])
+		material_dict = dict(self._stage_reward_list[stage])
 		if sql_stage + 1 == stage:  # 通过新关卡
 			material_dict.update({"stage": 1})
 		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
@@ -161,15 +179,13 @@ class GameManager:
 	async def try_small_energy_potion(self, world: int, unique_id: str, value: int) -> dict:
 		return await self._try_material(world, unique_id, 'small_energy_potion', value)
 
-#############################################################################
-#						End Bag Module Functions							#
-#############################################################################
+	#############################################################################
+	#						End Bag Module Functions							#
+	#############################################################################
 
-
-
-#############################################################################
-#						 Skill Module Functions								#
-#############################################################################
+	#############################################################################
+	#						 Skill Module Functions								#
+	#############################################################################
 
 	# TODO ensure SQL UPDATE statement succeeds
 	# TODO error checking for valid skill_id?
@@ -192,11 +208,9 @@ class GameManager:
 		if resp['status'] == 1:
 			return self._message_typesetting(4, 'User does not have enough scrolls')
 		if not self._roll_for_upgrade(scroll_id):
-			return self._message_typesetting(1, 'upgrade unsuccessful', {'keys' : [skill_id, scroll_id], 'values' : [skill_level, resp['remaining']]})
+			return self._message_typesetting(1, 'upgrade unsuccessful', {'keys': [skill_id, scroll_id], 'values': [skill_level, resp['remaining']]})
 		await self._execute_statement(world, 'UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
-		return self._message_typesetting(0, 'upgrade success', {'keys' : [skill_id, scroll_id], 'values' : [skill_level + 1, resp['remaining']]})
-
-
+		return self._message_typesetting(0, 'upgrade success', {'keys': [skill_id, scroll_id], 'values': [skill_level + 1, resp['remaining']]})
 
 	async def get_all_skill_level(self, world: int, unique_id: str) -> dict:
 		# success ===> 0
@@ -209,7 +223,6 @@ class GameManager:
 			key_list.append(val[0][0])
 			value_list.append(val[1])
 		return self._message_typesetting(0, 'success', {"keys": key_list, "values": value_list})
-
 
 	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
 		# success ===> 0
@@ -235,16 +248,13 @@ class GameManager:
 		except:
 			return self._internal_format(2, 'Invalid skill name')
 
+	#############################################################################
+	#						End Skill Module Functions							#
+	#############################################################################
 
-#############################################################################
-#						End Skill Module Functions							#
-#############################################################################
-
-
-#############################################################################
-#						Weapon Module Functions								#
-#############################################################################
-
+	#############################################################################
+	#						Weapon Module Functions								#
+	#############################################################################
 
 	async def level_up_weapon(self, world: int, unique_id: str, weapon: str, iron: int) -> dict:
 		# - 0 - Success
@@ -279,8 +289,7 @@ class GameManager:
 		row[0] = weapon
 		head.append('iron')
 		row.append(data['remaining'])
-		return self._message_typesetting(0, 'success', {'keys' : head, 'values' : row })
-
+		return self._message_typesetting(0, 'success', {'keys': head, 'values': row})
 
 	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str):
 		# - 0 - Success
@@ -301,7 +310,8 @@ class GameManager:
 			return self._message_typesetting(2, "Insufficient skill points, upgrade failed")
 		row[point_count] -= 1
 		row[passive_count] += 1
-		if await self._set_passive_skill_level_up_data(world, unique_id, weapon, passive, row[passive_count], row[point_count]) == 0:
+		if await self._set_passive_skill_level_up_data(world, unique_id, weapon, passive, row[passive_count],
+		                                               row[point_count]) == 0:
 			return self._message_typesetting(3, "Database operation error")
 		head[0] = "weapon"
 		row[0] = weapon
@@ -351,7 +361,8 @@ class GameManager:
 		row = await self._get_row_by_id(world, weapon, unique_id)
 
 		row[head.index("skill_point")] = row[head.index("weapon_level")]
-		row[head.index("passive_skill_1_level")] = row[head.index("passive_skill_2_level")] = row[head.index("passive_skill_3_level")] = row[head.index("passive_skill_4_level")] = 0
+		row[head.index("passive_skill_1_level")] = row[head.index("passive_skill_2_level")] = row[
+			head.index("passive_skill_3_level")] = row[head.index("passive_skill_4_level")] = 0
 		if await self._reset_skill_point(world, unique_id, weapon, row[head.index("skill_point")]) == 0:
 			return self._message_typesetting(3, "Database operation error!")
 
@@ -381,64 +392,157 @@ class GameManager:
 			values.append(attribute_list)
 		return self._message_typesetting(0, "gain success", {"keys": keys, "values": values})
 
+	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
+		try:
+			star = await self._get_weapon_star(world, unique_id, weapon)
+			if star != 0:
+				segment = await self._get_segment(world, unique_id, weapon) + 30
+				await self._set_segment_by_id(world, unique_id, weapon, segment)
+				return self._message_typesetting(0, 'Weapon already unlocked, got free segment!',
+				                                 {"keys": ['weapon', 'segment'], "values": [weapon, segment]})
+			await self._set_weapon_star(world, unique_id, weapon, 1)
+			return self._message_typesetting(1, 'Unlocked new weapon!', {"keys": ["weapon"], "values": [weapon]})
+		except:
+			return self._message_typesetting(2, 'no weapon!')
 
+	#############################################################################
+	#						End Weapon Module Functions							#
+	#############################################################################
 
+	#############################################################################
+	#						Stage Module Functions								#
+	#############################################################################
 
+	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
+		# success ===> 0
+		# 0 : passed customs ===> success
+		# 1 : database operation error
+		# 9 : abnormal data!
+		json_data = await self.try_all_material(world, unique_id, stage)
+		status = int(json_data["status"])
+		if status == 9:
+			return self._message_typesetting(9, "abnormal data!")
+		elif status == 1:
+			return self._message_typesetting(1, "database operation error")
+		else:
+			material_dict = json_data["remaining"][0]
+			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1],
+			        "rewards": list(material_dict.values())}
+			return self._message_typesetting(0, "passed customs!", data)
 
+	#############################################################################
+	#						End Stage Module Functions							#
+	#############################################################################
 
-#############################################################################
-#						End Weapon Module Functions							#
-#############################################################################
+	#############################################################################
+	#						Lottery Module Functions							#
+	#############################################################################
 
+	async def random_gift_skill(self, world: int, unique_id: str) -> dict:
+		# success ===> 0 and 1
+		# 0 - unlocked new skill            {"skill_id": skill_id, "value": value}
+		# 1 - you received a free scroll    {"skill_scroll_id": skill_scroll_id, "value": value}
+		# 2 - invalid skill name
+		# 3 - database operation error
+		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
+		gift_skill = (random.choices(self._skill_items[tier_choice]))[0]
+		data = await self.try_unlock_skill(world, unique_id, gift_skill)
+		status = int(data['status'])
+		if status == 0:
+			return self._message_typesetting(0, 'unlocked new skill', {'keys': [gift_skill], 'values': [1]})
+		elif status == 1:  # skill already unlocked
+			if tier_choice == 'skilltier1':
+				skill_scroll_id = 'skill_scroll_10'
+				data = await self.try_skill_scroll_10(world, unique_id, 1)
+			elif tier_choice == 'skilltier2':
+				skill_scroll_id = 'skill_scroll_30'
+				data = await self.try_skill_scroll_30(world, unique_id, 1)
+			else:
+				skill_scroll_id = 'skill_scroll_100'
+				data = await self.try_skill_scroll_100(world, unique_id, 1)
+			if data['status'] != 0:
+				return self._message_typesetting(3, 'Database operation error')
+			return self._message_typesetting(1, 'You received a free scroll',
+			                                 {'keys': [skill_scroll_id], 'values': [data['remaining']]})
+		else:
+			return self._message_typesetting(2, 'Invalid skill name')
 
+	async def random_gift_segment(self, world: int, unique_id: str) -> dict:
+		# success ===> 0 and 1
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
+		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
+		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
+		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
 
+	#############################################################################
+	#						End Lottery Module Functions						#
+	#############################################################################
 
+	#############################################################################
+	#							Private Functions								#
+	#############################################################################
 
-
-
-
-
-
-			####################################
-			#          P R I V A T E		   #
-			####################################
+	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
+		data = await self._execute_statement(world,
+		                                     'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0]), data[0][1]
 
 	async def _get_weapon_bag(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
 		return list(data[0])
 
 	async def _get_weapon_attributes(self, world: int, unique_id: str, weapon: str):
-		data = await self._execute_statement(world, 'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world,
+		                                     'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
 		return list(data[0])
 
 	async def _reset_skill_point(self, world: int, unique_id: str, weapon: str, skill_point: int):
-		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
+		return await self._execute_statement_update(world,
+		                                            'UPDATE `' + weapon + '` SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point = "' + str(
+			                                            skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
 	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
-		return await self._execute_statement_update(world, 'UPDATE weapon_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";') 
+		return await self._execute_statement_update(world, 'UPDATE weapon_bag SET ' + weapon + ' = "' + str(
+			star) + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
+		data = await self._execute_statement(world,
+		                                     'SELECT segment FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
 
 	async def _set_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
-		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET segment = "' + str(
+			segment) + '" WHERE unique_id = "' + unique_id + '";')
 
 	async def _get_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
-		data = await self._execute_statement(world, 'SELECT ' + weapon + ' FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world,
+		                                     'SELECT ' + weapon + ' FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
 
 	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> dict:
-		data = await self._execute_statement(world, 'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world,
+		                                     'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
 		return list(data[0])
 
-	async def _set_passive_skill_level_up_data(self, world: int, unique_id: str, weapon: str, passive: str, skill_level: int, skill_point: int) -> dict:
-		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET ' + passive + ' = "' + str(skill_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
+	async def _set_passive_skill_level_up_data(self, world: int, unique_id: str, weapon: str, passive: str,
+	                                           skill_level: int, skill_point: int) -> dict:
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET ' + passive + ' = "' + str(
+			skill_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
-	async def _set_weapon_level_up_data(self, world: int, unique_id: str, weapon: str, weapon_level: int, skill_point: int) -> dict:
-		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET weapon_level = "' + str(weapon_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
-
+	async def _set_weapon_level_up_data(self, world: int, unique_id: str, weapon: str, weapon_level: int,
+	                                    skill_point: int) -> dict:
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET weapon_level = "' + str(
+			weapon_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
 	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> dict:
-		data = await self._execute_statement(world, 'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world,
+		                                     'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
-
 
 	def _roll_for_upgrade(self, scroll_id: str) -> bool:
 		return random.random() < self._upgrade_chance[scroll_id]
@@ -472,7 +576,8 @@ class GameManager:
 		:param material:材料名
 		:return:返回材料名对应的值
 		"""
-		data = await self._execute_statement(world, 'SELECT ' + material + ' FROM player WHERE unique_id="' + str(unique_id) + '";')
+		data = await self._execute_statement(world, 'SELECT ' + material + ' FROM player WHERE unique_id="' + str(
+			unique_id) + '";')
 		return data[0][0]
 
 	async def _update_material(self, world: int, unique_id: str, material: str, value: int) -> int:
@@ -484,8 +589,8 @@ class GameManager:
 		:param material_value:要设置的材料对应的值
 		:return:返回是否更新成功的标识，1为成功，0为失败
 		"""
-		return await self._execute_statement_update(world, 'UPDATE player SET ' + material + '=' + str(value) + ' where unique_id="' + unique_id + '";')
-
+		return await self._execute_statement_update(world, 'UPDATE player SET ' + material + '=' + str(
+			value) + ' where unique_id="' + unique_id + '";')
 
 	def _sql_str_operating(self, unique_id: str, material_dict: dict) -> (str, str):
 		update_str = "UPDATE player SET "
@@ -523,7 +628,6 @@ class GameManager:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
-
 	def _internal_format(self, status: int, remaining: int or tuple or list) -> dict:
 		"""
 		Internal json formatted information
@@ -543,12 +647,20 @@ class GameManager:
 		"""
 		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
-	def _read_json_data(self) -> list:
-		if os.path.exists(JSON_NAME):
-			data_dict = json.load(open(JSON_NAME, encoding = 'utf-8'))
+	#  2019-07-24 12:26:00 修改了_read_json_data(self) ===> _read_json_data(self, path: str)
+	def _read_json_data(self, path: str) -> list:
+		if os.path.exists(path):
+			data_dict = json.load(open(path, encoding='utf-8'))
 			return [v for v in data_dict.values()]
 		return []
 
+	def _read_lottery_configuration(self):
+		self._skill_tier_names = eval(LOTTERY['skills']['names'])
+		self._skill_tier_weights = eval(LOTTERY['skills']['weights'])
+		self._skill_items = eval(LOTTERY['skills']['items'])
+		self._weapon_tier_names = eval(LOTTERY['weapons']['names'])
+		self._weapon_tier_weights = eval(LOTTERY['weapons']['weights'])
+		self._weapon_items = eval(LOTTERY['weapons']['items'])
 
 
 #############################################################################
@@ -577,11 +689,13 @@ async def __get_all_head(request: web.Request) -> web.Response:
 	result = await MANAGER.get_all_head(int(post['world']), post['table'])
 	return _json_response(result)
 
+
 @ROUTES.post('/get_all_material')
 async def __get_all_material(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.get_all_material(int(post['world']), post['unique_id'])
 	return _json_response(result)
+
 
 @ROUTES.post('/get_all_supplies')
 async def __get_all_supplies(request: web.Request) -> web.Response:
@@ -589,11 +703,13 @@ async def __get_all_supplies(request: web.Request) -> web.Response:
 	result = await MANAGER.get_all_supplies(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
+
 @ROUTES.post('/add_supplies')
 async def __add_supplies(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.add_supplies(int(post['world']), post['unique_id'], post['supply'], int(post['value']))
 	return _json_response(result)
+
 
 @ROUTES.post('/level_up_scroll')
 async def __level_up_scroll(request: web.Request) -> web.Response:
@@ -601,11 +717,13 @@ async def __level_up_scroll(request: web.Request) -> web.Response:
 	result = await MANAGER.level_up_scroll(int(post['world']), post['unique_id'], post['scroll_id'])
 	return _json_response(result)
 
+
 @ROUTES.post('/try_all_material')
 async def __try_all_material(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_all_material(int(post['world']), post['unique_id'], int(post['stage']))
 	return _json_response(result)
+
 
 @ROUTES.post('/try_coin')
 async def __try_coin(request: web.Request) -> web.Response:
@@ -613,11 +731,13 @@ async def __try_coin(request: web.Request) -> web.Response:
 	result = await MANAGER.try_coin(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
+
 @ROUTES.post('/try_iron')
 async def __try_iron(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_iron(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
+
 
 @ROUTES.post('/try_diamond')
 async def __try_diamond(request: web.Request) -> web.Response:
@@ -625,11 +745,13 @@ async def __try_diamond(request: web.Request) -> web.Response:
 	result = await MANAGER.try_diamond(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
+
 @ROUTES.post('/try_experience')
 async def __try_experience(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_experience(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
+
 
 @ROUTES.post('/try_level')
 async def __try_level(request: web.Request) -> web.Response:
@@ -637,11 +759,13 @@ async def __try_level(request: web.Request) -> web.Response:
 	result = await MANAGER.try_level(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
+
 @ROUTES.post('/try_role')
 async def __try_role(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_role(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
+
 
 @ROUTES.post('/try_stage')
 async def __try_stage(request: web.Request) -> web.Response:
@@ -649,11 +773,13 @@ async def __try_stage(request: web.Request) -> web.Response:
 	result = await MANAGER.try_stage(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
+
 @ROUTES.post('/try_skill_scroll_10')
 async def __try_skill_scroll_10(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_skill_scroll_10(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
+
 
 @ROUTES.post('/try_skill_scroll_30')
 async def __try_skill_scroll_30(request: web.Request) -> web.Response:
@@ -661,11 +787,13 @@ async def __try_skill_scroll_30(request: web.Request) -> web.Response:
 	result = await MANAGER.try_skill_scroll_30(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
+
 @ROUTES.post('/try_skill_scroll_100')
 async def __try_skill_scroll_100(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_skill_scroll_100(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
+
 
 @ROUTES.post('/try_experience_potion')
 async def __try_experience_potion(request: web.Request) -> web.Response:
@@ -673,11 +801,13 @@ async def __try_experience_potion(request: web.Request) -> web.Response:
 	result = await MANAGER.try_experience_potion(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
+
 @ROUTES.post('/try_small_energy_potion')
 async def __try_small_energy_potion(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_small_energy_potion(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
+
 
 @ROUTES.post('/level_up_skill')
 async def __level_up_skill(request: web.Request) -> web.Response:
@@ -685,11 +815,13 @@ async def __level_up_skill(request: web.Request) -> web.Response:
 	result = await MANAGER.level_up_skill(int(post['world']), post['unique_id'], post['skill_id'], post['scroll_id'])
 	return _json_response(result)
 
+
 @ROUTES.post('/get_all_skill_level')
 async def __get_all_skill_level(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.get_all_skill_level(int(post['world']), post['unique_id'])
 	return _json_response(result)
+
 
 @ROUTES.post('/get_skill')
 async def __get_skill(request: web.Request) -> web.Response:
@@ -697,17 +829,20 @@ async def __get_skill(request: web.Request) -> web.Response:
 	result = await MANAGER.get_skill(int(post['world']), post['unique_id'], post['skill_id'])
 	return _json_response(result)
 
+
 @ROUTES.post('/try_unlock_skill')
 async def __try_unlock_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.try_unlock_skill(int(post['world']), post['unique_id'], post['skill_id'])
 	return _json_response(result)
 
+
 @ROUTES.post('/level_up_weapon')
 async def __level_up_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.level_up_weapon(int(post['world']), post['unique_id'], post['weapon'], int(post['iron']))
 	return _json_response(result)
+
 
 @ROUTES.post('/level_up_passive')
 async def __level_up_passive(request: web.Request) -> web.Response:
@@ -722,11 +857,13 @@ async def __level_up_weapon_star(request: web.Request) -> web.Response:
 	result = await MANAGER.level_up_weapon_star(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
 
+
 @ROUTES.post('/reset_weapon_skill_point')
 async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
+
 
 @ROUTES.post('/get_all_weapon')
 async def __get_all_weapon(request: web.Request) -> web.Response:
@@ -735,14 +872,38 @@ async def __get_all_weapon(request: web.Request) -> web.Response:
 	return _json_response(result)
 
 
+@ROUTES.post('/try_unlock_weapon')
+async def __try_unlock_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.try_unlock_weapon(int(post['world']), post['unique_id'], post['weapon'])
+	return _json_response(result)
+
+
+@ROUTES.post('/pass_stage')
+async def __pass_stage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.pass_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	return _json_response(result)
+
+
+@ROUTES.post('/random_gift_skill')
+async def __random_gift_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.random_gift_skill(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/random_gift_segment')
+async def __random_gift_segment(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.random_gift_segment(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
 
 def run():
-	print('REMINDER: NEED TO READ PORT FROM CONFIG FILE')
-	print('REMINDER: NEED TO READ WEAPON_COST_INFO FROM CONFIG FILE')
-	print('REMINDER: NEED TO READ VALID PASSIVE SKILLS FROM CONFIG FILE')
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=8004)
+	web.run_app(app, port=CONFIG.getint('game_manager', 'port'))
 
 
 if __name__ == '__main__':
