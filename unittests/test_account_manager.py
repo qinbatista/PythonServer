@@ -6,10 +6,21 @@ sys.path.insert(0, '..')
 import pymysql
 import asyncio
 import unittest
+import requests
 import lukseun_client
 
+db = pymysql.connect('192.168.1.102', 'root', 'lukseun', 'user')
+cursor = db.cursor()
+cursor.execute('DELETE FROM info WHERE unique_id = "bindme";')
+db.commit()
 
-class TestLoginMethods(unittest.TestCase):
+resp = requests.post('http://localhost:8005/login_unique', data = {'unique_id' : 'bindme'})
+TOKEN = resp.json()['data']['token']
+
+
+
+
+class TestAccountManager(unittest.TestCase):
 	def setUp(self):
 		self.c = lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
 		self.db = pymysql.connect('192.168.1.102', 'root', 'lukseun', 'user')
@@ -119,6 +130,65 @@ class TestLoginMethods(unittest.TestCase):
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 1)
+
+	def test_can_bind_account(self):
+		self.cursor.execute('DELETE FROM info WHERE account = "alreadyexists";')
+		self.cursor.execute('DELETE FROM info WHERE email = "alreadyexists";')
+		self.cursor.execute('DELETE FROM info WHERE phone_number = "888";')
+		self.cursor.execute('UPDATE info SET account = "", password = "", email = "", phone_number = "" WHERE unique_id = "bindme";')
+		self.db.commit()
+		msg = {'function' : 'bind_account', 'data' : {'token' : TOKEN, 'password' : 'pass', 'account' : 'alreadyexists', 'email' : 'email', 'phone_number' : '888'}}
+
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 0)
+
+	def test_cannot_bind_account_already_bound(self):
+		self.cursor.execute('DELETE FROM info WHERE email = "email" AND unique_id != "bindme";')
+		self.cursor.execute('DELETE FROM info WHERE phone_number = "888" AND unique_id != "bindme";')
+		self.cursor.execute('UPDATE info SET account = "alreadybound", password = "", email = "", phone_number = "" WHERE unique_id = "bindme";')
+		self.db.commit()
+		msg = {'function' : 'bind_account', 'data' : {'token' : TOKEN, 'password' : 'pass', 'account' : 'alreadyexists', 'email' : 'email', 'phone_number' : '888'}}
+
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 1)
+
+	def test_cannot_bind_account_already_exist(self):
+		self.cursor.execute('DELETE FROM info WHERE email = "email" AND unique_id != "bindme";')
+		self.cursor.execute('DELETE FROM info WHERE phone_number = "888" AND unique_id != "bindme";')
+		self.cursor.execute('INSERT INTO info (unique_id, account) VALUES ("dummy", "alreadyexists");')
+		self.cursor.execute('UPDATE info SET account = "", password = "", email = "", phone_number = "" WHERE unique_id = "bindme";')
+		self.db.commit()
+		msg = {'function' : 'bind_account', 'data' : {'token' : TOKEN, 'password' : 'pass', 'account' : 'alreadyexists', 'email' : 'email', 'phone_number' : '888'}}
+
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.cursor.execute('DELETE FROM info WHERE unique_id = "dummy";')
+		self.db.commit()
+		self.assertEqual(response['status'], 2)
+
+	def test_cannot_bind_email_already_exists(self):
+		self.cursor.execute('DELETE FROM info WHERE account = "alreadyexists" AND unique_id != "bindme";')
+		self.cursor.execute('DELETE FROM info WHERE email = "alreadyexists" AND unique_id != "bindme";')
+		self.cursor.execute('DELETE FROM info WHERE phone_number = "888" AND unique_id != "bindme";')
+		self.cursor.execute('UPDATE info SET account = "", password = "", email = "alreadyexists", phone_number = "" WHERE unique_id = "bindme";')
+		self.db.commit()
+		msg = {'function' : 'bind_account', 'data' : {'token' : TOKEN, 'password' : 'pass', 'account' : 'alreadyexists', 'email' : 'alreadyexists', 'phone_number' : '888'}}
+
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 3)
+
+
+	def test_cannot_bind_phone_number_already_exists(self):
+		self.cursor.execute('DELETE FROM info WHERE account = "alreadyexists" AND unique_id != "bindme";')
+		self.cursor.execute('DELETE FROM info WHERE email = "alreadyexists" AND unique_id != "bindme";')
+		self.cursor.execute('DELETE FROM info WHERE phone_number = "888" AND unique_id != "bindme";')
+		self.cursor.execute('UPDATE info SET account = "", password = "", email = "", phone_number = "888" WHERE unique_id = "bindme";')
+		self.db.commit()
+		msg = {'function' : 'bind_account', 'data' : {'token' : TOKEN, 'password' : 'pass', 'account' : 'alreadyexists', 'email' : 'email', 'phone_number' : '888'}}
+
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 4)
+
+
 
 
 

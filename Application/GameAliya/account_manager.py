@@ -82,8 +82,8 @@ class AccountManager:
 		await self._execute_statement('INSERT INTO info (unique_id) VALUES ("' + unique_id + '");')
 
 	async def _check_exists(self, identifier: str, value: str) -> bool:
-		data = await self._execute_statement('SELECT `' + identifier + '` FROM info WHERE `' + identifier + '` = "' + value + '";')
-		if () == data or ('',) in data or (None,) in data:
+		data = await self._execute_statement('SELECT * FROM info WHERE `' + identifier + '` = "' + value + '";')
+		if () == data:
 			return False
 		return True
 

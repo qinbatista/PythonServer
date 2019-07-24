@@ -10,8 +10,6 @@ import configparser
 from aiohttp import web
 from datetime import datetime
 
-SERVER_CONFIG = './Configuration/server/1.0/server.conf'
-
 VERSION = './Configuration/config_timer_setting.json'
 
 MONSTER = './Configuration/client/{}/monster_config.json'
@@ -41,6 +39,12 @@ class ConfigurationManager:
 		self._read_hang_reward_config()
 		self._read_mysql_data_config()
 	
+	async def get_server_version(self):
+		return {'version' : self._sv}
+
+	async def get_client_version(self):
+		return {'version' : self._cv}
+
 	async def get_game_manager_config(self):
 		return self._game_manager_config
 
@@ -139,13 +143,22 @@ async def __get_hang_reward_config(request: web.Request) -> web.Response:
 async def __get_mysql_data_config(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_mysql_data_config())
 
+@ROUTES.get('/get_server_version')
+async def __get_server_version(request: web.Request) -> web.Response:
+	return _json_response(await MANAGER.get_server_version())
+
+@ROUTES.get('/get_client_version')
+async def __get_client_version(request: web.Request) -> web.Response:
+	return _json_response(await MANAGER.get_client_version())
+
+
+
+
 
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	server_config = configparser.ConfigParser()
-	server_config.read(SERVER_CONFIG)
-	web.run_app(app, port=server_config.getint('configuration_manager', 'port'))
+	web.run_app(app, port=8000)
 
 
 if __name__ == '__main__':

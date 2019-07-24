@@ -92,7 +92,7 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _bind_account(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/bind_account', data={'unique_id': message['data']['unique_id'], 'account': message["data"]["account"], 'password': message['data']['password']}) as resp:
+		async with session.post(MANAGER_ACCOUNT_BASE_URL + '/bind_account', data={'unique_id': message['data']['unique_id'], 'password' : message['data']['password'], 'account': message['data']['account'], 'email': message['data']['email'], 'phone_number' : message['data']['phone_number']}) as resp:
 			return await resp.text()
 
 	async def _level_up_skill(self, message: dict, session) -> str:
