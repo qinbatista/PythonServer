@@ -94,7 +94,7 @@ def try_energy():
 
 
 def start_hang_up():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/start_hang_up', data={"world": 0,'unique_id': "4", "stage": "1"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/start_hang_up', data={"world": 0,'unique_id': "4", "stage": "7"})
 	print(str(result.text))
 
 
