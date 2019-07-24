@@ -35,11 +35,11 @@ class GameManager:
 		self._skill_scroll_functions = {'skill_scroll_10' : self.try_skill_scroll_10, 'skill_scroll_30' : self.try_skill_scroll_30, 'skill_scroll_100' : self.try_skill_scroll_100}
 		self._upgrade_chance = {'skill_scroll_10' : 0.10, 'skill_scroll_30' : 0.30, 'skill_scroll_100' : 1}
 
-		self._standard_iron_count = 20
-		self._standard_segment_count = 30
-		self._standard_reset_weapon_skill_coin_count = 100
+		self._standard_iron_count = CONFIG.getint('_01_Manager_Weapon', 'standard_iron_count')
+		self._standard_segment_count = CONFIG.getint('_01_Manager_Weapon', 'standard_segment_count')
+		self._standard_reset_weapon_skill_coin_count = CONFIG.getint('_01_Manager_Weapon', 'standard_reset_weapon_skill_coin_count')
 
-		self._valid_passive_skills = {'passive_skill_1_level', 'passive_skill_2_level', 'passive_skill_3_level', 'passive_skill_4_level'}
+		self._valid_passive_skills = eval(CONFIG['_01_Manager_Weapon']['_valid_passive_skills'])
 
 
 #############################################################################
@@ -381,6 +381,21 @@ class GameManager:
 			values.append(attribute_list)
 		return self._message_typesetting(0, "gain success", {"keys": keys, "values": values})
 
+	
+	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
+		try:
+			star = await self._get_weapon_star(world, unique_id, weapon)
+			if star != 0:
+				segment = await self._get_segment(world, unique_id, weapon) + 30
+				await self._set_segment_by_id(world, unique_id, weapon, segment)
+				return self._message_typesetting(0, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'segment'], "values": [weapon, segment]})
+			await self._set_weapon_star(world, unique_id, weapon, 1)
+			return self._message_typesetting(1, 'Unlocked new weapon!', {"keys": ["weapon"], "values": [weapon]})
+		except:
+			return self._message_typesetting(2, 'no weapon!')
 
 
 
@@ -397,11 +412,42 @@ class GameManager:
 
 
 
+#############################################################################
+#						Stage Module Functions								#
+#############################################################################
+
+	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
+		# success ===> 0
+		# 0 : passed customs ===> success
+		# 1 : database operation error
+		# 9 : abnormal data!
+		json_data = await self.try_all_material(world, unique_id, stage)
+		status = int(json_data["status"])
+		if status == 9:
+			return self._message_typesetting(9, "abnormal data!")
+		elif status == 1:
+			return self._message_typesetting(1, "database operation error")
+		else:
+			material_dict = json_data["remaining"][0]
+			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
+			return self._message_typesetting(0, "passed customs!", data)
 
 
-			####################################
-			#          P R I V A T E		   #
-			####################################
+
+#############################################################################
+#						End Stage Module Functions							#
+#############################################################################
+
+
+
+
+
+
+
+
+#############################################################################
+#							Private Functions								#
+#############################################################################
 
 	async def _get_weapon_bag(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
@@ -416,6 +462,10 @@ class GameManager:
 
 	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
 		return await self._execute_statement_update(world, 'UPDATE weapon_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";') 
+
+	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
+		data = await self._execute_statement(world, 'SELECT segment FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
 
 	async def _set_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
@@ -734,12 +784,35 @@ async def __get_all_weapon(request: web.Request) -> web.Response:
 	result = await MANAGER.get_all_weapon(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
+@ROUTES.post('/try_unlock_weapon')
+async def __try_unlock_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.try_unlock_weapon(int(post['world']), post['unique_id'], post['weapon'])
+	return _json_response(result)
+
+@ROUTES.post('/pass_stage')
+async def __pass_stage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.pass_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	return _json_response(result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def run():
 	print('REMINDER: NEED TO READ PORT FROM CONFIG FILE')
-	print('REMINDER: NEED TO READ WEAPON_COST_INFO FROM CONFIG FILE')
-	print('REMINDER: NEED TO READ VALID PASSIVE SKILLS FROM CONFIG FILE')
 	app = web.Application()
 	app.add_routes(ROUTES)
 	web.run_app(app, port=8004)
