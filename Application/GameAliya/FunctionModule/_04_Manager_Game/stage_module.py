@@ -1,6 +1,7 @@
 import json
 import tormysql
 import time
+import os
 import datetime
 import configparser
 import random
@@ -11,7 +12,7 @@ from aiohttp import ClientSession
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf')
 MANAGER_BAG_BASE_URL = CONFIG['bag_manager']['address'] + ":" + CONFIG['bag_manager']['port']
-
+HANG_JSON_NAME = "../../Configuration/client/1.0/stage_reward_config.json"
 
 class StageSystemClass:
 	def __init__(self, *args, **kwargs):
@@ -25,6 +26,7 @@ class StageSystemClass:
 			"varchar": "'%s'",
 			"char": "'%s'"
 		}
+		self.stage_reward_list = self.__read_json_data(path=HANG_JSON_NAME)
 
 	async def pass_stage(self, unique_id: str, stage: int) -> dict:
 		# success ===> 0
@@ -49,14 +51,45 @@ class StageSystemClass:
 
 #  ############################# 2019-7-23 16:18 header #############################
 	async def start_hang_up(self, unique_id: str, stage: int):
-		# success ===> 0 , 1 , 2 , 3 , 4 , 5
+		"""
+		success ===> 0 , 1 , 2 , 3 , 4 , 5
+
+		1分钟奖励有可能奖励1颗钻石，30颗金币，10个铁
+		minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
+		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
+		"""
 		hang_up_time = self._get_hang_up_time(unique_id=unique_id)
+		material_dict = {}
 		if hang_up_time == "":
 			hang_up_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 			if self._set_hang_up_time(unique_id=unique_id, hang_up_time=hang_up_time) == 0:
 				return self.message_typesetting(status=1, message="database operating error")
 			return self.message_typesetting(status=0, message="hang up success", data={"hang_up_time": hang_up_time})
+		update_str, select_str = self.__sql_str_operating(unique_id=unique_id, material_dict=material_dict)
 		return self.message_typesetting(status=2, message="repeat hang up")
+
+	def __read_json_data(self, path: str) -> list:
+		data = []
+		if os.path.exists(path):
+			data_dict = json.load(open(path, encoding="utf-8"))
+			for key in data_dict.keys():
+				data.append(data_dict[key])
+		print("[__read_json_data] -> data:" + str(data))
+		return data
+
+	def __sql_str_operating(self, unique_id: str, material_dict: dict) -> (str, str):
+		update_str = "UPDATE player SET "
+		update_end_str = " where unique_id='%s'" % unique_id
+		select_str = "SELECT "
+		select_end_str = " FROM player WHERE unique_id='%s'" % unique_id
+		for key in material_dict.keys():
+			update_str += "%s=%s+%s, " % (key, key, material_dict[key])
+			select_str += "%s, " % key
+		update_str = update_str[: len(update_str) - 2] + update_end_str
+		select_str = select_str[: len(select_str) - 2] + select_end_str
+		print("[__sql_str_operating] -> update_str:" + update_str)
+		print("[__sql_str_operating] -> select_str:" + select_str)
+		return update_str, select_str
 
 	async def _set_hang_up_time(self, unique_id: str, hang_up_time: str) -> str:
 		return await self._execute_statement_update("update player set hang_up_time = '" + hang_up_time + "' where unique_id=%s" % unique_id)

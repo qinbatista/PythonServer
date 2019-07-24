@@ -7,7 +7,7 @@ from aiohttp import web
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../../Configuration/server/1.0/server.conf', encoding="utf-8")
-JSON_NAME = "../../Configuration/client/1.0/stage_reward_config.json"
+STATE_JSON_NAME = "../../Configuration/client/1.0/stage_reward_config.json"
 
 
 class BagSystemClass:
@@ -17,7 +17,7 @@ class BagSystemClass:
 		# 这是SQL服务器的连接池。 只要这个类还活着，这些连接就会保持打开状态。
 		# TODO verify that this is true :D
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='aliya', charset='utf8')
-		self.reward_list = self.__read_json_data()
+		self.stage_reward_list = self.__read_json_data(path=STATE_JSON_NAME)
 
 	async def get_all_head(self, table: str) -> dict:
 		"""
@@ -92,7 +92,7 @@ class BagSystemClass:
 		if stage <= 0 or sql_stage + 1 < stage:
 			print("[try_all_material] -> stage:" + str(stage))
 			return self.__internal_format(status=9, remaining=0)  # abnormal data!
-		material_dict = dict(self.reward_list[stage])
+		material_dict = dict(self.stage_reward_list[stage])
 		if sql_stage + 1 == stage:  # 通过新关卡
 			material_dict.update({"stage": 1})
 		update_str, select_str = self.__sql_str_operating(unique_id=unique_id, material_dict=material_dict)
@@ -215,10 +215,10 @@ class BagSystemClass:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
-	def __read_json_data(self) -> list:
+	def __read_json_data(self, path: str) -> list:
 		data = []
-		if os.path.exists(JSON_NAME):
-			data_dict = json.load(open(JSON_NAME, encoding="utf-8"))
+		if os.path.exists(path):
+			data_dict = json.load(open(path, encoding="utf-8"))
 			for key in data_dict.keys():
 				data.append(data_dict[key])
 		print("[__read_json_data] -> data:" + str(data))
