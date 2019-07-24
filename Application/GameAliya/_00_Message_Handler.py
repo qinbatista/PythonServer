@@ -16,7 +16,7 @@ CONFIG.read(PythonLocation() + '/Configuration/server/1.0/server.conf')
 DESIv = CONFIG['_00_Message_Handler']['DESIv']
 DESKey = CONFIG['_00_Message_Handler']['DESKey']
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
-TOKEN_BASE_URL = CONFIG['_00_Token_Server']['address'] + ":" + CONFIG['_00_Token_Server']['port']
+TOKEN_BASE_URL = CONFIG['token_server']['address'] + ":" + CONFIG['token_server']['port']
 MANAGER_ACCOUNT_BASE_URL = CONFIG['_01_Manager_Account']['address'] + ":" + CONFIG['_01_Manager_Account']['port']
 MANAGER_GAME_BASE_URL = CONFIG['_02_Manager_Game']['address'] + ":" + CONFIG['_02_Manager_Game']['port']
 
