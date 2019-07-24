@@ -11,11 +11,14 @@ import configparser
 from aiohttp import web
 from datetime import datetime, timedelta
 
+
 CONFIG = configparser.ConfigParser()
 CONFIG.read('./Configuration/server/1.0/server.conf')
 
-JSON_NAME = './Configuration/client/1.0/stage_reward_config.json'
+LOTTERY = configparser.ConfigParser()
+LOTTERY.read('./Configuration/server/1.0/lottery.conf')
 
+JSON_NAME = './Configuration/client/1.0/stage_reward_config.json'
 
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
@@ -35,11 +38,13 @@ class GameManager:
 		self._skill_scroll_functions = {'skill_scroll_10' : self.try_skill_scroll_10, 'skill_scroll_30' : self.try_skill_scroll_30, 'skill_scroll_100' : self.try_skill_scroll_100}
 		self._upgrade_chance = {'skill_scroll_10' : 0.10, 'skill_scroll_30' : 0.30, 'skill_scroll_100' : 1}
 
-		self._standard_iron_count = 20
-		self._standard_segment_count = 30
-		self._standard_reset_weapon_skill_coin_count = 100
+		self._standard_iron_count = CONFIG.getint('_01_Manager_Weapon', 'standard_iron_count')
+		self._standard_segment_count = CONFIG.getint('_01_Manager_Weapon', 'standard_segment_count')
+		self._standard_reset_weapon_skill_coin_count = CONFIG.getint('_01_Manager_Weapon', 'standard_reset_weapon_skill_coin_count')
 
-		self._valid_passive_skills = {'passive_skill_1_level', 'passive_skill_2_level', 'passive_skill_3_level', 'passive_skill_4_level'}
+		self._valid_passive_skills = eval(CONFIG['_01_Manager_Weapon']['_valid_passive_skills'])
+
+		self._read_lottery_configuration()
 
 
 #############################################################################
@@ -381,6 +386,21 @@ class GameManager:
 			values.append(attribute_list)
 		return self._message_typesetting(0, "gain success", {"keys": keys, "values": values})
 
+	
+	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
+		try:
+			star = await self._get_weapon_star(world, unique_id, weapon)
+			if star != 0:
+				segment = await self._get_segment(world, unique_id, weapon) + 30
+				await self._set_segment_by_id(world, unique_id, weapon, segment)
+				return self._message_typesetting(0, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'segment'], "values": [weapon, segment]})
+			await self._set_weapon_star(world, unique_id, weapon, 1)
+			return self._message_typesetting(1, 'Unlocked new weapon!', {"keys": ["weapon"], "values": [weapon]})
+		except:
+			return self._message_typesetting(2, 'no weapon!')
 
 
 
@@ -397,11 +417,97 @@ class GameManager:
 
 
 
+#############################################################################
+#						Stage Module Functions								#
+#############################################################################
+
+	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
+		# success ===> 0
+		# 0 : passed customs ===> success
+		# 1 : database operation error
+		# 9 : abnormal data!
+		json_data = await self.try_all_material(world, unique_id, stage)
+		status = int(json_data["status"])
+		if status == 9:
+			return self._message_typesetting(9, "abnormal data!")
+		elif status == 1:
+			return self._message_typesetting(1, "database operation error")
+		else:
+			material_dict = json_data["remaining"][0]
+			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
+			return self._message_typesetting(0, "passed customs!", data)
 
 
-			####################################
-			#          P R I V A T E		   #
-			####################################
+
+#############################################################################
+#						End Stage Module Functions							#
+#############################################################################
+
+
+
+
+#############################################################################
+#						Lottery Module Functions							#
+#############################################################################
+
+	async def random_gift_skill(self, world: int, unique_id: str) -> dict:
+		# success ===> 0 and 1
+		# 0 - unlocked new skill            {"skill_id": skill_id, "value": value}
+		# 1 - you received a free scroll    {"skill_scroll_id": skill_scroll_id, "value": value}
+		# 2 - invalid skill name
+		# 3 - database operation error
+		tier_choice = (random.choices(self._skill_tier_names, self._skill_tier_weights))[0]
+		gift_skill  = (random.choices(self._skill_items[tier_choice]))[0]
+		data = await self.try_unlock_skill(world, unique_id, gift_skill)
+		status = int(data['status'])
+		if status == 0:
+			return self._message_typesetting(0, 'unlocked new skill', {'keys' : [gift_skill], 'values': [1]})
+		elif status == 1:  # skill already unlocked
+			if tier_choice == 'skilltier1':
+				skill_scroll_id = 'skill_scroll_10'
+				data = await self.try_skill_scroll_10(world, unique_id, 1)
+			elif tier_choice == 'skilltier2':
+				skill_scroll_id = 'skill_scroll_30'
+				data = await self.try_skill_scroll_30(world, unique_id, 1)
+			else:
+				skill_scroll_id = 'skill_scroll_100'
+				data = await self.try_skill_scroll_100(world, unique_id, 1)
+			if data['status'] != 0:
+				return self._message_typesetting(3, 'Database operation error')
+			return self._message_typesetting(1, 'You received a free scroll', {'keys' : [skill_scroll_id], 'values' : [data['remaining']]})
+		else:
+			return self._message_typesetting(2, 'Invalid skill name')
+
+
+	async def random_gift_segment(self, world: int, unique_id: str) -> dict:
+		# success ===> 0 and 1
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
+		tier_choice = (random.choices(self._weapon_tier_names, self._weapon_tier_weights))[0]
+		gift_weapon = (random.choices(self._weapon_items[tier_choice]))[0]
+		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
+
+
+
+
+
+#############################################################################
+#						End Lottery Module Functions						#
+#############################################################################
+
+
+
+
+
+#############################################################################
+#							Private Functions								#
+#############################################################################
+
+	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
+		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0]), data[0][1]
+
 
 	async def _get_weapon_bag(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
@@ -416,6 +522,10 @@ class GameManager:
 
 	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
 		return await self._execute_statement_update(world, 'UPDATE weapon_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";') 
+
+	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
+		data = await self._execute_statement(world, 'SELECT segment FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
 
 	async def _set_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
@@ -548,6 +658,14 @@ class GameManager:
 			data_dict = json.load(open(JSON_NAME, encoding = 'utf-8'))
 			return [v for v in data_dict.values()]
 		return []
+
+	def _read_lottery_configuration(self):
+		self._skill_tier_names = eval(LOTTERY['skills']['names'])
+		self._skill_tier_weights = eval(LOTTERY['skills']['weights'])
+		self._skill_items = eval(LOTTERY['skills']['items'])
+		self._weapon_tier_names = eval(LOTTERY['weapons']['names'])
+		self._weapon_tier_weights = eval(LOTTERY['weapons']['weights'])
+		self._weapon_items = eval(LOTTERY['weapons']['items'])
 
 
 
@@ -734,15 +852,47 @@ async def __get_all_weapon(request: web.Request) -> web.Response:
 	result = await MANAGER.get_all_weapon(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
+@ROUTES.post('/try_unlock_weapon')
+async def __try_unlock_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.try_unlock_weapon(int(post['world']), post['unique_id'], post['weapon'])
+	return _json_response(result)
+
+@ROUTES.post('/pass_stage')
+async def __pass_stage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.pass_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	return _json_response(result)
+
+
+@ROUTES.post('/random_gift_skill')
+async def __random_gift_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.random_gift_skill(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/random_gift_segment')
+async def __random_gift_segment(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.random_gift_segment(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+
+
+
+
+
+
+
+
 
 
 def run():
-	print('REMINDER: NEED TO READ PORT FROM CONFIG FILE')
-	print('REMINDER: NEED TO READ WEAPON_COST_INFO FROM CONFIG FILE')
-	print('REMINDER: NEED TO READ VALID PASSIVE SKILLS FROM CONFIG FILE')
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=8004)
+	web.run_app(app, port=CONFIG.getint('game_manager', 'port'))
 
 
 if __name__ == '__main__':
