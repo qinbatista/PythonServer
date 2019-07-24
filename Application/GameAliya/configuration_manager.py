@@ -11,6 +11,9 @@ from aiohttp import web
 
 
 REWARD_LIST = './Configuration/client/1.0/stage_reward_config.json'
+LOTTERY = './Configuration/server/1.0/lottery.json'
+WEAPON = './Configuration/server/1.0/weapon.json'
+SKILL = './Configuration/server/1.0/skill.json'
 
 class ConfigurationManager:
 	def __init__(self):
@@ -19,19 +22,23 @@ class ConfigurationManager:
 
 
 	
+	async def get_game_manager_configuration(self):
+		return self.game_manager_config
 
 
 
 	def _refresh_configurations(self):
-		pass
-
+		self._read_game_manager_configuration()
 
 	def _read_game_manager_configuration(self):
-		pass
+		reward_list = [v for v in (json.load(open(REWARD_LIST, encoding = 'utf-8'))).values()]
+		lottery = json.load(open(LOTTERY, encoding = 'utf-8'))
+		weapon = json.load(open(WEAPON, encoding = 'utf-8'))
+		skill = json.load(open(SKILL, encoding = 'utf-8'))
+		self.game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill}
+
 
 	def _start_timer(self, seconds: int):
-		'''
-		'''
 		threading.Timer(seconds, self._refresh_configurations).start()
 
 
@@ -54,9 +61,8 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 
 
 
-@ROUTES.post('/get_game_manager_configuration')
+@ROUTES.get('/get_game_manager_configuration')
 async def __get_game_manager_configuration(request: web.Request) -> web.Response:
-	post = await request.post()
 	data = await MANAGER.get_game_manager_configuration()
 	return _json_response(data)
 
