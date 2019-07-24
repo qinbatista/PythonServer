@@ -12,15 +12,18 @@ from aiohttp import web
 from datetime import datetime, timedelta
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read('./Configuration/server/1.0/server.conf')
+CONFIG.read('./Configuration/server/1.0/server.conf', encoding="utf-8")
 
 LOTTERY = configparser.ConfigParser()
 LOTTERY.read('./Configuration/server/1.0/lottery.conf')
 
 STAGE_JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
-HANG_JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
-#  2019-07-24 12:26:00 修改了JSON_NAME ===> STAGE_JSON_NAME
-#  2019-07-24 12:26:00 添加了HANG_JSON_NAME
+HANG_JSON_NAME = "./Configuration/client/1.0/hang_reward_config.json"
+WEAPON_JSON_NAME = "./Configuration/server/1.0/weapon.json"
+LOTTERY_JSON_NAME = "./Configuration/server/1.0/lottery.json"
+#  houyao 2019-07-24 12:26:00 修改了JSON_NAME ===> STAGE_JSON_NAME
+#  houyao 2019-07-24 12:26:00 添加了HANG_JSON_NAME
+#  houyao 2019-07-24 17:14:00 添加了WEAPON_JSON_NAME
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level",
                  "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level",
@@ -44,17 +47,18 @@ class GameManager:
 		self._skill_scroll_functions = {'skill_scroll_10': self.try_skill_scroll_10, 'skill_scroll_30': self.try_skill_scroll_30, 'skill_scroll_100': self.try_skill_scroll_100}
 		self._upgrade_chance = {'skill_scroll_10': 0.10, 'skill_scroll_30': 0.30, 'skill_scroll_100': 1}
 
-		self._standard_iron_count = CONFIG.getint('_01_Manager_Weapon', 'standard_iron_count')
-		self._standard_segment_count = CONFIG.getint('_01_Manager_Weapon', 'standard_segment_count')
-		self._standard_reset_weapon_skill_coin_count = CONFIG.getint('_01_Manager_Weapon', 'standard_reset_weapon_skill_coin_count')
+		weapon_data = json.load(open(WEAPON_JSON_NAME, encoding="utf-8"))
+		self._standard_iron_count = weapon_data["standard_iron_count"]
+		self._standard_segment_count = weapon_data["standard_segment_count"]
+		self._standard_reset_weapon_skill_coin_count = weapon_data["standard_reset_weapon_skill_coin_count"]
 
-		self._valid_passive_skills = eval(CONFIG['_01_Manager_Weapon']['_valid_passive_skills'])
+		self._valid_passive_skills = weapon_data['valid_passive_skills']
 
 		self._read_lottery_configuration()
 
 		self._hang_reward_list = self._read_json_data(path=HANG_JSON_NAME)
-		#  2019-07-24 12:26:00 修改了self._stage_reward_list
-		#  2019-07-24 12:26:00 添加了self._hang_reward_list
+		#  houyao 2019-07-24 12:26:00 修改了self._stage_reward_list
+		#  houyao 2019-07-24 12:26:00 添加了self._hang_reward_list
 
 	#############################################################################
 	#						 Bag Module Functions								#
@@ -114,17 +118,13 @@ class GameManager:
 				dict2 = await self.try_skill_scroll_30(world, unique_id, 1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
 					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!",
-				                                 {"keys": ["skill_scroll_10", "skill_scroll_30"],
-				                                  "values": [dict1["remaining"], dict2["remaining"]]})
+				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
 			elif scroll_id == "skill_scroll_30":
 				dict1 = await self.try_skill_scroll_30(world, unique_id, -3)
 				dict2 = await self.try_skill_scroll_100(world, unique_id, 1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
 					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!",
-				                                 {"keys": ["skill_scroll_30", "skill_scroll_100"],
-				                                  "values": [dict1["remaining"], dict2["remaining"]]})
+				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_30", "skill_scroll_100"], "values": [dict1["remaining"], dict2["remaining"]]})
 			else:
 				return self._message_typesetting(3, message="unexpected parameter --> " + scroll_id)
 		except:
@@ -539,9 +539,8 @@ class GameManager:
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET weapon_level = "' + str(
 			weapon_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
-	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> dict:
-		data = await self._execute_statement(world,
-		                                     'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
+	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> int:
+		data = await self._execute_statement(world, 'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
 
 	def _roll_for_upgrade(self, scroll_id: str) -> bool:
@@ -576,8 +575,7 @@ class GameManager:
 		:param material:材料名
 		:return:返回材料名对应的值
 		"""
-		data = await self._execute_statement(world, 'SELECT ' + material + ' FROM player WHERE unique_id="' + str(
-			unique_id) + '";')
+		data = await self._execute_statement(world, 'SELECT ' + material + ' FROM player WHERE unique_id="' + str(unique_id) + '";')
 		return data[0][0]
 
 	async def _update_material(self, world: int, unique_id: str, material: str, value: int) -> int:
@@ -592,13 +590,18 @@ class GameManager:
 		return await self._execute_statement_update(world, 'UPDATE player SET ' + material + '=' + str(
 			value) + ' where unique_id="' + unique_id + '";')
 
-	def _sql_str_operating(self, unique_id: str, material_dict: dict) -> (str, str):
+	#  houyao 2019-7-24 15:18
+	# key_word用于存放字符串字段的关键字
+	def _sql_str_operating(self, unique_id: str, material_dict: dict, key_word: list=[]) -> (str, str):
 		update_str = "UPDATE player SET "
 		update_end_str = " where unique_id='%s'" % unique_id
 		select_str = "SELECT "
 		select_end_str = " FROM player WHERE unique_id='%s'" % unique_id
 		for key in material_dict.keys():
-			update_str += "%s=%s+%s, " % (key, key, material_dict[key])
+			if key in key_word:
+				update_str += "%s='%s', " % (key, material_dict[key])
+			else:
+				update_str += "%s=%s+%s, " % (key, key, material_dict[key])
 			select_str += "%s, " % key
 		update_str = update_str[: len(update_str) - 2] + update_end_str
 		select_str = select_str[: len(select_str) - 2] + select_end_str
@@ -647,7 +650,7 @@ class GameManager:
 		"""
 		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
-	#  2019-07-24 12:26:00 修改了_read_json_data(self) ===> _read_json_data(self, path: str)
+	#  houyao 2019-07-24 12:26:00 修改了_read_json_data(self) ===> _read_json_data(self, path: str)
 	def _read_json_data(self, path: str) -> list:
 		if os.path.exists(path):
 			data_dict = json.load(open(path, encoding='utf-8'))
@@ -655,20 +658,76 @@ class GameManager:
 		return []
 
 	def _read_lottery_configuration(self):
-		self._skill_tier_names = eval(LOTTERY['skills']['names'])
-		self._skill_tier_weights = eval(LOTTERY['skills']['weights'])
-		self._skill_items = eval(LOTTERY['skills']['items'])
-		self._weapon_tier_names = eval(LOTTERY['weapons']['names'])
-		self._weapon_tier_weights = eval(LOTTERY['weapons']['weights'])
-		self._weapon_items = eval(LOTTERY['weapons']['items'])
+		lottery_data = json.load(open(LOTTERY_JSON_NAME, encoding="utf-8"))
+		self._skill_tier_names = lottery_data["skills"]["names"]
+		self._skill_tier_weights = lottery_data['skills']['weights']
+		self._skill_items = lottery_data['skills']['items']
+		self._weapon_tier_names = lottery_data['weapons']['names']
+		self._weapon_tier_weights = lottery_data['weapons']['weights']
+		self._weapon_items = lottery_data['weapons']['items']
 
+	#  ##################################################################################
+	#  #########                                                                 ########
+	#  #########              houyao 2019-7-24 15:18 header                      ########
+	#  #########                                                                 ########
+	#  ##################################################################################
+	async def start_hang_up(self, world: int, unique_id: str, stage: int) -> dict:
+		"""
+		success ===> 0 , 1
+		# 0 - hang up success
+		# 1 - Repeated hang up successfully
+		# 2 - database operating error
+		1分钟奖励有可能奖励1颗钻石，30颗金币，10个铁
+		minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
+		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
+		"""
+		if stage <= 0:
+			return self._message_typesetting(status=9, message="Parameter error")
+		hang_up_time = await self._get_material(world=world, unique_id=unique_id, material="hang_up_time")
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if hang_up_time == "":
+			# 下面的功能是将奖励拿出来，并且将数据库剩余的值发送给客户端
+			material_dict = self._hang_reward_list[0]
+			material_dict.update({"hang_up_time": current_time})
+			key_word = ["hang_up_time"]
+			keys, hang_rewards = list(material_dict.keys()), list(material_dict.values())
+			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
+			print("update_str:" + update_str)
+			print("select_str:" + select_str)
+			if await self._execute_statement_update(world=world, statement=update_str) == 0:
+				return self._message_typesetting(status=2, message="database operating error")
+			data = await self._execute_statement(world=world, statement=select_str)
+			values = list(data[0])
 
-#############################################################################
-#
-#
-#
-#
-#############################################################################
+			# print("values:" + str(values))
+			return self._message_typesetting(status=0, message="hang up success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
+		else:
+			material_dict = self._hang_reward_list[stage]
+			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
+			minute = delta_time.seconds // 60
+			print("before hang_up_time:" + hang_up_time)
+			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+			print("after  hang_up_time:" + hang_up_time)
+			material_dict.update({"hang_up_time": hang_up_time})
+			key_word = ["hang_up_time"]
+			keys, hang_rewards = list(material_dict.keys()), []
+			for key in material_dict.keys():
+				if key not in key_word:
+					material_dict[key] = int(material_dict[key]) * minute
+				hang_rewards.append(material_dict[key])
+			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
+			await self._execute_statement_update(world=world, statement=update_str)
+			data = await self._execute_statement(world=world, statement=select_str)
+			values = list(data[0])
+
+			# print("values:" + str(values))
+			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
+	#  ##################################################################################
+	#  #########                                                                 ########
+	#  #########              houyao 2019-7-24 16:51 end                         ########
+	#  #########                                                                 ########
+	#  ##################################################################################
+
 
 MANAGER = GameManager()  # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
@@ -898,6 +957,23 @@ async def __random_gift_segment(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.random_gift_segment(int(post['world']), post['unique_id'])
 	return _json_response(result)
+
+
+	#  ##################################################################################
+	#  #########                                                                 ########
+	#  #########              houyao 2019-7-24 15:18 header                      ########
+	#  #########                                                                 ########
+	#  ##################################################################################
+@ROUTES.post('/start_hang_up')
+async def __start_hang_up(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.start_hang_up(world=int(post['world']), unique_id=post['unique_id'], stage=int(post['stage']))
+	return _json_response(result)
+	#  ##################################################################################
+	#  #########                                                                 ########
+	#  #########              houyao 2019-7-24 15:18 end                         ########
+	#  #########                                                                 ########
+	#  ##################################################################################
 
 
 def run():
