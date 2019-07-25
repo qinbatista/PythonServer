@@ -44,7 +44,6 @@ class ConfigurationManager:
 		self._read_mysql_data_config()
 		self._read_entry_consumables_config()
 		self._read_game_manager_config()
-	
 
 	async def get_server_config_location(self):
 		return {'file' : loc() + '/Configuration/server/' + self._sv + '/server.conf'}
@@ -81,7 +80,8 @@ class ConfigurationManager:
 		lottery = json.load(open(LOTTERY.format(self._sv), encoding = 'utf-8'))
 		weapon = json.load(open(WEAPON.format(self._sv), encoding = 'utf-8'))
 		skill = json.load(open(SKILL.format(self._sv), encoding = 'utf-8'))
-		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config}
+		player = json.load(open(PLAYER.format(self._sv), encoding = 'utf-8'))
+		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config,'player':player}
 
 	def _read_level_enemy_layouts_config(self):
 		self._level_enemy_layouts_config = json.load(open(ENEMY_LAYOUT.format(self._cv), encoding = 'utf-8'))
@@ -176,8 +176,6 @@ async def __get_server_config_location(request: web.Request) -> web.Response:
 @ROUTES.get('/get_entry_consumables_config')
 async def __get_entry_consumables_config(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_entry_consumables_config())
-
-
 
 def run():
 	app = web.Application()

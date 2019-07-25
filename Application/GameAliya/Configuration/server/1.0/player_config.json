@@ -1,10 +1,8 @@
 {
-	"player" :
+	"energy":
 	{
-		"energy":
-		{
-			"cool_time":"00:20:00",
-			"max_energy":"10"
-		}
+		"cooling_time":20,
+		"max_energy":10
 	}
+
 }

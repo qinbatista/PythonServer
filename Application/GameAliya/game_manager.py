@@ -791,6 +791,7 @@ class GameManager:
 		self._standard_reset_weapon_skill_coin_count = d['weapon']['standard_reset_weapon_skill_coin_count']
 		self._valid_passive_skills = d['weapon']['valid_passive_skills']
 		self._lottery = d['lottery']
+		self._player = d['player']
 		self._hang_reward_list = d['hang_reward']
 
 	def _start_timer(self, seconds: int):

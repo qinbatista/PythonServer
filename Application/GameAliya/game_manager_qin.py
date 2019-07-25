@@ -126,13 +126,13 @@ class GameManager:
 		# - 8 - 参数错误 === Parameter error
 		# - 9 - 无足够能量消耗 === Not enough energy consumption
 		# - 10 - 数据库操作错误 === Database operation error
-		self._full_energy=10
+		full_energy=self._player["energy"]["max_energy"]
 		if amount > 0:
 			data = (await self._decrease_energy(world=world,unique_id=unique_id, amount=0))["data"]
 			json_data = await self._try_material(world=world, unique_id=unique_id, material="energy", value=amount)
 			if int(json_data["status"]) == 1:
 				return self._message_typesetting(status=10, message="Database operation error")
-			elif int(json_data["remaining"] >= self._full_energy):
+			elif int(json_data["remaining"] >= full_energy):
 				sql_str = "UPDATE player SET recover_time = '' WHERE unique_id = '%s';" % unique_id
 				await self._execute_statement_update(world=world,statement=sql_str)
 				for i in range(len(data["keys"])):
@@ -148,7 +148,7 @@ class GameManager:
 					if data["keys"][i] == "energy":
 						data["values"][i] = json_data["remaining"]
 				return self._message_typesetting(status=1, message="Purchase energy successfully, energy is not fully restored", data=data)
-		elif self._full_energy + amount < 0:
+		elif full_energy + amount < 0:
 			return self._message_typesetting(status=8, message="Parameter error")
 		else:
 			return await self._decrease_energy(world=world,unique_id=unique_id, amount=abs(amount))
@@ -156,44 +156,46 @@ class GameManager:
 	async def _decrease_energy(self, world:int, unique_id: str, amount: int) -> dict:
 		current_energy, recover_time = await self._get_energy_information(world=world,unique_id=unique_id)
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		full_energy=self._player["energy"]["max_energy"]
+		_cooling_time=self._player["energy"]["cooling_time"]
 		if recover_time == '':  # 此时 current_energy == self._full_energy 成立
 			if amount == 0:  # 成功1：如果没有恢复时间且是获取能量值，则直接拿取数据库的值给客户端
 				return self._message_typesetting(status=2, message='Get energy successfully', data={"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, -1]})
 			current_energy -= amount
 			# 成功2：如果没有恢复时间且是消耗能量值，则直接用数据库的值减去消耗的能量值，
 			# 然后存入消耗之后的能量值，以及将当前的时间存入 恢复时间项
-			if current_energy >= self._full_energy: current_time = ""  # 能量超出满能力状态时，不计算恢复时间
-			cooling_time = self._cooling_time * 60
+			if current_energy >= full_energy: current_time = ""  # 能量超出满能力状态时，不计算恢复时间
+			cooling_time = _cooling_time * 60
 			await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
 			return self._message_typesetting(3, 'Energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, current_time, cooling_time]})
 		else:
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
-			recovered_energy = delta_time.seconds // 60 // self._cooling_time
+			recovered_energy = delta_time.seconds // 60 // _cooling_time
 			if amount == 0:
 				# 成功3：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
 				# 满足上限的情况：直接将满能量值和空字符串分别存入能量值项和恢复时间项
-				if current_energy + recovered_energy >= self._full_energy:
-					recover_time, current_energy, cooling_time = "", self._full_energy, -1
+				if current_energy + recovered_energy >= full_energy:
+					recover_time, current_energy, cooling_time = "", full_energy, -1
 					await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
 					return self._message_typesetting(status=4, message='Energy has been fully restored, successful energy update', data={"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
 				# 成功4：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
 				# 不满足上限的情况：将能恢复的能量值计算出来，并且计算恢复后的能量值current_energy
 				# 和恢复时间与恢复能量消耗的时间相减的恢复时间值
 				else:
-					recover_time, current_energy = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy
+					recover_time, current_energy = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * _cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy
 					delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
-					cooling_time = 60 * self._cooling_time - delta_time.seconds
+					cooling_time = 60 * _cooling_time - delta_time.seconds
 					await self._execute_statement_update(world=world, statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
 					return self._message_typesetting(status=5, message='Energy has not fully recovered, successful energy update', data={"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
 
 				# recover_time, current_energy = ("", self._full_energy) if (current_energy + recovered_energy >= self._full_energy) else ((datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy)
 				# await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
 				# return self.message_typesetting(status=0, message='Energy has been recovered and energy is successfully acquired', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
-			if recovered_energy + current_energy >= self._full_energy:
+			if recovered_energy + current_energy >= full_energy:
 				# 成功5：如果有恢复时间且是消耗能量
 				# 满足上限的情况是用上限能量值减去要消耗的能量值，然后设置减去之后的能量值和当前的时间分别存入能量值项和恢复时间项
-				current_energy = self._full_energy - amount
-				cooling_time = self._cooling_time * 60
+				current_energy = full_energy - amount
+				cooling_time = _cooling_time * 60
 				await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
 				return self._message_typesetting(6, 'After refreshing the energy, the energy value and recovery time are successfully updated.', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
 			elif recovered_energy + current_energy - amount >= 0:
@@ -201,9 +203,9 @@ class GameManager:
 				# 不满足上限的情况是用当前数据库的能量值和当前恢复的能量值相加然后减去消耗的能量值为要存入数据库的能量值项
 				# 数据库中的恢复时间与恢复能量消耗的时间相减的恢复时间值存入到数据库的恢复时间项
 				current_energy = recovered_energy + current_energy - amount
-				recover_time = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
+				recover_time = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * _cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
 				delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
-				cooling_time = 60 * self._cooling_time - delta_time.seconds
+				cooling_time = 60 * _cooling_time - delta_time.seconds
 				await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
 				return self._message_typesetting(7, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
 			else:  # 发生的情况是当前能量值和恢复能量值相加比需要消耗的能量值少
@@ -686,13 +688,12 @@ class GameManager:
 		tier_choice = (random.choices(tier_names, tier_weights))[0]
 		random_item = (random.choices(items[tier_choice]))[0]
 		try_result = await self.try_diamond(world,unique_id,0)
-		print("*"*10+random_item)
 		if random_item=="coin":
 			try_result = await self.try_coin(world,unique_id,int(self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]))
 		elif random_item=="energy":#can't work yet, matthow and houyao will merge energy problem
 			try_result = await self.try_energy(world,unique_id,int(self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]))
 			try_result["data"]["keys"]
-			return self._message_typesetting(0, 'get item success',{"remaining":{"keys": try_result["data"]["keys"], "values": try_result["data"]["keys"]},"reward":{"keys": [random_item], "values": [self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]]}})
+			return self._message_typesetting(0, 'get item success',{"remaining":{"keys": try_result["data"]["keys"], "values": try_result["data"]["values"]},"reward":{"keys": [random_item], "values": [self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]]}})
 		elif random_item=="diamond":
 			try_result = await self.try_diamond(world,unique_id,int(self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]))
 		elif random_item=="iron":
@@ -721,7 +722,7 @@ class GameManager:
 		# 3 - database operation error
 		# 4 - Insufficient material
 		# 5 - cost_item error
-		summon_kind = "pro"#this value control tiel
+		summon_kind = "basic"#this value control tiel
 		summon_item = "fortune_wheel"
 		if cost_item =="diamond":
 			result = await self.try_diamond(world,unique_id,-int(self.lottery[summon_item]["cost"]["diamond"])) #100 diamond should read from configuration
@@ -739,13 +740,12 @@ class GameManager:
 		tier_choice = (random.choices(tier_names, tier_weights))[0]
 		random_item = (random.choices(items[tier_choice]))[0]
 		try_result = await self.try_diamond(world,unique_id,0)
-		print("*"*10+random_item)
 		if random_item=="coin":
 			try_result = await self.try_coin(world,unique_id,int(self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]))
 		elif random_item=="energy":#can't work yet, matthow and houyao will merge energy problem
 			try_result = await self.try_energy(world,unique_id,int(self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]))
 			try_result["data"]["keys"]
-			return self._message_typesetting(0, 'get item success',{"remaining":{"keys": try_result["data"]["keys"], "values": try_result["data"]["keys"]},"reward":{"keys": [random_item], "values": [self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]]}})
+			return self._message_typesetting(0, 'get item success',{"remaining":{"keys": try_result["data"]["keys"], "values": try_result["data"]["values"]},"reward":{"keys": [random_item], "values": [self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]]}})
 		elif random_item=="diamond":
 			try_result = await self.try_diamond(world,unique_id,int(self.lottery["fortune_wheel"]["reward"][summon_kind][random_item]))
 		elif random_item=="iron":
@@ -946,9 +946,11 @@ class GameManager:
 		self._standard_reset_weapon_skill_coin_count = d['weapon']['standard_reset_weapon_skill_coin_count']
 		self._valid_passive_skills = d['weapon']['valid_passive_skills']
 		self.lottery = d['lottery']
+		#qin start
+		self._player = d['player']
+		#qin end
 
 	def _start_timer(self, seconds: int):
-		print("refresh time")
 		threading.Timer(seconds, self._refresh_configuration).start()
 
 
