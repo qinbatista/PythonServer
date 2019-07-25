@@ -14,12 +14,6 @@ from aiohttp import web
 from datetime import datetime, timedelta
 
 
-CONFIG = configparser.ConfigParser()
-r = requests.get('http://localhost:8000/get_server_version')
-version = r.json()['version']
-CONFIG.read(f'./Configuration/server/{version}/server.conf')
-
-
 
 class GameManager:
 	def __init__(self):
@@ -649,7 +643,9 @@ class GameManager:
 		self._lottery = d['lottery']
 
 	def _start_timer(self, seconds: int):
-		threading.Timer(seconds, self._refresh_configuration).start()
+		t = threading.Timer(seconds, self._refresh_configuration)
+		t.daemon = True
+		t.start()
 
 
 
@@ -660,7 +656,6 @@ class GameManager:
 #
 #############################################################################
 
-MANAGER = GameManager()  # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
 
 
@@ -676,190 +671,190 @@ def _json_response(body: dict = "", **kwargs) -> web.Response:
 @ROUTES.post('/get_all_head')
 async def __get_all_head(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.get_all_head(int(post['world']), post['table'])
+	result = await (request.app['MANAGER']).get_all_head(int(post['world']), post['table'])
 	return _json_response(result)
 
 @ROUTES.post('/get_all_material')
 async def __get_all_material(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.get_all_material(int(post['world']), post['unique_id'])
+	result = await (request.app['MANAGER']).get_all_material(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 @ROUTES.post('/get_all_supplies')
 async def __get_all_supplies(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.get_all_supplies(int(post['world']), post['unique_id'])
+	result = await (request.app['MANAGER']).get_all_supplies(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 @ROUTES.post('/add_supplies')
 async def __add_supplies(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.add_supplies(int(post['world']), post['unique_id'], post['supply'], int(post['value']))
+	result = await (request.app['MANAGER']).add_supplies(int(post['world']), post['unique_id'], post['supply'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/level_up_scroll')
 async def __level_up_scroll(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.level_up_scroll(int(post['world']), post['unique_id'], post['scroll_id'])
+	result = await (request.app['MANAGER']).level_up_scroll(int(post['world']), post['unique_id'], post['scroll_id'])
 	return _json_response(result)
 
 @ROUTES.post('/try_all_material')
 async def __try_all_material(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_all_material(int(post['world']), post['unique_id'], int(post['stage']))
+	result = await (request.app['MANAGER']).try_all_material(int(post['world']), post['unique_id'], int(post['stage']))
 	return _json_response(result)
 
 @ROUTES.post('/try_coin')
 async def __try_coin(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_coin(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_coin(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_iron')
 async def __try_iron(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_iron(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_iron(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_diamond')
 async def __try_diamond(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_diamond(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_diamond(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_experience')
 async def __try_experience(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_experience(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_experience(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_level')
 async def __try_level(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_level(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_level(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_role')
 async def __try_role(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_role(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_role(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_stage')
 async def __try_stage(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_stage(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_stage(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_skill_scroll_10')
 async def __try_skill_scroll_10(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_skill_scroll_10(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_skill_scroll_10(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_skill_scroll_30')
 async def __try_skill_scroll_30(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_skill_scroll_30(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_skill_scroll_30(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_skill_scroll_100')
 async def __try_skill_scroll_100(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_skill_scroll_100(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_skill_scroll_100(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_experience_potion')
 async def __try_experience_potion(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_experience_potion(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_experience_potion(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/try_small_energy_potion')
 async def __try_small_energy_potion(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_small_energy_potion(int(post['world']), post['unique_id'], int(post['value']))
+	result = await (request.app['MANAGER']).try_small_energy_potion(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
 @ROUTES.post('/level_up_skill')
 async def __level_up_skill(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.level_up_skill(int(post['world']), post['unique_id'], post['skill_id'], post['scroll_id'])
+	result = await (request.app['MANAGER']).level_up_skill(int(post['world']), post['unique_id'], post['skill_id'], post['scroll_id'])
 	return _json_response(result)
 
 @ROUTES.post('/get_all_skill_level')
 async def __get_all_skill_level(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.get_all_skill_level(int(post['world']), post['unique_id'])
+	result = await (request.app['MANAGER']).get_all_skill_level(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 @ROUTES.post('/get_skill')
 async def __get_skill(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.get_skill(int(post['world']), post['unique_id'], post['skill_id'])
+	result = await (request.app['MANAGER']).get_skill(int(post['world']), post['unique_id'], post['skill_id'])
 	return _json_response(result)
 
 @ROUTES.post('/try_unlock_skill')
 async def __try_unlock_skill(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_unlock_skill(int(post['world']), post['unique_id'], post['skill_id'])
+	result = await (request.app['MANAGER']).try_unlock_skill(int(post['world']), post['unique_id'], post['skill_id'])
 	return _json_response(result)
 
 @ROUTES.post('/level_up_weapon')
 async def __level_up_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.level_up_weapon(int(post['world']), post['unique_id'], post['weapon'], int(post['iron']))
+	result = await (request.app['MANAGER']).level_up_weapon(int(post['world']), post['unique_id'], post['weapon'], int(post['iron']))
 	return _json_response(result)
 
 @ROUTES.post('/level_up_passive')
 async def __level_up_passive(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.level_up_passive(int(post['world']), post['unique_id'], post['weapon'], post['passive'])
+	result = await (request.app['MANAGER']).level_up_passive(int(post['world']), post['unique_id'], post['weapon'], post['passive'])
 	return _json_response(result)
 
 
 @ROUTES.post('/level_up_weapon_star')
 async def __level_up_weapon_star(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.level_up_weapon_star(int(post['world']), post['unique_id'], post['weapon'])
+	result = await (request.app['MANAGER']).level_up_weapon_star(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
 
 @ROUTES.post('/reset_weapon_skill_point')
 async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
+	result = await (request.app['MANAGER']).reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
 
 @ROUTES.post('/get_all_weapon')
 async def __get_all_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.get_all_weapon(int(post['world']), post['unique_id'])
+	result = await (request.app['MANAGER']).get_all_weapon(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 @ROUTES.post('/try_unlock_weapon')
 async def __try_unlock_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.try_unlock_weapon(int(post['world']), post['unique_id'], post['weapon'])
+	result = await (request.app['MANAGER']).try_unlock_weapon(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
 
 @ROUTES.post('/pass_stage')
 async def __pass_stage(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.pass_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	result = await (request.app['MANAGER']).pass_stage(int(post['world']), post['unique_id'], int(post['stage']))
 	return _json_response(result)
 
 
 @ROUTES.post('/random_gift_skill')
 async def __random_gift_skill(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.random_gift_skill(int(post['world']), post['unique_id'])
+	result = await (request.app['MANAGER']).random_gift_skill(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 
 @ROUTES.post('/random_gift_segment')
 async def __random_gift_segment(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.random_gift_segment(int(post['world']), post['unique_id'])
+	result = await (request.app['MANAGER']).random_gift_segment(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 
@@ -870,13 +865,29 @@ async def __random_gift_segment(request: web.Request) -> web.Response:
 
 
 
+def get_config() -> configparser.ConfigParser:
+	'''
+	Fetches the server's configuration file from the config server.
+	Waits until the configuration server is online.
+	'''
+	while True:
+		try:
+			r = requests.get('http://localhost:8000/get_server_config_location')
+			parser = configparser.ConfigParser()
+			parser.read(r.json()['file'])
+			return parser
+		except requests.exceptions.ConnectionError:
+			print('Could not find configuration server, retrying in 5 seconds...')
+			time.sleep(5)
 
 
 
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port=CONFIG.getint('game_manager', 'port'))
+	config = get_config()
+	app['MANAGER'] = GameManager()
+	web.run_app(app, port=config.getint('game_manager', 'port'))
 
 
 if __name__ == '__main__':

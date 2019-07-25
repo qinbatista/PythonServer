@@ -4,24 +4,28 @@
 ###############################################################################
 
 
+import os
 import json
 import threading
 import configparser
 from aiohttp import web
 from datetime import datetime
 
-VERSION = './Configuration/config_timer_setting.json'
+def loc():
+	return os.path.dirname(os.path.realpath(__file__))
 
-MONSTER = './Configuration/client/{}/monster_config.json'
-REWARD_LIST = './Configuration/client/{}/stage_reward_config.json'
-ENEMY_LAYOUT = './Configuration/client/{}/level_enemy_layouts_config.json'
-HANG_REWARD = './Configuration/client/{}/hang_reward_config.json'
+VERSION = loc() + '/Configuration/config_timer_setting.json'
+
+MONSTER = loc() + '/Configuration/client/{}/monster_config.json'
+REWARD_LIST = loc() + '/Configuration/client/{}/stage_reward_config.json'
+ENEMY_LAYOUT = loc() + '/Configuration/client/{}/level_enemy_layouts_config.json'
+HANG_REWARD = loc() + '/Configuration/client/{}/hang_reward_config.json'
 
 
-MYSQL_DATA = './Configuration/server/{}/mysql_data_config.json'
-LOTTERY = './Configuration/server/{}/lottery.json'
-WEAPON = './Configuration/server/{}/weapon.json'
-SKILL = './Configuration/server/{}/skill.json'
+MYSQL_DATA = loc() + '/Configuration/server/{}/mysql_data_config.json'
+LOTTERY = loc() + '/Configuration/server/{}/lottery.json'
+WEAPON = loc() + '/Configuration/server/{}/weapon.json'
+SKILL = loc() + '/Configuration/server/{}/skill.json'
 
 class ConfigurationManager:
 	def __init__(self):
@@ -39,6 +43,10 @@ class ConfigurationManager:
 		self._read_hang_reward_config()
 		self._read_mysql_data_config()
 	
+
+	async def get_server_config_location(self):
+		return {'file' : loc() + '/Configuration/server/' + self._sv + '/server.conf'}
+
 	async def get_server_version(self):
 		return {'version' : self._sv}
 
@@ -97,7 +105,9 @@ class ConfigurationManager:
 
 
 	def _start_timer(self, seconds: int):
-		threading.Timer(seconds, self._refresh_configurations).start()
+		t = threading.Timer(seconds, self._refresh_configurations)
+		t.daemon = True
+		t.start()
 
 
 
@@ -151,6 +161,9 @@ async def __get_server_version(request: web.Request) -> web.Response:
 async def __get_client_version(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_client_version())
 
+@ROUTES.get('/get_server_config_location')
+async def __get_server_config_location(request: web.Request) -> web.Response:
+	return _json_response(await MANAGER.get_server_config_location())
 
 
 

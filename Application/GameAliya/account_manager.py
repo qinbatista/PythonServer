@@ -4,21 +4,17 @@
 ###############################################################################
 
 
-# Some safe default includes. Feel free to add more if you need.
+import time
 import json
 import random
 import tormysql
+import requests
 import configparser
 from aiohttp import web
 from aiohttp import ClientSession
 
 
-CONFIG = configparser.ConfigParser()
-CONFIG.read('Configuration/server/1.0/server.conf')
-
-
-TOKEN_SERVER_BASE_URL = 'http://localhost:' + CONFIG['token_server']['port']
-
+TOKEN_SERVER_BASE_URL = ''
 
 # Part (1 / 2)
 class AccountManager:
@@ -136,8 +132,8 @@ class AccountManager:
 
 
 # Part (2 / 2)
-MANAGER = AccountManager()  # we want to define a single instance of the class
 ROUTES = web.RouteTableDef()
+
 
 
 # Call this method whenever you return from any of the following functions.
@@ -154,28 +150,46 @@ def _json_response(body: dict = '', **kwargs) -> web.Response:
 @ROUTES.post('/login')
 async def __login(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = await MANAGER.login(post['identifier'], post['value'], post['password'])
+	data = await (request.app['MANAGER']).login(post['identifier'], post['value'], post['password'])
 	return _json_response(data)
 
 
 @ROUTES.post('/login_unique')
 async def __login(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = await MANAGER.login_unique(post['unique_id'])
+	data = await (request.app['MANAGER']).login_unique(post['unique_id'])
 	return _json_response(data)
 
 @ROUTES.post('/bind_account')
 async def __login(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = await MANAGER.bind_account(post['unique_id'], post['password'], post['account'], post['email'], post['phone_number'])
+	data = await (request.app['MANAGER']).bind_account(post['unique_id'], post['password'], post['account'], post['email'], post['phone_number'])
 	return _json_response(data)
 
 
+def get_config() -> configparser.ConfigParser:
+	'''
+	Fetches the server's configuration file from the config server.
+	Waits until the configuration server is online.
+	'''
+	while True:
+		try:
+			r = requests.get('http://localhost:8000/get_server_config_location')
+			parser = configparser.ConfigParser()
+			parser.read(r.json()['file'])
+			return parser
+		except requests.exceptions.ConnectionError:
+			print('Could not find configuration server, retrying in 5 seconds...')
+			time.sleep(5)
 
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	web.run_app(app, port = CONFIG.getint('account_manager', 'port'))
+	app['MANAGER'] = AccountManager()
+	config = get_config()
+	global TOKEN_SERVER_BASE_URL
+	TOKEN_SERVER_BASE_URL = 'http://localhost:' + config['token_server']['port']
+	web.run_app(app, port = config.getint('account_manager', 'port'))
 
 
 if __name__ == '__main__':
