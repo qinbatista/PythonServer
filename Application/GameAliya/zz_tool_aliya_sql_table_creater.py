@@ -38,7 +38,10 @@ def json_operating(table_name: str, table_attribute: list) -> None:
         json.dump(data, f, indent=4)
 
 
-def create_table(table_name: str, table_dict: dict) -> None:
+def sql_table_constructor(table_name: str, table_dict: dict) -> None:
+    """
+    mysql 表单构造器
+    """
     db = POOL.connection()
     cursor = db.cursor()
     sql_str = "CREATE TABLE %s(" % table_name
@@ -72,9 +75,10 @@ def create_player_table() -> None:
         "experience_potion": "INT(11) NULL DEFAULT(0) COMMENT '经验药水'",
         "small_energy_potion": "INT(11) NULL DEFAULT(0) COMMENT '小能量药水'",
         "recover_time": "VARCHAR(64) NULL DEFAULT '' COMMENT '恢复开始时间'",
+        "hang_stage": "INT(6) NULL DEFAULT(0) COMMENT '挂机的关卡'",
         "hang_up_time": "VARCHAR(64) NULL DEFAULT '' COMMENT '挂机开始时间'"
     }
-    create_table(table_name=table_name, table_dict=table_dict)
+    sql_table_constructor(table_name=table_name, table_dict=table_dict)
 
 
 def create_skill_table() -> None:
@@ -124,7 +128,7 @@ def create_skill_table() -> None:
         "g132_level": "TINYINT NULL DEFAULT(0) COMMENT '技能'",
         "g133_level": "TINYINT NULL DEFAULT(0) COMMENT '技能'"
     }
-    create_table(table_name=table_name, table_dict=table_dict)
+    sql_table_constructor(table_name=table_name, table_dict=table_dict)
 
 
 def create_weapon_table() -> None:
@@ -145,9 +149,9 @@ def create_weapon_table() -> None:
     }
     for i in range(1, 41):
         weapon_name = "weapon" + str(i)
-        create_table(table_name=weapon_name, table_dict=weapon_dict)  # 创建武器信息表
+        sql_table_constructor(table_name=weapon_name, table_dict=weapon_dict)  # 创建武器信息表
         table_dict.update({weapon_name: "SMALLINT(6) NULL DEFAULT(0) COMMENT '武器%s的星数'" % i})
-    create_table(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
+    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
 
 
 def create_user_table() -> None:
@@ -164,7 +168,7 @@ def create_user_table() -> None:
         "phone_number": "VARCHAR(32) NULL DEFAULT '' COMMENT '用户电话'",
         "avatar": "MEDIUMBLOB NULL DEFAULT(0x0) COMMENT '用户头像'"
     }
-    create_table(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
+    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
 
 
 def update_avatar(table_name: str, unique_id: str, img_path: str):  # png
@@ -191,9 +195,9 @@ def load_avatar(table_name:str, unique_id: str, img_path: str):
 
 if __name__ == '__main__':
     # 创建数据库表
-    # create_player_table()
-    # create_skill_table()
-    # create_weapon_table()
+    create_player_table()
+    create_skill_table()
+    create_weapon_table()
     create_user_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
