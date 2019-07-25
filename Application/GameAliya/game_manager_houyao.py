@@ -21,9 +21,12 @@ STAGE_JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
 HANG_JSON_NAME = "./Configuration/client/1.0/hang_reward_config.json"
 WEAPON_JSON_NAME = "./Configuration/server/1.0/weapon.json"
 LOTTERY_JSON_NAME = "./Configuration/server/1.0/lottery.json"
+ENTRY_JSON_NAME = "./Configuration/server/1.0/entry_consumables_config.json"
 #  houyao 2019-07-24 12:26:00 修改了JSON_NAME ===> STAGE_JSON_NAME
 #  houyao 2019-07-24 12:26:00 添加了HANG_JSON_NAME
 #  houyao 2019-07-24 17:14:00 添加了WEAPON_JSON_NAME
+#  houyao 2019-07-24 18:14:00 添加了LOTTERY_JSON_NAME
+#  houyao 2019-07-25 11:14:00 添加了ENTRY_JSON_NAME
 
 SKILL_ID_LIST = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level",
                  "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level",
@@ -57,8 +60,10 @@ class GameManager:
 		self._read_lottery_configuration()
 
 		self._hang_reward_list = self._read_json_data(path=HANG_JSON_NAME)
+		self._entry_consumables_list = self._read_json_data(path=ENTRY_JSON_NAME)
 		#  houyao 2019-07-24 12:26:00 修改了self._stage_reward_list
 		#  houyao 2019-07-24 12:26:00 添加了self._hang_reward_list
+		#  houyao 2019-07-25 11:26:00 添加了self._entry_consumables_list
 
 	#############################################################################
 	#						 Bag Module Functions								#
@@ -677,6 +682,7 @@ class GameManager:
 		# 0 - hang up success
 		# 1 - Repeated hang up successfully
 		# 2 - database operating error
+		# 9 - Parameter error
 		1分钟奖励有可能奖励1颗钻石，30颗金币，10个铁
 		minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
 		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
@@ -686,8 +692,8 @@ class GameManager:
 		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
 		key_list = await self._execute_statement(world=world, statement=sql_str)
 		hang_up_time, hang_stage = key_list[0]
-		print("hang_up_time:" + hang_up_time)
-		print("hang_stage:" + str(hang_stage))
+		print("[start_hang_up] -> hang_up_time:" + hang_up_time)
+		print("[start_hang_up] -> hang_stage:" + str(hang_stage))
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		if hang_up_time == "":
 			# 下面的功能是将奖励拿出来，并且将数据库剩余的值发送给客户端
@@ -697,8 +703,8 @@ class GameManager:
 			key_word = ["hang_stage", "hang_up_time"]
 			keys = list(material_dict.keys())
 			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
-			print("update_str:" + update_str)
-			print("select_str:" + select_str)
+			print("[start_hang_up] -> update_str:" + update_str)
+			print("[start_hang_up] -> select_str:" + select_str)
 			if await self._execute_statement_update(world=world, statement=update_str) == 0:
 				return self._message_typesetting(status=2, message="database operating error")
 			data = await self._execute_statement(world=world, statement=select_str)
@@ -717,9 +723,9 @@ class GameManager:
 
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 			minute = delta_time.seconds // 60
-			print("before hang_up_time:" + hang_up_time)
+			print("[start_hang_up] -> before hang_up_time:" + hang_up_time)
 			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
-			print("after  hang_up_time:" + hang_up_time)
+			print("[start_hang_up] -> after  hang_up_time:" + hang_up_time)
 
 			for key in material_dict.keys():
 				if key not in key_word:
@@ -748,8 +754,8 @@ class GameManager:
 		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
 		key_list = await self._execute_statement(world=world, statement=sql_str)
 		hang_up_time, hang_stage = key_list[0]
-		print("hang_up_time:" + hang_up_time)
-		print("hang_stage:" + str(hang_stage))
+		print("[get_hang_up_reward] -> hang_up_time:" + hang_up_time)
+		print("[get_hang_up_reward] -> hang_stage:" + str(hang_stage))
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		if hang_up_time == "" or int(hang_stage) == 0:
 			return self._message_typesetting(status=1, message="Temporarily no on-hook record")
@@ -764,9 +770,9 @@ class GameManager:
 
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 			minute = delta_time.seconds // 60
-			print("before hang_up_time:" + hang_up_time)
+			print("[get_hang_up_reward] -> before hang_up_time:" + hang_up_time)
 			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
-			print("after  hang_up_time:" + hang_up_time)
+			print("[get_hang_up_reward] -> after  hang_up_time:" + hang_up_time)
 
 			for key in material_dict.keys():
 				if key not in key_word:
@@ -784,6 +790,27 @@ class GameManager:
 			# print("values:" + str(values))
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
 
+	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
+		"""
+		success ===> 0
+		# 0 - Settlement reward success
+		# 1 - Temporarily no on-hook record
+		# 9 - Parameter error
+		"""
+		if stage <= 0 or stage > int(await self._get_material(world=world,  unique_id=unique_id, material="stage")):
+			return self._message_typesetting(status=9, message="Parameter error")
+		material_dict = self._entry_consumables_list[stage]
+		print("[enter_stage] -> before material_dict:" + str(material_dict))
+		for key in material_dict.keys():
+			material_dict[key] = -material_dict[key]
+		print("[enter_stage] -> after  material_dict:" + str(material_dict))
+		data_dict = {}
+		for key in material_dict.keys():
+			data = await self._try_material(world=world, unique_id=unique_id, material=key, value=int(material_dict[key]))
+			if int(data["status"]) == 1:
+				return self._message_typesetting(status=1, message=key + " insufficient")
+			data_dict.update({key, data["remaining"]})
+		return self._message_typesetting(status=0, message="success", data={})
 	#  ##################################################################################
 	#  #########                                                                 ########
 	#  #########              houyao 2019-7-25 16:51 end                         ########
