@@ -433,7 +433,7 @@ class GameManager:
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		if hang_up_time == "":
 			# 下面的功能是将奖励拿出来，并且将数据库剩余的值发送给客户端
-			material_dict = self._hang_reward_list[hang_stage]
+			material_dict = self._hang_reward_list[str(hang_stage)]
 			material_dict.update({"hang_stage": stage})  # 用于数据库设置当前的挂机关卡
 			material_dict.update({"hang_up_time": current_time})  # 用于数据库设置的挂机开始时间
 			key_word = ["hang_stage", "hang_up_time"]
@@ -449,7 +449,7 @@ class GameManager:
 			# 此时的material_dict字典的值是给奖励列表的，
 			# 所以hang_stage是奖励之前的关卡，
 			# hang_up_time是之前挂起的开始时间
-			material_dict = self._hang_reward_list[hang_stage]
+			material_dict = self._hang_reward_list[str(hang_stage)]
 			material_dict.update({"hang_stage": hang_stage})
 			material_dict.update({"hang_up_time": hang_up_time})
 			key_word = ["hang_stage", "hang_up_time"]
@@ -492,7 +492,7 @@ class GameManager:
 			# 此时的material_dict字典的值是给奖励列表的，
 			# 所以hang_stage是奖励之前的关卡，
 			# hang_up_time是之前挂起的开始时间
-			material_dict = self._hang_reward_list[hang_stage]
+			material_dict = self._hang_reward_list[str(hang_stage)]
 			material_dict.update({"hang_stage": hang_stage})
 			material_dict.update({"hang_up_time": hang_up_time})
 			key_word = ["hang_stage", "hang_up_time"]
