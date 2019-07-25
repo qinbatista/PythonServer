@@ -247,72 +247,147 @@ class TestGameManager(unittest.TestCase):
 		self.assertEqual(response['status'], 9)
 
 	def test_can_level_up_passive(self):
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon1 = "1" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET skill_point = "10" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_1_level = "2" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'level_up_passive', 'data' : {'token' : TOKEN, 'weapon' : 'weapon1', 'passive' : 'passive_skill_1_level'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 0)
+		self.assertEqual(response['data']['values'][0], 'weapon1')
+		self.assertEqual(int(response['data']['values'][2]), 3)
+		self.assertEqual(int(response['data']['values'][6]), 9)
 
 	def test_cannot_level_up_passive_without_having_weapon(self):
-		# status 1
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon1 = "0" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET skill_point = "10" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_1_level = "2" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'level_up_passive', 'data' : {'token' : TOKEN, 'weapon' : 'weapon1', 'passive' : 'passive_skill_1_level'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 1)
 
 	def test_cannot_level_up_passive_insufficient_skill_point(self):
-		# status 2
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon1 = "1" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET skill_point = "0" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_1_level = "2" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'level_up_passive', 'data' : {'token' : TOKEN, 'weapon' : 'weapon1', 'passive' : 'passive_skill_1_level'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 2)
 
 	def test_cannot_level_up_passive_skill_doesnt_exist(self):
-		# status 9
-		pass
+		msg = {'world' : '0', 'function' : 'level_up_passive', 'data' : {'token' : TOKEN, 'weapon' : 'weapon1', 'passive' : 'doesnt exist passive skill'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 9)
 
 	def test_can_level_up_weapon_star(self):
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon1 = "1" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET segment = "100" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'level_up_weapon_star', 'data' : {'token' : TOKEN, 'weapon' : 'weapon1'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 0)
+		self.assertEqual(int(response['data']['values'][-1]), 2)
+		self.assertEqual(int(response['data']['values'][7]), 40)
 
 	def test_cannot_level_up_weapon_star_insufficient_material(self):
-		# status 2
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon1 = "1" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET segment = "0" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'level_up_weapon_star', 'data' : {'token' : TOKEN, 'weapon' : 'weapon1'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 2)
 
 	def test_can_reset_weapon_skill_point(self):
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon1 = "1" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET weapon_level = "10" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_1_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_2_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_3_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_4_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET skill_point = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE player SET coin = "1000" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'reset_weapon_skill_point', 'data' : {'token' : TOKEN, 'weapon' : 'weapon1'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 0)
+		self.assertEqual(int(response['data']['values'][-1]), 900)
+		self.assertEqual(int(response['data']['values'][2]), 0)
+		self.assertEqual(int(response['data']['values'][3]), 0)
+		self.assertEqual(int(response['data']['values'][4]), 0)
+		self.assertEqual(int(response['data']['values'][5]), 0)
+		self.assertEqual(int(response['data']['values'][6]), 10)
 
 	def test_cannot_reset_weapon_skill_point_for_weapon_dont_have(self):
-		# status 1
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon1 = "0" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET skill_point = "10" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_1_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_2_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_3_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_4_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE player SET coin = "1000" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'reset_weapon_skill_point', 'data' : {'token' : TOKEN, 'weapon' : 'weapon1'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 1)
 
 	def test_cannot_reset_weapon_skill_point_insufficient_material(self):
-		# status 2
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon1 = "1" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET skill_point = "10" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_1_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_2_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_3_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE weapon1 SET passive_skill_4_level = "2" WHERE unique_id = "4";')
+		self.cursor.execute('UPDATE player SET coin = "0" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'reset_weapon_skill_point', 'data' : {'token' : TOKEN, 'weapon' : 'weapon1'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 2)
 
 	def test_can_get_all_weapon(self):
-		pass
+		msg = {'world' : '0', 'function' : 'get_all_weapon', 'data' : {'token' : TOKEN}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 0)
 
 	def test_can_try_unlock_weapon(self):
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon2 = "0" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'try_unlock_weapon', 'data' : {'token' : TOKEN, 'weapon' : 'weapon2'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 0)
 
 	def test_can_try_unlock_weapon_already_exists(self):
-		# status 1
-		pass
+		self.cursor.execute('UPDATE weapon_bag SET weapon2 = "1" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'try_unlock_weapon', 'data' : {'token' : TOKEN, 'weapon' : 'weapon2'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 1)
 
-	def test_cannot_try_unlock_weapon_dont_have(self):
-		# status 2
-		pass
+	def test_cannot_try_unlock_invalid_weapon(self):
+		msg = {'world' : '0', 'function' : 'try_unlock_weapon', 'data' : {'token' : TOKEN, 'weapon' : 'invalid weapon name'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 2)
 
 	def test_can_pass_stage(self):
-		pass
+		msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : TOKEN, 'stage' : '5'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 0)
 
 	def test_cannot_pass_stage_abnormal_data(self):
-		# status 9
-		pass
+		msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : TOKEN, 'stage' : '-5'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 9)
 
 	def test_can_random_gift_skill(self):
-		pass
-
-	def test_cannot_random_gift_skill_invalid_skill_name(self):
-		# status 2
-		pass
+		msg = {'world' : '0', 'function' : 'random_gift_skill', 'data' : {'token' : TOKEN}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertTrue(response['status'] == 0 or response['status'] == 1)
 
 	def test_can_random_gift_segment(self):
-		pass
-
-	def test_cannot_random_gift_segment_weapon_dont_have(self):
-		# status 2
-		pass
+		msg = {'world' : '0', 'function' : 'random_gift_segment', 'data' : {'token' : TOKEN}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertTrue(response['status'] == 0 or response['status'] == 1)
 
 
 
