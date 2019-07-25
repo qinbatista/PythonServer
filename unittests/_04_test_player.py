@@ -5,7 +5,7 @@ import configparser
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-GAME_MANAGER_BASE_URL = 'http://localhost:8888'
+GAME_MANAGER_BASE_URL = 'http://localhost:8004'
 
 
 
@@ -30,7 +30,7 @@ def level_up_weapon():
 
 
 def pass_stage():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_stage', data={'unique_id': "4", "stage": 2})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_stage', data={'world':0, 'unique_id': "4", "stage": 2, "customs_clearance_time": "2019-07-25 18:34:53"})
 	print(str(result.text))
 
 
@@ -95,7 +95,7 @@ def try_energy():
 
 
 def start_hang_up():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/start_hang_up', data={"world": 0,'unique_id': "4", "stage": "7"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/start_hang_up', data={"world": 0,'unique_id': "4", "stage": "1"})
 	print(str(result.text))
 
 
@@ -104,12 +104,17 @@ def get_hang_up_reward():
 	print(str(result.text))
 
 
+def enter_stage():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': 1})
+	print(str(result.text))
+
+
 if __name__ == "__main__":
 	# try_remove_coin()
 	# try_remove_iron()
 	# try_remove_diamond()
 	# level_up_weapon()
-	# pass_stage()
+	pass_stage()
 	# get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
@@ -121,6 +126,7 @@ if __name__ == "__main__":
 	# reset_weapon_skill_point()
 	# level_up_weapon_star()
 	# try_all_material()
-	try_energy()
+	# try_energy()
 	# start_hang_up()
 	# get_hang_up_reward()
+	# enter_stage()
