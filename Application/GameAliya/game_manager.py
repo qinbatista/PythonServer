@@ -56,7 +56,7 @@ class GameManager:
 		data_tuple = (await self.get_all_head(world, table="player"))["remaining"]
 		heads = []
 		for col in data_tuple:
-				heads.append(col[0])
+			heads.append(col[0])
 		content = list((await self.get_all_material(world, unique_id=unique_id))["remaining"])
 		heads.pop(0)
 		content.pop(0)
@@ -67,7 +67,7 @@ class GameManager:
 		if value <= 0: return self._message_typesetting(9, "not a positive number")
 		data = await self._try_material(world, unique_id, supply, value)
 		if data["status"] == 0:
-				return self._message_typesetting(0, "success", {"keys": [supply], "values": [data["remaining"]]})
+			return self._message_typesetting(0, "success", {"keys": [supply], "values": [data["remaining"]]})
 		return self._message_typesetting(1, "failure")
 
 	async def level_up_scroll(self, world: int, unique_id: str, scroll_id: str) -> dict:
@@ -297,7 +297,7 @@ class GameManager:
 
 	async def level_up_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Weapon upgrade success
-		# - 2 - insufficient gold coins, upgrade failed
+		# - 2 - insufficient segment, upgrade failed
 		# - 3 - database operation error!
 		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
 		head = [x[0] for x in data_tuple]
@@ -378,9 +378,9 @@ class GameManager:
 			if star != 0:
 				segment = await self._get_segment(world, unique_id, weapon) + 30
 				await self._set_segment_by_id(world, unique_id, weapon, segment)
-				return self._message_typesetting(0, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'segment'], "values": [weapon, segment]})
+				return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'segment'], "values": [weapon, segment]})
 			await self._set_weapon_star(world, unique_id, weapon, 1)
-			return self._message_typesetting(1, 'Unlocked new weapon!', {"keys": ["weapon"], "values": [weapon]})
+			return self._message_typesetting(0, 'Unlocked new weapon!', {"keys": ["weapon"], "values": [weapon]})
 		except:
 			return self._message_typesetting(2, 'no weapon!')
 
@@ -438,8 +438,8 @@ class GameManager:
 		# 1 - you received a free scroll    {"skill_scroll_id": skill_scroll_id, "value": value}
 		# 2 - invalid skill name
 		# 3 - database operation error
-		tier_choice = (random.choices(self._lottery['skill']['names'], self._lottery['skill']['weights']))[0]
-		gift_skill  = (random.choices(self._lottery['skill']['items'][tier_choice]))[0]
+		tier_choice = (random.choices(self._lottery['skills']['names'], self._lottery['skills']['weights']))[0]
+		gift_skill  = (random.choices(self._lottery['skills']['items'][tier_choice]))[0]
 		data = await self.try_unlock_skill(world, unique_id, gift_skill)
 		status = int(data['status'])
 		if status == 0:
@@ -466,8 +466,8 @@ class GameManager:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
 		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
 		# - 2 - no weapon!
-		tier_choice = (random.choices(self._lottery['weapon']['names'], self._lottery['weapon']['weights']))[0]
-		gift_weapon = (random.choices(self._lottery['weapon']['items'][tier_choice]))[0]
+		tier_choice = (random.choices(self._lottery['weapons']['names'], self._lottery['weapons']['weights']))[0]
+		gift_weapon = (random.choices(self._lottery['weapons']['items'][tier_choice]))[0]
 		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
 
 
@@ -646,7 +646,7 @@ class GameManager:
 		self._standard_segment_count = d['weapon']['standard_segment_count']
 		self._standard_reset_weapon_skill_coin_count = d['weapon']['standard_reset_weapon_skill_coin_count']
 		self._valid_passive_skills = d['weapon']['valid_passive_skills']
-		self.lottery = d['lottery']
+		self._lottery = d['lottery']
 
 	def _start_timer(self, seconds: int):
 		threading.Timer(seconds, self._refresh_configuration).start()
