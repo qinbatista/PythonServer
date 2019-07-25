@@ -4,6 +4,7 @@
 ###############################################################################
 
 
+import re
 import time
 import json
 import random
@@ -22,6 +23,8 @@ class AccountManager:
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='user', charset='utf8')
+		self._password_re = re.compile(r'\A([a-zA-Z0-9]){6,}\Z')
+		self._account_re = re.compile(r'\A([a-zA-Z0-9])+([A-Za-z0-9_\-.@]){,24}\Z')
 
 
 	async def login(self, identifier: str, value: str, password: str) -> dict:
@@ -96,7 +99,16 @@ class AccountManager:
 		data = await self._execute_statement('SELECT token FROM info WHERE `' + identifier + '` = "' + value + '";')
 		return data[0][0]
 
+	def _is_valid_password(self, password: str) -> bool:
+		return bool(self._password_re.match(password))
+
+	def _is_valid_account_name(self, account: str) -> bool:
+		return bool(self._account_re.match(account))
+
 	async def _valid_credentials(self, identifier: str, value: str, password: str) -> bool:
+		if not self._is_valid_password(password): return False
+		if identifier == 'account':
+			if not self._is_valid_account_name(value): return False
 		p = await self._execute_statement('SELECT password FROM info WHERE `' + identifier + '` = "' + value + '";')
 		return (password,) in p
 
