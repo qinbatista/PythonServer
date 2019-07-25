@@ -421,6 +421,7 @@ class GameManager:
 		# 0 - hang up success
 		# 1 - Repeated hang up successfully
 		# 2 - database operating error
+		# 9 - Parameter error
 		1分钟奖励有可能奖励1颗钻石，30颗金币，10个铁
 		minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
 		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron

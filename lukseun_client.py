@@ -42,7 +42,6 @@ class LukseunClient:
 		response = await self._receive_response(reader)
 		writer.close()
 		decoded_message = self._decode_message(response)
-		if "token" in str(decoded_message): self.token = json.loads(decoded_message, encoding="utf-8")["data"]["token"]
 		if decoded_message != '':
 			return json.loads(decoded_message, encoding='utf-8')
 		return {}

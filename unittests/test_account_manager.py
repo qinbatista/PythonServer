@@ -55,27 +55,27 @@ class TestAccountManager(unittest.TestCase):
 
 	def test_login_account(self):
 		self.cursor.execute('DELETE FROM info WHERE unique_id = "test";')
-		self.cursor.execute('INSERT INTO info (unique_id, password, account) VALUES ("test", "pass", "test");')
+		self.cursor.execute('INSERT INTO info (unique_id, password, account) VALUES ("test", "passpass", "test");')
 		self.db.commit()
-		msg = {'function' : 'login', 'data' : {'identifier' : 'account', 'value' : 'test', 'password' : 'pass'}}
+		msg = {'function' : 'login', 'data' : {'identifier' : 'account', 'value' : 'test', 'password' : 'passpass'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
 
 	def test_login_email(self):
 		self.cursor.execute('DELETE FROM info WHERE unique_id = "test";')
-		self.cursor.execute('INSERT INTO info (unique_id, password, email) VALUES ("test", "pass", "email");')
+		self.cursor.execute('INSERT INTO info (unique_id, password, email) VALUES ("test", "passpass", "email");')
 		self.db.commit()
-		msg = {'function' : 'login', 'data' : {'identifier' : 'email', 'value' : 'email', 'password' : 'pass'}}
+		msg = {'function' : 'login', 'data' : {'identifier' : 'email', 'value' : 'email', 'password' : 'passpass'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
 
 	def test_login_phone_number(self):
 		self.cursor.execute('DELETE FROM info WHERE unique_id = "test";')
-		self.cursor.execute('INSERT INTO info (unique_id, password, phone_number) VALUES ("test", "pass", "888");')
+		self.cursor.execute('INSERT INTO info (unique_id, password, phone_number) VALUES ("test", "passpass", "888");')
 		self.db.commit()
-		msg = {'function' : 'login', 'data' : {'identifier' : 'phone_number', 'value' : '888', 'password' : 'pass'}}
+		msg = {'function' : 'login', 'data' : {'identifier' : 'phone_number', 'value' : '888', 'password' : 'passpass'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
@@ -93,6 +93,11 @@ class TestAccountManager(unittest.TestCase):
 		self.db.commit()
 		msg = {'function' : 'login', 'data' : {'identifier' : 'email', 'value' : 'doesntexist', 'password' : 'keepo'}}
 
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 1)
+
+	def test_cannot_login_null(self):
+		msg = {'function' : 'login', 'data' : {'identifier' : 'account', 'value' : '', 'password' : ''}}
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 1)
 
