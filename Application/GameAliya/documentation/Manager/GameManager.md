@@ -247,59 +247,6 @@ Status codes and meaning:
 
 
 
-## DANGEROUS 
-
-## ========   random\_gift\_skill   ========
-
-Gives a chance to unlock a new skill if it doesn't already exist. If it does exist, the user gets a free skill scroll instead.
-
-Status codes and meaning:
-
-- 0 - Success unlocked new skill
-- 1 - Success  或者 You already have that skill, you got a new scroll for free!
-- 2 - invalid skill name
-- 3 - database operation error
-
-##### Sample Request
-
-```json
-{
-	"world" : 0,
-	"function" : "random_gift_skill"
-	"data" : {
-				"token" : "TOKEN"
-			 }
-}
-```
-
-##### Sample Responses
-
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-				"keys": [skill_id],
-				"values": [skill_value]
-			 }
-}
-```
-
-```json
-{
-	"status" : "1",
-	"message": "You already have that skill, you get a new scroll for free",
-	"data" : {
-        		"keys": [skill_scroll_id],
-				"values": [scroll_skill_quantity]
-			 }
-}
-```
-
-
-
-
-
 
 ## ========   level\_up\_skill   ========
 
@@ -706,5 +653,128 @@ Status codes and meaning:
 
 
 
+## ========   basic\_summon   ========
+
+Attempts to summon using the basic chance range.
+
+Current valid cost items are the following: **diamond**
 
 
+Status codes and meaning:
+
+- 0 - Unlocked new skill or weapon
+- 1 - Received free scroll or segments
+- 2 - Invalid skill name
+- 3 - Database operation error
+- 4 - Insufficient material
+- 5 - Cost item error
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "basic_summon",
+	"data" : {
+				"token" : "TOKEN",
+				"cost_item" : "COST ITEM"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys": [ keys ],
+				"values" : [ values ]
+			 }
+}
+```
+
+
+## ========   pro\_summon   ========
+
+Attempts to summon using the pro chance range.
+
+Current valid cost items are the following: **diamond**
+
+
+Status codes and meaning:
+
+- 0 - Unlocked new skill or weapon
+- 1 - Received free scroll or segments
+- 2 - Invalid skill name
+- 3 - Database operation error
+- 4 - Insufficient material
+- 5 - Cost item error
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "pro_summon",
+	"data" : {
+				"token" : "TOKEN",
+				"cost_item" : "COST ITEM"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys": [ keys ],
+				"values" : [ values ]
+			 }
+}
+```
+
+
+
+## ========   friend\_summon   ========
+
+Attempts to summon using the friend chance range.
+
+Current valid cost items are the following: **diamond**
+
+
+Status codes and meaning:
+
+- 0 - Unlocked new skill or weapon
+- 1 - Received free scroll or segments
+- 2 - Invalid skill name
+- 3 - Database operation error
+- 4 - Insufficient material
+- 5 - Cost item error
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "friend_summon",
+	"data" : {
+				"token" : "TOKEN",
+				"cost_item" : "COST ITEM"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys": [ keys ],
+				"values" : [ values ]
+			 }
+}
+```
