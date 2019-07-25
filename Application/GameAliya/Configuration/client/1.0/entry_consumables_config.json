@@ -1,0 +1,47 @@
+{
+	"stage0":{
+		"iron": 0,
+		"coin": 0,
+		"energy": 0
+	},
+	"stage1":{
+		"iron": 10,
+		"coin": 30,
+		"energy": 1
+	},
+	"stage2":{
+		"iron": 20,
+		"coin": 60,
+		"energy": 1
+	},
+	"stage3":{
+		"iron": 30,
+		"coin": 90,
+		"energy": 1
+	},
+	"stage4":{
+		"iron": 40,
+		"coin": 120,
+		"energy": 1
+	},
+	"stage5":{
+		"iron": 50,
+		"coin": 150,
+		"energy": 2
+	},
+	"stage6":{
+		"iron": 60,
+		"coin": 180,
+		"energy": 2
+	},
+	"stage7":{
+		"iron": 70,
+		"coin": 210,
+		"energy": 2
+	},
+	"stage8":{
+		"iron": 80,
+		"coin": 240,
+		"energy": 2
+	}
+}
