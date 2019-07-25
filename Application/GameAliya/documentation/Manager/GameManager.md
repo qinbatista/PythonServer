@@ -778,3 +778,81 @@ Status codes and meaning:
 			 }
 }
 ```
+
+## ========   start\_hang\_up   ========
+
+Documentation needed. Author: HouYao
+
+
+Status codes and meaning:
+
+- 0 - Hang up success
+- 1 - Repeated hang up successfully
+- 2 - Database operation error
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "start_hang_up",
+	"data" : {
+				"token" : "TOKEN",
+				"stage" : int
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys": [ keys ],
+				"values" : [ values ],
+				"hang_rewards" : [ rewards ]
+			 }
+}
+```
+
+
+## ========   get\_hang\_up\_reward   ========
+
+Documentation needed. Author: HouYao
+
+
+Status codes and meaning:
+
+- 0 - Settlement reward success
+- 1 - Temporarily no on-hook record
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "get_hang_up_reward",
+	"data" : {
+				"token" : "TOKEN"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys": [ keys ],
+				"values" : [ values ],
+				"hang_rewards" : [ rewards ]
+			 }
+}
+```
+
+
+
+
+
