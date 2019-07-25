@@ -370,6 +370,8 @@ class TestGameManager(unittest.TestCase):
 		self.assertEqual(response['status'], 2)
 
 	def test_can_pass_stage(self):
+		self.cursor.execute('UPDATE player SET stage = "7" WHERE unique_id = "4";')
+		self.db.commit()
 		msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : TOKEN, 'stage' : '5'}}
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
@@ -379,15 +381,68 @@ class TestGameManager(unittest.TestCase):
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 9)
 
-	def test_can_random_gift_skill(self):
-		msg = {'world' : '0', 'function' : 'random_gift_skill', 'data' : {'token' : TOKEN}}
+	def test_can_basic_summon(self):
+		self.cursor.execute('UPDATE player SET diamond = "100" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'basic_summon', 'data' : {'token' : TOKEN, 'cost_item' : 'diamond'}}
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertTrue(response['status'] == 0 or response['status'] == 1)
 
-	def test_can_random_gift_segment(self):
-		msg = {'world' : '0', 'function' : 'random_gift_segment', 'data' : {'token' : TOKEN}}
+	def test_cannot_basic_summon_insufficient_material(self):
+		self.cursor.execute('UPDATE player SET diamond = "0" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'basic_summon', 'data' : {'token' : TOKEN, 'cost_item' : 'diamond'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 4)
+
+	def test_cannot_basic_summon_invalid_cost_item(self):
+		self.cursor.execute('UPDATE player SET diamond = "100" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'basic_summon', 'data' : {'token' : TOKEN, 'cost_item' : 'invalid cost item'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 5)
+
+	def test_can_pro_summon(self):
+		self.cursor.execute('UPDATE player SET diamond = "100" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'pro_summon', 'data' : {'token' : TOKEN, 'cost_item' : 'diamond'}}
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertTrue(response['status'] == 0 or response['status'] == 1)
+
+	def test_cannot_pro_summon_insufficient_material(self):
+		self.cursor.execute('UPDATE player SET diamond = "0" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'pro_summon', 'data' : {'token' : TOKEN, 'cost_item' : 'diamond'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 4)
+
+	def test_cannot_pro_summon_invalid_cost_item(self):
+		self.cursor.execute('UPDATE player SET diamond = "100" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'pro_summon', 'data' : {'token' : TOKEN, 'cost_item' : 'invalid cost item'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 5)
+
+	def test_can_friend_summon(self):
+		self.cursor.execute('UPDATE player SET diamond = "100" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'friend_summon', 'data' : {'token' : TOKEN, 'cost_item' : 'diamond'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertTrue(response['status'] == 0 or response['status'] == 1)
+
+	def test_cannot_friend_summon_insufficient_material(self):
+		self.cursor.execute('UPDATE player SET diamond = "0" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'friend_summon', 'data' : {'token' : TOKEN, 'cost_item' : 'diamond'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 4)
+
+	def test_cannot_friend_summon_invalid_cost_item(self):
+		self.cursor.execute('UPDATE player SET diamond = "100" WHERE unique_id = "4";')
+		self.db.commit()
+		msg = {'world' : '0', 'function' : 'friend_summon', 'data' : {'token' : TOKEN, 'cost_item' : 'invalid cost item'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertEqual(response['status'], 5)
 
 
 

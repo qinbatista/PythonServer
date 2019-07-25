@@ -188,6 +188,17 @@ class MessageHandler:
 		async with session.post(MANAGER_GAME_BASE_URL + '/try_unlock_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon' : message['data']['weapon']}) as resp:
 			return await resp.text()
 
+	async def _basic_summon(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+
+	async def _pro_summon(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+
+	async def _friend_summon(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
 
 DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 
@@ -216,8 +227,9 @@ FUNCTION_LIST = {
 	'get_all_weapon' : MessageHandler._get_all_weapon,
 	'try_unlock_weapon' : MessageHandler._try_unlock_weapon,
 	'pass_stage' : MessageHandler._pass_stage,
-	'random_gift_skill' : MessageHandler._random_gift_skill,
-	'random_gift_segment' : MessageHandler._random_gift_segment
+	'basic_summon' : MessageHandler._basic_summon,
+	'pro_summon' : MessageHandler._pro_summon,
+	'friend_summon' : MessageHandler._friend_summon
 
 
 
