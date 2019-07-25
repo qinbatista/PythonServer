@@ -98,6 +98,11 @@ def start_hang_up():
 	print(str(result.text))
 
 
+def get_hang_up_reward():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/get_hang_up_reward', data={"world": 0, 'unique_id': "4"})
+	print(str(result.text))
+
+
 if __name__ == "__main__":
 	# try_remove_coin()
 	# try_remove_iron()
@@ -116,4 +121,5 @@ if __name__ == "__main__":
 	# level_up_weapon_star()
 	# try_all_material()
 	# try_energy()
-	start_hang_up()
+	# start_hang_up()
+	get_hang_up_reward()
