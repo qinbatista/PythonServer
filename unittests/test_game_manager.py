@@ -444,6 +444,10 @@ class TestGameManager(unittest.TestCase):
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 5)
 
+	def test_can_start_hang_up(self):
+		msg = {'world' : '0', 'function' : 'start_hang_up', 'data' : {'token' : TOKEN, 'stage' : '5'}}
+		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
+		self.assertTrue(response['status'] == 0 or response['status'] == 1)
 
 
 

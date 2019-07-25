@@ -20,6 +20,7 @@ MONSTER = loc() + '/Configuration/client/{}/monster_config.json'
 REWARD_LIST = loc() + '/Configuration/client/{}/stage_reward_config.json'
 ENEMY_LAYOUT = loc() + '/Configuration/client/{}/level_enemy_layouts_config.json'
 HANG_REWARD = loc() + '/Configuration/client/{}/hang_reward_config.json'
+ENTRY_CONSUMABLES = loc() + '/Configuration/client/{}/entry_consumables_config.json'
 
 
 MYSQL_DATA = loc() + '/Configuration/server/{}/mysql_data_config.json'
@@ -36,12 +37,13 @@ class ConfigurationManager:
 
 	def _refresh_configurations(self):
 		self._read_version()
-		self._read_game_manager_config()
 		self._read_level_enemy_layouts_config()
 		self._read_monster_config()
 		self._read_stage_reward_config()
 		self._read_hang_reward_config()
 		self._read_mysql_data_config()
+		self._read_entry_consumables_config()
+		self._read_game_manager_config()
 	
 
 	async def get_server_config_location(self):
@@ -52,6 +54,9 @@ class ConfigurationManager:
 
 	async def get_client_version(self):
 		return {'version' : self._cv}
+
+	async def get_entry_consumables_config(self):
+		return self._entry_consumables_config
 
 	async def get_game_manager_config(self):
 		return self._game_manager_config
@@ -76,10 +81,13 @@ class ConfigurationManager:
 		lottery = json.load(open(LOTTERY.format(self._sv), encoding = 'utf-8'))
 		weapon = json.load(open(WEAPON.format(self._sv), encoding = 'utf-8'))
 		skill = json.load(open(SKILL.format(self._sv), encoding = 'utf-8'))
-		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill}
+		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config}
 
 	def _read_level_enemy_layouts_config(self):
 		self._level_enemy_layouts_config = json.load(open(ENEMY_LAYOUT.format(self._cv), encoding = 'utf-8'))
+
+	def _read_entry_consumables_config(self):
+		self._entry_consumables_config = json.load(open(ENTRY_CONSUMABLES.format(self._cv), encoding = 'utf-8'))
 
 	def _read_monster_config(self):
 		self._monster_config = json.load(open(MONSTER.format(self._cv), encoding = 'utf-8'))
@@ -165,6 +173,9 @@ async def __get_client_version(request: web.Request) -> web.Response:
 async def __get_server_config_location(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_server_config_location())
 
+@ROUTES.get('/get_entry_consumables_config')
+async def __get_entry_consumables_config(request: web.Request) -> web.Response:
+	return _json_response(await MANAGER.get_entry_consumables_config())
 
 
 
