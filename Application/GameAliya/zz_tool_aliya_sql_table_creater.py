@@ -174,7 +174,7 @@ def update_avatar(table_name: str, unique_id: str, img_path: str):  # png
     avatar = pymysql.Binary(open(img_path, "rb").read())
     db = POOL.connection()
     cursor = db.cursor()
-    cursor.execute("UPDATE %s SET avatar=%s WHERE unique_id=%s;" % (table_name, avatar, unique_id))
+    cursor.execute("UPDATE %s SET avatar=%s WHERE unique_id=%s;", (table_name, avatar, unique_id))
     db.commit()
 
 
@@ -184,7 +184,7 @@ def load_avatar(table_name:str, unique_id: str, img_path: str):
     """
     db = POOL.connection()
     cursor = db.cursor()
-    cursor.execute("SELECT avatar From %s  WHERE unique_id = %s" % (table_name, unique_id))
+    cursor.execute("SELECT avatar From %s  WHERE unique_id = %s;", (table_name, unique_id))
     with open(img_path, "wb") as f:
         f.write(cursor.fetchone()[0])
 
