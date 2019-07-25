@@ -200,6 +200,15 @@ class MessageHandler:
 		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 
+	async def _start_hang_up(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/start_hang_up', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
+			return await resp.text()
+
+	async def _get_hang_up_reward(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_hang_up_reward', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+
 DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 
 FUNCTION_LIST = {
@@ -229,7 +238,9 @@ FUNCTION_LIST = {
 	'pass_stage' : MessageHandler._pass_stage,
 	'basic_summon' : MessageHandler._basic_summon,
 	'pro_summon' : MessageHandler._pro_summon,
-	'friend_summon' : MessageHandler._friend_summon
+	'friend_summon' : MessageHandler._friend_summon,
+	'start_hang_up' : MessageHandler._start_hang_up,
+	'get_hang_up_reward' : MessageHandler._get_hang_up_reward
 
 
 

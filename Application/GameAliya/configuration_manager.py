@@ -36,12 +36,12 @@ class ConfigurationManager:
 
 	def _refresh_configurations(self):
 		self._read_version()
-		self._read_game_manager_config()
 		self._read_level_enemy_layouts_config()
 		self._read_monster_config()
 		self._read_stage_reward_config()
 		self._read_hang_reward_config()
 		self._read_mysql_data_config()
+		self._read_game_manager_config()
 	
 
 	async def get_server_config_location(self):
@@ -76,7 +76,7 @@ class ConfigurationManager:
 		lottery = json.load(open(LOTTERY.format(self._sv), encoding = 'utf-8'))
 		weapon = json.load(open(WEAPON.format(self._sv), encoding = 'utf-8'))
 		skill = json.load(open(SKILL.format(self._sv), encoding = 'utf-8'))
-		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill}
+		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config}
 
 	def _read_level_enemy_layouts_config(self):
 		self._level_enemy_layouts_config = json.load(open(ENEMY_LAYOUT.format(self._cv), encoding = 'utf-8'))
@@ -88,7 +88,8 @@ class ConfigurationManager:
 		self._stage_reward_config = json.load(open(REWARD_LIST.format(self._cv), encoding = 'utf-8'))
 
 	def _read_hang_reward_config(self):
-		self._hang_reward_config = json.load(open(HANG_REWARD.format(self._cv), encoding = 'utf-8'))
+		d = json.load(open(HANG_REWARD.format(self._cv), encoding = 'utf-8'))
+		self._hang_reward_config = [v for v in d.values()]
 
 	def _read_mysql_data_config(self):
 		self._mysql_data_config = json.load(open(MYSQL_DATA.format(self._sv), encoding = 'utf-8'))
