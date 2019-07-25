@@ -16,17 +16,17 @@ def loc():
 
 VERSION = loc() + '/Configuration/config_timer_setting.json'
 
-MONSTER = loc() + '/Configuration/client/{}/monster_config.json'
-REWARD_LIST = loc() + '/Configuration/client/{}/stage_reward_config.json'
 ENEMY_LAYOUT = loc() + '/Configuration/client/{}/level_enemy_layouts_config.json'
-HANG_REWARD = loc() + '/Configuration/client/{}/hang_reward_config.json'
-ENTRY_CONSUMABLES = loc() + '/Configuration/client/{}/entry_consumables_config.json'
+MONSTER = loc() + '/Configuration/client/{}/monster_config.json'
 
-
+REWARD_LIST = loc() + '/Configuration/server/{}/stage_reward_config.json'
+HANG_REWARD = loc() + '/Configuration/server/{}/hang_reward_config.json'
+ENTRY_CONSUMABLES = loc() + '/Configuration/server/{}/entry_consumables_config.json'
 MYSQL_DATA = loc() + '/Configuration/server/{}/mysql_data_config.json'
-LOTTERY = loc() + '/Configuration/server/{}/lottery.json'
-WEAPON = loc() + '/Configuration/server/{}/weapon.json'
-SKILL = loc() + '/Configuration/server/{}/skill.json'
+LOTTERY = loc() + '/Configuration/server/{}/lottery_config.json'
+WEAPON = loc() + '/Configuration/server/{}/weapon_config.json'
+SKILL = loc() + '/Configuration/server/{}/skill_level_up_config.json'
+PLAYER = loc() + '/Configuration/server/{}/player_config.json'
 
 class ConfigurationManager:
 	def __init__(self):

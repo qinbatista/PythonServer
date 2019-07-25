@@ -1,0 +1,10 @@
+{
+	"player" :
+	{
+		"energy":
+		{
+			"cool_time":"00:20:00",
+			"max_energy":"10"
+		}
+	}
+}
