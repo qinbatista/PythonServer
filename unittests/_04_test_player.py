@@ -5,7 +5,7 @@ import configparser
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-GAME_MANAGER_BASE_URL = 'http://localhost:8888'
+GAME_MANAGER_BASE_URL = 'http://localhost:8004'
 
 
 
@@ -104,6 +104,11 @@ def get_hang_up_reward():
 	print(str(result.text))
 
 
+def enter_stage():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': 1})
+	print(str(result.text))
+
+
 if __name__ == "__main__":
 	# try_remove_coin()
 	# try_remove_iron()
@@ -121,6 +126,7 @@ if __name__ == "__main__":
 	# reset_weapon_skill_point()
 	# level_up_weapon_star()
 	# try_all_material()
-	try_energy()
+	# try_energy()
 	# start_hang_up()
 	# get_hang_up_reward()
+	enter_stage()

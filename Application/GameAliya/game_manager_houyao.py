@@ -21,7 +21,7 @@ STAGE_JSON_NAME = "./Configuration/client/1.0/stage_reward_config.json"
 HANG_JSON_NAME = "./Configuration/client/1.0/hang_reward_config.json"
 WEAPON_JSON_NAME = "./Configuration/server/1.0/weapon.json"
 LOTTERY_JSON_NAME = "./Configuration/server/1.0/lottery.json"
-ENTRY_JSON_NAME = "./Configuration/server/1.0/entry_consumables_config.json"
+ENTRY_JSON_NAME = "./Configuration/client/1.0/entry_consumables_config.json"
 #  houyao 2019-07-24 12:26:00 修改了JSON_NAME ===> STAGE_JSON_NAME
 #  houyao 2019-07-24 12:26:00 添加了HANG_JSON_NAME
 #  houyao 2019-07-24 17:14:00 添加了WEAPON_JSON_NAME
@@ -790,30 +790,37 @@ class GameManager:
 			# print("values:" + str(values))
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
 
+	#  #########              houyao 2019-7-25 18:18                             ########
 	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		"""
 		success ===> 0
-		# 0 - Settlement reward success
-		# 1 - Temporarily no on-hook record
+		# 0 - success
+		# 1 - database operating error
+		# 2 - key insufficient
 		# 9 - Parameter error
 		"""
 		if stage <= 0 or stage > int(await self._get_material(world=world,  unique_id=unique_id, material="stage")):
 			return self._message_typesetting(status=9, message="Parameter error")
-		material_dict = self._entry_consumables_list[stage]
-		print("[enter_stage] -> before material_dict:" + str(material_dict))
-		for key in material_dict.keys():
-			material_dict[key] = -material_dict[key]
-		print("[enter_stage] -> after  material_dict:" + str(material_dict))
-		data_dict = {}
-		for key in material_dict.keys():
-			data = await self._try_material(world=world, unique_id=unique_id, material=key, value=int(material_dict[key]))
-			if int(data["status"]) == 1:
-				return self._message_typesetting(status=1, message=key + " insufficient")
-			data_dict.update({key, data["remaining"]})
-		return self._message_typesetting(status=0, message="success", data={})
+		keys = list(self._entry_consumables_list[stage].keys())
+		values = [-v for v in list(self._entry_consumables_list[stage].values())]
+
+		material_dict = {}
+		for i in range(len(keys)):
+			material_dict.update({keys[i]: values[i]})
+
+		update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict)
+		select_values = (await self._execute_statement(world=world, statement=select_str))[0]
+		for i in range(len(select_values)):
+			values[i] = int(values[i]) + int(select_values[i])
+			if values[i] < 0:
+				return self._message_typesetting(status=2, message="%s insufficient" % keys[i])
+
+		if await self._execute_statement_update(world=world, statement=update_str) == 0:
+			return self._message_typesetting(status=1, message="database operating error")
+		return self._message_typesetting(status=0, message="success", data={"keys": keys, "values": values})
 	#  ##################################################################################
 	#  #########                                                                 ########
-	#  #########              houyao 2019-7-25 16:51 end                         ########
+	#  #########              houyao 2019-7-25 20:51 end                         ########
 	#  #########                                                                 ########
 	#  ##################################################################################
 
@@ -1064,6 +1071,13 @@ async def __start_hang_up(request: web.Request) -> web.Response:
 async def __get_hang_up_reward(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await MANAGER.get_hang_up_reward(world=int(post['world']), unique_id=post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/enter_stage')
+async def __enter_stage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await MANAGER.enter_stage(world=int(post['world']), unique_id=post['unique_id'], stage=int(post['stage']))
 	return _json_response(result)
 	#  ##################################################################################
 	#  #########                                                                 ########
