@@ -1,18 +1,16 @@
 import json
 import pyDes
 import base64
+import requests
 import configparser
-import os
 
 # DESIv = '67891234'
 # DESKey = '6789123467891234'
 #
 # MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
-def PythonLocation():
-    return os.path.dirname(os.path.realpath(__file__))
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read(PythonLocation() + '/Configuration/server/1.0/server.conf')
+CONFIG.read(requests.get('http://localhost:8000/get_server_config_location').json()['file'])
 
 DESIv = CONFIG['message_handler']['DESIv']
 DESKey = CONFIG['message_handler']['DESKey']
