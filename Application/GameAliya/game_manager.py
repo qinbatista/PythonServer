@@ -93,6 +93,7 @@ class GameManager:
 		except:
 			return self._message_typesetting(4, 'parameter error!')
 
+	# TODO rename function - it is private and only called by pass_stage function
 	async def try_all_material(self, world: int, unique_id: str, stage: int) -> dict:
 		sql_stage = await self._get_material(world, unique_id, "stage")
 		if stage <= 0 or sql_stage + 1 < stage:
@@ -170,7 +171,6 @@ class GameManager:
 		elif scroll_id not in self._skill_scroll_functions:
 			return self._message_typesetting(3, 'Invalid scroll id')
 		resp = await eval('self.try_' + scroll_id + '(world, unique_id, -1)')
-		#resp = await self._skill_scroll_functions[scroll_id](world, unique_id, -1)
 		if resp['status'] == 1:
 			return self._message_typesetting(4, 'User does not have enough scrolls')
 		if not self._roll_for_upgrade(scroll_id):
@@ -363,6 +363,7 @@ class GameManager:
 		return self._message_typesetting(0, "gain success", {"keys": keys, "values": values})
 
 	
+	# TODO INTERNAL USE only?????
 	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
 		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
