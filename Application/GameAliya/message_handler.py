@@ -1,18 +1,16 @@
 import json
 import pyDes
 import base64
+import requests
 import configparser
-import os
 
 # DESIv = '67891234'
 # DESKey = '6789123467891234'
 #
 # MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
-def PythonLocation():
-    return os.path.dirname(os.path.realpath(__file__))
 
 CONFIG = configparser.ConfigParser()
-CONFIG.read(PythonLocation() + '/Configuration/server/1.0/server.conf')
+CONFIG.read(requests.get('http://localhost:8000/get_server_config_location').json()['file'])
 
 DESIv = CONFIG['message_handler']['DESIv']
 DESKey = CONFIG['message_handler']['DESKey']
@@ -96,27 +94,27 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _level_up_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_skill', data={'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
 
 	async def _get_all_skill_level(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_skill_level', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_skill_level', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_all_supplies(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_supplies', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_supplies', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _random_gift_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/random_gift_skill', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/random_gift_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _random_gift_segment(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/random_gift_segment', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/random_gift_segment', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_skill', data={'unique_id': message['data']['unique_id'], 'skill_id': message["data"]["skill_id"]}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id': message["data"]["skill_id"]}) as resp:
 			return await resp.text()
 
 	async def _update_energy(self, message: dict, session) -> str:
@@ -124,33 +122,33 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _level_up_scroll(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_scroll', data={'unique_id': message['data']['unique_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_scroll', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
 	
 	# region _01_Manager_Weapon.py
 	async def _level_up_weapon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_weapon', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'iron': message['data']['iron']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'iron': message['data']['iron']}) as resp:
 			return await resp.text()
 
 	async def _level_up_passive(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_passive', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'passive': message['data']['passive']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_passive', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'passive': message['data']['passive']}) as resp:
 			return await resp.text()
 
 	async def _reset_weapon_skill_point(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/reset_weapon_skill_point', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/reset_weapon_skill_point', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
 			return await resp.text()
 
 	async def _level_up_weapon_star(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_weapon_star', data={'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_weapon_star', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
 			return await resp.text()
 
 	async def _get_all_weapon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_weapon', data={'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 	# endregion
 	
 	async def _pass_stage(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pass_stage', data={'unique_id': message['data']['unique_id'], 'stage': message['data']['stage']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pass_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage': message['data']['stage']}) as resp:
 			return await resp.text()
 
 	async def _decrease_energy(self, message: dict, session) -> str:
@@ -163,47 +161,64 @@ class MessageHandler:
 
 	# 以后会删除这个方法
 	async def _add_supplies(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/add_supplies', data={'unique_id': message['data']['unique_id'], 'key': message['data']['key'], 'value': message['data']['value']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/add_supplies', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'supply': message['data']['supply'], 'value': message['data']['value']}) as resp:
+			return await resp.text()
+
+	async def _get_all_head(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_head', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'table' : message['data']['table']}) as resp:
+			return await resp.text()
+
+	async def _get_all_material(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_material', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _try_all_material(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/try_all_material', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
+			return await resp.text()
+
+	async def _try_coin(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/try_coin', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'value' : message['data']['value']}) as resp:
+			return await resp.text()
+
+	async def _try_unlock_skill(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/try_unlock_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id' : message['data']['skill_id']}) as resp:
+			return await resp.text()
+
+	async def _try_unlock_weapon(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/try_unlock_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon' : message['data']['weapon']}) as resp:
 			return await resp.text()
 
 
 DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 
 FUNCTION_LIST = {
-	#Manager_Weapon
-	'get_all_weapon': MessageHandler._get_all_weapon,
-	'level_up_passive': MessageHandler._level_up_passive,
-	'reset_weapon_skill_point': MessageHandler._reset_weapon_skill_point,
-	'level_up_weapon_star': MessageHandler._level_up_weapon_star,
-	'level_up_weapon': MessageHandler._level_up_weapon,
-
-	#Manager_weapon
-	# 'get_level_setting': MessageHandler._get_level_setting,
-
-	#Manager_Level
-
-	#Manager_skill
-
-	#Manager_PlayerState(player_state_module.py,bag_module.py,lottery_module,skill_module)
-	# 'decrease_energy': MessageHandler._decrease_energy,
-	# 'increase_energy': MessageHandler._increase_energy,
-
-	'random_gift_skill': MessageHandler._random_gift_skill,
-	'random_gift_segment': MessageHandler._random_gift_segment,
-	'level_up_skill': MessageHandler._level_up_skill,
-	'level_up_scroll': MessageHandler._level_up_scroll,
-	'pass_stage': MessageHandler._pass_stage,
-
-	'get_all_skill_level': MessageHandler._get_all_skill_level,
-	'get_skill': MessageHandler._get_skill,
-	'update_energy': MessageHandler._update_energy,
-	'get_all_supplies': MessageHandler._get_all_supplies,
-
-	'add_supplies': MessageHandler._add_supplies,
-
-	#Manager_account
+	# account_manager
 	'login': MessageHandler._login,
 	'login_unique': MessageHandler._login_unique,
 	'bind_account': MessageHandler._bind_account,
+
+	# game_manager
+	'get_all_head' : MessageHandler._get_all_head,
+	'get_all_material' : MessageHandler._get_all_material,
+	'get_all_supplies' : MessageHandler._get_all_supplies,
+	'add_supplies' : MessageHandler._add_supplies,
+	'level_up_scroll' : MessageHandler._level_up_scroll,
+	'try_all_material' : MessageHandler._try_all_material,
+	'try_coin' : MessageHandler._try_coin,
+	'level_up_skill' : MessageHandler._level_up_skill,
+	'get_all_skill_level' : MessageHandler._get_all_skill_level,
+	'get_skill' : MessageHandler._get_skill,
+	'try_unlock_skill' : MessageHandler._try_unlock_skill,
+	'level_up_weapon' : MessageHandler._level_up_weapon,
+	'level_up_passive' : MessageHandler._level_up_passive,
+	'level_up_weapon_star' : MessageHandler._level_up_weapon_star,
+	'reset_weapon_skill_point' : MessageHandler._reset_weapon_skill_point,
+	'get_all_weapon' : MessageHandler._get_all_weapon,
+	'try_unlock_weapon' : MessageHandler._try_unlock_weapon,
+	'pass_stage' : MessageHandler._pass_stage,
+	'random_gift_skill' : MessageHandler._random_gift_skill,
+	'random_gift_segment' : MessageHandler._random_gift_segment
+
+
 
 }

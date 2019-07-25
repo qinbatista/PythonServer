@@ -1,6 +1,8 @@
 import jwt
+import time
 import json
 import random
+import requests
 import configparser
 
 
@@ -39,6 +41,21 @@ class TokenServer:
 	def _message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
 		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
 
+def get_config() -> configparser.ConfigParser:
+	'''
+	Fetches the server's configuration file from the config server.
+	Waits until the configuration server is online.
+	'''
+	while True:
+		try:
+			r = requests.get('http://localhost:8000/get_server_config_location')
+			parser = configparser.ConfigParser()
+			parser.read(r.json()['file'])
+			return parser
+		except requests.exceptions.ConnectionError:
+			print('Could not find configuration server, retrying in 5 seconds...')
+			time.sleep(5)
+
 def _json_response(body: dict = '', **kwargs) -> web.Response:
 	'''
 	A simple wrapper for aiohttp.web.Response where we dumps body to json
@@ -68,8 +85,7 @@ def run():
 	app.add_routes(ROUTES)
 	app['MANAGER'] = TokenServer()
 
-	config = configparser.ConfigParser()
-	config.read('Configuration/server/1.0/server.conf')
+	config = get_config()
 
 	web.run_app(app, port = config.getint('token_server', 'port'))
 

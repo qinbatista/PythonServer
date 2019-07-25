@@ -40,7 +40,10 @@ Any function call that requires a valid token and does not supply one will recei
 
 Used to level up a particular weapon.
 Currently only supports leveling up a single weapon at a time.
-The "iron" field should provide the amount of iron that the client is willing to spend on leveling up their weapon. It currently takes 20 iron to level up a single time. If the client makes a request with '100' iron, they will attempt to level up 5 total times. The max level per weapon is level 100.
+The "iron" field should provide the amount of iron that the client is willing to spend on leveling up their weapon.
+It currently takes 20 iron to level up a single time.
+If the client makes a request with '100' iron, they will attempt to level up 5 total times.
+The max level per weapon is level 100.
 
 Status codes and meaning:
 
@@ -55,6 +58,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
+	"world" : 0,
 	"function" : "level_up_weapon",
 	"data" : {
     			"token" : "valid token here",
@@ -70,8 +74,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag,unique_id replaced with weapon ],
-				"item1" : ['iron', remaining_iron_after_upgrade]
+				"keys" : [ head ],
+				"values" : [ values ]
 			 }
 }
 ```
@@ -96,6 +100,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
+	"world" : 0,
 	"function" : "level_up_passive",
 	"data" : {
 				"token" : "valid token here",
@@ -111,7 +116,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag,unique_id replaced with weapon ]
+				"keys" : [ head ],
+				"values" : [ values ]
 			 }
 }
 ```
@@ -121,11 +127,13 @@ Status codes and meaning:
 
 ### reset\_weapon\_skill\_point
 
-Resets all weapon's skill points. All removed skill points are refunded to the user. Costs coins.
+Resets all weapon's skill points.
+All removed skill points are refunded to the user.
+Costs coins.
 
 Status codes and meaning:
 
-- 0 -Weapon reset skill point success
+- 0 - Weapon reset skill point success
 - 1 - User does not have that weapon
 - 2 - Insufficient gold coins, upgrade failed
 - 3 - Database operation error
@@ -135,6 +143,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
+	"world" : 0,
 	"function" : "reset_weapon_skill_point"
 	"data" : {
 				"token" : "TOKEN",
@@ -149,8 +158,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag，unique_id replaced with weapon ],
-				"item1" : ["coin", REMAINING_COINS]
+				"keys" : [ head ],
+				"values" : [ values ]
 			 }
 }
 ```
@@ -165,7 +174,6 @@ Levels up the weapon star of the specified weapon. Costs segments.
 Status codes and meaning:
 
 - 0 - Weapon upgrade success
-- 1 - User does not have that weapon
 - 2 - Insufficient segments, upgrade failed
 - 3 - database operation error!
 
@@ -174,7 +182,8 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
-	"function" : "level_up_weapon_star"
+	"world" : 0,
+	"function" : "level_up_weapon_star",
 	"data" : {
 				"token" : "valid token here",
 				"weapon": "WEAPON"
@@ -188,7 +197,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag and WEAPON_STAR ]
+				"keys" : [ head ],
+				"values" : [ values ]
 			 }
 }
 ```
@@ -208,6 +218,7 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
+	"world" : 0,
 	"function" : "get_all_weapon"
 	"data" : {
 				"token" : "valid token here"
@@ -221,12 +232,8 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "gain success",
 	"data" : {
-				"weapon_bag1" : [ entire row of weapon bag and weapon star ],
-        		"weapon_bag2" : [ entire row of weapon bag and weapon star ],
-        		...
-        		...
-        		...
-        		"weapon_bagN" : [ entire row of weapon bag and weapon star ]
+				"keys" : [ keys ],
+				"values" : [ values ]
 			 }
 }
 ```
@@ -248,7 +255,8 @@ Gives a chance to unlock a new skill if it doesn't already exist. If it does exi
 
 Status codes and meaning:
 
-- 0 - Success  或者 You already have that skill, you got a new scroll for free!
+- 0 - Success unlocked new skill
+- 1 - Success  或者 You already have that skill, you got a new scroll for free!
 - 2 - invalid skill name
 - 3 - database operation error
 
@@ -256,10 +264,10 @@ Status codes and meaning:
 
 ```json
 {
+	"world" : 0,
 	"function" : "random_gift_skill"
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
-				"token" : "TOKEN",
+				"token" : "TOKEN"
 			 }
 }
 ```
@@ -279,7 +287,7 @@ Status codes and meaning:
 
 ```json
 {
-	"status" : "0",
+	"status" : "1",
 	"message": "You already have that skill, you get a new scroll for free",
 	"data" : {
         		"keys": [skill_scroll_id],
@@ -290,61 +298,14 @@ Status codes and meaning:
 
 
 
-## DANGEROUS
-
-## ========   random\_gift\_segment   ========
-
-Gives the user a chance at getting random segments, or a new weapon.
-
-Status codes and meaning:
-
-- 0 - Unlocked new weapon
-- 0 - Weapon already unlocked, got free segment!
-- 1 - no weapon
-
-##### Sample Request
-
-```json
-{
-	"function" : "random_gift_segment"
-	"data" : {
-    			"world" : "str 1 or 2 or 3....",
-				"token" : "valid token here"
-			 }
-}
-```
-
-##### Sample Response 1
-
-```json
-{
-	"status" : "0",
-	"message": "Unlocked new weapon!",
-	"data" : {
-        		"keys": ["weapon"],
-              	"values": [weapon]
-             }
-}
-```
-
-##### Sample Response 2
-
-```json
-{
-	"status" : "0",
-	"message": "Weapon already unlocked, got free segment!",
-	"data" : {
-                "keys": ['weapon', 'segment'], 
-                "values": [weapon, segment]
-    		 }
-}
-```
 
 
 
-## ========   level_up_skill   ========
+## ========   level\_up\_skill   ========
 
-Consume a skill scroll for a chance to level up the given skill. The skill must already be unlocked (not level 0). Different tiers of skill scrolls provide different chances to successfully level up the skill. 
+Consume a skill scroll for a chance to level up the given skill.
+The skill must already be unlocked (not level 0).
+Different tiers of skill scrolls provide different chances to successfully level up the skill. 
 
 
 Status codes and meaning:
@@ -355,14 +316,16 @@ Status codes and meaning:
 - 4 - User does not have enough scrolls
 - 9 - Skill already at max level
 
-The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 depending upon whether or not the skill actually leveled up. A failure here does not mean a failed API call - it means that the scroll skill did not yield a level up. Different levels of scroll skills have different success rates.
+The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 depending upon whether or not the skill actually leveled up.
+A failure here does not mean a failed API call - it means that the scroll skill did not yield a level up.
+Different levels of scroll skills have different success rates.
 
 ##### Sample Request
 ```json
 {
+	"world" : 0,
 	"function" : "level_up_skill",
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
 				"token" : "TOKEN",
 				"skill_id" : "SKILL ID",
 				"scroll_id" : "SCROLL ID"
@@ -377,8 +340,7 @@ The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 dependi
 	"message": "success",
 	"data" : {
 				"keys": [skill_id, scroll_id],
-				"values" : [skill_level, scroll_quantity],
-				"upgrade" : "UPGRADE_SUCCESS"
+				"values" : [skill_level, scroll_quantity]
 			 }
 }
 ```
@@ -406,10 +368,10 @@ Status codes and meaning:
 
 ```json
 {
-	"function" : "level_up_scroll"
+	"world" : 0, 
+	"function" : "level_up_scroll",
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
-				"token" : "valid token here",
+				"token" : "TOKEN",
 				"scroll_id" : "SCROLL_ID"
 			 }
 }
@@ -443,7 +405,7 @@ Status codes and meaning:
 
 
 
-## ========   pass_stage   ========
+## ========   pass\_stage   ========
 
 Let the player enter the next stage and give the reward.
 
@@ -457,9 +419,9 @@ Status codes and meaning:
 
 ```json
 {
+	"world" : 0,
 	"function" : "pass_stage"
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
 				"token" : "TOKEN",
     			"stage" : "int"
 			 }
@@ -494,10 +456,10 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
+	"world" : 0,
 	"function" : "get_all_skill_level"
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
-				"token" : "TOKEN",
+				"token" : "TOKEN"
 			 }
 }
 ```
@@ -529,9 +491,9 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
+	"world" : 0,
 	"function" : "get_skill",
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
 				"token" : "TOKEN",
 				"skill_id" : "SKILL_ID"
 			 }
@@ -605,7 +567,7 @@ Status codes and meaning:
 
 
 
-## ========   get_all_supplies   ========
+## ========   get\_all\_supplies   ========
 
 获取player表中的所有属性及值，包括energy和recover_time，
 
@@ -617,9 +579,9 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
+	"world" : 0,
 	"function" : "get_all_supplies",
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
 				"token" : "TOKEN"
 			 }
 }
@@ -642,9 +604,9 @@ Status codes and meaning:
 
 ## DANGEROUS 
 
-## ========   add_supplies   ========
+## ========   add\_supplies   ========
 
-#### add_supplies  => coin or iron or diamond or ...
+#### add\_supplies  => coin or iron or diamond or ...
 
 Increases the user's material by the given amount.
 
@@ -657,12 +619,12 @@ Status codes and meaning:
 ##### Sample Request
 ```json
 {
-	"function" : "add_supplies"
+	"world" : 0,
+	"function" : "add_supplies",
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
-				"token" : "valid token here",
-				"key" : "material_name",
-				"value" : "material_value"
+				"token" : "TOKEN",
+				"supply" : "SUPPLY",
+				"value" : int
 			 }
 }
 ```
@@ -680,7 +642,67 @@ Status codes and meaning:
 ```
 
 
+## ========   get\_all\_head   ========
 
+Internal use function.
+
+Returns all the column names of the table specified. Performs no error checking.
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "get_all_head",
+	"data" : {
+				"table" : "TABLE NAME"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"remaining" : [ list of column names ]
+}
+```
+
+
+
+## ========   get\_all\_material   ========
+
+Internal use function.
+
+Returns all the items in the player bag for the specified player. Performs no error checking.
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "get_all_material",
+	"data" : {
+				"token" : "TOKEN"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"remaining" : [ list of values of items in bag ]
+}
+```
 
 
 
