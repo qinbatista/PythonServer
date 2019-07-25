@@ -421,22 +421,6 @@ class GameManager:
 	#						Stage Module Functions								#
 	#############################################################################
 
-	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
-		# success ===> 0
-		# 0 : passed customs ===> success
-		# 1 : database operation error
-		# 9 : abnormal data!
-		json_data = await self.try_all_material(world, unique_id, stage)
-		status = int(json_data["status"])
-		if status == 9:
-			return self._message_typesetting(9, "abnormal data!")
-		elif status == 1:
-			return self._message_typesetting(1, "database operation error")
-		else:
-			material_dict = json_data["remaining"][0]
-			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1],
-			        "rewards": list(material_dict.values())}
-			return self._message_typesetting(0, "passed customs!", data)
 
 	#############################################################################
 	#						End Stage Module Functions							#
@@ -818,6 +802,23 @@ class GameManager:
 		if await self._execute_statement_update(world=world, statement=update_str) == 0:
 			return self._message_typesetting(status=1, message="database operating error")
 		return self._message_typesetting(status=0, message="success", data={"keys": keys, "values": values})
+
+	async def pass_stage(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
+		# success ===> 0
+		# 0 : passed customs ===> success
+		# 1 : database operation error
+		# 9 : abnormal data!
+		print("customs_clearance_time:" + customs_clearance_time)
+		json_data = await self.try_all_material(world, unique_id, stage)
+		status = int(json_data["status"])
+		if status == 9:
+			return self._message_typesetting(9, "abnormal data!")
+		elif status == 1:
+			return self._message_typesetting(1, "database operation error")
+		else:
+			material_dict = json_data["remaining"][0]
+			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
+			return self._message_typesetting(0, "passed customs!", data)
 	#  ##################################################################################
 	#  #########                                                                 ########
 	#  #########              houyao 2019-7-25 20:51 end                         ########
@@ -1037,7 +1038,7 @@ async def __try_unlock_weapon(request: web.Request) -> web.Response:
 @ROUTES.post('/pass_stage')
 async def __pass_stage(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await MANAGER.pass_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	result = await MANAGER.pass_stage(int(post['world']), post['unique_id'], int(post['stage']), post["customs_clearance_time"])
 	return _json_response(result)
 
 

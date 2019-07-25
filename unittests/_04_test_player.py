@@ -30,7 +30,7 @@ def level_up_weapon():
 
 
 def pass_stage():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_stage', data={'unique_id': "4", "stage": 2})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_stage', data={'world':0, 'unique_id': "4", "stage": 2, "customs_clearance_time": "2019-07-25 18:34:53"})
 	print(str(result.text))
 
 
@@ -95,7 +95,7 @@ def try_energy():
 
 
 def start_hang_up():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/start_hang_up', data={"world": 0,'unique_id': "4", "stage": "7"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/start_hang_up', data={"world": 0,'unique_id': "4", "stage": "1"})
 	print(str(result.text))
 
 
@@ -114,7 +114,7 @@ if __name__ == "__main__":
 	# try_remove_iron()
 	# try_remove_diamond()
 	# level_up_weapon()
-	# pass_stage()
+	pass_stage()
 	# get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
@@ -129,4 +129,4 @@ if __name__ == "__main__":
 	# try_energy()
 	# start_hang_up()
 	# get_hang_up_reward()
-	enter_stage()
+	# enter_stage()
