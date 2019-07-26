@@ -9,7 +9,13 @@ import unittest
 import requests
 import lukseun_client
 
+db = pymysql.connect('192.168.1.102', 'root', 'lukseun', 'user')
+cursor = db.cursor()
+cursor.execute('UPDATE info SET account = "", password = "", email = "", phone_number = "" WHERE unique_id = "4";')
+db.commit()
+
 resp = requests.post('http://localhost:8005/login_unique', data = {'unique_id' : '4'})
+print('this is STATUS: ', resp.json()['status'])
 TOKEN = resp.json()['data']['token']
 
 class TestGameManager(unittest.TestCase):
