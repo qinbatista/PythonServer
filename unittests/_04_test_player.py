@@ -109,12 +109,17 @@ def enter_stage():
 	print(str(result.text))
 
 
+def disintegrate_weapon():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/disintegrate_weapon', data={"world": 0, 'unique_id': "4", 'weapon': 'weapon1'})
+	print(str(result.text))
+
+
 if __name__ == "__main__":
 	# try_remove_coin()
 	# try_remove_iron()
 	# try_remove_diamond()
 	# level_up_weapon()
-	pass_stage()
+	# pass_stage()
 	# get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
@@ -130,3 +135,4 @@ if __name__ == "__main__":
 	# start_hang_up()
 	# get_hang_up_reward()
 	# enter_stage()
+	disintegrate_weapon()
