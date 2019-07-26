@@ -355,6 +355,7 @@ Status codes and meaning:
 ## ========   pass\_stage   ========
 
 Let the player enter the next stage and give the reward.
+The clear\_time parameter is a string representing the time it took to clear the level.
 
 Status codes and meaning:
 
@@ -370,7 +371,8 @@ Status codes and meaning:
 	"function" : "pass_stage"
 	"data" : {
 				"token" : "TOKEN",
-    			"stage" : "int"
+    			"stage" : "int",
+				"clear_time" : "str"
 			 }
 }
 ```
@@ -852,6 +854,103 @@ Status codes and meaning:
 }
 ```
 
+
+## ========   fortune\_wheel\_basic   ========
+
+Documentation needed. Author: Qin
+
+Spin the wheel of fortune to get a reward. Chance level basic.
+
+Current valid cost items are the following: **diamond**
+
+
+Status codes and meaning:
+
+- 0 - get item success
+- 2 - invalid skill name
+- 3 - database operation error
+- 4 - insufficient material
+- 5 - cost item error
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "get_hang_up_reward",
+	"data" : {
+				"token" : "TOKEN",
+				"cost_item" : "COST_ITEM"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"remaining" : {
+					"keys" : [ COST_ITEM ],
+					"values" : [ remaining amount ]
+				},
+				"reward" : {
+					"keys" : [ head ],
+					"values" : [ values ]
+				}
+			 }
+}
+```
+
+
+## ========   fortune\_wheel\_pro   ========
+
+Documentation needed. Author: Qin
+
+Spin the wheel of fortune to get a reward. Chance level pro.
+
+Current valid cost items are the following: **diamond**
+
+
+Status codes and meaning:
+
+- 0 - get item success
+- 2 - invalid skill name
+- 3 - database operation error
+- 4 - insufficient material
+- 5 - cost item error
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "get_hang_up_reward",
+	"data" : {
+				"token" : "TOKEN",
+				"cost_item" : "COST_ITEM"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"remaining" : {
+					"keys" : [ COST_ITEM ],
+					"values" : [ remaining amount ]
+				},
+				"reward" : {
+					"keys" : [ head ],
+					"values" : [ values ]
+				}
+			 }
+}
+```
 
 
 

@@ -148,7 +148,7 @@ class MessageHandler:
 	# endregion
 	
 	async def _pass_stage(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pass_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage': message['data']['stage']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pass_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage': message['data']['stage'], 'clear_time' : message['data']['clear_time']}) as resp:
 			return await resp.text()
 
 	async def _decrease_energy(self, message: dict, session) -> str:
@@ -208,6 +208,22 @@ class MessageHandler:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_hang_up_reward', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
+	async def _enter_stage(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/enter_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
+			return await resp.text()
+
+	async def _fortune_wheel_basic(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/fortune_wheel_basic', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+
+	async def _fortune_wheel_pro(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/fortune_wheel_pro', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+
+
+###############################################################################
+
+
 
 DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 
@@ -240,7 +256,10 @@ FUNCTION_LIST = {
 	'pro_summon' : MessageHandler._pro_summon,
 	'friend_summon' : MessageHandler._friend_summon,
 	'start_hang_up' : MessageHandler._start_hang_up,
-	'get_hang_up_reward' : MessageHandler._get_hang_up_reward
+	'get_hang_up_reward' : MessageHandler._get_hang_up_reward,
+	'enter_stage' : MessageHandler._enter_stage,
+	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
+	'fortune_wheel_pro' : MessageHandler._fortune_wheel_pro
 
 
 
