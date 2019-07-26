@@ -1,0 +1,13 @@
+{
+	"servers": {
+		"server1" : {
+			"worlds" : "1-5"
+		},
+		"server2" : {
+			"worlds" : "6-8"
+		},
+		"server3" : {
+			"worlds" : "9-10"
+		}
+	}
+}
