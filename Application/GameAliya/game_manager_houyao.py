@@ -1049,6 +1049,9 @@ class GameManager:
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
 
 
+
+	async def exchange_item(self, cost_it, cost_value, exchange_id, exchange_value) -> dict:
+		pass
 	#  #########################  houyao 2019-07-26 12：49  ##########################
 
 
