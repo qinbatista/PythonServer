@@ -378,12 +378,12 @@ class TestGameManager(unittest.TestCase):
 	def test_can_pass_stage(self):
 		self.cursor.execute('UPDATE player SET stage = "7" WHERE unique_id = "4";')
 		self.db.commit()
-		msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : TOKEN, 'stage' : '5'}}
+		msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : TOKEN, 'stage' : '5', 'clear_time' : 'we dont care what this string is'}}
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
 
 	def test_cannot_pass_stage_abnormal_data(self):
-		msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : TOKEN, 'stage' : '-5'}}
+		msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : TOKEN, 'stage' : '-5', 'clear_time' : 'we dont care what this string is'}}
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 9)
 
@@ -454,6 +454,7 @@ class TestGameManager(unittest.TestCase):
 		msg = {'world' : '0', 'function' : 'start_hang_up', 'data' : {'token' : TOKEN, 'stage' : '5'}}
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertTrue(response['status'] == 0 or response['status'] == 1)
+
 
 
 

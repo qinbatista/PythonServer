@@ -466,7 +466,7 @@ class GameManager:
 			return self._message_typesetting(status=1, message="database operating error")
 		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
 
-	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
+	async def pass_stage(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
 		# success ===> 0
 		# 0 : passed customs ===> success
 		# 1 : database operation error
@@ -806,7 +806,7 @@ class GameManager:
 		elif cost_item == 'basic_summon_scroll':
 			result = await self.try_basic_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['basic_summon_scroll']))
 		elif cost_item == 'basic_summon_scroll_10_times':
-			result = await self.try_basic_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['basic_summon_scroll']))
+			result = await self.try_basic_summon_scroll(world, unique_id, -10 * int(self._lottery[summon_item]['cost']['basic_summon_scroll']))
 		else:
 			return self._message_typesetting(5, 'cost_item error')
 		if result['status'] != 0:
@@ -1188,7 +1188,7 @@ async def __try_unlock_weapon(request: web.Request) -> web.Response:
 @ROUTES.post('/pass_stage')
 async def __pass_stage(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).pass_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	result = await (request.app['MANAGER']).pass_stage(int(post['world']), post['unique_id'], int(post['stage']), post['clear_time'])
 	return _json_response(result)
 
 
