@@ -483,110 +483,6 @@ class GameManager:
 			return self._message_typesetting(0, "passed customs!", data)
 
 
-	async def start_hang_up(self, world: int, unique_id: str, stage: int) -> dict:
-		"""
-		success ===> 0 , 1
-		# 0 - hang up success
-		# 1 - Repeated hang up successfully
-		# 2 - database operating error
-		# 9 - Parameter error
-		1分钟奖励有可能奖励1颗钻石，30颗金币，10个铁
-		minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
-		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
-		"""
-		if stage <= 0 or stage > int(await self._get_material(world=world,  unique_id=unique_id, material="stage")):
-			return self._message_typesetting(status=9, message="Parameter error")
-		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
-		key_list = await self._execute_statement(world=world, statement=sql_str)
-		hang_up_time, hang_stage = key_list[0]
-		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		if hang_up_time == "":
-			# 下面的功能是将奖励拿出来，并且将数据库剩余的值发送给客户端
-			material_dict = self._hang_reward_list[str(hang_stage)]
-			material_dict.update({"hang_stage": stage})  # 用于数据库设置当前的挂机关卡
-			material_dict.update({"hang_up_time": current_time})  # 用于数据库设置的挂机开始时间
-			key_word = ["hang_stage", "hang_up_time"]
-			keys = list(material_dict.keys())
-			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
-			if await self._execute_statement_update(world=world, statement=update_str) == 0:
-				return self._message_typesetting(status=2, message="database operating error")
-			data = await self._execute_statement(world=world, statement=select_str)
-			values = list(data[0])
-
-			return self._message_typesetting(status=0, message="hang up success", data={"keys": keys, "values": values})
-		else:
-			# 此时的material_dict字典的值是给奖励列表的，
-			# 所以hang_stage是奖励之前的关卡，
-			# hang_up_time是之前挂起的开始时间
-			material_dict = self._hang_reward_list[str(hang_stage)]
-			material_dict.update({"hang_stage": hang_stage})
-			material_dict.update({"hang_up_time": hang_up_time})
-			key_word = ["hang_stage", "hang_up_time"]
-
-			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
-			minute = delta_time.seconds // 60
-			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
-
-			for key in material_dict.keys():
-				if key not in key_word:
-					material_dict[key] = int(material_dict[key]) * minute
-			keys, hang_rewards = list(material_dict.keys()), list(material_dict.values())
-
-			# 此时的material_dict中的数据是用于数据库操作的数据
-			material_dict.update({"hang_stage": stage})
-			material_dict.update({"hang_up_time": hang_up_time})
-
-			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
-			await self._execute_statement_update(world=world, statement=update_str)
-			data = await self._execute_statement(world=world, statement=select_str)
-			values = list(data[0])
-
-			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
-
-
-
-	async def get_hang_up_reward(self, world: int, unique_id: str) -> dict:
-		"""
-		success ===> 0
-		# 0 - Settlement reward success
-		# 1 - Temporarily no on-hook record
-		"""
-		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
-		key_list = await self._execute_statement(world=world, statement=sql_str)
-		hang_up_time, hang_stage = key_list[0]
-		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		if hang_up_time == "" or int(hang_stage) == 0:
-			return self._message_typesetting(status=1, message="Temporarily no on-hook record")
-		else:
-			# 此时的material_dict字典的值是给奖励列表的，
-			# 所以hang_stage是奖励之前的关卡，
-			# hang_up_time是之前挂起的开始时间
-			material_dict = self._hang_reward_list[str(hang_stage)]
-			material_dict.update({"hang_stage": hang_stage})
-			material_dict.update({"hang_up_time": hang_up_time})
-			key_word = ["hang_stage", "hang_up_time"]
-
-			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
-			minute = delta_time.seconds // 60
-			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
-
-			for key in material_dict.keys():
-				if key not in key_word:
-					material_dict[key] = int(material_dict[key]) * minute
-			keys, hang_rewards = list(material_dict.keys()), list(material_dict.values())
-
-			# 此时的material_dict中的数据是用于数据库操作的数据
-			material_dict.update({"hang_up_time": hang_up_time})
-
-			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
-			await self._execute_statement_update(world=world, statement=update_str)
-			data = await self._execute_statement(world=world, statement=select_str)
-			values = list(data[0])
-
-			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
-
-
-
 	#############################################################################
 	#						End Stage Module Functions							#
 	#############################################################################
@@ -1013,25 +909,24 @@ class GameManager:
 		diamond_data = await self.try_diamond(world=world, unique_id=unique_id, value=-1*int(cost["diamond"]))
 		if int(diamond_data["status"]) == 1:
 			return self._message_typesetting(status=2, message="Insufficient diamond")
-		weapon_segment = weapon
+		reward_weapon_name = weapon
 		for i in range(len(weapon_tier)):
 			if weapon in weapon_tier[i]:
 				key = random.randint(0, len(weapon_tier[i]) - 1)
 				print("weapon: %s, weapon_tier[i][key]: %s" % (weapon, weapon_tier[i][key]))
 				while weapon == weapon_tier[i][key]:
 					key = random.randint(0, len(weapon_tier[i]) - 1)
-				weapon_segment = weapon_tier[i][key]  # 增加武器碎片的武器
+				reward_weapon_name = weapon_tier[i][key]  # 增加武器碎片的武器
 				break
-		if weapon == weapon_segment:
+		if weapon == reward_weapon_name:
 			return self._message_typesetting(status=3, message="self._player not updated")
 		#  数据库操作
 		star_code = await self._set_weapon_star(world=world, unique_id=unique_id, weapon=weapon, star=0)  # 武器星数至0
 
-
 		reward_weapon_segment = star * int(reward["segment"])  # 计算奖励武器的碎片数量
 		#  构造更新语句和查询语句
-		update_str = "update %s set segment=segment+%s where unique_id='%s'" % (weapon_segment, reward_weapon_segment, unique_id)
-		select_str = "select segment from %s where unique_id='%s'" % (weapon_segment, unique_id)
+		update_str = "update %s set segment=segment+%s where unique_id='%s'" % (reward_weapon_name, reward_weapon_segment, unique_id)
+		select_str = "select segment from %s where unique_id='%s'" % (reward_weapon_name, unique_id)
 		update_code = await self._execute_statement_update(world=world, statement=update_str)
 
 		select_result = await self._execute_statement(world=world, statement=select_str)  # 获取含有碎片的查询的结果
@@ -1039,16 +934,120 @@ class GameManager:
 		if star_code == 0 or update_code == 0 or int(coin_data["status"]) == 1:
 			return self._message_typesetting(status=4, message="database operating error ==> update_code: %s, star_code: %s, json_status: %s" % (update_code, star_code, coin_data["status"]))
 		data = {
-			"diamond": diamond_data["remaining"],  # player表中的钻石剩余数量
-			"weapon": weapon,  # 武器分解的名字
-			"weapon_star": 0, # 武器分解之后的星数
-			"reward_weapon": weapon_segment,  # 同等级的武器的名字
-			"reward_weapon_segment": reward_weapon_segment,  # 同等级的武器的名字  -->  奖励的碎片数量
-			"weapon_segment": select_result[0][0],  # 同等级的武器的名字  -->  碎片的剩余数量
-			"coin": coin_data["remaining"]  # player表中金币的剩余数量
+			"remaing": {
+				"cost_weapon_name": weapon,  # 武器分解的名字
+				"cost_weapon_star": 0,  # 武器分解之后的星数
+				"coin": coin_data["remaining"],  # player表中金币的剩余数量
+				"diamond": diamond_data["remaining"],  # player表中钻石的剩余数量
+				"reward_weapon_name": reward_weapon_name,  # 奖励碎片的武器名字
+				"reward_weapon_segment": select_result[0][0]  # 碎片的剩余数量
+			},
+			"reward": {
+				"coin": reward["coin"],  # 分解武器奖励的金币
+				"reward_weapon_name": reward_weapon_name,  # 奖励碎片的武器名字
+				"reward_weapon_segment": reward_weapon_segment  # 奖励碎片的数量
+			}
 		}
-		return self._message_typesetting(status=0, message="Successful weapon decomposition", data={"keys": list(data.keys()), "values": list(data.values())})
+		return self._message_typesetting(status=0, message="Successful weapon decomposition", data=data)
 		# except: return self._message_typesetting(status=9, message="Wrong name of weapon")
+
+	async def start_hang_up(self, world: int, unique_id: str, stage: int) -> dict:
+		"""
+		success ===> 0 , 1
+		# 0 - hang up success
+		# 1 - Repeated hang up successfully
+		# 2 - database operating error
+		# 9 - Parameter error
+		1分钟奖励有可能奖励1颗钻石，30颗金币，10个铁
+		minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
+		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
+		"""
+		if stage <= 0 or stage > int(await self._get_material(world=world,  unique_id=unique_id, material="stage")):
+			return self._message_typesetting(status=9, message="Parameter error")
+		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
+		key_list = await self._execute_statement(world=world, statement=sql_str)
+		hang_up_time, hang_stage = key_list[0]
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		# 此时的material_dict字典的值是给奖励列表的，
+		# 所以hang_stage是奖励之前的关卡，
+		# hang_up_time是之前挂起的开始时间
+		material_dict = {}
+		for key, value in self._hang_reward_list[str(hang_stage)].items():
+			material_dict.update({key: value})
+		material_dict.update({"hang_stage": hang_stage})
+		material_dict.update({"hang_up_time": hang_up_time})
+		key_word = ["hang_stage", "hang_up_time"]
+		if hang_up_time == "":
+			# 下面的功能是将奖励拿出来，并且将数据库剩余的值发送给客户端
+			keys = list(material_dict.keys())
+			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
+			if await self._execute_statement_update(world=world, statement=update_str) == 0:
+				return self._message_typesetting(status=2, message="database operating error")
+			data = await self._execute_statement(world=world, statement=select_str)
+			values = list(data[0])
+			return self._message_typesetting(status=0, message="hang up success", data={"keys": keys, "values": values})
+		else:
+			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
+			minute = delta_time.seconds // 60
+			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+
+			for key in material_dict.keys():
+				if key not in key_word:
+					material_dict[key] = int(material_dict[key]) * minute
+			keys, hang_rewards = list(material_dict.keys()), list(material_dict.values())
+
+			# 此时的material_dict中的数据是用于数据库操作的数据
+			material_dict.update({"hang_stage": stage})
+			material_dict.update({"hang_up_time": hang_up_time})
+
+			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
+			await self._execute_statement_update(world=world, statement=update_str)
+			data = await self._execute_statement(world=world, statement=select_str)
+			values = list(data[0])
+			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
+
+	async def get_hang_up_reward(self, world: int, unique_id: str) -> dict:
+		"""
+		success ===> 0
+		# 0 - Settlement reward success
+		# 1 - Temporarily no on-hook record
+		"""
+		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
+		key_list = await self._execute_statement(world=world, statement=sql_str)
+		hang_up_time, hang_stage = key_list[0]
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if hang_up_time == "" or int(hang_stage) == 0:
+			return self._message_typesetting(status=1, message="Temporarily no on-hook record")
+		else:
+			# 此时的material_dict字典的值是给奖励列表的，
+			# 所以hang_stage是奖励之前的关卡，
+			# hang_up_time是之前挂起的开始时间
+			material_dict = {}
+			for key, value in self._hang_reward_list[str(hang_stage)].items():
+				material_dict.update({key: value})
+			material_dict.update({"hang_stage": hang_stage})
+			material_dict.update({"hang_up_time": hang_up_time})
+			key_word = ["hang_stage", "hang_up_time"]
+
+			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
+			minute = delta_time.seconds // 60
+			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+
+			for key in material_dict.keys():
+				if key not in key_word:
+					material_dict[key] = int(material_dict[key]) * minute
+			keys, hang_rewards = list(material_dict.keys()), list(material_dict.values())
+
+			# 此时的material_dict中的数据是用于数据库操作的数据
+			material_dict.update({"hang_up_time": hang_up_time})
+
+			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
+			await self._execute_statement_update(world=world, statement=update_str)
+			data = await self._execute_statement(world=world, statement=select_str)
+			values = list(data[0])
+
+			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
+
 
 	#  #########################  houyao 2019-07-26 12：49  ##########################
 
