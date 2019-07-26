@@ -125,7 +125,7 @@ class AccountManager:
 			return False
 		return True
 
-	async def _phone_is_bound(Self, unique_id: str) -> bool:
+	async def _phone_is_bound(self, unique_id: str) -> bool:
 		data = await self._execute_statement('SELECT phone_number FROM info WHERE unique_id = "' + unique_id + '";')
 		if ('',) in data or () == data or (None,) in data:
 			return False
