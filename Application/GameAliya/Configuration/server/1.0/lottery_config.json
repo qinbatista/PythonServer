@@ -39,7 +39,7 @@
 		"cost":
 			{
 				"diamond":"100",
-				"forturn_wheel_ticket":"1"
+				"fortune_wheel_ticket":"1"
 			},
 		"names" : ["weapontier1", "weapontier2", "weapontier3", "weapontier4"],
 		"weights":
