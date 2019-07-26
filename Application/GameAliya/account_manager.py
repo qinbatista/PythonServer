@@ -24,7 +24,8 @@ class AccountManager:
 		# for as long as this class is alive.
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='user', charset='utf8')
 		self._password_re = re.compile(r'\A([a-zA-Z0-9_]){6,}\Z')
-		self._account_re = re.compile(r'\A([a-zA-Z0-9])+([A-Za-z0-9_\-.@]){,24}\Z')
+		self._account_re = re.compile(r'\A([a-zA-Z0-9])+([A-Za-z0-9_\-.@]){5,24}\Z')
+		self._email_re = re.compile(r'^\\s*([A-Za-z0-9_-]+(\\.\\w+)*@(\\w+\\.)+\\w{2,5})\\s*$')
 
 
 	async def login(self, identifier: str, value: str, password: str) -> dict:
@@ -105,10 +106,15 @@ class AccountManager:
 	def _is_valid_account_name(self, account: str) -> bool:
 		return bool(self._account_re.match(account))
 
+	def _is_valid_email(self, email: str) -> bool:
+		return bool(self._email_re.match(email))
+
 	async def _valid_credentials(self, identifier: str, value: str, password: str) -> bool:
 		if not self._is_valid_password(password): return False
 		if identifier == 'account':
 			if not self._is_valid_account_name(value): return False
+		elif identifier == 'email':
+			if not self._is_valid_email(value): return False
 		p = await self._execute_statement('SELECT password FROM info WHERE `' + identifier + '` = "' + value + '";')
 		return (password,) in p
 
