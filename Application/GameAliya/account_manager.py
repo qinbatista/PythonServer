@@ -25,7 +25,7 @@ class AccountManager:
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='user', charset='utf8')
 		self._password_re = re.compile(r'\A([a-zA-Z0-9_]){6,}\Z')
 		self._account_re = re.compile(r'\A([a-zA-Z0-9])+([A-Za-z0-9_\-.@]){5,24}\Z')
-		self._email_re = re.compile(r'^\\s*([A-Za-z0-9_-]+(\\.\\w+)*@(\\w+\\.)+\\w{2,5})\\s*$')
+		self._email_re = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
 
 
 	async def login(self, identifier: str, value: str, password: str) -> dict:
@@ -35,8 +35,13 @@ class AccountManager:
 		unique_id = await self._get_unique_id(identifier, value)
 		resp = await self._request_new_token(unique_id, await self._get_prev_token(identifier, value))
 		await self._register_token(unique_id, resp['token'])
+		account_email_phone = await self._get_account_email_phone(unique_id)
+		resp['account'] = account_email_phone[0]
+		resp['email'] = account_email_phone[1]
+		resp['phone_number'] = account_email_phone[2]
 		return self.message_typesetting(0, 'success', resp)
 
+	# TODO maybe check email and phone number
 	async def login_unique(self, unique_id: str) -> dict:
 		if not await self._check_exists('unique_id', unique_id):
 			await self._create_new_user(unique_id)
@@ -50,21 +55,58 @@ class AccountManager:
 		return self.message_typesetting(status, message, resp)
 
 	# TODO run check_exists as a task
+	# TODO refactor code for speed improvements
 	async def bind_account(self, unique_id: str, password: str, account: str, email: str, phone: str) -> dict:
-		is_bound = await self._account_is_bound(unique_id)
-		account_exists = await self._check_exists('account', account)
-		email_exists = await self._check_exists('email', email)
-		phone_exists = await self._check_exists('phone_number', phone)
-		if is_bound:
-			return self.message_typesetting(1, 'account already bound before')
-		if account_exists:
-			return self.message_typesetting(2, 'account name already exists')
-		if email_exists:
-			return self.message_typesetting(3, 'email already exists')
-		if phone_exists:
-			return self.message_typesetting(4, 'phone number already exists')
-		await self._bind_account(unique_id, password, account, email, phone)
+		if await self._account_is_bound(unique_id): # trying to bind additional items
+			if email != '':
+				if await self._email_is_bound(unique_id):
+					return self.message_typesetting(8, 'email already bound')
+				if await self._check_exists('email', email):
+					return self.message_typesetting(6, 'email already exists')
+				if not self._is_valid_email(email):
+					return self.message_typesetting(2, 'invalid email')
+
+			if phone != '':
+				if await self._phone_is_bound(unique_id):
+					return self.message_typesetting(9, 'phone already bound')
+				if await self._check_exists('phone_number', phone):
+					return self.message_typesetting(4, 'phone already exists')
+				if not self._is_valid_phone(phone):
+					return self.message_typesetting(3, 'invalid phone')
+
+			if email != '':
+				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
+			if phone != '':
+				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
+
+		else: # trying to bind for the first time
+			if not self._is_valid_account(account):
+				return self.message_typesetting(1, 'invalid account name')
+			if await self._check_exists('account', account):
+				return self.message_typesetting(5, 'account already exists')
+			if not self._is_valid_password(password):
+				return self.message_typesetting(4, 'invalid password')
+			
+			if email != '':
+				if await self._check_exists('email', email):
+					return self.message_typesetting(6, 'email already exists')
+				if not self._is_valid_email(email):
+					return self.message_typesetting(2, 'invalid email')
+
+			if phone != '':
+				if await self._check_exists('phone_number', phone):
+					return self.message_typesetting(7, 'phone already exists')
+				if not self._is_valid_phone(phone):
+					return self.message_typesetting(3, 'invalid phone')
+
+			await self._execute_statement('UPDATE info SET account = "' + account + '", password = "' + password + '" WHERE unique_id = "' + unique_id + '";')
+			if email != '':
+				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
+			if phone != '':
+				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
 		return self.message_typesetting(0, 'success')
+
+
 
 
 
@@ -72,6 +114,22 @@ class AccountManager:
 			####################################
 			#          P R I V A T E		   #
 			####################################
+
+	async def _get_account_email_phone(self, unique_id: str) -> tuple:
+		data = await self._execute_statement('SELECT account, email, phone_number FROM info WHERE unique_id = "' + unique_id + '";')
+		return data[0]
+
+	async def _email_is_bound(self, unique_id: str) -> bool:
+		data = await self._execute_statement('SELECT email FROM info WHERE unique_id = "' + unique_id + '";')
+		if ('',) in data or () == data or (None,) in data:
+			return False
+		return True
+
+	async def _phone_is_bound(Self, unique_id: str) -> bool:
+		data = await self._execute_statement('SELECT phone_number FROM info WHERE unique_id = "' + unique_id + '";')
+		if ('',) in data or () == data or (None,) in data:
+			return False
+		return True
 
 	#TODO return success or failure
 	async def _bind_account(self, unique_id: str, password: str, account: str, email: str, phone: str):
@@ -103,16 +161,19 @@ class AccountManager:
 	def _is_valid_password(self, password: str) -> bool:
 		return bool(self._password_re.match(password))
 
-	def _is_valid_account_name(self, account: str) -> bool:
+	def _is_valid_account(self, account: str) -> bool:
 		return bool(self._account_re.match(account))
 
 	def _is_valid_email(self, email: str) -> bool:
 		return bool(self._email_re.match(email))
 
+	def _is_valid_phone(self, phone: str) -> bool:
+		return True
+
 	async def _valid_credentials(self, identifier: str, value: str, password: str) -> bool:
 		if not self._is_valid_password(password): return False
 		if identifier == 'account':
-			if not self._is_valid_account_name(value): return False
+			if not self._is_valid_account(value): return False
 		elif identifier == 'email':
 			if not self._is_valid_email(value): return False
 		p = await self._execute_statement('SELECT password FROM info WHERE `' + identifier + '` = "' + value + '";')
