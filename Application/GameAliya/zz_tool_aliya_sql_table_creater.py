@@ -76,7 +76,13 @@ def create_player_table() -> None:
         "small_energy_potion": "INT(11) NULL DEFAULT(0) COMMENT '小能量药水'",
         "recover_time": "VARCHAR(64) NULL DEFAULT '' COMMENT '恢复开始时间'",
         "hang_stage": "INT(6) NULL DEFAULT(0) COMMENT '挂机的关卡'",
-        "hang_up_time": "VARCHAR(64) NULL DEFAULT '' COMMENT '挂机开始时间'"
+        "hang_up_time": "VARCHAR(64) NULL DEFAULT '' COMMENT '挂机开始时间'",
+        "basic_summon_scroll": "INT(11) NULL DEFAULT(0) COMMENT '低级召唤卷轴'",
+        "pro_summon_scroll": "INT(11) NULL DEFAULT(0) COMMENT '高级召唤卷轴'",
+        "friend_gift": "INT(11) NULL DEFAULT(0) COMMENT '朋友礼物'",
+        "prophet_summon_scroll": "INT(11) NULL DEFAULT(0) COMMENT '先知召唤卷轴'",
+        "fortune_wheel_ticket_basic": "INT(11) NULL DEFAULT(0) COMMENT '低级幸运循环票'",
+        "fortune_wheel_ticket_pro": "INT(11) NULL DEFAULT(0) COMMENT '高级幸运循环票'"
     }
     sql_table_constructor(table_name=table_name, table_dict=table_dict)
 

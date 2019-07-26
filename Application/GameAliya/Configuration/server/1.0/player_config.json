@@ -18,6 +18,58 @@
 		"weapontier2" : ["weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20"],
 		"weapontier3" : ["weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30"],
 		"weapontier4" : ["weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"]
+	},
+	"dark_market":
+	{
+		"weights":[0.40, 0.30, 0.20,0.1],
+		"tier1" : ["weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10"],
+		"tier2" : ["weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20"],
+		"tier3" : ["weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30"],
+		"tier4" : ["weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"],
+		"weapon_segment":
+		{
+			"diamond":{
+				"cost_range_min":50,
+				"cost_range_max":100,
+				"quantity_min":1,
+				"quantity_max":10
+			},
+			"coin":{
+				"cost_range_min":500,
+				"cost_range_max":1000,
+				"quantity_min":1,
+				"quantity_max":10
+			}
+		},
+		"skill_scroll_10":
+		{
+			"diamond":{
+				"cost_range_min":10,
+				"cost_range_max":100,
+				"quantity_min":1,
+				"quantity_max":10
+			},
+			"coin":{
+				"cost_range_min":100,
+				"cost_range_max":1000,
+				"quantity_min":1,
+				"quantity_max":15
+			}
+		},
+		"skill_scroll_30":
+		{
+			"diamond":{
+				"cost_range_min":90,
+				"cost_range_max":100,
+				"quantity_min":1,
+				"quantity_max":10
+			},
+			"coin":{
+				"cost_range_min":100,
+				"cost_range_max":1000,
+				"quantity_min":1,
+				"quantity_max":15
+			}
+		}
 	}
-
 }
