@@ -13,7 +13,7 @@
 		},
 		"items" : {
 			"skilltier1" : ["m1_level", "p1_level", "g1_level"],
-			"skilltier2" : ["m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level"],
+			"skilltier2" : ["m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level"],
 			"skilltier3" : ["m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]}
 	},
 	"weapons" : {
