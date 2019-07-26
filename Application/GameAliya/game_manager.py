@@ -441,6 +441,31 @@ class GameManager:
 #						Stage Module Functions								#
 #############################################################################
 
+	# TODO CHECK SPEED IMPROVEMENTS
+	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
+		# 0 - success
+		# 1 - database operation error
+		# 2 - key insufficient
+		# 9 - parameter error
+		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
+			return self._message_typesetting(9, "Parameter error")
+		keys = list(self._entry_consumables[str(stage)].keys())
+		values = [-v for v in list(self._entry_consumables[str(stage)].values())]
+		material_dict = {}
+		for i in range(len(keys)):
+			material_dict.update({keys[i]: values[i]})
+
+		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
+		select_values = (await self._execute_statement(world, select_str))[0]
+		for i in range(len(select_values)):
+			values[i] = int(values[i]) + int(select_values[i])
+			if values[i] < 0:
+				return self._message_typesetting(2, "%s insufficient" % keys[i])
+
+		if await self._execute_statement_update(world, update_str) == 0:
+			return self._message_typesetting(status=1, message="database operating error")
+		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
+
 	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		# success ===> 0
 		# 0 : passed customs ===> success
@@ -957,6 +982,7 @@ class GameManager:
 		self._lottery = d['lottery']
 		self._player = d['player']
 		self._hang_reward_list = d['hang_reward']
+		self._entry_consumables = d['entry_consumables']
 
 	def _start_timer(self, seconds: int):
 		t = threading.Timer(seconds, self._refresh_configuration)
@@ -1209,6 +1235,11 @@ async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).fortune_wheel_pro(int(post['world']), post['unique_id'], post['cost_item'])
 	return _json_response(result)
 
+@ROUTES.post('/enter_stage')
+async def __enter_stage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).enter_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	return _json_response(result)
 
 
 

@@ -81,7 +81,7 @@ class ConfigurationManager:
 		weapon = json.load(open(WEAPON.format(self._sv), encoding = 'utf-8'))
 		skill = json.load(open(SKILL.format(self._sv), encoding = 'utf-8'))
 		player = json.load(open(PLAYER.format(self._sv), encoding = 'utf-8'))
-		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config,'player':player}
+		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config,'player':player, 'entry_consumables' : self._entry_consumables_config}
 
 	def _read_level_enemy_layouts_config(self):
 		self._level_enemy_layouts_config = json.load(open(ENEMY_LAYOUT.format(self._cv), encoding = 'utf-8'))
