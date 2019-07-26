@@ -225,7 +225,8 @@ def create_dark_market_table() -> None:
         "currency_type8": "VARCHAR(32) NULL DEFAULT '' COMMENT '材料8的价值(金币或者钻石)'",
         "currency_type8_price": "INT(6) NULL DEFAULT(0) COMMENT '材料8的价格'",
 
-        "refresh_time": "VARCHAR(32) NULL DEFAULT '' COMMENT '刷新所有材料的刷新时间'"
+        "refresh_time": "VARCHAR(32) NULL DEFAULT '' COMMENT '刷新所有材料的刷新时间'",
+        "refreshable_quantity": "INT(6) NULL DEFAULT(0) COMMENT '可以刷新所有材料的次数'"
     }
     sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
 

@@ -1048,11 +1048,21 @@ class GameManager:
 
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
 
-
-
-	async def exchange_item(self, cost_it, cost_value, exchange_id, exchange_value) -> dict:
+	#  TODO Black market transaction 黑市交易
+	async def black_market_transaction(self, world: int, unique_id: str, merchandise_id: int) -> dict:
+		# success ===> 0
+		# 0 : Successful weapon decomposition
+		# 1 : User does not have this weapon
+		# 2 : Insufficient diamond
+		# 3 : self._player not updated
+		# 4 : database operation error
+		merchandise = await self._get_dark_market_material()
 		pass
-	#  #########################  houyao 2019-07-26 12：49  ##########################
+
+	async def _get_dark_market_material(self):
+		pass
+
+	#  #########################  houyao 2019-07-26 19：49  ##########################
 
 
 
