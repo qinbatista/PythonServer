@@ -988,7 +988,7 @@ class GameManager:
 			return self._message_typesetting(status=0, message="hang up success", data={"keys": keys, "values": values})
 		else:
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
-			minute = delta_time.seconds // 60
+			minute = int(delta_time.total_seconds()) // 60
 			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
 
 			for key in material_dict.keys():
@@ -1030,7 +1030,7 @@ class GameManager:
 			key_word = ["hang_stage", "hang_up_time"]
 
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
-			minute = delta_time.seconds // 60
+			minute = int(delta_time.total_seconds()) // 60
 			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
 
 			for key in material_dict.keys():
