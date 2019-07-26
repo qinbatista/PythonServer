@@ -842,11 +842,11 @@ class GameManager:
 	async def _set_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
 
-	async def _get_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
+	async def _get_weapon_star(self, world: int, unique_id: str, weapon: str) -> int:
 		data = await self._execute_statement(world, 'SELECT ' + weapon + ' FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
 
-	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> dict:
+	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> list:
 		data = await self._execute_statement(world, 'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
 		return list(data[0])
 
