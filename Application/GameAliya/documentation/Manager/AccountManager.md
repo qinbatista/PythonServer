@@ -39,6 +39,7 @@ Attempts to log the user in using the specified credentials. The 'identifier' sp
 Valid identifiers are: account, email, phone\_number. 
 
 Returns an authorized token to the user.
+If the account, email, or phone\_number values are not empty that means it has been bound.
 
 Status codes and meaning:
 
@@ -52,7 +53,6 @@ Status codes and meaning:
 {
 	"function" : "login",
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
 				"identifier" : "IDENTIFIER",
 				"value" : "VALUE_OF_IDENTIFIER",
 				"password" : "PASSWORD"
@@ -66,7 +66,10 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"token" : "generated token"
+				"token" : "generated token",
+				"account" : "ACCOUNT",
+				"email" : "EMAIL",
+				"phone_number" : "PHONE"
 			 }
 }
 ```
@@ -90,7 +93,6 @@ Status codes and meaning:
 {
 	"function" : "login_unique",
 	"data" : {
-    			"world" : "str 1 or 2 or 3....",
 				"unique_id" : "UNIQUE_ID"
 			 }
 }
@@ -114,13 +116,25 @@ Status codes and meaning:
 
 Binds the account specified with the unique\_id to the provided information.
 
+Minimally, a valid account name and password must be provided when binding.
+Email and phone number are optional, and should be left empty if omitted.
+This function can be called again to bind previously unbound items such as email or phone.
+
+Data validation for account name, password, and email is currently in use.
+Phone number validation has yet to be implemented.
+
 Status codes and meaning:
 
 - 0 - Success
-- 1 - The account has already been bound before
-- 2 - Account name already exists
-- 3 - Email already exists
-- 4 - Phone number already exists
+- 1 - Invalid account name
+- 2 - Invalid email
+- 3 - Invalid phone
+- 4 - Invalid password
+- 5 - Account already exists
+- 6 - Email already exists
+- 7 - Phone already exists
+- 8 - Email already bound
+- 9 - Phone already bound
 
 
 
@@ -134,6 +148,19 @@ Status codes and meaning:
 				"password" : "PASSWORD",
 				"email" : "EMAIL",
 				"phone_number" : "PHONE_NUMBER"
+			 }
+}
+```
+
+```json
+{
+	"function" : "bind_account",
+	"data" : {
+				"token" : "TOKEN",
+				"account" : "ACCOUNT_NAME",
+				"password" : "PASSWORD",
+				"email" : "",
+				"phone_number" : ""
 			 }
 }
 ```

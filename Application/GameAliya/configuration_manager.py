@@ -19,6 +19,7 @@ VERSION = loc() + '/Configuration/config_timer_setting.json'
 ENEMY_LAYOUT = loc() + '/Configuration/client/{}/level_enemy_layouts_config.json'
 MONSTER = loc() + '/Configuration/client/{}/monster_config.json'
 
+WORLD_DISTRIBUTION = loc() + '/Configuration/server/{}/world_distribution.json'
 REWARD_LIST = loc() + '/Configuration/server/{}/stage_reward_config.json'
 HANG_REWARD = loc() + '/Configuration/server/{}/hang_reward_config.json'
 ENTRY_CONSUMABLES = loc() + '/Configuration/server/{}/entry_consumables_config.json'
@@ -43,6 +44,7 @@ class ConfigurationManager:
 		self._read_hang_reward_config()
 		self._read_mysql_data_config()
 		self._read_entry_consumables_config()
+		self._read_world_distribution_config()
 		self._read_game_manager_config()
 
 	async def get_server_config_location(self):
@@ -59,6 +61,9 @@ class ConfigurationManager:
 
 	async def get_game_manager_config(self):
 		return self._game_manager_config
+
+	async def get_world_distribution_config(self):
+		return self._world_distribution_config
 
 	async def get_level_enemy_layouts_config(self):
 		return self._level_enemy_layouts_config
@@ -92,6 +97,12 @@ class ConfigurationManager:
 	def _read_monster_config(self):
 		self._monster_config = json.load(open(MONSTER.format(self._cv), encoding = 'utf-8'))
 
+	def _read_world_distribution_config(self):
+		d = json.load(open(WORLD_DISTRIBUTION.format(self._cv), encoding = 'utf-8'))
+		for server in d['servers']:
+			d['servers'][server]['worlds'] = self._world_range_parser(d['servers'][server]['worlds'])
+		self._world_distribution_config = d
+
 	def _read_stage_reward_config(self):
 		self._stage_reward_config = json.load(open(REWARD_LIST.format(self._cv), encoding = 'utf-8'))
 
@@ -100,6 +111,37 @@ class ConfigurationManager:
 
 	def _read_mysql_data_config(self):
 		self._mysql_data_config = json.load(open(MYSQL_DATA.format(self._sv), encoding = 'utf-8'))
+
+	def _world_range_parser(self, s: str) -> [int]:
+		'''
+		Parses a valid input sequence into a list containing the specified values.
+		A valid input sequence is a single string containing any number of comma separated valid ranges.
+		A valid range can be either a single positive number, or a positive number followed by a '-' character,
+		followed by an equal or larger number.
+		Raises ValueError if input contains non valid characters.
+
+		Examples of valid input:
+		'1' -> [1]
+		'1, 12-13' -> [1, 12, 13]
+		'4-7, 1, 2-3' -> [1, 2, 3, 4, 5, 6, 7]
+		'''
+		ret = []
+		for sequence in s.split(','):
+			end = None
+			start = None
+			is_range = False
+			for c in sequence:
+				if c in {'0','1','2','3','4','5','6','7','8','9'}:
+					if not is_range:
+						start = int(c) if start == None else (10 * start) + int(c)
+					else:
+						end = int(c) if end == None else (10 * end) + int(c)
+				elif c == '-':
+					is_range = True
+				elif c != ' ':
+					raise ValueError
+			ret.extend([_ for _ in range(start, (start if end == None else end) + 1)])
+		return list(set(ret))
 
 	def _read_version(self):
 		version = json.load(open(VERSION, encoding = 'utf-8'))
@@ -176,6 +218,10 @@ async def __get_server_config_location(request: web.Request) -> web.Response:
 @ROUTES.get('/get_entry_consumables_config')
 async def __get_entry_consumables_config(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_entry_consumables_config())
+
+@ROUTES.get('/get_world_distribution_config')
+async def __get_world_distribution_config(request: web.Request) -> web.Response:
+	return _json_response(await MANAGER.get_world_distribution_config())
 
 def run():
 	app = web.Application()

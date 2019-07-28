@@ -1,15 +1,20 @@
 {
 	"skills" : {
 		"cost":{
+			"coin":"100",
 			"diamond":"100",
-			"basic_summon_scroll":"1"
+			"basic_summon_scroll":"1",
+			"pro_summon_scroll":"1",
+			"friend_gitf":"10",
+			"prophet_summon_scroll":"1"
 		},
 		"names" : ["skilltier1", "skilltier2", "skilltier3"],
 		"weights":
 		{
 				"basic":[0.60, 0.30, 0.10],
 				"pro":[0.30, 0.50, 0.20],
-				"friend":[0.50, 0.40, 0.10]
+				"friend":[0.50, 0.40, 0.10],
+				"prophet":[0.10, 0.40, 0.50]
 		},
 		"items" : {
 			"skilltier1" : ["m1_level", "p1_level", "g1_level"],
@@ -18,15 +23,20 @@
 	},
 	"weapons" : {
 		"cost":{
+			"coin":"100",
 			"diamond":"100",
-			"basic_summon_scroll":"1"
+			"basic_summon_scroll":"1",
+			"pro_summon_scroll":"1",
+			"friend_gitf":"10",
+			"prophet_summon_scroll":"1"
 		},
 		"names" : ["weapontier1", "weapontier2", "weapontier3", "weapontier4"],
 		"weights":
 		{
 			"basic":[0.4, 0.5, 0.1, 0],
 			"pro":[0.3, 0.4, 0.2, 0.1],
-			"friend":[0.4, 0.5, 0.1, 0]
+			"friend":[0.4, 0.5, 0.1, 0],
+			"prophet":[0, 0.2, 0.5, 0.3]
 		},
 		"items" : {
 			"weapontier1" : ["weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10"],
@@ -38,13 +48,15 @@
 	{
 		"cost":
 			{
+				"coin":"100",
 				"diamond":"100",
-				"fortune_wheel_ticket":"1"
+				"fortune_wheel_ticket_basic":"1",
+				"fortune_wheel_ticket_pro":"1"
 			},
 		"names" : ["weapontier1", "weapontier2", "weapontier3", "weapontier4"],
 		"weights":
 		{
-			"basic":[0.6, 0.25, 0.1, 0.05],
+			"basic":[0.05, 0.25, 0.1, 0.6],
 			"pro":[0.2, 0.3, 0.3, 0.2]
 		},
 		"items" :
