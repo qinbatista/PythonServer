@@ -1523,7 +1523,7 @@ def run():
 	app.add_routes(ROUTES)
 	config = get_config()
 	app['MANAGER'] = GameManager()
-	web.run_app(app, port=config.getint('game_manager', 'port'))
+	web.run_app(app, port=config.getint('game_manager_qin', 'port'))
 
 
 if __name__ == '__main__':

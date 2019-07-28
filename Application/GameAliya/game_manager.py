@@ -643,7 +643,7 @@ class GameManager:
 		# 3 - database operation error
 		# 4 - insufficient material
 		# 5 - cost_item error
-		return await self._default_summon(world, unique_id, cost_item, 'basic')
+		return json.loads(requests.post('http://localhost:8006' + '/basic_summon', data={'world': world, "unique_id": unique_id,"cost_item":cost_item}).text)
 
 	async def pro_summon(self, world: int, unique_id: str, cost_item: str) -> dict:
 		# 0 - unlocked new skill or weapon
