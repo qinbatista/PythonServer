@@ -1048,13 +1048,13 @@ class GameManager:
 
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
 
-	#  TODO Black market refresh_store 自动刷新商店
-	#  houyao 2019-07-28 13:56:00
+	#  houyao 2019-07-28 13:56:00  自动刷新商店
 	async def automatically_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		success ===> 0 and 1
 		# 0 - First refresh market success
 		# 1 - Refresh market success
+		# 97 - Refresh time is not over yet
 		# 98 - Unexpected element, please update the configuration table
 		# 99 - database operating error
 		"""
@@ -1098,15 +1098,19 @@ class GameManager:
 				data["keys"] = data["keys"] + ["merchandise" + str(code), "merchandise" + str(code) + "_quantity", "currency_type" + str(code), "currency_type" + str(code) + "_price"]
 				data["values"] = data["values"] + [merchandise, merchandise_quantity, currency_type, currency_type_price]
 			data["keys"] = data["keys"] + ["refresh_time", "refreshable_quantity"]
-			data["values"] = data["values"] + [refresh_time, refreshable_quantity]
+			data["values"] = data["values"] + [refresh_time, int(refreshable_quantity)]
 			return self._message_typesetting(status=0, message="First refresh market success", data=data)
 		else:
-			if refreshable_quantity < 3:
-				refreshable_quantity += 1
 			current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')
 			if delta_time.total_seconds() // 3600 >= 3:
-				refresh_time = current_time  # 重置刷新黑市的时间
+				frequency = delta_time.total_seconds() // 3600 // 3  # 计算出能增加的免费刷新次数
+				refreshable_quantity += frequency  # 增加免费刷新次数
+				if refreshable_quantity > 3:
+					refreshable_quantity = 3
+				# 重置刷新黑市的时间
+				refresh_time = (datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S') + timedelta(hours=frequency * 3)).strftime("%Y-%m-%d %H:%M:%S")
+
 				# 筛选出8个商品所在的层级
 				tier_choice = random.choices(population=dark_market_data['names'], weights=dark_market_data['weights'], k=8)
 				key_list = [(random.choices(population=dark_market_data[tier], k=1))[0] for tier in tier_choice]  # 筛选出具体的关键值
@@ -1141,10 +1145,24 @@ class GameManager:
 					data["keys"] = data["keys"] + ["merchandise" + str(code), "merchandise" + str(code) + "_quantity", "currency_type" + str(code), "currency_type" + str(code) + "_price"]
 					data["values"] = data["values"] + [merchandise, merchandise_quantity, currency_type, currency_type_price]
 				data["keys"] = data["keys"] + ["refresh_time", "refreshable_quantity"]
-				data["values"] = data["values"] + [refresh_time, refreshable_quantity]
+				data["values"] = data["values"] + [refresh_time, int(refreshable_quantity)]
 				return self._message_typesetting(status=1, message="Refresh market success", data=data)
 			else:
 				return self._message_typesetting(status=97, message="Refresh time is not over yet")
+
+	async def manually_refresh_store(self, world: int, unique_id: str) -> dict:
+		"""
+				success ===> 0 and 1
+				# 0 - First refresh market success
+				# 1 - Refresh market success
+				# 98 - Unexpected element, please update the configuration table
+				# 99 - database operating error
+				"""
+		dark_market_data = self._player['dark_market']
+		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=1)
+		data = {"keys": [], "values": []}
+		if refreshable_quantity == 0:
+			pass
 
 
 	#  TODO Black market transaction 黑市交易
