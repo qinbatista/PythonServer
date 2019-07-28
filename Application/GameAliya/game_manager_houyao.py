@@ -1050,8 +1050,51 @@ class GameManager:
 
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
 
-	#  TODO Black market transaction 黑市交易
+	#  TODO Black market refresh_store 自动刷新商店
 	#  houyao 2019-07-28 13:56:00
+	async def automatically_refresh_store(self, world: int, unique_id: str) -> dict:
+		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, merchandise_id=merchandise_id)
+		data = {"keys": [], "values": []}
+		if refresh_time == "":  # 玩家第一次进入黑市
+			refreshable_quantity = 3
+			refresh_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+			# 筛选出8个商品所在的层级
+			tier_choice = random.choices(population=self._dark_market['names'], weights=self._dark_market['weights'], k=8)
+			key_list = [(random.choices(population=self._dark_market[tier], k=1))[0] for tier in tier_choice]  # 筛选出具体的关键值
+			for i in range(len(key_list)):
+				merchandise = key_list[i]
+				code = i + 1
+				if merchandise in self._dark_market["weapon"]:  # 所属种类为武器，奖励碎片
+					currency_type = (random.choices(population=self._dark_market['segment'].keys(), k=1))[0]
+					merchandise_quantity = random.randint(int(self._dark_market['segment'][currency_type]["quantity_min"]), int(self._dark_market['segment'][currency_type]["quantity_max"]))
+					currency_type_price = random.randint(int(self._dark_market['segment'][currency_type]["cost_range_min"]), int(self._dark_market['segment'][currency_type]["cost_range_max"]))
+					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
+						print("数据库操作错误，黑市刷新出现严重问题")
+						return self._message_typesetting(status=99, message="database operating error")
+				elif merchandise in self._dark_market["skill"]:  # 所属种类为技能，如果数据库中存在此技能，则奖励随机奖励卷轴
+					currency_type = (random.choices(population=self._dark_market['reward_skill'].keys(), k=1))[0]
+					merchandise_quantity = 1
+					currency_type_price = random.randint(int(self._dark_market['reward_skill'][currency_type]["cost_range_min"]), int(self._dark_market['reward_skill'][currency_type]["cost_range_max"]))
+					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
+						print("数据库操作错误，黑市刷新出现严重问题")
+						return self._message_typesetting(status=99, message="database operating error")
+				elif merchandise in self._dark_market["other"].keys():
+					currency_type = (random.choices(population=self._dark_market['other'][merchandise].keys(), k=1))[0]
+					merchandise_quantity = random.randint(int(self._dark_market['other'][merchandise][currency_type]["quantity_min"]), int(self._dark_market['segment'][merchandise][currency_type]["quantity_max"]))
+					currency_type_price = random.randint(int(self._dark_market['other'][merchandise][currency_type]["cost_range_min"]), int(self._dark_market['segment'][merchandise][currency_type]["cost_range_max"]))
+					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
+						print("数据库操作错误，黑市刷新出现严重问题")
+						return self._message_typesetting(status=99, message="database operating error")
+				else:
+					return self._message_typesetting(status=98, message="Unexpected element, please update the configuration table")
+				data["keys"] = data["keys"] + ["merchandise" + str(code), "merchandise" + str(code) + "_quantity", "currency_type" + str(code), "currency_type" + str(code) + "_price"]
+				data["values"] = data["values"] + [merchandise, merchandise_quantity, currency_type, currency_type_price]
+			data["keys"] = data["keys"] + ["refresh_time", "refreshable_quantity"]
+			data["values"] = data["values"] + [refresh_time, refreshable_quantity]
+			return self._message_typesetting(status=0, message="First refresh market success", data=data)
+		return {}
+
+	#  TODO Black market transaction 黑市交易
 	async def black_market_transaction(self, world: int, unique_id: str, merchandise_id: int) -> dict:
 		# success ===> 0
 		# 0 : Successful weapon decomposition
@@ -1059,19 +1102,18 @@ class GameManager:
 		# 2 : Insufficient diamond
 		# 3 : self._player not updated
 		# 4 : database operation error
-		if merchandise_id < 1 or merchandise_id > 8:
+		if merchandise_id < 1 or merchandise_id > 8:  # 数据库中只有1-8的商品代号
 			return self._message_typesetting(status=99, message="parameter error")
-		
-		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, merchandise_id=merchandise_id)
+		# merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, merchandise_id=merchandise_id)
 		return {}
 
-	async def _get_dark_market_material(self, world: int, unique_id: str, merchandise_id: int):
+	async def _get_dark_market_material(self, world: int, unique_id: str, merchandise_id: int) -> tuple:
 		sql_str = "select merchandise%s, merchandise%s_quantity, currency_type%s, currency_type%s_price, refresh_time, refreshable_quantity from dark_market where unique_id=%s" % (merchandise_id, merchandise_id, merchandise_id, merchandise_id, unique_id)
 		data = await self._execute_statement(world=world, statement=sql_str)
 		return data[0]
 
-	async def _set_dark_market_material(self, world: int, unique_id: str, merchandise_id: int, refresh_time: str, refreshable_quantity: int):
-		sql_str = "update dark_market set merchandise%s=%s, merchandise%s_quantity=%s, currency_type%s=%s, currency_type%s_price=%s, refresh_time=%s, refreshable_quantity=%s where unique_id=%s" % (merchandise_id, "", merchandise_id, 0, merchandise_id, "", merchandise_id, 0, refresh_time, refreshable_quantity, unique_id)
+	async def _set_dark_market_material(self, world: int, unique_id: str, code: int, merchandise: str, merchandise_quantity: int, currency_type: str, currency_type_price: int, refresh_time: str, refreshable_quantity: int) -> int:
+		sql_str = "update dark_market set merchandise%s=%s, merchandise%s_quantity=%s, currency_type%s=%s, currency_type%s_price=%s, refresh_time=%s, refreshable_quantity=%s where unique_id=%s" % (code, merchandise, code, merchandise_quantity, code, currency_type, code, currency_type_price, refresh_time, refreshable_quantity, unique_id)
 		return await self._execute_statement_update(world=world, statement=sql_str)
 #  #########################  houyao 2019-07-26 19：49  ##########################
 
