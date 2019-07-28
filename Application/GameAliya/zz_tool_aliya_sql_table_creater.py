@@ -161,6 +161,29 @@ def create_weapon_table() -> None:
     sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
 
 
+def create_role_table() -> None:
+    """
+    创建角色背包表以及角色信息表
+    """
+    table_name = "role_bag"
+    table_dict = {"unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'"}
+    weapon_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
+        "weapon_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色等级'",
+        "passive_skill_1_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色技能1'",
+        "passive_skill_2_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色技能2'",
+        "passive_skill_3_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色技能3'",
+        "passive_skill_4_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色技能4'",
+        "skill_point": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色技能点'",
+        "segment": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色碎片'"
+    }
+    for i in range(1, 41):
+        weapon_name = "role" + str(i)
+        sql_table_constructor(table_name=weapon_name, table_dict=weapon_dict)  # 创建角色信息表
+        table_dict.update({weapon_name: "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色%s的星数'" % i})
+    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建角色背包表
+
+
 def create_user_table() -> None:
     """
     创建武器背包表以及武器信息表
@@ -258,8 +281,9 @@ if __name__ == '__main__':
     # create_player_table()
     # create_skill_table()
     # create_weapon_table()
+    create_role_table()
     # create_user_table()
-    create_dark_market_table()
+    # create_dark_market_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")

@@ -114,6 +114,11 @@ def disintegrate_weapon():
 	print(str(result.text))
 
 
+def automatically_refresh_store():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/automatically_refresh_store', data={"world": 0, 'unique_id': "4"})
+	print(str(result.text))
+
+
 if __name__ == "__main__":
 	# try_remove_coin()
 	# try_remove_iron()
@@ -132,7 +137,8 @@ if __name__ == "__main__":
 	# level_up_weapon_star()
 	# try_all_material()
 	# try_energy()
-	start_hang_up()
+	# start_hang_up()
 	# get_hang_up_reward()
 	# enter_stage()
 	# disintegrate_weapon()
+	automatically_refresh_store()

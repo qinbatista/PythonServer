@@ -22,6 +22,7 @@
 	"dark_market":
 	{
 		"weights":[0.40, 0.30, 0.20, 0.10],
+		"names": ["tier1", "tier2", "tier3", "tier4"],
 		"tier1" : ["skill_scroll_10", "experience_potion", "small_energy_potion", "weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10"],
 		"tier2" : ["skill_scroll_30", "iron", "weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20", "m1_level", "p1_level", "g1_level"],
 		"tier3" : ["skill_scroll_100", "weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level"],
@@ -33,13 +34,11 @@
 		{
 			"diamond":{
 				"cost_range_min":50,
-				"cost_range_max":100,
-				"quantity":1
+				"cost_range_max":100
 			},
 			"coin":{
 				"cost_range_min":500,
-				"cost_range_max":1000,
-				"quantity":1
+				"cost_range_max":1000
 			}
 		},
 		"segment":
@@ -57,94 +56,96 @@
 				"quantity_max":10
 			}
 		},
-		"iron":
-		{
-			"diamond":{
-				"cost_range_min":50,
-				"cost_range_max":100,
-				"quantity_min":1,
-				"quantity_max":10
+		"other": {
+			"iron":
+			{
+				"diamond":{
+					"cost_range_min":50,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":10
+				},
+				"coin":{
+					"cost_range_min":500,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
 			},
-			"coin":{
-				"cost_range_min":500,
-				"cost_range_max":1000,
-				"quantity_min":1,
-				"quantity_max":10
-			}
-		},
-		"experience_potion":
-		{
-			"diamond":{
-				"cost_range_min":50,
-				"cost_range_max":100,
-				"quantity_min":1,
-				"quantity_max":10
+			"experience_potion":
+			{
+				"diamond":{
+					"cost_range_min":50,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":10
+				},
+				"coin":{
+					"cost_range_min":500,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
 			},
-			"coin":{
-				"cost_range_min":500,
-				"cost_range_max":1000,
-				"quantity_min":1,
-				"quantity_max":10
-			}
-		},
-		"small_energy_potion":
-		{
-			"diamond":{
-				"cost_range_min":50,
-				"cost_range_max":100,
-				"quantity_min":1,
-				"quantity_max":10
+			"small_energy_potion":
+			{
+				"diamond":{
+					"cost_range_min":50,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":10
+				},
+				"coin":{
+					"cost_range_min":500,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
 			},
-			"coin":{
-				"cost_range_min":500,
-				"cost_range_max":1000,
-				"quantity_min":1,
-				"quantity_max":10
-			}
-		},
-		"skill_scroll_10":
-		{
-			"diamond":{
-				"cost_range_min":10,
-				"cost_range_max":100,
-				"quantity_min":1,
-				"quantity_max":20
+			"skill_scroll_10":
+			{
+				"diamond":{
+					"cost_range_min":10,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":20
+				},
+				"coin":{
+					"cost_range_min":100,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
 			},
-			"coin":{
-				"cost_range_min":100,
-				"cost_range_max":1000,
-				"quantity_min":1,
-				"quantity_max":10
-			}
-		},
-		"skill_scroll_30":
-		{
-			"diamond":{
-				"cost_range_min":90,
-				"cost_range_max":100,
-				"quantity_min":1,
-				"quantity_max":15
+			"skill_scroll_30":
+			{
+				"diamond":{
+					"cost_range_min":90,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":15
+				},
+				"coin":{
+					"cost_range_min":900,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
 			},
-			"coin":{
-				"cost_range_min":900,
-				"cost_range_max":1000,
-				"quantity_min":1,
-				"quantity_max":10
-			}
-		},
-		"skill_scroll_100":
-		{
-			"diamond":{
-				"cost_range_min":100,
-				"cost_range_max":200,
-				"quantity_min":1,
-				"quantity_max":15
-			},
-			"coin":{
-				"cost_range_min":1000,
-				"cost_range_max":2000,
-				"quantity_min":1,
-				"quantity_max":10
+			"skill_scroll_100":
+			{
+				"diamond":{
+					"cost_range_min":100,
+					"cost_range_max":200,
+					"quantity_min":1,
+					"quantity_max":15
+				},
+				"coin":{
+					"cost_range_min":1000,
+					"cost_range_max":2000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
 			}
 		}
 	}
