@@ -913,7 +913,10 @@ class GameManager:
 		elif cost_item == 'prophet_summon_scroll':
 			result = await self.try_prophet_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['prophet_summon_scroll']))
 		else:
-			return self._message_typesetting(4, 'insufficient materials')
+			return self._message_typesetting(4, 'wrong item name')
+		if result["remaining"]<0:
+			return self._message_typesetting(97, 'insufficient materials')
+		# print("result="+str(result)+" cost_item = "+cost_item+ " coin="+(self._lottery[summon_item]['cost']['diamond']))
 		if summon_item == 'skills':
 			try_result = await self.random_gift_skill(world, unique_id, tier)
 			if try_result["status"]==0 or try_result["status"]==1:
