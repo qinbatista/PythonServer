@@ -186,6 +186,20 @@ class GameManager:
 	async def try_small_energy_potion(self, world: int, unique_id: str, value: int) -> dict:
 		return await self._try_material(world, unique_id, 'small_energy_potion', value)
 
+	async def try_fortune_wheel_ticket_basic(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'fortune_wheel_ticket_basic', value)
+
+	async def try_fortune_wheel_ticket_pro(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'fortune_wheel_ticket_pro', value)
+
+	async def try_basic_summon_scroll(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'basic_summon_scroll', value)
+
+	async def try_pro_summon_scroll(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'pro_summon_scroll', value)
+
+	async def try_friend_gift(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'friend_gift', value)
 #############################################################################
 #						End Bag Module Functions							#
 #############################################################################
@@ -704,9 +718,9 @@ class GameManager:
 		if cost_item == 'diamond':
 			result = await self.try_diamond(world, uid, -int(self._lottery['fortune_wheel']['cost']['diamond']))
 		elif cost_item == 'fortune_wheel_ticket_basic':
-			result = await self.try_basic_summon_scroll(world, uid, -int(self._lottery['fortune_wheel']['cost']['fortune_wheel_ticket_basic']))
+			result = await self.fortune_wheel_ticket_basic(world, uid, -int(self._lottery['fortune_wheel']['cost']['fortune_wheel_ticket_basic']))
 		elif cost_item == 'fortune_wheel_ticket_pro':
-			result = await self.try_basic_summon_scroll(world, uid, -int(self._lottery['fortune_wheel']['cost']['fortune_wheel_ticket_pro']))
+			result = await self.fortune_wheel_ticket_pro(world, uid, -int(self._lottery['fortune_wheel']['cost']['fortune_wheel_ticket_pro']))
 		else:
 			return self._message_typesetting(99, 'cost_item error')
 		if result['status'] != 0:
@@ -1233,6 +1247,41 @@ async def __try_small_energy_potion(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).try_small_energy_potion(int(post['world']), post['unique_id'], int(post['value']))
 	return _json_response(result)
 
+@ROUTES.post('/try_basic_summon_scroll')
+async def __try_basic_summon_scroll(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).try_basic_summon_scroll(int(post['world']), post['unique_id'], int(post['value']))
+	return _json_response(result)
+
+@ROUTES.post('/try_pro_summon_scroll')
+async def __try_pro_summon_scroll(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).try_pro_summon_scroll(int(post['world']), post['unique_id'], int(post['value']))
+	return _json_response(result)
+
+@ROUTES.post('/try_friend_gift')
+async def __try_friend_gift(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).try_friend_gift(int(post['world']), post['unique_id'], int(post['value']))
+	return _json_response(result)
+
+@ROUTES.post('/try_fprophet_summon_scroll')
+async def __try_fprophet_summon_scroll(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).try_fprophet_summon_scroll(int(post['world']), post['unique_id'], int(post['value']))
+	return _json_response(result)
+
+@ROUTES.post('/try_fortune_wheel_ticket_basic')
+async def __try_fortune_wheel_ticket_basic(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).try_fortune_wheel_ticket_basic(int(post['world']), post['unique_id'], int(post['value']))
+	return _json_response(result)
+
+@ROUTES.post('/try_fortune_wheel_ticket_pro')
+async def __try_fortune_wheel_ticket_pro(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).try_fortune_wheel_ticket_pro(int(post['world']), post['unique_id'], int(post['value']))
+	return _json_response(result)
 @ROUTES.post('/level_up_skill')
 async def __level_up_skill(request: web.Request) -> web.Response:
 	post = await request.post()

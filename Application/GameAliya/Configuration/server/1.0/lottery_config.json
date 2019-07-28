@@ -1,6 +1,7 @@
 {
 	"skills" : {
 		"cost":{
+			"coin":"100",
 			"diamond":"100",
 			"basic_summon_scroll":"1",
 			"pro_summon_scroll":"1",
@@ -22,6 +23,7 @@
 	},
 	"weapons" : {
 		"cost":{
+			"coin":"100",
 			"diamond":"100",
 			"basic_summon_scroll":"1",
 			"pro_summon_scroll":"1",
@@ -46,6 +48,7 @@
 	{
 		"cost":
 			{
+				"coin":"100",
 				"diamond":"100",
 				"fortune_wheel_ticket_basic":"1",
 				"fortune_wheel_ticket_pro":"1"
