@@ -15,11 +15,12 @@ def PythonLocation():
 
 JSON_NAME = PythonLocation() + "/Configuration/mysql_data_config.json"
 
-# host = "192.168.1.102",
+
 # 建立数据库连接池
 POOL = PooledDB(
     pymysql, 5,  # 5为连接池里的最少连接数
-    host="127.0.0.1",
+    # host="127.0.0.1",
+    host="192.168.1.102",
     user="root",
     passwd="lukseun",
     db="aliya",
@@ -177,6 +178,59 @@ def create_user_table() -> None:
     sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
 
 
+def create_dark_market_table() -> None:
+    """
+    创建武器背包表以及武器信息表
+    """
+    table_name = "dark_market"
+    table_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
+        "merchandise1": "VARCHAR(32) NULL DEFAULT '' COMMENT '黑市中展示可以买的材料1'",
+        "merchandise1_quantity": "INT(6) NULL DEFAULT(0) COMMENT '黑市中展示可以买的材料1的数量'",
+        "currency_type1": "VARCHAR(32) NULL DEFAULT '' COMMENT '材料1的价值(金币或者钻石)'",
+        "currency_type1_price": "INT(6) NULL DEFAULT(0) COMMENT '材料1的价格'",
+
+        "merchandise2": "VARCHAR(32) NULL DEFAULT '' COMMENT '黑市中展示可以买的材料2'",
+        "merchandise2_quantity": "INT(6) NULL DEFAULT(0) COMMENT '黑市中展示可以买的材料2的数量'",
+        "currency_type2": "VARCHAR(32) NULL DEFAULT '' COMMENT '材料2的价值(金币或者钻石)'",
+        "currency_type2_price": "INT(6) NULL DEFAULT(0) COMMENT '材料2的价格'",
+
+        "merchandise3": "VARCHAR(32) NULL DEFAULT '' COMMENT '黑市中展示可以买的材料3'",
+        "merchandise3_quantity": "INT(6) NULL DEFAULT(0) COMMENT '黑市中展示可以买的材料3的数量'",
+        "currency_type3": "VARCHAR(32) NULL DEFAULT '' COMMENT '材料3的价值(金币或者钻石)'",
+        "currency_type3_price": "INT(6) NULL DEFAULT(0) COMMENT '材料3的价格'",
+
+        "merchandise4": "VARCHAR(32) NULL DEFAULT '' COMMENT '黑市中展示可以买的材料4'",
+        "merchandise4_quantity": "INT(6) NULL DEFAULT(0) COMMENT '黑市中展示可以买的材料4的数量'",
+        "currency_type4": "VARCHAR(32) NULL DEFAULT '' COMMENT '材料4的价值(金币或者钻石)'",
+        "currency_type4_price": "INT(6) NULL DEFAULT(0) COMMENT '材料4的价格'",
+
+        "merchandise5": "VARCHAR(32) NULL DEFAULT '' COMMENT '黑市中展示可以买的材料5'",
+        "merchandise5_quantity": "INT(6) NULL DEFAULT(0) COMMENT '黑市中展示可以买的材料5的数量'",
+        "currency_type5": "VARCHAR(32) NULL DEFAULT '' COMMENT '材料5的价值(金币或者钻石)'",
+        "currency_type5_price": "INT(6) NULL DEFAULT(0) COMMENT '材料5的价格'",
+
+        "merchandise6": "VARCHAR(32) NULL DEFAULT '' COMMENT '黑市中展示可以买的材料6'",
+        "merchandise6_quantity": "INT(6) NULL DEFAULT(0) COMMENT '黑市中展示可以买的材料6的数量'",
+        "currency_type6": "VARCHAR(32) NULL DEFAULT '' COMMENT '材料6的价值(金币或者钻石)'",
+        "currency_type6_price": "INT(6) NULL DEFAULT(0) COMMENT '材料6的价格'",
+
+        "merchandise7": "VARCHAR(32) NULL DEFAULT '' COMMENT '黑市中展示可以买的材料7'",
+        "merchandise7_quantity": "INT(6) NULL DEFAULT(0) COMMENT '黑市中展示可以买的材料7的数量'",
+        "currency_type7": "VARCHAR(32) NULL DEFAULT '' COMMENT '材料7的价值(金币或者钻石)'",
+        "currency_type7_price": "INT(6) NULL DEFAULT(0) COMMENT '材料7的价格'",
+
+        "merchandise8": "VARCHAR(32) NULL DEFAULT '' COMMENT '黑市中展示可以买的材料8'",
+        "merchandise8_quantity": "INT(6) NULL DEFAULT(0) COMMENT '黑市中展示可以买的材料8的数量'",
+        "currency_type8": "VARCHAR(32) NULL DEFAULT '' COMMENT '材料8的价值(金币或者钻石)'",
+        "currency_type8_price": "INT(6) NULL DEFAULT(0) COMMENT '材料8的价格'",
+
+        "refresh_time": "VARCHAR(32) NULL DEFAULT '' COMMENT '刷新所有材料的刷新时间'",
+        "refreshable_quantity": "INT(6) NULL DEFAULT(0) COMMENT '可以刷新所有材料的次数'"
+    }
+    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
+
+
 def update_avatar(table_name: str, unique_id: str, img_path: str):  # png
     """
     更新用户表中的头像
@@ -201,10 +255,11 @@ def load_avatar(table_name:str, unique_id: str, img_path: str):
 
 if __name__ == '__main__':
     # 创建数据库表
-    create_player_table()
-    create_skill_table()
-    create_weapon_table()
-    create_user_table()
+    # create_player_table()
+    # create_skill_table()
+    # create_weapon_table()
+    # create_user_table()
+    create_dark_market_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
