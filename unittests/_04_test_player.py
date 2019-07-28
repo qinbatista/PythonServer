@@ -124,6 +124,11 @@ def manually_refresh_store():
 	print(str(result.text))
 
 
+def diamond_refresh_store():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/diamond_refresh_store', data={"world": 0, 'unique_id': "4"})
+	print(str(result.text))
+
+
 if __name__ == "__main__":
 	# try_remove_coin()
 	# try_remove_iron()
@@ -147,4 +152,5 @@ if __name__ == "__main__":
 	# enter_stage()
 	# disintegrate_weapon()
 	# automatically_refresh_store()
-	manually_refresh_store()
+	# manually_refresh_store()
+	diamond_refresh_store()

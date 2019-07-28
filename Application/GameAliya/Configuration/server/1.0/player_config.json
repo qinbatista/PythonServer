@@ -147,6 +147,9 @@
 					"quantity_max":10
 				}
 			}
+		},
+		"diamond_refresh_store":{
+			"diamond": 100
 		}
 	}
 }
