@@ -879,6 +879,8 @@ class GameManager:
 		self._player = d['player']
 		self._hang_reward_list = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
+		#  houyao 2019-07-28 13:49
+		self._dark_market = d['dark_market']
 
 	def _start_timer(self, seconds: int):
 		t = threading.Timer(seconds, self._refresh_configuration)
@@ -1049,6 +1051,7 @@ class GameManager:
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
 
 	#  TODO Black market transaction 黑市交易
+	#  houyao 2019-07-28 13:56:00
 	async def black_market_transaction(self, world: int, unique_id: str, merchandise_id: int) -> dict:
 		# success ===> 0
 		# 0 : Successful weapon decomposition
@@ -1056,13 +1059,21 @@ class GameManager:
 		# 2 : Insufficient diamond
 		# 3 : self._player not updated
 		# 4 : database operation error
-		merchandise = await self._get_dark_market_material()
-		pass
+		if merchandise_id < 1 or merchandise_id > 8:
+			return self._message_typesetting(status=99, message="parameter error")
+		
+		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, merchandise_id=merchandise_id)
+		return {}
 
-	async def _get_dark_market_material(self):
-		pass
+	async def _get_dark_market_material(self, world: int, unique_id: str, merchandise_id: int):
+		sql_str = "select merchandise%s, merchandise%s_quantity, currency_type%s, currency_type%s_price, refresh_time, refreshable_quantity from dark_market where unique_id=%s" % (merchandise_id, merchandise_id, merchandise_id, merchandise_id, unique_id)
+		data = await self._execute_statement(world=world, statement=sql_str)
+		return data[0]
 
-	#  #########################  houyao 2019-07-26 19：49  ##########################
+	async def _set_dark_market_material(self, world: int, unique_id: str, merchandise_id: int, refresh_time: str, refreshable_quantity: int):
+		sql_str = "update dark_market set merchandise%s=%s, merchandise%s_quantity=%s, currency_type%s=%s, currency_type%s_price=%s, refresh_time=%s, refreshable_quantity=%s where unique_id=%s" % (merchandise_id, "", merchandise_id, 0, merchandise_id, "", merchandise_id, 0, refresh_time, refreshable_quantity, unique_id)
+		return await self._execute_statement_update(world=world, statement=sql_str)
+#  #########################  houyao 2019-07-26 19：49  ##########################
 
 
 
