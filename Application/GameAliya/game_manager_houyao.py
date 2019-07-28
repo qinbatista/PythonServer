@@ -1205,7 +1205,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(status=97, message="Insufficient refreshable quantity")
 
-	#  houyao 2019-07-28 16:56:00  钻石刷新商店
+	#  houyao 2019-07-28 17:56:00  钻石刷新商店
 	async def diamond_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		success ===> 0
@@ -1269,10 +1269,18 @@ class GameManager:
 		# 1 : User does not have this weapon
 		# 2 : Insufficient diamond
 		# 3 : self._player not updated
-		# 4 : database operation error
+		# 98 : Merchandise has been sold
+		# 99 : Parameter error
 		if code < 1 or code > 8:  # 数据库中只有1-8的商品代号
-			return self._message_typesetting(status=99, message="parameter error")
-		# merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, merchandise_id=merchandise_id)
+			return self._message_typesetting(status=99, message="Parameter error")
+		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=code)
+		if merchandise != "":
+			return self._message_typesetting(status=98, message="Merchandise has been sold")
+		else:
+			dark_market_data = self._player["dark_market"]
+			if merchandise in dark_market_data["weapon"]:
+				sql_str = "update %s set segment=%s where unique_id=%s" % (merchandise, merchandise_quantity, unique_id)
+				code1 = await self._execute_statement_update(world=world, statement=sql_str)
 		return {}
 
 	async def _get_dark_market_material(self, world: int, unique_id: str, code: int) -> tuple:
