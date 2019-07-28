@@ -1051,7 +1051,13 @@ class GameManager:
 	#  TODO Black market refresh_store 自动刷新商店
 	#  houyao 2019-07-28 13:56:00
 	async def automatically_refresh_store(self, world: int, unique_id: str) -> dict:
-		#  houyao 2019-07-28 13:49
+		"""
+		success ===> 0 and 1
+		# 0 - First refresh market success
+		# 1 - Refresh market success
+		# 98 - Unexpected element, please update the configuration table
+		# 99 - database operating error
+		"""
 		dark_market_data = self._player['dark_market']
 		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=1)
 		data = {"keys": [], "values": []}
