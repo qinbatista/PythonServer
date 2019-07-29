@@ -189,15 +189,15 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _basic_summon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item'], 'summon_kind' : message['data']['summon_kind']}) as resp:
 			return await resp.text()
 
 	async def _pro_summon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item'], 'summon_kind' : message['data']['summon_kind']}) as resp:
 			return await resp.text()
 
 	async def _friend_summon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item'], 'summon_kind' : message['data']['summon_kind']}) as resp:
 			return await resp.text()
 
 	async def _start_hang_up(self, message: dict, session) -> str:
