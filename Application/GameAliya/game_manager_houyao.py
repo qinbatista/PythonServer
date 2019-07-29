@@ -1260,7 +1260,7 @@ class GameManager:
 			data["values"] = data["values"] + [refresh_time, int(refreshable_quantity), diamond]
 			return self._message_typesetting(status=0, message="Refresh market success", data=data)
 
-	#  TODO Black market transaction 黑市交易
+	# 黑市交易
 	async def black_market_transaction(self, world: int, unique_id: str, code: int) -> dict:
 		# success ===> 0 , 1 , 2 , 3
 		# 0 : Gain weapon fragments
@@ -1350,7 +1350,10 @@ class GameManager:
 	async def _set_dark_market_material(self, world: int, unique_id: str, code: int, merchandise: str, merchandise_quantity: int, currency_type: str, currency_type_price: int, refresh_time: str, refreshable_quantity: int) -> int:
 		sql_str = "update dark_market set merchandise%s='%s', merchandise%s_quantity=%s, currency_type%s='%s', currency_type%s_price=%s, refresh_time='%s', refreshable_quantity=%s where unique_id='%s'" % (code, merchandise, code, merchandise_quantity, code, currency_type, code, currency_type_price, refresh_time, refreshable_quantity, unique_id)
 		return await self._execute_statement_update(world=world, statement=sql_str)
-#  #########################  houyao 2019-07-26 19：49  ##########################
+#  #########################  houyao 2019-07-29 14：49  ##########################
+	#  TODO Black market transaction 黑市交易
+
+#  #########################  houyao 2019-07-29 14：49  ##########################
 
 
 
