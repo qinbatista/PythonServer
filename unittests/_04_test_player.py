@@ -105,7 +105,7 @@ def get_hang_up_reward():
 
 
 def enter_stage():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': 1})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': "1"})
 	print(str(result.text))
 
 

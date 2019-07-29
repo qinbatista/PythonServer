@@ -517,13 +517,14 @@ class GameManager:
 	# TODO CHECK SPEED IMPROVEMENTS
 	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
-		# 1 - database operation error
-		# 2 - key insufficient
-		# 9 - parameter error
+		# 97 - database operation error
+		# 98 - key insufficient
+		# 99 - parameter error
+		enter_stage_data = self._entry_consumables["stage"]
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
-			return self._message_typesetting(9, "Parameter error")
-		keys = list(self._entry_consumables[str(stage)].keys())
-		values = [-v for v in list(self._entry_consumables[str(stage)].values())]
+			return self._message_typesetting(99, "Parameter error")
+		keys = list(enter_stage_data[str(stage)].keys())
+		values = [-v for v in list(enter_stage_data[str(stage)].values())]
 		material_dict = {}
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
@@ -533,10 +534,10 @@ class GameManager:
 		for i in range(len(select_values)):
 			values[i] = int(values[i]) + int(select_values[i])
 			if values[i] < 0:
-				return self._message_typesetting(2, "%s insufficient" % keys[i])
+				return self._message_typesetting(98, "%s insufficient" % keys[i])
 
 		if await self._execute_statement_update(world, update_str) == 0:
-			return self._message_typesetting(status=1, message="database operating error")
+			return self._message_typesetting(status=97, message="database operating error")
 		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
 
 	async def pass_stage(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:

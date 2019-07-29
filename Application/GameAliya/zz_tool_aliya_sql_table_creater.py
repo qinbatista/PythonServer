@@ -267,7 +267,7 @@ def create_friend_list_table() -> None:
         data = {
             "friend_id" + str(i): "VARCHAR(128) NOT NULL DEFAULT '' COMMENT '朋友%s唯一标识'" % i,
             "friend_name" + str(i): "VARCHAR(32) NOT NULL DEFAULT '' COMMENT '朋友%s的名字'" % i,
-            "friend_grade" + str(i): "INT(6) NOT NULL DEFAULT(0) COMMENT '朋友%s的等级'" % i,
+            "friend_level" + str(i): "INT(6) NOT NULL DEFAULT(0) COMMENT '朋友%s的等级'" % i,
             "recovery_time" + str(i): "VARCHAR(32) NOT NULL DEFAULT '' COMMENT '朋友%s好感度恢复时间'" % i
         }
         table_dict.update(data)

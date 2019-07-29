@@ -446,10 +446,11 @@ class GameManager:
 		# 97 - database operation error
 		# 98 - key insufficient
 		# 99 - parameter error
+		enter_stage_data = self._entry_consumables["stage"]
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
 			return self._message_typesetting(99, "Parameter error")
-		keys = list(self._entry_consumables[str(stage)].keys())
-		values = [-v for v in list(self._entry_consumables[str(stage)].values())]
+		keys = list(enter_stage_data[str(stage)].keys())
+		values = [-v for v in list(enter_stage_data[str(stage)].values())]
 		material_dict = {}
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
