@@ -517,13 +517,14 @@ class GameManager:
 	# TODO CHECK SPEED IMPROVEMENTS
 	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
-		# 1 - database operation error
-		# 2 - key insufficient
-		# 9 - parameter error
+		# 97 - database operation error
+		# 98 - key insufficient
+		# 99 - parameter error
+		enter_stage_data = self._entry_consumables["stage"]
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
-			return self._message_typesetting(9, "Parameter error")
-		keys = list(self._entry_consumables[str(stage)].keys())
-		values = [-v for v in list(self._entry_consumables[str(stage)].values())]
+			return self._message_typesetting(99, "Parameter error")
+		keys = list(enter_stage_data[str(stage)].keys())
+		values = [-v for v in list(enter_stage_data[str(stage)].values())]
 		material_dict = {}
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
@@ -533,10 +534,10 @@ class GameManager:
 		for i in range(len(select_values)):
 			values[i] = int(values[i]) + int(select_values[i])
 			if values[i] < 0:
-				return self._message_typesetting(2, "%s insufficient" % keys[i])
+				return self._message_typesetting(98, "%s insufficient" % keys[i])
 
 		if await self._execute_statement_update(world, update_str) == 0:
-			return self._message_typesetting(status=1, message="database operating error")
+			return self._message_typesetting(status=97, message="database operating error")
 		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
 
 	async def pass_stage(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
@@ -555,7 +556,7 @@ class GameManager:
 			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
 			return self._message_typesetting(0, "passed customs!", data)
 
-	
+
 	async def start_hang_up(self, world: int, unique_id: str, stage: int) -> dict:
 		"""
 		success ===> 0 , 1
@@ -573,31 +574,27 @@ class GameManager:
 		key_list = await self._execute_statement(world=world, statement=sql_str)
 		hang_up_time, hang_stage = key_list[0]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		# 此时的material_dict字典的值是给奖励列表的，
+		# 所以hang_stage是奖励之前的关卡，
+		# hang_up_time是之前挂起的开始时间
+		material_dict = {}
+		for key, value in self._hang_reward_list[str(hang_stage)].items():
+			material_dict.update({key: value})
+		material_dict.update({"hang_stage": hang_stage})
+		material_dict.update({"hang_up_time": hang_up_time})
+		key_word = ["hang_stage", "hang_up_time"]
 		if hang_up_time == "":
 			# 下面的功能是将奖励拿出来，并且将数据库剩余的值发送给客户端
-			material_dict = self._hang_reward_list[str(hang_stage)]
-			material_dict.update({"hang_stage": stage})  # 用于数据库设置当前的挂机关卡
-			material_dict.update({"hang_up_time": current_time})  # 用于数据库设置的挂机开始时间
-			key_word = ["hang_stage", "hang_up_time"]
 			keys = list(material_dict.keys())
 			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
 			if await self._execute_statement_update(world=world, statement=update_str) == 0:
 				return self._message_typesetting(status=2, message="database operating error")
 			data = await self._execute_statement(world=world, statement=select_str)
 			values = list(data[0])
-
 			return self._message_typesetting(status=0, message="hang up success", data={"keys": keys, "values": values})
 		else:
-			# 此时的material_dict字典的值是给奖励列表的，
-			# 所以hang_stage是奖励之前的关卡，
-			# hang_up_time是之前挂起的开始时间
-			material_dict = self._hang_reward_list[str(hang_stage)]
-			material_dict.update({"hang_stage": hang_stage})
-			material_dict.update({"hang_up_time": hang_up_time})
-			key_word = ["hang_stage", "hang_up_time"]
-
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
-			minute = delta_time.seconds // 60
+			minute = int(delta_time.total_seconds()) // 60
 			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
 
 			for key in material_dict.keys():
@@ -613,11 +610,7 @@ class GameManager:
 			await self._execute_statement_update(world=world, statement=update_str)
 			data = await self._execute_statement(world=world, statement=select_str)
 			values = list(data[0])
-
 			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
-
-	
-
 
 	async def get_hang_up_reward(self, world: int, unique_id: str) -> dict:
 		"""
@@ -635,13 +628,15 @@ class GameManager:
 			# 此时的material_dict字典的值是给奖励列表的，
 			# 所以hang_stage是奖励之前的关卡，
 			# hang_up_time是之前挂起的开始时间
-			material_dict = self._hang_reward_list[str(hang_stage)]
+			material_dict = {}
+			for key, value in self._hang_reward_list[str(hang_stage)].items():
+				material_dict.update({key: value})
 			material_dict.update({"hang_stage": hang_stage})
 			material_dict.update({"hang_up_time": hang_up_time})
 			key_word = ["hang_stage", "hang_up_time"]
 
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
-			minute = delta_time.seconds // 60
+			minute = int(delta_time.total_seconds()) // 60
 			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
 
 			for key in material_dict.keys():
@@ -659,7 +654,6 @@ class GameManager:
 
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
 
-		
 
 
 
@@ -773,7 +767,7 @@ class GameManager:
 #							Private Functions								#
 #############################################################################
 
-	async def _set_role_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
+	async def _set_role_segment_by_id(self, world: int, unique_id: str, role: str, segment: int):
 		return await self._execute_statement_update(world, 'UPDATE `' + role + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
 
 	async def _get_role_segment(self, world: int, unique_id: str, role: str) -> int:
@@ -1065,7 +1059,7 @@ class GameManager:
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET weapon_level = "' + str(weapon_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
 
-	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> dict:
+	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> int:
 		data = await self._execute_statement(world, 'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
 
@@ -1459,6 +1453,26 @@ async def __pro_summon(request: web.Request) -> web.Response:
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/fortune_wheel_pro', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+@ROUTES.post('/automatically_refresh_store')
+async def __automatically_refresh_store(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8007' + '/automatically_refresh_store', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+@ROUTES.post('/manually_refresh_store')
+async def __manually_refresh_store(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8007' + '/manually_refresh_store', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+@ROUTES.post('/diamond_refresh_store')
+async def __diamond_refresh_store(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8007' + '/diamond_refresh_store', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+@ROUTES.post('/black_market_transaction')
+async def __black_market_transaction(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8007' + '/black_market_transaction', data = {'world': post['world'], "unique_id": post['unique_id'], "code": post['code']}).text))
 
 @ROUTES.post('/start_hang_up')
 async def __start_hang_up(request: web.Request) -> web.Response:
