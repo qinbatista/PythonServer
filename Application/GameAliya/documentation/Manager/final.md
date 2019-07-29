@@ -165,6 +165,37 @@ Status codes and meaning:
 }
 ```
 
+### Phophet Summon
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "prophet_summon",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
 
 
 ### Basic Summon Skill 
@@ -330,6 +361,8 @@ Status codes and meaning:
 			 }
 }
 ```
+
+
 ### Friend Summon Role 
 
 Empty
@@ -344,6 +377,365 @@ Status codes and meaning:
 {
 	"world" : 0,
 	"function" : "friend_summon_role",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+### Start Hang Up 
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "start_hang_up",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+
+### Get Hang Up Reward 
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "get_hang_up_reward",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+
+### Enter Stage 
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "enter_stage",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+
+### Pass Level Success 
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "friend_summon_role",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+### Fortune Wheel Basic 
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "fortune_wheel_basic",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+### Fortune Wheel Pro 
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "fortune_wheel_pro",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+
+### Disintegrate Weapon 
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "disintegrate_weapon",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+### Automatically Refresh Store
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "automatically_refresh_store",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+
+### Manually Refresh Store
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "manually_refresh_store",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+
+### Diamond Refresh Store
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "diamond_refresh_store",
+	"data" : {
+    			"token" : "valid token here"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"keys" : [ head ],
+				"values" : [ values ]
+			 }
+}
+```
+
+
+### Black Market Transaction
+
+Empty
+
+Status codes and meaning:
+
+- 0 - Success
+
+
+##### Sample Request
+```json
+{
+	"world" : 0,
+	"function" : "black_market_transaction",
 	"data" : {
     			"token" : "valid token here"
 			 }
