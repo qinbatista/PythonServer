@@ -35,17 +35,17 @@ def pass_stage():
 
 
 def get_skill():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/get_skill', data={'unique_id': "4", "skill_id": "m1_level"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/get_skill', data={'world':0, 'unique_id': "4", "skill_id": "m1_level"})
 	print(str(result.text))
 
 
 def get_all_skill_level():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/get_all_skill_level', data={'unique_id': "4"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/get_all_skill_level', data={'world':0, 'unique_id': "4"})
 	print(str(result.text))
 
 
 def level_up_skill():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_skill', data={'unique_id': "4", "skill_id": "m1_level",  "scroll_id": "skill_scroll_10"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_skill', data={'world':0, 'unique_id': "4", "skill_id": "m1_level",  "scroll_id": "skill_scroll_10"})
 	print(str(result.text))
 
 
@@ -140,7 +140,7 @@ if __name__ == "__main__":
 	# try_remove_diamond()
 	# level_up_weapon()
 	# pass_stage()
-	# get_skill()
+	get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
 	# random_gift_skill()
@@ -157,6 +157,6 @@ if __name__ == "__main__":
 	# enter_stage()
 	# disintegrate_weapon()
 	# automatically_refresh_store()
-	manually_refresh_store()
+	# manually_refresh_store()
 	# diamond_refresh_store()
 	# black_market_transaction(4)

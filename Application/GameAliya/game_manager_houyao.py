@@ -753,7 +753,7 @@ class GameManager:
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET weapon_level = "' + str(weapon_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
 
-	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> dict:
+	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> int:
 		data = await self._execute_statement(world, 'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
 
@@ -1352,6 +1352,8 @@ class GameManager:
 		return await self._execute_statement_update(world=world, statement=sql_str)
 #  #########################  houyao 2019-07-29 14：49  ##########################
 	#  TODO Black market transaction 黑市交易
+
+
 
 #  #########################  houyao 2019-07-29 14：49  ##########################
 
