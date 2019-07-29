@@ -434,6 +434,67 @@ class GameManager:
 		await self._set_role_star(world, unique_id, role, 1)
 		return self._message_typesetting(0, 'Unlocked new role!', {'keys' : ['role', 'star', 'segment'], 'values' : [role, 1, 0]})
 
+	async def disintegrate_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
+		# 0 - successful weapon decomposition
+		# 1 - User does not have that weapon
+		# 2 - insufficient diamond
+		# 3 - self._player is not updated
+		# 4 - database operation error
+		cost = self._player["disintegrate_weapon"]["cost"]  # cost is dict
+		reward = self._player["disintegrate_weapon"]["reward"]  # dict
+		weapon_tier = [
+			self._player["disintegrate_weapon"]["weapontier1"],
+			self._player["disintegrate_weapon"]["weapontier2"],
+			self._player["disintegrate_weapon"]["weapontier3"],
+			self._player["disintegrate_weapon"]["weapontier4"]
+		]  # list
+		star = await self._get_weapon_star(world=world, unique_id=unique_id, weapon=weapon)
+		if star == 0:
+			return self._message_typesetting(status=1, message="User does not have this weapon")
+		#  能分解武器的情况下再扣钻石
+		diamond_data = await self.try_diamond(world=world, unique_id=unique_id, value=-1*int(cost["diamond"]))
+		if int(diamond_data["status"]) == 1:
+			return self._message_typesetting(status=2, message="Insufficient diamond")
+		reward_weapon_name = weapon
+		for i in range(len(weapon_tier)):
+			if weapon in weapon_tier[i]:
+				key = random.randint(0, len(weapon_tier[i]) - 1)
+				print("weapon: %s, weapon_tier[i][key]: %s" % (weapon, weapon_tier[i][key]))
+				while weapon == weapon_tier[i][key]:
+					key = random.randint(0, len(weapon_tier[i]) - 1)
+				reward_weapon_name = weapon_tier[i][key]  # 增加武器碎片的武器
+				break
+		if weapon == reward_weapon_name:
+			return self._message_typesetting(status=3, message="self._player not updated")
+		#  数据库操作
+		star_code = await self._set_weapon_star(world=world, unique_id=unique_id, weapon=weapon, star=0)  # 武器星数至0
+
+		reward_weapon_segment = star * int(reward["segment"])  # 计算奖励武器的碎片数量
+		#  构造更新语句和查询语句
+		update_str = "update %s set segment=segment+%s where unique_id='%s'" % (reward_weapon_name, reward_weapon_segment, unique_id)
+		select_str = "select segment from %s where unique_id='%s'" % (reward_weapon_name, unique_id)
+		update_code = await self._execute_statement_update(world=world, statement=update_str)
+
+		select_result = await self._execute_statement(world=world, statement=select_str)  # 获取含有碎片的查询的结果
+		coin_data = await self.try_coin(world=world, unique_id=unique_id, value=int(reward["coin"])) # 获取添加金币之后的金币数量
+		if star_code == 0 or update_code == 0 or int(coin_data["status"]) == 1:
+			return self._message_typesetting(status=4, message="database operating error ==> update_code: %s, star_code: %s, json_status: %s" % (update_code, star_code, coin_data["status"]))
+		data = {
+			"remaing": {
+				"cost_weapon_name": weapon,  # 武器分解的名字
+				"cost_weapon_star": 0,  # 武器分解之后的星数
+				"coin": coin_data["remaining"],  # player表中金币的剩余数量
+				"diamond": diamond_data["remaining"],  # player表中钻石的剩余数量
+				"reward_weapon_name": reward_weapon_name,  # 奖励碎片的武器名字
+				"reward_weapon_segment": select_result[0][0]  # 碎片的剩余数量
+			},
+			"reward": {
+				"coin": reward["coin"],  # 分解武器奖励的金币
+				"reward_weapon_name": reward_weapon_name,  # 奖励碎片的武器名字
+				"reward_weapon_segment": reward_weapon_segment  # 奖励碎片的数量
+			}
+		}
+		return self._message_typesetting(status=0, message="Successful weapon decomposition", data=data)
 
 
 
@@ -557,6 +618,7 @@ class GameManager:
 
 	
 
+
 	async def get_hang_up_reward(self, world: int, unique_id: str) -> dict:
 		"""
 		success ===> 0
@@ -596,6 +658,8 @@ class GameManager:
 			values = list(data[0])
 
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
+
+		
 
 
 
