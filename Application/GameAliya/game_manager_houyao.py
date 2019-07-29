@@ -1351,8 +1351,57 @@ class GameManager:
 		sql_str = "update dark_market set merchandise%s='%s', merchandise%s_quantity=%s, currency_type%s='%s', currency_type%s_price=%s, refresh_time='%s', refreshable_quantity=%s where unique_id='%s'" % (code, merchandise, code, merchandise_quantity, code, currency_type, code, currency_type_price, refresh_time, refreshable_quantity, unique_id)
 		return await self._execute_statement_update(world=world, statement=sql_str)
 #  #########################  houyao 2019-07-29 14：49  ##########################
-	#  TODO Black market transaction 黑市交易
 
+	# TODO enter_tower
+	async def enter_tower(self, world: int, unique_id: str, stage: int) -> dict:
+		# 0 - success
+		# 97 - database operation error
+		# 98 - key insufficient
+		# 99 - parameter error
+		enter_tower_data = self._entry_consumables["tower_stage"]
+		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
+			return self._message_typesetting(99, "Parameter error")
+		if stage % 10 != 0:
+			keys = list(enter_tower_data[str(stage)].keys())
+			values = [-v for v in list(enter_tower_data[str(stage)].values())]
+			material_dict = {}
+			for i in range(len(keys)):
+				material_dict.update({keys[i]: values[i]})
+
+			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
+			select_values = (await self._execute_statement(world, select_str))[0]
+			for i in range(len(select_values)):
+				values[i] = int(values[i]) + int(select_values[i])
+				if values[i] < 0:
+					return self._message_typesetting(98, "%s insufficient" % keys[i])
+
+			if await self._execute_statement_update(world, update_str) == 0:
+				return self._message_typesetting(status=97, message="database operating error")
+			return self._message_typesetting(0, "success", {"keys": keys, "values": values})
+		else:
+			reward = random.choices(population=enter_tower_data[str(stage)])[0]
+			if reward in enter_tower_data["skill"]:
+				reward_data = await self.try_unlock_skill(world=world, unique_id=unique_id, skill_id=reward)
+				if reward_data["status"] == 0:
+					return self._message_typesetting(status=1, message="Successfully unlock new skills", data={"keys": [reward], "values": [1]})
+				else:
+					scroll = random.choices(population=enter_tower_data["skill_scroll"], cum_weights=[0.5, 0.8, 1])[0]
+					scroll_data = await self._try_material(world=world, unique_id=unique_id, material=scroll, value=1)
+					if scroll_data["status"] == 1:
+						return self._message_typesetting(status=95, message="skill -> database operating error")
+					return self._message_typesetting(status=2, message="Gain a scroll", data={"keys": [scroll], "values": [scroll_data["remaining"]]})
+			elif reward in enter_tower_data["weapon"]:  # weapon
+				if len(enter_tower_data["segment"]) == 2:
+					segment = random.randint(enter_tower_data["segment"][0], enter_tower_data["segment"][1])
+				else:
+					segment = enter_tower_data["segment"][0]
+				sql_str = "update %s set segment=segment+%s where unique_id='%s'" % (reward, segment, unique_id)
+				if await self._execute_statement_update(world=world, statement=sql_str) == 0:
+					return self._message_typesetting(status=94, message="weapon -> database operating error")
+				segment = await self._get_segment(world=world, unique_id=unique_id, weapon=reward)
+				return self._message_typesetting(status=3, message="Gain weapon fragments", data={"keys": ["weapon", "segment"], "values": [reward, segment]})
+			else:
+				self._message_typesetting(status=96, message="Accidental prize -> " + reward)
 
 
 #  #########################  houyao 2019-07-29 14：49  ##########################
