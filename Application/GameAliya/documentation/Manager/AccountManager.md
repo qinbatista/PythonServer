@@ -30,22 +30,62 @@ Any function call that requires a valid token and does not supply one will recei
 }
 ```
 
+**Note - AccountManager API does not require the 'world' parameter to be present in requests**
+
 ---
+
+### login\_unique
+
+Tries to log the user in using only their unique\_id.
+A user can log in using just their unique\_id if they have not yet bound their account.
+The game can only be played until a certain point with an unbound account.
+If called with a unique\_id not found in the database, create a new account.
+
+Returns an authorized token to the user.
+
+Status codes and meaning:
+
+- 0 - Success
+- 1 - Success, new account created
+- 2 - The account has already been bound before, log in using a different method
+
+
+##### Sample Request
+```json
+{
+	"function" : "login_unique",
+	"data" : {
+				"unique_id" : "UNIQUE_ID"
+			 }
+}
+```
+
+##### Sample Response
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"token" : "generated token"
+			 }
+}
+```
+
 
 ### login
 
-Attempts to log the user in using the specified credentials. The 'identifier' specifies which identifying information the user will try to use to log in. 
+Attempts to log the user in using the specified credentials.
+The 'identifier' specifies which identifying information the user will try to use to log in. 
+If the email or phone\_number fields in the response are empty that means those identifiers have not yet been bound to the account.
 
-Valid identifiers are: account, email, phone\_number. 
+Valid identifiers are: **account**, **email**, **phone\_number**. 
 
 Returns an authorized token to the user.
-If the account, email, or phone\_number values are not empty that means it has been bound.
 
 Status codes and meaning:
 
 - 0 - Success
 - 1 - Invalid credentials
-
 
 
 ##### Sample Request
@@ -75,53 +115,19 @@ Status codes and meaning:
 ```
 
 
-
-### login\_unique
-
-Tries to log the user in using their unique\_id. A user can log in using just their unique\_id if they have not yet bound their account. The game can only be played until a certain point with an unbound account. If it is a new unique\_id, create a new account and populate database tables with information. Returns an authorized token to the user.
-
-Status codes and meaning:
-
-- 0 - Success
-- 1 - Success, new account created
-- 2 - The account has already been bound before, log in using a different method
-
-
-
-##### Sample Request
-```json
-{
-	"function" : "login_unique",
-	"data" : {
-				"unique_id" : "UNIQUE_ID"
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"message": "success",
-	"data" : {
-				"token" : "generated token"
-			 }
-}
-```
-
-
-
-
 ### bind\_account
 
-Binds the account specified with the unique\_id to the provided information.
+Binds a user account with the provided information.
 
 Minimally, a valid account name and password must be provided when binding.
 Email and phone number are optional, and should be left empty if omitted.
 This function can be called again to bind previously unbound items such as email or phone.
 
-Data validation for account name, password, and email is currently in use.
-Phone number validation has yet to be implemented.
+Data validation for all parameters as follows:
+- password - any combination of **non-whitespace** characters. 6-30 length.
+- account - starts with a **letter**, followed by any combination of **letter**s, **number**s, **\_**, **.**, **@**, and **-**. 6-25 length.
+- email - any valid email address
+- phone - any valid phone number, including country code
 
 Status codes and meaning:
 
