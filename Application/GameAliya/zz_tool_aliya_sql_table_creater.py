@@ -71,6 +71,7 @@ def create_player_table() -> None:
         "level": "INT(11) NULL DEFAULT(0) COMMENT '玩家等级'",
         "role": "INT(11) NULL DEFAULT(0) COMMENT '角色'",
         "stage": "INT(11) NULL DEFAULT(0) COMMENT '关卡等级'",
+        "tower_stage": "INT(11) NULL DEFAULT(0) COMMENT '塔的阶段'",
         "skill_scroll_10": "INT(11) NULL DEFAULT(0) COMMENT '低级卷轴'",
         "skill_scroll_30": "INT(11) NULL DEFAULT(0) COMMENT '中级卷轴'",
         "skill_scroll_100": "INT(11) NULL DEFAULT(0) COMMENT '高级卷轴'",
