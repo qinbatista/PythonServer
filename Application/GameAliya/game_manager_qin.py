@@ -622,6 +622,13 @@ class GameManager:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
 		# 99 - send friend gift failed, because not cooldown time is not finished
+		#return value
+		# {
+		# 	 {"f_id": "5", "f_name": "\u4faf\u5c27", "f_level": 0}
+		# }
+		# f_id friend id
+		# f_name friend name
+		# f_level friend level
 		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
 		mylist = list(data[0])
 		my_friend_id_index =  mylist.index(friend_id)
@@ -647,7 +654,26 @@ class GameManager:
 				return self._message_typesetting(1, 'send friend gift success because time is over 1 day',data)
 			else:
 				return self._message_typesetting(99, 'send friend gift failed, because not cooldown time is not finished',data)
-
+	async def _get_all_friend_info(self, world: int, unique_id: str):
+		#0 got all friends info
+		# return message:{"f_list_id":f_id, "f_name":f_name,"f_level":f_level,"f_recovery_time":f_recovery_time}
+		#return all friends info which friend id is not empty
+		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
+		mylist = list(data[0])
+		f_id,f_name,f_level,f_recovery_time =[],[],[],[]
+		for i in range(0,int((len(mylist)-1)/4)):
+			if mylist[i*4+1+0]!="":
+				f_id.append(mylist[i*4+1+0])
+				f_name.append(mylist[i*4+1+1])
+				f_level.append(mylist[i*4+1+2])
+				f_recovery_time.append(mylist[i*4+1+3])
+		data={
+			"f_list_id":f_id,
+			"f_name":f_name,
+			"f_level":f_level,
+			"f_recovery_time":f_recovery_time
+		}
+		return self._message_typesetting(0, 'got all friends info',data)
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0]), data[0][1]
@@ -1070,6 +1096,12 @@ async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER'])._send_friend_gift(int(post['world']), post['unique_id'], post['friend_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_friend_info')
+async def __fortune_wheel_pro(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._get_all_friend_info(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 def get_config() -> configparser.ConfigParser:
