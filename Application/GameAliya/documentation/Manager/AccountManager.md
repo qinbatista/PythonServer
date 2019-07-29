@@ -124,7 +124,7 @@ Email and phone number are optional, and should be left empty if omitted.
 This function can be called again to bind previously unbound items such as email or phone.
 
 Data validation for all parameters as follows:
-- password - any combination of **non-whitespace** characters. 6-30 length.
+- password - any combination of normal ascii characters. 6-30 length.
 - account - starts with a **letter**, followed by any combination of **letter**s, **number**s, **\_**, **.**, **@**, and **-**. 6-25 length.
 - email - any valid email address
 - phone - any valid phone number, including country code
