@@ -62,6 +62,7 @@ def create_player_table() -> None:
     table_name = "player"
     table_dict = {
         "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
+        "game_name": "VARCHAR(64) NULL DEFAULT '' COMMENT '游戏名字'",
         "coin": "INT(11) NULL DEFAULT(0) COMMENT '金币'",
         "iron": "INT(11) NULL DEFAULT(0) COMMENT '铁'",
         "diamond": "INT(11) NULL DEFAULT(0) COMMENT '钻石'",
