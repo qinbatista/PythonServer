@@ -1486,12 +1486,6 @@ async def __get_hang_up_reward(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).get_hang_up_reward(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
-@ROUTES.post('/fortune_wheel_basic')
-async def __fortune_wheel_basic(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).fortune_wheel_basic(int(post['world']), post['unique_id'], post['cost_item'])
-	return _json_response(result)
-
 @ROUTES.post('/fortune_wheel_pro')
 async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	post = await request.post()
