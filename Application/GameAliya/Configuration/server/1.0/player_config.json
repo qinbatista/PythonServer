@@ -150,6 +150,7 @@
 		},
 		"diamond_refresh_store":{
 			"diamond": 100
-		}
+		},
+		"skill_scroll": ["skill_scroll_10", "skill_scroll_30", "skill_scroll_100"]
 	}
 }
