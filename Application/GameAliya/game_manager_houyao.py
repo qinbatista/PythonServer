@@ -235,7 +235,6 @@ class GameManager:
 			value_list.append(val[1])
 		return self._message_typesetting(0, 'success', {"keys": key_list, "values": value_list})
 
-
 	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
 		# success ===> 0
 		# 0 - Success

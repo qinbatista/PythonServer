@@ -20,7 +20,7 @@ def try_iron():
 
 
 def try_diamond():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/try_diamond', data={'unique_id': "4", "value": -1000})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/try_diamond', data={'world':0, 'unique_id': "4", "value": -1000})
 	print(str(result.text))
 
 
@@ -135,9 +135,9 @@ def black_market_transaction(code: int=0):
 
 
 if __name__ == "__main__":
-	# try_remove_coin()
-	# try_remove_iron()
-	# try_remove_diamond()
+	# try_coin()
+	# try_iron()
+	try_diamond()
 	# level_up_weapon()
 	# pass_stage()
 	get_skill()
