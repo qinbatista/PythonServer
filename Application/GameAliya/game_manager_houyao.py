@@ -845,7 +845,7 @@ class GameManager:
 				return await cursor.execute(statement)
 
 
-	def _internal_format(self, status: int, remaining: int or tuple or list) -> dict:
+	def _internal_format(self, status: int, remaining: int or tuple or list or str) -> dict:
 		"""
 		Internal json formatted information
 		内部json格式化信息
@@ -1260,28 +1260,87 @@ class GameManager:
 			data["values"] = data["values"] + [refresh_time, int(refreshable_quantity), diamond]
 			return self._message_typesetting(status=0, message="Refresh market success", data=data)
 
-
-
 	#  TODO Black market transaction 黑市交易
 	async def black_market_transaction(self, world: int, unique_id: str, code: int) -> dict:
-		# success ===> 0
-		# 0 : Successful weapon decomposition
-		# 1 : User does not have this weapon
-		# 2 : Insufficient diamond
-		# 3 : self._player not updated
+		# success ===> 0 , 1 , 2 , 3
+		# 0 : Gain weapon fragments
+		# 1 : Gain new skills
+		# 2 : Gain a scroll
+		# 3 : Gain several materials
+		# 93 : Unexpected element, please update the configuration table
+		# 94 : other -> database operating error
+		# 95 : skill -> database operating error
+		# 96 : weapon -> database operating error
+		# 97 : (diamond or coin) insufficient
 		# 98 : Merchandise has been sold
 		# 99 : Parameter error
 		if code < 1 or code > 8:  # 数据库中只有1-8的商品代号
 			return self._message_typesetting(status=99, message="Parameter error")
 		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=code)
-		if merchandise != "":
+		if merchandise == "":
 			return self._message_typesetting(status=98, message="Merchandise has been sold")
 		else:
 			dark_market_data = self._player["dark_market"]
+			data = {"keys": [], "values": []}
+			# weapon
 			if merchandise in dark_market_data["weapon"]:
-				sql_str = "update %s set segment=%s where unique_id=%s" % (merchandise, merchandise_quantity, unique_id)
-				code1 = await self._execute_statement_update(world=world, statement=sql_str)
-		return {}
+				currency_type_data = await self._try_material(world=world, unique_id=unique_id, material=currency_type, value=-1 * currency_type_price)
+				if currency_type_data["status"] == 1:
+					return self._message_typesetting(status=97, message=currency_type + " insufficient")
+				sql_str = "update %s set segment=segment+%s where unique_id='%s'" % (merchandise, merchandise_quantity, unique_id)
+				if await self._execute_statement_update(world=world, statement=sql_str) == 0:
+					return self._message_typesetting(status=96, message="weapon -> database operating error")
+				segment = (await self._execute_statement(world=world, statement="select segment from %s where unique_id='%s'" % (merchandise, unique_id)))[0][0]
+				# code是出售的商品代号，weapon是那把武器，segment是前面指定的武器的碎片数量，
+				# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
+				data["keys"] = ["code", "weapon", "segment", "currency_type", "currency_type_price"]
+				data["values"] = [code, merchandise, segment, currency_type, currency_type_data["remaining"]]
+				if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
+					print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
+				return self._message_typesetting(status=0, message="Gain weapon fragments", data=data)
+			# skill
+			elif merchandise in dark_market_data["skill"]:
+				currency_type_data = await self._try_material(world=world, unique_id=unique_id, material=currency_type, value=-1 * currency_type_price)
+				if currency_type_data["status"] == 1:
+					return self._message_typesetting(status=97, message=currency_type + " insufficient")
+				skill_data = await self.try_unlock_skill(world=world, unique_id=unique_id, skill_id=merchandise)
+				if skill_data["status"] == 0:  # 存在技能，并且奖励技能
+					# code是出售的商品代号，skill是哪个技能，level是前面指定的技能的等级，
+					# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
+					data["keys"] = ["code", "skill", "level", "currency_type", "currency_type_price"]
+					data["values"] = [code, merchandise, 1, currency_type, currency_type_data["remaining"]]
+					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
+						print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
+					return self._message_typesetting(status=1, message="Gain new skills", data=data)
+				else:  # 技能存在则替换成随机获得卷轴
+					scroll = (random.choices(population=dark_market_data["skill_scroll"], cum_weights=[0.7, 0.9, 1]))[0]
+					scroll_data = await self._try_material(world=world, unique_id=unique_id, material=scroll, value=1)
+					if scroll_data["status"] == 1:
+						return self._message_typesetting(status=95, message="skill -> database operating error")
+					# code是出售的商品代号，scroll是哪种类型的卷轴，quantity是前面指定的卷轴的剩余数量，
+					# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
+					data["keys"] = ["code", "scroll", "quantity", "currency_type", "currency_type_price"]
+					data["values"] = [code, scroll, scroll_data["remaining"], currency_type, currency_type_data["remaining"]]
+					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
+						print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
+					return self._message_typesetting(status=2, message="Gain a scroll", data=data)
+			# other
+			elif merchandise in dark_market_data["other"].keys():
+				currency_type_data = await self._try_material(world=world, unique_id=unique_id, material=currency_type, value=-1 * currency_type_price)
+				if currency_type_data["status"] == 1:
+					return self._message_typesetting(status=97, message=currency_type + " insufficient")
+				other_data = await self._try_material(world=world, unique_id=unique_id, material=merchandise, value=merchandise_quantity)
+				if other_data["status"] == 1:
+					return self._message_typesetting(status=94, message="other -> database operating error")
+				# code是出售的商品代号，merchandise是哪种材料，quantity是前面指定的材料的剩余量，
+				# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
+				data["keys"] = ["code", "merchandise", "quantity", "currency_type", "currency_type_price"]
+				data["values"] = [code, merchandise, other_data["remaining"], currency_type, currency_type_data["remaining"]]
+				if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
+					print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
+				return self._message_typesetting(status=3, message="Gain several materials", data=data)
+			else:
+				return self._message_typesetting(status=93, message="Unexpected element, please update the configuration table")
 
 	async def _get_dark_market_material(self, world: int, unique_id: str, code: int) -> tuple:
 		sql_str = "select merchandise%s, merchandise%s_quantity, currency_type%s, currency_type%s_price, refresh_time, refreshable_quantity from dark_market where unique_id='%s'" % (code, code, code, code, unique_id)
@@ -1570,6 +1629,12 @@ async def __diamond_refresh_store(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).diamond_refresh_store(int(post['world']), post['unique_id'])
 	return _json_response(result)
+
+@ROUTES.post('/black_market_transaction')
+async def __black_market_transaction(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).black_market_transaction(int(post['world']), post['unique_id'], int(post['code']))
+	return _json_response(result)
 #  #########################  houyao 2019-07-28 19：49  ##########################
 
 
@@ -1597,7 +1662,7 @@ def run():
 	app.add_routes(ROUTES)
 	config = get_config()
 	app['MANAGER'] = GameManager()
-	web.run_app(app, port=config.getint('game_manager', 'port'))
+	web.run_app(app, port=config.getint('game_manager_houyao', 'port'))
 
 
 if __name__ == '__main__':

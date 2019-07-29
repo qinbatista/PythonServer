@@ -5,7 +5,7 @@ import configparser
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-GAME_MANAGER_BASE_URL = 'http://localhost:8004'
+GAME_MANAGER_BASE_URL = 'http://localhost:8007'
 
 
 
@@ -129,6 +129,11 @@ def diamond_refresh_store():
 	print(str(result.text))
 
 
+def black_market_transaction(code: int=0):
+	result = requests.post(GAME_MANAGER_BASE_URL + '/black_market_transaction', data={"world": 0, 'unique_id': "4", 'code': code})
+	print(str(result.text))
+
+
 if __name__ == "__main__":
 	# try_remove_coin()
 	# try_remove_iron()
@@ -152,5 +157,6 @@ if __name__ == "__main__":
 	# enter_stage()
 	# disintegrate_weapon()
 	# automatically_refresh_store()
-	# manually_refresh_store()
-	diamond_refresh_store()
+	manually_refresh_store()
+	# diamond_refresh_store()
+	# black_market_transaction(4)
