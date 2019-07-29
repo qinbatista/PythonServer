@@ -409,17 +409,17 @@ class GameManager:
 	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
 		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 2 - no weapon!
+		# - 99 - no weapon!
 		try:
 			star = await self._get_weapon_star(world, unique_id, weapon)
 			if star != 0:
 				segment = await self._get_segment(world, unique_id, weapon) + 30
 				await self._set_segment_by_id(world, unique_id, weapon, segment)
-				return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'segment'], "values": [weapon, segment]})
+				return self._message_typesetting(status=1, message='Weapon already unlocked, got free segment!', data={"keys": ['weapon', 'segment'], "values": [weapon, segment]})
 			await self._set_weapon_star(world, unique_id, weapon, 1)
-			return self._message_typesetting(0, 'Unlocked new weapon!', {"keys": ["weapon"], "values": [weapon]})
+			return self._message_typesetting(status=0, message='Unlocked new weapon!', data={"keys": ["weapon"], "values": [weapon]})
 		except:
-			return self._message_typesetting(2, 'no weapon!')
+			return self._message_typesetting(status=99, message='no weapon!')
 
 
 
@@ -443,11 +443,11 @@ class GameManager:
 	# TODO CHECK SPEED IMPROVEMENTS
 	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
-		# 1 - database operation error
-		# 2 - key insufficient
-		# 9 - parameter error
+		# 97 - database operation error
+		# 98 - key insufficient
+		# 99 - parameter error
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
-			return self._message_typesetting(9, "Parameter error")
+			return self._message_typesetting(99, "Parameter error")
 		keys = list(self._entry_consumables[str(stage)].keys())
 		values = [-v for v in list(self._entry_consumables[str(stage)].values())]
 		material_dict = {}
@@ -459,23 +459,23 @@ class GameManager:
 		for i in range(len(select_values)):
 			values[i] = int(values[i]) + int(select_values[i])
 			if values[i] < 0:
-				return self._message_typesetting(2, "%s insufficient" % keys[i])
+				return self._message_typesetting(98, "%s insufficient" % keys[i])
 
 		if await self._execute_statement_update(world, update_str) == 0:
-			return self._message_typesetting(status=1, message="database operating error")
+			return self._message_typesetting(status=97, message="database operating error")
 		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
 
 	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		# success ===> 0
 		# 0 : passed customs ===> success
-		# 1 : database operation error
-		# 9 : abnormal data!
+		# 98 : database operation error
+		# 99 : abnormal data!
 		json_data = await self.try_all_material(world, unique_id, stage)
 		status = int(json_data["status"])
 		if status == 9:
-			return self._message_typesetting(9, "abnormal data!")
+			return self._message_typesetting(99, "abnormal data!")
 		elif status == 1:
-			return self._message_typesetting(1, "database operation error")
+			return self._message_typesetting(98, "database operation error")
 		else:
 			material_dict = json_data["remaining"][0]
 			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
@@ -526,7 +526,7 @@ class GameManager:
 		# success ===> 0 and 1
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
 		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 2 - no weapon!
+		# - 99 - no weapon!
 		tier_choice = (random.choices(self._lottery['weapons']['names'], self._lottery['weapons']['weights'][kind]))[0]
 		gift_weapon = (random.choices(self._lottery['weapons']['items'][tier_choice]))[0]
 		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
