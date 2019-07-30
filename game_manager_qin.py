@@ -340,6 +340,58 @@ class GameManager:
 		# 5 - cost_item error
 		return await self._default_summon(world, unique_id, cost_item, 'prophet',summon_kind)
 
+	async def basic_summon_10_times(self, world: int, unique_id: str, cost_item: str, summon_kind:str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		result_list = []
+		for _ in range(0,10):
+			message_list=await self._default_summon(world, unique_id, cost_item, 'basic',summon_kind)
+			result_list.append(message_list['data'])
+		return self._message_typesetting(2, '10 times basic_summon',result_list)
+
+	async def pro_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		result_list = []
+		for _ in range(0,10):
+			message_list=await self._default_summon(world, unique_id, cost_item, 'pro',summon_kind)
+			result_list.append(message_list['data'])
+		return self._message_typesetting(2, '10 times pro_summon',result_list)
+
+	async def friend_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		result_list = []
+		for _ in range(0,10):
+			message_list=await self._default_summon(world, unique_id, cost_item, 'pro',summon_kind)
+			result_list.append(message_list['data'])
+		return self._message_typesetting(2, '10 times pro_summon',result_list)
+
+	async def prophet_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		result_list = []
+		for _ in range(0,10):
+			message_list=await self._default_summon(world, unique_id, cost_item, 'prophet',summon_kind)
+			result_list.append(message_list['data'])
+		return self._message_typesetting(2, '10 times pro_summon',result_list)
+
 	async def fortune_wheel_basic(self, world: int, unique_id: str, cost_item: str) -> dict:
 		return await self._default_fortune_wheel(world, unique_id, cost_item, 'basic')
 
@@ -1082,41 +1134,105 @@ async def __friend_summon(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
 	return _json_response(result)
 
+@ROUTES.post('/basic_summon_10_times')
+async def __basic_summon_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).basic_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
+	return _json_response(result)
+
+@ROUTES.post('/pro_summon_10_times')
+async def __pro_summon_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).pro_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
+	return _json_response(result)
+
+@ROUTES.post('/friend_summon_10_times')
+async def __friend_summon_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).friend_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
+	return _json_response(result)
+
+@ROUTES.post('/prophet_summon_10_times')
+async def __prophet_summon_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).prophet_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
+	return _json_response(result)
+
 @ROUTES.post('/basic_summon_skill')
-async def __basic_summon(request: web.Request) -> web.Response:
+async def basic_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).basic_summon(int(post['world']), post['unique_id'], post['cost_item'],"skills")
 	return _json_response(result)
 
 @ROUTES.post('/pro_summon_skill')
-async def __pro_summon(request: web.Request) -> web.Response:
+async def pro_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).pro_summon(int(post['world']), post['unique_id'], post['cost_item'],"skills")
 	return _json_response(result)
 
 @ROUTES.post('/friend_summon_skill')
-async def __friend_summon(request: web.Request) -> web.Response:
+async def friend_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'],"skills")
 	return _json_response(result)
 
+
+@ROUTES.post('/basic_summon_skill_10_times')
+async def basic_summon_skill_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).basic_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"skills")
+	return _json_response(result)
+
+@ROUTES.post('/pro_summon_skill_10_times')
+async def pro_summon_skill_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).pro_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"skills")
+	return _json_response(result)
+
+@ROUTES.post('/friend_summon_skill_10_times')
+async def friend_summon_skill_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).friend_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"skills")
+	return _json_response(result)
+
+
 @ROUTES.post('/basic_summon_roles')
-async def __basic_summon(request: web.Request) -> web.Response:
+async def basic_summon_roles(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).basic_summon(int(post['world']), post['unique_id'], post['cost_item'],"roles")
 	return _json_response(result)
 
 @ROUTES.post('/pro_summon_roles')
-async def __pro_summon(request: web.Request) -> web.Response:
+async def pro_summon_roles(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).pro_summon(int(post['world']), post['unique_id'], post['cost_item'],"roles")
 	return _json_response(result)
 
 @ROUTES.post('/friend_summon_roles')
-async def __friend_summon(request: web.Request) -> web.Response:
+async def friend_summon_roles(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'],"roles")
 	return _json_response(result)
+
+
+@ROUTES.post('/basic_summon_roles_10_times')
+async def basic_summon_roles_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).basic_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"roles")
+	return _json_response(result)
+
+@ROUTES.post('/pro_summon_roles_10_times')
+async def pro_summon_roles_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).pro_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"roles")
+	return _json_response(result)
+
+@ROUTES.post('/friend_summon_roles_10_times')
+async def friend_summon_roles_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).friend_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"roles")
+	return _json_response(result)
+
 
 @ROUTES.post('/fortune_wheel_basic')
 async def __fortune_wheel_basic(request: web.Request) -> web.Response:
