@@ -22,78 +22,6 @@ class GameManager:
 		self._start_timer(600)
 
 
-
-#############################################################################
-#						 Bag Module Functions								#
-#############################################################################
-	async def get_all_head(self, world: int, table: str) -> dict:
-		"""
-		Used to get information such as the title of the database
-		用于获取数据库的标题等信息
-		:return:返回所有数据库的标题等信息，json数据
-		"""
-		data = list(await self._execute_statement(world, "desc %s;" % table))
-		return self._internal_format(0, data)
-
-	async def get_all_material(self, world: int, unique_id: str) -> dict:
-		"""
-		Used to get all numeric or string information
-		用于获取所有的数字或字符串信息
-		:param unique_id: 用户的唯一标识
-		:return:返回所有材料名对应的值，json数据
-		"""
-		data = await self._execute_statement(world, "SELECT * FROM player WHERE unique_id='" + str(unique_id) + "'")
-		return self._internal_format(0, data[0])
-
-	async def get_all_supplies(self, world: int, unique_id: str) -> dict:
-		# success ===> 0
-		data_tuple = (await self.get_all_head(world, table="player"))["remaining"]
-		heads = []
-		for col in data_tuple:
-			heads.append(col[0])
-		content = list((await self.get_all_material(world, unique_id=unique_id))["remaining"])
-		heads.pop(0)
-		content.pop(0)
-		return self._message_typesetting(0, "get supplies success", {"keys": heads, "values": content})
-
-	async def add_supplies(self, world: int, unique_id: str, supply: str, value: int):
-		# success ===> 0
-		if value <= 0: return self._message_typesetting(9, "not a positive number")
-		data = await self._try_material(world, unique_id, supply, value)
-		if data["status"] == 0:
-			return self._message_typesetting(0, "success", {"keys": [supply], "values": [data["remaining"]]})
-		return self._message_typesetting(1, "failure")
-
-	async def level_up_scroll(self, world: int, unique_id: str, scroll_id: str) -> dict:
-		# 0 success
-		# 1 advanced reels are not upgradeable
-		# 2 insufficient scroll
-		# 3 unexpected parameter
-		# 4 parameter error
-		# 9 database operation error
-		if scroll_id == "skill_scroll_100": return self._message_typesetting(1, "advanced reels are not upgradeable!")
-		try:
-			scroll_id_count = await self._get_material(world, unique_id, scroll_id)
-			if int(scroll_id_count) < 3:
-				return self._message_typesetting(2, "Insufficient scroll")
-			elif scroll_id == "skill_scroll_10":
-				dict1 = await self.try_skill_scroll_10(world, unique_id, -3)
-				dict2 = await self.try_skill_scroll_30(world, unique_id, 1)
-				if dict1["status"] == 1 or dict2["status"] == 1:
-					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
-			elif scroll_id == "skill_scroll_30":
-				dict1 = await self.try_skill_scroll_30(world, unique_id, -3)
-				dict2 = await self.try_skill_scroll_100(world, unique_id, 1)
-				if dict1["status"] == 1 or dict2["status"] == 1:
-					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_30", "skill_scroll_100"], "values": [dict1["remaining"], dict2["remaining"]]})
-			else:
-				return self._message_typesetting(3, message="unexpected parameter --> " + scroll_id)
-		except:
-			return self._message_typesetting(4, 'parameter error!')
-
-	# TODO rename function - it is private and only called by pass_stage function
 	async def try_all_material(self, world: int, unique_id: str, stage: int) -> dict:
 		sql_stage = await self._get_material(world, unique_id, "stage")
 		if stage <= 0 or sql_stage + 1 < stage:
@@ -283,143 +211,6 @@ class GameManager:
 #############################################################################
 #						Weapon Module Functions								#
 #############################################################################
-
-
-	async def level_up_weapon(self, world: int, unique_id: str, weapon: str, iron: int) -> dict:
-		# - 0 - Success
-		# - 1 - User does not have that weapon
-		# - 2 - Incoming materials are not upgraded enough
-		# - 3 - Insufficient materials, upgrade failed
-		# - 4 - Database operation error
-		# - 9 - Weapon already max level
-		if await self._get_weapon_star(world, unique_id, weapon) == 0:
-			return self._message_typesetting(1, 'User does not have that weapon')
-		row = await self._get_row_by_id(world, weapon, unique_id)
-		if row[1] == 100:
-			return self._message_typesetting(9, 'Weapon already max level')
-		skill_upgrade_number = iron // self._standard_iron_count
-		data_tuple = (await self.get_all_head(world, weapon))['remaining']
-		head = [x[0] for x in data_tuple]
-		level_count = head.index('weapon_level')
-		point_count = head.index('skill_point')
-		if (row[level_count] + skill_upgrade_number) > 100:
-			skill_upgrade_number = 100 - row[level_count]
-		row[level_count] += skill_upgrade_number
-		row[point_count] += skill_upgrade_number
-
-		if skill_upgrade_number == 0:
-			return self._message_typesetting(2, 'Incoming materials are not upgraded enough')
-		data = await self.try_iron(world, unique_id, -1 * skill_upgrade_number * self._standard_iron_count)
-		if int(data['status']) == 1:
-			return self._message_typesetting(3, 'Insufficient materials, upgrade failed')
-		if await self._set_weapon_level_up_data(world, unique_id, weapon, row[level_count], row[point_count]) == 0:
-			return self._message_typesetting(3, 'Database operation error')
-		head[0] = 'weapon'
-		row[0] = weapon
-		head.append('iron')
-		row.append(data['remaining'])
-		return self._message_typesetting(0, 'success', {'keys' : head, 'values' : row })
-
-
-	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str):
-		# - 0 - Success
-		# - 1 - User does not have that weapon
-		# - 2 - Insufficient skill points, upgrade failed
-		# - 3 - Database operation error
-		# - 9 - Passive skill does not exist
-		if await self._get_weapon_star(world, unique_id, weapon) == 0:
-			return self._message_typesetting(1, "User does not have that weapon")
-		if passive not in self._valid_passive_skills:
-			return self._message_typesetting(9, "Passive skill does not exist")
-		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
-		head = [x[0] for x in data_tuple]
-		row = await self._get_row_by_id(world, weapon, unique_id)
-		point_count = head.index("skill_point")
-		passive_count = head.index(passive)
-		if row[point_count] == 0:
-			return self._message_typesetting(2, "Insufficient skill points, upgrade failed")
-		row[point_count] -= 1
-		row[passive_count] += 1
-		if await self._set_passive_skill_level_up_data(world, unique_id, weapon, passive, row[passive_count], row[point_count]) == 0:
-			return self._message_typesetting(3, "Database operation error")
-		head[0] = "weapon"
-		row[0] = weapon
-		return self._message_typesetting(0, "success", {"keys": head, "values": row})
-
-	async def level_up_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
-		# - 0 - Weapon upgrade success
-		# - 2 - insufficient segment, upgrade failed
-		# - 3 - database operation error!
-		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
-		head = [x[0] for x in data_tuple]
-		row = await self._get_row_by_id(world, weapon, unique_id)
-		weapon_star = await self._get_weapon_star(world, unique_id, weapon)
-		segment_count = self._standard_segment_count * (1 + weapon_star)  # 根据武器星数增加碎片的消耗数量
-
-		if int(row[head.index("segment")]) < segment_count:
-			return self._message_typesetting(2, "Insufficient segments, upgrade failed!")
-
-		row[head.index("segment")] = int(row[head.index("segment")]) - segment_count
-		weapon_star += 1
-		code1 = await self._set_segment_by_id(world, unique_id, weapon, row[head.index("segment")])
-		code2 = await self._set_weapon_star(world, unique_id, weapon, weapon_star)
-		if code1 == 0 or code2 == 0:
-			return self._message_typesetting(3, "Database operation error!")
-		head[0] = "weapon"
-		row[0] = weapon
-		head.append("star")
-		row.append(weapon_star)
-		return self._message_typesetting(0, weapon + " upgrade success!", {"keys": head, "values": row})
-
-	async def reset_weapon_skill_point(self, world: int, unique_id: str, weapon: str) -> dict:
-		# - 0 - Success
-		# - 1 - no weapon
-		# - 2 - insufficient gold coins, upgrade failed
-		# - 3 - database operation error!
-
-		if await self._get_weapon_star(world, unique_id, weapon) == 0:
-			return self._message_typesetting(1, "no weapon!")
-		data = await self.try_coin(world, unique_id, -1 * self._standard_reset_weapon_skill_coin_count)
-		if int(data["status"]) == 1:
-			return self._message_typesetting(2, "Insufficient gold coins, upgrade failed")
-
-		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
-		head = [x[0] for x in data_tuple]
-
-		row = await self._get_row_by_id(world, weapon, unique_id)
-
-		row[head.index("skill_point")] = row[head.index("weapon_level")]
-		row[head.index("passive_skill_1_level")] = row[head.index("passive_skill_2_level")] = row[head.index("passive_skill_3_level")] = row[head.index("passive_skill_4_level")] = 0
-		if await self._reset_skill_point(world, unique_id, weapon, row[head.index("skill_point")]) == 0:
-			return self._message_typesetting(3, "Database operation error!")
-
-		head[0] = "weapon"
-		row[0] = weapon
-		head.append("coin")
-		row.append(data["remaining"])
-		return self._message_typesetting(0, weapon + " reset skill point success!", {"keys": head, "values": row})
-
-	# TODO CHECK FOR SPEED IMPROVEMENTS
-	async def get_all_weapon(self, world: int, unique_id: str):
-		# - 0 - gain success
-		data_tuple = (await self.get_all_head(world, "weapon_bag"))["remaining"]
-		col_name_list = [x[0] for x in data_tuple]
-		weapons_stars_list = await self._get_weapon_bag(world, unique_id)
-		# The 0 position stores the UNIQUE_ID, so the column header does not traverse the 0 position.
-		# The 0 position obtained by the __get_weapon_attributes method below is also UNIQUE_ID.
-		# So it will be replaced by the number of weapons stars.
-		# 0位置存储unique_id，因此列标题不会遍历0位置。下面的__get_weapon_attributes方法获得的0位置也是unique_id，
-		# 因此它将被武器星数替换。
-		keys = []
-		values = []
-		for i in range(1, len(col_name_list)):
-			attribute_list = await self._get_weapon_attributes(world, unique_id, col_name_list[i])
-			keys.append(col_name_list[i])
-			attribute_list[0] = weapons_stars_list[i]
-			values.append(attribute_list)
-		return self._message_typesetting(0, "gain success", {"keys": keys, "values": values})
-
-#qin modified callback message
 	# TODO INTERNAL USE only?????
 	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
@@ -451,166 +242,6 @@ class GameManager:
 		# except:
 		# 	return self._message_typesetting(2, 'no role!')
 
-
-
-
-
-#############################################################################
-#						End Weapon Module Functions							#
-#############################################################################
-
-
-
-
-
-
-
-
-#############################################################################
-#						Stage Module Functions								#
-#############################################################################
-
-	# TODO CHECK SPEED IMPROVEMENTS
-	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
-		# 0 - success
-		# 1 - database operation error
-		# 2 - key insufficient
-		# 9 - parameter error
-		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
-			return self._message_typesetting(9, "Parameter error")
-		keys = list(self._entry_consumables[str(stage)].keys())
-		values = [-v for v in list(self._entry_consumables[str(stage)].values())]
-		material_dict = {}
-		for i in range(len(keys)):
-			material_dict.update({keys[i]: values[i]})
-
-		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-		select_values = (await self._execute_statement(world, select_str))[0]
-		for i in range(len(select_values)):
-			values[i] = int(values[i]) + int(select_values[i])
-			if values[i] < 0:
-				return self._message_typesetting(2, "%s insufficient" % keys[i])
-
-		if await self._execute_statement_update(world, update_str) == 0:
-			return self._message_typesetting(status=1, message="database operating error")
-		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
-
-	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
-		# success ===> 0
-		# 0 : passed customs ===> success
-		# 1 : database operation error
-		# 9 : abnormal data!
-		json_data = await self.try_all_material(world, unique_id, stage)
-		status = int(json_data["status"])
-		if status == 9:
-			return self._message_typesetting(9, "abnormal data!")
-		elif status == 1:
-			return self._message_typesetting(1, "database operation error")
-		else:
-			material_dict = json_data["remaining"][0]
-			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
-			return self._message_typesetting(0, "passed customs!", data)
-
-	
-	async def start_hang_up(self, world: int, unique_id: str, stage: int) -> dict:
-		"""
-		success ===> 0 , 1
-		# 0 - hang up success
-		# 1 - Repeated hang up successfully
-		# 2 - database operating error
-		# 9 - Parameter error
-		1分钟奖励有可能奖励1颗钻石，30颗金币，10个铁
-		minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
-		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
-		"""
-		if stage <= 0 or stage > int(await self._get_material(world=world,  unique_id=unique_id, material="stage")):
-			return self._message_typesetting(status=9, message="Parameter error")
-		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
-		key_list = await self._execute_statement(world=world, statement=sql_str)
-		hang_up_time, hang_stage = key_list[0]
-		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		if hang_up_time == "":
-			# 下面的功能是将奖励拿出来，并且将数据库剩余的值发送给客户端
-			material_dict = self._hang_reward_list[str(hang_stage)]
-			material_dict.update({"hang_stage": stage})  # 用于数据库设置当前的挂机关卡
-			material_dict.update({"hang_up_time": current_time})  # 用于数据库设置的挂机开始时间
-			key_word = ["hang_stage", "hang_up_time"]
-			keys = list(material_dict.keys())
-			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
-			if await self._execute_statement_update(world=world, statement=update_str) == 0:
-				return self._message_typesetting(status=2, message="database operating error")
-			data = await self._execute_statement(world=world, statement=select_str)
-			values = list(data[0])
-
-			return self._message_typesetting(status=0, message="hang up success", data={"keys": keys, "values": values})
-		else:
-			# 此时的material_dict字典的值是给奖励列表的，
-			# 所以hang_stage是奖励之前的关卡，
-			# hang_up_time是之前挂起的开始时间
-			material_dict = self._hang_reward_list[str(hang_stage)]
-			material_dict.update({"hang_stage": hang_stage})
-			material_dict.update({"hang_up_time": hang_up_time})
-			key_word = ["hang_stage", "hang_up_time"]
-
-			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
-			minute = delta_time.seconds // 60
-			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
-
-			for key in material_dict.keys():
-				if key not in key_word:
-					material_dict[key] = int(material_dict[key]) * minute
-			keys, hang_rewards = list(material_dict.keys()), list(material_dict.values())
-
-			# 此时的material_dict中的数据是用于数据库操作的数据
-			material_dict.update({"hang_stage": stage})
-			material_dict.update({"hang_up_time": hang_up_time})
-
-			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
-			await self._execute_statement_update(world=world, statement=update_str)
-			data = await self._execute_statement(world=world, statement=select_str)
-			values = list(data[0])
-
-			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
-
-	async def get_hang_up_reward(self, world: int, unique_id: str) -> dict:
-		"""
-		success ===> 0
-		# 0 - Settlement reward success
-		# 1 - Temporarily no on-hook record
-		"""
-		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
-		key_list = await self._execute_statement(world=world, statement=sql_str)
-		hang_up_time, hang_stage = key_list[0]
-		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		if hang_up_time == "" or int(hang_stage) == 0:
-			return self._message_typesetting(status=1, message="Temporarily no on-hook record")
-		else:
-			# 此时的material_dict字典的值是给奖励列表的，
-			# 所以hang_stage是奖励之前的关卡，
-			# hang_up_time是之前挂起的开始时间
-			material_dict = self._hang_reward_list[str(hang_stage)]
-			material_dict.update({"hang_stage": hang_stage})
-			material_dict.update({"hang_up_time": hang_up_time})
-			key_word = ["hang_stage", "hang_up_time"]
-
-			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
-			minute = delta_time.seconds // 60
-			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
-
-			for key in material_dict.keys():
-				if key not in key_word:
-					material_dict[key] = int(material_dict[key]) * minute
-			keys, hang_rewards = list(material_dict.keys()), list(material_dict.values())
-
-			# 此时的material_dict中的数据是用于数据库操作的数据
-			material_dict.update({"hang_up_time": hang_up_time})
-
-			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
-			await self._execute_statement_update(world=world, statement=update_str)
-			data = await self._execute_statement(world=world, statement=select_str)
-			values = list(data[0])
-
-			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
 
 
 
@@ -899,7 +530,7 @@ class GameManager:
 
 
 #qin modify callback message
-	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str, summon_item:str):
+	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str, summon_item:str)->str:
 		if cost_item == 'diamond':
 			result = await self.try_diamond(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['diamond']))
 		elif cost_item == 'coin':
@@ -987,8 +618,62 @@ class GameManager:
 				return self._message_typesetting(1, 'get role item success', message_dic)
 			else:
 				return self._message_typesetting(97, 'opeartion error')
-
-
+	async def _send_friend_gift(self, world: int, unique_id: str, friend_id: str)->str:
+		# 0 - send friend gift success because of f_recovering_time is empty
+		# 1 - send friend gift success because time is over 1 day
+		# 99 - send friend gift failed, because not cooldown time is not finished
+		#return value
+		# {
+		# 	 {"f_id": "5", "f_name": "\u4faf\u5c27", "f_level": 0}
+		# }
+		# f_id friend id
+		# f_name friend name
+		# f_level friend level
+		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
+		mylist = list(data[0])
+		my_friend_id_index =  mylist.index(friend_id)
+		f_id = mylist[(my_friend_id_index-1)*4+1]
+		f_recovering_time = mylist[(my_friend_id_index-1)*4+4]
+		sql_result = await self._execute_statement(world, 'SELECT game_name,level FROM player WHERE unique_id = "' + unique_id + '";')
+		f_game_name = sql_result[0][0]
+		f_level = sql_result[0][1]
+		data={
+			"f_id":f_id,
+			"f_name":f_game_name,
+			"f_level":f_level,
+		}
+		if f_recovering_time=="":
+			current_time = time.strftime('%Y-%m-%d', time.localtime())
+			data = await self._execute_statement_update(world, 'UPDATE friend_list SET recovery_time' + str(my_friend_id_index) + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
+			return self._message_typesetting(0, 'send friend gift success because of f_recovering_time is empty',data)
+		else:
+			current_time = time.strftime('%Y-%m-%d', time.localtime())
+			delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
+			if delta_time.days>=1:
+				await self._execute_statement_update(world, "UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level) + " WHERE unique_id ='" +unique_id +"';")
+				return self._message_typesetting(1, 'send friend gift success because time is over 1 day',data)
+			else:
+				return self._message_typesetting(99, 'send friend gift failed, because not cooldown time is not finished',data)
+	async def _get_all_friend_info(self, world: int, unique_id: str):
+		#0 got all friends info
+		# return message:{"f_list_id":f_id, "f_name":f_name,"f_level":f_level,"f_recovery_time":f_recovery_time}
+		#return all friends info which friend id is not empty
+		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
+		mylist = list(data[0])
+		f_id,f_name,f_level,f_recovery_time =[],[],[],[]
+		for i in range(0,int((len(mylist)-1)/4)):
+			if mylist[i*4+1+0]!="":
+				f_id.append(mylist[i*4+1+0])
+				f_name.append(mylist[i*4+1+1])
+				f_level.append(mylist[i*4+1+2])
+				f_recovery_time.append(mylist[i*4+1+3])
+		data={
+			"f_list_id":f_id,
+			"f_name":f_name,
+			"f_level":f_level,
+			"f_recovery_time":f_recovery_time
+		}
+		return self._message_typesetting(0, 'got all friends info',data)
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0]), data[0][1]
@@ -1197,35 +882,6 @@ def _json_response(body: dict = "", **kwargs) -> web.Response:
 	return web.Response(**kwargs)
 
 
-@ROUTES.post('/get_all_head')
-async def __get_all_head(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).get_all_head(int(post['world']), post['table'])
-	return _json_response(result)
-
-@ROUTES.post('/get_all_material')
-async def __get_all_material(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).get_all_material(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
-@ROUTES.post('/get_all_supplies')
-async def __get_all_supplies(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).get_all_supplies(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
-@ROUTES.post('/add_supplies')
-async def __add_supplies(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).add_supplies(int(post['world']), post['unique_id'], post['supply'], int(post['value']))
-	return _json_response(result)
-
-@ROUTES.post('/level_up_scroll')
-async def __level_up_scroll(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).level_up_scroll(int(post['world']), post['unique_id'], post['scroll_id'])
-	return _json_response(result)
 
 @ROUTES.post('/try_all_material')
 async def __try_all_material(request: web.Request) -> web.Response:
@@ -1352,12 +1008,6 @@ async def __level_up_skill(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).level_up_skill(int(post['world']), post['unique_id'], post['skill_id'], post['scroll_id'])
 	return _json_response(result)
 
-@ROUTES.post('/get_all_skill_level')
-async def __get_all_skill_level(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).get_all_skill_level(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
 @ROUTES.post('/get_skill')
 async def __get_skill(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -1370,49 +1020,11 @@ async def __try_unlock_skill(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).try_unlock_skill(int(post['world']), post['unique_id'], post['skill_id'])
 	return _json_response(result)
 
-@ROUTES.post('/level_up_weapon')
-async def __level_up_weapon(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).level_up_weapon(int(post['world']), post['unique_id'], post['weapon'], int(post['iron']))
-	return _json_response(result)
-
-@ROUTES.post('/level_up_passive')
-async def __level_up_passive(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).level_up_passive(int(post['world']), post['unique_id'], post['weapon'], post['passive'])
-	return _json_response(result)
-
-
-@ROUTES.post('/level_up_weapon_star')
-async def __level_up_weapon_star(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).level_up_weapon_star(int(post['world']), post['unique_id'], post['weapon'])
-	return _json_response(result)
-
-@ROUTES.post('/reset_weapon_skill_point')
-async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
-	return _json_response(result)
-
-@ROUTES.post('/get_all_weapon')
-async def __get_all_weapon(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).get_all_weapon(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
 @ROUTES.post('/try_unlock_weapon')
 async def __try_unlock_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).try_unlock_weapon(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
-
-@ROUTES.post('/pass_stage')
-async def __pass_stage(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).pass_stage(int(post['world']), post['unique_id'], int(post['stage']))
-	return _json_response(result)
-
 
 @ROUTES.post('/basic_summon')
 async def __basic_summon(request: web.Request) -> web.Response:
@@ -1468,18 +1080,6 @@ async def __friend_summon(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'],"roles")
 	return _json_response(result)
 
-@ROUTES.post('/start_hang_up')
-async def __start_hang_up(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).start_hang_up(int(post['world']), post['unique_id'], int(post['stage']))
-	return _json_response(result)
-
-@ROUTES.post('/get_hang_up_reward')
-async def __get_hang_up_reward(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).get_hang_up_reward(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
 @ROUTES.post('/fortune_wheel_basic')
 async def __fortune_wheel_basic(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -1492,14 +1092,17 @@ async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).fortune_wheel_pro(int(post['world']), post['unique_id'], post['cost_item'])
 	return _json_response(result)
 
-@ROUTES.post('/enter_stage')
-async def __enter_stage(request: web.Request) -> web.Response:
+@ROUTES.post('/send_friend_gift')
+async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).enter_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	result = await (request.app['MANAGER'])._send_friend_gift(int(post['world']), post['unique_id'], post['friend_id'])
 	return _json_response(result)
 
-
-
+@ROUTES.post('/get_all_friend_info')
+async def __fortune_wheel_pro(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._get_all_friend_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
 
 def get_config() -> configparser.ConfigParser:
 	'''

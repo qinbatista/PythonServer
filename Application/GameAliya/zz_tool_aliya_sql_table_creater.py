@@ -62,6 +62,7 @@ def create_player_table() -> None:
     table_name = "player"
     table_dict = {
         "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
+        "game_name": "VARCHAR(64) NULL DEFAULT '' COMMENT '游戏名字'",
         "coin": "INT(11) NULL DEFAULT(0) COMMENT '金币'",
         "iron": "INT(11) NULL DEFAULT(0) COMMENT '铁'",
         "diamond": "INT(11) NULL DEFAULT(0) COMMENT '钻石'",
@@ -70,6 +71,7 @@ def create_player_table() -> None:
         "level": "INT(11) NULL DEFAULT(0) COMMENT '玩家等级'",
         "role": "INT(11) NULL DEFAULT(0) COMMENT '角色'",
         "stage": "INT(11) NULL DEFAULT(0) COMMENT '关卡等级'",
+        "tower_stage": "INT(11) NULL DEFAULT(0) COMMENT '塔的阶段'",
         "skill_scroll_10": "INT(11) NULL DEFAULT(0) COMMENT '低级卷轴'",
         "skill_scroll_30": "INT(11) NULL DEFAULT(0) COMMENT '中级卷轴'",
         "skill_scroll_100": "INT(11) NULL DEFAULT(0) COMMENT '高级卷轴'",
@@ -254,6 +256,25 @@ def create_dark_market_table() -> None:
     sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
 
 
+def create_friend_list_table() -> None:
+    """
+    创建武器背包表以及武器信息表
+    """
+    table_name = "friend_list"
+    table_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
+    }
+    for i in range(1, 31):
+        data = {
+            "friend_id" + str(i): "VARCHAR(128) NOT NULL DEFAULT '' COMMENT '朋友%s唯一标识'" % i,
+            "friend_name" + str(i): "VARCHAR(32) NOT NULL DEFAULT '' COMMENT '朋友%s的名字'" % i,
+            "friend_level" + str(i): "INT(6) NOT NULL DEFAULT(0) COMMENT '朋友%s的等级'" % i,
+            "recovery_time" + str(i): "VARCHAR(32) NOT NULL DEFAULT '' COMMENT '朋友%s好感度恢复时间'" % i
+        }
+        table_dict.update(data)
+    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
+
+
 def update_avatar(table_name: str, unique_id: str, img_path: str):  # png
     """
     更新用户表中的头像
@@ -281,9 +302,10 @@ if __name__ == '__main__':
     # create_player_table()
     # create_skill_table()
     # create_weapon_table()
-    create_role_table()
+    # create_role_table()
     # create_user_table()
     # create_dark_market_table()
+    create_friend_list_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")

@@ -5,7 +5,7 @@ import configparser
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-GAME_MANAGER_BASE_URL = 'http://localhost:8004'
+GAME_MANAGER_BASE_URL = 'http://localhost:8007'
 
 
 
@@ -20,7 +20,7 @@ def try_iron():
 
 
 def try_diamond():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/try_diamond', data={'unique_id': "4", "value": -1000})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/try_diamond', data={'world':0, 'unique_id': "4", "value": -1000})
 	print(str(result.text))
 
 
@@ -35,17 +35,17 @@ def pass_stage():
 
 
 def get_skill():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/get_skill', data={'unique_id': "4", "skill_id": "m1_level"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/get_skill', data={'world':0, 'unique_id': "4", "skill_id": "m1_level"})
 	print(str(result.text))
 
 
 def get_all_skill_level():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/get_all_skill_level', data={'unique_id': "4"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/get_all_skill_level', data={'world':0, 'unique_id': "4"})
 	print(str(result.text))
 
 
 def level_up_skill():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_skill', data={'unique_id': "4", "skill_id": "m1_level",  "scroll_id": "skill_scroll_10"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_skill', data={'world':0, 'unique_id': "4", "skill_id": "m1_level",  "scroll_id": "skill_scroll_10"})
 	print(str(result.text))
 
 
@@ -105,7 +105,7 @@ def get_hang_up_reward():
 
 
 def enter_stage():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': 1})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': "1"})
 	print(str(result.text))
 
 
@@ -129,10 +129,15 @@ def diamond_refresh_store():
 	print(str(result.text))
 
 
+def black_market_transaction(code: int=0):
+	result = requests.post(GAME_MANAGER_BASE_URL + '/black_market_transaction', data={"world": 0, 'unique_id': "4", 'code': code})
+	print(str(result.text))
+
+
 if __name__ == "__main__":
-	# try_remove_coin()
-	# try_remove_iron()
-	# try_remove_diamond()
+	# try_coin()
+	# try_iron()
+	# try_diamond()
 	# level_up_weapon()
 	# pass_stage()
 	# get_skill()
@@ -149,8 +154,9 @@ if __name__ == "__main__":
 	# try_energy()
 	# start_hang_up()
 	# get_hang_up_reward()
-	# enter_stage()
+	enter_stage()
 	# disintegrate_weapon()
 	# automatically_refresh_store()
 	# manually_refresh_store()
-	diamond_refresh_store()
+	# diamond_refresh_store()
+	# black_market_transaction(4)

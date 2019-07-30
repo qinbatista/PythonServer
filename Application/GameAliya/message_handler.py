@@ -220,6 +220,22 @@ class MessageHandler:
 		async with session.post(MANAGER_GAME_BASE_URL + '/fortune_wheel_pro', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 
+	async def _automatically_refresh_store(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/automatically_refresh_store', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _manually_refresh_store(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/manually_refresh_store', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _diamond_refresh_store(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/diamond_refresh_store', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _black_market_transaction(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/black_market_transaction', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'code': message['data']['code']}) as resp:
+			return await resp.text()
+
 
 ###############################################################################
 
@@ -259,8 +275,11 @@ FUNCTION_LIST = {
 	'get_hang_up_reward' : MessageHandler._get_hang_up_reward,
 	'enter_stage' : MessageHandler._enter_stage,
 	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
-	'fortune_wheel_pro' : MessageHandler._fortune_wheel_pro
+	'fortune_wheel_pro' : MessageHandler._fortune_wheel_pro,
 
-
+	'automatically_refresh_store': MessageHandler._automatically_refresh_store,
+	'manually_refresh_store': MessageHandler._manually_refresh_store,
+	'diamond_refresh_store': MessageHandler._diamond_refresh_store,
+	'black_market_transaction': MessageHandler._black_market_transaction
 
 }

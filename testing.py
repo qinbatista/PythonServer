@@ -41,8 +41,11 @@ MESSAGE_LIST = [ {'function': 'login', 'random': '-906', 'data':{'unique_id':'ma
 				 {'function': 'add_supplies','random':'-906', 'data':{"key": "iron", "value": 10}},
 				 {'function': 'add_supplies','random':'-906', 'data':{"key": "skill_scroll_10", "value": 10}},
 				 {'function': 'add_supplies','random':'-906', 'data':{"key": "skill_scroll_30", "value": 10}},
-				# 20 ---
-				 {'function': 'add_supplies','random':'-906', 'data':{"key": "skill_scroll_100", "value": 10}}
+				# 20 --- 23
+				 {'function': 'automatically_refresh_store','random':'-906', 'data':{"world": "0"}},
+				 {'function': 'manually_refresh_store','random':'-906', 'data':{"world": "0"}},
+				 {'function': 'diamond_refresh_store','random':'-906', 'data':{"world": "0"}},
+				 {'function': 'black_market_transaction','random':'-906', 'data':{"world": "0", "code": 1}}
 				]
 LOGIN = 0
 LOGIN_UNIQUE = 1  # ----------------------------------------------
@@ -70,7 +73,10 @@ ADD_IRON = 17  # ----------------------------------------------
 ADD_SCROLL_10 = 18  # ----------------------------------------------
 ADD_SCROLL_30 = 19  # ----------------------------------------------
 
-ADD_SCROLL_100 = 20  # ----------------------------------------------
+AUTOMATICALLY_REFRESH_STORE = 20  # ----------------------------------------------
+MANUALLY_REFRESH_STORE = 21  # ----------------------------------------------
+DIAMOND_REFRESH_STORE = 22  # ----------------------------------------------
+BLACK_MARKET_TRANSACTION = 23  # ----------------------------------------------
 
 def test_multiple_message(n: int):
 	start = time.time()
@@ -84,6 +90,7 @@ def send_single_message(message_id: int):
 	client = LukseunClient(client_type, host, port=8880)
 	start = time.time()
 	MESSAGE_LIST[message_id]["data"]['token']=token
+	MESSAGE_LIST[message_id]["data"]['world']=0
 	newstring  =  str(MESSAGE_LIST[message_id]).replace("'","\"")
 	asyncio.run(client.send_message(newstring))
 	print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
@@ -246,26 +253,28 @@ def main() -> None:
 	# send_single_message(LOGIN_AS_ACCOUNT)
 	token = send_single_message(LOGIN_UNIQUE)
 	print(f'this is token = {token}')
-	send_single_message(UPDATE_ENERGY)
-	send_single_message(GET_SKILL)
-	send_single_message(GET_ALL_SUPPLIES)
-	send_single_message(GET_ALL_SKILL_LEVEL)
-	send_single_message(RANDOM_GIFT_SKILL)
-	send_single_message(LEVEL_UP_SCROLL)
-	send_single_message(PASS_STAGE)
-	send_single_message(LEVEL_UP_SKILL)
-	send_single_message(RANDOM_GIFT_SEGMENT)
-	send_single_message(RESET_WEAPON_SKILL_POINT)
-	send_single_message(LEVEL_UP_WEAPON_STAR)
-	send_single_message(GET_ALL_WEAPON)
-	send_single_message(LEVEL_UP_PASSIVE)
-	send_single_message(LEVEL_UP_WEAPON)
-	send_single_message(ADD_COIN)
-	send_single_message(ADD_IRON)
-	send_single_message(ADD_SCROLL_10)
-	send_single_message(ADD_SCROLL_30)
-	send_single_message(ADD_SCROLL_100)
-	send_single_message(GET_ALL_SUPPLIES)
+	# send_single_message(UPDATE_ENERGY)
+	# send_single_message(GET_SKILL)
+	# send_single_message(GET_ALL_SUPPLIES)
+	# send_single_message(GET_ALL_SKILL_LEVEL)
+	# send_single_message(RANDOM_GIFT_SKILL)
+	# send_single_message(LEVEL_UP_SCROLL)
+	# send_single_message(PASS_STAGE)
+	# send_single_message(LEVEL_UP_SKILL)
+	# send_single_message(RANDOM_GIFT_SEGMENT)
+	# send_single_message(RESET_WEAPON_SKILL_POINT)
+	# send_single_message(LEVEL_UP_WEAPON_STAR)
+	# send_single_message(GET_ALL_WEAPON)
+	# send_single_message(LEVEL_UP_PASSIVE)
+	# send_single_message(LEVEL_UP_WEAPON)
+	# send_single_message(ADD_COIN)
+	# send_single_message(ADD_IRON)
+	# send_single_message(ADD_SCROLL_10)
+	# send_single_message(ADD_SCROLL_30)
+	send_single_message(AUTOMATICALLY_REFRESH_STORE)
+	# send_single_message(MANUALLY_REFRESH_STORE)
+	# send_single_message(DIAMOND_REFRESH_STORE)
+	# send_single_message(BLACK_MARKET_TRANSACTION)
 
 	# test_token_server()
 
