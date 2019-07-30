@@ -77,6 +77,8 @@ Status codes and meaning:
 Attempts to log the user in using the specified credentials.
 The 'identifier' specifies which identifying information the user will try to use to log in. 
 If the email or phone\_number fields in the response are empty that means those identifiers have not yet been bound to the account.
+Uses the stored salt value in the database to hash and salt the incoming password.
+If the resulting hash matches the password hash stored in the database, the user is logged in.
 
 Valid identifiers are: **account**, **email**, **phone\_number**. 
 
@@ -124,10 +126,14 @@ Email and phone number are optional, and should be left empty if omitted.
 This function can be called again to bind previously unbound items such as email or phone.
 
 Data validation for all parameters as follows:
-- password - any combination of **non-whitespace** characters. 6-30 length.
+- password - any combination of normal ascii characters. 6-30 length.
 - account - starts with a **letter**, followed by any combination of **letter**s, **number**s, **\_**, **.**, **@**, and **-**. 6-25 length.
 - email - any valid email address
 - phone - any valid phone number, including country code
+
+Passwords are salted and hashed before both being stored in the database.
+The salt used is a randomly generated 256-bit integer using the **secrets** library.
+A new salt is generated for each user.
 
 Status codes and meaning:
 

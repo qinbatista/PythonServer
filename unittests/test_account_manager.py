@@ -55,27 +55,39 @@ class TestAccountManager(unittest.TestCase):
 
 	def test_login_account(self):
 		self.cursor.execute('DELETE FROM info WHERE unique_id = "testtest";')
-		self.cursor.execute('INSERT INTO info (unique_id, password, account) VALUES ("testtest", "passpass", "testtest");')
+		self.cursor.execute('DELETE FROM info WHERE account = "keepokappa";')
+		self.cursor.execute('DELETE FROM info WHERE email = "email@domain.com";')
+		self.cursor.execute('DELETE FROM info WHERE phone_number = "18186691566";')
+		self.cursor.execute('INSERT INTO info (unique_id) VALUES ("testtest");')
 		self.db.commit()
-		msg = {'function' : 'login', 'data' : {'identifier' : 'account', 'value' : 'testtest', 'password' : 'passpass'}}
+		r = requests.post('http://localhost:8005/bind_account', data = {'unique_id' : 'testtest', 'account' : 'keepokappa', 'password' : 'secretpass', 'email' : '', 'phone_number' :''})
+		msg = {'function' : 'login', 'data' : {'identifier' : 'account', 'value' : 'keepokappa', 'password' : 'secretpass'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
 
 	def test_login_email(self):
 		self.cursor.execute('DELETE FROM info WHERE unique_id = "testtest";')
-		self.cursor.execute('INSERT INTO info (unique_id, password, email) VALUES ("testtest", "passpass", "email@domain.com");')
+		self.cursor.execute('DELETE FROM info WHERE account = "keepokappa";')
+		self.cursor.execute('DELETE FROM info WHERE email = "email@domain.com";')
+		self.cursor.execute('DELETE FROM info WHERE phone_number = "18186691566";')
+		self.cursor.execute('INSERT INTO info (unique_id) VALUES ("testtest");')
 		self.db.commit()
-		msg = {'function' : 'login', 'data' : {'identifier' : 'email', 'value' : 'email@domain.com', 'password' : 'passpass'}}
+		r = requests.post('http://localhost:8005/bind_account', data = {'unique_id' : 'testtest', 'account' : 'keepokappa', 'password' : 'secretpass', 'email' : 'email@domain.com', 'phone_number' :''})
+		msg = {'function' : 'login', 'data' : {'identifier' : 'email', 'value' : 'email@domain.com', 'password' : 'secretpass'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
 
 	def test_login_phone_number(self):
 		self.cursor.execute('DELETE FROM info WHERE unique_id = "testtest";')
-		self.cursor.execute('INSERT INTO info (unique_id, password, phone_number) VALUES ("testtest", "passpass", "888");')
+		self.cursor.execute('DELETE FROM info WHERE account = "keepokappa";')
+		self.cursor.execute('DELETE FROM info WHERE email = "email@domain.com";')
+		self.cursor.execute('DELETE FROM info WHERE phone_number = "18186691566";')
+		self.cursor.execute('INSERT INTO info (unique_id) VALUES ("testtest");')
 		self.db.commit()
-		msg = {'function' : 'login', 'data' : {'identifier' : 'phone_number', 'value' : '888', 'password' : 'passpass'}}
+		r = requests.post('http://localhost:8005/bind_account', data = {'unique_id' : 'testtest', 'account' : 'keepokappa', 'password' : 'secretpass', 'email' : '', 'phone_number' :'18186691566'})
+		msg = {'function' : 'login', 'data' : {'identifier' : 'phone_number', 'value' : '18186691566', 'password' : 'secretpass'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
@@ -139,25 +151,13 @@ class TestAccountManager(unittest.TestCase):
 	def test_can_bind_account(self):
 		self.cursor.execute('DELETE FROM info WHERE account = "alreadyexists";')
 		self.cursor.execute('DELETE FROM info WHERE email = "alreadyexists";')
-		self.cursor.execute('DELETE FROM info WHERE phone_number = "888";')
+		self.cursor.execute('DELETE FROM info WHERE phone_number = "18186691566";')
 		self.cursor.execute('UPDATE info SET account = "", password = "", email = "", phone_number = "" WHERE unique_id = "bindme";')
 		self.db.commit()
-		msg = {'function' : 'bind_account', 'data' : {'token' : TOKEN, 'password' : 'passpass', 'account' : 'alreadyexists', 'email' : 'email@domain.com', 'phone_number' : '888'}}
+		msg = {'function' : 'bind_account', 'data' : {'token' : TOKEN, 'password' : 'passpass', 'account' : 'alreadyexists', 'email' : 'email@domain.com', 'phone_number' : '18186691566'}}
 
 		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
 		self.assertEqual(response['status'], 0)
-
-	@unittest.skip('Cannot decide on error code for this case')
-	def test_cannot_bind_account_already_bound(self):
-		pass
-		self.cursor.execute('DELETE FROM info WHERE email = "email" AND unique_id != "bindme";')
-		self.cursor.execute('DELETE FROM info WHERE phone_number = "888" AND unique_id != "bindme";')
-		self.cursor.execute('UPDATE info SET account = "alreadybound", password = "", email = "", phone_number = "" WHERE unique_id = "bindme";')
-		self.db.commit()
-		msg = {'function' : 'bind_account', 'data' : {'token' : TOKEN, 'password' : 'pass', 'account' : 'alreadyexists', 'email' : 'email@domain.com', 'phone_number' : '888'}}
-
-		response = asyncio.get_event_loop().run_until_complete(self.c.send_message(str(msg).replace("'", "\"")))
-		self.assertEqual(response['status'], 1)
 
 	def test_cannot_bind_account_already_exist(self):
 		self.cursor.execute('DELETE FROM info WHERE email = "email" AND unique_id != "bindme";')
