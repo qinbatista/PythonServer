@@ -13,7 +13,7 @@ def PythonLocation():
     return os.path.dirname(os.path.realpath(__file__))
 
 
-JSON_NAME = PythonLocation() + "/Configuration/mysql_data_config.json"
+JSON_NAME = PythonLocation() + "/mysql_data_config.json"
 
 
 # 建立数据库连接池
@@ -275,6 +275,24 @@ def create_friend_list_table() -> None:
     sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
 
 
+def create_armor_table(armor: int) -> None:
+    """
+    创建武器背包表以及武器信息表
+    """
+    table_name = "armor%s" % armor
+    table_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
+    }
+    for i in range(1, 11):
+        table_dict.update({"armor_level%s" % i: "INT(6) NOT NULL DEFAULT(0) COMMENT '盔甲的等级%s'" % i})
+    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
+
+
+def create_armor_factory_table() -> None:
+    for i in range(1, 5):
+        create_armor_table(armor=i)
+
+
 def update_avatar(table_name: str, unique_id: str, img_path: str):  # png
     """
     更新用户表中的头像
@@ -305,7 +323,8 @@ if __name__ == '__main__':
     # create_role_table()
     # create_user_table()
     # create_dark_market_table()
-    create_friend_list_table()
+    # create_friend_list_table()
+    create_armor_factory_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
