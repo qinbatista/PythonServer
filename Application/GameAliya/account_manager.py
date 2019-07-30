@@ -89,21 +89,22 @@ class AccountManager:
 				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
 
 		else: # trying to bind for the first time
+			retvals = await asyncio.gather(self._check_exists('account', account), self._check_exists('email', email), self._check_exists('phone_number', phone))
 			if not self._is_valid_account(account):
 				return self.message_typesetting(1, 'invalid account name')
-			if await self._check_exists('account', account):
+			if retvals[0]:
 				return self.message_typesetting(5, 'account already exists')
 			if not self._is_valid_password(password):
 				return self.message_typesetting(4, 'invalid password')
 			
 			if email != '':
-				if await self._check_exists('email', email):
+				if retvals[1]:
 					return self.message_typesetting(6, 'email already exists')
 				if not self._is_valid_email(email):
 					return self.message_typesetting(2, 'invalid email')
 
 			if phone != '':
-				if await self._check_exists('phone_number', phone):
+				if retvals[2]:
 					return self.message_typesetting(7, 'phone already exists')
 				if not self._is_valid_phone(phone):
 					return self.message_typesetting(3, 'invalid phone')
@@ -155,6 +156,8 @@ class AccountManager:
 		await self._execute_statement('INSERT INTO info (unique_id) VALUES ("' + unique_id + '");')
 
 	async def _check_exists(self, identifier: str, value: str) -> bool:
+		if value == '':
+			return True
 		data = await self._execute_statement('SELECT * FROM info WHERE `' + identifier + '` = "' + value + '";')
 		if () == data:
 			return False
