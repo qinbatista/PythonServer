@@ -1387,9 +1387,13 @@ class GameManager:
 
 		if await self._execute_statement_update(world, update_str) == 0:
 			return self._message_typesetting(status=97, message="database operating error")
-		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
+		remaining = {}
+		for i in range(len(keys)):
+			remaining.update({keys[i]: values[i]})
+		return self._message_typesetting(0, "success", {"remaining": remaining})
+		# return self._message_typesetting(0, "success", {"keys": keys, "values": values})
 
-	async def pass_tower(self, world: int, unique_id: str, stage: int) -> dict:
+	async def pass_tower(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
 		# 0 - Earn rewards success
 		# 1 - Successfully unlock new skills
 		# 2 - Gain a scroll
@@ -1405,7 +1409,6 @@ class GameManager:
 			return self._message_typesetting(99, "Parameter error")
 
 		if stage % 10 != 0:
-			keys = list(pass_tower_data[str(stage)].keys())
 			material_dict = {}
 			for key, value in pass_tower_data[str(stage)].items():
 				material_dict.update({key: value})
@@ -1414,22 +1417,31 @@ class GameManager:
 			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
 			if await self._execute_statement_update(world, update_str) == 0:
 				return self._message_typesetting(status=97, message="pass_tower_data -> database operating error")
+			keys = list(material_dict.keys())
 			values = list((await self._execute_statement(world=world, statement=select_str))[0])
-			return self._message_typesetting(0, "Earn rewards success", {"keys": keys, "values": values, "rewards": list(material_dict.values())})
+			remaining_dict = {}
+			for i in range(len(keys)):
+				remaining_dict.update({keys[i]: values[i]})
+			if sql_stage + 1 == stage:
+				material_dict.pop("tower_stage")
+			return self._message_typesetting(status=0, message="Earn rewards success", data={"remaining": remaining_dict, "reward": material_dict})
+			# return self._message_typesetting(status=0, message="Earn rewards success", data={"keys": keys, "values": values, "rewards": list(material_dict.values())})
 		else:
 			reward = random.choices(population=pass_tower_data[str(stage)])[0]
 			if reward in pass_tower_data["skill"]:
 				reward_data = await self.try_unlock_skill(world=world, unique_id=unique_id, skill_id=reward)
 				if reward_data["status"] == 0:
 					tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage", value=1 if sql_stage + 1 == stage else 0))["remaining"]
-					return self._message_typesetting(status=1, message="Successfully unlock new skills", data={"keys": [reward, "tower_stage"], "values": [1, tower_stage], "rewards": [1, -1]})
+					return self._message_typesetting(status=1, message="Successfully unlock new skills", data={"remaining": {reward: 1, "tower_stage": tower_stage}, "reward": {reward: 1}})
+					# return self._message_typesetting(status=1, message="Successfully unlock new skills", data={"keys": [reward, "tower_stage"], "values": [1, tower_stage], "rewards": [1, -1]})
 				else:
 					scroll = random.choices(population=pass_tower_data["skill_scroll"], weights=pass_tower_data["weights"])[0]
 					scroll_data = await self._try_material(world=world, unique_id=unique_id, material=scroll, value=1)
 					if scroll_data["status"] == 1:
 						return self._message_typesetting(status=95, message="skill -> database operating error")
 					tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage", value=1 if sql_stage + 1 == stage else 0))["remaining"]
-					return self._message_typesetting(status=2, message="Gain a scroll", data={"keys": [scroll, "tower_stage"], "values": [scroll_data["remaining"], tower_stage], "rewards": [1, -1]})
+					return self._message_typesetting(status=2, message="Gain a scroll", data={"remaining": {scroll: scroll_data["remaining"], "tower_stage": tower_stage}, "reward": {scroll: 1}})
+					# return self._message_typesetting(status=2, message="Gain a scroll", data={"keys": [scroll, "tower_stage"], "values": [scroll_data["remaining"], tower_stage], "rewards": [1, -1]})
 			elif reward in pass_tower_data["weapon"]:  # weapon
 				if len(pass_tower_data["segment"]) == 2:
 					segment = random.randint(pass_tower_data["segment"][0], pass_tower_data["segment"][1])
@@ -1440,7 +1452,8 @@ class GameManager:
 					return self._message_typesetting(status=94, message="weapon -> database operating error")
 				segment_result = await self._get_segment(world=world, unique_id=unique_id, weapon=reward)
 				tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage", value=1 if sql_stage + 1 == stage else 0))["remaining"]
-				return self._message_typesetting(status=3, message="Gain weapon fragments", data={"keys": ["weapon", "segment", "tower_stage"], "values": [reward, segment_result, tower_stage], "rewards": [reward, segment, -1]})
+				return self._message_typesetting(status=3, message="Gain weapon fragments", data={"remaining": {"weapon": reward, "segment": segment_result, "tower_stage": tower_stage}, "reward": {"segment": segment}})
+				# return self._message_typesetting(status=3, message="Gain weapon fragments", data={"keys": ["weapon", "segment", "tower_stage"], "values": [reward, segment_result, tower_stage], "rewards": [reward, segment, -1]})
 			else:
 				return self._message_typesetting(status=96, message="Accidental prize -> " + reward)
 
