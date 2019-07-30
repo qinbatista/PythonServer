@@ -14,20 +14,20 @@ from datetime import datetime
 def loc():
 	return os.path.dirname(os.path.realpath(__file__))
 
-VERSION = loc() + '/Configuration/config_timer_setting.json'
+VERSION = loc() + '/configuration/config_timer_setting.json'
 
-ENEMY_LAYOUT = loc() + '/Configuration/client/{}/level_enemy_layouts_config.json'
-MONSTER = loc() + '/Configuration/client/{}/monster_config.json'
+ENEMY_LAYOUT = loc() + '/configuration/client/{}/level_enemy_layouts_config.json'
+MONSTER = loc() + '/configuration/client/{}/monster_config.json'
 
-WORLD_DISTRIBUTION = loc() + '/Configuration/server/{}/world_distribution.json'
-REWARD = loc() + '/Configuration/server/{}/stage_reward_config.json'
-HANG_REWARD = loc() + '/Configuration/server/{}/hang_reward_config.json'
-ENTRY_CONSUMABLES = loc() + '/Configuration/server/{}/entry_consumables_config.json'
-MYSQL_DATA = loc() + '/Configuration/server/{}/mysql_data_config.json'
-LOTTERY = loc() + '/Configuration/server/{}/lottery_config.json'
-WEAPON = loc() + '/Configuration/server/{}/weapon_config.json'
-SKILL = loc() + '/Configuration/server/{}/skill_level_up_config.json'
-PLAYER = loc() + '/Configuration/server/{}/player_config.json'
+WORLD_DISTRIBUTION = loc() + '/configuration/server/{}/world_distribution.json'
+REWARD = loc() + '/configuration/server/{}/stage_reward_config.json'
+HANG_REWARD = loc() + '/configuration/server/{}/hang_reward_config.json'
+ENTRY_CONSUMABLES = loc() + '/configuration/server/{}/entry_consumables_config.json'
+MYSQL_DATA = loc() + '/configuration/server/{}/mysql_data_config.json'
+LOTTERY = loc() + '/configuration/server/{}/lottery_config.json'
+WEAPON = loc() + '/configuration/server/{}/weapon_config.json'
+SKILL = loc() + '/configuration/server/{}/skill_level_up_config.json'
+PLAYER = loc() + '/configuration/server/{}/player_config.json'
 
 class ConfigurationManager:
 	def __init__(self):
@@ -48,7 +48,7 @@ class ConfigurationManager:
 		self._read_game_manager_config()
 
 	async def get_server_config_location(self):
-		return {'file' : loc() + '/Configuration/server/' + self._sv + '/server.conf'}
+		return {'file' : loc() + '/configuration/server/' + self._sv + '/server.conf'}
 
 	async def get_server_version(self):
 		return {'version' : self._sv}

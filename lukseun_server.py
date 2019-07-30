@@ -15,8 +15,7 @@ import os
 import aiohttp
 import asyncio
 import concurrent.futures
-from Utility.LogRecorder import LogUtility as Log
-from Application.GameAliya import message_handler as handler
+import message_handler as handler
 
 # the size of the header in bytes that we expect to receive from the client.
 HEADER_BUFFER_SIZE = 36
@@ -45,7 +44,6 @@ class LukseunServer:
 		'''
 		self._clientsession = aiohttp.ClientSession()
 		server = await asyncio.start_server(self._handle_connection, self._host, self._port)
-		Log('[lukseun_server.py][run()] Starting server on {addr}'.format(addr=server.sockets[0].getsockname()))
 		async with server:
 			await server.serve_forever()
 		await self._clientsession.close()
@@ -60,8 +58,6 @@ class LukseunServer:
 			raw_header = await reader.read(HEADER_BUFFER_SIZE)
 			loop = asyncio.get_running_loop()
 			size = await loop.run_in_executor(self._pool, self._handler.is_valid_header, raw_header)
-			Log(COLORS['ylw'] + '[lukseun_server.py][_handle_connection] Received valid data from {}'.format(
-				writer.get_extra_info('peername')) + COLORS['end'])
 			message = await reader.read(size)
 			
 			# ResolveMsg and MakeHeader are two CPU intensive, blocking function calls that hamper the speed of the server.
@@ -78,9 +74,8 @@ class LukseunServer:
 			
 			writer.write(encoded_response)
 			await writer.drain()
-			Log(COLORS['grn'] + '[lukseun_server.py][_handle_connection] Sent response to client {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
 		except handler.InvalidHeaderError:
-			Log(COLORS['fail'] + '[lukseun_server.py][_handle_connection] Received illegal data from {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
+			pass
 		finally:
 			writer.close()
 
