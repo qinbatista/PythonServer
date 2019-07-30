@@ -1457,6 +1457,16 @@ class GameManager:
 			else:
 				return self._message_typesetting(status=96, message="Accidental prize -> " + reward)
 
+	#  #########################  houyao 2019-07-29 14：49  ##########################
+	async def upgrade_armor(self, armor_kind: str, armor_id: int) -> dict:
+		"""
+
+		:param armor_kind: 盔甲的种类，代表是哪一张表 ==> armor1、armor2、armor3、armor4
+		:param armor_id: 盔甲种类下的等级，代表armor_level1、armor_level2、armor_level3   ......
+		:return: dict
+		"""
+		pass
+
 #  #########################  houyao 2019-07-29 14：49  ##########################
 
 
