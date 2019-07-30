@@ -20,7 +20,7 @@ ENEMY_LAYOUT = loc() + '/Configuration/client/{}/level_enemy_layouts_config.json
 MONSTER = loc() + '/Configuration/client/{}/monster_config.json'
 
 WORLD_DISTRIBUTION = loc() + '/Configuration/server/{}/world_distribution.json'
-REWARD_LIST = loc() + '/Configuration/server/{}/stage_reward_config.json'
+REWARD = loc() + '/Configuration/server/{}/stage_reward_config.json'
 HANG_REWARD = loc() + '/Configuration/server/{}/hang_reward_config.json'
 ENTRY_CONSUMABLES = loc() + '/Configuration/server/{}/entry_consumables_config.json'
 MYSQL_DATA = loc() + '/Configuration/server/{}/mysql_data_config.json'
@@ -81,12 +81,13 @@ class ConfigurationManager:
 		return self._mysql_data_config
 
 	def _read_game_manager_config(self):
-		reward_list = [v for v in (json.load(open(REWARD_LIST.format(self._cv), encoding = 'utf-8'))).values()]
+		# reward_list = [v for v in (json.load(open(REWARD_LIST.format(self._cv), encoding = 'utf-8'))).values()]
+		reward = json.load(open(REWARD.format(self._cv), encoding = 'utf-8'))
 		lottery = json.load(open(LOTTERY.format(self._sv), encoding = 'utf-8'))
 		weapon = json.load(open(WEAPON.format(self._sv), encoding = 'utf-8'))
 		skill = json.load(open(SKILL.format(self._sv), encoding = 'utf-8'))
 		player = json.load(open(PLAYER.format(self._sv), encoding = 'utf-8'))
-		self._game_manager_config = {'reward_list' : reward_list, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config,'player':player, 'entry_consumables' : self._entry_consumables_config}
+		self._game_manager_config = {'reward' : reward, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config,'player':player, 'entry_consumables' : self._entry_consumables_config}
 
 	def _read_level_enemy_layouts_config(self):
 		self._level_enemy_layouts_config = json.load(open(ENEMY_LAYOUT.format(self._cv), encoding = 'utf-8'))
@@ -104,7 +105,7 @@ class ConfigurationManager:
 		self._world_distribution_config = d
 
 	def _read_stage_reward_config(self):
-		self._stage_reward_config = json.load(open(REWARD_LIST.format(self._cv), encoding = 'utf-8'))
+		self._stage_reward_config = json.load(open(REWARD.format(self._cv), encoding = 'utf-8'))
 
 	def _read_hang_reward_config(self):
 		self._hang_reward_config = json.load(open(HANG_REWARD.format(self._cv), encoding = 'utf-8'))
