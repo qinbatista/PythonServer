@@ -654,6 +654,44 @@ class GameManager:
 				return self._message_typesetting(1, 'send friend gift success because time is over 1 day',data)
 			else:
 				return self._message_typesetting(99, 'send friend gift failed, because not cooldown time is not finished',data)
+	async def _send_all_friend_gift(self, world: int, unique_id: str):
+		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
+		mylist = list(data[0])
+		f_id,f_name,f_level,f_recovery_time =[],[],[],[]
+		for my_friend_id_index in range(1,int((len(mylist)-1)/4)+1):
+			f_id_check = mylist[(my_friend_id_index-1)*4+1]
+			f_game_name_check = mylist[(my_friend_id_index-1)*4+2]
+			f_level_check = mylist[(my_friend_id_index-1)*4+3]
+			if f_id_check =="":
+				continue
+			f_recovering_time = mylist[(my_friend_id_index-1)*4+4]
+			if f_recovering_time=="":
+				current_time = time.strftime('%Y-%m-%d', time.localtime())
+				data = await self._execute_statement_update(world, 'UPDATE friend_list SET recovery_time' + str(my_friend_id_index) + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
+				mylist[(my_friend_id_index-1)*4+4]=current_time
+				print('send friend gift success because of f_recovering_time is empty')
+			else:
+				current_time = time.strftime('%Y-%m-%d', time.localtime())
+				delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
+				if delta_time.days>=1:
+					# print("UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name_check)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" +unique_id +"';")
+					await self._execute_statement_update(world, "UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name_check)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" +unique_id +"';")
+					mylist[(my_friend_id_index-1)*4+4]=current_time
+					print('send friend gift success because time is over 1 day')
+				else:
+					print('send friend gift failed, because not cooldown time is not finished')
+			if mylist[(my_friend_id_index-1)*4+1+0]!='':
+				f_id.append(mylist[(my_friend_id_index-1)*4+1])
+				f_name.append(mylist[(my_friend_id_index-1)*4+2])
+				f_level.append(mylist[(my_friend_id_index-1)*4+3])
+				f_recovery_time.append(mylist[(my_friend_id_index-1)*4+4])
+		data={
+			"f_list_id":f_id,
+			"f_name":f_name,
+			"f_level":f_level,
+			"f_recovery_time":f_recovery_time
+		}
+		return self._message_typesetting(0, 'send all friends gift',data)
 	async def _get_all_friend_info(self, world: int, unique_id: str):
 		#0 got all friends info
 		# return message:{"f_list_id":f_id, "f_name":f_name,"f_level":f_level,"f_recovery_time":f_recovery_time}
@@ -844,7 +882,7 @@ class GameManager:
 	def _refresh_configuration(self):
 		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
-		self._reward_list = d['reward_list']
+		self._reward = d['reward']
 		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
 		self._upgrade_chance = d['skill']['upgrade_chance']
 		self._standard_iron_count = d['weapon']['standard_iron_count']
@@ -1096,6 +1134,12 @@ async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER'])._send_friend_gift(int(post['world']), post['unique_id'], post['friend_id'])
+	return _json_response(result)
+
+@ROUTES.post('/send_all_friend_gift')
+async def __fortune_wheel_pro(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._send_all_friend_gift(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 @ROUTES.post('/get_all_friend_info')
