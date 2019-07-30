@@ -94,11 +94,14 @@ class GameManager:
 			return self._message_typesetting(4, 'parameter error!')
 
 	# TODO rename function - it is private and only called by pass_stage function
-	async def try_all_material(self, world: int, unique_id: str, stage: int) -> dict:
+	async def try_pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
+		stage_data = self._stage_reward["stage"]
 		sql_stage = await self._get_material(world, unique_id, "stage")
 		if stage <= 0 or sql_stage + 1 < stage:
 			return self._internal_format(status=9, remaining=0)  # abnormal data!
-		material_dict = dict(self._reward_list[stage])
+		material_dict = {}
+		for key, value in stage_data[str(stage)].items():
+			material_dict.update({key: value})
 		if sql_stage + 1 == stage:  # 通过新关卡
 			material_dict.update({"stage": 1})
 		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
@@ -545,7 +548,7 @@ class GameManager:
 		# 0 : passed customs ===> success
 		# 1 : database operation error
 		# 9 : abnormal data!
-		json_data = await self.try_all_material(world, unique_id, stage)
+		json_data = await self.try_pass_stage(world, unique_id, stage)
 		status = int(json_data["status"])
 		if status == 9:
 			return self._message_typesetting(9, "abnormal data!")
@@ -1174,7 +1177,7 @@ class GameManager:
 	def _refresh_configuration(self):
 		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
-		self._reward_list = d['reward_list']
+		self._stage_reward = d['reward']
 		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
 		self._upgrade_chance = d['skill']['upgrade_chance']
 		self._standard_iron_count = d['weapon']['standard_iron_count']
