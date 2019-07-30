@@ -309,7 +309,7 @@ class GameManager:
 		row.append(data['remaining'])
 		return self._message_typesetting(0, 'success', {'keys' : head, 'values' : row })
 
-
+	# 2019年7月30日17点08分 houyao
 	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str):
 		# - 0 - Success
 		# - 96 - User does not have that weapon
@@ -335,10 +335,11 @@ class GameManager:
 		row[0] = weapon
 		return self._message_typesetting(status=0, message="success", data={"keys": head, "values": row})
 
+	# 2019年7月30日17点12分 houyao
 	async def level_up_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Weapon upgrade success
-		# - 2 - insufficient segment, upgrade failed
-		# - 3 - Skill has been reset or database operation error!
+		# - 98 - insufficient segment, upgrade failed
+		# - 99 - Skill has been reset or database operation error!
 		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
 		head = [x[0] for x in data_tuple]
 		row = await self._get_row_by_id(world, weapon, unique_id)
@@ -346,20 +347,21 @@ class GameManager:
 		segment_count = self._standard_segment_count * (1 + weapon_star)  # 根据武器星数增加碎片的消耗数量
 
 		if int(row[head.index("segment")]) < segment_count:
-			return self._message_typesetting(2, "Insufficient segments, upgrade failed!")
+			return self._message_typesetting(status=98, message="Insufficient segments, upgrade failed!")
 
 		row[head.index("segment")] = int(row[head.index("segment")]) - segment_count
 		weapon_star += 1
 		code1 = await self._set_segment_by_id(world, unique_id, weapon, row[head.index("segment")])
 		code2 = await self._set_weapon_star(world, unique_id, weapon, weapon_star)
 		if code1 == 0 or code2 == 0:
-			return self._message_typesetting(3, "Skill has been reset or database operation error!")
+			return self._message_typesetting(status=99, message="Skill has been reset or database operation error!")
 		head[0] = "weapon"
 		row[0] = weapon
 		head.append("star")
 		row.append(weapon_star)
-		return self._message_typesetting(0, weapon + " upgrade success!", {"keys": head, "values": row})
+		return self._message_typesetting(status=0, message=weapon + " upgrade success!", data={"keys": head, "values": row})
 
+	# 2019年7月30日17点08分 houyao
 	async def reset_weapon_skill_point(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Success
 		# - 97 - no weapon
