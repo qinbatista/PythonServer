@@ -1477,6 +1477,21 @@ async def __black_market_transaction(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8007' + '/black_market_transaction', data = {'world': post['world'], "unique_id": post['unique_id'], "code": post['code']}).text))
 
+@ROUTES.post('/send_friend_gift')
+async def _send_friend_gift(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/send_friend_gift', data = {'world': post['world'], "unique_id": post['unique_id'], "friend_id": post['friend_id']}).text))
+
+@ROUTES.post('/send_all_friend_gift')
+async def _send_all_friend_gift(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/send_all_friend_gift', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+@ROUTES.post('/get_all_friend_info')
+async def _get_all_friend_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/get_all_friend_info', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
 @ROUTES.post('/start_hang_up')
 async def __start_hang_up(request: web.Request) -> web.Response:
 	post = await request.post()
