@@ -70,7 +70,7 @@ def level_up_scroll():
 
 
 def get_all_weapon():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/get_all_weapon', data={'unique_id': "4"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/get_all_weapon', data={'world': 0, 'unique_id': "4"})
 	print(str(result.text))
 
 
@@ -157,10 +157,10 @@ if __name__ == "__main__":
 	# random_gift_skill()
 	# random_gift_weapon()
 	# level_up_scroll()
-	# get_all_weapon()
+	get_all_weapon()
 	# level_up_passive()
 	# reset_weapon_skill_point()
-	level_up_weapon_star()
+	# level_up_weapon_star()
 	# try_all_material()
 	# try_energy()
 	# start_hang_up()

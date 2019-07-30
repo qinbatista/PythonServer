@@ -310,7 +310,7 @@ class GameManager:
 		return self._message_typesetting(0, 'success', {'keys' : head, 'values' : row })
 
 	# 2019年7月30日17点08分 houyao
-	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str):
+	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str) -> dict:
 		# - 0 - Success
 		# - 96 - User does not have that weapon
 		# - 97 - Insufficient skill points, upgrade failed
@@ -391,7 +391,7 @@ class GameManager:
 		return self._message_typesetting(status=0, message=weapon + " reset skill point success!", data={"keys": head, "values": row})
 
 	# TODO CHECK FOR SPEED IMPROVEMENTS
-	async def get_all_weapon(self, world: int, unique_id: str):
+	async def get_all_weapon(self, world: int, unique_id: str) -> dict:
 		# - 0 - gain success
 		data_tuple = (await self.get_all_head(world, "weapon_bag"))["remaining"]
 		col_name_list = [x[0] for x in data_tuple]
@@ -408,7 +408,7 @@ class GameManager:
 			keys.append(col_name_list[i])
 			attribute_list[0] = weapons_stars_list[i]
 			values.append(attribute_list)
-		return self._message_typesetting(0, "gain success", {"keys": keys, "values": values})
+		return self._message_typesetting(status=0, message="gain success", data={"keys": keys, "values": values})
 
 
 	# TODO INTERNAL USE only?????
