@@ -11,6 +11,7 @@
 #    A new header has to be generated via the header_tool.
 # 4) close the connection
 
+import os
 import aiohttp
 import asyncio
 import concurrent.futures
@@ -77,17 +78,15 @@ class LukseunServer:
 			
 			writer.write(encoded_response)
 			await writer.drain()
-			Log(COLORS['grn'] + '[lukseun_server.py][_handle_connection] Sent response to client {}'.format(
-				writer.get_extra_info('peername')) + COLORS['end'])
+			Log(COLORS['grn'] + '[lukseun_server.py][_handle_connection] Sent response to client {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
 		except handler.InvalidHeaderError:
-			Log(COLORS['fail'] + '[lukseun_server.py][_handle_connection] Received illegal data from {}'.format(
-				writer.get_extra_info('peername')) + COLORS['end'])
+			Log(COLORS['fail'] + '[lukseun_server.py][_handle_connection] Received illegal data from {}'.format(writer.get_extra_info('peername')) + COLORS['end'])
 		finally:
 			writer.close()
 
 
 async def main() -> None:
-	server = LukseunServer(max_workers=16)
+	server = LukseunServer(max_workers=os.cpu_count())
 	await server.run()
 
 
