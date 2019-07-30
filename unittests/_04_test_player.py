@@ -75,7 +75,7 @@ def get_all_weapon():
 
 
 def level_up_passive():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_passive', data={'unique_id': "4", "weapon": "weapon1", "passive": "passive_skill_1_level"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_passive', data={'world': 0, 'unique_id': "4", "weapon": "weapon1", "passive": "passive_skill_1_level"})
 	print(str(result.text))
 
 
@@ -148,7 +148,7 @@ if __name__ == "__main__":
 	# try_coin()
 	# try_iron()
 	# try_diamond()
-	level_up_weapon()
+	# level_up_weapon()
 	# pass_stage(stage=6)
 	# pass_tower(stage=10)
 	# get_skill()
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 	# random_gift_weapon()
 	# level_up_scroll()
 	# get_all_weapon()
-	# level_up_passive()
+	level_up_passive()
 	# reset_weapon_skill_point()
 	# level_up_weapon_star()
 	# try_all_material()

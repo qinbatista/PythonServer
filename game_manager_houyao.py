@@ -312,28 +312,28 @@ class GameManager:
 
 	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str):
 		# - 0 - Success
-		# - 1 - User does not have that weapon
-		# - 2 - Insufficient skill points, upgrade failed
-		# - 3 - Database operation error
-		# - 9 - Passive skill does not exist
+		# - 96 - User does not have that weapon
+		# - 97 - Insufficient skill points, upgrade failed
+		# - 98 - Database operation error
+		# - 99 - Passive skill does not exist
 		if await self._get_weapon_star(world, unique_id, weapon) == 0:
-			return self._message_typesetting(1, "User does not have that weapon")
+			return self._message_typesetting(status=96, message="User does not have that weapon")
 		if passive not in self._valid_passive_skills:
-			return self._message_typesetting(9, "Passive skill does not exist")
+			return self._message_typesetting(status=99, message="Passive skill does not exist")
 		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
 		head = [x[0] for x in data_tuple]
 		row = await self._get_row_by_id(world, weapon, unique_id)
 		point_count = head.index("skill_point")
 		passive_count = head.index(passive)
 		if row[point_count] == 0:
-			return self._message_typesetting(2, "Insufficient skill points, upgrade failed")
+			return self._message_typesetting(status=97, message="Insufficient skill points, upgrade failed")
 		row[point_count] -= 1
 		row[passive_count] += 1
 		if await self._set_passive_skill_level_up_data(world, unique_id, weapon, passive, row[passive_count], row[point_count]) == 0:
-			return self._message_typesetting(3, "Database operation error")
+			return self._message_typesetting(status=98, message="Database operation error")
 		head[0] = "weapon"
 		row[0] = weapon
-		return self._message_typesetting(0, "success", {"keys": head, "values": row})
+		return self._message_typesetting(status=0, message="success", data={"keys": head, "values": row})
 
 	async def level_up_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Weapon upgrade success
