@@ -5,7 +5,8 @@ import configparser
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-GAME_MANAGER_BASE_URL = 'http://localhost:8007'
+GAME_MANAGER_BASE_URL = 'http://localhost:8004'
+# GAME_MANAGER_BASE_URL = 'http://localhost:8007'
 
 
 
@@ -35,7 +36,7 @@ def pass_stage(stage: int):
 
 
 def pass_tower(stage: int):
-	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_tower', data={"world": 0, 'unique_id': "4", 'stage': stage, "customs_clearance_time": "2019-07-25 18:34:53"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_tower', data={"world": 0, 'unique_id': "4", 'stage': stage, "clear_time": "2019-07-25 18:34:53"})
 	print(str(result.text))
 
 
@@ -150,14 +151,14 @@ if __name__ == "__main__":
 	# try_diamond()
 	# level_up_weapon()
 	# pass_stage(stage=6)
-	# pass_tower(stage=10)
+	pass_tower(stage=3)
 	# get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
 	# random_gift_skill()
 	# random_gift_weapon()
 	# level_up_scroll()
-	get_all_weapon()
+	# get_all_weapon()
 	# level_up_passive()
 	# reset_weapon_skill_point()
 	# level_up_weapon_star()
