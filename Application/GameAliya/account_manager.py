@@ -27,7 +27,7 @@ class AccountManager:
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='user', charset='utf8')
-		self._password_re = re.compile(r'\A[\w!@#$%^&*()_+|~=\-\\\[\],.<>]{6,30}\Z')
+		self._password_re = re.compile(r'\A[\w!@#$%^&*()_+|~=\-\\\[\]:;\'\"{}/?,.<>]{6,30}\Z')
 		self._account_re = re.compile(r'\A([a-zA-Z])+([A-Za-z0-9_\-.@]){5,24}\Z')
 		self._email_re = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
 		self._phone_re = re.compile(r'\A[0-9]{10,15}\Z')
