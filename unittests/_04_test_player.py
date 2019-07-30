@@ -25,7 +25,7 @@ def try_diamond():
 
 
 def level_up_weapon():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_weapon', data={'unique_id': "4", "weapon": "weapon1", "iron": 1000})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_weapon', data={'world':0, 'unique_id': "4", "weapon": "weapon1", "iron": 1000})
 	print(str(result.text))
 
 
@@ -148,7 +148,7 @@ if __name__ == "__main__":
 	# try_coin()
 	# try_iron()
 	# try_diamond()
-	# level_up_weapon()
+	level_up_weapon()
 	# pass_stage(stage=6)
 	# pass_tower(stage=10)
 	# get_skill()
@@ -166,7 +166,7 @@ if __name__ == "__main__":
 	# start_hang_up()
 	# get_hang_up_reward()
 	# enter_stage(stage=1)
-	enter_tower(stage=3)
+	# enter_tower(stage=3)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
 	# manually_refresh_store()

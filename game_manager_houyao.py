@@ -273,19 +273,19 @@ class GameManager:
 	#						Weapon Module Functions								#
 	#############################################################################
 
-
+	# 2019年7月30日16点30分 houyao
 	async def level_up_weapon(self, world: int, unique_id: str, weapon: str, iron: int) -> dict:
 		# - 0 - Success
-		# - 1 - User does not have that weapon
-		# - 2 - Incoming materials are not upgraded enough
-		# - 3 - Insufficient materials, upgrade failed
-		# - 4 - Database operation error
-		# - 9 - Weapon already max level
+		# - 95 - User does not have that weapon
+		# - 96 - Incoming materials are not upgraded enough
+		# - 97 - Insufficient materials, upgrade failed
+		# - 98 - Database operation error
+		# - 99 - Weapon already max level
 		if await self._get_weapon_star(world, unique_id, weapon) == 0:
-			return self._message_typesetting(1, 'User does not have that weapon')
+			return self._message_typesetting(95, 'User does not have that weapon')
 		row = await self._get_row_by_id(world, weapon, unique_id)
 		if row[1] == 100:
-			return self._message_typesetting(9, 'Weapon already max level')
+			return self._message_typesetting(99, 'Weapon already max level')
 		skill_upgrade_number = iron // self._standard_iron_count
 		data_tuple = (await self.get_all_head(world, weapon))['remaining']
 		head = [x[0] for x in data_tuple]
@@ -297,12 +297,12 @@ class GameManager:
 		row[point_count] += skill_upgrade_number
 
 		if skill_upgrade_number == 0:
-			return self._message_typesetting(2, 'Incoming materials are not upgraded enough')
+			return self._message_typesetting(96, 'Incoming materials are not upgraded enough')
 		data = await self.try_iron(world, unique_id, -1 * skill_upgrade_number * self._standard_iron_count)
 		if int(data['status']) == 1:
-			return self._message_typesetting(3, 'Insufficient materials, upgrade failed')
+			return self._message_typesetting(97, 'Insufficient materials, upgrade failed')
 		if await self._set_weapon_level_up_data(world, unique_id, weapon, row[level_count], row[point_count]) == 0:
-			return self._message_typesetting(3, 'Database operation error')
+			return self._message_typesetting(98, 'Database operation error')
 		head[0] = 'weapon'
 		row[0] = weapon
 		head.append('iron')
@@ -1360,7 +1360,6 @@ class GameManager:
 		return await self._execute_statement_update(world=world, statement=sql_str)
 #  #########################  houyao 2019-07-29 14：49  ##########################
 
-	# TODO pass_tower
 	async def enter_tower(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
 		# 97 - database operation error
