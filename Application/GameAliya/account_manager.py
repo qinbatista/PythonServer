@@ -5,9 +5,13 @@
 
 
 import re
+import sys
 import time
 import json
 import random
+import hashlib
+import secrets
+import binascii
 import tormysql
 import requests
 import configparser
@@ -27,6 +31,9 @@ class AccountManager:
 		self._account_re = re.compile(r'\A([a-zA-Z])+([A-Za-z0-9_\-.@]){5,24}\Z')
 		self._email_re = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
 		self._phone_re = re.compile(r'\A[0-9]{10,15}\Z')
+		self._n = 2**10
+		self._r = 8
+		self._p = 1
 
 
 	async def login(self, identifier: str, value: str, password: str) -> dict:
@@ -100,7 +107,13 @@ class AccountManager:
 				if not self._is_valid_phone(phone):
 					return self.message_typesetting(3, 'invalid phone')
 
-			await self._execute_statement('UPDATE info SET account = "' + account + '", password = "' + password + '" WHERE unique_id = "' + unique_id + '";')
+
+			random_salt = str(secrets.randbits(256))
+			if len(random_salt) % 2 != 0:
+				random_salt = '0' + random_salt
+			hashed_password = hashlib.scrypt(password.encode(), salt=random_salt.encode(), n = self._n, r = self._r, p = self._p).hex()
+			await self._execute_statement('UPDATE info SET account = "' + account + '", password = "' + hashed_password + '", salt = "' + random_salt + '" WHERE unique_id = "' + unique_id + '";')
+
 			if email != '':
 				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
 			if phone != '':
@@ -177,8 +190,10 @@ class AccountManager:
 			if not self._is_valid_account(value): return False
 		elif identifier == 'email':
 			if not self._is_valid_email(value): return False
-		p = await self._execute_statement('SELECT password FROM info WHERE `' + identifier + '` = "' + value + '";')
-		return (password,) in p
+		p = await self._execute_statement('SELECT password, salt FROM info WHERE `' + identifier + '` = "' + value + '";')
+		hashed_password, salt = p[0]
+		input_hash = hashlib.scrypt(password.encode(), salt = salt.encode(), n = self._n, r = self._r, p = self._p).hex()
+		return hashed_password == input_hash
 
 	async def _request_new_token(self, unique_id: str, prev_token: str = ''):
 		async with ClientSession() as session:
