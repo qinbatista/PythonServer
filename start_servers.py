@@ -11,6 +11,7 @@ def main():
 	processes = []
 	try:
 		processes.append(subprocess.Popen(['python', loc() + '/configuration_manager.py']))
+		time.sleep(1)
 		processes.append(subprocess.Popen(['python', loc() + '/token_server.py']))
 		processes.append(subprocess.Popen(['python', loc() + '/account_manager.py']))
 		processes.append(subprocess.Popen(['python', loc() + '/game_manager.py']))
