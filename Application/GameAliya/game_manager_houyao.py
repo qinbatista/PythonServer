@@ -1389,7 +1389,7 @@ class GameManager:
 				if reward_data["status"] == 0:
 					return self._message_typesetting(status=1, message="Successfully unlock new skills", data={"keys": [reward], "values": [1], "rewards": [1]})
 				else:
-					scroll = random.choices(population=pass_tower_data["skill_scroll"], cum_weights=[0.5, 0.8, 1])[0]
+					scroll = random.choices(population=pass_tower_data["skill_scroll"], weights=pass_tower_data["weights"])[0]
 					scroll_data = await self._try_material(world=world, unique_id=unique_id, material=scroll, value=1)
 					if scroll_data["status"] == 1:
 						return self._message_typesetting(status=95, message="skill -> database operating error")

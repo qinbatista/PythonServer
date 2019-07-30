@@ -34,6 +34,11 @@ def pass_stage(stage: int):
 	print(str(result.text))
 
 
+def pass_tower(stage: int):
+	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_tower', data={"world": 0, 'unique_id': "4", 'stage': stage, "customs_clearance_time": "2019-07-25 18:34:53"})
+	print(str(result.text))
+
+
 def get_skill():
 	result = requests.post(GAME_MANAGER_BASE_URL + '/get_skill', data={'world':0, 'unique_id': "4", "skill_id": "m1_level"})
 	print(str(result.text))
@@ -109,11 +114,6 @@ def enter_stage(stage: int):
 	print(str(result.text))
 
 
-def pass_tower(stage: int):
-	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_tower', data={"world": 0, 'unique_id': "4", 'stage': stage})
-	print(str(result.text))
-
-
 def disintegrate_weapon():
 	result = requests.post(GAME_MANAGER_BASE_URL + '/disintegrate_weapon', data={"world": 0, 'unique_id': "4", 'weapon': 'weapon1'})
 	print(str(result.text))
@@ -144,7 +144,8 @@ if __name__ == "__main__":
 	# try_iron()
 	# try_diamond()
 	# level_up_weapon()
-	pass_stage(6)
+	# pass_stage(stage=6)
+	pass_tower(stage=10)
 	# get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
@@ -160,7 +161,6 @@ if __name__ == "__main__":
 	# start_hang_up()
 	# get_hang_up_reward()
 	# enter_stage(stage=1)
-	# pass_tower(stage=20)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
 	# manually_refresh_store()
