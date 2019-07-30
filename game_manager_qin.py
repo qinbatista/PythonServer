@@ -26,7 +26,7 @@ class GameManager:
 		sql_stage = await self._get_material(world, unique_id, "stage")
 		if stage <= 0 or sql_stage + 1 < stage:
 			return self._internal_format(status=9, remaining=0)  # abnormal data!
-		material_dict = dict(self._reward_list[stage])
+		material_dict = dict(self._reward[stage])
 		if sql_stage + 1 == stage:  # 通过新关卡
 			material_dict.update({"stage": 1})
 		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
@@ -593,8 +593,6 @@ class GameManager:
 			result = await self.try_pro_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['pro_summon_scroll']))
 		elif cost_item == 'friend_gift':
 			result = await self.try_friend_gift(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['friend_gift']))
-		elif cost_item == 'prophet_summon_scroll':
-			result = await self.try_prophet_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['prophet_summon_scroll']))
 		else:
 			return self._message_typesetting(4, 'wrong item name')
 		if result["remaining"]<0:
