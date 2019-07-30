@@ -5,13 +5,12 @@
 
 
 import re
-import sys
 import time
 import json
 import random
+import asyncio
 import hashlib
 import secrets
-import binascii
 import tormysql
 import requests
 import configparser
@@ -42,19 +41,19 @@ class AccountManager:
 			return self.message_typesetting(1, 'Invalid credentials')
 		unique_id = await self._get_unique_id(identifier, value)
 		resp = await self._request_new_token(unique_id, await self._get_prev_token(identifier, value))
-		await self._register_token(unique_id, resp['token'])
-		account_email_phone = await self._get_account_email_phone(unique_id)
+		retvals = await asyncio.gather(self._register_token(unique_id, resp['token']), self._get_account_email_phone(unique_id))
+		account_email_phone = retvals[1]
 		resp['account'] = account_email_phone[0]
 		resp['email'] = account_email_phone[1]
 		resp['phone_number'] = account_email_phone[2]
 		return self.message_typesetting(0, 'success', resp)
 
-	# TODO maybe check email and phone number
 	async def login_unique(self, unique_id: str) -> dict:
-		if not await self._check_exists('unique_id', unique_id):
+		retvals = await asyncio.gather(self._check_exists('unique_id', unique_id), self._account_is_bound(unique_id))
+		if not retvals[0]:
 			await self._create_new_user(unique_id)
 			status, message, prev_token = 1, 'new account created', ''
-		elif await self._account_is_bound(unique_id):
+		elif retvals[1]:
 			return self.message_typesetting(2, 'account already bound')
 		else:
 			status, message, prev_token = 0, 'success', await self._get_prev_token('unique_id', unique_id)
@@ -67,17 +66,19 @@ class AccountManager:
 	async def bind_account(self, unique_id: str, password: str, account: str, email: str, phone: str) -> dict:
 		if await self._account_is_bound(unique_id): # trying to bind additional items
 			if email != '':
-				if await self._email_is_bound(unique_id):
+				retvals = await asyncio.gather(self._email_is_bound(unique_id), self._check_exists('email', email))
+				if retvals[0]:
 					return self.message_typesetting(8, 'email already bound')
-				if await self._check_exists('email', email):
+				if retvals[1]:
 					return self.message_typesetting(6, 'email already exists')
 				if not self._is_valid_email(email):
 					return self.message_typesetting(2, 'invalid email')
 
 			if phone != '':
-				if await self._phone_is_bound(unique_id):
+				retvals = await asyncio.gather(self._phone_is_bound(unique_id), self._check_exists('phone_number', phone))
+				if retvals[0]:
 					return self.message_typesetting(9, 'phone already bound')
-				if await self._check_exists('phone_number', phone):
+				if retvals[1]:
 					return self.message_typesetting(4, 'phone already exists')
 				if not self._is_valid_phone(phone):
 					return self.message_typesetting(3, 'invalid phone')
