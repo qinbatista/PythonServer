@@ -338,7 +338,7 @@ class GameManager:
 	async def level_up_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Weapon upgrade success
 		# - 2 - insufficient segment, upgrade failed
-		# - 3 - database operation error!
+		# - 3 - Skill has been reset or database operation error!
 		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
 		head = [x[0] for x in data_tuple]
 		row = await self._get_row_by_id(world, weapon, unique_id)
@@ -353,7 +353,7 @@ class GameManager:
 		code1 = await self._set_segment_by_id(world, unique_id, weapon, row[head.index("segment")])
 		code2 = await self._set_weapon_star(world, unique_id, weapon, weapon_star)
 		if code1 == 0 or code2 == 0:
-			return self._message_typesetting(3, "Database operation error!")
+			return self._message_typesetting(3, "Skill has been reset or database operation error!")
 		head[0] = "weapon"
 		row[0] = weapon
 		head.append("star")
@@ -362,15 +362,15 @@ class GameManager:
 
 	async def reset_weapon_skill_point(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Success
-		# - 1 - no weapon
-		# - 2 - insufficient gold coins, upgrade failed
-		# - 3 - database operation error!
+		# - 97 - no weapon
+		# - 98 - insufficient gold coins, upgrade failed
+		# - 99 - database operation error!
 
 		if await self._get_weapon_star(world, unique_id, weapon) == 0:
-			return self._message_typesetting(1, "no weapon!")
+			return self._message_typesetting(status=97, message="no weapon!")
 		data = await self.try_coin(world, unique_id, -1 * self._standard_reset_weapon_skill_coin_count)
 		if int(data["status"]) == 1:
-			return self._message_typesetting(2, "Insufficient gold coins, upgrade failed")
+			return self._message_typesetting(status=98, message="Insufficient gold coins, upgrade failed")
 
 		data_tuple = (await self.get_all_head(world, weapon))["remaining"]
 		head = [x[0] for x in data_tuple]
@@ -380,13 +380,13 @@ class GameManager:
 		row[head.index("skill_point")] = row[head.index("weapon_level")]
 		row[head.index("passive_skill_1_level")] = row[head.index("passive_skill_2_level")] = row[head.index("passive_skill_3_level")] = row[head.index("passive_skill_4_level")] = 0
 		if await self._reset_skill_point(world, unique_id, weapon, row[head.index("skill_point")]) == 0:
-			return self._message_typesetting(3, "Database operation error!")
+			return self._message_typesetting(status=99, message="Database operation error!")
 
 		head[0] = "weapon"
 		row[0] = weapon
 		head.append("coin")
 		row.append(data["remaining"])
-		return self._message_typesetting(0, weapon + " reset skill point success!", {"keys": head, "values": row})
+		return self._message_typesetting(status=0, message=weapon + " reset skill point success!", data={"keys": head, "values": row})
 
 	# TODO CHECK FOR SPEED IMPROVEMENTS
 	async def get_all_weapon(self, world: int, unique_id: str):

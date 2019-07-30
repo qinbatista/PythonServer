@@ -80,7 +80,7 @@ def level_up_passive():
 
 
 def reset_weapon_skill_point():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/reset_weapon_skill_point', data={'unique_id': "4", "weapon": "weapon1"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/reset_weapon_skill_point', data={'world': 0, 'unique_id': "4", "weapon": "weapon1"})
 	print(str(result.text))
 
 
@@ -158,8 +158,8 @@ if __name__ == "__main__":
 	# random_gift_weapon()
 	# level_up_scroll()
 	# get_all_weapon()
-	level_up_passive()
-	# reset_weapon_skill_point()
+	# level_up_passive()
+	reset_weapon_skill_point()
 	# level_up_weapon_star()
 	# try_all_material()
 	# try_energy()
