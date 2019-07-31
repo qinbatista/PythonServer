@@ -619,7 +619,7 @@ class GameManager:
 						"remaining":
 						{
 							"scroll_id":try_result['data']["keys"][0],
-							"scroll_quantity":try_result['data']["values"][0]
+							"scroll_quantity":try_result['data']["values"][0]+1
 						},
 						"reward":
 						{
@@ -638,7 +638,7 @@ class GameManager:
 					{
 						"weapon":try_result['data']["values"][0],
 						"star":try_result['data']["values"][1],
-						"segment":try_result['data']["values"][2]
+						"segment":try_result['data']["values"][2]+self._standard_segment_count
 					},
 					"reward":
 					{
@@ -660,7 +660,7 @@ class GameManager:
 					{
 						"role":try_result['data']["values"][0],
 						"star":try_result['data']["values"][1],
-						"segment":try_result['data']["values"][2]
+						"segment":try_result['data']["values"][2]+self._standard_segment_count
 					},
 					"reward":
 					{
