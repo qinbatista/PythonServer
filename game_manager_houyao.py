@@ -1363,6 +1363,7 @@ class GameManager:
 #  #########################  houyao 2019-07-29 14：49  ##########################
 
 	async def enter_tower(self, world: int, unique_id: str, stage: int) -> dict:
+		# success ===> 0
 		# 0 - success
 		# 97 - database operation error
 		# 98 - key insufficient
@@ -1394,6 +1395,7 @@ class GameManager:
 		# return self._message_typesetting(0, "success", {"keys": keys, "values": values})
 
 	async def pass_tower(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
+		# success ===> 0 , 1 , 2 , 3
 		# 0 - Earn rewards success
 		# 1 - Successfully unlock new skills
 		# 2 - Gain a scroll
@@ -1457,15 +1459,19 @@ class GameManager:
 			else:
 				return self._message_typesetting(status=96, message="Accidental prize -> " + reward)
 
-	#  #########################  houyao 2019-07-29 14：49  ##########################
+	#  #########################  houyao 2019年7月31日10点19分  ##########################
 	async def upgrade_armor(self, armor_kind: str, armor_id: int) -> dict:
 		"""
-
+		# success ===> 0
+		# 0 - success
+		# 97 - database operation error
+		# 98 - key insufficient
+		# 99 - parameter error
 		:param armor_kind: 盔甲的种类，代表是哪一张表 ==> armor1、armor2、armor3、armor4
 		:param armor_id: 盔甲种类下的等级，代表armor_level1、armor_level2、armor_level3   ......
 		:return: dict
 		"""
-		pass
+		sql_str = "selcet * from %s where unique_id=%s"
 
 #  #########################  houyao 2019-07-29 14：49  ##########################
 
