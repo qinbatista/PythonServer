@@ -48,50 +48,48 @@ class GameManager:
 	async def get_all_supplies(self, world: int, unique_id: str) -> dict:
 		# success ===> 0
 		data_tuple = (await self.get_all_head(world, table="player"))["remaining"]
-		heads = []
-		for col in data_tuple:
-			heads.append(col[0])
 		content = list((await self.get_all_material(world, unique_id=unique_id))["remaining"])
-		heads.pop(0)
-		content.pop(0)
-		return self._message_typesetting(0, "get supplies success", {"keys": heads, "values": content})
+		remaining = {}
+		for i in range(1, len(data_tuple)):
+			remaining.update({data_tuple[i][0]: content[i]})
+		return self._message_typesetting(0, "get supplies success", {"remaining": remaining})
 
 	async def add_supplies(self, world: int, unique_id: str, supply: str, value: int):
 		# success ===> 0
 		if value <= 0: return self._message_typesetting(9, "not a positive number")
 		data = await self._try_material(world, unique_id, supply, value)
 		if data["status"] == 0:
-			return self._message_typesetting(0, "success", {"keys": [supply], "values": [data["remaining"]]})
-		return self._message_typesetting(1, "failure")
+			return self._message_typesetting(status=0, message="success", data={"remaining": {supply: data["remaining"]}})
+		return self._message_typesetting(status=1, message="failure")
 
 	async def level_up_scroll(self, world: int, unique_id: str, scroll_id: str) -> dict:
 		# 0 success
-		# 1 advanced reels are not upgradeable
-		# 2 insufficient scroll
-		# 3 unexpected parameter
-		# 4 parameter error
-		# 9 database operation error
-		if scroll_id == "skill_scroll_100": return self._message_typesetting(1, "advanced reels are not upgradeable!")
+		# 95 advanced reels are not upgradeable
+		# 96 insufficient scroll
+		# 97 unexpected parameter --> scroll_id
+		# 98 parameter error
+		# 99 database operation error
+		if scroll_id == "skill_scroll_100": return self._message_typesetting(status=95, message="advanced reels are not upgradeable!")
 		try:
 			scroll_id_count = await self._get_material(world, unique_id, scroll_id)
 			if int(scroll_id_count) < 3:
-				return self._message_typesetting(2, "Insufficient scroll")
+				return self._message_typesetting(status=96, message="Insufficient scroll")
 			elif scroll_id == "skill_scroll_10":
 				dict1 = await self.try_skill_scroll_10(world, unique_id, -3)
 				dict2 = await self.try_skill_scroll_30(world, unique_id, 1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
-					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
+					return self._message_typesetting(status=99, message="database operation error!")
+				return self._message_typesetting(status=0, message="level up scroll success!", data={"remaining": {"skill_scroll_10": dict1["remaining"], "skill_scroll_30": dict2["remaining"]}})
 			elif scroll_id == "skill_scroll_30":
 				dict1 = await self.try_skill_scroll_30(world, unique_id, -3)
 				dict2 = await self.try_skill_scroll_100(world, unique_id, 1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
-					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_30", "skill_scroll_100"], "values": [dict1["remaining"], dict2["remaining"]]})
+					return self._message_typesetting(status=99, message="database operation error!")
+				return self._message_typesetting(status=0, message="level up scroll success!", data={"remaining": {"skill_scroll_30": dict1["remaining"], "skill_scroll_100": dict2["remaining"]}})
 			else:
-				return self._message_typesetting(3, message="unexpected parameter --> " + scroll_id)
+				return self._message_typesetting(status=97, message="unexpected parameter --> " + scroll_id)
 		except:
-			return self._message_typesetting(4, 'parameter error!')
+			return self._message_typesetting(status=98, message='parameter error!')
 
 	# TODO rename function - it is private and only called by pass_stage function
 	async def try_pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
@@ -99,7 +97,7 @@ class GameManager:
 		sql_stage = await self._get_material(world, unique_id, "stage")
 		if stage <= 0 or sql_stage + 1 < stage:
 			return self._internal_format(status=9, remaining=0)  # abnormal data!
-		material_dict = {}
+		material_dict = {"stage": 0}
 		for key, value in stage_data[str(stage)].items():
 			material_dict.update({key: value})
 		if sql_stage + 1 == stage:  # 通过新关卡
@@ -123,15 +121,15 @@ class GameManager:
 		# - 5 - 能量尚未完全恢复，能量更新成功 === Energy has not fully recovered, successful energy update
 		# - 6 - 能量刷新后已消耗，能量值及恢复时间更新成功 === After refreshing the energy, the energy value and recovery time are successfully updated.
 		# - 7 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功 === Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully
-		# - 8 - 参数错误 === Parameter error
-		# - 9 - 无足够能量消耗 === Not enough energy consumption
-		# - 10 - 数据库操作错误 === Database operation error
+		# - 97 - 参数错误 === Parameter error
+		# - 98 - 无足够能量消耗 === Not enough energy consumption
+		# - 99 - 数据库操作错误 === Database operation error
 		full_energy=self._player["energy"]["max_energy"]
 		if amount > 0:
 			data = (await self._decrease_energy(world, unique_id, 0))["data"]
 			json_data = await self._try_material(world, unique_id, "energy", amount)
 			if int(json_data["status"]) == 1:
-				return self._message_typesetting(10, "Database operation error")
+				return self._message_typesetting(status=99, message="Database operation error")
 			elif int(json_data["remaining"] >= full_energy):
 				sql_str = "UPDATE player SET recover_time = '' WHERE unique_id = '%s';" % unique_id
 				await self._execute_statement_update(world, sql_str)
@@ -149,7 +147,7 @@ class GameManager:
 						data["values"][i] = json_data["remaining"]
 				return self._message_typesetting(1, "Purchase energy successfully, energy is not fully restored", data)
 		elif full_energy + amount < 0:
-			return self._message_typesetting(8, "Parameter error")
+			return self._message_typesetting(status=97, message="Parameter error")
 		else:
 			return await self._decrease_energy(world, unique_id, abs(amount))
 
@@ -205,25 +203,24 @@ class GameManager:
 		# success ===> 0 and 1
 		# 0 - upgrade success
 		# 1 - upgrade unsuccessful
-		# 2 - User does not have that skill
-		# 3 - Invalid scroll id
-		# 4 - User does not have enough scrolls
-		# 9 - Skill already at max level
+		# 96 - User does not have that skill
+		# 97 - Invalid scroll id
+		# 98 - User does not have enough scrolls
+		# 99 - Skill already at max level
 		skill_level = await self._get_skill_level(world, unique_id, skill_id)
 		if skill_level == 0:
-			return self._message_typesetting(2, 'User does not have that skill')
+			return self._message_typesetting(96, 'User does not have that skill')
 		elif skill_level >= 10:
-			return self._message_typesetting(9, 'Skill already max level')
+			return self._message_typesetting(99, 'Skill already max level')
 		elif scroll_id not in self._skill_scroll_functions:
-			return self._message_typesetting(3, 'Invalid scroll id')
+			return self._message_typesetting(97, 'Invalid scroll id')
 		resp = await eval('self.try_' + scroll_id + '(world, unique_id, -1)')
 		if resp['status'] == 1:
-			return self._message_typesetting(4, 'User does not have enough scrolls')
+			return self._message_typesetting(98, 'User does not have enough scrolls')
 		if not self._roll_for_upgrade(scroll_id):
-			return self._message_typesetting(1, 'upgrade unsuccessful', {'keys' : [skill_id, scroll_id], 'values' : [skill_level, resp['remaining']]})
+			return self._message_typesetting(1, 'upgrade unsuccessful', {'remaining': {skill_id: skill_level, scroll_id: resp['remaining']}})
 		await self._execute_statement(world, 'UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
-		return self._message_typesetting(0, 'upgrade success', {'keys' : [skill_id, scroll_id], 'values' : [skill_level + 1, resp['remaining']]})
-
+		return self._message_typesetting(0, 'upgrade success', {'remaining': {skill_id: skill_level + 1, scroll_id: resp['remaining']}})
 
 
 	async def get_all_skill_level(self, world: int, unique_id: str) -> dict:
@@ -231,21 +228,19 @@ class GameManager:
 		# 0 - Success
 		names = await self._execute_statement(world, 'DESCRIBE skill;')
 		values = await self._execute_statement(world, 'SELECT * from skill WHERE unique_id = "' + str(unique_id) + '";')
-		key_list = []
-		value_list = []
+		remaining = {}
 		for num, val in enumerate(zip(names[1:], values[0][1:])):
-			key_list.append(val[0][0])
-			value_list.append(val[1])
-		return self._message_typesetting(0, 'success', {"keys": key_list, "values": value_list})
+			remaining.update({val[0][0]: val[1]})
+		return self._message_typesetting(0, 'success', {"remaining": remaining})
 
 
 	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
 		# success ===> 0
 		# 0 - Success
-		# 1 - invalid skill name
+		# 99 - invalid skill name
 		try:
 			level = await self._get_skill_level(world, unique_id, skill_id)
-			return self._message_typesetting(0, 'success', {'keys': [skill_id], 'values': [level]})
+			return self._message_typesetting(0, 'success', {'remaining': {skill_id: level}})
 		except:
 			return self._message_typesetting(1, 'invalid skill name')
 
@@ -307,8 +302,10 @@ class GameManager:
 		row[0] = weapon
 		head.append('iron')
 		row.append(data['remaining'])
-		return self._message_typesetting(status=0, message='success', data={'keys' : head, 'values' : row })
-
+		remaining = {}
+		for i in range(len(head)):
+			remaining.update({head[i]: row[i]})
+		return self._message_typesetting(status=0, message='success', data={'remaining': remaining})
 
 
 	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str) -> dict:
@@ -334,7 +331,11 @@ class GameManager:
 			return self._message_typesetting(status=98, message="Database operation error")
 		head[0] = "weapon"
 		row[0] = weapon
-		return self._message_typesetting(status=0, message="success", data={"keys": head, "values": row})
+		remaining = {}
+		for i in range(len(head)):
+			remaining.update({head[i]: row[i]})
+		return self._message_typesetting(status=0, message="success", data={"remaining": remaining})
+
 
 	async def level_up_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Weapon upgrade success
@@ -359,7 +360,10 @@ class GameManager:
 		row[0] = weapon
 		head.append("star")
 		row.append(weapon_star)
-		return self._message_typesetting(status=0, message=weapon + " upgrade success!", data={"keys": head, "values": row})
+		remaining = {}
+		for i in range(len(head)):
+			remaining.update({head[i]: row[i]})
+		return self._message_typesetting(status=0, message=weapon + " upgrade success!", data={"remaining": remaining})
 
 	async def reset_weapon_skill_point(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Success
@@ -387,29 +391,35 @@ class GameManager:
 		row[0] = weapon
 		head.append("coin")
 		row.append(data["remaining"])
-		return self._message_typesetting(status=0, message=weapon + " reset skill point success!", data={"keys": head, "values": row})
+		remaining = {}
+		for i in range(len(head)):
+			remaining.update({head[i]: row[i]})
+		return self._message_typesetting(status=0, message=weapon + " reset skill point success!", data={"remaining": remaining})
 
 	# TODO CHECK FOR SPEED IMPROVEMENTS
 	async def get_all_weapon(self, world: int, unique_id: str) -> dict:
 		# - 0 - gain success
 		data_tuple = (await self.get_all_head(world, "weapon_bag"))["remaining"]
 		col_name_list = [x[0] for x in data_tuple]
+
+		head_tuple = (await self.get_all_head(world, col_name_list[1]))["remaining"]
+		head = [x[0] for x in head_tuple]
+
 		weapons_stars_list = await self._get_weapon_bag(world, unique_id)
 		# The 0 position stores the UNIQUE_ID, so the column header does not traverse the 0 position.
 		# The 0 position obtained by the __get_weapon_attributes method below is also UNIQUE_ID.
 		# So it will be replaced by the number of weapons stars.
 		# 0位置存储unique_id，因此列标题不会遍历0位置。下面的__get_weapon_attributes方法获得的0位置也是unique_id，
 		# 因此它将被武器星数替换。
-		keys = []
-		values = []
+		remaining = {}
 		for i in range(1, len(col_name_list)):
 			attribute_list = await self._get_weapon_attributes(world, unique_id, col_name_list[i])
-			keys.append(col_name_list[i])
-			attribute_list[0] = weapons_stars_list[i]
-			values.append(attribute_list)
-		return self._message_typesetting(status=0, message="gain success", data={"keys": keys, "values": values})
+			values = {"star": weapons_stars_list[i]}
+			for j in range(1, len(attribute_list)):
+				values.update({head[j]: attribute_list[j]})
+			remaining.update({col_name_list[i]: values})
+		return self._message_typesetting(status=0, message="gain success", data={"remaining": remaining})
 
-	
 	# TODO INTERNAL USE only?????
 	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
@@ -544,23 +554,31 @@ class GameManager:
 
 		if await self._execute_statement_update(world, update_str) == 0:
 			return self._message_typesetting(status=97, message="database operating error")
-		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
+		remaining = {}
+		for i in range(len(keys)):
+			remaining.update({keys[i]: values[i]})
+		return self._message_typesetting(0, "success", {"remaining": remaining})
 
 	async def pass_stage(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
 		# success ===> 0
 		# 0 : passed customs ===> success
-		# 1 : database operation error
-		# 9 : abnormal data!
+		# 98 : database operation error
+		# 99 : abnormal data!
 		json_data = await self.try_pass_stage(world, unique_id, stage)
 		status = int(json_data["status"])
 		if status == 9:
-			return self._message_typesetting(9, "abnormal data!")
+			return self._message_typesetting(status=99, message="abnormal data!")
 		elif status == 1:
-			return self._message_typesetting(1, "database operation error")
+			return self._message_typesetting(status=98, message="database operation error")
 		else:
-			material_dict = json_data["remaining"][0]
-			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
-			return self._message_typesetting(0, "passed customs!", data)
+			reward = json_data["remaining"][0]
+			keys = list(reward.keys())
+			values = json_data["remaining"][1]
+			remaining = {}
+			for i in range(len(keys)):
+				remaining.update({keys[i]: values[i]})
+			reward.pop("stage")
+			return self._message_typesetting(status=0, message="passed customs!", data={"remaining": remaining, "reward": reward})
 
 	async def enter_tower(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
@@ -608,7 +626,7 @@ class GameManager:
 			return self._message_typesetting(99, "Parameter error")
 
 		if stage % 10 != 0:
-			material_dict = {}
+			material_dict = {"tower_stage": 0}
 			for key, value in pass_tower_data[str(stage)].items():
 				material_dict.update({key: value})
 			if sql_stage + 1 == stage:  # 通过新关卡
@@ -618,12 +636,11 @@ class GameManager:
 				return self._message_typesetting(status=97, message="pass_tower_data -> database operating error")
 			keys = list(material_dict.keys())
 			values = list((await self._execute_statement(world=world, statement=select_str))[0])
-			remaining_dict = {}
+			remaining = {}
 			for i in range(len(keys)):
-				remaining_dict.update({keys[i]: values[i]})
-			if sql_stage + 1 == stage:
-				material_dict.pop("tower_stage")
-			return self._message_typesetting(status=0, message="Earn rewards success", data={"remaining": remaining_dict, "reward": material_dict})
+				remaining.update({keys[i]: values[i]})
+			material_dict.pop("tower_stage")
+			return self._message_typesetting(status=0, message="Earn rewards success", data={"remaining": remaining, "reward": material_dict})
 		else:
 			reward = random.choices(population=pass_tower_data[str(stage)])[0]
 			if reward in pass_tower_data["skill"]:
@@ -657,14 +674,14 @@ class GameManager:
 		success ===> 0 , 1
 		# 0 - hang up success
 		# 1 - Repeated hang up successfully
-		# 2 - database operating error
-		# 9 - Parameter error
+		# 98 - database operating error
+		# 99 - Parameter error
 		1分钟奖励有可能奖励1颗钻石，30颗金币，10个铁
 		minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
 		minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
 		"""
 		if stage <= 0 or stage > int(await self._get_material(world=world,  unique_id=unique_id, material="stage")):
-			return self._message_typesetting(status=9, message="Parameter error")
+			return self._message_typesetting(status=99, message="Parameter error")
 		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
 		key_list = await self._execute_statement(world=world, statement=sql_str)
 		hang_up_time, hang_stage = key_list[0]
@@ -679,46 +696,54 @@ class GameManager:
 		material_dict.update({"hang_up_time": hang_up_time})
 		key_word = ["hang_stage", "hang_up_time"]
 		if hang_up_time == "":
+			material_dict.update({"hang_up_time": current_time})
+			material_dict.update({"hang_stage": stage})
 			# 下面的功能是将奖励拿出来，并且将数据库剩余的值发送给客户端
 			keys = list(material_dict.keys())
 			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
 			if await self._execute_statement_update(world=world, statement=update_str) == 0:
-				return self._message_typesetting(status=2, message="database operating error")
+				return self._message_typesetting(status=98, message="database operating error")
 			data = await self._execute_statement(world=world, statement=select_str)
-			values = list(data[0])
-			return self._message_typesetting(status=0, message="hang up success", data={"keys": keys, "values": values})
+			remaining = {}
+			for i in range(len(keys)):
+				remaining.update({keys[i]: data[0][i]})
+			return self._message_typesetting(status=0, message="hang up success", data={"remaining": remaining})
 		else:
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 			minute = int(delta_time.total_seconds()) // 60
-			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+			current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
 
 			for key in material_dict.keys():
 				if key not in key_word:
 					material_dict[key] = int(material_dict[key]) * minute
-			keys, hang_rewards = list(material_dict.keys()), list(material_dict.values())
+			keys = list(material_dict.keys())
 
 			# 此时的material_dict中的数据是用于数据库操作的数据
 			material_dict.update({"hang_stage": stage})
-			material_dict.update({"hang_up_time": hang_up_time})
+			material_dict.update({"hang_up_time": current_time})
 
 			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
 			await self._execute_statement_update(world=world, statement=update_str)
 			data = await self._execute_statement(world=world, statement=select_str)
-			values = list(data[0])
-			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
+			remaining = {}
+			for i in range(len(keys)):
+				remaining.update({keys[i]: data[0][i]})
+			material_dict.update({"hang_stage": hang_stage})
+			material_dict.update({"hang_up_time": hang_up_time})
+			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"remaining": remaining, "reward": material_dict})
 
 	async def get_hang_up_reward(self, world: int, unique_id: str) -> dict:
 		"""
 		success ===> 0
 		# 0 - Settlement reward success
-		# 1 - Temporarily no on-hook record
+		# 99 - Temporarily no on-hook record
 		"""
 		sql_str = "SELECT hang_up_time,hang_stage FROM player WHERE unique_id='%s'" % unique_id
 		key_list = await self._execute_statement(world=world, statement=sql_str)
 		hang_up_time, hang_stage = key_list[0]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		if hang_up_time == "" or int(hang_stage) == 0:
-			return self._message_typesetting(status=1, message="Temporarily no on-hook record")
+			return self._message_typesetting(status=99, message="Temporarily no on-hook record")
 		else:
 			# 此时的material_dict字典的值是给奖励列表的，
 			# 所以hang_stage是奖励之前的关卡，
@@ -732,23 +757,37 @@ class GameManager:
 
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 			minute = int(delta_time.total_seconds()) // 60
-			hang_up_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+			current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
 
 			for key in material_dict.keys():
 				if key not in key_word:
 					material_dict[key] = int(material_dict[key]) * minute
-			keys, hang_rewards = list(material_dict.keys()), list(material_dict.values())
+			keys = list(material_dict.keys())
 
 			# 此时的material_dict中的数据是用于数据库操作的数据
-			material_dict.update({"hang_up_time": hang_up_time})
+			material_dict.update({"hang_up_time": current_time})
 
 			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
 			await self._execute_statement_update(world=world, statement=update_str)
 			data = await self._execute_statement(world=world, statement=select_str)
-			values = list(data[0])
 
-			return self._message_typesetting(status=0, message="Settlement reward success", data={"keys": keys, "values": values, "hang_rewards": hang_rewards})
+			remaining = {}
+			for i in range(len(keys)):
+				remaining.update({keys[i]: data[0][i]})
+			material_dict.update({"hang_up_time": hang_up_time})
+			return self._message_typesetting(status=0, message="Settlement reward success", data={"remaining": remaining, "reward": material_dict})
 
+	async def show_energy(self, world: int, unique_id: str):
+		data = await self.try_energy(world=world, unique_id=unique_id, amount=0)
+		_data = data["data"]
+		if "keys" in _data:
+			keys = _data["keys"]
+			values = _data["values"]
+			data_dict = {}
+			for i in range(len(keys)):
+				data_dict.update({keys[i]: values[i]})
+			data["data"] = data_dict
+		return data
 
 
 
@@ -1036,7 +1075,7 @@ class GameManager:
 				await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
 				return self._message_typesetting(7, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
 			else:  # 发生的情况是当前能量值和恢复能量值相加比需要消耗的能量值少
-				return self._message_typesetting(status=9, message="Not enough energy consumption")
+				return self._message_typesetting(status=98, message="Not enough energy consumption")
 
 
 
@@ -1617,6 +1656,12 @@ async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 async def __enter_stage(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).enter_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	return _json_response(result)
+
+@ROUTES.post('/show_energy')
+async def __show_energy(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).show_energy(world=int(post['world']), unique_id=post['unique_id'])
 	return _json_response(result)
 
 

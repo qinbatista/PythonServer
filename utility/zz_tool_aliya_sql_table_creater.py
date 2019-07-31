@@ -317,14 +317,14 @@ def load_avatar(table_name:str, unique_id: str, img_path: str):
 
 if __name__ == '__main__':
     # 创建数据库表
-    # create_player_table()
+    create_player_table()
     # create_skill_table()
     # create_weapon_table()
     # create_role_table()
     # create_user_table()
     # create_dark_market_table()
     # create_friend_list_table()
-    create_armor_factory_table()
+    # create_armor_factory_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
