@@ -1064,13 +1064,13 @@ class GameManager:
 		success ===> 0 and 1
 		# 0 - First refresh market success
 		# 1 - Refresh market success
-		# 97 - Refresh time is not over yet
+		# 2 - Refresh time is not over yet, market information has been obtained
 		# 98 - Unexpected element, please update the configuration table
 		# 99 - database operating error
 		"""
 		dark_market_data = self._player['dark_market']
 		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=1)
-		data = {"keys": [], "values": []}
+		remaining = {}
 		if refresh_time == "":  # 玩家第一次进入黑市
 			refreshable_quantity = 3
 			refresh_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -1105,11 +1105,9 @@ class GameManager:
 						return self._message_typesetting(status=99, message="database operating error")
 				else:
 					return self._message_typesetting(status=98, message="Unexpected element, please update the configuration table")
-				data["keys"] = data["keys"] + ["merchandise" + str(code), "merchandise" + str(code) + "_quantity", "currency_type" + str(code), "currency_type" + str(code) + "_price"]
-				data["values"] = data["values"] + [merchandise, merchandise_quantity, currency_type, currency_type_price]
-			data["keys"] = data["keys"] + ["refresh_time", "refreshable_quantity"]
-			data["values"] = data["values"] + [refresh_time, int(refreshable_quantity)]
-			return self._message_typesetting(status=0, message="First refresh market success", data=data)
+				remaining.update({"merchandise%s" % code: merchandise, "merchandise%s_quantity" % code: merchandise_quantity, "currency_type%s" % code: currency_type, "currency_type%s_price" % code: currency_type_price})
+			remaining.update({"refresh_time": refresh_time, "refreshable_quantity": int(refreshable_quantity)})
+			return self._message_typesetting(status=0, message="First refresh market success", data={"remaining": remaining})
 		else:
 			current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')
@@ -1152,13 +1150,16 @@ class GameManager:
 							return self._message_typesetting(status=99, message="database operating error")
 					else:
 						return self._message_typesetting(status=98, message="Unexpected element, please update the configuration table")
-					data["keys"] = data["keys"] + ["merchandise" + str(code), "merchandise" + str(code) + "_quantity", "currency_type" + str(code), "currency_type" + str(code) + "_price"]
-					data["values"] = data["values"] + [merchandise, merchandise_quantity, currency_type, currency_type_price]
-				data["keys"] = data["keys"] + ["refresh_time", "refreshable_quantity"]
-				data["values"] = data["values"] + [refresh_time, int(refreshable_quantity)]
-				return self._message_typesetting(status=1, message="Refresh market success", data=data)
+					remaining.update({"merchandise%s" % code: merchandise, "merchandise%s_quantity" % code: merchandise_quantity, "currency_type%s" % code: currency_type, "currency_type%s_price" % code: currency_type_price})
+				remaining.update({"refresh_time": refresh_time, "refreshable_quantity": int(refreshable_quantity)})
+				return self._message_typesetting(status=1, message="Refresh market success", data={"remaining": remaining})
 			else:
-				return self._message_typesetting(status=97, message="Refresh time is not over yet")
+				headers = [x[0] for x in list(await self._execute_statement(world, "desc dark_market;"))]
+				content = (await self._execute_statement(world=world, statement="select * from dark_market where unique_id='%s'" % unique_id))[0]
+				for i in range(len(headers)):
+					remaining.update({headers[i]: content[i]})
+				remaining.pop("unique_id")
+				return self._message_typesetting(status=2, message="Refresh time is not over yet, market information has been obtained", data={"remaining": remaining})
 
 	#  houyao 2019-07-28 16:56:00  手动刷新商店
 	async def manually_refresh_store(self, world: int, unique_id: str) -> dict:
@@ -1171,7 +1172,7 @@ class GameManager:
 		"""
 		dark_market_data = self._player['dark_market']
 		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=1)
-		data = {"keys": [], "values": []}
+		remaining = {}
 		if refreshable_quantity > 0:
 			if refreshable_quantity == 3:  # 如果满足3次免费刷新，使用时则重置刷新开始时间
 				refresh_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -1207,11 +1208,9 @@ class GameManager:
 						return self._message_typesetting(status=99, message="database operating error")
 				else:
 					return self._message_typesetting(status=98, message="Unexpected element, please update the configuration table")
-				data["keys"] = data["keys"] + ["merchandise" + str(code), "merchandise" + str(code) + "_quantity", "currency_type" + str(code), "currency_type" + str(code) + "_price"]
-				data["values"] = data["values"] + [merchandise, merchandise_quantity, currency_type, currency_type_price]
-			data["keys"] = data["keys"] + ["refresh_time", "refreshable_quantity"]
-			data["values"] = data["values"] + [refresh_time, int(refreshable_quantity)]
-			return self._message_typesetting(status=0, message="Refresh market success", data=data)
+				remaining.update({"merchandise%s" % code: merchandise, "merchandise%s_quantity" % code: merchandise_quantity, "currency_type%s" % code: currency_type, "currency_type%s_price" % code: currency_type_price})
+			remaining.update({"refresh_time": refresh_time, "refreshable_quantity": int(refreshable_quantity)})
+			return self._message_typesetting(status=0, message="Refresh market success", data={"remaining": remaining})
 		else:
 			return self._message_typesetting(status=97, message="Insufficient refreshable quantity")
 
@@ -1226,12 +1225,11 @@ class GameManager:
 		"""
 		dark_market_data = self._player['dark_market']
 		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=1)
-		data = {"keys": [], "values": []}
 		diamond_data = await self.try_diamond(world=world, unique_id=unique_id, value=-1 * int(dark_market_data["diamond_refresh_store"]["diamond"]))
+		remaining = {"diamond": diamond_data["remaining"]}
 		if diamond_data["status"] == 1:
 			return self._message_typesetting(status=97, message="Insufficient diamond")
 		else:
-			diamond = diamond_data["remaining"]
 			# refresh_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 			# 筛选出8个商品所在的层级
 			tier_choice = random.choices(population=dark_market_data['names'], weights=dark_market_data['weights'], k=8)
@@ -1264,11 +1262,9 @@ class GameManager:
 						return self._message_typesetting(status=99, message="database operating error")
 				else:
 					return self._message_typesetting(status=98, message="Unexpected element, please update the configuration table")
-				data["keys"] = data["keys"] + ["merchandise" + str(code), "merchandise" + str(code) + "_quantity", "currency_type" + str(code), "currency_type" + str(code) + "_price"]
-				data["values"] = data["values"] + [merchandise, merchandise_quantity, currency_type, currency_type_price]
-			data["keys"] = data["keys"] + ["refresh_time", "refreshable_quantity", "diamond"]
-			data["values"] = data["values"] + [refresh_time, int(refreshable_quantity), diamond]
-			return self._message_typesetting(status=0, message="Refresh market success", data=data)
+				remaining.update({"merchandise%s" % code: merchandise, "merchandise%s_quantity" % code: merchandise_quantity, "currency_type%s" % code: currency_type, "currency_type%s_price" % code: currency_type_price})
+			remaining.update({"refresh_time": refresh_time, "refreshable_quantity": int(refreshable_quantity)})
+			return self._message_typesetting(status=0, message="Refresh market success", data={"remaining": remaining})
 
 	# 黑市交易
 	async def black_market_transaction(self, world: int, unique_id: str, code: int) -> dict:
@@ -1291,7 +1287,7 @@ class GameManager:
 			return self._message_typesetting(status=98, message="Merchandise has been sold")
 		else:
 			dark_market_data = self._player["dark_market"]
-			data = {"keys": [], "values": []}
+			remaining = {}
 			# weapon
 			if merchandise in dark_market_data["weapon"]:
 				currency_type_data = await self._try_material(world=world, unique_id=unique_id, material=currency_type, value=-1 * currency_type_price)
@@ -1303,11 +1299,10 @@ class GameManager:
 				segment = (await self._execute_statement(world=world, statement="select segment from %s where unique_id='%s'" % (merchandise, unique_id)))[0][0]
 				# code是出售的商品代号，weapon是那把武器，segment是前面指定的武器的碎片数量，
 				# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
-				data["keys"] = ["code", "weapon", "segment", "currency_type", "currency_type_price"]
-				data["values"] = [code, merchandise, segment, currency_type, currency_type_data["remaining"]]
+				remaining.update({"code": code, "weapon": merchandise, "segment": segment, currency_type: currency_type_data["remaining"]})
 				if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
 					print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
-				return self._message_typesetting(status=0, message="Gain weapon fragments", data=data)
+				return self._message_typesetting(status=0, message="Gain weapon fragments", data={"remaining": remaining})
 			# skill
 			elif merchandise in dark_market_data["skill"]:
 				currency_type_data = await self._try_material(world=world, unique_id=unique_id, material=currency_type, value=-1 * currency_type_price)
@@ -1317,11 +1312,10 @@ class GameManager:
 				if skill_data["status"] == 0:  # 存在技能，并且奖励技能
 					# code是出售的商品代号，skill是哪个技能，level是前面指定的技能的等级，
 					# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
-					data["keys"] = ["code", "skill", "level", "currency_type", "currency_type_price"]
-					data["values"] = [code, merchandise, 1, currency_type, currency_type_data["remaining"]]
+					remaining.update({"code": code, "skill": merchandise, "level": 1, currency_type: currency_type_data["remaining"]})
 					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
 						print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
-					return self._message_typesetting(status=1, message="Gain new skills", data=data)
+					return self._message_typesetting(status=1, message="Gain new skills", data={"remaining": remaining})
 				else:  # 技能存在则替换成随机获得卷轴
 					scroll = (random.choices(population=dark_market_data["skill_scroll"], cum_weights=[0.7, 0.9, 1]))[0]
 					scroll_data = await self._try_material(world=world, unique_id=unique_id, material=scroll, value=1)
@@ -1329,11 +1323,10 @@ class GameManager:
 						return self._message_typesetting(status=95, message="skill -> database operating error")
 					# code是出售的商品代号，scroll是哪种类型的卷轴，quantity是前面指定的卷轴的剩余数量，
 					# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
-					data["keys"] = ["code", "scroll", "quantity", "currency_type", "currency_type_price"]
-					data["values"] = [code, scroll, scroll_data["remaining"], currency_type, currency_type_data["remaining"]]
+					remaining.update({"code": code, "scroll": scroll, "quantity": scroll_data["remaining"], currency_type: currency_type_data["remaining"]})
 					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
 						print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
-					return self._message_typesetting(status=2, message="Gain a scroll", data=data)
+					return self._message_typesetting(status=2, message="Gain a scroll", data={"remaining": remaining})
 			# other
 			elif merchandise in dark_market_data["other"].keys():
 				currency_type_data = await self._try_material(world=world, unique_id=unique_id, material=currency_type, value=-1 * currency_type_price)
@@ -1344,11 +1337,10 @@ class GameManager:
 					return self._message_typesetting(status=94, message="other -> database operating error")
 				# code是出售的商品代号，merchandise是哪种材料，quantity是前面指定的材料的剩余量，
 				# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
-				data["keys"] = ["code", "merchandise", "quantity", "currency_type", "currency_type_price"]
-				data["values"] = [code, merchandise, other_data["remaining"], currency_type, currency_type_data["remaining"]]
+				remaining.update({"code": code, "merchandise": merchandise, "quantity": other_data["remaining"], currency_type: currency_type_data["remaining"]})
 				if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
 					print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
-				return self._message_typesetting(status=3, message="Gain several materials", data=data)
+				return self._message_typesetting(status=3, message="Gain several materials", data={"remaining": remaining})
 			else:
 				return self._message_typesetting(status=93, message="Unexpected element, please update the configuration table")
 
