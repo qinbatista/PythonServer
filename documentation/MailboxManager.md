@@ -25,8 +25,8 @@ All mail returned by the server to the client will follow this format.
 {
 	"subject" : str,
 	"time_recieved" : str,
+	"body" : str,
 	"has_attachment" : boolean,
-	"body" : str - message body,
 	"callback" : str,
 	"args" : {
 		"key" : "value"
@@ -65,6 +65,33 @@ Returns all the mail in the user's mailbox.
 }
 ```
 
+## ========   get new mail   ========
+
+Returns all the new, unread mail in the user's mailbox.
+
+All mail returned this way is marked as 'Read' on the server side, regardless of whether or not the client has actually read the mail.
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "get_new_mail",
+	"data" : {
+		"token" : "TOKEN"
+	}
+}
+```
+
+##### Sample Responses
+
+```json
+{
+	"status" : 0,
+	"message" : "successfully recieved all new mail",
+	"data" : [ list of all mail ]
+}
+```
 
 # Private
 
@@ -100,7 +127,8 @@ Sends the mail to the specified user.
 
 ## ========   broadcast mail   ========
 
-Sends the mail to the specified user.
+Sends a piece of mail to all users.
+This could take a while.
 
 ##### Sample Request
 
