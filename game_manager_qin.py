@@ -805,6 +805,8 @@ class GameManager:
 		return self._message_typesetting(0, 'got all friends info',data)
 
 	async def _get_all_tower_info(self, world: int, unique_id: str):
+		if self._entry_consumables!="":
+			return self._message_typesetting(1, 'configration is empty')
 		data = {
 			"remaining":{
 				"entry_consumables":self._entry_consumables
@@ -825,18 +827,26 @@ class GameManager:
 		return self._message_typesetting(0, 'got all armor info',data)
 
 	async def _level_enemy_layouts_config(self, world: int, unique_id: str):
+		if self._level_enemy_layouts_config_json=="":
+			return self._message_typesetting(1, 'configration is empty')
 		data = {"remaining":{"level_enemy_layouts_config":self._level_enemy_layouts_config_json}}
 		return self._message_typesetting(0, 'got all level enemy layouts config info',data)
 
 	async def _monster_config(self, world: int, unique_id: str):
+		if self._monster_config_json=="":
+			return self._message_typesetting(1, 'configration is empty')
 		data = {"remaining":{"monster_config":self._monster_config_json}}
 		return self._message_typesetting(0, 'got all monster config info',data)
 
 	async def _get_lottery_config_info(self, world: int, unique_id: str):
+		if self._lottery=="":
+			return self._message_typesetting(1, 'configration is empty')
 		data = {"remaining":{"skills":self._lottery["skills"]["cost"],"weapons":self._lottery["weapons"]["cost"],"roles":self._lottery["roles"]["cost"],"fortune_wheel":self._lottery["fortune_wheel"]["cost"]}}
 		return self._message_typesetting(0, 'got all lottery config info',data)
 
 	async def _get_stage_reward_config(self, world: int, unique_id: str):
+		if self._get_stage_reward_config_json=="":
+			return self._message_typesetting(1, 'configration is empty')
 		data = {"remaining":{"stage_reward_config":self._get_stage_reward_config_json}}
 		return self._message_typesetting(0, 'got all stage reward config info',data)
 
