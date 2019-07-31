@@ -35,8 +35,9 @@ Any function call that requires a valid token and does not supply one will recei
 
 ---
 
+## ========   level\_up\_weapon   ========
 
-### level\_up\_weapon
+Documentation needed. Author: HouYao
 
 Used to level up a particular weapon.
 Currently only supports leveling up a single weapon at a time.
@@ -48,10 +49,11 @@ The max level per weapon is level 100.
 Status codes and meaning:
 
 - 0 - Success
-- 1 - User does not have that weapon
-- 2 - Insufficient materials, upgrade failed
-- 3 - Database operation error
-- 9 - Weapon already max level
+- 95 - User does not have that weapon
+- 96 - Incoming materials are not upgraded enough
+- 97 - Insufficient materials, upgrade failed
+- 98 - Database operation error
+- 99 - Weapon already max level
 
 
 
@@ -74,8 +76,18 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+				"remaining" : 
+                {
+                    "weapon": "string",
+                    "weapon_level": "int",
+                    "passive_skill_1_level": "int",
+                    "passive_skill_2_level": "int",
+                    "passive_skill_3_level": "int",
+                    "passive_skill_4_level": "int",
+                    "skill_point": "int",
+                    "segment": "int",
+                    "iron": "int"
+                }
 			 }
 }
 ```
@@ -83,17 +95,19 @@ Status codes and meaning:
 
 
 
-### level\_up\_passive
+## ========   level\_up\_passive   ========
+
+Documentation needed. Author: HouYao
 
 Used to level up a the passive skill of a particular weapon.
 
 Status codes and meaning:
 
 - 0 - Success
-- 1 - User does not have that weapon
-- 2 - Insufficient skill points, upgrade failed
-- 3 - Database operation error
-- 9 - passive skill does not exist
+- 96 - User does not have that weapon
+- 97 - Insufficient skill points, upgrade failed
+- 98 - Database operation error
+- 99 - Passive skill does not exist
 
 
 
@@ -116,8 +130,17 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+				"remaining" : 
+                {
+                    "weapon": "string",
+                    "weapon_level": "int",
+                    "passive_skill_1_level": "int",
+                    "passive_skill_2_level": "int",
+                    "passive_skill_3_level": "int",
+                    "passive_skill_4_level": "int",
+                    "skill_point": "int",
+                    "segment": "int"
+                }
 			 }
 }
 ```
@@ -125,7 +148,9 @@ Status codes and meaning:
 
 
 
-### reset\_weapon\_skill\_point
+## ========   reset\_weapon\_skill\_point   ========
+
+Documentation needed. Author: HouYao
 
 Resets all weapon's skill points.
 All removed skill points are refunded to the user.
@@ -134,9 +159,9 @@ Costs coins.
 Status codes and meaning:
 
 - 0 - Weapon reset skill point success
-- 1 - User does not have that weapon
-- 2 - Insufficient gold coins, upgrade failed
-- 3 - Database operation error
+- 97 - User does not have that weapon
+- 98 - Insufficient gold coins, upgrade failed
+- 99 - Database operation error
 
 
 
@@ -158,8 +183,18 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+				"remaining" : 
+                {
+                    "weapon": "string",
+                    "weapon_level": "int",
+                    "passive_skill_1_level": "int",
+                    "passive_skill_2_level": "int",
+                    "passive_skill_3_level": "int",
+                    "passive_skill_4_level": "int",
+                    "skill_point": "int",
+                    "segment": "int",
+                    "coin": "int"
+                }
 			 }
 }
 ```
@@ -167,15 +202,17 @@ Status codes and meaning:
 
 
 
-### level\_up\_weapon\_star
+## ========   level\_up\_weapon\_star   ========
+
+Documentation needed. Author: HouYao
 
 Levels up the weapon star of the specified weapon. Costs segments.
 
 Status codes and meaning:
 
 - 0 - Weapon upgrade success
-- 2 - Insufficient segments, upgrade failed
-- 3 - database operation error!
+- 98 - Insufficient segments, upgrade failed
+- 99 - Skill has been reset or database operation error!
 
 
 
@@ -197,8 +234,18 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+				"remaining" : 
+                {
+                    "weapon": "string",
+                    "weapon_level": "int",
+                    "passive_skill_1_level": "int",
+                    "passive_skill_2_level": "int",
+                    "passive_skill_3_level": "int",
+                    "passive_skill_4_level": "int",
+                    "skill_point": "int",
+                    "segment": "int",
+                    "star": "int"
+                }
 			 }
 }
 ```
@@ -206,7 +253,9 @@ Status codes and meaning:
 
 
 
-### get\_all\_weapon
+## ========   get\_all\_weapon   ========
+
+Documentation needed. Author: HouYao
 
 Returns the entire row of the weapon bag.
 
@@ -232,8 +281,31 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "gain success",
 	"data" : {
-				"keys" : [ keys ],
-				"values" : [ values ]
+				"remaining" : 
+                {
+                    "weapon1": 
+                    {
+                        "star": "int",
+                        "weapon_level": "int",
+                        "passive_skill_1_level": "int",
+                        "passive_skill_2_level": "int",
+                        "passive_skill_3_level": "int",
+                        "passive_skill_4_level": "int",
+                        "skill_point": "int",
+                        "segment": "int"
+                    },
+                    "weapon2": 
+                    {
+                        "star": "int",
+                        "weapon_level": "int",
+                        "passive_skill_1_level": "int",
+                        "passive_skill_2_level": "int",
+                        "passive_skill_3_level": "int",
+                        "passive_skill_4_level": "int",
+                        "skill_point": "int",
+                        "segment": "int"
+                    }
+                }
 			 }
 }
 ```
@@ -250,6 +322,8 @@ Status codes and meaning:
 
 ## ========   level\_up\_skill   ========
 
+Documentation needed. Author: HouYao
+
 Consume a skill scroll for a chance to level up the given skill.
 The skill must already be unlocked (not level 0).
 Different tiers of skill scrolls provide different chances to successfully level up the skill. 
@@ -257,11 +331,12 @@ Different tiers of skill scrolls provide different chances to successfully level
 
 Status codes and meaning:
 
-- 0 - Success  （upgrade=0 升级成功， upgrade=1升级失败）
-- 1 - User does not have that skill
-- 2 - Invalid scroll id
-- 4 - User does not have enough scrolls
-- 9 - Skill already at max level
+- 0 - upgrade success
+- 1 - upgrade unsuccessful
+- 96 - User does not have that skill
+- 97 - Invalid scroll id
+- 98 - User does not have enough scrolls
+- 99 - Skill already at max level
 
 The UPGRADE\_SUCCESS value in the server's response can be either 0 or 1 depending upon whether or not the skill actually leveled up.
 A failure here does not mean a failed API call - it means that the scroll skill did not yield a level up.
@@ -286,8 +361,11 @@ Different levels of scroll skills have different success rates.
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys": [skill_id, scroll_id],
-				"values" : [skill_level, scroll_quantity]
+        		"remaining": 
+        		{
+                    "skill_id": "int", 
+                    "scroll_id": "int"
+                }
 			 }
 }
 ```
@@ -295,6 +373,8 @@ Different levels of scroll skills have different success rates.
 
 
 ## ========   level\_up\_scroll ========
+
+Documentation needed. Author: HouYao
 
 Combine several existing low level scrolls to make one higher level scroll.
 
@@ -305,11 +385,11 @@ Combine several existing low level scrolls to make one higher level scroll.
 Status codes and meaning:
 
 - 0 - level up scroll success
-- 1 - advanced reels are not upgradeable
-- 2 - insufficient scroll
-- 3 - unexpected parameter --> scroll_id
-- 4 - parameter error
-- 9 - database operation error
+- 95 - advanced reels are not upgradeable
+- 96 - insufficient scroll
+- 97 - unexpected parameter --> scroll_id
+- 98 - parameter error
+- 99 - database operation error
 
 ##### Sample Request
 
@@ -331,8 +411,11 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "level up scroll success",
 	"data" : {
-				"keys" : [ "skill_scroll_10", "skill_scroll_30" ],
-				"values" : [ "value10", "value30" ]
+        		"remaining": 
+        		{
+                    "skill_scroll_10": "int", 
+                    "skill_scroll_30": "int"
+                }
 			 }
 }
 ```
@@ -344,8 +427,58 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "level up scroll success",
 	"data" : {
-				"keys" : [ "skill_scroll_30", "skill_scroll_100" ],
-				"values" : [ "value30", "value100" ]
+        		"remaining": 
+        		{
+                    "skill_scroll_30": "int", 
+                    "skill_scroll_100": "int"
+                }
+			 }
+}
+```
+
+
+
+## ========   enter_stage   ========
+
+Documentation needed. Author: HouYao
+
+Let the player enter the next stage and give the reward.
+The clear\_time parameter is a string representing the time it took to clear the level.
+
+Status codes and meaning:
+
+- 0 - passed customs
+- 97 - database operation error
+- 98 - key insufficient
+- 99 - parameter error
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "enter_stage"
+	"data" : {
+				"token" : "TOKEN",
+    			"stage" : "int",
+				"clear_time" : "str"
+			 }
+}
+```
+
+##### Sample Response
+
+```json
+{
+	"status" : "0",
+	"message": "passed customs",
+	"data" : {
+        		"remaining": 
+                {
+                    "iron": 13375, 
+                    "coin": 17896, 
+                    "energy": 118
+                }
 			 }
 }
 ```
@@ -354,14 +487,16 @@ Status codes and meaning:
 
 ## ========   pass\_stage   ========
 
+Documentation needed. Author: HouYao
+
 Let the player enter the next stage and give the reward.
 The clear\_time parameter is a string representing the time it took to clear the level.
 
 Status codes and meaning:
 
 - 0 - passed customs
-- 1 - database operation error
-- 9 - abnormal data!
+- 98 - database operation error
+- 99 - abnormal data!
 
 ##### Sample Request
 
@@ -384,16 +519,138 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "passed customs",
 	"data" : {
-        		"keys": [], 
-        		"values": [], 
-        		"rewards": []
+        		"remaining": 
+                {
+                    "stage": 40, 
+                    "experience_potion": 6485, 
+                    "experience": 340, 
+                    "iron": 10820, 
+                    "coin": 9521, 
+                    "small_energy_potion": 48
+                }, 
+                "reward": 
+                {
+                    "experience_potion": 225, 
+                    "experience": 10, 
+                    "iron": 225, 
+                    "coin": 675, 
+                    "small_energy_potion": 1
+                }
 			 }
 }
 ```
 
 
 
+## ========   enter_tower   ========
+
+Documentation needed. Author: HouYao
+
+Let the player enter the next stage and give the reward.
+The clear\_time parameter is a string representing the time it took to clear the level.
+
+Status codes and meaning:
+
+- 0 - passed customs
+- 97 - database operation error
+- 98 - key insufficient
+- 99 - parameter error
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "enter_tower"
+	"data" : {
+				"token" : "TOKEN",
+    			"stage" : "int",
+				"clear_time" : "str"
+			 }
+}
+```
+
+##### Sample Response
+
+```json
+{
+	"status" : "0",
+	"message": "passed customs",
+	"data" : {
+        		"remaining": 
+                {
+                    "iron": 13385, 
+                    "coin": 17926, 
+                    "energy": 119
+                }
+			 }
+}
+```
+
+
+
+## ========   pass_tower   ========
+
+Documentation needed. Author: HouYao
+
+Let the player enter the next stage and give the reward.
+The clear\_time parameter is a string representing the time it took to clear the level.
+
+Status codes and meaning:
+
+- 0 - Earn rewards success
+- 1 - Successfully unlock new skills
+- 2 - Gain a scroll
+- 3 - Gain weapon fragments
+- 94 - weapon -> database operating error
+- 95 - skill -> database operating error
+- 96 - Accidental prize -> key
+- 97 - pass_tower_data -> database operation error
+- 99 - parameter error
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "pass_tower"
+	"data" : {
+				"token" : "TOKEN",
+    			"stage" : "int",
+				"clear_time" : "str"
+			 }
+}
+```
+
+##### Sample Response
+
+```json
+{
+	"status" : "0",
+	"message": "passed customs",
+	"data" : {
+        		"remaining": 
+        		{
+                    "iron": 13685, 
+                    "coin": 18116, 
+                    "energy": 121, 
+                    "tower_stage": 10
+                }, 
+        		"reward": 
+        		{
+                    "iron": 310, 
+                    "coin": 220, 
+                    "energy": 3
+    			}
+			}
+}
+```
+
+
+
 ## ========   get\_all\_skill\_level   ========
+
+Documentation needed. Author: HouYao
 
 Returns all the current skill levels.
 
@@ -419,9 +676,15 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys": [skill_name1, skill_name2, ......, skill_nameN],
-        		"values": [skill_value1, skill_value2, ......, skill_valueN]
-		 }
+        		"remaining": 
+                {
+                    "m1_level": 5, 
+                    "m11_level": 1, 
+                    "m12_level": 1, 
+                    "m13_level": 10, 
+                    "m111_level": 1	
+                }
+    		}
 }
 ```
 
@@ -429,12 +692,14 @@ Status codes and meaning:
 
 ## ========   get\_skill   ========
 
+Documentation needed. Author: HouYao
+
 Returns the requested skill level.
 
 Status codes and meaning:
 
 - 0 - Success
-- 1 - Invalid skill name
+- 99 - Invalid skill name
 
 
 ##### Sample Request
@@ -455,42 +720,42 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys": [skill_id], 
-        		"values": [level]
+				"remaining": 
+        		{
+                    "m1_level": 5
+                }
 			 }
 }
 ```
 
 
 
-## ========   update_energy   ========
+## ========   show_energy   ========
+
+Documentation needed. Author: HouYao
 
 Get the energy value or the energy consumption value.
 
 Status codes and meaning:
 
-- 0 - 获取能量成功 
+- 2 - 获取能量成功 
   - Get energy successfully
-- 0 - 能量已消耗，能量值及恢复时间更新成功 
-  - Energy has been consumed, energy value and recovery time updated successfully
-- 0 - 能量已恢复，获取能量成功 
-  -  Energy has been recovered and energy is successfully acquired
-
-- 0 - 能量刷新后已消耗，能量值及恢复时间更新成功
-  - After refreshing the energy, the energy value and recovery time are successfully updated.
-- 0 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功
-  - Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully
-
-- 1 - 参数错误 
+- 4 - 能源已全面恢复，能源更新成功
+  - Energy has been fully restored, successful energy update
+- 5 - 能源尚未完全恢复，能源更新成功
+  -  Energy has not fully recovered, successful energy update
+- 97 - 参数错误 
   - Parameter error
-- 2 - 无足够能量消耗 
+- 98 - 无足够能量消耗 
   - Not enough energy consumption
+- 99 - 数据库操作错误
+  - Database operation error
 
 ##### Sample Request
 
 ```json
 {
-	"function" : "update_energy",
+	"function" : "show_energy",
 	"data" : {
     			"world" : "str 1 or 2 or 3....",
 				"token" : "TOKEN",
@@ -506,8 +771,12 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys": ['energy', 'recover_time'], 
-        		"values": [current_energy, recover_time]
+        		"remaining":
+        		{
+                    "energy": 0, 
+                    "recover_time": "", 
+                    "cooling_time": -1
+                }
 			 }
 }
 ```
@@ -517,6 +786,8 @@ Status codes and meaning:
 
 
 ## ========   get\_all\_supplies   ========
+
+Documentation needed. Author: HouYao
 
 获取player表中的所有属性及值，包括energy和recover_time，
 
@@ -543,8 +814,15 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "get supplies success",
 	"data" : {
-        		"keys": [heads],
-              	"values": [content]
+        		"remaining": 
+        		{
+                    "game_name": "", 
+                    "coin": 2541, 
+                    "iron": 5235, 
+                    "diamond": 3244, 
+                    "energy": 0, 
+                    "experience": 0
+                }
     		 }
 }
 ```
@@ -554,6 +832,8 @@ Status codes and meaning:
 ## DANGEROUS 
 
 ## ========   add\_supplies   ========
+
+Documentation needed. Author: HouYao
 
 #### add\_supplies  => coin or iron or diamond or ...
 
@@ -584,72 +864,11 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [key],
-				"values" : [value]
+				"remaining" :
+                {
+                    "supply": 0
+                }
 			 }
-}
-```
-
-
-## ========   get\_all\_head   ========
-
-Internal use function.
-
-Returns all the column names of the table specified. Performs no error checking.
-
-Status codes and meaning:
-
-- 0 - Success
-
-
-##### Sample Request
-```json
-{
-	"world" : 0,
-	"function" : "get_all_head",
-	"data" : {
-				"table" : "TABLE NAME"
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"remaining" : [ list of column names ]
-}
-```
-
-
-
-## ========   get\_all\_material   ========
-
-Internal use function.
-
-Returns all the items in the player bag for the specified player. Performs no error checking.
-
-Status codes and meaning:
-
-- 0 - Success
-
-
-##### Sample Request
-```json
-{
-	"world" : 0,
-	"function" : "get_all_material",
-	"data" : {
-				"token" : "TOKEN"
-			 }
-}
-```
-
-##### Sample Response
-```json
-{
-	"status" : "0",
-	"remaining" : [ list of values of items in bag ]
 }
 ```
 
@@ -805,6 +1024,8 @@ Status codes and meaning:
 }
 ```
 
+
+
 ## ========   start\_hang\_up   ========
 
 Documentation needed. Author: HouYao
@@ -814,7 +1035,8 @@ Status codes and meaning:
 
 - 0 - Hang up success
 - 1 - Repeated hang up successfully
-- 2 - Database operation error
+- 98 - database operating error
+- 99 - Parameter error
 
 
 ##### Sample Request
@@ -829,18 +1051,50 @@ Status codes and meaning:
 }
 ```
 
-##### Sample Response
+##### Sample Response1
 ```json
 {
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys": [ keys ],
-				"values" : [ values ],
-				"hang_rewards" : [ rewards ]
-			 }
+				"remaining":
+                {
+					"iron": 5235, 
+                    "coin": 2541, 
+                    "hang_stage": 0, 
+                    "hang_up_time": "2019-07-31 17:33:37"
+                }
+        	}
 }
 ```
+
+##### Sample Response2
+
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+        		"remaining": 
+        		{
+                    "iron": 5545, 
+                    "coin": 3471, 
+                    "hang_stage": 2, 
+                    "hang_up_time": "2019-07-31 17:40:03"
+                }, 
+        		"reward": 
+        		{
+                    "iron": 300, 
+                    "coin": 900,
+                    "hang_stage": 1, 
+                    "hang_up_time": "2019-07-31 17:10:03"
+                }
+        	}
+}
+```
+
+## 
+
 
 
 ## ========   get\_hang\_up\_reward   ========
@@ -851,7 +1105,7 @@ Documentation needed. Author: HouYao
 Status codes and meaning:
 
 - 0 - Settlement reward success
-- 1 - Temporarily no on-hook record
+- 99 - Temporarily no on-hook record
 
 
 ##### Sample Request
@@ -871,9 +1125,20 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys": [ keys ],
-				"values" : [ values ],
-				"hang_rewards" : [ rewards ]
+        		"remaining": 
+        		{
+                    "iron": 5545, 
+                    "coin": 3471, 
+                    "hang_stage": 2, 
+                    "hang_up_time": "2019-07-31 17:40:03"
+                }, 
+        		"reward": 
+        		{
+                    "iron": 300, 
+                    "coin": 900,
+                    "hang_stage": 2, 
+                    "hang_up_time": "2019-07-31 17:10:03"
+                }
 			 }
 }
 ```

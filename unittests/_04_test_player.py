@@ -31,7 +31,7 @@ def level_up_weapon():
 
 
 def pass_stage(stage: int):
-	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_stage', data={'world':0, 'unique_id': "4", "stage": stage, "customs_clearance_time": "2019-07-25 18:34:53"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/pass_stage', data={'world':0, 'unique_id': "4", "stage": stage, "clear_time": "2019-07-25 18:34:53"})
 	print(str(result.text))
 
 
@@ -101,7 +101,7 @@ def try_energy():
 
 
 def start_hang_up():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/start_hang_up', data={"world": 0, 'unique_id': "4", "stage": "1"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/start_hang_up', data={"world": 0, 'unique_id': "4", "stage": "2"})
 	print(str(result.text))
 
 
@@ -145,6 +145,21 @@ def black_market_transaction(code: int=0):
 	print(str(result.text))
 
 
+def show_energy():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/show_energy', data={"world": 0, 'unique_id': "4"})
+	print(str(result.text))
+
+
+def get_all_supplies():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/get_all_supplies', data={"world": 0, 'unique_id': "4"})
+	print(str(result.text))
+
+def test():
+	s22k = "999"
+	s21k = "939"
+	print(eval("s2%sk"%2))
+
+
 if __name__ == "__main__":
 	# try_coin()
 	# try_iron()
@@ -165,11 +180,13 @@ if __name__ == "__main__":
 	# try_all_material()
 	# try_energy()
 	# start_hang_up()
-	# get_hang_up_reward()
+	get_hang_up_reward()
 	# enter_stage(stage=1)
 	# enter_tower(stage=3)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
 	# manually_refresh_store()
 	# diamond_refresh_store()
-	black_market_transaction(4)
+	# black_market_transaction(4)
+	# show_energy()
+	# get_all_supplies()
