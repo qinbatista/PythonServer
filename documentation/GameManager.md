@@ -659,17 +659,15 @@ Status codes and meaning:
 
 Attempts to summon using the basic chance range.
 
-Current valid cost items are the following: **diamond**
+Current valid cost items are the following: **diamond**,**coin**,**basic_summon_scroll** ,**pro_summon_scroll**,**friend_gift**
 
 
 Status codes and meaning:
 
-- 0 - Unlocked new skill or weapon
-- 1 - Received free scroll or segments
-- 2 - Invalid skill name
-- 3 - Database operation error
-- 4 - Insufficient material
-- 5 - Cost item error
+- 0 - Unlocked new weapon
+- 1 - get segments success
+- 96-weapons opeartion error
+- 97-insufficient materials
 
 
 ##### Sample Request
@@ -690,8 +688,17 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys": [ keys ],
-				"values" : [ values ]
+					"remaining":
+					{
+						"weapon":try_result['data']["values"][0],
+						"star":try_result['data']["values"][1],
+						"segment":try_result['data']["values"][2]
+					},
+					"reward":
+					{
+						"weapon":try_result['data']["values"][0],
+						"segment":self._standard_segment_count
+					}
 			 }
 }
 ```
@@ -701,8 +708,7 @@ Status codes and meaning:
 
 Attempts to summon using the pro chance range.
 
-Current valid cost items are the following: **diamond**
-
+Current valid cost items are the following: **diamond**,**coin**,**basic_summon_scroll** ,**pro_summon_scroll**,**friend_gift**
 
 Status codes and meaning:
 
@@ -732,8 +738,17 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys": [ keys ],
-				"values" : [ values ]
+				"remaining":
+					{
+						"weapon":try_result['data']["values"][0],
+						"star":try_result['data']["values"][1],
+						"segment":try_result['data']["values"][2]
+					},
+					"reward":
+					{
+						"weapon":try_result['data']["values"][0],
+						"segment":self._standard_segment_count
+					}
 			 }
 }
 ```
@@ -744,7 +759,7 @@ Status codes and meaning:
 
 Attempts to summon using the friend chance range.
 
-Current valid cost items are the following: **diamond**
+Current valid cost items are the following: **diamond**,**coin**,**basic_summon_scroll** ,**pro_summon_scroll**,**friend_gift**
 
 
 Status codes and meaning:
@@ -775,8 +790,17 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys": [ keys ],
-				"values" : [ values ]
+				"remaining":
+					{
+						"weapon":try_result['data']["values"][0],
+						"star":try_result['data']["values"][1],
+						"segment":try_result['data']["values"][2]
+					},
+					"reward":
+					{
+						"weapon":try_result['data']["values"][0],
+						"segment":self._standard_segment_count
+					}
 			 }
 }
 ```
@@ -861,16 +885,19 @@ Documentation needed. Author: Qin
 
 Spin the wheel of fortune to get a reward. Chance level basic.
 
-Current valid cost items are the following: **diamond**
+Current valid cost items are the following: **diamond**,**coin **,**fortune_wheel_ticket_basic**, **fortune_wheel_ticket_pro**,**basic_summon_scroll** ,**pro_summon_scroll**
 
 
 Status codes and meaning:
 
-- 0 - get item success
-- 2 - invalid skill name
-- 3 - database operation error
-- 4 - insufficient material
-- 5 - cost item error
+- 0 - get energy success
+- 1 - get weapon item success
+- 2 - get skill item success
+- 3 - get resource success, resource contain,coin,energy,diamond,iron,skill_scroll_10,skill_scroll_30,skill_scroll_100
+- 96 - item name error
+- 97 - database opeartion error
+- 98 - insufficient material
+- 99 - cost_item error
 
 
 ##### Sample Request
@@ -896,8 +923,16 @@ Status codes and meaning:
 					"values" : [ remaining amount ]
 				},
 				"reward" : {
-					"keys" : [ head ],
-					"values" : [ values ]
+						"remaining":
+						{
+							"scroll_id":try_result['data']["keys"][0],
+							"scroll_quantity":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"scroll_id":try_result['data']["values"][0],
+							"scroll_quantity":1
+						}
 				}
 			 }
 }
@@ -910,16 +945,19 @@ Documentation needed. Author: Qin
 
 Spin the wheel of fortune to get a reward. Chance level pro.
 
-Current valid cost items are the following: **diamond**
+Current valid cost items are the following: **diamond**,**coin **,**fortune_wheel_ticket_basic**, **fortune_wheel_ticket_pro**,**basic_summon_scroll** ,**pro_summon_scroll**
 
 
 Status codes and meaning:
 
-- 0 - get item success
-- 2 - invalid skill name
-- 3 - database operation error
-- 4 - insufficient material
-- 5 - cost item error
+- 0 - get energy success
+- 1 - get weapon item success
+- 2 - get skill item success
+- 3 - get resource success, resource contain,coin,energy,diamond,iron,skill_scroll_10,skill_scroll_30,skill_scroll_100
+- 96 - item name error
+- 97 - database opeartion error
+- 98 - insufficient material
+- 99 - cost_item error
 
 
 ##### Sample Request
@@ -945,13 +983,164 @@ Status codes and meaning:
 					"values" : [ remaining amount ]
 				},
 				"reward" : {
-					"keys" : [ head ],
-					"values" : [ values ]
+						"remaining":
+						{
+							"scroll_id":try_result['data']["keys"][0],
+							"scroll_quantity":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"scroll_id":try_result['data']["values"][0],
+							"scroll_quantity":1
+						}
 				}
 			 }
 }
 ```
 
+## ========   get_all_friend_info   ========
+
+Documentation needed. Author: Qin
+
+get all friend information to, users information contain user_id, user_name, user_level, user_recovery_time
+
+Status codes and meaning:
+
+- 0 - get all information success
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "get_hang_up_reward",
+	"data" : {
+				"token" : "TOKEN",
+				"cost_item" : "COST_ITEM"
+			 }
+}
+```
+
+##### Sample Response
+
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"remaining" : {
+					"keys" : [ COST_ITEM ],
+					"values" : [ remaining amount ]
+				},
+				"remaining" : {
+                  {
+                    "f_list_id":f_id_list,
+                    "f_name":f_name_list,
+                    "f_level":f_level_list,
+                    "f_recovery_time":f_recovery_time_list
+                }
+				}
+			 }
+}
+```
+
+
+
+## ========   send_all_friend_gift   ========
+
+Documentation needed. Author: Qin
+
+send all friend gitf  to users, callback will give reuslt of send sccuess friends list , callback contain user_id, user_name, user_level, user_recovery_time
+
+Status codes and meaning:
+
+- 0 - get all information success
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "get_hang_up_reward",
+	"data" : {
+				"token" : "TOKEN",
+				"cost_item" : "COST_ITEM"
+			 }
+}
+```
+
+##### Sample Response
+
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"remaining" : {
+					"keys" : [ COST_ITEM ],
+					"values" : [ remaining amount ]
+				},
+				"remaining" : {
+                  {
+                    "f_list_id":f_id_list,
+                    "f_name":f_name_list,
+                    "f_level":f_level_list,
+                    "f_recovery_time":f_recovery_time_list
+                }
+				}
+			 }
+}
+```
+
+
+
+## ========   send_friend_gift   ========
+
+Documentation needed. Author: Qin
+
+send friend gift  to one friend, result will give  friend information containing user_id, user_name, user_level, user_recovery_time
+
+Status codes and meaning:
+
+- 0 - send friend gift success because of f_recovering_time is empty
+- 1 - send friend gift success because time is over 1 day
+- 99 - send friend gift failed, because not cooldown time is not finished
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "get_hang_up_reward",
+	"data" : {
+				"token" : "TOKEN",
+				"cost_item" : "COST_ITEM"
+			 }
+}
+```
+
+##### Sample Response
+
+```json
+{
+	"status" : "0",
+	"message": "success",
+	"data" : {
+				"remaining" : {
+					"keys" : [ COST_ITEM ],
+					"values" : [ remaining amount ]
+				},
+				"remaining" : {
+                  {
+                    "f_list_id":f_id,
+                    "f_name":f_name,
+                    "f_level":f_level,
+                    "f_recovery_time":f_recovery_time
+                }
+				}
+			 }
+}
+```
 
 
 

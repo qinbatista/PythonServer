@@ -60,8 +60,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+				"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -94,8 +102,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -126,8 +142,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+				"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -159,8 +183,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+					"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -191,8 +223,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -224,8 +264,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -257,8 +305,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+					"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -290,8 +346,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -323,8 +387,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+					  "remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -356,8 +428,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -389,8 +469,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -421,8 +509,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -454,8 +550,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -487,8 +591,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -520,8 +632,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -552,8 +672,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+					 "remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -584,8 +712,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -617,8 +753,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+				"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -649,8 +793,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -682,8 +834,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -715,8 +875,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```
@@ -748,8 +916,16 @@ Status codes and meaning:
 	"status" : "0",
 	"message": "success",
 	"data" : {
-				"keys" : [ head ],
-				"values" : [ values ]
+						"remaining":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						},
+						"reward":
+						{
+							"skill_id":try_result['data']["keys"][0],
+							"skill_level":try_result['data']["values"][0]
+						}
 			 }
 }
 ```

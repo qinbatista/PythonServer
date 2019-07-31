@@ -26,7 +26,7 @@ class GameManager:
 		sql_stage = await self._get_material(world, unique_id, "stage")
 		if stage <= 0 or sql_stage + 1 < stage:
 			return self._internal_format(status=9, remaining=0)  # abnormal data!
-		material_dict = dict(self._reward_list[stage])
+		material_dict = dict(self._reward[stage])
 		if sql_stage + 1 == stage:  # 通过新关卡
 			material_dict.update({"stage": 1})
 		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
@@ -340,6 +340,58 @@ class GameManager:
 		# 5 - cost_item error
 		return await self._default_summon(world, unique_id, cost_item, 'prophet',summon_kind)
 
+	async def basic_summon_10_times(self, world: int, unique_id: str, cost_item: str, summon_kind:str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		result_list = []
+		for _ in range(0,10):
+			message_list=await self._default_summon(world, unique_id, cost_item, 'basic',summon_kind)
+			result_list.append(message_list['data'])
+		return self._message_typesetting(2, '10 times basic_summon',result_list)
+
+	async def pro_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		result_list = []
+		for _ in range(0,10):
+			message_list=await self._default_summon(world, unique_id, cost_item, 'pro',summon_kind)
+			result_list.append(message_list['data'])
+		return self._message_typesetting(2, '10 times pro_summon',result_list)
+
+	async def friend_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		result_list = []
+		for _ in range(0,10):
+			message_list=await self._default_summon(world, unique_id, cost_item, 'pro',summon_kind)
+			result_list.append(message_list['data'])
+		return self._message_typesetting(2, '10 times pro_summon',result_list)
+
+	async def prophet_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		result_list = []
+		for _ in range(0,10):
+			message_list=await self._default_summon(world, unique_id, cost_item, 'prophet',summon_kind)
+			result_list.append(message_list['data'])
+		return self._message_typesetting(2, '10 times pro_summon',result_list)
+
 	async def fortune_wheel_basic(self, world: int, unique_id: str, cost_item: str) -> dict:
 		return await self._default_fortune_wheel(world, unique_id, cost_item, 'basic')
 
@@ -366,7 +418,7 @@ class GameManager:
 		# 2 - get skill item success
 		# 3 - get resource success
 		# 96 - item name error
-		# 97 - skill opeartion error
+		# 97 - database opeartion error
 		# 98 - insufficient material
 		# 99 - cost_item error
 		if cost_item == 'diamond':
@@ -422,7 +474,7 @@ class GameManager:
 				}
 				return self._message_typesetting(1, 'get weapon item success', message_dic)
 			else:
-				return self._message_typesetting(97, 'skill opeartion error')
+				return self._message_typesetting(97, 'database opeartion error')
 		elif random_item == 'skill':
 			try_result = await self.random_gift_skill(world, uid, tier)
 			if try_result["status"]==0 or try_result["status"]==1:
@@ -454,7 +506,7 @@ class GameManager:
 					}
 				return self._message_typesetting(2, 'get skill item success', message_dic)
 			else:
-				return self._message_typesetting(97, 'skill opeartion error')
+				return self._message_typesetting(97, 'database opeartion error')
 		else:
 			return self._message_typesetting(96, 'item name error')
 		return self._message_typesetting(3, 'get item success', {'remaining' : {'keys' : [random_item], 'values' : [try_result['remaining']]}, 'reward' : {'keys' : [random_item], 'values' : [self._lottery['fortune_wheel']['reward'][tier][random_item]]}})
@@ -541,8 +593,6 @@ class GameManager:
 			result = await self.try_pro_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['pro_summon_scroll']))
 		elif cost_item == 'friend_gift':
 			result = await self.try_friend_gift(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['friend_gift']))
-		elif cost_item == 'prophet_summon_scroll':
-			result = await self.try_prophet_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['prophet_summon_scroll']))
 		else:
 			return self._message_typesetting(4, 'wrong item name')
 		if result["remaining"]<0:
@@ -596,9 +646,12 @@ class GameManager:
 						"segment":self._standard_segment_count
 					}
 				}
-				return self._message_typesetting(1, 'get weapon item success', message_dic)
+				if try_result["status"]==0:
+					return self._message_typesetting(0, 'get weapon success', message_dic)
+				else:
+					return self._message_typesetting(1, 'get weapon segment success', message_dic)
 			else:
-				return self._message_typesetting(97, 'skill opeartion error')
+				return self._message_typesetting(96, 'weapons opeartion error')
 		elif summon_item == 'roles':
 			try_result = await self.random_gift_role(world, unique_id, tier)
 			if try_result["status"]==0  or try_result["status"]==1:
@@ -637,23 +690,45 @@ class GameManager:
 		sql_result = await self._execute_statement(world, 'SELECT game_name,level FROM player WHERE unique_id = "' + unique_id + '";')
 		f_game_name = sql_result[0][0]
 		f_level = sql_result[0][1]
-		data={
-			"f_id":f_id,
-			"f_name":f_game_name,
-			"f_level":f_level,
-		}
 		if f_recovering_time=="":
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
 			data = await self._execute_statement_update(world, 'UPDATE friend_list SET recovery_time' + str(my_friend_id_index) + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
+			data={
+				"remaining" :
+				{
+				"f_id":f_id,
+				"f_name":f_game_name,
+				"f_level":f_level,
+				"current_time":current_time
+				}
+			}
 			return self._message_typesetting(0, 'send friend gift success because of f_recovering_time is empty',data)
 		else:
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
 			if delta_time.days>=1:
 				await self._execute_statement_update(world, "UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level) + " WHERE unique_id ='" +unique_id +"';")
+				data={
+					"remaining" :
+					{
+						"f_id":f_id,
+						"f_name":f_game_name,
+						"f_level":f_level,
+						"current_time":current_time
+					}
+				}
 				return self._message_typesetting(1, 'send friend gift success because time is over 1 day',data)
 			else:
-				return self._message_typesetting(99, 'send friend gift failed, because not cooldown time is not finished',data)
+				data={
+					"remaining" :
+					{
+						"f_id":f_id,
+						"f_name":f_game_name,
+						"f_level":f_level,
+						"current_time":f_recovering_time
+					}
+				}
+				return self._message_typesetting(99, 'send friend gift failed, because cooldown time is not finished',data)
 	async def _send_all_friend_gift(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
 		mylist = list(data[0])
@@ -669,7 +744,7 @@ class GameManager:
 				current_time = time.strftime('%Y-%m-%d', time.localtime())
 				data = await self._execute_statement_update(world, 'UPDATE friend_list SET recovery_time' + str(my_friend_id_index) + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
 				mylist[(my_friend_id_index-1)*4+4]=current_time
-				print('send friend gift success because of f_recovering_time is empty')
+				# print('send friend gift success because of f_recovering_time is empty')
 			else:
 				current_time = time.strftime('%Y-%m-%d', time.localtime())
 				delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
@@ -677,19 +752,23 @@ class GameManager:
 					# print("UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name_check)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" +unique_id +"';")
 					await self._execute_statement_update(world, "UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name_check)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" +unique_id +"';")
 					mylist[(my_friend_id_index-1)*4+4]=current_time
-					print('send friend gift success because time is over 1 day')
+					# print('send friend gift success because time is over 1 day')
 				else:
-					print('send friend gift failed, because not cooldown time is not finished')
+					pass
+					# print('send friend gift failed, because not cooldown time is not finished')
 			if mylist[(my_friend_id_index-1)*4+1+0]!='':
 				f_id.append(mylist[(my_friend_id_index-1)*4+1])
 				f_name.append(mylist[(my_friend_id_index-1)*4+2])
 				f_level.append(mylist[(my_friend_id_index-1)*4+3])
 				f_recovery_time.append(mylist[(my_friend_id_index-1)*4+4])
 		data={
-			"f_list_id":f_id,
-			"f_name":f_name,
-			"f_level":f_level,
-			"f_recovery_time":f_recovery_time
+			"remaining":
+			{
+				"f_list_id":f_id,
+				"f_name":f_name,
+				"f_level":f_level,
+				"f_recovery_time":f_recovery_time
+			}
 		}
 		return self._message_typesetting(0, 'send all friends gift',data)
 	async def _get_all_friend_info(self, world: int, unique_id: str):
@@ -706,10 +785,13 @@ class GameManager:
 				f_level.append(mylist[i*4+1+2])
 				f_recovery_time.append(mylist[i*4+1+3])
 		data={
-			"f_list_id":f_id,
-			"f_name":f_name,
-			"f_level":f_level,
-			"f_recovery_time":f_recovery_time
+			"remaining":
+			{
+				"f_list_id":f_id,
+				"f_name":f_name,
+				"f_level":f_level,
+				"f_recovery_time":f_recovery_time
+			}
 		}
 		return self._message_typesetting(0, 'got all friends info',data)
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
@@ -1082,41 +1164,105 @@ async def __friend_summon(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
 	return _json_response(result)
 
+@ROUTES.post('/basic_summon_10_times')
+async def __basic_summon_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).basic_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
+	return _json_response(result)
+
+@ROUTES.post('/pro_summon_10_times')
+async def __pro_summon_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).pro_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
+	return _json_response(result)
+
+@ROUTES.post('/friend_summon_10_times')
+async def __friend_summon_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).friend_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
+	return _json_response(result)
+
+@ROUTES.post('/prophet_summon_10_times')
+async def __prophet_summon_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).prophet_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"weapons")
+	return _json_response(result)
+
 @ROUTES.post('/basic_summon_skill')
-async def __basic_summon(request: web.Request) -> web.Response:
+async def basic_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).basic_summon(int(post['world']), post['unique_id'], post['cost_item'],"skills")
 	return _json_response(result)
 
 @ROUTES.post('/pro_summon_skill')
-async def __pro_summon(request: web.Request) -> web.Response:
+async def pro_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).pro_summon(int(post['world']), post['unique_id'], post['cost_item'],"skills")
 	return _json_response(result)
 
 @ROUTES.post('/friend_summon_skill')
-async def __friend_summon(request: web.Request) -> web.Response:
+async def friend_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'],"skills")
 	return _json_response(result)
 
+
+@ROUTES.post('/basic_summon_skill_10_times')
+async def basic_summon_skill_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).basic_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"skills")
+	return _json_response(result)
+
+@ROUTES.post('/pro_summon_skill_10_times')
+async def pro_summon_skill_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).pro_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"skills")
+	return _json_response(result)
+
+@ROUTES.post('/friend_summon_skill_10_times')
+async def friend_summon_skill_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).friend_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"skills")
+	return _json_response(result)
+
+
 @ROUTES.post('/basic_summon_roles')
-async def __basic_summon(request: web.Request) -> web.Response:
+async def basic_summon_roles(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).basic_summon(int(post['world']), post['unique_id'], post['cost_item'],"roles")
 	return _json_response(result)
 
 @ROUTES.post('/pro_summon_roles')
-async def __pro_summon(request: web.Request) -> web.Response:
+async def pro_summon_roles(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).pro_summon(int(post['world']), post['unique_id'], post['cost_item'],"roles")
 	return _json_response(result)
 
 @ROUTES.post('/friend_summon_roles')
-async def __friend_summon(request: web.Request) -> web.Response:
+async def friend_summon_roles(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'],"roles")
 	return _json_response(result)
+
+
+@ROUTES.post('/basic_summon_roles_10_times')
+async def basic_summon_roles_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).basic_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"roles")
+	return _json_response(result)
+
+@ROUTES.post('/pro_summon_roles_10_times')
+async def pro_summon_roles_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).pro_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"roles")
+	return _json_response(result)
+
+@ROUTES.post('/friend_summon_roles_10_times')
+async def friend_summon_roles_10_times(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).friend_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'],"roles")
+	return _json_response(result)
+
 
 @ROUTES.post('/fortune_wheel_basic')
 async def __fortune_wheel_basic(request: web.Request) -> web.Response:
