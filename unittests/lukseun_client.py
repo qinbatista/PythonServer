@@ -20,7 +20,7 @@ DESKey = '6789123467891234'
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 
 # the size of the header in bytes that we will send to and receive from the server.
-HEADER_BUFFER_SIZE = 36
+HEADER_BUFFER_SIZE = 37
 
 
 class LukseunClient:

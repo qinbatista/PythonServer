@@ -2,6 +2,7 @@ import jwt
 import time
 import json
 import random
+import secrets
 import requests
 import configparser
 
@@ -18,6 +19,7 @@ class TokenServer:
 		self._secret = 'password'
 		self._alg = 'HS256'
 		self._delta = 500
+		self._gift_table = {}
 
 	
 	async def issue_token(self, unique_id: str, prev_token: str) -> dict:
@@ -36,10 +38,33 @@ class TokenServer:
 			return self._message_typesetting(1, 'invalid token')
 		else:
 			return self._message_typesetting(0, 'authorized', {'unique_id' : payload['unique_id']})
+	
+	async def generate_nonce(self, mtype: str, **kwargs) -> dict:
+		try:
+			nonce = self._generate_nonce()
+			if mtype == 'gift':
+				self._gift_table[nonce] = {}
+				self._gift_table[nonce]['items'] = [kwargs['items']]
+				self._gift_table[nonce]['quantities'] = [kwargs['quantities']]
+		except KeyError:
+			return self._message_typesetting(-1, 'invalid request format')
+		return self._message_typesetting(0, 'success', {'nonce' : nonce})
+
+
+	async def redeem_nonce(self, mtype: str, nonce: str) -> dict:
+		if mtype == 'gift':
+			if nonce not in self._gift_table:
+				return self._message_typesetting(-2, 'already redeemed')
+			else:
+				return self._message_typesetting(0, 'successfully redeemed', self._gift_table.pop(nonce))
+
 
 
 	def _message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
 		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
+
+	def _generate_nonce(self) -> str:
+		return str(secrets.randbits(256))
 
 def get_config() -> configparser.ConfigParser:
 	'''
@@ -79,6 +104,16 @@ async def __issue_token(request: web.Request) -> web.Response:
 	data = await (request.app['MANAGER']).validate(post['token'])
 	return _json_response(data)
 
+@ROUTES.post('/generate_nonce')
+async def __generate_nonce(request: web.Request) -> web.Response:
+	post = await request.json()
+	kwargs = {k : v for k, v in post.items() if k != 'type'}
+	return _json_response(await (request.app['MANAGER']).generate_nonce(post['type'], **kwargs))
+
+@ROUTES.post('/redeem_nonce')
+async def __redeem_nonce(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).redeem_nonce(post['type'], post['nonce']))
 
 def run():
 	app = web.Application()
