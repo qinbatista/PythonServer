@@ -619,7 +619,7 @@ class GameManager:
 						"remaining":
 						{
 							"scroll_id":try_result['data']["keys"][0],
-							"scroll_quantity":try_result['data']["values"][0]
+							"scroll_quantity":try_result['data']["values"][0]+1
 						},
 						"reward":
 						{
@@ -638,7 +638,7 @@ class GameManager:
 					{
 						"weapon":try_result['data']["values"][0],
 						"star":try_result['data']["values"][1],
-						"segment":try_result['data']["values"][2]
+						"segment":try_result['data']["values"][2]+self._standard_segment_count
 					},
 					"reward":
 					{
@@ -660,7 +660,7 @@ class GameManager:
 					{
 						"role":try_result['data']["values"][0],
 						"star":try_result['data']["values"][1],
-						"segment":try_result['data']["values"][2]
+						"segment":try_result['data']["values"][2]+self._standard_segment_count
 					},
 					"reward":
 					{
@@ -771,6 +771,85 @@ class GameManager:
 			}
 		}
 		return self._message_typesetting(0, 'send all friends gift',data)
+	async def _get_all_resource_info(self, world: int, unique_id: str):
+		data = await self._execute_statement(world, 'SELECT * FROM player WHERE unique_id = "' + unique_id + '";')
+		mylist = list(data[0])
+		data = {
+			"remaining":{
+				"game_name": mylist[1],
+				"coin": mylist[2],
+				"iron": mylist[3],
+				"diamond": mylist[4],
+				"energy": mylist[5],
+				"experience": mylist[6],
+				"level": mylist[7],
+				"role": mylist[8],
+				"stage": mylist[9],
+				"tower_stage": mylist[10],
+				"skill_scroll_10":mylist[11],
+				"skill_scroll_30": mylist[12],
+				"skill_scroll_100": mylist[13],
+				"experience_potion": mylist[14],
+				"small_energy_potion": mylist[15],
+				"recover_time": mylist[16],
+				"hang_stage": mylist[17],
+				"hang_up_time": mylist[18],
+				"basic_summon_scroll": mylist[19],
+				"pro_summon_scroll": mylist[20],
+				"friend_gift": mylist[21],
+				"prophet_summon_scroll": mylist[22],
+				"fortune_wheel_ticket_basic": mylist[23],
+				"fortune_wheel_ticket_pro": mylist[24]
+			}
+		}
+		return self._message_typesetting(0, 'got all friends info',data)
+
+	async def _get_all_tower_info(self, world: int, unique_id: str):
+		if self._entry_consumables!="":
+			return self._message_typesetting(1, 'configration is empty')
+		data = {
+			"remaining":{
+				"entry_consumables":self._entry_consumables
+			}
+		}
+		return self._message_typesetting(0, 'got all tower info',data)
+
+	async def _get_all_armor_info(self, world: int, unique_id: str):
+		armor1 = await self._execute_statement(world, 'SELECT * FROM armor1 WHERE unique_id = "' + unique_id + '";')
+		armor2 = await self._execute_statement(world, 'SELECT * FROM armor2 WHERE unique_id = "' + unique_id + '";')
+		armor3 = await self._execute_statement(world, 'SELECT * FROM armor3 WHERE unique_id = "' + unique_id + '";')
+		armor4 = await self._execute_statement(world, 'SELECT * FROM armor4 WHERE unique_id = "' + unique_id + '";')
+		data = {}
+		for i in range(1,5):
+			data.update({"armor"+str(i):{}})
+			for j in range(1,11):
+				data["armor"+str(i)].update({"armor_level"+str(j):str(eval("armor%s"%i)[0][j])})
+		return self._message_typesetting(0, 'got all armor info',data)
+
+	async def _level_enemy_layouts_config(self, world: int, unique_id: str):
+		if self._level_enemy_layouts_config_json=="":
+			return self._message_typesetting(1, 'configration is empty')
+		data = {"remaining":{"level_enemy_layouts_config":self._level_enemy_layouts_config_json}}
+		return self._message_typesetting(0, 'got all level enemy layouts config info',data)
+
+	async def _monster_config(self, world: int, unique_id: str):
+		if self._monster_config_json=="":
+			return self._message_typesetting(1, 'configration is empty')
+		data = {"remaining":{"monster_config":self._monster_config_json}}
+		return self._message_typesetting(0, 'got all monster config info',data)
+
+	async def _get_lottery_config_info(self, world: int, unique_id: str):
+		if self._lottery=="":
+			return self._message_typesetting(1, 'configration is empty')
+		data = {"remaining":{"skills":self._lottery["skills"]["cost"],"weapons":self._lottery["weapons"]["cost"],"roles":self._lottery["roles"]["cost"],"fortune_wheel":self._lottery["fortune_wheel"]["cost"]}}
+		return self._message_typesetting(0, 'got all lottery config info',data)
+
+	async def _get_stage_reward_config(self, world: int, unique_id: str):
+		if self._get_stage_reward_config_json=="":
+			return self._message_typesetting(1, 'configration is empty')
+		data = {"remaining":{"stage_reward_config":self._get_stage_reward_config_json}}
+		return self._message_typesetting(0, 'got all stage reward config info',data)
+
 	async def _get_all_friend_info(self, world: int, unique_id: str):
 		#0 got all friends info
 		# return message:{"f_list_id":f_id, "f_name":f_name,"f_level":f_level,"f_recovery_time":f_recovery_time}
@@ -975,6 +1054,15 @@ class GameManager:
 		self._player = d['player']
 		self._hang_reward_list = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
+
+		result = requests.get('http://localhost:8000/get_level_enemy_layouts_config')
+		self._level_enemy_layouts_config_json = result.json()
+
+		result = requests.get('http://localhost:8000/get_monster_config')
+		self._monster_config_json = result.json()
+
+		result = requests.get('http://localhost:8000/get_stage_reward_config')
+		self._get_stage_reward_config_json = result.json()
 
 	def _start_timer(self, seconds: int):
 		t = threading.Timer(seconds, self._refresh_configuration)
@@ -1293,6 +1381,50 @@ async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER'])._get_all_friend_info(int(post['world']), post['unique_id'])
 	return _json_response(result)
+
+@ROUTES.post('/get_all_resource_info')
+async def __get_all_resource_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._get_all_resource_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_tower_info')
+async def __get_all_tower_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._get_all_tower_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_armor_info')
+async def get_all_armor_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._get_all_armor_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/level_enemy_layouts_config')
+async def _level_enemy_layouts_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._level_enemy_layouts_config(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/monster_config')
+async def _monster_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._monster_config(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_lottery_config_info')
+async def _get_lottery_config_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._get_lottery_config_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_stage_reward_config')
+async def _get_stage_reward_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._get_stage_reward_config(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
 
 def get_config() -> configparser.ConfigParser:
 	'''
