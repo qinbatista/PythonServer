@@ -40,38 +40,9 @@ All mail returned by the server to the client will follow this format.
 
 # Public
 
-## ========   get all mail   ========
-
-Returns all the mail in the user's mailbox. 
-
-Reads mail from the **new** and **cur** directories.
-Marks all new mail as **read** and moves them to **cur** directory.
-
-##### Sample Request
-
-```json
-{
-	"world" : 0,
-	"function" : "get_all_mail",
-	"data" : {
-		"token" : "TOKEN"
-	}
-}
-```
-
-##### Sample Responses
-
-```json
-{
-	"status" : 0,
-	"message" : "successfully recieved all mail",
-	"data" : [ list of all mail ]
-}
-```
-
 ## ========   get new mail   ========
 
-Returns all the new, unread mail in the user's **new** mailbox.
+Returns all the new mail in the user's **new** mailbox.
 
 All mail returned this way is marked as **read** on the server side, regardless of whether or not the client has actually read the mail.
 Additionally moves all new mail to the **cur** directory.
@@ -98,9 +69,41 @@ Additionally moves all new mail to the **cur** directory.
 }
 ```
 
+
+## ========   get all mail   ========
+
+Returns all the mail in the user's mailbox. 
+
+Reads mail from the **new** and **cur** directories.
+Moves all mail in the **new** directory to the **cur** directory.
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "get_all_mail",
+	"data" : {
+		"token" : "TOKEN"
+	}
+}
+```
+
+##### Sample Responses
+
+```json
+{
+	"status" : 0,
+	"message" : "successfully recieved all mail",
+	"data" : [ list of all mail ]
+}
+```
+
+
 ## ========   delete all mail   ========
 
-Deletes all the mail in the user's mailbox. 
+Deletes all of the read mail in the user's mailbox.
+Unread mail in the **new** directory is preserved.
 
 ##### Sample Request
 
@@ -124,31 +127,6 @@ Deletes all the mail in the user's mailbox.
 }
 ```
 
-## ========   delete mail   ======== (unimplemented)
-
-Deletes the user's selected mail from the server.
-
-##### Sample Request
-
-```json
-{
-	"world" : 0,
-	"function" : "delete_mail",
-	"data" : {
-		"token" : "TOKEN",
-		"mail" : mail
-	}
-}
-```
-
-##### Sample Responses
-
-```json
-{
-	"status" : 0,
-	"message" : "success",
-}
-```
 
 # Private
 
@@ -160,11 +138,6 @@ Sends mail to the specified user.
 Send a POST request with the following parameters to the mail server at the **/send\_mail** endpoint.
 
 **NOTE** - When making requests, be sure to send your POST data as a **json**.
-This can be done using the requests library like so:
-
-```python
-requests.post('URL', json = {dictionary})
-```
 
 At minimum, every request must have **world** and **uid\_to**.
 However, the message created by such a simple request will not be very interesting.
@@ -204,16 +177,24 @@ Example
 }
 ```
 
-Example
+Example - sending a gift message to a user containing 4 skill\_scroll\10, and 300 coins.
+
+(Using requests library for example. Please use async library in production code)
+```python
+data = {'world':'0','uid_to':'4','kwargs':{'from':'server','subject':'You have a gift!','body':'Your gift is waiting','type':'gift','items':'skill_scroll_10,coin', 'quantities':'4,300'}}
+requests.post('MAILSERVERURL/send_mail', json = data)
+```
+
+data:
 ```json
 {
 	"world" : "0",
 	"uid_to": "4",
 	"kwargs":
 	{
-		"from" : "",
+		"from" : "server",
 		"subject" : "You have a gift!",
-		"body" : "Congradulations! You have a gift waiting to be retrieved!",
+		"body" : "Your gift is waiting",
 		"type" : "gift",
 		"items": "skill_scroll_10, coin",
 		"quantities" : "4, 300"
@@ -231,6 +212,40 @@ Example
 }
 ```
 
+## ========   delete mail   ========
+
+Deletes the message with the associated nonce from the user's mailbox.
+
+After a user redeems something using the message **nonce**, that message should be deleted from their mailbox.
+This operation, however, is not automatic.
+It is the responsibility of the redeem function author to call this function to delete that message.
+Has no effect if a message with the provided nonce does not exist.
+
+Send a POST request with the following parameters to the mail server at the **/delete\_mail** endpoint.
+
+##### Sample POST
+
+```json
+{
+	"world" : 0,
+	"unique_id" : str,
+	"nonce" : str
+}
+```
+
+(Using requests library for example. Please use async library in production code)
+```python
+requests.post('MAILSERVERURL/delete_mail', data = {'world':0, 'unique_id':'4', 'nonce':'23423'})
+```
+
+##### Sample Responses
+
+```json
+{
+	"status" : 0,
+	"message" : "success"
+}
+```
 
 ## ========   broadcast mail   ======== (unimplemented)
 

@@ -26,8 +26,8 @@ class AccountManager:
 		# This is the connection pool to the SQL server. These connections stay open
 		# for as long as this class is alive.
 		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='user', charset='utf8')
-		self._password_re = re.compile(r'\A[\w!@#$%^&*()_+|~=\-\\\[\]:;\'\"{}/?,.<>]{6,30}\Z')
-		self._account_re = re.compile(r'\A([a-zA-Z])+([A-Za-z0-9_\-.@]){5,24}\Z')
+		self._password_re = re.compile(r'\A[\w!@#$%^&*()_+|`~=\-\\\[\]:;\'\"{}/?,.<>]{6,30}\Z')
+		self._account_re = re.compile(r'^[A-Za-z]\w{5,24}$')
 		self._email_re = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
 		self._phone_re = re.compile(r'\A[0-9]{10,15}\Z')
 		self._n = 2**10
@@ -65,6 +65,8 @@ class AccountManager:
 	# TODO refactor code for speed improvements
 	async def bind_account(self, unique_id: str, password: str, account: str, email: str, phone: str) -> dict:
 		if await self._account_is_bound(unique_id): # trying to bind additional items
+			if email == '' and phone == '':
+				return self.message_typesetting(9, 'could not bind additional items')
 			if email != '':
 				retvals = await asyncio.gather(self._email_is_bound(unique_id), self._check_exists('email', email))
 				if retvals[0]:
@@ -195,6 +197,7 @@ class AccountManager:
 		elif identifier == 'email':
 			if not self._is_valid_email(value): return False
 		p = await self._execute_statement('SELECT password, salt FROM info WHERE `' + identifier + '` = "' + value + '";')
+		if p == (): return False
 		hashed_password, salt = p[0]
 		input_hash = hashlib.scrypt(password.encode(), salt = salt.encode(), n = self._n, r = self._r, p = self._p).hex()
 		return hashed_password == input_hash
