@@ -819,15 +819,16 @@ class GameManager:
 		return self._message_typesetting(0, 'got all tower info',data)
 
 	async def _get_all_armor_info(self, world: int, unique_id: str):
-		armor1 = await self._execute_statement(world, 'SELECT * FROM armor1 WHERE unique_id = "' + unique_id + '";')
-		armor2 = await self._execute_statement(world, 'SELECT * FROM armor2 WHERE unique_id = "' + unique_id + '";')
-		armor3 = await self._execute_statement(world, 'SELECT * FROM armor3 WHERE unique_id = "' + unique_id + '";')
-		armor4 = await self._execute_statement(world, 'SELECT * FROM armor4 WHERE unique_id = "' + unique_id + '";')
+		result = await self._execute_statement(world, 'SELECT * FROM armor WHERE unique_id = "' + unique_id + '";')
+		print("result="+str(result))
+		print("len ="+str(len(result)))
 		data = {}
-		for i in range(1,5):
-			data.update({"armor"+str(i):{}})
+		for i in range(0,len(result)):
+			data.update({result[i][1]:{}})
 			for j in range(1,11):
-				data["armor"+str(i)].update({"armor_level"+str(j):str(eval("armor%s"%i)[0][j])})
+				data[result[i][1]].update({"armor_level"+str(j):result[i][j+1]})
+			# print("data="+str(data))
+		print("data="+str(data))
 		return self._message_typesetting(0, 'got all armor info',data)
 
 	async def _level_enemy_layouts_config(self, world: int, unique_id: str):
