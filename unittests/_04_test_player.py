@@ -6,7 +6,8 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
 # GAME_MANAGER_BASE_URL = 'http://localhost:8004'
-GAME_MANAGER_BASE_URL = 'http://localhost:8007'
+# GAME_MANAGER_BASE_URL = 'http://localhost:8007'
+GAME_MANAGER_BASE_URL = 'http://localhost:8006'
 
 
 
@@ -154,6 +155,11 @@ def get_all_supplies():
 	result = requests.post(GAME_MANAGER_BASE_URL + '/get_all_supplies', data={"world": 0, 'unique_id': "4"})
 	print(str(result.text))
 
+
+def basic_summon():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/basic_summon', data={"world": 0, 'unique_id': "4", "cost_item": "diamond"})
+	print(str(result.text))
+
 def test():
 	s22k = "999"
 	s21k = "939"
@@ -184,9 +190,10 @@ if __name__ == "__main__":
 	# enter_stage(stage=1)
 	# enter_tower(stage=3)
 	# disintegrate_weapon()
-	automatically_refresh_store()
+	# automatically_refresh_store()
 	# manually_refresh_store()
 	# diamond_refresh_store()
 	# black_market_transaction(1)
 	# show_energy()
 	# get_all_supplies()
+	basic_summon()
