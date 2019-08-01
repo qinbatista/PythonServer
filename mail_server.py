@@ -7,6 +7,7 @@ import os
 import json
 import random
 import mailbox
+import requests
 
 
 from aiohttp import web
@@ -50,6 +51,8 @@ class MailServer:
 		messages = []
 		for mid, msg in folder.iteritems():
 			if msg.get_subdir() == 'new':
+				msg['nonce'] = self._request_nonce(msg)
+				print(f'this is msg[nonce] : {msg["nonce"]}')
 				messages.append(self._message_to_dict(msg))
 				msg.set_subdir('cur')
 				folder[mid] = msg
@@ -65,10 +68,11 @@ class MailServer:
 			return self._message_typesetting(1, 'user has no mail')
 		messages = []
 		for mid, msg in folder.iteritems():
-			messages.append(self._message_to_dict(msg))
 			if msg.get_subdir() == 'new':
+				msg['nonce'] = self._request_nonce(msg)
 				msg.set_subdir('cur')
 				folder[mid] = msg
+			messages.append(self._message_to_dict(msg))
 		if not messages:
 			return self._message_typesetting(1, 'user has no mail')
 		return self._message_typesetting(0, 'got all mail', {'mail' : messages})
@@ -84,6 +88,11 @@ class MailServer:
 		folder.clear()
 		return self._message_typesetting(0, 'deleted all mail')
 
+	def _request_nonce(self, msg: mailbox.MaildirMessage):
+		if msg['type'] == 'gift':
+			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'gift', 'items' : msg['items'], 'quantities' : msg['quantities']})
+			return r.json()['data']['nonce']
+
 	def _construct_message(self, **kwargs):
 		msg = mailbox.MaildirMessage()
 		msg['time']    = datetime.now().strftime('%Y/%m/%d, %H:%M:%S')
@@ -91,6 +100,9 @@ class MailServer:
 		msg['type']    = kwargs['type']
 		msg['subject'] = kwargs['subject']
 		msg.set_payload(kwargs['body'])
+		if msg['type'] == 'gift':
+			msg['items'] = kwargs['items']
+			msg['quantities'] = kwargs['quantities']
 		return msg
 
 	def _message_to_dict(self, msg: mailbox.MaildirMessage, **kwargs) -> dict:
@@ -100,6 +112,8 @@ class MailServer:
 		d['from'] = msg['from']
 		d['body'] = msg.get_payload()
 		d['type'] = msg['type']
+		d['data'] = {}
+		d['data']['nonce'] = msg['nonce']
 		return d
 
 
