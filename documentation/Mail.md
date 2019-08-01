@@ -98,7 +98,33 @@ Additionally moves all new mail to the **cur** directory.
 }
 ```
 
-## ========   delete mail   ========
+## ========   delete all mail   ========
+
+Deletes all the mail in the user's mailbox. 
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "delete_all_mail",
+	"data" : {
+		"token" : "TOKEN"
+	}
+}
+```
+
+##### Sample Responses
+
+```json
+{
+	"status" : 0,
+	"message" : "successfully deleted all mail",
+	"data" : [ list of all mail ]
+}
+```
+
+## ========   delete mail   ======== (unimplemented)
 
 Deletes the user's selected mail from the server.
 
@@ -132,6 +158,13 @@ Deletes the user's selected mail from the server.
 Sends mail to the specified user.
 
 Send a POST request with the following parameters to the mail server at the **/send\_mail** endpoint.
+
+**NOTE** - When making requests, be sure to send your POST data as a **json**.
+This can be done using the requests library like so:
+
+```python
+requests.post('URL', json = {dictionary})
+```
 
 At minimum, every request must have **world** and **uid\_to**.
 However, the message created by such a simple request will not be very interesting.
@@ -199,7 +232,7 @@ Example
 ```
 
 
-## ========   broadcast mail   ========
+## ========   broadcast mail   ======== (unimplemented)
 
 Sends a piece of mail to all users.
 This could take a while.
