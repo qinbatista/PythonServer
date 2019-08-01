@@ -197,6 +197,7 @@ class AccountManager:
 		elif identifier == 'email':
 			if not self._is_valid_email(value): return False
 		p = await self._execute_statement('SELECT password, salt FROM info WHERE `' + identifier + '` = "' + value + '";')
+		if p == (): return False
 		hashed_password, salt = p[0]
 		input_hash = hashlib.scrypt(password.encode(), salt = salt.encode(), n = self._n, r = self._r, p = self._p).hex()
 		return hashed_password == input_hash
