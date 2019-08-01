@@ -39,7 +39,7 @@ def json_operating(table_name: str, table_attribute: list) -> None:
         json.dump(data, f, indent=4)
 
 
-def sql_table_constructor(table_name: str, table_dict: dict) -> None:
+def sql_table_constructor(table_name: str, table_dict: dict, key_str: str = None) -> None:
     """
     mysql 表单构造器
     """
@@ -49,7 +49,10 @@ def sql_table_constructor(table_name: str, table_dict: dict) -> None:
     sql_str_end = ");"
     for key in table_dict.keys():
         sql_str += key + " " + table_dict[key] + ","
-    sql_str = sql_str[:len(sql_str) - 1] + sql_str_end
+    if key_str:
+        sql_str = sql_str + key_str + sql_str_end
+    else:
+        sql_str = sql_str[:len(sql_str) - 1] + sql_str_end
     cursor.execute(sql_str)
     # db.commit()
     json_operating(table_name=table_name, table_attribute=list(table_dict.keys()))
@@ -144,10 +147,11 @@ def create_weapon_table() -> None:
     """
     创建武器背包表以及武器信息表
     """
-    table_name = "weapon_bag"
-    table_dict = {"unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'"}
-    weapon_dict = {
-        "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
+    table_name = "weapon"
+    table_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL COMMENT '玩家唯一标识'",
+        "weapon_name": "VARCHAR(64) NOT NULL COMMENT '武器名字'",
+        "weapon_star": "SMALLINT(6) NULL DEFAULT(0) COMMENT '武器星数'",
         "weapon_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '武器等级'",
         "passive_skill_1_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '武器技能1'",
         "passive_skill_2_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '武器技能2'",
@@ -156,22 +160,33 @@ def create_weapon_table() -> None:
         "skill_point": "SMALLINT(6) NULL DEFAULT(0) COMMENT '武器技能点'",
         "segment": "SMALLINT(6) NULL DEFAULT(0) COMMENT '武器碎片'"
     }
-    for i in range(1, 41):
-        weapon_name = "weapon" + str(i)
-        sql_table_constructor(table_name=weapon_name, table_dict=weapon_dict)  # 创建武器信息表
-        table_dict.update({weapon_name: "SMALLINT(6) NULL DEFAULT(0) COMMENT '武器%s的星数'" % i})
-    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
+    sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id, weapon_name)")  # 创建武器表的约束 key_str="CONSTRAINT weapon PRIMARY KEY(unique_id, weapon_name)"
+
+
+def create_armor_table() -> None:
+    """
+    创建武器背包表以及武器信息表
+    """
+    table_name = "armor"
+    table_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL COMMENT '玩家唯一标识'",
+        "armor_id": "VARCHAR(64) NOT NULL COMMENT '盔甲唯一标识'",
+    }
+    for i in range(1, 11):
+        table_dict.update({"armor_level%s" % i: "INT(6) NOT NULL DEFAULT(0) COMMENT '盔甲的等级%s'" % i})
+    sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id, armor_id)")  # 创建盔甲背包表
 
 
 def create_role_table() -> None:
     """
-    创建角色背包表以及角色信息表
+    创建角色表
     """
-    table_name = "role_bag"
-    table_dict = {"unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'"}
-    weapon_dict = {
-        "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
-        "weapon_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色等级'",
+    table_name = "role"
+    table_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL COMMENT '玩家唯一标识'",
+        "role_name": "VARCHAR(64) NOT NULL COMMENT '角色名字'",
+        "role_star": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色星数'",
+        "role_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色等级'",
         "passive_skill_1_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色技能1'",
         "passive_skill_2_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色技能2'",
         "passive_skill_3_level": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色技能3'",
@@ -179,11 +194,7 @@ def create_role_table() -> None:
         "skill_point": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色技能点'",
         "segment": "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色碎片'"
     }
-    for i in range(1, 41):
-        weapon_name = "role" + str(i)
-        sql_table_constructor(table_name=weapon_name, table_dict=weapon_dict)  # 创建角色信息表
-        table_dict.update({weapon_name: "SMALLINT(6) NULL DEFAULT(0) COMMENT '角色%s的星数'" % i})
-    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建角色背包表
+    sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id, role_name)")  # 创建角色表的约束
 
 
 def create_user_table() -> None:
@@ -256,41 +267,19 @@ def create_dark_market_table() -> None:
     sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
 
 
-def create_friend_list_table() -> None:
+def create_friend_table() -> None:
     """
     创建武器背包表以及武器信息表
     """
-    table_name = "friend_list"
+    table_name = "friend"
     table_dict = {
-        "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
+        "unique_id": "VARCHAR(128) NOT NULL COMMENT '玩家唯一标识'",
+        "friend_id": "VARCHAR(128) NOT NULL COMMENT '朋友唯一标识'",
+        "friend_name": "VARCHAR(32) NOT NULL COMMENT '朋友的名字'",
+        "friend_level": "INT(6) NULL DEFAULT (0) COMMENT '朋友的等级'",
+        "recovery_time": "VARCHAR(32) NOT NULL COMMENT '朋友好感度恢复时间'"
     }
-    for i in range(1, 31):
-        data = {
-            "friend_id" + str(i): "VARCHAR(128) NOT NULL DEFAULT '' COMMENT '朋友%s唯一标识'" % i,
-            "friend_name" + str(i): "VARCHAR(32) NOT NULL DEFAULT '' COMMENT '朋友%s的名字'" % i,
-            "friend_level" + str(i): "INT(6) NOT NULL DEFAULT(0) COMMENT '朋友%s的等级'" % i,
-            "recovery_time" + str(i): "VARCHAR(32) NOT NULL DEFAULT '' COMMENT '朋友%s好感度恢复时间'" % i
-        }
-        table_dict.update(data)
-    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
-
-
-def create_armor_table(armor: int) -> None:
-    """
-    创建武器背包表以及武器信息表
-    """
-    table_name = "armor%s" % armor
-    table_dict = {
-        "unique_id": "VARCHAR(128) NOT NULL PRIMARY KEY COMMENT '玩家唯一标识'",
-    }
-    for i in range(1, 11):
-        table_dict.update({"armor_level%s" % i: "INT(6) NOT NULL DEFAULT(0) COMMENT '盔甲的等级%s'" % i})
-    sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
-
-
-def create_armor_factory_table() -> None:
-    for i in range(1, 5):
-        create_armor_table(armor=i)
+    sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id, friend_id)")  # 创建武器背包表
 
 
 def update_avatar(table_name: str, unique_id: str, img_path: str):  # png
@@ -317,14 +306,14 @@ def load_avatar(table_name:str, unique_id: str, img_path: str):
 
 if __name__ == '__main__':
     # 创建数据库表
-    create_player_table()
+    # create_player_table()
     # create_skill_table()
-    # create_weapon_table()
+    create_weapon_table()
+    create_armor_table()
     # create_role_table()
     # create_user_table()
     # create_dark_market_table()
-    # create_friend_list_table()
-    # create_armor_factory_table()
+    # create_friend_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
