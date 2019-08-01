@@ -112,7 +112,8 @@ class MailServer:
 		d['from'] = msg['from']
 		d['body'] = msg.get_payload()
 		d['type'] = msg['type']
-		d['nonce'] = msg['nonce']
+		d['data'] = {}
+		d['data']['nonce'] = msg['nonce']
 		return d
 
 
