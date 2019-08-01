@@ -236,6 +236,14 @@ class MessageHandler:
 		async with session.post(MANAGER_GAME_BASE_URL + '/black_market_transaction', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'code': message['data']['code']}) as resp:
 			return await resp.text()
 
+	async def _show_energy(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/show_energy', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _upgrade_armor(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/upgrade_armor', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'armor_kind': message['data']['armor_kind'], 'armor_id': message['data']['armor_id']}) as resp:
+			return await resp.text()
+
 
 ###############################################################################
 
@@ -280,6 +288,8 @@ FUNCTION_LIST = {
 	'automatically_refresh_store': MessageHandler._automatically_refresh_store,
 	'manually_refresh_store': MessageHandler._manually_refresh_store,
 	'diamond_refresh_store': MessageHandler._diamond_refresh_store,
-	'black_market_transaction': MessageHandler._black_market_transaction
+	'black_market_transaction': MessageHandler._black_market_transaction,
+	'show_energy': MessageHandler._show_energy,
+	'upgrade_armor': MessageHandler._upgrade_armor
 
 }
