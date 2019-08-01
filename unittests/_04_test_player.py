@@ -6,8 +6,8 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
 # GAME_MANAGER_BASE_URL = 'http://localhost:8004'
-# GAME_MANAGER_BASE_URL = 'http://localhost:8007'
-GAME_MANAGER_BASE_URL = 'http://localhost:8006'
+GAME_MANAGER_BASE_URL = 'http://localhost:8007'
+# GAME_MANAGER_BASE_URL = 'http://localhost:8006'
 
 
 
@@ -160,6 +160,16 @@ def basic_summon():
 	result = requests.post(GAME_MANAGER_BASE_URL + '/basic_summon', data={"world": 0, 'unique_id': "4", "cost_item": "diamond"})
 	print(str(result.text))
 
+
+def get_hang_up_info():
+	result = requests.post(GAME_MANAGER_BASE_URL + '/get_hang_up_info', data={"world": 0, 'unique_id': "4"})
+	print(str(result.text))
+
+
+def upgrade_armor(armor_id: int):
+	result = requests.post(GAME_MANAGER_BASE_URL + '/upgrade_armor', data={"world": 0, 'unique_id': "4", "armor_kind": "armor1", "armor_id": armor_id})
+	print(str(result.text))
+
 def test():
 	s22k = "999"
 	s21k = "939"
@@ -196,4 +206,6 @@ if __name__ == "__main__":
 	# black_market_transaction(1)
 	# show_energy()
 	# get_all_supplies()
-	basic_summon()
+	# basic_summon()
+	# get_hang_up_info()
+	upgrade_armor(0)

@@ -704,7 +704,7 @@ class GameManager:
 			if await self._execute_statement_update(world=world, statement=update_str) == 0:
 				return self._message_typesetting(status=98, message="database operating error")
 			data = await self._execute_statement(world=world, statement=select_str)
-			remaining = {}
+			remaining = {"hang_up_time_seconds": 0}
 			for i in range(len(keys)):
 				remaining.update({keys[i]: data[0][i]})
 			return self._message_typesetting(status=0, message="hang up success", data={"remaining": remaining})
@@ -725,7 +725,9 @@ class GameManager:
 			update_str, select_str = self._sql_str_operating(unique_id=unique_id, material_dict=material_dict, key_word=key_word)
 			await self._execute_statement_update(world=world, statement=update_str)
 			data = await self._execute_statement(world=world, statement=select_str)
-			remaining = {}
+
+			delta_time = datetime.strptime(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			remaining = {"hang_up_time_seconds": int(delta_time.total_seconds())}
 			for i in range(len(keys)):
 				remaining.update({keys[i]: data[0][i]})
 			material_dict.update({"hang_stage": hang_stage})
@@ -771,11 +773,23 @@ class GameManager:
 			await self._execute_statement_update(world=world, statement=update_str)
 			data = await self._execute_statement(world=world, statement=select_str)
 
-			remaining = {}
+			delta_time = datetime.strptime(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()), '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			remaining = {"hang_up_time_seconds": int(delta_time.total_seconds())}
 			for i in range(len(keys)):
 				remaining.update({keys[i]: data[0][i]})
 			material_dict.update({"hang_up_time": hang_up_time})
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"remaining": remaining, "reward": material_dict})
+
+	async def get_hang_up_info(self, world: int, unique_id: str) -> dict:
+		"""
+		success ===> 0
+		# 0 - get hang up info
+		"""
+		sql_str = "SELECT hang_up_time, hang_stage FROM player WHERE unique_id='%s'" % unique_id
+		hang_up_time, hang_stage = (await self._execute_statement(world=world, statement=sql_str))[0]
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
+		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
 
 	async def show_energy(self, world: int, unique_id: str):
 		data = await self.try_energy(world=world, unique_id=unique_id, amount=0)
@@ -789,6 +803,32 @@ class GameManager:
 			data["data"] = data_dict
 		return data
 
+	async def upgrade_armor(self, world: int, unique_id: str, armor_kind: str, armor_id: int) -> dict:
+		"""
+		# success ===> 0
+		# 0 - Successful synthesis
+		# 97 - database operation error
+		# 98 - Insufficient basic armor
+		# 99 - parameter error
+		:param armor_kind: 盔甲的种类，代表是哪一张表 ==> armor1、armor2、armor3、armor4
+		:param armor_id: 盔甲种类下的等级，代表armor_level1、armor_level2、armor_level3   ......
+		:return: dict
+		"""
+		if armor_id < 1 or armor_id > 9:
+			return self._message_typesetting(status=99, message="Parameter error")
+		armor1, armor2 = f"armor_level{armor_id}", f"armor_level{armor_id + 1}"
+		armor = {armor1: 0, armor2: 0}
+		sql_str = f"select {armor1}, {armor2} from {armor_kind} where unique_id='{unique_id}'"
+		armor[armor1], armor[armor2] = (await self._execute_statement(world=world, statement=sql_str))[0]
+		if armor[armor1] < 3:
+			return self._message_typesetting(status=98, message="Insufficient basic armor")
+		else:
+			armor[armor1] -= 3
+			armor[armor2] += 1
+			sql_str = f"update {armor_kind} set {armor1}={armor[armor1]}, {armor2}={armor[armor2]} where unique_id='{unique_id}'"
+			if await self._execute_statement_update(world=world, statement=sql_str) == 0:
+				return self._message_typesetting(status=97, message="database operating error")
+			return self._message_typesetting(status=0, message="Successful synthesis", data={"remaining": armor})
 
 
 #############################################################################
@@ -1646,6 +1686,12 @@ async def __get_hang_up_reward(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).get_hang_up_reward(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
+@ROUTES.post('/get_hang_up_info')
+async def __get_hang_up_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_hang_up_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
 @ROUTES.post('/fortune_wheel_pro')
 async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -1662,6 +1708,12 @@ async def __enter_stage(request: web.Request) -> web.Response:
 async def __show_energy(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).show_energy(world=int(post['world']), unique_id=post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/upgrade_armor')
+async def __upgrade_armor(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).upgrade_armor(int(post['world']), post['unique_id'], post["armor_kind"], int(post['armor_id']))
 	return _json_response(result)
 
 
