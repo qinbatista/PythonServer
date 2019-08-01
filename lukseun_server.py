@@ -18,7 +18,7 @@ import concurrent.futures
 import message_handler as handler
 
 # the size of the header in bytes that we expect to receive from the client.
-HEADER_BUFFER_SIZE = 36
+HEADER_BUFFER_SIZE = 37
 
 # some color codes to make log easier to read
 COLORS = {'pass': '\033[92m', 'fail': '\033[91m', 'end': '\033[0m',

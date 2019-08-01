@@ -79,7 +79,7 @@ class MessageHandler:
 		'''
 		0 pads the size of the message and outputs bytes.
 		'''
-		return str(size).zfill(4).encode()
+		return str(size).zfill(5).encode()
 #
 	async def _login(self, message: dict, session) -> str:
 		async with session.post(MANAGER_ACCOUNT_BASE_URL + '/login', data={'identifier': message['data']['identifier'], 'value': message['data']['value'], 'password': message['data']['password']}) as resp:
