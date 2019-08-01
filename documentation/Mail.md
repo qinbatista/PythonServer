@@ -98,7 +98,33 @@ Additionally moves all new mail to the **cur** directory.
 }
 ```
 
-## ========   delete mail   ========
+## ========   delete all mail   ========
+
+Deletes all the mail in the user's mailbox. 
+
+##### Sample Request
+
+```json
+{
+	"world" : 0,
+	"function" : "delete_all_mail",
+	"data" : {
+		"token" : "TOKEN"
+	}
+}
+```
+
+##### Sample Responses
+
+```json
+{
+	"status" : 0,
+	"message" : "successfully deleted all mail",
+	"data" : [ list of all mail ]
+}
+```
+
+## ========   delete mail   ======== (unimplemented)
 
 Deletes the user's selected mail from the server.
 
@@ -206,7 +232,7 @@ Example
 ```
 
 
-## ========   broadcast mail   ========
+## ========   broadcast mail   ======== (unimplemented)
 
 Sends a piece of mail to all users.
 This could take a while.
