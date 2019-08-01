@@ -582,7 +582,7 @@ class GameManager:
 
 
 #qin modify callback message
-	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str, summon_item:str)->str:
+	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str, summon_item: str) -> dict:
 		if cost_item == 'diamond':
 			result = await self.try_diamond(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['diamond']))
 		elif cost_item == 'coin':
@@ -606,7 +606,8 @@ class GameManager:
 						"remaining":
 						{
 							"skill_id":try_result['data']["keys"][0],
-							"skill_level":try_result['data']["values"][0]
+							"skill_level":try_result['data']["values"][0],
+							cost_item: result["remaining"]
 						},
 						"reward":
 						{
@@ -619,7 +620,8 @@ class GameManager:
 						"remaining":
 						{
 							"scroll_id":try_result['data']["keys"][0],
-							"scroll_quantity":try_result['data']["values"][0]+1
+							"scroll_quantity":try_result['data']["values"][0]+1,
+							cost_item: result["remaining"]
 						},
 						"reward":
 						{
@@ -638,7 +640,8 @@ class GameManager:
 					{
 						"weapon":try_result['data']["values"][0],
 						"star":try_result['data']["values"][1],
-						"segment":try_result['data']["values"][2]+self._standard_segment_count
+						"segment":try_result['data']["values"][2]+self._standard_segment_count,
+						cost_item: result["remaining"]
 					},
 					"reward":
 					{
@@ -660,7 +663,8 @@ class GameManager:
 					{
 						"role":try_result['data']["values"][0],
 						"star":try_result['data']["values"][1],
-						"segment":try_result['data']["values"][2]+self._standard_segment_count
+						"segment":try_result['data']["values"][2]+self._standard_segment_count,
+						cost_item: result["remaining"]
 					},
 					"reward":
 					{
