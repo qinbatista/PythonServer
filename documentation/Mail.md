@@ -133,6 +133,13 @@ Sends mail to the specified user.
 
 Send a POST request with the following parameters to the mail server at the **/send\_mail** endpoint.
 
+**NOTE** - When making requests, be sure to send your POST data as a **json**.
+This can be done using the requests library like so:
+
+```python
+requests.post('URL', json = {dictionary})
+```
+
 At minimum, every request must have **world** and **uid\_to**.
 However, the message created by such a simple request will not be very interesting.
 The last parameter, **kwargs**, functions as a simple key-value store to create more robust messages.

@@ -8,7 +8,9 @@ import json
 import random
 import mailbox
 
+
 from aiohttp import web
+from datetime import datetime
 
 
 #TODO read port number from configuration manager
@@ -19,14 +21,21 @@ class MailServer:
 	def __init__(self):
 		self._box = mailbox.Maildir(DIRNAME)
 	
+	# TODO refactor code
 	def send_mail(self, world: int, uid_to: str, **kwargs):
-		msg = self._construct_message(**kwargs)
+		# 0 - successfully sent mail
+		# 60 - invalid request format
+		# 61 - invalid message type
+		if kwargs['type'] not in {'simple', 'gift'}:
+			return self._message_typesetting(61, 'invalid message type')
 		try:
+			msg = self._construct_message(**kwargs)
 			recipient_folder = self._box.get_folder(str(world)).get_folder(uid_to)
+		except KeyError:
+			return self._message_typesetting(60, 'invalid request format')
 		except mailbox.NoSuchMailboxError:
 			recipient_folder = self._box.get_folder(str(world)).add_folder(uid_to)
-		finally:
-			recipient_folder.add(msg)
+		recipient_folder.add(msg)
 		return self._message_typesetting(0, 'success')
 
 
@@ -75,9 +84,9 @@ class MailServer:
 		folder.clear()
 		return self._message_typesetting(0, 'deleted all mail')
 
-	#TODO add the time to the message
 	def _construct_message(self, **kwargs):
 		msg = mailbox.MaildirMessage()
+		msg['time']    = datetime.now().strftime('%Y/%m/%d, %H:%M:%S')
 		msg['from']    = kwargs['from']
 		msg['type']    = kwargs['type']
 		msg['subject'] = kwargs['subject']
@@ -106,10 +115,7 @@ def _json_response(body: dict = '', **kwargs) -> web.Response:
 ROUTES = web.RouteTableDef()
 @ROUTES.post('/send_mail')
 async def __send_mail(request: web.Request) -> web.Response:
-	post = await request.post()
-	print(f'this is post: {post}')
-	print(f'this is len: {len(post)}')
-	print(post.keys())
+	post = await request.json() # notice we are awaiting a json type due to nested dictionary
 	data = (request.app['MANAGER']).send_mail(post['world'], post['uid_to'], **post['kwargs'])
 	return _json_response(data)
 
@@ -117,6 +123,18 @@ async def __send_mail(request: web.Request) -> web.Response:
 async def __get_new_mail(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = (request.app['MANAGER']).get_new_mail(post['world'], post['unique_id'])
+	return _json_response(data)
+
+@ROUTES.post('/get_all_mail')
+async def __get_all_mail(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = (request.app['MANAGER']).get_all_mail(post['world'], post['unique_id'])
+	return _json_response(data)
+
+@ROUTES.post('/delete_all_mail')
+async def __delete_all_mail(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = (request.app['MANAGER']).delete_all_mail(post['world'], post['unique_id'])
 	return _json_response(data)
 
 def run():
