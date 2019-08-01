@@ -1477,20 +1477,34 @@ class GameManager:
 				return self._message_typesetting(status=96, message="Accidental prize -> " + reward)
 
 	#  #########################  houyao 2019年7月31日10点19分  ##########################
-	async def upgrade_armor(self, armor_kind: str, armor_id: int) -> dict:
+	async def upgrade_armor(self, world: int, unique_id: str, armor_kind: str, armor_id: int) -> dict:
 		"""
 		# success ===> 0
-		# 0 - success
+		# 0 - Successful synthesis
 		# 97 - database operation error
-		# 98 - key insufficient
+		# 98 - Insufficient basic armor
 		# 99 - parameter error
 		:param armor_kind: 盔甲的种类，代表是哪一张表 ==> armor1、armor2、armor3、armor4
 		:param armor_id: 盔甲种类下的等级，代表armor_level1、armor_level2、armor_level3   ......
 		:return: dict
 		"""
-		sql_str = "selcet * from %s where unique_id=%s"
+		if armor_id < 1 or armor_id > 9:
+			return self._message_typesetting(status=99, message="Parameter error")
+		armor1, armor2 = f"armor_level{armor_id}", f"armor_level{armor_id + 1}"
+		armor = {armor1: 0, armor2: 0}
+		sql_str = f"select {armor1}, {armor2} from {armor_kind} where unique_id='{unique_id}'"
+		armor[armor1], armor[armor2] = (await self._execute_statement(world=world, statement=sql_str))[0]
+		if armor[armor1] < 3:
+			return self._message_typesetting(status=98, message="Insufficient basic armor")
+		else:
+			armor[armor1] -= 3
+			armor[armor2] += 1
+			sql_str = f"update {armor_kind} set {armor1}={armor[armor1]}, {armor2}={armor[armor2]} where unique_id='{unique_id}'"
+			if await self._execute_statement_update(world=world, statement=sql_str) == 0:
+				return self._message_typesetting(status=97, message="database operating error")
+			return self._message_typesetting(status=0, message="Successful synthesis", data={"remaining": armor})
 
-#  #########################  houyao 2019-07-29 14：49  ##########################
+		#  #########################  houyao 2019-07-29 14：49  ##########################
 
 
 
@@ -1792,6 +1806,12 @@ async def __enter_tower(request: web.Request) -> web.Response:
 async def __pass_tower(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).pass_tower(int(post['world']), post['unique_id'], int(post['stage']))
+	return _json_response(result)
+
+@ROUTES.post('/upgrade_armor')
+async def __upgrade_armor(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).upgrade_armor(int(post['world']), post['unique_id'], post["armor_kind"], int(post['armor_id']))
 	return _json_response(result)
 #  #########################  houyao 2019-07-28 19：49  ##########################
 
