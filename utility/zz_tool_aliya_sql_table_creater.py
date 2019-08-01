@@ -304,12 +304,21 @@ def load_avatar(table_name:str, unique_id: str, img_path: str):
         f.write(cursor.fetchone()[0])
 
 
+def test():
+    db = POOL.connection()
+    cursor = db.cursor()
+    # d = cursor.execute('replace into armor(armor_level1,armor_level2,unique_id,armor_id)values(122+2,444+777,"9","6")')
+    d = cursor.execute('INSERT into armor(armor_level1,armor_level2,unique_id,armor_id) values(122+2,444+777,"9","6"),(13552,447,"9","7"),(6422,12,"8","7")')
+    print("d:" + str(d))
+    print("fetchall:" + str(cursor.fetchall()))
+    db.commit()
+
 if __name__ == '__main__':
     # 创建数据库表
     # create_player_table()
     # create_skill_table()
-    create_weapon_table()
-    create_armor_table()
+    # create_weapon_table()
+    # create_armor_table()
     # create_role_table()
     # create_user_table()
     # create_dark_market_table()
@@ -317,3 +326,4 @@ if __name__ == '__main__':
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
+    test()
