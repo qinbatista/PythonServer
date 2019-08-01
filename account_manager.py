@@ -65,6 +65,8 @@ class AccountManager:
 	# TODO refactor code for speed improvements
 	async def bind_account(self, unique_id: str, password: str, account: str, email: str, phone: str) -> dict:
 		if await self._account_is_bound(unique_id): # trying to bind additional items
+			if email == '' and phone == '':
+				return self.message_typesetting(9, 'could not bind additional items')
 			if email != '':
 				retvals = await asyncio.gather(self._email_is_bound(unique_id), self._check_exists('email', email))
 				if retvals[0]:

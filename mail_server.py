@@ -80,6 +80,17 @@ class MailServer:
 	def delete_mail(self):
 		pass
 
+	def delete_mail(self, world: int, unique_id: str, nonce: str) -> dict:
+		try:
+			folder = self._box.get_folder(str(world)).get_folder(unique_id)
+			for mid, message in folder.iteritems():
+				if message['nonce'] == nonce:
+					folder.discard(mid)
+		except mailbox.NoSuchMailboxError:
+			pass
+		return self._message_typesetting(0, 'successfully deleted message')
+
+
 	def delete_all_mail(self, world:int, uid: str):
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(uid)
@@ -149,6 +160,12 @@ async def __get_all_mail(request: web.Request) -> web.Response:
 async def __delete_all_mail(request: web.Request) -> web.Response:
 	post = await request.post()
 	data = (request.app['MANAGER']).delete_all_mail(post['world'], post['unique_id'])
+	return _json_response(data)
+
+@ROUTES.post('/delete_mail_gift')
+async def __delete_mail_gift(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = (request.app['MANAGER']).delete_mail_gift(post['world'], post['unique_id'], post['nonce'])
 	return _json_response(data)
 
 def run():
