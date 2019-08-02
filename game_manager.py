@@ -1760,7 +1760,17 @@ async def __upgrade_armor(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).upgrade_armor(int(post['world']), post['unique_id'], post["armor_kind"], int(post['armor_id']))
 	return _json_response(result)
 
+@ROUTES.post('/send_friend_gift')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8006/send_friend_gift', data=await request.post()).text))
 
+@ROUTES.post('/redeem_nonce')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8006/redeem_nonce', data=await request.post()).text))
+
+@ROUTES.post('/get_new_mail')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8006/get_new_mail', data=await request.post()).text))
 
 
 def get_config() -> configparser.ConfigParser:
