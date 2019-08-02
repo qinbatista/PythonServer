@@ -795,42 +795,33 @@ class GameManager:
 			return self._message_typesetting(98, 'you have no friends')
 		mylist = list(data)
 		f_id, f_name, f_level, f_recovery_time = [], [], [], []
-		print(data)
 		for my_friend_id_index in range(0, int((len(mylist)))):
-			print("attr_index=" + str(my_friend_id_index))
 			f_id_check = mylist[my_friend_id_index][1]
 			if f_id_check == "":
 				continue
 			f_game_name_check = mylist[my_friend_id_index][2]
 			f_level_check = mylist[my_friend_id_index][3]
 			f_recovering_time = mylist[my_friend_id_index][4]
-			print("f_id_check=" + str(f_id_check))
-			print("f_game_name_check=" + str(f_game_name_check))
-			print("f_level_check=" + str(f_level_check))
-			print("f_recovering_time=" + str(f_recovering_time))
 			if f_recovering_time == "":
 				current_time = time.strftime('%Y-%m-%d', time.localtime())
 				await self._execute_statement_update(world, 'UPDATE friend SET recovery_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="' + f_id_check + '";')
-				mylist[my_friend_id_index][4] = current_time
-			# print('send friend gift success because of f_recovering_time is empty')
+				print("current_time=" + current_time)
+				f_recovery_time.append(current_time)
 			else:
 				current_time = time.strftime('%Y-%m-%d', time.localtime())
 				delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
 				if delta_time.days >= 1:
-					# print("UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name_check)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" +unique_id +"';")
 					await self._execute_statement_update(world, "UPDATE friend_list SET recovery_time" + str(
 						my_friend_id_index) + " = '" + current_time + "',friend_name" + str(
 						my_friend_id_index) + "='" + str(f_game_name_check) + "'" + ",friend_level" + str(
 						my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" + unique_id + "';")
-					mylist[my_friend_id_index][4] = current_time
-				# print('send friend gift success because time is over 1 day')
+					print("current_time2=" + current_time)
+					f_recovery_time.append(current_time)
 				else:
-					pass
-				# print('send friend gift failed, because not cooldown time is not finished')
+					f_recovery_time.append(f_recovering_time)
 			f_id.append(mylist[my_friend_id_index][1])
 			f_name.append(mylist[my_friend_id_index][2])
 			f_level.append(mylist[my_friend_id_index][3])
-			f_recovery_time.append(mylist[my_friend_id_index][4])
 		data_json = {
 			"remaining":
 				{

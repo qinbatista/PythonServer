@@ -277,7 +277,7 @@ def create_friend_table() -> None:
         "friend_id": "VARCHAR(128) NOT NULL COMMENT '朋友唯一标识'",
         "friend_name": "VARCHAR(32) NOT NULL COMMENT '朋友的名字'",
         "friend_level": "INT(6) NULL DEFAULT (0) COMMENT '朋友的等级'",
-        "recovery_time": "VARCHAR(32) NOT NULL COMMENT '朋友好感度恢复时间'"
+        "recovery_time": "VARCHAR(32) NULL DEFAULT '' COMMENT '朋友好感度恢复时间'"
     }
     sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id, friend_id)")  # 创建武器背包表
 
@@ -322,7 +322,7 @@ if __name__ == '__main__':
     # create_role_table()
     # create_user_table()
     # create_dark_market_table()
-    # create_friend_table()
+    create_friend_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")

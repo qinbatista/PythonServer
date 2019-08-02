@@ -303,6 +303,18 @@ class MessageHandler:
 		async with session.post(MANAGER_GAME_BASE_URL + '/upgrade_armor', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'armor_kind': message['data']['armor_kind'], 'armor_id': message['data']['armor_id']}) as resp:
 			return await resp.text()
 
+	async def _send_friend_gift(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/send_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_id': message['data']['friend_id']}) as resp:
+			return await resp.text()
+
+	async def _redeem_nonce(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/redeem_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'type': message['data']['type'], 'nonce': message['data']['nonce']}) as resp:
+			return await resp.text()
+
+	async def _get_new_mail(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_new_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
 
 ###############################################################################
 
@@ -369,6 +381,10 @@ FUNCTION_LIST = {
 	'diamond_refresh_store': MessageHandler._diamond_refresh_store,
 	'black_market_transaction': MessageHandler._black_market_transaction,
 	'show_energy': MessageHandler._show_energy,
-	'upgrade_armor': MessageHandler._upgrade_armor
+	'upgrade_armor': MessageHandler._upgrade_armor,
+
+	'send_friend_gift': MessageHandler._send_friend_gift,
+	'redeem_nonce': MessageHandler._redeem_nonce,
+	'get_new_mail': MessageHandler._get_new_mail
 
 }
