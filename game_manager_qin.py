@@ -616,6 +616,7 @@ class GameManager:
 							"skill_level":try_result['data']["values"][0]
 						}
 					}
+					return self._message_typesetting(0, 'get skill success', message_dic)
 				else:
 					message_dic={
 						"remaining":
@@ -631,7 +632,7 @@ class GameManager:
 							"scroll_quantity":1
 						}
 					}
-				return self._message_typesetting(2, 'get skill item success', message_dic)
+					return self._message_typesetting(1, 'you already has skill, get scroll', message_dic)
 			else:
 				return self._message_typesetting(97, 'skill opeartion error')
 		elif summon_item == 'weapons':
@@ -913,28 +914,29 @@ class GameManager:
 		return self._message_typesetting(0, 'got all stage reward config info',data)
 
 	async def _get_all_friend_info(self, world: int, unique_id: str):
-		#0 got all friends info
+		# 0 got all friends info
 		# return message:{"f_list_id":f_id, "f_name":f_name,"f_level":f_level,"f_recovery_time":f_recovery_time}
-		#return all friends info which friend id is not empty
-		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
-		mylist = list(data[0])
-		f_id,f_name,f_level,f_recovery_time =[],[],[],[]
-		for i in range(0,int((len(mylist)-1)/4)):
-			if mylist[i*4+1+0]!="":
-				f_id.append(mylist[i*4+1+0])
-				f_name.append(mylist[i*4+1+1])
-				f_level.append(mylist[i*4+1+2])
-				f_recovery_time.append(mylist[i*4+1+3])
-		data={
+		# return all friends info which friend id is not empty
+		data = await self._execute_statement(world, 'SELECT * FROM friend WHERE unique_id = "' + unique_id + '";')
+		if len(data) == 0:
+			return self._message_typesetting(98, "you don't have friend")
+		f_id, f_name, f_level, f_recovery_time = [], [], [], []
+		for i in range(0, len(data)):
+			if data[i][1] != "":
+				f_id.append(data[i][1])
+				f_name.append(data[i][2])
+				f_level.append(data[i][3])
+				f_recovery_time.append(data[i][4])
+		data = {
 			"remaining":
-			{
-				"f_list_id":f_id,
-				"f_name":f_name,
-				"f_level":f_level,
-				"f_recovery_time":f_recovery_time
-			}
+				{
+					"f_list_id": f_id,
+					"f_name": f_name,
+					"f_level": f_level,
+					"f_recovery_time": f_recovery_time
+				}
 		}
-		return self._message_typesetting(0, 'got all friends info',data)
+		return self._message_typesetting(0, 'got all friends info', data)
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0]), data[0][1]

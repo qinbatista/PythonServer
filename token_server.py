@@ -54,17 +54,18 @@ class TokenServer:
 		return self._message_typesetting(0, 'success', {'nonce' : nonce})
 
 
-	async def redeem_nonce(self, mtype: str, nonce: str) -> dict:
-		if mtype == 'gift':
-			if nonce not in self._gift_table:
-				return self._message_typesetting(-2, 'already redeemed')
-			else:
-				return self._message_typesetting(0, 'successfully redeemed', self._gift_table.pop(nonce))
-		elif mtype == 'friend_request':
-			if nonce not in self._fr_table:
-				return self._message_typesetting(-2, 'already accepted request')
-			else:
-				return self._message_typesetting(0, 'new friend added', {'uid_sender' : self._fr_table.pop(nonce)})
+	async def redeem_nonce(self, types: [str], nonces: [str]) -> dict:
+		for t, n in zip(types, nonces):
+			if t == 'gift':
+				if n not in self._gift_table:
+					return self._message_typesetting(-2, 'already redeemed')
+				else:
+					return self._message_typesetting(0, 'successfully redeemed', self._gift_table.pop(n))
+			elif t == 'friend_request':
+				if n not in self._fr_table:
+					return self._message_typesetting(-2, 'already accepted request')
+				else:
+					return self._message_typesetting(0, 'new friend added', {'uid_sender' : self._fr_table.pop(n)})
 
 
 
@@ -120,7 +121,7 @@ async def __generate_nonce(request: web.Request) -> web.Response:
 
 @ROUTES.post('/redeem_nonce')
 async def __redeem_nonce(request: web.Request) -> web.Response:
-	post = await request.post()
+	post = await request.json()
 	return _json_response(await (request.app['MANAGER']).redeem_nonce(post['type'], post['nonce']))
 
 def run():
