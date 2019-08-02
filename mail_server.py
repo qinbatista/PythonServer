@@ -40,8 +40,6 @@ class MailServer:
 		return self._message_typesetting(0, 'success')
 
 
-	def broadcast_mail(self):
-		pass
 
 	def get_new_mail(self, world: int, uid: str):
 		try:
@@ -76,9 +74,6 @@ class MailServer:
 			return self._message_typesetting(1, 'user has no mail')
 		return self._message_typesetting(0, 'got all mail', {'mail' : messages})
 
-	def delete_mail(self):
-		pass
-
 	def delete_mail(self, world: int, unique_id: str, nonce: str) -> dict:
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(unique_id)
@@ -90,7 +85,7 @@ class MailServer:
 		return self._message_typesetting(0, 'successfully deleted message')
 
 
-	def delete_all_mail(self, world:int, uid: str):
+	def delete_all_mail(self, world: int, uid: str):
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(uid)
 		except mailbox.NoSuchMailboxError:
@@ -99,6 +94,22 @@ class MailServer:
 			if msg.get_subdir() == 'cur':
 				folder.discard(mid)
 		return self._message_typesetting(0, 'deleted all mail')
+
+	# TODO map for loop to run concurrently
+	def broadcast_mail(self, world: int, users: [str], **kwargs) -> dict:
+		if kwargs['type'] not in {'simple', 'gift', 'friend_request'}:
+			return self._message_typesetting(61, 'invalid message type')
+		try:
+			msg = self._construct_message(**kwargs)
+		except KeyError:
+			return self._message_typesetting(60, 'invalid request format')
+		for user in users:
+			try:
+				folder = self._box.get_folder(str(world)).get_folder(user)
+			except mailbox.NoSuchMailboxError:
+				folder = self._box.get_folder(str(world)).add_folder(user)
+			folder.add(msg)
+		return self._message_typesetting(0, 'success')
 
 	def _request_nonce(self, msg: mailbox.MaildirMessage):
 		if msg['type'] == 'gift':
@@ -180,8 +191,14 @@ async def __delete_mail(request: web.Request) -> web.Response:
 	data = (request.app['MANAGER']).delete_mail(post['world'], post['unique_id'], post['nonce'])
 	return _json_response(data)
 
+@ROUTES.post('/broadcast_mail')
+async def __broadcast_mail(request: web.Request) -> web.Response:
+	post = await request.json() # notice we are awaiting a json type due to nested dictionary
+	data = (request.app['MANAGER']).broadcast_mail(post['world'], post['users'], **post['mail'])
+	return _json_response(data)
+
 def run():
-	app = web.Application()
+	app = web.Application(client_max_size = 10000000) # accept client requests up to 10 MB
 	app.add_routes(ROUTES)
 	app['MANAGER'] = MailServer()
 	web.run_app(app, port = 8020)
