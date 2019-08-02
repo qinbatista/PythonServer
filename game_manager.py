@@ -1526,34 +1526,39 @@ async def __try_unlock_skill(request: web.Request) -> web.Response:
 
 @ROUTES.post('/level_up_weapon')
 async def __level_up_weapon(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).level_up_weapon(int(post['world']), post['unique_id'], post['weapon'], int(post['iron']))
-	return _json_response(result)
+	return _json_response(json.loads(requests.post('http://localhost:8007/level_up_weapon', data=await request.post()).text))
+	# post = await request.post()
+	# result = await (request.app['MANAGER']).level_up_weapon(int(post['world']), post['unique_id'], post['weapon'], int(post['iron']))
+	# return _json_response(result)
 
 @ROUTES.post('/level_up_passive')
 async def __level_up_passive(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).level_up_passive(int(post['world']), post['unique_id'], post['weapon'], post['passive'])
-	return _json_response(result)
+	return _json_response(json.loads(requests.post('http://localhost:8007/level_up_passive', data=await request.post()).text))
+	# post = await request.post()
+	# result = await (request.app['MANAGER']).level_up_passive(int(post['world']), post['unique_id'], post['weapon'], post['passive'])
+	# return _json_response(result)
 
 
 @ROUTES.post('/level_up_weapon_star')
 async def __level_up_weapon_star(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).level_up_weapon_star(int(post['world']), post['unique_id'], post['weapon'])
-	return _json_response(result)
+	return _json_response(json.loads(requests.post('http://localhost:8007/level_up_weapon_star', data=await request.post()).text))
+	# post = await request.post()
+	# result = await (request.app['MANAGER']).level_up_weapon_star(int(post['world']), post['unique_id'], post['weapon'])
+	# return _json_response(result)
 
 @ROUTES.post('/reset_weapon_skill_point')
 async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
-	return _json_response(result)
+	return _json_response(json.loads(requests.post('http://localhost:8007/reset_weapon_skill_point', data=await request.post()).text))
+	# post = await request.post()
+	# result = await (request.app['MANAGER']).reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
+	# return _json_response(result)
 
 @ROUTES.post('/get_all_weapon')
 async def __get_all_weapon(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).get_all_weapon(int(post['world']), post['unique_id'])
-	return _json_response(result)
+	return _json_response(json.loads(requests.post('http://localhost:8007/get_all_weapon', data=await request.post()).text))
+	# post = await request.post()
+	# result = await (request.app['MANAGER']).get_all_weapon(int(post['world']), post['unique_id'])
+	# return _json_response(result)
 
 @ROUTES.post('/try_unlock_weapon')
 async def __try_unlock_weapon(request: web.Request) -> web.Response:

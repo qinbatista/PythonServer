@@ -5,8 +5,8 @@ import configparser
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-# GAME_MANAGER_BASE_URL = 'http://localhost:8004'
-GAME_MANAGER_BASE_URL = 'http://localhost:8007'
+GAME_MANAGER_BASE_URL = 'http://localhost:8004'
+# GAME_MANAGER_BASE_URL = 'http://localhost:8007'
 # GAME_MANAGER_BASE_URL = 'http://localhost:8006'
 
 
@@ -87,7 +87,7 @@ def reset_weapon_skill_point():
 
 
 def level_up_weapon_star():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_weapon_star', data={'world': 0, 'unique_id': "4", "weapon": "weapon1"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_weapon_star', data={'world': 0, 'unique_id': "4", "weapon": "weapon10"})
 	print(str(result.text))
 
 

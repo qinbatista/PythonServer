@@ -306,7 +306,6 @@ class GameManager:
 			if head[i] != "unique_id" and head[i] != "weapon_name":
 				sql_str += head[i] + "=" + str(row[i]) + ","
 		sql_str = sql_str[:len(sql_str) - 1] + f" where unique_id='{unique_id}' and weapon_name='{weapon}'"
-		print(sql_str)
 		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
 			return self._message_typesetting(status=98, message='Database operation error')
 		remaining = {"iron": data["remaining"]}
@@ -339,7 +338,6 @@ class GameManager:
 			if head[i] != "unique_id" and head[i] != "weapon_name":
 				sql_str += head[i] + "=" + str(row[i]) + ","
 		sql_str = sql_str[:len(sql_str) - 1] + f" where unique_id='{unique_id}' and weapon_name='{weapon}'"
-		print(sql_str)
 		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
 			return self._message_typesetting(status=98, message="Database operation error")
 		remaining = {}
@@ -395,8 +393,6 @@ class GameManager:
 		data_tuple = (await self.get_all_head(world, "weapon"))["remaining"]
 		head = [x[0] for x in data_tuple]
 
-		row = await self._get_row_by_id(world, weapon, unique_id)
-
 		row[head.index("skill_point")] = row[head.index("weapon_level")]
 		row[head.index("passive_skill_1_level")] = row[head.index("passive_skill_2_level")] = row[head.index("passive_skill_3_level")] = row[head.index("passive_skill_4_level")] = 0
 
@@ -405,7 +401,6 @@ class GameManager:
 			if head[i] != "unique_id" and head[i] != "weapon_name":
 				sql_str += head[i] + "=" + str(row[i]) + ","
 		sql_str = sql_str[:len(sql_str) - 1] + f" where unique_id='{unique_id}' and weapon_name='{weapon}'"
-		print(sql_str)
 		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
 			return self._message_typesetting(status=99, message="Database operation error!")
 
@@ -421,14 +416,14 @@ class GameManager:
 		data_tuple = (await self.get_all_head(world, "weapon"))["remaining"]
 		col_name_list = [x[0] for x in data_tuple]
 
-		sql_str = 'SELECT * FROM `weapon` WHERE unique_id = "' + unique_id + '";'
+		sql_str = 'SELECT * FROM weapon WHERE unique_id = "' + unique_id + '";'
 		row = await self._execute_statement(world=world, statement=sql_str)
-
 		remaining = {}
 		for i in range(0, len(row)):
-			for j in range(0, len(row[i])):
-				remaining.update({col_name_list[j]: row[i][j]})
-			remaining.pop("unique_id")
+			weapon = {}
+			for j in range(2, len(row[i])):
+				weapon.update({col_name_list[j]: row[i][j]})
+			remaining.update({row[i][1]: weapon})
 		return self._message_typesetting(status=0, message="gain success", data={"remaining": remaining})
 
 
@@ -774,9 +769,11 @@ class GameManager:
 		return int(data[0][0])
 
 	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> list:
-		print('SELECT * FROM `weapon` WHERE unique_id = "' + unique_id + '" and weapon_name="' + weapon + '";')
-		data = await self._execute_statement(world, 'SELECT * FROM `weapon` WHERE unique_id = "' + unique_id + '" and weapon_name="' + weapon + '";')
-		return list(data[0])
+		try:
+			return list((await self._execute_statement(world, 'SELECT * FROM `weapon` WHERE unique_id = "' + unique_id + '" and weapon_name="' + weapon + '";'))[0])
+		except:
+			await self._execute_statement(world, f"insert into weapon (unique_id, weapon_name) values ('{unique_id}','{weapon}')")
+			return list((await self._execute_statement(world, 'SELECT * FROM `weapon` WHERE unique_id = "' + unique_id + '" and weapon_name="' + weapon + '";'))[0])
 
 	async def _set_passive_skill_level_up_data(self, world: int, unique_id: str, weapon: str, passive: str, skill_level: int, skill_point: int) -> dict:
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET ' + passive + ' = "' + str(skill_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
