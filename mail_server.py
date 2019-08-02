@@ -15,9 +15,6 @@ import configparser
 from aiohttp import web
 from datetime import datetime
 
-
-#TODO read port number from configuration manager
-
 DIRNAME = os.path.dirname(os.path.realpath(__file__)) + '/box'
 
 class MailServer:
@@ -44,10 +41,12 @@ class MailServer:
 
 
 	def get_new_mail(self, world: int, uid: str):
+		# 0 - successfully got new mail
+		# 62 - mailbox empty
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(uid)
 		except mailbox.NoSuchMailboxError:
-			return self._message_typesetting(1, 'user has no new mail')
+			return self._message_typesetting(62, 'mailbox empty')
 		messages = []
 		for mid, msg in folder.iteritems():
 			if msg.get_subdir() == 'new':
@@ -56,15 +55,17 @@ class MailServer:
 				msg.set_subdir('cur')
 				folder[mid] = msg
 		if not messages:
-			return self._message_typesetting(1, 'user has no new mail')
+			return self._message_typesetting(62, 'mailbox empty')
 		return self._message_typesetting(0, 'got new mail', {'mail' : messages})
 
 
 	def get_all_mail(self, world:int, uid: str):
+		# 0 - successfully got all mail
+		# 62 - mailbox empty
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(uid)
 		except mailbox.NoSuchMailboxError:
-			return self._message_typesetting(1, 'user has no mail')
+			return self._message_typesetting(62, 'mailbox empty')
 		messages = []
 		for mid, msg in folder.iteritems():
 			if msg.get_subdir() == 'new':
@@ -73,10 +74,11 @@ class MailServer:
 				folder[mid] = msg
 			messages.append(self._message_to_dict(msg))
 		if not messages:
-			return self._message_typesetting(1, 'user has no mail')
+			return self._message_typesetting(62, 'mailbox empty')
 		return self._message_typesetting(0, 'got all mail', {'mail' : messages})
 
 	def delete_mail(self, world: int, unique_id: str, nonce: str) -> dict:
+		# 0 - successfully deleted mail
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(unique_id)
 			for mid, message in folder.iteritems():
@@ -88,6 +90,7 @@ class MailServer:
 
 
 	def delete_all_mail(self, world: int, uid: str):
+		# 0 - successfully deleted all mail
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(uid)
 		except mailbox.NoSuchMailboxError:
@@ -99,6 +102,9 @@ class MailServer:
 
 	# TODO map for loop to run concurrently
 	def broadcast_mail(self, world: int, users: [str], **kwargs) -> dict:
+		# 0 - successfully sent mail
+		# 60 - invalid request format
+		# 61 - invalid message type
 		if kwargs['type'] not in {'simple', 'gift', 'friend_request'}:
 			return self._message_typesetting(61, 'invalid message type')
 		try:
