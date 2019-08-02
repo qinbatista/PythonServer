@@ -5,8 +5,8 @@ import configparser
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-# GAME_MANAGER_BASE_URL = 'http://localhost:8004'
-GAME_MANAGER_BASE_URL = 'http://localhost:8007'
+GAME_MANAGER_BASE_URL = 'http://localhost:8004'
+# GAME_MANAGER_BASE_URL = 'http://localhost:8007'
 # GAME_MANAGER_BASE_URL = 'http://localhost:8006'
 
 
@@ -87,7 +87,7 @@ def reset_weapon_skill_point():
 
 
 def level_up_weapon_star():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_weapon_star', data={'world': 0, 'unique_id': "4", "weapon": "weapon1"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_weapon_star', data={'world': 0, 'unique_id': "4", "weapon": "weapon10"})
 	print(str(result.text))
 
 
@@ -170,6 +170,11 @@ def upgrade_armor(armor_id: int):
 	result = requests.post(GAME_MANAGER_BASE_URL + '/upgrade_armor', data={"world": 0, 'unique_id': "4", "armor_kind": "armor1", "armor_id": armor_id})
 	print(str(result.text))
 
+
+def random_gift_segment():
+	result = requests.post('http://localhost:8007/random_gift_segment', data={"world": 0, 'unique_id': "4"})
+	print(str(result.text))
+
 def test():
 	s22k = "999"
 	s21k = "939"
@@ -208,4 +213,5 @@ if __name__ == "__main__":
 	# get_all_supplies()
 	# basic_summon()
 	# get_hang_up_info()
-	upgrade_armor(0)
+	# upgrade_armor(0)
+	random_gift_segment()
