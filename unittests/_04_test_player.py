@@ -1,3 +1,5 @@
+import json
+
 import requests
 import configparser
 
@@ -180,6 +182,17 @@ def send_friend_gift():
 	result = requests.post('http://localhost:8006/send_friend_gift', data={"world": 0, 'unique_id': "4", "friend_id": 5})
 	print(str(result.text))
 
+
+def get_new_mail():
+	result = requests.post('http://localhost:8006/get_new_mail', data={"world": 0, 'unique_id': "5"})
+	print(str(result.text))
+	return result.json()['data']['mail'][0]['data']['nonce']
+
+
+def redeem_nonce(nonce: str):
+	result = requests.post('http://localhost:8006/redeem_nonce', data={"world": 0, 'unique_id': "5", "friend_id": 5, "type": "gift", "nonce": nonce})
+	print(str(result.text))
+
 def test():
 	s22k = "999"
 	s21k = "939"
@@ -238,3 +251,5 @@ if __name__ == "__main__":
 	# upgrade_armor(1)
 	# random_gift_segment()
 	send_friend_gift()
+	nonce = get_new_mail()
+	redeem_nonce(nonce=nonce)

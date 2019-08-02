@@ -675,9 +675,10 @@ class GameManager:
 				return self._message_typesetting(1, 'get role item success', message_dic)
 			else:
 				return self._message_typesetting(97, 'opeartion error')
-	async def _send_friend_gift(self, world: int, unique_id: str, friend_id: str)->str:
+	async def _send_friend_gift(self, world: int, unique_id: str, friend_id: str)->dict:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
+		# 97 - Mailbox error
 		# 98 - this person is not your friend anymore
 		# 99 - send friend gift failed, because not cooldown time is not finished
 		#return value
@@ -698,6 +699,22 @@ class GameManager:
 		f_game_name = sql_result[0][0]
 		f_level = sql_result[0][1]
 		if f_recovering_time=="":
+			json_data = {
+				"world": world,
+				"uid_to": friend_id,
+				"kwargs":
+					{
+						"from": "server",
+						"subject": "You have a gift!",
+						"body": "Your gift is waiting",
+						"type": "gift",
+						"items": "friend_gift",
+						"quantities": "1"
+					}
+			}
+			result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+			if result["status"] != 0:
+				return self._message_typesetting(97, 'Mailbox error')
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
 			await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
 			data={
@@ -709,39 +726,14 @@ class GameManager:
 				"current_time":current_time
 				}
 			}
-			json_data = {
-				"world": world,
-				"uid_to": unique_id,
-				"kwargs":
-					{
-						"from": "server",
-						"subject": "You have a gift!",
-						"body": "Your gift is waiting",
-						"type": "gift",
-						"items": "friend_gift",
-						"quantities": "1"
-					}
-			}
-			result = requests.post('http://192.168.1.102:8020/send_mail', json=json_data)
-			print(str(result.text))
 			return self._message_typesetting(0, 'send friend gift success because of f_recovering_time is empty',data)
 		else:
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
 			if delta_time.days>=1:
-				await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
-				data={
-					"remaining" :
-					{
-						"f_id":f_id,
-						"f_name":f_game_name,
-						"f_level":f_level,
-						"current_time":current_time
-					}
-				}
 				json_data = {
 					"world": world,
-					"uid_to": unique_id,
+					"uid_to": friend_id,
 					"kwargs":
 						{
 							"from": "server",
@@ -752,15 +744,21 @@ class GameManager:
 							"quantities": "1"
 						}
 				}
-				result = requests.post('http://localhost:8020/send_mail', json=json_data)
-				# result = requests.post('http://192.168.1.102:8020/send_mail', json=json_data)
-				print(result.text)
+				result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+				if result["status"] != 0:
+					return self._message_typesetting(97, 'Mailbox error')
+				await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
+				data={
+					"remaining" :
+					{
+						"f_id":f_id,
+						"f_name":f_game_name,
+						"f_level":f_level,
+						"current_time":current_time
+					}
+				}
 				return self._message_typesetting(1, 'send friend gift success because time is over 1 day',data)
 			else:
-
-
-
-
 				data={
 					"remaining" :
 					{
@@ -771,6 +769,22 @@ class GameManager:
 					}
 				}
 				return self._message_typesetting(99, 'send friend gift failed, because cooldown time is not finished',data)
+
+	async def redeem_nonce(self, world: int, unique_id: str, friend_id: str, type: str, nonce: str) -> dict:
+		# success -> 0
+		# 0 - successfully redeemed
+		# 99 - database operating error
+		response = requests.post('http://localhost:8001/redeem_nonce', data = {'type' : type, 'nonce' : nonce})
+		data = response.json()
+		items = data["data"]["items"]
+		quantities = data["data"]["quantities"]
+		sql_str = f"update player set {items}={items}+{quantities} where unique_id='{unique_id}'"
+		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
+			return self._message_typesetting(status=99, message="database operating error")
+		sql_str = f"select {items} from player where unique_id='{unique_id}'"
+		quantities = (await self._execute_statement(world=world, statement=sql_str))[0][0]
+		return self._message_typesetting(status=0, message="successfully redeemed", data={"remaining": {items: quantities}})
+
 	async def _send_all_friend_gift(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
 		mylist = list(data[0])
@@ -813,6 +827,7 @@ class GameManager:
 			}
 		}
 		return self._message_typesetting(0, 'send all friends gift',data)
+
 	async def _get_all_resource_info(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM player WHERE unique_id = "' + unique_id + '";')
 		mylist = list(data[0])
@@ -1478,6 +1493,16 @@ async def _get_stage_reward_config(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER'])._get_stage_reward_config(int(post['world']), post['unique_id'])
 	return _json_response(result)
+
+@ROUTES.post('/redeem_nonce')
+async def _redeem_nonce(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).redeem_nonce(int(post['world']), post['unique_id'], post['friend_id'], post['type'], post['nonce'])
+	return _json_response(result)
+
+@ROUTES.post('/get_new_mail')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8020/get_new_mail', data=await request.post()).text))
 
 
 def get_config() -> configparser.ConfigParser:
