@@ -1144,6 +1144,39 @@ class GameManager:
 		t.daemon = True
 		t.start()
 
+	async def _request_friend(self, world: int, unique_id: str, friend_name: str):
+		friend_data = await self._execute_statement(world=world, statement=f"SELECT unique_id FROM player WHERE game_name='{friend_name}'")
+		if len(friend_data) == 0:
+			return self._message_typesetting(status=99, message="No such person")
+		friend_id = friend_data[0][0]
+
+		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{unique_id}' and friend_id='{friend_id}'")
+		if len(data) != 0:
+			if data[0][-1] == "":
+				return self._message_typesetting(status=98, message="You have sent a friend request")
+			return self._message_typesetting(status=97, message="You already have this friend")
+
+		unique_name = (await self._execute_statement(world=world, statement=f"SELECT game_name FROM player WHERE unique_id='{unique_id}'"))[0][0]
+		json_data = {
+			"world": world,
+			"uid_to": friend_id,
+			"kwargs": {
+				"from": "server",
+				"subject": "You have a gift!",
+				"body": "Your gift is waiting",
+				"type": "friend_request",
+				"sender": unique_name,
+				"uid_sender": unique_id
+			}
+		}
+		result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+		if result["status"] != 0:
+			return self._message_typesetting(status=96, message='Mailbox error')
+
+		if await self._execute_statement_update(world=world, statement=f"insert into friend (unique_id, friend_id, friend_name) values ('{unique_id}', '{friend_id}', '{friend_name}')") == 0:
+			return self._message_typesetting(status=95, message="database operating error")
+
+		return self._message_typesetting(status=0, message="Friend added successfully")
 
 
 #############################################################################
@@ -1509,6 +1542,12 @@ async def _redeem_nonce(request: web.Request) -> web.Response:
 @ROUTES.post('/get_new_mail')
 async def _get_new_mail(request: web.Request) -> web.Response:
 	return _json_response(json.loads(requests.post('http://localhost:8020/get_new_mail', data=await request.post()).text))
+
+@ROUTES.post('/request_friend')
+async def _request_friend(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._request_friend(int(post['world']), post['unique_id'], post['friend_name'])
+	return _json_response(result)
 
 
 def get_config() -> configparser.ConfigParser:

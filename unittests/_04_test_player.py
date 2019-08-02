@@ -193,6 +193,11 @@ def redeem_nonce(nonce: str):
 	result = requests.post('http://localhost:8004/redeem_nonce', data={"world": 0, 'unique_id': "5", "friend_id": 5, "type": "gift", "nonce": nonce})
 	print(str(result.text))
 
+
+def request_friend():
+	result = requests.post('http://localhost:8006/request_friend', data={"world": 0, 'unique_id': 4, "friend_name": "曲永杰"})
+	print(str(result.text))
+
 def test():
 	s22k = "999"
 	s21k = "939"
@@ -238,7 +243,7 @@ if __name__ == "__main__":
 	# start_hang_up()
 	# get_hang_up_reward()
 	# enter_stage(stage=1)
-	enter_tower(stage=3)
+	# enter_tower(stage=3)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
 	# manually_refresh_store()
@@ -254,3 +259,4 @@ if __name__ == "__main__":
 	# send_friend_gift()
 	# nonce = get_new_mail()
 	# redeem_nonce(nonce=nonce)
+	request_friend()
