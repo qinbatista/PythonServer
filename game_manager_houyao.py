@@ -738,48 +738,28 @@ class GameManager:
 		else:
 			return await self.random_gift_segment(world, unique_id, tier)
 
-	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
-		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
-		return int(data[0][0]), data[0][1]
-
-
-	async def _get_weapon_bag(self, world: int, unique_id: str):
-		data = await self._execute_statement(world, 'SELECT * FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
-		return list(data[0])
-
-	async def _get_weapon_attributes(self, world: int, unique_id: str, weapon: str):
-		data = await self._execute_statement(world, 'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
-		return list(data[0])
-
-	async def _reset_skill_point(self, world: int, unique_id: str, weapon: str, skill_point: int):
-		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
-
 	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
-		return await self._execute_statement_update(world, 'UPDATE weapon_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";')
+		return await self._execute_statement_update(world, f"UPDATE weapon SET weapon_star={star}  WHERE unique_id='{unique_id}' and weapon_name='{weapon}';")
 
 	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
-		data = await self._execute_statement(world, 'SELECT segment FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world, f"SELECT segment FROM weapon WHERE unique_id='{unique_id}' and weapon_name='{weapon}';")
 		return int(data[0][0])
 
 	async def _set_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
-		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
+		return await self._execute_statement_update(world, f"UPDATE weapon SET segment={segment}  WHERE unique_id='{unique_id}' and weapon_name='{weapon}';")
 
 	async def _get_weapon_star(self, world: int, unique_id: str, weapon: str) -> int:
-		data = await self._execute_statement(world, 'SELECT ' + weapon + ' FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world, f"SELECT weapon_star FROM weapon WHERE unique_id='{unique_id}' and weapon_name='{weapon}';")
 		return int(data[0][0])
 
 	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> list:
 		try:
-			return list((await self._execute_statement(world, 'SELECT * FROM `weapon` WHERE unique_id = "' + unique_id + '" and weapon_name="' + weapon + '";'))[0])
+			return list((await self._execute_statement(world, f"select * from weapon where unique_id='{unique_id}' and weapon_name='{weapon}'"))[0])
 		except:
 			await self._execute_statement(world, f"insert into weapon (unique_id, weapon_name) values ('{unique_id}','{weapon}')")
-			return list((await self._execute_statement(world, 'SELECT * FROM `weapon` WHERE unique_id = "' + unique_id + '" and weapon_name="' + weapon + '";'))[0])
+			return list((await self._execute_statement(world, f"select * from weapon where unique_id='{unique_id}' and weapon_name='{weapon}'"))[0])
 
-	async def _set_passive_skill_level_up_data(self, world: int, unique_id: str, weapon: str, passive: str, skill_level: int, skill_point: int) -> dict:
-		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET ' + passive + ' = "' + str(skill_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
-	async def _set_weapon_level_up_data(self, world: int, unique_id: str, weapon: str, weapon_level: int, skill_point: int) -> dict:
-		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET weapon_level = "' + str(weapon_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
 
 	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> int:
@@ -1832,6 +1812,12 @@ async def __pass_tower(request: web.Request) -> web.Response:
 async def __upgrade_armor(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).upgrade_armor(int(post['world']), post['unique_id'], post["armor_kind"], int(post['armor_id']))
+	return _json_response(result)
+
+@ROUTES.post('/random_gift_segment')
+async def __random_gift_segment(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).random_gift_segment(int(post['world']), post['unique_id'], "basic")
 	return _json_response(result)
 #  #########################  houyao 2019-07-28 19：49  ##########################
 

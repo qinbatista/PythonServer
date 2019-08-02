@@ -170,6 +170,11 @@ def upgrade_armor(armor_id: int):
 	result = requests.post(GAME_MANAGER_BASE_URL + '/upgrade_armor', data={"world": 0, 'unique_id': "4", "armor_kind": "armor1", "armor_id": armor_id})
 	print(str(result.text))
 
+
+def random_gift_segment():
+	result = requests.post('http://localhost:8007/random_gift_segment', data={"world": 0, 'unique_id': "4"})
+	print(str(result.text))
+
 def test():
 	s22k = "999"
 	s21k = "939"
@@ -180,7 +185,7 @@ if __name__ == "__main__":
 	# try_coin()
 	# try_iron()
 	# try_diamond()
-	level_up_weapon()
+	# level_up_weapon()
 	# pass_stage(stage=6)
 	# pass_tower(stage=3)
 	# get_skill()
@@ -189,10 +194,10 @@ if __name__ == "__main__":
 	# random_gift_skill()
 	# random_gift_weapon()
 	# level_up_scroll()
-	get_all_weapon()
-	level_up_passive()
-	reset_weapon_skill_point()
-	level_up_weapon_star()
+	# get_all_weapon()
+	# level_up_passive()
+	# reset_weapon_skill_point()
+	# level_up_weapon_star()
 	# try_all_material()
 	# try_energy()
 	# start_hang_up()
@@ -209,3 +214,4 @@ if __name__ == "__main__":
 	# basic_summon()
 	# get_hang_up_info()
 	# upgrade_armor(0)
+	random_gift_segment()
