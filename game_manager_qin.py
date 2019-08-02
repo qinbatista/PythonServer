@@ -819,15 +819,16 @@ class GameManager:
 		return self._message_typesetting(0, 'got all tower info',data)
 
 	async def _get_all_armor_info(self, world: int, unique_id: str):
-		armor1 = await self._execute_statement(world, 'SELECT * FROM armor1 WHERE unique_id = "' + unique_id + '";')
-		armor2 = await self._execute_statement(world, 'SELECT * FROM armor2 WHERE unique_id = "' + unique_id + '";')
-		armor3 = await self._execute_statement(world, 'SELECT * FROM armor3 WHERE unique_id = "' + unique_id + '";')
-		armor4 = await self._execute_statement(world, 'SELECT * FROM armor4 WHERE unique_id = "' + unique_id + '";')
+		result = await self._execute_statement(world, 'SELECT * FROM armor WHERE unique_id = "' + unique_id + '";')
+		print("result="+str(result))
+		print("len ="+str(len(result)))
 		data = {}
-		for i in range(1,5):
-			data.update({"armor"+str(i):{}})
+		for i in range(0,len(result)):
+			data.update({result[i][1]:{}})
 			for j in range(1,11):
-				data["armor"+str(i)].update({"armor_level"+str(j):str(eval("armor%s"%i)[0][j])})
+				data[result[i][1]].update({"armor_level"+str(j):result[i][j+1]})
+			# print("data="+str(data))
+		print("data="+str(data))
 		return self._message_typesetting(0, 'got all armor info',data)
 
 	async def _level_enemy_layouts_config(self, world: int, unique_id: str):
@@ -887,39 +888,50 @@ class GameManager:
 		return list(data[0])
 
 	async def _get_weapon_attributes(self, world: int, unique_id: str, weapon: str):
-		data = await self._execute_statement(world, 'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world, 'SELECT * FROM `weapon` WHERE unique_id = "' + unique_id + '" and weapon="'+weapon+'";')
 		return list(data[0])
 
 	async def _reset_skill_point(self, world: int, unique_id: str, weapon: str, skill_point: int):
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
 	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
-		return await self._execute_statement_update(world, 'UPDATE weapon_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";') 
+		return await self._execute_statement_update(world, 'UPDATE weapon SET weapon_star' + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '" and weapon_name="'+weapon+'";') 
 
-	async def _set_role_star(self, world: int, unique_id: str, weapon: str, star: int):
-		return await self._execute_statement_update(world, 'UPDATE role_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";') 
+	async def _set_role_star(self, world: int, unique_id: str, role: str, star: int):
+		return await self._execute_statement_update(world, 'UPDATE role SET role_star' + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '" and role_name="'+role+'";')
 
 	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
 		data = await self._execute_statement(world, 'SELECT segment FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
 
 	async def _get_role_segment(self, world: int, unique_id: str, role: str) -> int:
-		data = await self._execute_statement(world, 'SELECT segment FROM `' + role + '` WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world, 'SELECT segment FROM `role' + '` WHERE unique_id = "' + unique_id + '" and role_name="'+role+'";')
 		return int(data[0][0])
 
 	async def _set_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
-		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
+		return await self._execute_statement_update(world, 'UPDATE `weapon' + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id  + '" and weapon_name="'+weapon+'";')
 
 	async def _set_role_segment_by_id(self, world: int, unique_id: str, role: str, segment: int):
-		return await self._execute_statement_update(world, 'UPDATE `' + role + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
+		return await self._execute_statement_update(world, 'UPDATE `role' + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '" and role_name="'+role+'";')
 
 	async def _get_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
-		data = await self._execute_statement(world, 'SELECT ' + weapon + ' FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
-		return int(data[0][0])
+		data = await self._execute_statement(world, 'SELECT weapon_star' + ' FROM weapon WHERE unique_id = "' + unique_id +'" and weapon_name="'+weapon+'";')
+		if len(data)==0:
+			await self._execute_statement(world, 'insert into weapon(unique_id,weapon_name) values ("' + unique_id +'","'+weapon+'");')
+			result = 0
+		else:
+			result = int(data[0][0])
+		return result
+
 
 	async def _get_role_star(self, world: int, unique_id: str, role: str) -> dict:
-		data = await self._execute_statement(world, 'SELECT ' + role + ' FROM role_bag WHERE unique_id = "' + unique_id + '";')
-		return int(data[0][0])
+		data = await self._execute_statement(world, 'SELECT role_star' + ' FROM role WHERE unique_id = "' + unique_id +'" and role_name="'+role+'";')
+		if len(data)==0:
+			await self._execute_statement(world, 'insert into role(unique_id,role_name) values ("' + unique_id +'","'+role+'");')
+			result = 0
+		else:
+			result = int(data[0][0])
+		return result
 
 	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> dict:
 		data = await self._execute_statement(world, 'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
