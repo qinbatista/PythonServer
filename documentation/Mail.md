@@ -35,6 +35,16 @@ All mail returned by the server to the client will follow this format.
 }
 ```
 
+Depending on the type of message, you can expect to find these additional items in **data**:
+- **simple**:
+	- No additional items.
+- **gift**:
+	- nonce - a one time use code to redeem the gift
+- **friend\_request**:
+	- nonce - a one time use code to confirm friend request
+	- sender - the game name of the user who sent the request
+
+
 
 
 
@@ -147,9 +157,10 @@ The **from**, **subject**, **body**, and **type** arguments should be included i
 
 Current valid types of messages:
 - **simple** - A simple message containing only text
-- **gift**   - A message containing text and a gift attachment
+- **gift**   - A message containing a gift attachment
+- **friend\_request** - A message containing a friend request
 
-If the type of message is **gift**, additional arguments are required (inside kwargs)
+If the type of message is **gift**, additional arguments are required (inside kwargs):
 ```json
 "items" : a str containing comma separated items - str,
 "quantities" : a string containing comma separated quantities - str
@@ -159,6 +170,12 @@ Example
 ```json
 "items" : "skill_scroll_10,coin",
 "quantities" : "4,300"
+```
+
+If the type of message is **friend\_request**, additional arguments are required (inside kwargs):
+```json
+"sender" : the game name of the friend request sender,
+"uid_sender" : the unique_id of the sender
 ```
 
 ##### Sample POST
@@ -177,7 +194,7 @@ Example
 }
 ```
 
-Example - sending a gift message to a user containing 4 skill\_scroll\10, and 300 coins.
+Example - sending a gift message to a user containing 4 skill\_scroll\_10, and 300 coins.
 
 (Using requests library for example. Please use async library in production code)
 ```python

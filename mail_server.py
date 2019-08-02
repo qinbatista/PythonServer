@@ -27,7 +27,7 @@ class MailServer:
 		# 0 - successfully sent mail
 		# 60 - invalid request format
 		# 61 - invalid message type
-		if kwargs['type'] not in {'simple', 'gift'}:
+		if kwargs['type'] not in {'simple', 'gift', 'friend_request'}:
 			return self._message_typesetting(61, 'invalid message type')
 		try:
 			msg = self._construct_message(**kwargs)
@@ -104,6 +104,9 @@ class MailServer:
 		if msg['type'] == 'gift':
 			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'gift', 'items' : msg['items'], 'quantities' : msg['quantities']})
 			return r.json()['data']['nonce']
+		elif msg['type'] == 'friend_request':
+			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'friend_request', 'uid_sender' : msg['uid_sender']})
+			return r.json()['data']['nonce']
 
 	def _construct_message(self, **kwargs):
 		msg = mailbox.MaildirMessage()
@@ -115,6 +118,9 @@ class MailServer:
 		if msg['type'] == 'gift':
 			msg['items'] = kwargs['items']
 			msg['quantities'] = kwargs['quantities']
+		elif msg['type'] == 'friend_request':
+			msg['sender'] = kwargs['sender']
+			msg['uid_sender'] = kwargs['uid_sender']
 		return msg
 
 	def _message_to_dict(self, msg: mailbox.MaildirMessage, **kwargs) -> dict:
@@ -125,7 +131,12 @@ class MailServer:
 		d['body'] = msg.get_payload()
 		d['type'] = msg['type']
 		d['data'] = {}
-		d['data']['nonce'] = msg['nonce']
+		if msg['type'] == 'gift':
+			d['data']['nonce'] = msg['nonce']
+		elif msg['type'] == 'friend_request':
+			d['data']['nonce'] = msg['nonce']
+			d['data']['sender'] = msg['sender']
+
 		return d
 
 
