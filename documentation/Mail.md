@@ -13,7 +13,11 @@ See the General Server documentation for more information on request and respons
 
 # General API Documentation
 
-**NOTE - Error codes have yet to be formalized**
+**Standard response codes:**
+- 0  - success
+- 60 - invalid request format
+- 61 - invalid message type
+- 62 - mailbox empty
 
 Standard mail response json format.
 All mail returned by the server to the client will follow this format.
@@ -270,6 +274,8 @@ Sends a piece of mail to all users specified.
 The **mail** parameter follows the same formatting as the **kwargs** section in the **send\_mail** function.
 
 This could take a while.
+
+**NOTE** - When making requests, be sure to send your POST data as a **json**.
 
 ##### Sample POST (json format)
 
