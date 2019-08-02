@@ -16,6 +16,8 @@ See the General Server documentation for more information on request and respons
 Redeem the nonce if valid.
 A nonce can only be used one time, subsequent calls using the same nonce will always fail.
 
+**NOTE** Requests made to this function must be formatted as **json**.
+
 Current valid types, and expected results in **data**:
 - **gift**
 	- **items** : a string containing comma separated item names
