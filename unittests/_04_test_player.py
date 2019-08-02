@@ -114,7 +114,7 @@ def get_hang_up_reward():
 
 
 def enter_stage(stage: int):
-	result = requests.post(GAME_MANAGER_BASE_URL + '/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': stage})
+	result = requests.post('http://localhost:8004/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': stage})
 	print(str(result.text))
 
 
@@ -238,7 +238,7 @@ if __name__ == "__main__":
 	# start_hang_up()
 	# get_hang_up_reward()
 	# enter_stage(stage=1)
-	# enter_tower(stage=3)
+	enter_tower(stage=3)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
 	# manually_refresh_store()
@@ -250,6 +250,7 @@ if __name__ == "__main__":
 	# get_hang_up_info()
 	# upgrade_armor(1)
 	# random_gift_segment()
-	send_friend_gift()
-	nonce = get_new_mail()
-	redeem_nonce(nonce=nonce)
+
+	# send_friend_gift()
+	# nonce = get_new_mail()
+	# redeem_nonce(nonce=nonce)
