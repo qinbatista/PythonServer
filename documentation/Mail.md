@@ -13,8 +13,7 @@ See the General Server documentation for more information on request and respons
 
 # General API Documentation
 
-
-To be described later
+**NOTE - Error codes have yet to be formalized**
 
 Standard mail response json format.
 All mail returned by the server to the client will follow this format.
@@ -178,7 +177,7 @@ If the type of message is **friend\_request**, additional arguments are required
 "uid_sender" : the unique_id of the sender
 ```
 
-##### Sample POST
+##### Sample POST (json format)
 
 ```json
 {
@@ -264,21 +263,45 @@ requests.post('MAILSERVERURL/delete_mail', data = {'world':0, 'unique_id':'4', '
 }
 ```
 
-## ========   broadcast mail   ======== (unimplemented)
+## ========   broadcast mail   ========
 
-Sends a piece of mail to all users.
+Sends a piece of mail to all users specified.
+
+The **mail** parameter follows the same formatting as the **kwargs** section in the **send\_mail** function.
+
 This could take a while.
 
-##### Sample Request
+##### Sample POST (json format)
 
 ```json
 {
 	"world" : 0,
-	"function" : "broadcast_mail",
-	"data" : {
-		"mail" : mail
+	"users" : [uid1, uid2, ..., uidn],
+	"mail":
+	{
+		"from" : the name of the sender - str,
+		"subject" : the subject line of the message - str,
+		"body" : the main body of the message - str,
+		"type" : the type of the message - str
 	}
 }
+```
+
+(Using requests library for example. Please use async library in production code)
+```python
+data = {
+		'world' : '0',
+		'users' : ['1', '2', '3', '4', '5'],
+		'mail' : 
+			{
+			'from' : 'server',
+			'subject' : 'Server Announcement',
+			'body' : 'Servers will undergo standard maintenance from 14:00 - 14:30.',
+			'type' : 'simple'
+			}
+		}
+
+requests.post('MAILSERVERURL/broadcast_mail', json = data)
 ```
 
 ##### Sample Responses
