@@ -5,9 +5,11 @@
 
 import os
 import json
+import time
 import random
 import mailbox
 import requests
+import configparser
 
 
 from aiohttp import web
@@ -27,7 +29,7 @@ class MailServer:
 		# 0 - successfully sent mail
 		# 60 - invalid request format
 		# 61 - invalid message type
-		if kwargs['type'] not in {'simple', 'gift'}:
+		if kwargs['type'] not in {'simple', 'gift', 'friend_request'}:
 			return self._message_typesetting(61, 'invalid message type')
 		try:
 			msg = self._construct_message(**kwargs)
@@ -40,8 +42,6 @@ class MailServer:
 		return self._message_typesetting(0, 'success')
 
 
-	def broadcast_mail(self):
-		pass
 
 	def get_new_mail(self, world: int, uid: str):
 		try:
@@ -76,9 +76,6 @@ class MailServer:
 			return self._message_typesetting(1, 'user has no mail')
 		return self._message_typesetting(0, 'got all mail', {'mail' : messages})
 
-	def delete_mail(self):
-		pass
-
 	def delete_mail(self, world: int, unique_id: str, nonce: str) -> dict:
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(unique_id)
@@ -90,7 +87,7 @@ class MailServer:
 		return self._message_typesetting(0, 'successfully deleted message')
 
 
-	def delete_all_mail(self, world:int, uid: str):
+	def delete_all_mail(self, world: int, uid: str):
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(uid)
 		except mailbox.NoSuchMailboxError:
@@ -100,9 +97,28 @@ class MailServer:
 				folder.discard(mid)
 		return self._message_typesetting(0, 'deleted all mail')
 
+	# TODO map for loop to run concurrently
+	def broadcast_mail(self, world: int, users: [str], **kwargs) -> dict:
+		if kwargs['type'] not in {'simple', 'gift', 'friend_request'}:
+			return self._message_typesetting(61, 'invalid message type')
+		try:
+			msg = self._construct_message(**kwargs)
+		except KeyError:
+			return self._message_typesetting(60, 'invalid request format')
+		for user in users:
+			try:
+				folder = self._box.get_folder(str(world)).get_folder(user)
+			except mailbox.NoSuchMailboxError:
+				folder = self._box.get_folder(str(world)).add_folder(user)
+			folder.add(msg)
+		return self._message_typesetting(0, 'success')
+
 	def _request_nonce(self, msg: mailbox.MaildirMessage):
 		if msg['type'] == 'gift':
 			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'gift', 'items' : msg['items'], 'quantities' : msg['quantities']})
+			return r.json()['data']['nonce']
+		elif msg['type'] == 'friend_request':
+			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'friend_request', 'uid_sender' : msg['uid_sender']})
 			return r.json()['data']['nonce']
 
 	def _construct_message(self, **kwargs):
@@ -115,6 +131,9 @@ class MailServer:
 		if msg['type'] == 'gift':
 			msg['items'] = kwargs['items']
 			msg['quantities'] = kwargs['quantities']
+		elif msg['type'] == 'friend_request':
+			msg['sender'] = kwargs['sender']
+			msg['uid_sender'] = kwargs['uid_sender']
 		return msg
 
 	def _message_to_dict(self, msg: mailbox.MaildirMessage, **kwargs) -> dict:
@@ -125,13 +144,28 @@ class MailServer:
 		d['body'] = msg.get_payload()
 		d['type'] = msg['type']
 		d['data'] = {}
-		d['data']['nonce'] = msg['nonce']
+		if msg['type'] == 'gift':
+			d['data']['nonce'] = msg['nonce']
+		elif msg['type'] == 'friend_request':
+			d['data']['nonce'] = msg['nonce']
+			d['data']['sender'] = msg['sender']
+
 		return d
 
 
 	def _message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
 		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
 
+def get_config():
+	while True:
+		try:
+			r = requests.get('http://localhost:8000/get_server_config_location')
+			parser = configparser.ConfigParser()
+			parser.read(r.json()['file'])
+			return parser
+		except requests.exceptions.ConnectionError:
+			print('Could not find configuration server, retrying in 5 seconds...')
+			time.sleep(5)
 
 def _json_response(body: dict = '', **kwargs) -> web.Response:
 	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
@@ -169,11 +203,18 @@ async def __delete_mail(request: web.Request) -> web.Response:
 	data = (request.app['MANAGER']).delete_mail(post['world'], post['unique_id'], post['nonce'])
 	return _json_response(data)
 
+@ROUTES.post('/broadcast_mail')
+async def __broadcast_mail(request: web.Request) -> web.Response:
+	post = await request.json() # notice we are awaiting a json type due to nested dictionary
+	data = (request.app['MANAGER']).broadcast_mail(post['world'], post['users'], **post['mail'])
+	return _json_response(data)
+
 def run():
-	app = web.Application()
+	app = web.Application(client_max_size = 10000000) # accept client requests up to 10 MB
 	app.add_routes(ROUTES)
 	app['MANAGER'] = MailServer()
-	web.run_app(app, port = 8020)
+	config = get_config()
+	web.run_app(app, port = config.getint('mail_server', 'port'))
 
 
 

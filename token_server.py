@@ -20,6 +20,7 @@ class TokenServer:
 		self._alg = 'HS256'
 		self._delta = 500
 		self._gift_table = {}
+		self._fr_table = {}
 
 	
 	async def issue_token(self, unique_id: str, prev_token: str) -> dict:
@@ -44,8 +45,10 @@ class TokenServer:
 			nonce = self._generate_nonce()
 			if mtype == 'gift':
 				self._gift_table[nonce] = {}
-				self._gift_table[nonce]['items'] = [kwargs['items']]
-				self._gift_table[nonce]['quantities'] = [kwargs['quantities']]
+				self._gift_table[nonce]['items'] = kwargs['items']
+				self._gift_table[nonce]['quantities'] = kwargs['quantities']
+			elif mtype == 'friend_request':
+				self._fr_table[nonce] = kwargs['uid_sender']
 		except KeyError:
 			return self._message_typesetting(-1, 'invalid request format')
 		return self._message_typesetting(0, 'success', {'nonce' : nonce})
@@ -57,6 +60,11 @@ class TokenServer:
 				return self._message_typesetting(-2, 'already redeemed')
 			else:
 				return self._message_typesetting(0, 'successfully redeemed', self._gift_table.pop(nonce))
+		elif mtype == 'friend_request':
+			if nonce not in self._fr_table:
+				return self._message_typesetting(-2, 'already accepted request')
+			else:
+				return self._message_typesetting(0, 'new friend added', {'uid_sender' : self._fr_table.pop(nonce)})
 
 
 
