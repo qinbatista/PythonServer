@@ -189,17 +189,76 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _basic_summon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item'], 'summon_kind' : message['data']['summon_kind']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-
+			
+	async def _basic_summon_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+	async def _pro_summon_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+			
 	async def _pro_summon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item'], 'summon_kind' : message['data']['summon_kind']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 
 	async def _friend_summon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item'], 'summon_kind' : message['data']['summon_kind']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+	async def _friend_summon_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+			
+			
+			
+	async def _basic_summon_roles(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+			
+	async def _basic_summon_roles_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+	async def _pro_summon_roles_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+			
+	async def _pro_summon_roles(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 
+	async def _friend_summon_roles(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/friend_roles_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+	async def _friend_summon_roles_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+			
+		
+
+	
+	async def _basic_summon_skill(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+			
+	async def _basic_summon_skill_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+	async def _pro_summon_skill_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+			
+	async def _pro_summon_skill(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+
+	async def _friend_summon_skill(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+	async def _friend_summon_skill_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
+			
 	async def _start_hang_up(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/start_hang_up', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
 			return await resp.text()
@@ -277,8 +336,28 @@ FUNCTION_LIST = {
 	'try_unlock_weapon' : MessageHandler._try_unlock_weapon,
 	'pass_stage' : MessageHandler._pass_stage,
 	'basic_summon' : MessageHandler._basic_summon,
+	'_basic_summon_10_times' : MessageHandler._basic_summon_10_times,
 	'pro_summon' : MessageHandler._pro_summon,
+	'pro_summon_10_times' : MessageHandler._pro_summon_10_times,
 	'friend_summon' : MessageHandler._friend_summon,
+	'friend_summon_10_times' : MessageHandler._friend_summon_10_times,
+	'basic_summon_roles' : MessageHandler._basic_summon_roles,
+	'_basic_summon_roles_10_times' : MessageHandler._basic_summon_roles_10_times,
+	'pro_summon_roles' : MessageHandler._pro_summon_roles,
+	'pro_summon_roles_10_times' : MessageHandler._pro_summon_roles_10_times,
+	'friend_summon_roles' : MessageHandler._friend_summon_roles,
+	'friend_summon_roles_10_times' : MessageHandler._friend_summon_roles_10_times,
+	
+	
+	'basic_summon_skill' : MessageHandler._basic_summon_skill,
+	'_basic_summon_skill_10_times' : MessageHandler._basic_summon_skill_10_times,
+	'pro_summon_skill' : MessageHandler._pro_summon_skill,
+	'pro_summon_skill_10_times' : MessageHandler._pro_summon_skill_10_times,
+	'friend_summon_skill' : MessageHandler._friend_summon_skill,
+	'friend_summon_skill_10_times' : MessageHandler._friend_summon_skill_10_times,
+	
+	
+	
 	'start_hang_up' : MessageHandler._start_hang_up,
 	'get_hang_up_reward' : MessageHandler._get_hang_up_reward,
 	'enter_stage' : MessageHandler._enter_stage,
