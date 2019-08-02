@@ -542,9 +542,14 @@ class GameManager:
 			return self._message_typesetting(99, "Parameter error")
 		keys = list(enter_stage_data[str(stage)].keys())
 		values = [-v for v in list(enter_stage_data[str(stage)].values())]
-		if "energy" in keys:
-			await self.try_energy(world=world, unique_id=unique_id, amount=0)
+		remaining = {}
 		material_dict = {}
+		if "energy" in keys:
+			energy = (await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")]))["remaining"]
+			num = keys.index("energy")
+			keys.pop(num)
+			values.pop(num)
+			remaining.update({"energy": energy})
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
 
@@ -557,7 +562,6 @@ class GameManager:
 
 		if await self._execute_statement_update(world, update_str) == 0:
 			return self._message_typesetting(status=97, message="database operating error")
-		remaining = {}
 		for i in range(len(keys)):
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
@@ -593,9 +597,14 @@ class GameManager:
 			return self._message_typesetting(99, "Parameter error")
 		keys = list(enter_tower_data[str(stage)].keys())
 		values = [-v for v in list(enter_tower_data[str(stage)].values())]
-		if "energy" in keys:
-			await self.try_energy(world=world, unique_id=unique_id, amount=0)
+		remaining = {}
 		material_dict = {}
+		if "energy" in keys:
+			energy = (await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")]))["remaining"]
+			num = keys.index("energy")
+			keys.pop(num)
+			values.pop(num)
+			remaining.update({"energy": energy})
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
 
@@ -608,7 +617,6 @@ class GameManager:
 
 		if await self._execute_statement_update(world, update_str) == 0:
 			return self._message_typesetting(status=97, message="database operating error")
-		remaining = {}
 		for i in range(len(keys)):
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
@@ -1701,9 +1709,8 @@ async def __black_market_transaction(request: web.Request) -> web.Response:
 
 # TODO port over
 @ROUTES.post('/send_friend_gift')
-async def _send_friend_gift(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/send_friend_gift', data = {'world': post['world'], "unique_id": post['unique_id'], "friend_id": post['friend_id']}).text))
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8006/send_friend_gift', data=await request.post()).text))
 
 # TODO port over
 @ROUTES.post('/send_all_friend_gift')
@@ -1762,7 +1769,13 @@ async def __upgrade_armor(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).upgrade_armor(int(post['world']), post['unique_id'], post["armor_kind"], int(post['armor_id']))
 	return _json_response(result)
 
+@ROUTES.post('/redeem_nonce')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8006/redeem_nonce', data=await request.post()).text))
 
+@ROUTES.post('/get_new_mail')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8006/get_new_mail', data=await request.post()).text))
 
 
 def get_config() -> configparser.ConfigParser:
