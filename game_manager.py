@@ -800,7 +800,7 @@ class GameManager:
 			data_dict = {}
 			for i in range(len(keys)):
 				data_dict.update({keys[i]: values[i]})
-			data["data"] = data_dict
+			data["data"] = {"remaining": data_dict}
 		return data
 
 	async def upgrade_armor(self, world: int, unique_id: str, armor_id: str, level: int) -> dict:
@@ -1533,6 +1533,7 @@ async def __try_unlock_skill(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).try_unlock_skill(int(post['world']), post['unique_id'], post['skill_id'])
 	return _json_response(result)
 
+# TODO port over
 @ROUTES.post('/level_up_weapon')
 async def __level_up_weapon(request: web.Request) -> web.Response:
 	return _json_response(json.loads(requests.post('http://localhost:8007/level_up_weapon', data=await request.post()).text))
@@ -1540,6 +1541,7 @@ async def __level_up_weapon(request: web.Request) -> web.Response:
 	# result = await (request.app['MANAGER']).level_up_weapon(int(post['world']), post['unique_id'], post['weapon'], int(post['iron']))
 	# return _json_response(result)
 
+# TODO port over
 @ROUTES.post('/level_up_passive')
 async def __level_up_passive(request: web.Request) -> web.Response:
 	return _json_response(json.loads(requests.post('http://localhost:8007/level_up_passive', data=await request.post()).text))
@@ -1548,6 +1550,7 @@ async def __level_up_passive(request: web.Request) -> web.Response:
 	# return _json_response(result)
 
 
+# TODO port over
 @ROUTES.post('/level_up_weapon_star')
 async def __level_up_weapon_star(request: web.Request) -> web.Response:
 	return _json_response(json.loads(requests.post('http://localhost:8007/level_up_weapon_star', data=await request.post()).text))
@@ -1555,6 +1558,7 @@ async def __level_up_weapon_star(request: web.Request) -> web.Response:
 	# result = await (request.app['MANAGER']).level_up_weapon_star(int(post['world']), post['unique_id'], post['weapon'])
 	# return _json_response(result)
 
+# TODO port over
 @ROUTES.post('/reset_weapon_skill_point')
 async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
 	return _json_response(json.loads(requests.post('http://localhost:8007/reset_weapon_skill_point', data=await request.post()).text))
@@ -1562,6 +1566,7 @@ async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
 	# result = await (request.app['MANAGER']).reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
 	# return _json_response(result)
 
+# TODO port over
 @ROUTES.post('/get_all_weapon')
 async def __get_all_weapon(request: web.Request) -> web.Response:
 	return _json_response(json.loads(requests.post('http://localhost:8007/get_all_weapon', data=await request.post()).text))
@@ -1593,100 +1598,125 @@ async def __pass_tower(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).pass_tower(int(post['world']), post['unique_id'], int(post['stage']), post['clear_time'])
 	return _json_response(result)
 
+
+
+
+# TODO port over
 @ROUTES.post('/basic_summon')
 async def __basic_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/pro_summon')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/pro_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/friend_summon')
 async def __friend_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/friend_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/prophet_summon')
 async def __prophet_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/prophet_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/basic_summon_skill')
 async def __basic_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon_skill', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/pro_summon_skill')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/pro_summon_skill', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/friend_summon_skill')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/friend_summon_skill', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/basic_summon_roles')
 async def __basic_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon_roles', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/pro_summon_roles')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/pro_summon_roles', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/friend_summon_roles')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/friend_summon_roles', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/fortune_wheel_basic')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/fortune_wheel_basic', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/fortune_wheel_pro')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/fortune_wheel_pro', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/automatically_refresh_store')
 async def __automatically_refresh_store(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8007' + '/automatically_refresh_store', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
 
+# TODO port over
 @ROUTES.post('/manually_refresh_store')
 async def __manually_refresh_store(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8007' + '/manually_refresh_store', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
 
+# TODO port over
 @ROUTES.post('/diamond_refresh_store')
 async def __diamond_refresh_store(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8007' + '/diamond_refresh_store', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
 
+# TODO port over
 @ROUTES.post('/black_market_transaction')
 async def __black_market_transaction(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8007' + '/black_market_transaction', data = {'world': post['world'], "unique_id": post['unique_id'], "code": post['code']}).text))
 
+# TODO port over
 @ROUTES.post('/send_friend_gift')
 async def _send_friend_gift(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/send_friend_gift', data = {'world': post['world'], "unique_id": post['unique_id'], "friend_id": post['friend_id']}).text))
 
+# TODO port over
 @ROUTES.post('/send_all_friend_gift')
 async def _send_all_friend_gift(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/send_all_friend_gift', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
 
+# TODO port over
 @ROUTES.post('/get_all_friend_info')
 async def _get_all_friend_info(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/get_all_friend_info', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+
+
 
 @ROUTES.post('/start_hang_up')
 async def __start_hang_up(request: web.Request) -> web.Response:
