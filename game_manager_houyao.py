@@ -1492,19 +1492,27 @@ class GameManager:
 			return self._message_typesetting(status=99, message="Parameter error")
 		armor1, armor2 = f"armor_level{level}", f"armor_level{level + 1}"
 		armor = {armor1: 0, armor2: 0}
-		sql_str = f"select {armor1}, {armor2} from armor where unique_id='{unique_id}' and armor_id='{armor_id}'"
-		armor[armor1], armor[armor2] = (await self._execute_statement(world=world, statement=sql_str))[0]
+		armor[armor1], armor[armor2] = await self._get_armor(world=world, unique_id=unique_id, armor_id=armor_id, armor1=armor1, armor2=armor2)
 		if armor[armor1] < 3:
 			return self._message_typesetting(status=98, message="Insufficient basic armor")
 		else:
 			armor[armor1] -= 3
 			armor[armor2] += 1
-			sql_str = f"update {armor_kind} set {armor1}={armor[armor1]}, {armor2}={armor[armor2]} where unique_id='{unique_id}'"
+			sql_str = f"update armor set {armor1}={armor[armor1]}, {armor2}={armor[armor2]} where unique_id='{unique_id}' and armor_id='{armor_id}'"
 			if await self._execute_statement_update(world=world, statement=sql_str) == 0:
 				return self._message_typesetting(status=97, message="database operating error")
 			return self._message_typesetting(status=0, message="Successful synthesis", data={"remaining": armor})
 
-		#  #########################  houyao 2019-07-29 14：49  ##########################
+	async def _get_armor(self, world: int, unique_id: str, armor_id: str, armor1: str, armor2: str) -> tuple:
+		sql_str = f"select {armor1}, {armor2} from armor where unique_id='{unique_id}' and armor_id='{armor_id}'"
+		try:
+			return (await self._execute_statement(world=world, statement=sql_str))[0]
+		except:
+			print(f"insert into armor(unique_id, armor_id) values ('{unique_id}','{armor_id}')")
+			await self._execute_statement_update(world=world, statement=f"insert into armor(unique_id, armor_id) values ('{unique_id}','{armor_id}')")
+			return (await self._execute_statement(world=world, statement=sql_str))[0]
+
+	#  #########################  houyao 2019-07-29 14：49  ##########################
 
 
 
