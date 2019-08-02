@@ -800,7 +800,7 @@ class GameManager:
 			data_dict = {}
 			for i in range(len(keys)):
 				data_dict.update({keys[i]: values[i]})
-			data["data"] = data_dict
+			data["data"] = {"remaining": data_dict}
 		return data
 
 	async def upgrade_armor(self, world: int, unique_id: str, armor_id: str, level: int) -> dict:
