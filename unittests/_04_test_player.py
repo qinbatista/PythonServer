@@ -167,7 +167,7 @@ def get_hang_up_info():
 
 
 def upgrade_armor(armor_id: int):
-	result = requests.post(GAME_MANAGER_BASE_URL + '/upgrade_armor', data={"world": 0, 'unique_id': "4", "armor_kind": "armor1", "armor_id": armor_id})
+	result = requests.post('http://localhost:8007/upgrade_armor', data={"world": 0, 'unique_id': "4", "armor_kind": "armor1", "armor_id": armor_id})
 	print(str(result.text))
 
 
@@ -213,5 +213,5 @@ if __name__ == "__main__":
 	# get_all_supplies()
 	# basic_summon()
 	# get_hang_up_info()
-	# upgrade_armor(0)
-	random_gift_segment()
+	upgrade_armor(1)
+	# random_gift_segment()
