@@ -545,11 +545,14 @@ class GameManager:
 		remaining = {}
 		material_dict = {}
 		if "energy" in keys:
-			energy = (await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")]))["remaining"]
+			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")])
+			if energy_data["status"] >= 97:
+				return self._message_typesetting(status=96, message="Insufficient physical strength")
 			num = keys.index("energy")
 			keys.pop(num)
 			values.pop(num)
-			remaining.update({"energy": energy})
+			for i in range(len(energy_data["data"]["keys"])):
+				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
 
@@ -593,18 +596,21 @@ class GameManager:
 		# 98 - key insufficient
 		# 99 - parameter error
 		enter_tower_data = self._entry_consumables["tower"]
-		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "tower_stage")):
+		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
 			return self._message_typesetting(99, "Parameter error")
 		keys = list(enter_tower_data[str(stage)].keys())
 		values = [-v for v in list(enter_tower_data[str(stage)].values())]
 		remaining = {}
 		material_dict = {}
 		if "energy" in keys:
-			energy = (await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")]))["remaining"]
+			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")])
+			if energy_data["status"] >= 97:
+				return self._message_typesetting(status=96, message="Insufficient physical strength")
 			num = keys.index("energy")
 			keys.pop(num)
 			values.pop(num)
-			remaining.update({"energy": energy})
+			for i in range(len(energy_data["data"]["keys"])):
+				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
 
