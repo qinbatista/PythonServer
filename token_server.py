@@ -18,7 +18,7 @@ class TokenServer:
 		self._invalidated = set()
 		self._secret = 'password'
 		self._alg = 'HS256'
-		self._delta = 500
+		self._delta = 3600*24*30
 		self._gift_table = {}
 		self._fr_table = {}
 
