@@ -842,6 +842,18 @@ class GameManager:
 			await self._execute_statement_update(world=world, statement=f"insert into armor(unique_id, armor_id) values ('{unique_id}','{armor_id}')")
 			return (await self._execute_statement(world=world, statement=sql_str))[0]
 
+	
+	async def automatically_refresh_store(self, world: int, unique_id: str) -> dict:
+		"""
+		success -> 0 and 1
+		# 0 - First refresh market success
+		# 1 - Refresh market success
+		# 2 - Refresh time is not over yet, market information has been obtained
+		# 98 - Unexpected element, please update the configuration table
+		# 99 - database operation error
+		"""
+		dark_market_data = self._player['dark_market']
+
 
 #############################################################################
 #						End Stage Module Functions							#
@@ -1135,6 +1147,7 @@ class GameManager:
 
 
 
+	# TODO REFACTOR REFACTOR REFACTOR
 	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str, summon_item: str):
 		if cost_item == 'diamond':
 			result = await self.try_diamond(world, unique_id, -1 * int(self._lottery[summon_item]['cost'][cost_item]))
@@ -1146,8 +1159,6 @@ class GameManager:
 			result = await self.try_pro_summon_scroll(world, unique_id, -int(self._lottery[summon_item]['cost'][cost_item]))
 		elif cost_item == 'friend_gift':
 			result = await self.try_friend_gift(world, unique_id, -int(self._lottery[summon_item]['cost'][cost_item]))
-		elif cost_item == 'prophet_summon_scroll':
-			result = await self.try_prophet_summon_scroll(world, unique_id, -int(self._lottery[summon_item]['cost'][cost_item]))
 		else:
 			return self._message_typesetting(4, 'wrong item name')
 		if result['remaining'] < 0:
@@ -1160,7 +1171,8 @@ class GameManager:
 						'remaining':
 						{
 							'skill_id' : try_result['data']['keys'][0],
-							'skill_level' : try_result['data']['values'][0]
+							'skill_level' : try_result['data']['values'][0],
+							cost_item : result['remaining']
 						},
 						'reward':
 						{
@@ -1173,7 +1185,8 @@ class GameManager:
 						'remaining':
 						{
 							'scroll_id' : try_result['data']['keys'][0],
-							'scroll_quantity' : try_result['data']['values'][0]
+							'scroll_quantity' : try_result['data']['values'][0] + 1,
+							cost_item : result['remaining']
 						},
 						'reward':
 						{
@@ -1192,7 +1205,8 @@ class GameManager:
 					{
 						'weapon' : try_result['data']['values'][0],
 						'star' : try_result['data']['values'][1],
-						'segment' : try_result['data']['values'][2]
+						'segment' : try_result['data']['values'][2] + self._standard_segment_count,
+						cost_item : result['remaining']
 					},
 					'reward':
 					{
@@ -1200,7 +1214,30 @@ class GameManager:
 						'segment' : self._standard_segment_count
 					}
 				}
-				return self._message_typsetting(1, 'get weapon item success', message_dic)
+				if try_result['status'] == 0:
+					return self._message_typesetting(0, 'get weapon success', message_dic)
+				else:
+					return self._message_typesetting(1, 'get weapon segment success', message_dic)
+			else:
+				return self._message_typesetting(96, 'weapons operation error')
+		elif summon_item == 'roles':
+			try_result = await self.random_gift_role(world, unique_id, tier)
+			if try_result['status'] == 0 or try_result['status'] == 1:
+				message_dic = {
+					'remaining' :
+					{
+						'weapon' : try_result['data']['values'][0],
+						'star' : try_result['data']['values'][1],
+						'segment' : try_result['data']['values'][2] + self._standard_segment_count,
+						cost_item : result['remaining']
+					},
+					'reward':
+					{
+						'weapon' : try_result['data']['values'][0],
+						'segment' : self._standard_segment_count
+					}
+				}
+				return self._message_typesetting(1, 'get role item success', message_dic)
 			else:
 				return self._message_typesetting(97, 'operation error')
 
@@ -1568,7 +1605,6 @@ async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
 
-# TODO port over
 @ROUTES.post('/get_all_weapon')
 async def __get_all_weapon(request: web.Request) -> web.Response:
 	#return _json_response(json.loads(requests.post('http://localhost:8007/get_all_weapon', data=await request.post()).text))
@@ -1607,7 +1643,8 @@ async def __pass_tower(request: web.Request) -> web.Response:
 @ROUTES.post('/basic_summon')
 async def __basic_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+	result = await (request.app['MANAGER']).basic_summon(int(post['world']), post['unique_id'], post['cost_item'])
+	#return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
 # TODO port over
 @ROUTES.post('/pro_summon')
