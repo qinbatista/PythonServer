@@ -175,11 +175,33 @@ def random_gift_segment():
 	result = requests.post('http://localhost:8007/random_gift_segment', data={"world": 0, 'unique_id': "4"})
 	print(str(result.text))
 
+
+def send_friend_gift():
+	result = requests.post('http://localhost:8006/send_friend_gift', data={"world": 0, 'unique_id': "4", "friend_id": 5})
+	print(str(result.text))
+
 def test():
 	s22k = "999"
 	s21k = "939"
 	print(eval("s2%sk"%2))
 
+"""
+json_data = {
+	"world": world,
+	"uid_to": unique_id,
+	"kwargs":
+		{
+			"from": "server",
+			"subject": "You have a gift!",
+			"body": "Your gift is waiting",
+			"type": "gift",
+			"items": "friend_gift",
+			"quantities": "1"
+		}
+}
+result = requests.post('http://localhost:8020/send_mail', json=json_data)
+print(str(result.text))
+"""
 
 if __name__ == "__main__":
 	# try_coin()
@@ -213,5 +235,6 @@ if __name__ == "__main__":
 	# get_all_supplies()
 	# basic_summon()
 	# get_hang_up_info()
-	upgrade_armor(1)
+	# upgrade_armor(1)
 	# random_gift_segment()
+	send_friend_gift()
