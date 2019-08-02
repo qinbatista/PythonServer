@@ -678,6 +678,7 @@ class GameManager:
 	async def _send_friend_gift(self, world: int, unique_id: str, friend_id: str)->str:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
+		# 98 - this person is not your friend anymore
 		# 99 - send friend gift failed, because not cooldown time is not finished
 		#return value
 		# {
@@ -686,17 +687,19 @@ class GameManager:
 		# f_id friend id
 		# f_name friend name
 		# f_level friend level
-		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world, 'SELECT * FROM friend WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
+		if len(data)==0:
+			return self._message_typesetting(98, 'this person is not your friend anymore')
 		mylist = list(data[0])
-		my_friend_id_index =  mylist.index(friend_id)
-		f_id = mylist[(my_friend_id_index-1)*4+1]
-		f_recovering_time = mylist[(my_friend_id_index-1)*4+4]
+		print("mylist="+str(mylist))
+		f_id = mylist[1]
+		f_recovering_time = mylist[4]
 		sql_result = await self._execute_statement(world, 'SELECT game_name,level FROM player WHERE unique_id = "' + unique_id + '";')
 		f_game_name = sql_result[0][0]
 		f_level = sql_result[0][1]
 		if f_recovering_time=="":
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
-			data = await self._execute_statement_update(world, 'UPDATE friend_list SET recovery_time' + str(my_friend_id_index) + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
+			data = await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
 			data={
 				"remaining" :
 				{
@@ -711,7 +714,7 @@ class GameManager:
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
 			if delta_time.days>=1:
-				await self._execute_statement_update(world, "UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level) + " WHERE unique_id ='" +unique_id +"';")
+				data = await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
 				data={
 					"remaining" :
 					{

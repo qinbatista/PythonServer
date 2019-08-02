@@ -5,8 +5,8 @@ import configparser
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-# GAME_MANAGER_BASE_URL = 'http://localhost:8004'
-GAME_MANAGER_BASE_URL = 'http://localhost:8007'
+GAME_MANAGER_BASE_URL = 'http://localhost:8004'
+# GAME_MANAGER_BASE_URL = 'http://localhost:8007'
 # GAME_MANAGER_BASE_URL = 'http://localhost:8006'
 
 
@@ -87,7 +87,7 @@ def reset_weapon_skill_point():
 
 
 def level_up_weapon_star():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_weapon_star', data={'world': 0, 'unique_id': "4", "weapon": "weapon1"})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/level_up_weapon_star', data={'world': 0, 'unique_id': "4", "weapon": "weapon10"})
 	print(str(result.text))
 
 
@@ -167,7 +167,17 @@ def get_hang_up_info():
 
 
 def upgrade_armor(armor_id: int):
-	result = requests.post(GAME_MANAGER_BASE_URL + '/upgrade_armor', data={"world": 0, 'unique_id': "4", "armor_kind": "armor1", "armor_id": armor_id})
+	result = requests.post('http://localhost:8007/upgrade_armor', data={"world": 0, 'unique_id': "4", "armor_kind": "armor1", "armor_id": armor_id})
+	print(str(result.text))
+
+
+def random_gift_segment():
+	result = requests.post('http://localhost:8007/random_gift_segment', data={"world": 0, 'unique_id': "4"})
+	print(str(result.text))
+
+
+def send_friend_gift():
+	result = requests.post('http://localhost:8006/send_friend_gift', data={"world": 0, 'unique_id': "4", "friend_id": 5})
 	print(str(result.text))
 
 def test():
@@ -175,6 +185,23 @@ def test():
 	s21k = "939"
 	print(eval("s2%sk"%2))
 
+"""
+json_data = {
+	"world": world,
+	"uid_to": unique_id,
+	"kwargs":
+		{
+			"from": "server",
+			"subject": "You have a gift!",
+			"body": "Your gift is waiting",
+			"type": "gift",
+			"items": "friend_gift",
+			"quantities": "1"
+		}
+}
+result = requests.post('http://localhost:8020/send_mail', json=json_data)
+print(str(result.text))
+"""
 
 if __name__ == "__main__":
 	# try_coin()
@@ -208,4 +235,6 @@ if __name__ == "__main__":
 	# get_all_supplies()
 	# basic_summon()
 	# get_hang_up_info()
-	upgrade_armor(0)
+	# upgrade_armor(1)
+	# random_gift_segment()
+	send_friend_gift()
