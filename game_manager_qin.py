@@ -699,7 +699,7 @@ class GameManager:
 		f_level = sql_result[0][1]
 		if f_recovering_time=="":
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
-			data = await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
+			await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
 			data={
 				"remaining" :
 				{
@@ -709,12 +709,27 @@ class GameManager:
 				"current_time":current_time
 				}
 			}
+			json_data = {
+				"world": world,
+				"uid_to": unique_id,
+				"kwargs":
+					{
+						"from": "server",
+						"subject": "You have a gift!",
+						"body": "Your gift is waiting",
+						"type": "gift",
+						"items": "friend_gift",
+						"quantities": "1"
+					}
+			}
+			result = requests.post('http://192.168.1.102:8020/send_mail', json=json_data)
+			print(str(result.text))
 			return self._message_typesetting(0, 'send friend gift success because of f_recovering_time is empty',data)
 		else:
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
 			if delta_time.days>=1:
-				data = await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
+				await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
 				data={
 					"remaining" :
 					{
@@ -724,8 +739,28 @@ class GameManager:
 						"current_time":current_time
 					}
 				}
+				json_data = {
+					"world": world,
+					"uid_to": unique_id,
+					"kwargs":
+						{
+							"from": "server",
+							"subject": "You have a gift!",
+							"body": "Your gift is waiting",
+							"type": "gift",
+							"items": "friend_gift",
+							"quantities": "1"
+						}
+				}
+				result = requests.post('http://localhost:8020/send_mail', json=json_data)
+				# result = requests.post('http://192.168.1.102:8020/send_mail', json=json_data)
+				print(result.text)
 				return self._message_typesetting(1, 'send friend gift success because time is over 1 day',data)
 			else:
+
+
+
+
 				data={
 					"remaining" :
 					{
