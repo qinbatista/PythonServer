@@ -216,16 +216,16 @@ class GameManager:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
 		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
 		# - 2 - no weapon!
-		# try:
-		star = await self._get_weapon_star(world, unique_id, weapon)
-		if star != 0:
-			segment = await self._get_segment(world, unique_id, weapon) + 30
-			await self._set_segment_by_id(world, unique_id, weapon, segment)
-			return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon','star','segment'], "values": [weapon,star,segment]})
-		await self._set_weapon_star(world, unique_id, weapon, 1)
-		return self._message_typesetting(0, 'Unlocked new weapon!', {"keys": ["weapon","star","segment"], "values": [weapon,1,0]})
-		# except:
-		# 	return self._message_typesetting(2, 'no weapon!')
+		try:
+			star = await self._get_weapon_star(world, unique_id, weapon)
+			if star != 0:
+				segment = await self._get_segment(world, unique_id, weapon) + 30
+				await self._set_segment_by_id(world, unique_id, weapon, segment)
+				return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon','star','segment'], "values": [weapon,star,segment]})
+			await self._set_weapon_star(world, unique_id, weapon, 1)
+			return self._message_typesetting(0, 'Unlocked new weapon!', {"keys": ["weapon","star","segment"], "values": [weapon,1,0]})
+		except:
+			return self._message_typesetting(2, 'no weapon!')
 
 	async def try_unlock_role(self, world: int, unique_id: str, role: str) -> dict:
 		# - 0 - Unlocked new role!   ===> {"keys": ["role"], "values": [role]}
@@ -329,7 +329,7 @@ class GameManager:
 		# 3 - database operation error
 		# 4 - insufficient material
 		# 5 - cost_item error
-		return await self._default_summon(world, unique_id, cost_item, 'friend_gift',summon_kind)
+		return await self._default_summon(world, unique_id, cost_item, 'friend_gitf',summon_kind)
 
 	async def prophet_summon(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
 		# 0 - unlocked new skill or weapon
@@ -607,8 +607,7 @@ class GameManager:
 						{
 							"skill_id":try_result['data']["keys"][0],
 							"skill_level":try_result['data']["values"][0],
-							"cost_item":cost_item,
-							"quantity": result["remaining"]
+							cost_item: result["remaining"]
 						},
 						"reward":
 						{
@@ -622,8 +621,7 @@ class GameManager:
 						{
 							"scroll_id":try_result['data']["keys"][0],
 							"scroll_quantity":try_result['data']["values"][0]+1,
-							"cost_item":cost_item,
-							"quantity": result["remaining"]
+							cost_item: result["remaining"]
 						},
 						"reward":
 						{
@@ -643,8 +641,7 @@ class GameManager:
 						"weapon":try_result['data']["values"][0],
 						"star":try_result['data']["values"][1],
 						"segment":try_result['data']["values"][2]+self._standard_segment_count,
-						"cost_item":cost_item,
-						"quantity": result["remaining"]
+						cost_item: result["remaining"]
 					},
 					"reward":
 					{
@@ -667,8 +664,7 @@ class GameManager:
 						"role":try_result['data']["values"][0],
 						"star":try_result['data']["values"][1],
 						"segment":try_result['data']["values"][2]+self._standard_segment_count,
-						"cost_item":cost_item,
-						"quantity": result["remaining"]
+						cost_item: result["remaining"]
 					},
 					"reward":
 					{
@@ -679,9 +675,10 @@ class GameManager:
 				return self._message_typesetting(1, 'get role item success', message_dic)
 			else:
 				return self._message_typesetting(97, 'opeartion error')
-	async def _send_friend_gift(self, world: int, unique_id: str, friend_id: str)->str:
+	async def _send_friend_gift(self, world: int, unique_id: str, friend_id: str)->dict:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
+		# 97 - Mailbox error
 		# 98 - this person is not your friend anymore
 		# 99 - send friend gift failed, because not cooldown time is not finished
 		#return value
@@ -695,12 +692,29 @@ class GameManager:
 		if len(data)==0:
 			return self._message_typesetting(98, 'this person is not your friend anymore')
 		mylist = list(data[0])
+		print("mylist="+str(mylist))
 		f_id = mylist[1]
 		f_recovering_time = mylist[4]
 		sql_result = await self._execute_statement(world, 'SELECT game_name,level FROM player WHERE unique_id = "' + unique_id + '";')
 		f_game_name = sql_result[0][0]
 		f_level = sql_result[0][1]
 		if f_recovering_time=="":
+			json_data = {
+				"world": world,
+				"uid_to": friend_id,
+				"kwargs":
+					{
+						"from": "server",
+						"subject": "You have a gift!",
+						"body": "Your gift is waiting",
+						"type": "gift",
+						"items": "friend_gift",
+						"quantities": "1"
+					}
+			}
+			result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+			if result["status"] != 0:
+				return self._message_typesetting(97, 'Mailbox error')
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
 			await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
 			data={
@@ -712,39 +726,14 @@ class GameManager:
 				"current_time":current_time
 				}
 			}
-			json_data = {
-				"world": world,
-				"uid_to": unique_id,
-				"kwargs":
-					{
-						"from": "server",
-						"subject": "You have a gift!",
-						"body": "Your gift is waiting",
-						"type": "gift",
-						"items": "friend_gift",
-						"quantities": "1"
-					}
-			}
-			result = requests.post('http://192.168.1.102:8020/send_mail', json=json_data)
-			print(str(result.text))
 			return self._message_typesetting(0, 'send friend gift success because of f_recovering_time is empty',data)
 		else:
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
 			delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
 			if delta_time.days>=1:
-				await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
-				data={
-					"remaining" :
-					{
-						"f_id":f_id,
-						"f_name":f_game_name,
-						"f_level":f_level,
-						"current_time":current_time
-					}
-				}
 				json_data = {
 					"world": world,
-					"uid_to": unique_id,
+					"uid_to": friend_id,
 					"kwargs":
 						{
 							"from": "server",
@@ -755,15 +744,21 @@ class GameManager:
 							"quantities": "1"
 						}
 				}
-				result = requests.post('http://localhost:8020/send_mail', json=json_data)
-				# result = requests.post('http://192.168.1.102:8020/send_mail', json=json_data)
-				print(result.text)
+				result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+				if result["status"] != 0:
+					return self._message_typesetting(97, 'Mailbox error')
+				await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
+				data={
+					"remaining" :
+					{
+						"f_id":f_id,
+						"f_name":f_game_name,
+						"f_level":f_level,
+						"current_time":current_time
+					}
+				}
 				return self._message_typesetting(1, 'send friend gift success because time is over 1 day',data)
 			else:
-
-
-
-
 				data={
 					"remaining" :
 					{
@@ -774,46 +769,55 @@ class GameManager:
 					}
 				}
 				return self._message_typesetting(99, 'send friend gift failed, because cooldown time is not finished',data)
+
+	async def redeem_nonce(self, world: int, unique_id: str, friend_id: str, type: str, nonce: str) -> dict:
+		# success -> 0
+		# 0 - successfully redeemed
+		# 99 - database operating error
+		response = requests.post('http://localhost:8001/redeem_nonce', data = {'type' : type, 'nonce' : nonce})
+		data = response.json()
+		items = data["data"]["items"]
+		quantities = data["data"]["quantities"]
+		sql_str = f"update player set {items}={items}+{quantities} where unique_id='{unique_id}'"
+		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
+			return self._message_typesetting(status=99, message="database operating error")
+		sql_str = f"select {items} from player where unique_id='{unique_id}'"
+		quantities = (await self._execute_statement(world=world, statement=sql_str))[0][0]
+		return self._message_typesetting(status=0, message="successfully redeemed", data={"remaining": {items: quantities}})
+
 	async def _send_all_friend_gift(self, world: int, unique_id: str):
-		data = await self._execute_statement(world, 'SELECT * FROM friend WHERE unique_id = "' + unique_id + '";')
-		if len(data)==0:
-			return self._message_typesetting(98, 'you have no friends')
-		mylist = list(data)
+		data = await self._execute_statement(world, 'SELECT * FROM friend_list WHERE unique_id = "' + unique_id + '";')
+		mylist = list(data[0])
 		f_id,f_name,f_level,f_recovery_time =[],[],[],[]
-		print(data)
-		for my_friend_id_index in range(0,int((len(mylist)))):
-				print("attr_index="+str(my_friend_id_index))
-				f_id_check = mylist[my_friend_id_index][1]
-				if f_id_check =="":
-					continue
-				f_game_name_check = mylist[my_friend_id_index][2]
-				f_level_check = mylist[my_friend_id_index][3]
-				f_recovering_time = mylist[my_friend_id_index][4]
-				print("f_id_check="+str(f_id_check))
-				print("f_game_name_check="+str(f_game_name_check))
-				print("f_level_check="+str(f_level_check))
-				print("f_recovering_time="+str(f_recovering_time))
-				if f_recovering_time=="":
-					current_time = time.strftime('%Y-%m-%d', time.localtime())
-					await self._execute_statement_update(world, 'UPDATE friend SET recovery_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+f_id_check+'";')
-					mylist[my_friend_id_index][4]=current_time
-					# print('send friend gift success because of f_recovering_time is empty')
+		for my_friend_id_index in range(1,int((len(mylist)-1)/4)+1):
+			f_id_check = mylist[(my_friend_id_index-1)*4+1]
+			f_game_name_check = mylist[(my_friend_id_index-1)*4+2]
+			f_level_check = mylist[(my_friend_id_index-1)*4+3]
+			if f_id_check =="":
+				continue
+			f_recovering_time = mylist[(my_friend_id_index-1)*4+4]
+			if f_recovering_time=="":
+				current_time = time.strftime('%Y-%m-%d', time.localtime())
+				data = await self._execute_statement_update(world, 'UPDATE friend_list SET recovery_time' + str(my_friend_id_index) + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
+				mylist[(my_friend_id_index-1)*4+4]=current_time
+				# print('send friend gift success because of f_recovering_time is empty')
+			else:
+				current_time = time.strftime('%Y-%m-%d', time.localtime())
+				delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
+				if delta_time.days>=1:
+					# print("UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name_check)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" +unique_id +"';")
+					await self._execute_statement_update(world, "UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name_check)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" +unique_id +"';")
+					mylist[(my_friend_id_index-1)*4+4]=current_time
+					# print('send friend gift success because time is over 1 day')
 				else:
-					current_time = time.strftime('%Y-%m-%d', time.localtime())
-					delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
-					if delta_time.days>=1:
-						# print("UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name_check)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" +unique_id +"';")
-						await self._execute_statement_update(world, "UPDATE friend_list SET recovery_time" + str(my_friend_id_index) + " = '" + current_time + "',friend_name"+str(my_friend_id_index) + "='" + str(f_game_name_check)+"'" + ",friend_level"+str(my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" +unique_id +"';")
-						mylist[my_friend_id_index][4]=current_time
-						# print('send friend gift success because time is over 1 day')
-					else:
-						pass
-						# print('send friend gift failed, because not cooldown time is not finished')
-				f_id.append(mylist[my_friend_id_index][1])
-				f_name.append(mylist[my_friend_id_index][2])
-				f_level.append(mylist[my_friend_id_index][3])
-				f_recovery_time.append(mylist[my_friend_id_index][4])
-		data_json={
+					pass
+					# print('send friend gift failed, because not cooldown time is not finished')
+			if mylist[(my_friend_id_index-1)*4+1+0]!='':
+				f_id.append(mylist[(my_friend_id_index-1)*4+1])
+				f_name.append(mylist[(my_friend_id_index-1)*4+2])
+				f_level.append(mylist[(my_friend_id_index-1)*4+3])
+				f_recovery_time.append(mylist[(my_friend_id_index-1)*4+4])
+		data={
 			"remaining":
 			{
 				"f_list_id":f_id,
@@ -822,7 +826,8 @@ class GameManager:
 				"f_recovery_time":f_recovery_time
 			}
 		}
-		return self._message_typesetting(0, 'send all friends gift',data_json)
+		return self._message_typesetting(0, 'send all friends gift',data)
+
 	async def _get_all_resource_info(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM player WHERE unique_id = "' + unique_id + '";')
 		mylist = list(data[0])
@@ -949,7 +954,7 @@ class GameManager:
 		return await self._execute_statement_update(world, 'UPDATE role SET role_star' + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '" and role_name="'+role+'";')
 
 	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
-		data = await self._execute_statement(world, 'SELECT segment FROM weapon`' + '` WHERE unique_id = "' + unique_id + '" and weapon_name="'+weapon+'";')
+		data = await self._execute_statement(world, 'SELECT segment FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
 
 	async def _get_role_segment(self, world: int, unique_id: str, role: str) -> int:
@@ -1488,6 +1493,16 @@ async def _get_stage_reward_config(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER'])._get_stage_reward_config(int(post['world']), post['unique_id'])
 	return _json_response(result)
+
+@ROUTES.post('/redeem_nonce')
+async def _redeem_nonce(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).redeem_nonce(int(post['world']), post['unique_id'], post['friend_id'], post['type'], post['nonce'])
+	return _json_response(result)
+
+@ROUTES.post('/get_new_mail')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8020/get_new_mail', data=await request.post()).text))
 
 
 def get_config() -> configparser.ConfigParser:
