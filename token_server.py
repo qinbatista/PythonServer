@@ -70,7 +70,7 @@ class TokenServer:
 					results[n] = {'status' : 1, 'type' : 'friend_request'}
 				else:
 					results[n] = {'status' : 0, 'type' : 'friend_request', **self._fr_table.pop(n)}
-		return self._message_typesetting(0, 'success', results)
+		return results
 
 
 
