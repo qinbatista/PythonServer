@@ -856,8 +856,8 @@ class GameManager:
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['gift'], 'nonce' : [nonce]})
 		print(response.text)
 		data = response.json()
-		items = data["data"]["items"]
-		quantities = data["data"]["quantities"]
+		items = data[nonce]["items"]
+		quantities = data[nonce]["quantities"]
 		sql_str = f"update player set {items}={items}+{quantities} where unique_id='{unique_id}'"
 		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
 			return self._message_typesetting(status=99, message="database operating error")
@@ -1271,13 +1271,13 @@ class GameManager:
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
 		print(response.text)
 		data = response.json()
-		# friend_name = data["data"]["sender"]
-		friend_id = data["data"]["uid_sender"]
+		friend_name = data[nonce]["sender"]
+		friend_id = data[nonce]["uid_sender"]
 
 		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
 		if data[0][-1] != "":
 			return self._message_typesetting(status=99, message="You already have this friend")
-		friend_name = data[0][2]
+		# friend_name = data[0][2]
 
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
 		update_str = f"update friend set become_friend_time='{current_time}' where unique_id='{friend_id}' and friend_id='{unique_id}'"
