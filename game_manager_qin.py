@@ -345,8 +345,22 @@ class GameManager:
 		# 1 - you received free scroll or segments
 		# 2 - invalid skill name
 		# 3 - database operation error
-		# 4 - insufficient material
-		# 5 - cost_item error
+		# 4 - wrong item name
+		# 97 -insufficient materials
+		if cost_item == 'diamond':
+			result = await self.try_diamond(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['diamond']))
+		elif cost_item == 'coin':
+			result = await self.try_coin(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['diamond']))
+		elif cost_item == 'basic_summon_scroll':
+			result = await self.try_basic_summon_scroll(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['basic_summon_scroll']))
+		elif cost_item == 'pro_summon_scroll':
+			result = await self.try_pro_summon_scroll(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['pro_summon_scroll']))
+		elif cost_item == 'friend_gift':
+			result = await self.try_friend_gift(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['friend_gift']))
+		else:
+			return self._message_typesetting(4, 'wrong item name')
+		if result["remaining"]<0:
+			return self._message_typesetting(97, 'insufficient materials')
 		result_list = []
 		for _ in range(0,10):
 			message_list=await self._default_summon(world, unique_id, cost_item, 'basic',summon_kind)
@@ -358,8 +372,22 @@ class GameManager:
 		# 1 - you received free scroll or segments
 		# 2 - invalid skill name
 		# 3 - database operation error
-		# 4 - insufficient material
-		# 5 - cost_item error
+		# 4 - wrong item name
+		# 97 -insufficient materials
+		if cost_item == 'diamond':
+			result = await self.try_diamond(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['diamond']))
+		elif cost_item == 'coin':
+			result = await self.try_coin(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['diamond']))
+		elif cost_item == 'basic_summon_scroll':
+			result = await self.try_basic_summon_scroll(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['basic_summon_scroll']))
+		elif cost_item == 'pro_summon_scroll':
+			result = await self.try_pro_summon_scroll(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['pro_summon_scroll']))
+		elif cost_item == 'friend_gift':
+			result = await self.try_friend_gift(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['friend_gift']))
+		else:
+			return self._message_typesetting(4, 'wrong item name')
+		if result["remaining"]<0:
+			return self._message_typesetting(97, 'insufficient materials')
 		result_list = []
 		for _ in range(0,10):
 			message_list=await self._default_summon(world, unique_id, cost_item, 'pro',summon_kind)
@@ -371,11 +399,25 @@ class GameManager:
 		# 1 - you received free scroll or segments
 		# 2 - invalid skill name
 		# 3 - database operation error
-		# 4 - insufficient material
-		# 5 - cost_item error
+		# 4 - wrong item name
+		# 97 -insufficient materials
+		if cost_item == 'diamond':
+			result = await self.try_diamond(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['diamond']))
+		elif cost_item == 'coin':
+			result = await self.try_coin(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['diamond']))
+		elif cost_item == 'basic_summon_scroll':
+			result = await self.try_basic_summon_scroll(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['basic_summon_scroll']))
+		elif cost_item == 'pro_summon_scroll':
+			result = await self.try_pro_summon_scroll(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['pro_summon_scroll']))
+		elif cost_item == 'friend_gift':
+			result = await self.try_friend_gift(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['friend_gift']))
+		else:
+			return self._message_typesetting(4, 'wrong item name')
+		if result["remaining"]<0:
+			return self._message_typesetting(97, 'insufficient materials')
 		result_list = []
 		for _ in range(0,10):
-			message_list=await self._default_summon(world, unique_id, cost_item, 'pro',summon_kind)
+			message_list=await self._default_summon(world, unique_id, cost_item, 'friend',summon_kind)
 			result_list.append(message_list['data'])
 		return self._message_typesetting(2, '10 times pro_summon',result_list)
 
@@ -384,8 +426,22 @@ class GameManager:
 		# 1 - you received free scroll or segments
 		# 2 - invalid skill name
 		# 3 - database operation error
-		# 4 - insufficient material
-		# 5 - cost_item error
+		# 4 - wrong item name
+		# 97 -insufficient materials
+		if cost_item == 'diamond':
+			result = await self.try_diamond(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['diamond']))
+		elif cost_item == 'coin':
+			result = await self.try_coin(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['diamond']))
+		elif cost_item == 'basic_summon_scroll':
+			result = await self.try_basic_summon_scroll(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['basic_summon_scroll']))
+		elif cost_item == 'pro_summon_scroll':
+			result = await self.try_pro_summon_scroll(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['pro_summon_scroll']))
+		elif cost_item == 'friend_gift':
+			result = await self.try_friend_gift(world, unique_id, -10 * int(self._lottery[summon_kind]['cost']['friend_gift']))
+		else:
+			return self._message_typesetting(4, 'wrong item name')
+		if result["remaining"]<0:
+			return self._message_typesetting(97, 'insufficient materials')
 		result_list = []
 		for _ in range(0,10):
 			message_list=await self._default_summon(world, unique_id, cost_item, 'prophet',summon_kind)
@@ -414,9 +470,10 @@ class GameManager:
 #qin modify new callback message keyward
 	async def _default_fortune_wheel(self, world: int, uid: str, cost_item: str, tier: str):
 		# 0 - get energy success
-		# 1 - get weapon item success
-		# 2 - get skill item success
-		# 3 - get resource success
+		# 1 - get weapon success
+		# 2 - get weapon segment success
+		# 3 - get skill success
+		# 4 - get skill scroll success
 		# 96 - item name error
 		# 97 - database opeartion error
 		# 98 - insufficient material
@@ -472,7 +529,10 @@ class GameManager:
 						"segment":self._standard_segment_count
 					}
 				}
-				return self._message_typesetting(1, 'get weapon item success', message_dic)
+				if try_result["status"]==0:
+					return self._message_typesetting(1, 'get weapon success', message_dic)
+				if try_result["status"]==1:
+					return self._message_typesetting(2, 'get weapon segment success', message_dic)
 			else:
 				return self._message_typesetting(97, 'database opeartion error')
 		elif random_item == 'skill':
@@ -491,6 +551,7 @@ class GameManager:
 							"skill_level":try_result['data']["values"][0]
 						}
 					}
+					return self._message_typesetting(3, 'get skill success', message_dic)
 				else:
 					message_dic={
 						"remaining":
@@ -504,7 +565,7 @@ class GameManager:
 							"scroll_quantity":1
 						}
 					}
-				return self._message_typesetting(2, 'get skill item success', message_dic)
+					return self._message_typesetting(4, 'you already has skill, get scroll', message_dic)
 			else:
 				return self._message_typesetting(97, 'database opeartion error')
 		else:
@@ -723,12 +784,11 @@ class GameManager:
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
 			await self._execute_statement_update(world, 'UPDATE friend SET recovery_time' + ' = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
 			data={
-				"remaining" :
-				{
-				"f_id":f_id,
-				"f_name":f_game_name,
-				"f_level":f_level,
-				"current_time":current_time
+				"remaining" :{
+					"f_id":f_id,
+					"f_name":f_game_name,
+					"f_level":f_level,
+					"current_time":current_time
 				}
 			}
 			return self._message_typesetting(0, 'send friend gift success because of f_recovering_time is empty',data)
@@ -775,11 +835,12 @@ class GameManager:
 				}
 				return self._message_typesetting(99, 'send friend gift failed, because cooldown time is not finished',data)
 
-	async def redeem_nonce(self, world: int, unique_id: str, friend_id: str, type: str, nonce: str) -> dict:
+	async def redeem_nonce(self, world: int, unique_id: str, nonce: str) -> dict:
 		# success -> 0
 		# 0 - successfully redeemed
 		# 99 - database operating error
-		response = requests.post('http://localhost:8001/redeem_nonce', data = {'type' : type, 'nonce' : nonce})
+		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['gift'], 'nonce' : [nonce]})
+		print(response.text)
 		data = response.json()
 		items = data["data"]["items"]
 		quantities = data["data"]["quantities"]
@@ -1144,7 +1205,14 @@ class GameManager:
 		t.daemon = True
 		t.start()
 
-	async def _request_friend(self, world: int, unique_id: str, friend_name: str):
+	async def _request_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
+		# success -> 0
+		# 0 - request friend successfully
+		# 95 - database operating error
+		# 96 - Mailbox error
+		# 97 - You already have this friend
+		# 98 - You have sent a friend request
+		# 99 - No such person
 		friend_data = await self._execute_statement(world=world, statement=f"SELECT unique_id FROM player WHERE game_name='{friend_name}'")
 		if len(friend_data) == 0:
 			return self._message_typesetting(status=99, message="No such person")
@@ -1162,22 +1230,50 @@ class GameManager:
 			"uid_to": friend_id,
 			"kwargs": {
 				"from": "server",
-				"subject": "You have a gift!",
-				"body": "Your gift is waiting",
+				"subject": "You have a friend request!",
+				"body": "Friend request",
 				"type": "friend_request",
 				"sender": unique_name,
 				"uid_sender": unique_id
 			}
 		}
+		print(f'sending mail to mail server: {json_data}')
 		result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+		print(f"result:{result}")
 		if result["status"] != 0:
 			return self._message_typesetting(status=96, message='Mailbox error')
 
 		if await self._execute_statement_update(world=world, statement=f"insert into friend (unique_id, friend_id, friend_name) values ('{unique_id}', '{friend_id}', '{friend_name}')") == 0:
 			return self._message_typesetting(status=95, message="database operating error")
 
-		return self._message_typesetting(status=0, message="Friend added successfully")
+		return self._message_typesetting(status=0, message="request friend successfully")
 
+
+	async def _response_friend(self, world: int, unique_id: str, nonce: str) -> dict:
+		# success -> 0
+		# 0 - Add friends to success
+		# 98 - database operating error
+		# 99 - You already have this friend
+		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
+		print(response.text)
+		data = response.json()
+		# friend_name = data["data"]["sender"]
+		friend_id = data["data"]["uid_sender"]
+
+		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
+		if data[0][-1] != "":
+			return self._message_typesetting(status=99, message="You already have this friend")
+		friend_name = data[0][2]
+
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		update_str = f"update friend set become_friend_time='{current_time}' where unique_id='{friend_id}' and friend_id='{unique_id}'"
+		insert_str = f"replace into friend(unique_id, friend_id, friend_name, become_friend_time) values('{unique_id}', '{friend_id}', '{friend_name}', '{current_time}')"
+		update_code = await self._execute_statement_update(world=world, statement=update_str)
+		insert_code = await self._execute_statement_update(world=world, statement=insert_str)
+		if update_code == 0 or insert_code == 0:
+			print(f"update_code:{update_code}, update_str:{update_str}\ninsert_code:{insert_code}, insert_str:{insert_str}")
+			return self._message_typesetting(status=98, message="database operating error")
+		return self._message_typesetting(status=0, message="Add friends to success", data={"remaining": {"friend_name": friend_name, "become_friend_time": current_time}})
 
 #############################################################################
 #
@@ -1536,7 +1632,7 @@ async def _get_stage_reward_config(request: web.Request) -> web.Response:
 @ROUTES.post('/redeem_nonce')
 async def _redeem_nonce(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).redeem_nonce(int(post['world']), post['unique_id'], post['friend_id'], post['type'], post['nonce'])
+	result = await (request.app['MANAGER']).redeem_nonce(int(post['world']), post['unique_id'], post['nonce'])
 	return _json_response(result)
 
 @ROUTES.post('/get_new_mail')
@@ -1547,6 +1643,12 @@ async def _get_new_mail(request: web.Request) -> web.Response:
 async def _request_friend(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER'])._request_friend(int(post['world']), post['unique_id'], post['friend_name'])
+	return _json_response(result)
+
+@ROUTES.post('/response_friend')
+async def _response_friend(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._response_friend(int(post['world']), post['unique_id'], post['nonce'])
 	return _json_response(result)
 
 

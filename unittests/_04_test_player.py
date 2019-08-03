@@ -179,23 +179,29 @@ def random_gift_segment():
 
 
 def send_friend_gift():
-	result = requests.post('http://localhost:8004/send_friend_gift', data={"world": 0, 'unique_id': "4", "friend_id": 5})
+	result = requests.post('http://localhost:8004/send_friend_gift', data={"world": 0, 'unique_id': "4", "friend_id": 6})
 	print(str(result.text))
 
 
 def get_new_mail():
-	result = requests.post('http://localhost:8004/get_new_mail', data={"world": 0, 'unique_id': "5"})
+	result = requests.post('http://localhost:8004/get_new_mail', data={"world": 0, 'unique_id': "6"})
 	print(str(result.text))
 	return result.json()['data']['mail'][0]['data']['nonce']
 
 
 def redeem_nonce(nonce: str):
-	result = requests.post('http://localhost:8004/redeem_nonce', data={"world": 0, 'unique_id': "5", "friend_id": 5, "type": "gift", "nonce": nonce})
+	result = requests.post('http://localhost:8004/redeem_nonce', data={"world": 0, 'unique_id': 6, "nonce": nonce})
 	print(str(result.text))
 
 
 def request_friend():
-	result = requests.post('http://localhost:8006/request_friend', data={"world": 0, 'unique_id': 4, "friend_name": "曲永杰"})
+	# result = requests.post('http://localhost:8006/request_friend', data={"world": 0, 'unique_id': 4, "friend_name": "曲永杰"})
+	result = requests.post('http://localhost:8006/request_friend', data={"world": 0, 'unique_id': 4, "friend_name": "quyongjie"})
+	print(str(result.text))
+
+
+def response_friend(nonce: str):
+	result = requests.post('http://localhost:8006/response_friend', data={"world": 0, 'unique_id': "6", "friend_id": 5, "nonce": nonce})
 	print(str(result.text))
 
 def test():
@@ -256,7 +262,10 @@ if __name__ == "__main__":
 	# upgrade_armor(1)
 	# random_gift_segment()
 
-	# send_friend_gift()
+	send_friend_gift()
+	nonce = get_new_mail()
+	redeem_nonce(nonce=nonce)
+
+	# request_friend()
 	# nonce = get_new_mail()
-	# redeem_nonce(nonce=nonce)
-	request_friend()
+	# response_friend(nonce=nonce)

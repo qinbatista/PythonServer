@@ -309,6 +309,7 @@ def test():
     db = POOL.connection()
     cursor = db.cursor()
     # d = cursor.execute('replace into armor(armor_level1,armor_level2,unique_id,armor_id)values(122+2,444+777,"9","6")')
+    # d = cursor.execute('replace into armor(armor_level1,armor_level2,unique_id,armor_id)values()')
     d = cursor.execute('INSERT into armor(armor_level1,armor_level2,unique_id,armor_id) values(122+2,444+777,"9","6"),(13552,447,"9","7"),(6422,12,"8","7")')
     print("d:" + str(d))
     print("fetchall:" + str(cursor.fetchall()))
