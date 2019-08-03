@@ -262,10 +262,10 @@ if __name__ == "__main__":
 	# upgrade_armor(1)
 	# random_gift_segment()
 
-	send_friend_gift()
-	nonce = get_new_mail()
-	redeem_nonce(nonce=nonce)
-
-	# request_friend()
+	# send_friend_gift()
 	# nonce = get_new_mail()
-	# response_friend(nonce=nonce)
+	# redeem_nonce(nonce=nonce)
+
+	request_friend()
+	nonce = get_new_mail()
+	response_friend(nonce=nonce)
