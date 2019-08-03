@@ -249,7 +249,7 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _redeem_nonce(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/redeem_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'type': message['data']['type'], 'nonce': message['data']['nonce']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/redeem_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
 
 	async def _get_new_mail(self, message: dict, session) -> str:
