@@ -644,6 +644,17 @@ class GameManager:
 
 #qin modify callback message
 	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str, summon_item: str) -> dict:
+		#95 wrong item name, you can't use this to cost
+		#96, 'weapons opeartion error'
+		#97 insufficient materials
+		#98, 'skill opeartion error'
+		#99, 'opeartion error'
+		#0 get skill success
+		#1, 'you already has skill, get scroll'
+		#2, 'get weapon success'
+		#3, 'get weapon segment success'
+		#4, 'get role success'
+		#5, 'get role segment success'
 		if cost_item == 'diamond':
 			result = await self.try_diamond(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['diamond']))
 		elif cost_item == 'coin':
@@ -655,7 +666,7 @@ class GameManager:
 		elif cost_item == 'friend_gift':
 			result = await self.try_friend_gift(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['friend_gift']))
 		else:
-			return self._message_typesetting(4, 'wrong item name')
+			return self._message_typesetting(95, 'wrong item name')
 		if result["remaining"]<0:
 			return self._message_typesetting(97, 'insufficient materials')
 		# print("result="+str(result)+" cost_item = "+cost_item+ " coin="+(self._lottery[summon_item]['cost']['diamond']))
@@ -695,7 +706,7 @@ class GameManager:
 					}
 					return self._message_typesetting(1, 'you already has skill, get scroll', message_dic)
 			else:
-				return self._message_typesetting(97, 'skill opeartion error')
+				return self._message_typesetting(98, 'skill opeartion error')
 		elif summon_item == 'weapons':
 			try_result = await self.random_gift_segment(world, unique_id, tier)
 			if try_result["status"]==0  or try_result["status"]==1:
@@ -715,9 +726,9 @@ class GameManager:
 					}
 				}
 				if try_result["status"]==0:
-					return self._message_typesetting(0, 'get weapon success', message_dic)
+					return self._message_typesetting(2, 'get weapon success', message_dic)
 				else:
-					return self._message_typesetting(1, 'get weapon segment success', message_dic)
+					return self._message_typesetting(3, 'get weapon segment success', message_dic)
 			else:
 				return self._message_typesetting(96, 'weapons opeartion error')
 		elif summon_item == 'roles':
@@ -738,9 +749,12 @@ class GameManager:
 						"segment":self._standard_segment_count
 					}
 				}
-				return self._message_typesetting(1, 'get role item success', message_dic)
+				if try_result["status"]==0:
+					return self._message_typesetting(4, 'get role  success', message_dic)
+				else:
+					return self._message_typesetting(5, 'get role segement success', message_dic)
 			else:
-				return self._message_typesetting(97, 'opeartion error')
+				return self._message_typesetting(99, 'opeartion error')
 	async def _send_friend_gift(self, world: int, unique_id: str, friend_id: str)->dict:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
