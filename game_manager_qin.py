@@ -755,7 +755,8 @@ class GameManager:
 					return self._message_typesetting(5, 'get role segement success', message_dic)
 			else:
 				return self._message_typesetting(99, 'opeartion error')
-	async def _send_friend_gift(self, world: int, unique_id: str, friend_id: str)->dict:
+
+	async def _send_friend_gift(self, world: int, unique_id: str, friend_name: str)->dict:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
 		# 97 - Mailbox error
@@ -768,6 +769,8 @@ class GameManager:
 		# f_id friend id
 		# f_name friend name
 		# f_level friend level
+
+		friend_id = (await self._execute_statement(world, f"SELECT unique_id FROM player WHERE game_name = '{friend_name}'"))[0][0]
 		data = await self._execute_statement(world, 'SELECT * FROM friend WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
 		if len(data)==0:
 			return self._message_typesetting(98, 'this person is not your friend anymore')
@@ -849,7 +852,7 @@ class GameManager:
 				}
 				return self._message_typesetting(99, 'send friend gift failed, because cooldown time is not finished',data)
 
-	async def redeem_nonce(self, world: int, unique_id: str, nonce: str) -> dict:
+	async def _redeem_nonce(self, world: int, unique_id: str, nonce: str) -> dict:
 		# success -> 0
 		# 0 - successfully redeemed
 		# 99 - database operating error
@@ -865,7 +868,7 @@ class GameManager:
 		quantities = (await self._execute_statement(world=world, statement=sql_str))[0][0]
 		return self._message_typesetting(status=0, message="successfully redeemed", data={"remaining": {items: quantities}})
 
-	async def _send_all_friend_gift(self, world: int, unique_id: str):
+	async def _send_all_friend_gift(self, world: int, unique_id: str) -> dict:
 		data = await self._execute_statement(world, 'SELECT * FROM friend WHERE unique_id = "' + unique_id + '";')
 		if len(data) == 0:
 			return self._message_typesetting(98, 'you have no friends')
@@ -883,6 +886,23 @@ class GameManager:
 				await self._execute_statement_update(world, 'UPDATE friend SET recovery_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '" and friend_id="' + f_id_check + '";')
 				print("current_time=" + current_time)
 				f_recovery_time.append(current_time)
+				json_data = {
+					"world": world,
+					"uid_to": f_id_check,
+					"kwargs":
+						{
+							"from": "server",
+							"subject": "You have a gift!",
+							"body": "Your gift is waiting",
+							"type": "gift",
+							"items": "friend_gift",
+							"quantities": "1"
+						}
+				}
+				result = requests.post('http://localhost:8020/send_mail', json=json_data)
+				print(f"result:{result.text}")
+			# if result["status"] != 0:
+				# 	return self._message_typesetting(97, 'Mailbox error')
 			else:
 				current_time = time.strftime('%Y-%m-%d', time.localtime())
 				delta_time = datetime.strptime(current_time, '%Y-%m-%d') - datetime.strptime(f_recovering_time, '%Y-%m-%d')
@@ -893,6 +913,21 @@ class GameManager:
 						my_friend_id_index) + "=" + str(f_level_check) + " WHERE unique_id ='" + unique_id + "';")
 					print("current_time2=" + current_time)
 					f_recovery_time.append(current_time)
+					json_data = {
+						"world": world,
+						"uid_to": f_id_check,
+						"kwargs":
+							{
+								"from": "server",
+								"subject": "You have a gift!",
+								"body": "Your gift is waiting",
+								"type": "gift",
+								"items": "friend_gift",
+								"quantities": "1"
+							}
+					}
+					result = requests.post('http://localhost:8020/send_mail', json=json_data)
+					print(f"result:{result.text}")
 				else:
 					f_recovery_time.append(f_recovering_time)
 			f_id.append(mylist[my_friend_id_index][1])
@@ -908,6 +943,66 @@ class GameManager:
 				}
 		}
 		return self._message_typesetting(0, 'send all friends gift', data_json)
+
+	async def _redeem_all_nonce(self, world: int, unique_id: str, type_list: [str], nonce_list: [str]) -> dict:
+		# success -> 0
+		# 0 - Add friends to success
+		# 98 - database operating error
+		# 99 - You already have this friend
+		print(f"type_list: {type_list}")
+		print(f"nonce_list: {nonce_list}")
+		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : type_list, 'nonce' : nonce_list})
+		print(f"response.text: {response.text}")
+		data = response.json()
+		remaining = {}
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		for i in range(len(type_list)):
+			if type_list[i] == "gift":
+				items = data[nonce_list[i]]["items"]
+				quantities = data[nonce_list[i]]["quantities"]
+				sql_str = f"update player set {items}={items}+{quantities} where unique_id='{unique_id}'"
+				if await self._execute_statement_update(world=world, statement=sql_str) == 0:
+					return self._message_typesetting(status=99, message="database operating error")
+				sql_str = f"select {items} from player where unique_id='{unique_id}'"
+				quantities = (await self._execute_statement(world=world, statement=sql_str))[0][0]
+				remaining.update({items: quantities})
+			elif type_list[i] == "simple":
+				pass
+			elif type_list[i] == "friend_request":
+
+				friend_name = data[nonce_list[i]]["sender"]
+				friend_id = data[nonce_list[i]]["uid_sender"]
+				unique_data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
+				if unique_data[0][5] == "":
+					# friend_name = data[0][2]
+					update_str = f"update friend set become_friend_time='{current_time}' where unique_id='{friend_id}' and friend_id='{unique_id}'"
+					insert_str = f"replace into friend(unique_id, friend_id, friend_name, become_friend_time) values('{unique_id}', '{friend_id}', '{friend_name}', '{current_time}')"
+					update_code = await self._execute_statement_update(world=world, statement=update_str)
+					insert_code = await self._execute_statement_update(world=world, statement=insert_str)
+					if update_code == 0 or insert_code == 0:
+						print(f"update_code:{update_code}, update_str:{update_str}\ninsert_code:{insert_code}, insert_str:{insert_str}")
+					else:
+						remaining.update({nonce_list[i]: {"friend_name": friend_name, "become_friend_time": current_time}})
+			else:
+				return self._message_typesetting(status=99, message="type_list error")
+		return self._message_typesetting(status=0, message="successfully redeemed", data={"remaining": remaining})
+
+	async def _delete_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
+		# success -> 0
+		# 0 - request friend successfully
+		# 98 -you don't have this friend
+		# 99 - No such person
+		friend_data = await self._execute_statement(world=world, statement=f"SELECT unique_id FROM player WHERE game_name='{friend_name}'")
+		if len(friend_data) == 0:
+			return self._message_typesetting(status=99, message="No such person")
+		friend_id = friend_data[0][0]
+		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{unique_id}' and friend_id='{friend_id}'")
+		if len(data) != 0:
+			data = await self._execute_statement(world=world, statement=f"delete FROM friend WHERE unique_id='{unique_id}' and friend_id='{friend_id}'")
+			return self._message_typesetting(status=0, message="delete this friend successful")
+		else:
+			return self._message_typesetting(status=98, message="you don't have this friend")
+
 	async def _get_all_resource_info(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM player WHERE unique_id = "' + unique_id + '";')
 		mylist = list(data[0])
@@ -1012,6 +1107,7 @@ class GameManager:
 				}
 		}
 		return self._message_typesetting(0, 'got all friends info', data)
+
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0]), data[0][1]
@@ -1234,7 +1330,7 @@ class GameManager:
 
 		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{unique_id}' and friend_id='{friend_id}'")
 		if len(data) != 0:
-			if data[0][-1] == "":
+			if data[0][5] == "":
 				return self._message_typesetting(status=98, message="You have sent a friend request")
 			return self._message_typesetting(status=97, message="You already have this friend")
 
@@ -1275,7 +1371,7 @@ class GameManager:
 		friend_id = data[nonce]["uid_sender"]
 
 		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
-		if data[0][-1] != "":
+		if data[0][5] != "":
 			return self._message_typesetting(status=99, message="You already have this friend")
 		# friend_name = data[0][2]
 
@@ -1585,7 +1681,7 @@ async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 @ROUTES.post('/send_friend_gift')
 async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER'])._send_friend_gift(int(post['world']), post['unique_id'], post['friend_id'])
+	result = await (request.app['MANAGER'])._send_friend_gift(int(post['world']), post['unique_id'], post['friend_name'])
 	return _json_response(result)
 
 @ROUTES.post('/send_all_friend_gift')
@@ -1646,7 +1742,13 @@ async def _get_stage_reward_config(request: web.Request) -> web.Response:
 @ROUTES.post('/redeem_nonce')
 async def _redeem_nonce(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).redeem_nonce(int(post['world']), post['unique_id'], post['nonce'])
+	result = await (request.app['MANAGER'])._redeem_nonce(int(post['world']), post['unique_id'], post['nonce'])
+	return _json_response(result)
+
+@ROUTES.post('/redeem_all_nonce')
+async def _redeem_all_nonce(request: web.Request) -> web.Response:
+	post = await request.json()
+	result = await (request.app['MANAGER'])._redeem_all_nonce(int(post['world']), post['unique_id'], post['type_list'], post['nonce_list'])
 	return _json_response(result)
 
 @ROUTES.post('/get_new_mail')
@@ -1665,6 +1767,11 @@ async def _response_friend(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER'])._response_friend(int(post['world']), post['unique_id'], post['nonce'])
 	return _json_response(result)
 
+@ROUTES.post('/delete_friend')
+async def _delete_friend(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._delete_friend(int(post['world']), post['unique_id'], post['friend_name'])
+	return _json_response(result)
 
 def get_config() -> configparser.ConfigParser:
 	'''
