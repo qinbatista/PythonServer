@@ -201,7 +201,7 @@ def request_friend():
 
 
 def response_friend(nonce: str):
-	result = requests.post('http://localhost:8006/response_friend', data={"world": 0, 'unique_id': "6", "friend_id": 5, "nonce": nonce})
+	result = requests.post('http://localhost:8006/response_friend', data={"world": 0, 'unique_id': "6", "nonce": nonce})
 	print(str(result.text))
 
 def test():
