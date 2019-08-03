@@ -1767,6 +1767,11 @@ async def _get_all_friend_info(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(json.loads(requests.post('http://localhost:8006' + '/get_all_friend_info', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
 
+# TODO port over
+@ROUTES.post('/delete_friend')
+async def _get_all_friend_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/delete_friend', data = {'world': post['world'], "unique_id": post['unique_id'],"friend_name": post['friend_name']}).text))
 
 
 
