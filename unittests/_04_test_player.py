@@ -178,8 +178,8 @@ def random_gift_segment():
 	print(str(result.text))
 
 
-def send_friend_gift(unique_id: str, friend_id: str):
-	result = requests.post('http://localhost:8004/send_friend_gift', data={"world": 0, 'unique_id': unique_id, "friend_id": friend_id})
+def send_friend_gift(unique_id: str, friend_name: str):
+	result = requests.post('http://localhost:8004/send_friend_gift', data={"world": 0, 'unique_id': unique_id, "friend_name": friend_name})
 	print(str(result.text))
 
 
@@ -294,13 +294,13 @@ if __name__ == "__main__":
 	# nonce = get_new_mail(unique_id="7")
 	# response_friend(unique_id="7", nonce=nonce)
 
-	request_friend(unique_id="1", friend_name="g")
-	request_friend(unique_id="2", friend_name="g")
-	request_friend(unique_id="3", friend_name="g")
+	# request_friend(unique_id="1", friend_name="g")
+	# request_friend(unique_id="2", friend_name="g")
+	# request_friend(unique_id="3", friend_name="g")
 
-	send_friend_gift(unique_id="1", friend_id="7")
-	send_friend_gift(unique_id="2", friend_id="7")
-	send_friend_gift(unique_id="3", friend_id="7")
+	send_friend_gift(unique_id="1", friend_name="g")
+	send_friend_gift(unique_id="2", friend_name="g")
+	send_friend_gift(unique_id="3", friend_name="g")
 	# send_all_friend_gift(unique_id="4")
 
 	type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")

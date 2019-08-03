@@ -756,7 +756,7 @@ class GameManager:
 			else:
 				return self._message_typesetting(99, 'opeartion error')
 
-	async def _send_friend_gift(self, world: int, unique_id: str, friend_id: str)->dict:
+	async def _send_friend_gift(self, world: int, unique_id: str, friend_name: str)->dict:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
 		# 97 - Mailbox error
@@ -769,6 +769,8 @@ class GameManager:
 		# f_id friend id
 		# f_name friend name
 		# f_level friend level
+
+		friend_id = (await self._execute_statement(world, f"SELECT unique_id FROM player WHERE game_name = '{friend_name}'"))[0][0]
 		data = await self._execute_statement(world, 'SELECT * FROM friend WHERE unique_id = "' + unique_id + '" and friend_id="'+friend_id+'";')
 		if len(data)==0:
 			return self._message_typesetting(98, 'this person is not your friend anymore')
@@ -1679,7 +1681,7 @@ async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 @ROUTES.post('/send_friend_gift')
 async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER'])._send_friend_gift(int(post['world']), post['unique_id'], post['friend_id'])
+	result = await (request.app['MANAGER'])._send_friend_gift(int(post['world']), post['unique_id'], post['friend_name'])
 	return _json_response(result)
 
 @ROUTES.post('/send_all_friend_gift')
