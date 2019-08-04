@@ -469,7 +469,7 @@ class GameManager:
 #############################################################################
 #qin modify new callback message keyward
 	async def _default_fortune_wheel(self, world: int, uid: str, cost_item: str, tier: str):
-		# 0 - get energy success
+		# 0 - get energy/item success
 		# 1 - get weapon success
 		# 2 - get weapon segment success
 		# 3 - get skill success
@@ -570,7 +570,7 @@ class GameManager:
 				return self._message_typesetting(97, 'database opeartion error')
 		else:
 			return self._message_typesetting(96, 'item name error')
-		return self._message_typesetting(3, 'get item success', {'remaining' : {'keys' : [random_item], 'values' : [try_result['remaining']]}, 'reward' : {'keys' : [random_item], 'values' : [self._lottery['fortune_wheel']['reward'][tier][random_item]]}})
+		return self._message_typesetting(0, 'get item success', {'remaining' : {'keys' : [random_item], 'values' : [try_result['remaining']]}, 'reward' : {'keys' : [random_item], 'values' : [self._lottery['fortune_wheel']['reward'][tier][random_item]]}})
 
 
 
@@ -655,6 +655,9 @@ class GameManager:
 		#3, 'get weapon segment success'
 		#4, 'get role success'
 		#5, 'get role segment success'
+		
+		
+		
 		if cost_item == 'diamond':
 			result = await self.try_diamond(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['diamond']))
 		elif cost_item == 'coin':

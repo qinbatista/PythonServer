@@ -18,8 +18,8 @@ DESKey = CONFIG['message_handler']['DESKey']
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 TOKEN_BASE_URL = CONFIG['token_server']['address'] + ":" + CONFIG['token_server']['port']
 MANAGER_ACCOUNT_BASE_URL = CONFIG['account_manager']['address'] + ":" + CONFIG['account_manager']['port']
-MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager']['port']
-
+#MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager']['port']
+MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager_qin']['port']
 
 class InvalidHeaderError(Exception):
 	pass
@@ -228,7 +228,7 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _friend_summon_roles(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/friend_roles_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _friend_summon_roles_10_times(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
@@ -258,7 +258,9 @@ class MessageHandler:
 	async def _friend_summon_skill_10_times(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-			
+	async def _prophet_summon_10_times(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/prophet_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+			return await resp.text()
 	async def _start_hang_up(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/start_hang_up', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
 			return await resp.text()
@@ -351,13 +353,13 @@ FUNCTION_LIST = {
 	'try_unlock_weapon' : MessageHandler._try_unlock_weapon,
 	'pass_stage' : MessageHandler._pass_stage,
 	'basic_summon' : MessageHandler._basic_summon,
-	'_basic_summon_10_times' : MessageHandler._basic_summon_10_times,
+	'basic_summon_10_times' : MessageHandler._basic_summon_10_times,
 	'pro_summon' : MessageHandler._pro_summon,
 	'pro_summon_10_times' : MessageHandler._pro_summon_10_times,
 	'friend_summon' : MessageHandler._friend_summon,
 	'friend_summon_10_times' : MessageHandler._friend_summon_10_times,
 	'basic_summon_roles' : MessageHandler._basic_summon_roles,
-	'_basic_summon_roles_10_times' : MessageHandler._basic_summon_roles_10_times,
+	'basic_summon_roles_10_times' : MessageHandler._basic_summon_roles_10_times,
 	'pro_summon_roles' : MessageHandler._pro_summon_roles,
 	'pro_summon_roles_10_times' : MessageHandler._pro_summon_roles_10_times,
 	'friend_summon_roles' : MessageHandler._friend_summon_roles,
@@ -365,11 +367,12 @@ FUNCTION_LIST = {
 	
 	
 	'basic_summon_skill' : MessageHandler._basic_summon_skill,
-	'_basic_summon_skill_10_times' : MessageHandler._basic_summon_skill_10_times,
+	'basic_summon_skill_10_times' : MessageHandler._basic_summon_skill_10_times,
 	'pro_summon_skill' : MessageHandler._pro_summon_skill,
 	'pro_summon_skill_10_times' : MessageHandler._pro_summon_skill_10_times,
 	'friend_summon_skill' : MessageHandler._friend_summon_skill,
 	'friend_summon_skill_10_times' : MessageHandler._friend_summon_skill_10_times,
+	'prophet_summon_10_times' : MessageHandler._prophet_summon_10_times,
 	
 	
 	
