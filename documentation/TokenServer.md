@@ -18,11 +18,12 @@ A nonce can only be used one time, subsequent calls using the same nonce will al
 
 **NOTE** Requests made to this function must be formatted as **json**.
 
-Current valid types, and expected results in **data**:
+Current valid types, and expected additional key-value pairs:
 - **gift**
 	- **items** : a string containing comma separated item names
 	- **quantities** : a string containing comma separated quantities for the respective items
 - **friend\_request**
+	- **sender** : the name of the friend request sender
 	- **uid\_sender** : the unique\_id of the friend request sender
 
 
@@ -30,8 +31,8 @@ Current valid types, and expected results in **data**:
 
 ```json
 {
-	"type" : str,
-	"nonce": str
+	"type" : [str],
+	"nonce": [str]
 }
 ```
 
@@ -43,7 +44,9 @@ Current valid types, and expected results in **data**:
 	"message" : "successfully redeemed",
 	"data" :
 	{
-		optional key-value pairs
+		"nonce" : { "status": int, "type" : type, optional key-value pairs},
+		.....,
+		"nonce" : { "status": int, "type" : type, optional key-value pairs}
 	}
 }
 ```

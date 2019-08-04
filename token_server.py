@@ -48,24 +48,29 @@ class TokenServer:
 				self._gift_table[nonce]['items'] = kwargs['items']
 				self._gift_table[nonce]['quantities'] = kwargs['quantities']
 			elif mtype == 'friend_request':
-				self._fr_table[nonce] = kwargs['uid_sender']
+				self._fr_table[nonce] = {}
+				self._fr_table[nonce]['uid_sender'] = kwargs['uid_sender']
+				self._fr_table[nonce]['sender'] = kwargs['sender']
+
 		except KeyError:
 			return self._message_typesetting(-1, 'invalid request format')
 		return self._message_typesetting(0, 'success', {'nonce' : nonce})
 
 
 	async def redeem_nonce(self, types: [str], nonces: [str]) -> dict:
+		results = {}
 		for t, n in zip(types, nonces):
 			if t == 'gift':
 				if n not in self._gift_table:
-					return self._message_typesetting(-2, 'already redeemed')
+					results[n] = {'status' : 1, 'type' : 'gift'}
 				else:
-					return self._message_typesetting(0, 'successfully redeemed', self._gift_table.pop(n))
+					results[n] = {'status' : 0, 'type' : 'gift', **self._gift_table.pop(n)}
 			elif t == 'friend_request':
 				if n not in self._fr_table:
-					return self._message_typesetting(-2, 'already accepted request')
+					results[n] = {'status' : 1, 'type' : 'friend_request'}
 				else:
-					return self._message_typesetting(0, 'new friend added', {'uid_sender' : self._fr_table.pop(n)})
+					results[n] = {'status' : 0, 'type' : 'friend_request', **self._fr_table.pop(n)}
+		return results
 
 
 

@@ -124,7 +124,7 @@ class MailServer:
 			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'gift', 'items' : msg['items'], 'quantities' : msg['quantities']})
 			return r.json()['data']['nonce']
 		elif msg['type'] == 'friend_request':
-			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'friend_request', 'uid_sender' : msg['uid_sender']})
+			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'friend_request', 'uid_sender' : msg['uid_sender'], 'sender' : msg['sender']})
 			return r.json()['data']['nonce']
 
 	def _construct_message(self, **kwargs):
