@@ -1217,7 +1217,20 @@ class GameManager:
 		# 97 - skill operation error
 		# 98 - insufficient materials
 		# 99 - wrong item name
-		return await self._default_summon(world, unique_id, cost_item, 'friend', summon_kind)
+		return await self._default_summon(world, unique_id, cost_item, 'friend_gift', summon_kind)
+
+	async def prophet_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
+		# success -> 0 , 1 , 2 , 3
+		# 0 - get skill item success
+		# 1 - get weapon success
+		# 2 - get weapon segment success
+		# 3 - get role item success
+		# 95 - operation error
+		# 96 - weapons operation error
+		# 97 - skill operation error
+		# 98 - insufficient materials
+		# 99 - wrong item name
+		return await self._default_summon(world, unique_id, cost_item, 'prophet', summon_kind)
 
 	async def fortune_wheel_basic(self, world: int, unique_id: str, cost_item: str) -> dict:
 		# 0  - get item success
@@ -1966,6 +1979,11 @@ async def __pass_tower(request: web.Request) -> web.Response:
 
 
 # start 2019年8月5日11点22分 houyao
+
+
+# ############################################################ #
+# ######                     weapons                    ###### #
+# ############################################################ #
 @ROUTES.post('/basic_summon')
 async def __basic_summon(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -1981,9 +1999,18 @@ async def __pro_summon(request: web.Request) -> web.Response:
 @ROUTES.post('/friend_summon')
 async def __friend_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).basic_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="weapons"))
+	return _json_response(await (request.app['MANAGER']).friend_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="weapons"))
 
 
+@ROUTES.post('/prophet_summon')
+async def __prophet_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).prophet_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="weapons"))
+
+
+# ############################################################ #
+# ######                     skills                     ###### #
+# ############################################################ #
 @ROUTES.post('/basic_summon_skill')
 async def __basic_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -1999,9 +2026,18 @@ async def __pro_summon_skill(request: web.Request) -> web.Response:
 @ROUTES.post('/friend_summon_skill')
 async def __friend_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).basic_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="skills"))
+	return _json_response(await (request.app['MANAGER']).friend_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="skills"))
 
 
+@ROUTES.post('/prophet_summon_skill')
+async def __prophet_summon_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).prophet_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="skills"))
+
+
+# ############################################################ #
+# ######                     roles                      ###### #
+# ############################################################ #
 @ROUTES.post('/basic_summon_roles')
 async def __basic_summon(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -2011,13 +2047,19 @@ async def __basic_summon(request: web.Request) -> web.Response:
 @ROUTES.post('/pro_summon_roles')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).basic_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="roles"))
+	return _json_response(await (request.app['MANAGER']).pro_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="roles"))
 
 
 @ROUTES.post('/friend_summon_roles')
 async def __friend_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).basic_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="roles"))
+	return _json_response(await (request.app['MANAGER']).friend_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="roles"))
+
+
+@ROUTES.post('/prophet_summon_roles')
+async def __prophet_summon_skill(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).prophet_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="roles"))
 # end   2019年8月5日11点22分 houyao
 
 
