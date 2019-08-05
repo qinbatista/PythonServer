@@ -1238,20 +1238,8 @@ class GameManager:
 		sql_str = 'UPDATE dark_market SET merchandise%s="%s", merchandise%s_quantity="%s", currency_type%s="%s", currency_type%s_price="%s", refresh_time="%s", refreshable_quantity="%s" WHERE unique_id="%s";' % (code, merchandise, code, merchandise_quantity, code, currency_type, code, currency_type_price, refresh_time, refreshable_quantity, unique_id)
 		return await self._execute_statement_update(world, sql_str)
 
-	async def _set_role_segment_by_id(self, world: int, unique_id: str, role: str, segment: int):
-		return await self._execute_statement_update(world, 'UPDATE `' + role + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
 
-	async def _get_role_segment(self, world: int, unique_id: str, role: str) -> int:
-		data = await self._execute_statement(world, 'SELECT segment FROM `' + role + '` WHERE unique_id = "' + unique_id + '";')
-		return int(data[0][0])
-
-	async def _get_role_star(self, world: int, unique_id: str, role: str) -> dict:
-		data = await self._execute_statement(world, 'SELECT ' + role + ' FROM role_bag WHERE unique_id = "' + unique_id + '";')
-		return int(data[0][0])
-
-	async def _set_role_star(self, world: int, unique_id: str, weapon: str, star: int):
-		return await self._execute_statement_update(world, 'UPDATE role_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";')
-
+# start 2019年8月5日16点29分 houyao TODO This method needs to be modified
 	async def _default_fortune_wheel(self, world: int, uid: str, cost_item: str, tier: str):
 		# 0 - get item success
 		# 1 - get weapon item success
@@ -1278,14 +1266,14 @@ class GameManager:
 			return self._message_typesetting(98, 'insufficient materials')
 		tier_choice = (random.choices(self._lottery['fortune_wheel']['names'], self._lottery['fortune_wheel']['weights'][tier]))[0]
 		random_item = (random.choices(self._lottery['fortune_wheel']['items'][tier_choice]))[0]
-		try_result = await self.try_diamond(world, uid, 0)
+		try_result = await self.try_diamond(world, uid, 0)  # TODO What is the role? try_result has not been used since
 
 		# TODO THIS SHIT NEEDS TO BE REFACTORED
 		if random_item == 'coin':
 			try_result = await self.try_coin(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
 		elif random_item == 'energy':
 			try_result = await self.try_energy(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
-			return self._message_typesetting(0, 'get item success', {'remaining' : {'keys' : try_result['data']['keys'], 'values' : try_result['data']['values']}, 'reward' : {'keys' : [random_item], 'values' : [self._lottery['fortune_wheel']['reward'][tier][random_item]]}})
+			return self._message_typesetting(0, 'get item success', {'remaining' : {try_result['data']['keys'] : try_result['data']['values']}, 'reward' : {random_item : self._lottery['fortune_wheel']['reward'][tier][random_item]}})
 		elif random_item == 'diamond':
 			try_result = await self.try_diamond(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
 		elif random_item == 'skill_scroll_10':
@@ -1300,6 +1288,7 @@ class GameManager:
 				message_dic = {
 					"remaining" :
 					{
+						cost_item: result["remaining"],
 						"weapon" : try_result['data']['values'][0],
 						'star' : try_result['data']['values'][1],
 						'segment' : try_result['data']['values'][2]
@@ -1320,6 +1309,7 @@ class GameManager:
 					message_dic = {
 						"remaining":
 						{
+							cost_item: result["remaining"],
 							"skill_id" : try_result['data']['keys'][0],
 							'skill_level' : try_result['data']['values'][0]
 						},
@@ -1333,6 +1323,7 @@ class GameManager:
 					message_dic = {
 						'remaining' :
 						{
+							cost_item: result["remaining"],
 							'scroll_id' : try_result['data']['keys'][0],
 							'scroll_quantity' : try_result['data']['values'][0]
 						},
@@ -1347,8 +1338,8 @@ class GameManager:
 				return self._message_typesetting(97, 'skill operation error')
 		else:
 			return self._message_typesetting(96, 'item name error')
-		return self._message_typesetting(3, 'get item success', {'remaining' : {'keys' : [random_item], 'values' : [try_result['remaining']]}, 'reward' : {'keys' : [random_item], 'values' : [self._lottery['fortune_wheel']['reward'][tier][random_item]]}})
-
+		return self._message_typesetting(3, 'get item success', {'remaining' : {cost_item : result["remaining"], random_item : [try_result['remaining']]}, 'reward' : {random_item : self._lottery['fortune_wheel']['reward'][tier][random_item]}})
+# end   2019年8月5日16点30分 houyao
 
 
 
@@ -1430,6 +1421,12 @@ class GameManager:
 
 	async def try_friend_gift(self, world: int, unique_id: str, value: int) -> dict:
 		return await self._try_material(world, unique_id, 'friend_gift', value)
+
+	async def try_fortune_wheel_ticket_basic(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'fortune_wheel_ticket_basic', value)
+
+	async def try_fortune_wheel_ticket_pro(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'fortune_wheel_ticket_pro', value)
 # end    2019年8月5日10点59分 houyao
 
 	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str, summon_item: str):
@@ -1987,53 +1984,21 @@ async def __friend_summon(request: web.Request) -> web.Response:
 # end   2019年8月5日11点22分 houyao
 
 
-# TODO port over
-@ROUTES.post('/basic_summon_skill')
-async def __basic_summon(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon_skill', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
-
-# TODO port over
-@ROUTES.post('/pro_summon_skill')
-async def __pro_summon(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/pro_summon_skill', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
-
-# TODO port over
-@ROUTES.post('/friend_summon_skill')
-async def __pro_summon(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/friend_summon_skill', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
-
-# TODO port over
-@ROUTES.post('/basic_summon_roles')
-async def __basic_summon(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon_roles', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
-
-# TODO port over
-@ROUTES.post('/pro_summon_roles')
-async def __pro_summon(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/pro_summon_roles', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
-
-# TODO port over
-@ROUTES.post('/friend_summon_roles')
-async def __pro_summon(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/friend_summon_roles', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
-
-# TODO port over
+# start 2019年8月5日15点51分 houyao
 @ROUTES.post('/fortune_wheel_basic')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/fortune_wheel_basic', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+	result = await (request.app['MANAGER']).fortune_wheel_basic(int(post['world']), post['unique_id'], post['cost_item'])
+	return _json_response(result)
 
-# TODO port over
+
 @ROUTES.post('/fortune_wheel_pro')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(json.loads(requests.post('http://localhost:8006' + '/fortune_wheel_pro', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+	result = await (request.app['MANAGER']).fortune_wheel_pro(int(post['world']), post['unique_id'], post['cost_item'])
+	return _json_response(result)
+# end   2019年8月5日16点14分 houyao
+
 
 @ROUTES.post('/automatically_refresh_store')
 async def __automatically_refresh_store(request: web.Request) -> web.Response:
