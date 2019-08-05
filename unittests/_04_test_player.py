@@ -335,4 +335,6 @@ if __name__ == "__main__":
 	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
 	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
 	# end   ########################################################
-	all_function(unique_id="4")
+	enter_stage(stage=1)
+	enter_tower(stage=1)
+	# all_function(unique_id="4")

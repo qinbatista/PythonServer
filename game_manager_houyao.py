@@ -1480,13 +1480,11 @@ class GameManager:
 		else:
 			return self._message_typesetting(95, 'item name error')
 		return self._message_typesetting(3, 'get item success', {'remaining' : {cost_item : result["remaining"], random_item : [try_result['remaining']]}, 'reward' : {random_item : self._lottery['fortune_wheel']['reward'][tier][random_item]}})
-# end   2019年8月5日16点30分 houyao
-
-
 
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
-		data = await self._execute_statement(world, 'SELECT energy, recover_time, FROM player WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world, f"SELECT energy, recover_time FROM player WHERE unique_id='{unique_id}';")
 		return int(data[0][0]), data[0][1]
+# end   2019年8月5日19点41分 houyao
 
 	async def _decrease_energy(self, world:int, unique_id: str, amount: int) -> dict:
 		current_energy, recover_time = await self._get_energy_information(world, unique_id)
