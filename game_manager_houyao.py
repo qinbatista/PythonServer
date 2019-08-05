@@ -23,9 +23,9 @@ class GameManager:
 
 
 
-	#############################################################################
-	#						 Bag Module Functions								#
-	#############################################################################
+#############################################################################
+#						 Bag Module Functions								#
+#############################################################################
 	async def get_all_head(self, world: int, table: str) -> dict:
 		"""
 		Used to get information such as the title of the database
@@ -48,59 +48,56 @@ class GameManager:
 	async def get_all_supplies(self, world: int, unique_id: str) -> dict:
 		# success ===> 0
 		data_tuple = (await self.get_all_head(world, table="player"))["remaining"]
-		heads = []
-		for col in data_tuple:
-			heads.append(col[0])
 		content = list((await self.get_all_material(world, unique_id=unique_id))["remaining"])
-		heads.pop(0)
-		content.pop(0)
-		return self._message_typesetting(0, "get supplies success", {"keys": heads, "values": content})
+		remaining = {}
+		for i in range(1, len(data_tuple)):
+			remaining.update({data_tuple[i][0]: content[i]})
+		return self._message_typesetting(0, "get supplies success", {"remaining": remaining})
 
 	async def add_supplies(self, world: int, unique_id: str, supply: str, value: int):
 		# success ===> 0
 		if value <= 0: return self._message_typesetting(9, "not a positive number")
 		data = await self._try_material(world, unique_id, supply, value)
 		if data["status"] == 0:
-			return self._message_typesetting(0, "success", {"keys": [supply], "values": [data["remaining"]]})
-		return self._message_typesetting(1, "failure")
+			return self._message_typesetting(status=0, message="success", data={"remaining": {supply: data["remaining"]}})
+		return self._message_typesetting(status=1, message="failure")
 
 	async def level_up_scroll(self, world: int, unique_id: str, scroll_id: str) -> dict:
 		# 0 success
-		# 1 advanced reels are not upgradeable
-		# 2 insufficient scroll
-		# 3 unexpected parameter
-		# 4 parameter error
-		# 9 database operation error
-		if scroll_id == "skill_scroll_100": return self._message_typesetting(1, "advanced reels are not upgradeable!")
+		# 95 advanced reels are not upgradeable
+		# 96 insufficient scroll
+		# 97 unexpected parameter --> scroll_id
+		# 98 parameter error
+		# 99 database operation error
+		if scroll_id == "skill_scroll_100": return self._message_typesetting(status=95, message="advanced reels are not upgradeable!")
 		try:
 			scroll_id_count = await self._get_material(world, unique_id, scroll_id)
 			if int(scroll_id_count) < 3:
-				return self._message_typesetting(2, "Insufficient scroll")
+				return self._message_typesetting(status=96, message="Insufficient scroll")
 			elif scroll_id == "skill_scroll_10":
 				dict1 = await self.try_skill_scroll_10(world, unique_id, -3)
 				dict2 = await self.try_skill_scroll_30(world, unique_id, 1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
-					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_10", "skill_scroll_30"], "values": [dict1["remaining"], dict2["remaining"]]})
+					return self._message_typesetting(status=99, message="database operation error!")
+				return self._message_typesetting(status=0, message="level up scroll success!", data={"remaining": {"skill_scroll_10": dict1["remaining"], "skill_scroll_30": dict2["remaining"]}})
 			elif scroll_id == "skill_scroll_30":
 				dict1 = await self.try_skill_scroll_30(world, unique_id, -3)
 				dict2 = await self.try_skill_scroll_100(world, unique_id, 1)
 				if dict1["status"] == 1 or dict2["status"] == 1:
-					return self._message_typesetting(9, "database operation error!")
-				return self._message_typesetting(0, "level up scroll success!", {"keys": ["skill_scroll_30", "skill_scroll_100"], "values": [dict1["remaining"], dict2["remaining"]]})
+					return self._message_typesetting(status=99, message="database operation error!")
+				return self._message_typesetting(status=0, message="level up scroll success!", data={"remaining": {"skill_scroll_30": dict1["remaining"], "skill_scroll_100": dict2["remaining"]}})
 			else:
-				return self._message_typesetting(3, message="unexpected parameter --> " + scroll_id)
+				return self._message_typesetting(status=97, message="unexpected parameter --> " + scroll_id)
 		except:
-			return self._message_typesetting(4, 'parameter error!')
+			return self._message_typesetting(status=98, message='parameter error!')
 
-	# houyao
 	# TODO rename function - it is private and only called by pass_stage function
 	async def try_pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		stage_data = self._stage_reward["stage"]
 		sql_stage = await self._get_material(world, unique_id, "stage")
 		if stage <= 0 or sql_stage + 1 < stage:
 			return self._internal_format(status=9, remaining=0)  # abnormal data!
-		material_dict = {}
+		material_dict = {"stage": 0}
 		for key, value in stage_data[str(stage)].items():
 			material_dict.update({key: value})
 		if sql_stage + 1 == stage:  # 通过新关卡
@@ -124,15 +121,15 @@ class GameManager:
 		# - 5 - 能量尚未完全恢复，能量更新成功 === Energy has not fully recovered, successful energy update
 		# - 6 - 能量刷新后已消耗，能量值及恢复时间更新成功 === After refreshing the energy, the energy value and recovery time are successfully updated.
 		# - 7 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功 === Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully
-		# - 8 - 参数错误 === Parameter error
-		# - 9 - 无足够能量消耗 === Not enough energy consumption
-		# - 10 - 数据库操作错误 === Database operation error
+		# - 97 - 参数错误 === Parameter error
+		# - 98 - 无足够能量消耗 === Not enough energy consumption
+		# - 99 - 数据库操作错误 === Database operation error
 		full_energy=self._player["energy"]["max_energy"]
 		if amount > 0:
 			data = (await self._decrease_energy(world, unique_id, 0))["data"]
 			json_data = await self._try_material(world, unique_id, "energy", amount)
 			if int(json_data["status"]) == 1:
-				return self._message_typesetting(10, "Database operation error")
+				return self._message_typesetting(status=99, message="Database operation error")
 			elif int(json_data["remaining"] >= full_energy):
 				sql_str = "UPDATE player SET recover_time = '' WHERE unique_id = '%s';" % unique_id
 				await self._execute_statement_update(world, sql_str)
@@ -150,7 +147,7 @@ class GameManager:
 						data["values"][i] = json_data["remaining"]
 				return self._message_typesetting(1, "Purchase energy successfully, energy is not fully restored", data)
 		elif full_energy + amount < 0:
-			return self._message_typesetting(8, "Parameter error")
+			return self._message_typesetting(status=97, message="Parameter error")
 		else:
 			return await self._decrease_energy(world, unique_id, abs(amount))
 
@@ -190,15 +187,15 @@ class GameManager:
 	async def try_small_energy_potion(self, world: int, unique_id: str, value: int) -> dict:
 		return await self._try_material(world, unique_id, 'small_energy_potion', value)
 
-	#############################################################################
-	#						End Bag Module Functions							#
-	#############################################################################
+#############################################################################
+#						End Bag Module Functions							#
+#############################################################################
 
 
 
-	#############################################################################
-	#						 Skill Module Functions								#
-	#############################################################################
+#############################################################################
+#						 Skill Module Functions								#
+#############################################################################
 
 	# TODO ensure SQL UPDATE statement succeeds
 	# TODO error checking for valid skill_id?
@@ -206,25 +203,24 @@ class GameManager:
 		# success ===> 0 and 1
 		# 0 - upgrade success
 		# 1 - upgrade unsuccessful
-		# 2 - User does not have that skill
-		# 3 - Invalid scroll id
-		# 4 - User does not have enough scrolls
-		# 9 - Skill already at max level
+		# 96 - User does not have that skill
+		# 97 - Invalid scroll id
+		# 98 - User does not have enough scrolls
+		# 99 - Skill already at max level
 		skill_level = await self._get_skill_level(world, unique_id, skill_id)
 		if skill_level == 0:
-			return self._message_typesetting(2, 'User does not have that skill')
+			return self._message_typesetting(96, 'User does not have that skill')
 		elif skill_level >= 10:
-			return self._message_typesetting(9, 'Skill already max level')
+			return self._message_typesetting(99, 'Skill already max level')
 		elif scroll_id not in self._skill_scroll_functions:
-			return self._message_typesetting(3, 'Invalid scroll id')
+			return self._message_typesetting(97, 'Invalid scroll id')
 		resp = await eval('self.try_' + scroll_id + '(world, unique_id, -1)')
 		if resp['status'] == 1:
-			return self._message_typesetting(4, 'User does not have enough scrolls')
+			return self._message_typesetting(98, 'User does not have enough scrolls')
 		if not self._roll_for_upgrade(scroll_id):
-			return self._message_typesetting(1, 'upgrade unsuccessful', {'keys' : [skill_id, scroll_id], 'values' : [skill_level, resp['remaining']]})
+			return self._message_typesetting(1, 'upgrade unsuccessful', {'remaining': {skill_id: skill_level, scroll_id: resp['remaining']}})
 		await self._execute_statement(world, 'UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
-		return self._message_typesetting(0, 'upgrade success', {'keys' : [skill_id, scroll_id], 'values' : [skill_level + 1, resp['remaining']]})
-
+		return self._message_typesetting(0, 'upgrade success', {'remaining': {skill_id: skill_level + 1, scroll_id: resp['remaining']}})
 
 
 	async def get_all_skill_level(self, world: int, unique_id: str) -> dict:
@@ -232,20 +228,19 @@ class GameManager:
 		# 0 - Success
 		names = await self._execute_statement(world, 'DESCRIBE skill;')
 		values = await self._execute_statement(world, 'SELECT * from skill WHERE unique_id = "' + str(unique_id) + '";')
-		key_list = []
-		value_list = []
+		remaining = {}
 		for num, val in enumerate(zip(names[1:], values[0][1:])):
-			key_list.append(val[0][0])
-			value_list.append(val[1])
-		return self._message_typesetting(0, 'success', {"keys": key_list, "values": value_list})
+			remaining.update({val[0][0]: val[1]})
+		return self._message_typesetting(0, 'success', {"remaining": remaining})
+
 
 	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
 		# success ===> 0
 		# 0 - Success
-		# 1 - invalid skill name
+		# 99 - invalid skill name
 		try:
 			level = await self._get_skill_level(world, unique_id, skill_id)
-			return self._message_typesetting(0, 'success', {'keys': [skill_id], 'values': [level]})
+			return self._message_typesetting(0, 'success', {'remaining': {skill_id: level}})
 		except:
 			return self._message_typesetting(1, 'invalid skill name')
 
@@ -264,16 +259,16 @@ class GameManager:
 			return self._internal_format(2, 'Invalid skill name')
 
 
-	#############################################################################
-	#						End Skill Module Functions							#
-	#############################################################################
+#############################################################################
+#						End Skill Module Functions							#
+#############################################################################
 
 
-	#############################################################################
-	#						Weapon Module Functions								#
-	#############################################################################
+#############################################################################
+#						Weapon Module Functions								#
+#############################################################################
 
-	# houyao
+
 	async def level_up_weapon(self, world: int, unique_id: str, weapon: str, iron: int) -> dict:
 		# - 0 - Success
 		# - 95 - User does not have that weapon
@@ -283,11 +278,12 @@ class GameManager:
 		# - 99 - Weapon already max level
 		row = await self._get_row_by_id(world, weapon, unique_id)
 		if row[2] == 0:
-			return self._message_typesetting(status=95, message='User does not have that weapon')
-		if row[3] == 100:  # weapon_level
+			return self._message_typesetting(95, 'User does not have that weapon')
+		if row[3] == 100:
 			return self._message_typesetting(status=99, message='Weapon already max level')
+
 		skill_upgrade_number = iron // self._standard_iron_count
-		data_tuple = (await self.get_all_head(world, "weapon"))['remaining']
+		data_tuple = (await self.get_all_head(world, 'weapon'))['remaining']
 		head = [x[0] for x in data_tuple]
 		level_count = head.index('weapon_level')
 		point_count = head.index('skill_point')
@@ -300,19 +296,20 @@ class GameManager:
 			return self._message_typesetting(status=96, message='Incoming materials are not upgraded enough')
 		data = await self.try_iron(world, unique_id, -1 * skill_upgrade_number * self._standard_iron_count)
 		if int(data['status']) == 1:
-			return self._message_typesetting(status=97, message='Insufficient materials, upgrade failed')
-		sql_str = "update weapon set "
+			return self._message_typesetting(97, 'Insufficient materials, upgrade failed')
+		sql_str = 'UPDATE weapon SET '
 		for i in range(len(head)):
-			if head[i] != "unique_id" and head[i] != "weapon_name":
-				sql_str += head[i] + "=" + str(row[i]) + ","
-		sql_str = sql_str[:len(sql_str) - 1] + f" where unique_id='{unique_id}' and weapon_name='{weapon}'"
-		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
-			return self._message_typesetting(status=98, message='Database operation error')
-		remaining = {"iron": data["remaining"]}
+			if head[i] != 'unique_id' and head[i] != 'weapon_name':
+				sql_str += head[i] + '=' + str(row[i]) + ','
+		sql_str = sql_str[:-1] + f' WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'
+		if await self._execute_statement_update(world, sql_str) == 0:
+			return self._message_typesetting(98, 'Database operation error')
+		remaining = {'iron' : data['remaining']}
 		for i in range(len(head)):
-			remaining.update({head[i]: row[i]})
-		remaining.pop("unique_id")
+			remaining.update({head[i] : row[i]})
+		remaining.pop('unique_id')
 		return self._message_typesetting(status=0, message='success', data={'remaining': remaining})
+
 
 	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str) -> dict:
 		# - 0 - Success
@@ -325,25 +322,26 @@ class GameManager:
 			return self._message_typesetting(status=96, message="User does not have that weapon")
 		if passive not in self._valid_passive_skills:
 			return self._message_typesetting(status=99, message="Passive skill does not exist")
-		data_tuple = (await self.get_all_head(world, "weapon"))["remaining"]
+		data_tuple = (await self.get_all_head(world, 'weapon'))["remaining"]
 		head = [x[0] for x in data_tuple]
+		row = await self._get_row_by_id(world, weapon, unique_id)
 		point_count = head.index("skill_point")
 		passive_count = head.index(passive)
 		if row[point_count] == 0:
 			return self._message_typesetting(status=97, message="Insufficient skill points, upgrade failed")
 		row[point_count] -= 1
 		row[passive_count] += 1
-		sql_str = "update weapon set "
+		sql_str = 'UPDATE weapon SET '
 		for i in range(len(head)):
-			if head[i] != "unique_id" and head[i] != "weapon_name":
-				sql_str += head[i] + "=" + str(row[i]) + ","
-		sql_str = sql_str[:len(sql_str) - 1] + f" where unique_id='{unique_id}' and weapon_name='{weapon}'"
-		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
-			return self._message_typesetting(status=98, message="Database operation error")
+			if head[i] != 'unique_id' and head[i] != 'weapon_name':
+				sql_str += head[i] + '=' + str(row[i]) + ','
+		sql_str = sql_str[:-1] + f' WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'
+		if await self._execute_statement_update(world, sql_str) == 0:
+			return self._message_typesetting(98, 'Database operation error')
 		remaining = {}
 		for i in range(len(head)):
-			remaining.update({head[i]: row[i]})
-		remaining.pop("unique_id")
+			remaining.update({head[i] : row[i]})
+		remaining.pop('unique_id')
 		return self._message_typesetting(status=0, message="success", data={"remaining": remaining})
 
 
@@ -351,31 +349,30 @@ class GameManager:
 		# - 0 - Weapon upgrade success
 		# - 98 - insufficient segment, upgrade failed
 		# - 99 - Skill has been reset or database operation error!
-		data_tuple = (await self.get_all_head(world, "weapon"))["remaining"]
+		data_tuple = (await self.get_all_head(world, 'weapon'))["remaining"]
 		head = [x[0] for x in data_tuple]
 		row = await self._get_row_by_id(world, weapon, unique_id)
 
-		star_count = head.index("weapon_star")
-		segment_count = self._standard_segment_count * (1 + row[star_count])  # 根据武器星数增加碎片的消耗数量
+		star_count = head.index('weapon_star')
+		segment_count = self._standard_segment_count * (1 + row[star_count])
 
 		if int(row[head.index("segment")]) < segment_count:
-			return self._message_typesetting(status=98, message="Insufficient segments, upgrade failed!")
+			return self._message_typesetting(98, "Insufficient segments, upgrade failed!")
 
 		row[head.index("segment")] = int(row[head.index("segment")]) - segment_count
 		row[star_count] += 1
-		sql_str = "update weapon set "
+		sql_str = 'UPDATE weapon SET '
 		for i in range(len(head)):
-			if head[i] != "unique_id" and head[i] != "weapon_name":
-				sql_str += head[i] + "=" + str(row[i]) + ","
-		sql_str = sql_str[:len(sql_str) - 1] + f" where unique_id='{unique_id}' and weapon_name='{weapon}'"
-		print(sql_str)
-		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
-			return self._message_typesetting(status=99, message="Skill has been reset or database operation error!")
+			if head[i] != 'unique_id' and head[i] != 'weapon_name':
+				sql_str += head[i] + '=' + str(row[i]) + ','
+		sql_str = sql_str[:-1] + f' WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'
+		if await self._execute_statement_update(world, sql_str) == 0:
+			return self._message_typesetting(99, 'Skill has been reset or database operation error!')
 		remaining = {}
 		for i in range(len(head)):
 			remaining.update({head[i]: row[i]})
-		remaining.pop("unique_id")
-		return self._message_typesetting(status=0, message=weapon + " upgrade success!", data={"remaining": remaining})
+		remaining.pop('unique_id')
+		return self._message_typesetting(0, weapon + " upgrade success!", {"remaining": remaining})
 
 	async def reset_weapon_skill_point(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Success
@@ -385,30 +382,31 @@ class GameManager:
 
 		row = await self._get_row_by_id(world, weapon, unique_id)
 		if row[2] == 0:
-			return self._message_typesetting(status=97, message="no weapon!")
+			return self._message_typesetting(97, 'no weapon!')
 		data = await self.try_coin(world, unique_id, -1 * self._standard_reset_weapon_skill_coin_count)
 		if int(data["status"]) == 1:
-			return self._message_typesetting(status=98, message="Insufficient gold coins, upgrade failed")
+			return self._message_typesetting(98, "Insufficient gold coins, upgrade failed")
 
-		data_tuple = (await self.get_all_head(world, "weapon"))["remaining"]
+		data_tuple = (await self.get_all_head(world, 'weapon'))["remaining"]
 		head = [x[0] for x in data_tuple]
 
 		row[head.index("skill_point")] = row[head.index("weapon_level")]
 		row[head.index("passive_skill_1_level")] = row[head.index("passive_skill_2_level")] = row[head.index("passive_skill_3_level")] = row[head.index("passive_skill_4_level")] = 0
 
-		sql_str = "update weapon set "
+		sql_str = 'UPDATE weapon SET '
 		for i in range(len(head)):
-			if head[i] != "unique_id" and head[i] != "weapon_name":
-				sql_str += head[i] + "=" + str(row[i]) + ","
-		sql_str = sql_str[:len(sql_str) - 1] + f" where unique_id='{unique_id}' and weapon_name='{weapon}'"
-		if await self._execute_statement_update(world=world, statement=sql_str) == 0:
-			return self._message_typesetting(status=99, message="Database operation error!")
+			if head[i] != 'unique_id' and head[i] != 'weapon_name':
+				sql_str += head[i] + '=' + str(row[i]) + ','
+		sql_str = sql_str[:-1] + f' WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'
 
-		remaining = {"coin": data["remaining"]}
+		if await self._execute_statement_update(world, sql_str) == 0:
+			return self._message_typesetting(99, 'Database operation error')
+
+		remaining = {'coin' : data['remaining']}
 		for i in range(len(head)):
 			remaining.update({head[i]: row[i]})
-		remaining.pop("unique_id")
-		return self._message_typesetting(status=0, message=weapon + " reset skill point success!", data={"remaining": remaining})
+		remaining.pop('unique_id')
+		return self._message_typesetting(0, weapon + " reset skill point success!", {"remaining": remaining})
 
 	# TODO CHECK FOR SPEED IMPROVEMENTS
 	async def get_all_weapon(self, world: int, unique_id: str) -> dict:
@@ -416,493 +414,49 @@ class GameManager:
 		data_tuple = (await self.get_all_head(world, "weapon"))["remaining"]
 		col_name_list = [x[0] for x in data_tuple]
 
-		sql_str = 'SELECT * FROM weapon WHERE unique_id = "' + unique_id + '";'
-		row = await self._execute_statement(world=world, statement=sql_str)
+		row = await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}";')
 		remaining = {}
 		for i in range(0, len(row)):
 			weapon = {}
 			for j in range(2, len(row[i])):
-				weapon.update({col_name_list[j]: row[i][j]})
-			remaining.update({row[i][1]: weapon})
-		return self._message_typesetting(status=0, message="gain success", data={"remaining": remaining})
-
+				weapon.update({col_name_list[j] : row[i][j]})
+			remaining.update({row[i][1] : weapon})
+		return self._message_typesetting(0, "gain success", {"remaining": remaining})
 
 	# TODO INTERNAL USE only?????
 	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
 		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 99 - no weapon!
+		# - 2 - no weapon!
 		try:
 			star = await self._get_weapon_star(world, unique_id, weapon)
 			if star != 0:
 				segment = await self._get_segment(world, unique_id, weapon) + 30
 				await self._set_segment_by_id(world, unique_id, weapon, segment)
-				return self._message_typesetting(status=1, message='Weapon already unlocked, got free segment!', data={"keys": ['weapon', 'segment'], "values": [weapon, segment]})
+				return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'star', 'segment'], "values": [weapon, star, segment]})
 			await self._set_weapon_star(world, unique_id, weapon, 1)
-			return self._message_typesetting(status=0, message='Unlocked new weapon!', data={"keys": ["weapon"], "values": [weapon]})
+			return self._message_typesetting(0, 'Unlocked new weapon!', {"keys": ["weapon", 'star', 'segment'], "values": [weapon, 1, 0]})
 		except:
-			return self._message_typesetting(status=99, message='no weapon!')
+			return self._message_typesetting(2, 'no weapon!')
+
+	async def try_unlock_role(self, world: int, unique_id: str, role: str) -> dict:
+		# - 0 - Unlocked new role!   ===> {"keys": ["role"], "values": [role]}
+		# - 1 - Role already unlocked, got free segment   ===>  {"keys": ['role', 'segment'], "values": [role, segment]}
+		# - 2 - no role!
+		star = await self._get_role_star(world, unique_id, role)
+		if star != 0:
+			segment = await self._get_role_segment(world, unique_id, role) + 30
+			await self._set_role_segment_by_id(world, unique_id, role, segment)
+			return self._message_typesetting(1, 'Role already unlocked, got free segment', {'keys' : ['role', 'star', 'segment'], 'values' : [role, star, segment]})
+		await self._set_role_star(world, unique_id, role, 1)
+		return self._message_typesetting(0, 'Unlocked new role!', {'keys' : ['role', 'star', 'segment'], 'values' : [role, 1, 0]})
 
-
-
-
-
-	#############################################################################
-	#						End Weapon Module Functions							#
-	#############################################################################
-
-
-
-
-
-
-
-
-	#############################################################################
-	#						Stage Module Functions								#
-	#############################################################################
-
-	# houyao
-	# TODO CHECK SPEED IMPROVEMENTS
-	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
-		# 0 - success
-		# 97 - database operation error
-		# 98 - key insufficient
-		# 99 - parameter error
-		enter_stage_data = self._entry_consumables["stage"]
-		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
-			return self._message_typesetting(99, "Parameter error")
-		keys = list(enter_stage_data[str(stage)].keys())
-		values = [-v for v in list(enter_stage_data[str(stage)].values())]
-		if "energy" in keys:
-			await self.try_energy(world=world, unique_id=unique_id, amount=0)
-		material_dict = {}
-		for i in range(len(keys)):
-			material_dict.update({keys[i]: values[i]})
-
-		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-		select_values = (await self._execute_statement(world, select_str))[0]
-		for i in range(len(select_values)):
-			values[i] = int(values[i]) + int(select_values[i])
-			if values[i] < 0:
-				return self._message_typesetting(98, "%s insufficient" % keys[i])
-
-		if await self._execute_statement_update(world, update_str) == 0:
-			return self._message_typesetting(status=97, message="database operating error")
-		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
-
-	# houyao
-	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
-		# success ===> 0
-		# 0 : passed customs ===> success
-		# 98 : database operation error
-		# 99 : abnormal data!
-		json_data = await self.try_pass_stage(world, unique_id, stage)
-		status = int(json_data["status"])
-		if status == 9:
-			return self._message_typesetting(99, "abnormal data!")
-		elif status == 1:
-			return self._message_typesetting(98, "database operation error")
-		else:
-			material_dict = json_data["remaining"][0]
-			data = {"keys": list(material_dict.keys()), "values": json_data["remaining"][1], "rewards": list(material_dict.values())}
-			return self._message_typesetting(0, "passed customs!", data)
-
-
-	#############################################################################
-	#						End Stage Module Functions							#
-	#############################################################################
-
-
-
-
-	#############################################################################
-	#						Lottery Module Functions							#
-	#############################################################################
-
-	async def random_gift_skill(self, world: int, unique_id: str, kind: str) -> dict:
-		# success ===> 0 and 1
-		# 0 - unlocked new skill            {"skill_id": skill_id, "value": value}
-		# 1 - you received a free scroll    {"skill_scroll_id": skill_scroll_id, "value": value}
-		# 2 - invalid skill name
-		# 3 - database operation error
-		tier_choice = (random.choices(self._lottery['skills']['names'], self._lottery['skills']['weights'][kind]))[0]
-		gift_skill  = (random.choices(self._lottery['skills']['items'][tier_choice]))[0]
-		data = await self.try_unlock_skill(world, unique_id, gift_skill)
-		status = int(data['status'])
-		if status == 0:
-			return self._message_typesetting(0, 'unlocked new skill', {'keys' : [gift_skill], 'values': [1]})
-		elif status == 1:  # skill already unlocked
-			if tier_choice == 'skilltier1':
-				skill_scroll_id = 'skill_scroll_10'
-				data = await self.try_skill_scroll_10(world, unique_id, 1)
-			elif tier_choice == 'skilltier2':
-				skill_scroll_id = 'skill_scroll_30'
-				data = await self.try_skill_scroll_30(world, unique_id, 1)
-			else:
-				skill_scroll_id = 'skill_scroll_100'
-				data = await self.try_skill_scroll_100(world, unique_id, 1)
-			if data['status'] != 0:
-				return self._message_typesetting(3, 'Database operation error')
-			return self._message_typesetting(1, 'You received a free scroll', {'keys' : [skill_scroll_id], 'values' : [data['remaining']]})
-		else:
-			return self._message_typesetting(2, 'Invalid skill name')
-
-
-	async def random_gift_segment(self, world: int, unique_id: str, kind: str) -> dict:
-		# success ===> 0 and 1
-		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 99 - no weapon!
-		tier_choice = (random.choices(self._lottery['weapons']['names'], self._lottery['weapons']['weights'][kind]))[0]
-		gift_weapon = (random.choices(self._lottery['weapons']['items'][tier_choice]))[0]
-		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
-
-	async def basic_summon(self, world: int, unique_id: str, cost_item: str) -> dict:
-		# 0 - unlocked new skill or weapon
-		# 1 - you received free scroll or segments
-		# 2 - invalid skill name
-		# 3 - database operation error
-		# 4 - insufficient material
-		# 5 - cost_item error
-		return await self._default_summon(world, unique_id, cost_item, 'basic')
-
-	async def pro_summon(self, world: int, unique_id: str, cost_item: str) -> dict:
-		# 0 - unlocked new skill or weapon
-		# 1 - you received free scroll or segments
-		# 2 - invalid skill name
-		# 3 - database operation error
-		# 4 - insufficient material
-		# 5 - cost_item error
-		return await self._default_summon(world, unique_id, cost_item, 'pro')
-
-
-	async def friend_summon(self, world: int, unique_id: str, cost_item: str) -> dict:
-		# 0 - unlocked new skill or weapon
-		# 1 - you received free scroll or segments
-		# 2 - invalid skill name
-		# 3 - database operation error
-		# 4 - insufficient material
-		# 5 - cost_item error
-		return await self._default_summon(world, unique_id, cost_item, 'friend')
-
-	async def fortune_wheel_basic(self, world: int, unique_id: str, cost_item: str) -> dict:
-		return await self._default_fortune_wheel(world, unique_id, cost_item, 'basic')
-
-	async def fortune_wheel_pro(self, world: int, unique_id: str, cost_item: str) -> dict:
-		return await self._default_fortune_wheel(world, unique_id, cost_item, 'pro')
-
-
-
-	#############################################################################
-	#						End Lottery Module Functions						#
-	#############################################################################
-
-
-
-
-
-	#############################################################################
-	#							Private Functions								#
-	#############################################################################
-
-	async def _default_fortune_wheel(self, world: int, uid: str, cost_item: str, tier: str):
-		# 0 - get item success
-		# 2 - invalid skill name
-		# 3 - database operation error
-		# 4 - insufficient material
-		# 5 - cost_item error
-		if cost_item == 'diamond':
-			result = await self.try_diamond(world, uid, -int(self._lottery['fortune_wheel']['cost']['diamond']))
-		elif cost_item == 'fortune_wheel_ticket':
-			result = await self.try_basic_summon_scroll(world, uid, -int(self._lottery['fortune_wheel']['cost']['fortune_wheel_ticket']))
-		elif cost_item == 'fortune_wheel_ticket_10_times':
-			result = await self.try_basic_summon_scroll(world, uid, -10*int(self._lottery['fortune_wheel']['cost']['fortune_wheel_ticket']))
-		else:
-			return self._message_typesetting(5, 'cost_item error')
-		if result['status'] != 0:
-			return self._message_typesetting(4, 'insufficient materials')
-		tier_choice = (random.choices(self._lottery['fortune_wheel']['names'], self._lottery['fortune_wheel']['weights'][tier]))[0]
-		random_item = (random.choices(self._lottery['fortune_wheel']['items'][tier_choice]))[0]
-		try_result = await self.try_diamond(world, uid, 0)
-
-		# TODO THIS SHIT NEEDS TO BE REFACTORED
-		if random_item == 'coin':
-			try_result = await self.try_coin(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
-		elif random_item == 'energy':
-			try_result = await self.try_energy(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
-			return self._message_typesetting(0, 'get item success', {'remaining' : {'keys' : try_result['data']['keys'], 'values' : try_result['data']['values']}, 'reward' : {'keys' : [random_item], 'values' : [self._lottery['fortune_wheel']['reward'][tier][random_item]]}})
-		elif random_item == 'diamond':
-			try_result = await self.try_diamond(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
-		elif random_item == 'skill_scroll_10':
-			try_result = await self.try_skill_scroll_10(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
-		elif random_item == 'skill_scroll_30':
-			try_result = await self.try_skill_scroll_30(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
-		elif random_item == 'skill_scroll_100':
-			try_result = await self.try_skill_scroll_100(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
-		elif random_item == 'weapon':
-			try_result = await self.random_gift_segment(world, uid, tier)
-			return self._message_typesetting(0, 'get item success', {'remaining' : try_result['data']})
-		elif random_item == 'skill':
-			try_result = await self.random_gift_skill(world, uid, tier)
-			return self._message_typesetting(0, 'get item success', {'remaining' : try_result['data']})
-		else:
-			return self._message_typesetting(3, 'item name error')
-		return self._message_typesetting(0, 'get item success', {'remaining' : {'keys' : [random_item], 'values' : [try_result['remaining']]}, 'reward' : {'keys' : [random_item], 'values' : [self._lottery['fortune_wheel']['reward'][tier][random_item]]}})
-
-
-
-
-	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
-		data = await self._execute_statement(world, 'SELECT energy, recover_time, FROM player WHERE unique_id = "' + unique_id + '";')
-		return int(data[0][0]), data[0][1]
-
-	async def _decrease_energy(self, world:int, unique_id: str, amount: int) -> dict:
-		current_energy, recover_time = await self._get_energy_information(world, unique_id)
-		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		full_energy=self._player["energy"]["max_energy"]
-		_cooling_time=self._player["energy"]["cooling_time"]
-		if recover_time == '':  # 此时 current_energy == self._full_energy 成立
-			if amount == 0:  # 成功1：如果没有恢复时间且是获取能量值，则直接拿取数据库的值给客户端
-				return self._message_typesetting(2, 'Get energy successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, -1]})
-			current_energy -= amount
-			# 成功2：如果没有恢复时间且是消耗能量值，则直接用数据库的值减去消耗的能量值，
-			# 然后存入消耗之后的能量值，以及将当前的时间存入 恢复时间项
-			if current_energy >= full_energy: current_time = ""  # 能量超出满能力状态时，不计算恢复时间
-			cooling_time = _cooling_time * 60
-			await self._execute_statement_update(world, 'UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
-			return self._message_typesetting(3, 'Energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, current_time, cooling_time]})
-		else:
-			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
-			recovered_energy = delta_time.seconds // 60 // _cooling_time
-			if amount == 0:
-				# 成功3：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
-				# 满足上限的情况：直接将满能量值和空字符串分别存入能量值项和恢复时间项
-				if current_energy + recovered_energy >= full_energy:
-					recover_time, current_energy, cooling_time = "", full_energy, -1
-					await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
-					return self._message_typesetting(status=4, message='Energy has been fully restored, successful energy update', data={"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
-				# 成功4：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
-				# 不满足上限的情况：将能恢复的能量值计算出来，并且计算恢复后的能量值current_energy
-				# 和恢复时间与恢复能量消耗的时间相减的恢复时间值
-				else:
-					recover_time, current_energy = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * _cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy
-					delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
-					cooling_time = 60 * _cooling_time - delta_time.seconds
-					await self._execute_statement_update(world=world, statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
-					return self._message_typesetting(status=5, message='Energy has not fully recovered, successful energy update', data={"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
-
-			# recover_time, current_energy = ("", self._full_energy) if (current_energy + recovered_energy >= self._full_energy) else ((datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy)
-			# await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
-			# return self.message_typesetting(status=0, message='Energy has been recovered and energy is successfully acquired', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
-			if recovered_energy + current_energy >= full_energy:
-				# 成功5：如果有恢复时间且是消耗能量
-				# 满足上限的情况是用上限能量值减去要消耗的能量值，然后设置减去之后的能量值和当前的时间分别存入能量值项和恢复时间项
-				current_energy = full_energy - amount
-				cooling_time = _cooling_time * 60
-				await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
-				return self._message_typesetting(6, 'After refreshing the energy, the energy value and recovery time are successfully updated.', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
-			elif recovered_energy + current_energy - amount >= 0:
-				# 成功6：如果有恢复时间且是消耗能量
-				# 不满足上限的情况是用当前数据库的能量值和当前恢复的能量值相加然后减去消耗的能量值为要存入数据库的能量值项
-				# 数据库中的恢复时间与恢复能量消耗的时间相减的恢复时间值存入到数据库的恢复时间项
-				current_energy = recovered_energy + current_energy - amount
-				recover_time = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * _cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
-				delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
-				cooling_time = 60 * _cooling_time - delta_time.seconds
-				await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
-				return self._message_typesetting(7, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
-			else:  # 发生的情况是当前能量值和恢复能量值相加比需要消耗的能量值少
-				return self._message_typesetting(status=9, message="Not enough energy consumption")
-
-
-
-
-
-
-
-	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str):
-		summon_item = random.choice(['weapons', 'skills'])
-		if cost_item == 'diamond':
-			result = await self.try_diamond(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['diamond']))
-		elif cost_item == 'basic_summon_scroll':
-			result = await self.try_basic_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['basic_summon_scroll']))
-		elif cost_item == 'basic_summon_scroll_10_times':
-			result = await self.try_basic_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost']['basic_summon_scroll']))
-		else:
-			return self._message_typesetting(5, 'cost_item error')
-		if result['status'] != 0:
-			return self._message_typesetting(4, 'insufficient materials')
-		if summon_item == 'skills':
-			return await self.random_gift_skill(world, unique_id, tier)
-		else:
-			return await self.random_gift_segment(world, unique_id, tier)
-
-	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
-		return await self._execute_statement_update(world, f"UPDATE weapon SET weapon_star={star}  WHERE unique_id='{unique_id}' and weapon_name='{weapon}';")
-
-	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
-		data = await self._execute_statement(world, f"SELECT segment FROM weapon WHERE unique_id='{unique_id}' and weapon_name='{weapon}';")
-		return int(data[0][0])
-
-	async def _set_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
-		return await self._execute_statement_update(world, f"UPDATE weapon SET segment={segment}  WHERE unique_id='{unique_id}' and weapon_name='{weapon}';")
-
-	async def _get_weapon_star(self, world: int, unique_id: str, weapon: str) -> int:
-		data = await self._execute_statement(world, f"SELECT weapon_star FROM weapon WHERE unique_id='{unique_id}' and weapon_name='{weapon}';")
-		return int(data[0][0])
-
-	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> list:
-		try:
-			return list((await self._execute_statement(world, f"select * from weapon where unique_id='{unique_id}' and weapon_name='{weapon}'"))[0])
-		except:
-			await self._execute_statement(world, f"insert into weapon (unique_id, weapon_name) values ('{unique_id}','{weapon}')")
-			return list((await self._execute_statement(world, f"select * from weapon where unique_id='{unique_id}' and weapon_name='{weapon}'"))[0])
-
-
-
-
-	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> int:
-		data = await self._execute_statement(world, 'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
-		return int(data[0][0])
-
-
-	def _roll_for_upgrade(self, scroll_id: str) -> bool:
-		return random.random() < self._upgrade_chance[scroll_id]
-
-	async def _try_material(self, world: int, unique_id: str, material: str, value: int) -> dict:
-		"""
-		Try to change the database information
-		A status of 0 is a success and a 1 is a failure.
-		Return json data format
-		尝试更改数据库信息
-		状态为0表示成功，1表示失败。
-		返回json数据格式
-		:param unique_id:用户唯一识别码
-		:param key:材料名
-		:param value: 改变的材料值，正数是加运算，负数是减运算，0是给值
-		:return:返回数据格式为 {"status": status, "remaining": remaining}
-		"""
-		num = await self._get_material(world, unique_id, material)
-		if value == 0: return self._internal_format(0, num)
-		num += value
-		if num < 0: return self._internal_format(1, num)
-		if await self._update_material(world, unique_id, material, num) == 0:
-			return self._internal_format(1, num)
-		return self._internal_format(status=0, remaining=num)
-
-	async def _get_material(self, world: int, unique_id: str, material: str) -> int or str:
-		"""
-		Used to get numeric or string information
-		用于获取数字或字符串信息
-		:param unique_id: 用户的唯一标识
-		:param material:材料名
-		:return:返回材料名对应的值
-		"""
-		data = await self._execute_statement(world, 'SELECT ' + material + ' FROM player WHERE unique_id="' + str(unique_id) + '";')
-		return data[0][0]
-
-	async def _update_material(self, world: int, unique_id: str, material: str, value: int) -> int:
-		"""
-		Used to set information such as numeric values
-		用于设置数值等信息
-		:param unique_id:用户唯一识别码
-		:param material:材料名
-		:param material_value:要设置的材料对应的值
-		:return:返回是否更新成功的标识，1为成功，0为失败
-		"""
-		return await self._execute_statement_update(world, 'UPDATE player SET ' + material + '=' + str(value) + ' where unique_id="' + unique_id + '";')
-
-
-	def _sql_str_operating(self, unique_id: str, material_dict: dict, key_word: list = []) -> (str, str):
-		update_str = "UPDATE player SET "
-		update_end_str = " where unique_id='%s'" % unique_id
-		select_str = "SELECT "
-		select_end_str = " FROM player WHERE unique_id='%s'" % unique_id
-		for key in material_dict.keys():
-			if key in key_word:
-				update_str += "%s='%s', " % (key, material_dict[key])
-			else:
-				update_str += "%s=%s+%s, " % (key, key, material_dict[key])
-			select_str += "%s, " % key
-		update_str = update_str[: len(update_str) - 2] + update_end_str
-		select_str = select_str[: len(select_str) - 2] + select_end_str
-		return update_str, select_str
-
-	async def _execute_statement(self, world: int, statement: str) -> tuple:
-		"""
-		Executes the given statement and returns the result.
-		执行给定的语句并返回结果。
-		:param statement: Mysql执行的语句
-		:return: 返回执行后的二维元组表
-		"""
-		async with await self._pools[world].Connection() as conn:
-			async with conn.cursor() as cursor:
-				await cursor.execute(statement)
-				data = cursor.fetchall()
-				return data
-
-	async def _execute_statement_update(self, world: int, statement: str) -> int:
-		"""
-		Execute the update or set statement and return the result.
-		执行update或set语句并返回结果。
-		:param statement: Mysql执行的语句
-		:return: 返回update或者是set执行的结果
-		"""
-		async with await self._pools[world].Connection() as conn:
-			async with conn.cursor() as cursor:
-				return await cursor.execute(statement)
-
-
-	def _internal_format(self, status: int, remaining: int or tuple or list or str) -> dict:
-		"""
-		Internal json formatted information
-		内部json格式化信息
-		:param status:状态标识0：成功，1：失败
-		:param remaining:改变后的结果
-		:return:json格式：{"status": status, "remaining": remaining}
-		"""
-		return {"status": status, "remaining": remaining}
-
-	def _message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
-		"""
-		Format the information
-		:param message:说明语句
-		:param data:json数据
-		:return:返回客户端需要的json数据
-		"""
-		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
-
-
-	def _refresh_configuration(self):
-		r = requests.get('http://localhost:8000/get_game_manager_config')
-		d = r.json()
-		self._stage_reward = d['reward']
-		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
-		self._upgrade_chance = d['skill']['upgrade_chance']
-		self._standard_iron_count = d['weapon']['standard_iron_count']
-		self._standard_segment_count = d['weapon']['standard_segment_count']
-		self._standard_reset_weapon_skill_coin_count = d['weapon']['standard_reset_weapon_skill_coin_count']
-		self._valid_passive_skills = d['weapon']['valid_passive_skills']
-		self._lottery = d['lottery']
-		self._player = d['player']
-		self._hang_reward_list = d['hang_reward']
-		self._entry_consumables = d['entry_consumables']
-
-	def _start_timer(self, seconds: int):
-		t = threading.Timer(seconds, self._refresh_configuration)
-		t.daemon = True
-		t.start()
-
-	#  #########################  houyao  ##########################
 	async def disintegrate_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
-		# success ===> 0
-		# 0 : Successful weapon decomposition
-		# 1 : User does not have this weapon
-		# 2 : Insufficient diamond
-		# 3 : self._player not updated
-		# 4 : database operation error
-		# try:
+		# 0 - successful weapon decomposition
+		# 1 - User does not have that weapon
+		# 2 - insufficient diamond
+		# 3 - self._player is not updated
+		# 4 - database operation error
 		cost = self._player["disintegrate_weapon"]["cost"]  # cost is dict
 		reward = self._player["disintegrate_weapon"]["reward"]  # dict
 		weapon_tier = [
@@ -958,7 +512,179 @@ class GameManager:
 			}
 		}
 		return self._message_typesetting(status=0, message="Successful weapon decomposition", data=data)
-		# except: return self._message_typesetting(status=9, message="Wrong name of weapon")
+
+
+
+
+#############################################################################
+#						End Weapon Module Functions							#
+#############################################################################
+
+
+
+
+
+
+
+
+#############################################################################
+#						Stage Module Functions								#
+#############################################################################
+
+	# TODO CHECK SPEED IMPROVEMENTS
+	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
+		# 0 - success
+		# 97 - database operation error
+		# 98 - key insufficient
+		# 99 - parameter error
+		enter_stage_data = self._entry_consumables["stage"]
+		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
+			return self._message_typesetting(99, "Parameter error")
+		keys = list(enter_stage_data[str(stage)].keys())
+		values = [-v for v in list(enter_stage_data[str(stage)].values())]
+		remaining = {}
+		material_dict = {}
+		if "energy" in keys:
+			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")])
+			if energy_data["status"] >= 97:
+				return self._message_typesetting(status=96, message="Insufficient physical strength")
+			num = keys.index("energy")
+			keys.pop(num)
+			values.pop(num)
+			for i in range(len(energy_data["data"]["keys"])):
+				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
+		for i in range(len(keys)):
+			material_dict.update({keys[i]: values[i]})
+
+		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
+		select_values = (await self._execute_statement(world, select_str))[0]
+		for i in range(len(select_values)):
+			values[i] = int(values[i]) + int(select_values[i])
+			if values[i] < 0:
+				return self._message_typesetting(98, "%s insufficient" % keys[i])
+
+		if await self._execute_statement_update(world, update_str) == 0:
+			return self._message_typesetting(status=97, message="database operating error")
+		for i in range(len(keys)):
+			remaining.update({keys[i]: values[i]})
+		return self._message_typesetting(0, "success", {"remaining": remaining})
+
+	async def pass_stage(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
+		# success ===> 0
+		# 0 : passed customs ===> success
+		# 98 : database operation error
+		# 99 : abnormal data!
+		json_data = await self.try_pass_stage(world, unique_id, stage)
+		status = int(json_data["status"])
+		if status == 9:
+			return self._message_typesetting(status=99, message="abnormal data!")
+		elif status == 1:
+			return self._message_typesetting(status=98, message="database operation error")
+		else:
+			reward = json_data["remaining"][0]
+			keys = list(reward.keys())
+			values = json_data["remaining"][1]
+			remaining = {}
+			for i in range(len(keys)):
+				remaining.update({keys[i]: values[i]})
+			reward.pop("stage")
+			return self._message_typesetting(status=0, message="passed customs!", data={"remaining": remaining, "reward": reward})
+
+	async def enter_tower(self, world: int, unique_id: str, stage: int) -> dict:
+		# 0 - success
+		# 97 - database operation error
+		# 98 - key insufficient
+		# 99 - parameter error
+		enter_tower_data = self._entry_consumables["tower"]
+		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")):
+			return self._message_typesetting(99, "Parameter error")
+		keys = list(enter_tower_data[str(stage)].keys())
+		values = [-v for v in list(enter_tower_data[str(stage)].values())]
+		remaining = {}
+		material_dict = {}
+		if "energy" in keys:
+			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")])
+			if energy_data["status"] >= 97:
+				return self._message_typesetting(status=96, message="Insufficient physical strength")
+			num = keys.index("energy")
+			keys.pop(num)
+			values.pop(num)
+			for i in range(len(energy_data["data"]["keys"])):
+				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
+		for i in range(len(keys)):
+			material_dict.update({keys[i]: values[i]})
+
+		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
+		select_values = (await self._execute_statement(world, select_str))[0]
+		for i in range(len(select_values)):
+			values[i] = int(values[i]) + int(select_values[i])
+			if values[i] < 0:
+				return self._message_typesetting(98, "%s insufficient" % keys[i])
+
+		if await self._execute_statement_update(world, update_str) == 0:
+			return self._message_typesetting(status=97, message="database operating error")
+		for i in range(len(keys)):
+			remaining.update({keys[i]: values[i]})
+		return self._message_typesetting(0, "success", {"remaining": remaining})
+
+	async def pass_tower(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
+		# 0 - Earn rewards success
+		# 1 - Successfully unlock new skills
+		# 2 - Gain a scroll
+		# 3 - Gain weapon fragments
+		# 94 - weapon -> database operating error
+		# 95 - skill -> database operating error
+		# 96 - Accidental prize -> key
+		# 97 - pass_tower_data -> database operation error
+		# 99 - parameter error
+		pass_tower_data = self._stage_reward["tower"]
+		sql_stage = int(await self._get_material(world,  unique_id, "tower_stage"))
+		if stage <= 0 or stage > sql_stage + 1:
+			return self._message_typesetting(99, "Parameter error")
+
+		if stage % 10 != 0:
+			material_dict = {"tower_stage": 0}
+			for key, value in pass_tower_data[str(stage)].items():
+				material_dict.update({key: value})
+			if sql_stage + 1 == stage:  # 通过新关卡
+				material_dict.update({"tower_stage": 1})
+			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
+			if await self._execute_statement_update(world, update_str) == 0:
+				return self._message_typesetting(status=97, message="pass_tower_data -> database operating error")
+			keys = list(material_dict.keys())
+			values = list((await self._execute_statement(world=world, statement=select_str))[0])
+			remaining = {}
+			for i in range(len(keys)):
+				remaining.update({keys[i]: values[i]})
+			material_dict.pop("tower_stage")
+			return self._message_typesetting(status=0, message="Earn rewards success", data={"remaining": remaining, "reward": material_dict})
+		else:
+			reward = random.choices(population=pass_tower_data[str(stage)])[0]
+			if reward in pass_tower_data["skill"]:
+				reward_data = await self.try_unlock_skill(world=world, unique_id=unique_id, skill_id=reward)
+				if reward_data["status"] == 0:
+					tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage", value=1 if sql_stage + 1 == stage else 0))["remaining"]
+					return self._message_typesetting(status=1, message="Successfully unlock new skills", data={"remaining": {reward: 1, "tower_stage": tower_stage}, "reward": {reward: 1}})
+				else:
+					scroll = random.choices(population=pass_tower_data["skill_scroll"], weights=pass_tower_data["weights"])[0]
+					scroll_data = await self._try_material(world=world, unique_id=unique_id, material=scroll, value=1)
+					if scroll_data["status"] == 1:
+						return self._message_typesetting(status=95, message="skill -> database operating error")
+					tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage", value=1 if sql_stage + 1 == stage else 0))["remaining"]
+					return self._message_typesetting(status=2, message="Gain a scroll", data={"remaining": {scroll: scroll_data["remaining"], "tower_stage": tower_stage}, "reward": {scroll: 1}})
+			elif reward in pass_tower_data["weapon"]:  # weapon
+				if len(pass_tower_data["segment"]) == 2:
+					segment = random.randint(pass_tower_data["segment"][0], pass_tower_data["segment"][1])
+				else:
+					segment = pass_tower_data["segment"][0]
+				sql_str = "update %s set segment=segment+%s where unique_id='%s'" % (reward, segment, unique_id)
+				if await self._execute_statement_update(world=world, statement=sql_str) == 0:
+					return self._message_typesetting(status=94, message="weapon -> database operating error")
+				segment_result = await self._get_segment(world=world, unique_id=unique_id, weapon=reward)
+				tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage", value=1 if sql_stage + 1 == stage else 0))["remaining"]
+				return self._message_typesetting(status=3, message="Gain weapon fragments", data={"remaining": {"weapon": reward, "segment": segment_result, "tower_stage": tower_stage}, "reward": {"segment": segment}})
+			else:
+				return self._message_typesetting(status=96, message="Accidental prize -> " + reward)
 
 	async def start_hang_up(self, world: int, unique_id: str, stage: int) -> dict:
 		"""
@@ -1082,400 +808,18 @@ class GameManager:
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
 
-	#  houyao  自动刷新商店
-	async def automatically_refresh_store(self, world: int, unique_id: str) -> dict:
-		"""
-		success ===> 0 and 1
-		# 0 - First refresh market success
-		# 1 - Refresh market success
-		# 2 - Refresh time is not over yet, market information has been obtained
-		# 98 - Unexpected element, please update the configuration table
-		# 99 - database operating error
-		"""
-		dark_market_data = self._player['dark_market']
-		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=1)
-		remaining = {}
-		if refresh_time == "":  # 玩家第一次进入黑市
-			refreshable_quantity = 3
-			refresh_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-			# 筛选出8个商品所在的层级
-			tier_choice = random.choices(population=dark_market_data['names'], weights=dark_market_data['weights'], k=8)
-			key_list = [(random.choices(population=dark_market_data[tier], k=1))[0] for tier in tier_choice]  # 筛选出具体的关键值
-			print("tier_choice:" + str(tier_choice))
-			print("key_list:" + str(key_list))
-			for i in range(len(key_list)):
-				merchandise = key_list[i]
-				code = i + 1
-				if merchandise in dark_market_data["weapon"]:  # 所属种类为武器，奖励碎片
-					currency_type = (random.choices(population=list(dark_market_data['segment'].keys()), k=1))[0]
-					merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]["quantity_min"]), int(dark_market_data['segment'][currency_type]["quantity_max"]))
-					currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]["cost_range_min"]), int(dark_market_data['segment'][currency_type]["cost_range_max"]))
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市刷新出现严重问题")
-						return self._message_typesetting(status=99, message="database operating error")
-				elif merchandise in dark_market_data["skill"]:  # 所属种类为技能，如果数据库中存在此技能，则奖励随机奖励卷轴
-					currency_type = (random.choices(population=list(dark_market_data['reward_skill'].keys()), k=1))[0]
-					merchandise_quantity = 1
-					currency_type_price = random.randint(int(dark_market_data['reward_skill'][currency_type]["cost_range_min"]), int(dark_market_data['reward_skill'][currency_type]["cost_range_max"]))
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市刷新出现严重问题")
-						return self._message_typesetting(status=99, message="database operating error")
-				elif merchandise in dark_market_data["other"].keys():
-					currency_type = (random.choices(population=list(dark_market_data['other'][merchandise].keys()), k=1))[0]
-					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]["quantity_min"]), int(dark_market_data['other'][merchandise][currency_type]["quantity_max"]))
-					currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]["cost_range_min"]), int(dark_market_data['other'][merchandise][currency_type]["cost_range_max"]))
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市刷新出现严重问题")
-						return self._message_typesetting(status=99, message="database operating error")
-				else:
-					return self._message_typesetting(status=98, message="Unexpected element, please update the configuration table")
-				remaining.update({"merchandise%s" % code: merchandise, "merchandise%s_quantity" % code: merchandise_quantity, "currency_type%s" % code: currency_type, "currency_type%s_price" % code: currency_type_price})
-			remaining.update({"refresh_time": refresh_time, "refreshable_quantity": int(refreshable_quantity)})
-			return self._message_typesetting(status=0, message="First refresh market success", data={"remaining": remaining})
-		else:
-			current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')
-			if delta_time.total_seconds() // 3600 >= 3:
-				frequency = delta_time.total_seconds() // 3600 // 3  # 计算出能增加的免费刷新次数
-				refreshable_quantity += frequency  # 增加免费刷新次数
-				if refreshable_quantity > 3:
-					refreshable_quantity = 3
-				# 重置刷新黑市的时间
-				refresh_time = (datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S') + timedelta(hours=frequency * 3)).strftime("%Y-%m-%d %H:%M:%S")
-
-				# 筛选出8个商品所在的层级
-				tier_choice = random.choices(population=dark_market_data['names'], weights=dark_market_data['weights'], k=8)
-				key_list = [(random.choices(population=dark_market_data[tier], k=1))[0] for tier in tier_choice]  # 筛选出具体的关键值
-				print("tier_choice:" + str(tier_choice))
-				print("key_list:" + str(key_list))
-				for i in range(len(key_list)):
-					merchandise = key_list[i]
-					code = i + 1
-					if merchandise in dark_market_data["weapon"]:  # 所属种类为武器，奖励碎片
-						currency_type = (random.choices(population=list(dark_market_data['segment'].keys()), k=1))[0]
-						merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]["quantity_min"]), int(dark_market_data['segment'][currency_type]["quantity_max"]))
-						currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]["cost_range_min"]), int(dark_market_data['segment'][currency_type]["cost_range_max"]))
-						if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-							print("数据库操作错误，黑市刷新出现严重问题")
-							return self._message_typesetting(status=99, message="database operating error")
-					elif merchandise in dark_market_data["skill"]:  # 所属种类为技能，如果数据库中存在此技能，则奖励随机奖励卷轴
-						currency_type = (random.choices(population=list(dark_market_data['reward_skill'].keys()), k=1))[0]
-						merchandise_quantity = 1
-						currency_type_price = random.randint(int(dark_market_data['reward_skill'][currency_type]["cost_range_min"]), int(dark_market_data['reward_skill'][currency_type]["cost_range_max"]))
-						if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-							print("数据库操作错误，黑市刷新出现严重问题")
-							return self._message_typesetting(status=99, message="database operating error")
-					elif merchandise in dark_market_data["other"].keys():
-						currency_type = (random.choices(population=list(dark_market_data['other'][merchandise].keys()), k=1))[0]
-						merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]["quantity_min"]), int(dark_market_data['other'][merchandise][currency_type]["quantity_max"]))
-						currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]["cost_range_min"]), int(dark_market_data['other'][merchandise][currency_type]["cost_range_max"]))
-						if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-							print("数据库操作错误，黑市刷新出现严重问题")
-							return self._message_typesetting(status=99, message="database operating error")
-					else:
-						return self._message_typesetting(status=98, message="Unexpected element, please update the configuration table")
-					remaining.update({"merchandise%s" % code: merchandise, "merchandise%s_quantity" % code: merchandise_quantity, "currency_type%s" % code: currency_type, "currency_type%s_price" % code: currency_type_price})
-				remaining.update({"refresh_time": refresh_time, "refreshable_quantity": int(refreshable_quantity)})
-				return self._message_typesetting(status=1, message="Refresh market success", data={"remaining": remaining})
-			else:
-				headers = [x[0] for x in list(await self._execute_statement(world, "desc dark_market;"))]
-				content = (await self._execute_statement(world=world, statement="select * from dark_market where unique_id='%s'" % unique_id))[0]
-				for i in range(len(headers)):
-					remaining.update({headers[i]: content[i]})
-				remaining.pop("unique_id")
-				return self._message_typesetting(status=2, message="Refresh time is not over yet, market information has been obtained", data={"remaining": remaining})
-
-	#  houyao  手动刷新商店
-	async def manually_refresh_store(self, world: int, unique_id: str) -> dict:
-		"""
-		success ===> 0
-		# 0 - Refresh market success
-		# 97 - Insufficient refreshable quantity
-		# 98 - Unexpected element, please update the configuration table
-		# 99 - database operating error
-		"""
-		dark_market_data = self._player['dark_market']
-		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=1)
-		remaining = {}
-		if refreshable_quantity > 0:
-			if refreshable_quantity == 3:  # 如果满足3次免费刷新，使用时则重置刷新开始时间
-				refresh_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-			refreshable_quantity -= 1
-			# 筛选出8个商品所在的层级
-			tier_choice = random.choices(population=dark_market_data['names'], weights=dark_market_data['weights'], k=8)
-			key_list = [(random.choices(population=dark_market_data[tier], k=1))[0] for tier in tier_choice]  # 筛选出具体的关键值
-			print("tier_choice:" + str(tier_choice))
-			print("key_list:" + str(key_list))
-			for i in range(len(key_list)):
-				merchandise = key_list[i]
-				code = i + 1
-				if merchandise in dark_market_data["weapon"]:  # 所属种类为武器，奖励碎片
-					currency_type = (random.choices(population=list(dark_market_data['segment'].keys()), k=1))[0]
-					merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]["quantity_min"]), int(dark_market_data['segment'][currency_type]["quantity_max"]))
-					currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]["cost_range_min"]), int(dark_market_data['segment'][currency_type]["cost_range_max"]))
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市刷新出现严重问题")
-						return self._message_typesetting(status=99, message="database operating error")
-				elif merchandise in dark_market_data["skill"]:  # 所属种类为技能，如果数据库中存在此技能，则奖励随机奖励卷轴
-					currency_type = (random.choices(population=list(dark_market_data['reward_skill'].keys()), k=1))[0]
-					merchandise_quantity = 1
-					currency_type_price = random.randint(int(dark_market_data['reward_skill'][currency_type]["cost_range_min"]), int(dark_market_data['reward_skill'][currency_type]["cost_range_max"]))
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市刷新出现严重问题")
-						return self._message_typesetting(status=99, message="database operating error")
-				elif merchandise in dark_market_data["other"].keys():
-					currency_type = (random.choices(population=list(dark_market_data['other'][merchandise].keys()), k=1))[0]
-					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]["quantity_min"]), int(dark_market_data['other'][merchandise][currency_type]["quantity_max"]))
-					currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]["cost_range_min"]), int(dark_market_data['other'][merchandise][currency_type]["cost_range_max"]))
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市刷新出现严重问题")
-						return self._message_typesetting(status=99, message="database operating error")
-				else:
-					return self._message_typesetting(status=98, message="Unexpected element, please update the configuration table")
-				remaining.update({"merchandise%s" % code: merchandise, "merchandise%s_quantity" % code: merchandise_quantity, "currency_type%s" % code: currency_type, "currency_type%s_price" % code: currency_type_price})
-			remaining.update({"refresh_time": refresh_time, "refreshable_quantity": int(refreshable_quantity)})
-			return self._message_typesetting(status=0, message="Refresh market success", data={"remaining": remaining})
-		else:
-			return self._message_typesetting(status=97, message="Insufficient refreshable quantity")
-
-	#  houyao  钻石刷新商店
-	async def diamond_refresh_store(self, world: int, unique_id: str) -> dict:
-		"""
-		success ===> 0
-		# 0 - Refresh market success
-		# 97 - Insufficient diamond
-		# 98 - Unexpected element, please update the configuration table
-		# 99 - database operating error
-		"""
-		dark_market_data = self._player['dark_market']
-		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=1)
-		diamond_data = await self.try_diamond(world=world, unique_id=unique_id, value=-1 * int(dark_market_data["diamond_refresh_store"]["diamond"]))
-		remaining = {"diamond": diamond_data["remaining"]}
-		if diamond_data["status"] == 1:
-			return self._message_typesetting(status=97, message="Insufficient diamond")
-		else:
-			# refresh_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-			# 筛选出8个商品所在的层级
-			tier_choice = random.choices(population=dark_market_data['names'], weights=dark_market_data['weights'], k=8)
-			key_list = [(random.choices(population=dark_market_data[tier], k=1))[0] for tier in tier_choice]  # 筛选出具体的关键值
-			print("tier_choice:" + str(tier_choice))
-			print("key_list:" + str(key_list))
-			for i in range(len(key_list)):
-				merchandise = key_list[i]
-				code = i + 1
-				if merchandise in dark_market_data["weapon"]:  # 所属种类为武器，奖励碎片
-					currency_type = (random.choices(population=list(dark_market_data['segment'].keys()), k=1))[0]
-					merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]["quantity_min"]), int(dark_market_data['segment'][currency_type]["quantity_max"]))
-					currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]["cost_range_min"]), int(dark_market_data['segment'][currency_type]["cost_range_max"]))
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市刷新出现严重问题")
-						return self._message_typesetting(status=99, message="database operating error")
-				elif merchandise in dark_market_data["skill"]:  # 所属种类为技能，如果数据库中存在此技能，则奖励随机奖励卷轴
-					currency_type = (random.choices(population=list(dark_market_data['reward_skill'].keys()), k=1))[0]
-					merchandise_quantity = 1
-					currency_type_price = random.randint(int(dark_market_data['reward_skill'][currency_type]["cost_range_min"]), int(dark_market_data['reward_skill'][currency_type]["cost_range_max"]))
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市刷新出现严重问题")
-						return self._message_typesetting(status=99, message="database operating error")
-				elif merchandise in dark_market_data["other"].keys():
-					currency_type = (random.choices(population=list(dark_market_data['other'][merchandise].keys()), k=1))[0]
-					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]["quantity_min"]), int(dark_market_data['other'][merchandise][currency_type]["quantity_max"]))
-					currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]["cost_range_min"]), int(dark_market_data['other'][merchandise][currency_type]["cost_range_max"]))
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise=merchandise, merchandise_quantity=merchandise_quantity, currency_type=currency_type, currency_type_price=currency_type_price, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市刷新出现严重问题")
-						return self._message_typesetting(status=99, message="database operating error")
-				else:
-					return self._message_typesetting(status=98, message="Unexpected element, please update the configuration table")
-				remaining.update({"merchandise%s" % code: merchandise, "merchandise%s_quantity" % code: merchandise_quantity, "currency_type%s" % code: currency_type, "currency_type%s_price" % code: currency_type_price})
-			remaining.update({"refresh_time": refresh_time, "refreshable_quantity": int(refreshable_quantity)})
-			return self._message_typesetting(status=0, message="Refresh market success", data={"remaining": remaining})
-
-	# 黑市交易
-	async def black_market_transaction(self, world: int, unique_id: str, code: int) -> dict:
-		# success ===> 0 , 1 , 2 , 3
-		# 0 : Gain weapon fragments
-		# 1 : Gain new skills
-		# 2 : Gain a scroll
-		# 3 : Gain several materials
-		# 93 : Unexpected element, please update the configuration table
-		# 94 : other -> database operating error
-		# 95 : skill -> database operating error
-		# 96 : weapon -> database operating error
-		# 97 : (diamond or coin) insufficient
-		# 98 : Merchandise has been sold
-		# 99 : Parameter error
-		if code < 1 or code > 8:  # 数据库中只有1-8的商品代号
-			return self._message_typesetting(status=99, message="Parameter error")
-		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world=world, unique_id=unique_id, code=code)
-		if merchandise == "":
-			return self._message_typesetting(status=98, message="Merchandise has been sold")
-		else:
-			dark_market_data = self._player["dark_market"]
-			remaining = {}
-			# weapon
-			if merchandise in dark_market_data["weapon"]:
-				currency_type_data = await self._try_material(world=world, unique_id=unique_id, material=currency_type, value=-1 * currency_type_price)
-				if currency_type_data["status"] == 1:
-					return self._message_typesetting(status=97, message=currency_type + " insufficient")
-				sql_str = "update %s set segment=segment+%s where unique_id='%s'" % (merchandise, merchandise_quantity, unique_id)
-				if await self._execute_statement_update(world=world, statement=sql_str) == 0:
-					return self._message_typesetting(status=96, message="weapon -> database operating error")
-				segment = (await self._execute_statement(world=world, statement="select segment from %s where unique_id='%s'" % (merchandise, unique_id)))[0][0]
-				# code是出售的商品代号，weapon是那把武器，segment是前面指定的武器的碎片数量，
-				# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
-				remaining.update({"code": code, "weapon": merchandise, "segment": segment, currency_type: currency_type_data["remaining"]})
-				if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-					print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
-				return self._message_typesetting(status=0, message="Gain weapon fragments", data={"remaining": remaining})
-			# skill
-			elif merchandise in dark_market_data["skill"]:
-				currency_type_data = await self._try_material(world=world, unique_id=unique_id, material=currency_type, value=-1 * currency_type_price)
-				if currency_type_data["status"] == 1:
-					return self._message_typesetting(status=97, message=currency_type + " insufficient")
-				skill_data = await self.try_unlock_skill(world=world, unique_id=unique_id, skill_id=merchandise)
-				if skill_data["status"] == 0:  # 存在技能，并且奖励技能
-					# code是出售的商品代号，skill是哪个技能，level是前面指定的技能的等级，
-					# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
-					remaining.update({"code": code, "skill": merchandise, "level": 1, currency_type: currency_type_data["remaining"]})
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
-					return self._message_typesetting(status=1, message="Gain new skills", data={"remaining": remaining})
-				else:  # 技能存在则替换成随机获得卷轴
-					scroll = (random.choices(population=dark_market_data["skill_scroll"], cum_weights=[0.7, 0.9, 1]))[0]
-					scroll_data = await self._try_material(world=world, unique_id=unique_id, material=scroll, value=1)
-					if scroll_data["status"] == 1:
-						return self._message_typesetting(status=95, message="skill -> database operating error")
-					# code是出售的商品代号，scroll是哪种类型的卷轴，quantity是前面指定的卷轴的剩余数量，
-					# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
-					remaining.update({"code": code, "scroll": scroll, "quantity": scroll_data["remaining"], currency_type: currency_type_data["remaining"]})
-					if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-						print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
-					return self._message_typesetting(status=2, message="Gain a scroll", data={"remaining": remaining})
-			# other
-			elif merchandise in dark_market_data["other"].keys():
-				currency_type_data = await self._try_material(world=world, unique_id=unique_id, material=currency_type, value=-1 * currency_type_price)
-				if currency_type_data["status"] == 1:
-					return self._message_typesetting(status=97, message=currency_type + " insufficient")
-				other_data = await self._try_material(world=world, unique_id=unique_id, material=merchandise, value=merchandise_quantity)
-				if other_data["status"] == 1:
-					return self._message_typesetting(status=94, message="other -> database operating error")
-				# code是出售的商品代号，merchandise是哪种材料，quantity是前面指定的材料的剩余量，
-				# currency_type是货币类型（暂时只有钻石和金币），currency_type_price是货币剩余数量
-				remaining.update({"code": code, "merchandise": merchandise, "quantity": other_data["remaining"], currency_type: currency_type_data["remaining"]})
-				if await self._set_dark_market_material(world=world, unique_id=unique_id, code=code, merchandise="", merchandise_quantity=0, currency_type="", currency_type_price=0, refresh_time=refresh_time, refreshable_quantity=refreshable_quantity) == 0:
-					print("数据库操作错误，黑市商品重置出现问题code: " + str(code))
-				return self._message_typesetting(status=3, message="Gain several materials", data={"remaining": remaining})
-			else:
-				return self._message_typesetting(status=93, message="Unexpected element, please update the configuration table")
-
-	async def _get_dark_market_material(self, world: int, unique_id: str, code: int) -> tuple:
-		sql_str = "select merchandise%s, merchandise%s_quantity, currency_type%s, currency_type%s_price, refresh_time, refreshable_quantity from dark_market where unique_id='%s'" % (code, code, code, code, unique_id)
-		data = await self._execute_statement(world=world, statement=sql_str)
-		return data[0]
-
-	async def _set_dark_market_material(self, world: int, unique_id: str, code: int, merchandise: str, merchandise_quantity: int, currency_type: str, currency_type_price: int, refresh_time: str, refreshable_quantity: int) -> int:
-		sql_str = "update dark_market set merchandise%s='%s', merchandise%s_quantity=%s, currency_type%s='%s', currency_type%s_price=%s, refresh_time='%s', refreshable_quantity=%s where unique_id='%s'" % (code, merchandise, code, merchandise_quantity, code, currency_type, code, currency_type_price, refresh_time, refreshable_quantity, unique_id)
-		return await self._execute_statement_update(world=world, statement=sql_str)
-#  #########################  houyao   ##########################
-
-	async def enter_tower(self, world: int, unique_id: str, stage: int) -> dict:
-		# success ===> 0
-		# 0 - success
-		# 97 - database operation error
-		# 98 - key insufficient
-		# 99 - parameter error
-		enter_tower_data = self._entry_consumables["tower"]
-		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "tower_stage")):
-			return self._message_typesetting(99, "Parameter error")
-		keys = list(enter_tower_data[str(stage)].keys())
-		values = [-v for v in list(enter_tower_data[str(stage)].values())]
-		if "energy" in keys:
-			await self.try_energy(world=world, unique_id=unique_id, amount=0)
-		material_dict = {}
-		for i in range(len(keys)):
-			material_dict.update({keys[i]: values[i]})
-
-		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-		select_values = (await self._execute_statement(world, select_str))[0]
-		for i in range(len(select_values)):
-			values[i] = int(values[i]) + int(select_values[i])
-			if values[i] < 0:
-				return self._message_typesetting(98, "%s insufficient" % keys[i])
-
-		if await self._execute_statement_update(world, update_str) == 0:
-			return self._message_typesetting(status=97, message="database operating error")
-		remaining = {}
-		for i in range(len(keys)):
-			remaining.update({keys[i]: values[i]})
-		return self._message_typesetting(0, "success", {"remaining": remaining})
-		# return self._message_typesetting(0, "success", {"keys": keys, "values": values})
-
-	async def pass_tower(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
-		# success ===> 0 , 1 , 2 , 3
-		# 0 - Earn rewards success
-		# 1 - Successfully unlock new skills
-		# 2 - Gain a scroll
-		# 3 - Gain weapon fragments
-		# 94 - weapon -> database operating error
-		# 95 - skill -> database operating error
-		# 96 - Accidental prize -> key
-		# 97 - pass_tower_data -> database operation error
-		# 99 - parameter error
-		pass_tower_data = self._stage_reward["tower"]
-		sql_stage = int(await self._get_material(world,  unique_id, "tower_stage"))
-		if stage <= 0 or stage > sql_stage + 1:
-			return self._message_typesetting(99, "Parameter error")
-
-		if stage % 10 != 0:
-			material_dict = {}
-			for key, value in pass_tower_data[str(stage)].items():
-				material_dict.update({key: value})
-			if sql_stage + 1 == stage:  # 通过新关卡
-				material_dict.update({"tower_stage": 1})
-			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-			if await self._execute_statement_update(world, update_str) == 0:
-				return self._message_typesetting(status=97, message="pass_tower_data -> database operating error")
-			keys = list(material_dict.keys())
-			values = list((await self._execute_statement(world=world, statement=select_str))[0])
-			remaining_dict = {}
+	async def show_energy(self, world: int, unique_id: str):
+		data = await self.try_energy(world=world, unique_id=unique_id, amount=0)
+		_data = data["data"]
+		if "keys" in _data:
+			keys = _data["keys"]
+			values = _data["values"]
+			data_dict = {}
 			for i in range(len(keys)):
-				remaining_dict.update({keys[i]: values[i]})
-			if sql_stage + 1 == stage:
-				material_dict.pop("tower_stage")
-			return self._message_typesetting(status=0, message="Earn rewards success", data={"remaining": remaining_dict, "reward": material_dict})
-			# return self._message_typesetting(status=0, message="Earn rewards success", data={"keys": keys, "values": values, "rewards": list(material_dict.values())})
-		else:
-			reward = random.choices(population=pass_tower_data[str(stage)])[0]
-			if reward in pass_tower_data["skill"]:
-				reward_data = await self.try_unlock_skill(world=world, unique_id=unique_id, skill_id=reward)
-				if reward_data["status"] == 0:
-					tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage", value=1 if sql_stage + 1 == stage else 0))["remaining"]
-					return self._message_typesetting(status=1, message="Successfully unlock new skills", data={"remaining": {reward: 1, "tower_stage": tower_stage}, "reward": {reward: 1}})
-					# return self._message_typesetting(status=1, message="Successfully unlock new skills", data={"keys": [reward, "tower_stage"], "values": [1, tower_stage], "rewards": [1, -1]})
-				else:
-					scroll = random.choices(population=pass_tower_data["skill_scroll"], weights=pass_tower_data["weights"])[0]
-					scroll_data = await self._try_material(world=world, unique_id=unique_id, material=scroll, value=1)
-					if scroll_data["status"] == 1:
-						return self._message_typesetting(status=95, message="skill -> database operating error")
-					tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage", value=1 if sql_stage + 1 == stage else 0))["remaining"]
-					return self._message_typesetting(status=2, message="Gain a scroll", data={"remaining": {scroll: scroll_data["remaining"], "tower_stage": tower_stage}, "reward": {scroll: 1}})
-					# return self._message_typesetting(status=2, message="Gain a scroll", data={"keys": [scroll, "tower_stage"], "values": [scroll_data["remaining"], tower_stage], "rewards": [1, -1]})
-			elif reward in pass_tower_data["weapon"]:  # weapon
-				if len(pass_tower_data["segment"]) == 2:
-					segment = random.randint(pass_tower_data["segment"][0], pass_tower_data["segment"][1])
-				else:
-					segment = pass_tower_data["segment"][0]
-				sql_str = "update %s set segment=segment+%s where unique_id='%s'" % (reward, segment, unique_id)
-				if await self._execute_statement_update(world=world, statement=sql_str) == 0:
-					return self._message_typesetting(status=94, message="weapon -> database operating error")
-				segment_result = await self._get_segment(world=world, unique_id=unique_id, weapon=reward)
-				tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage", value=1 if sql_stage + 1 == stage else 0))["remaining"]
-				return self._message_typesetting(status=3, message="Gain weapon fragments", data={"remaining": {"weapon": reward, "segment": segment_result, "tower_stage": tower_stage}, "reward": {"segment": segment}})
-				# return self._message_typesetting(status=3, message="Gain weapon fragments", data={"keys": ["weapon", "segment", "tower_stage"], "values": [reward, segment_result, tower_stage], "rewards": [reward, segment, -1]})
-			else:
-				return self._message_typesetting(status=96, message="Accidental prize -> " + reward)
+				data_dict.update({keys[i]: values[i]})
+			data["data"] = {"remaining": data_dict}
+		return data
 
-	#  #########################  houyao   ##########################
 	async def upgrade_armor(self, world: int, unique_id: str, armor_id: str, level: int) -> dict:
 		"""
 		# success ===> 0
@@ -1512,8 +856,826 @@ class GameManager:
 			await self._execute_statement_update(world=world, statement=f"insert into armor(unique_id, armor_id) values ('{unique_id}','{armor_id}')")
 			return (await self._execute_statement(world=world, statement=sql_str))[0]
 
-	#  #########################  houyao   ##########################
+	
+	async def automatically_refresh_store(self, world: int, unique_id: str) -> dict:
+		"""
+		success -> 0 and 1
+		# 0 - First refresh market success
+		# 1 - Refresh market success
+		# 2 - Refresh time is not over yet, market information has been obtained
+		# 98 - Unexpected element, please update the configuration table
+		# 99 - database operation error
+		"""
+		dark_market_data = self._player['dark_market']
+		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world, unique_id, code = 1)
 
+		remaining = {}
+		if refresh_time == '':
+			refreshable_quantity = 3
+			refresh_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+			tier_choice = random.choices(dark_market_data['names'], dark_market_data['weights'], k = 8)
+			key_list = [(random.choices(dark_market_data[tier], k = 1))[0] for tier in tier_choice]
+			for i in range(len(key_list)):
+				merchandise = key_list[i]
+				code = i + 1
+				if merchandise in dark_market_data['weapon']:
+					currency_type = (random.choices(list(dark_market_data['segment'].keys()), k = 1))[0]
+					merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]['quantity_min']), int(dark_market_data['segment'][currency_type]['quantity_max']))
+					currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]['cost_range_min']), int(dark_market_data['segment'][currency_type]['cost_range_max']))
+					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+						return self._message_typesetting(99, 'database operation error')
+				elif merchandise in dark_market_data['skill']:
+					currency_type = (random.choices(list(dark_market_data['reward_skill'].keys()), k=1))[0]
+					merchandise_quantity = 1
+					currency_type_price = random.randint(int(dark_market_data['reward_skill'][currency_type]['cost_range_min']), int(dark_market_data['reward_skill'][currency_type]['cost_range_max']))
+					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+						return self._message_typesetting(99, 'database operation error')
+				elif merchandise in dark_market_data['other'].keys():
+					currency_type = (random.choices(list(dark_market_data['other'][merchandise].keys()), k=1))[0]
+					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
+					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+						return self._message_typesetting(99, 'database operating error')
+				else:
+					return self._message_typesetting(98, 'Unexpected element, please update the configuration table.')
+				remaining.update({'merchandise%s' % code : merchandise, 'merchandise%s_quantity' % code : merchandise_quantity, 'currency_type%s' % code : currency_type, 'currency_type%s_price' % code : currency_type_price})
+			remaining.update({'refresh_time' : refresh_time, 'refreshable_quantity' : int(refreshable_quantity)})
+			return self._message_typesetting(0, 'First refresh market success', {'remaining' : remaining})
+		else:
+			current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')
+			if delta_time.total_seconds() // 3600 >= 3:
+				frequency = delta_time.total_seconds() // 3600 // 3
+				refreshable_quantity += frequency
+				if refreshable_quantity > 3:
+					refreshable_quantity = 3
+				refresh_time = (datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S') + timedelta(hours = frequency*3)).strftime('%Y-%m-%d %H:%M:%S')
+
+				tier_choice = random.choices(dark_market_data['names'], dark_market_data['weights'], k = 8)
+				key_list = [(random.choices(dark_market_data[tier], k = 1))[0] for tier in tier_choice]
+				for i in range(len(key_list)):
+					merchandise = key_list[i]
+					code = i + 1
+					if merchandise in dark_market_data['weapon']:
+						currency_type = (random.choices(list(dark_market_data['segment'].keys()), k = 1))[0]
+						merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]['quantity_min']), int(dark_market_data['segment'][currency_type]['quantity_max']))
+						currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]['cost_range_min']), int(dark_market_data['segment'][currency_type]['cost_range_max']))
+						if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+							return self._message_typesetting(99, 'database operation error')
+					elif merchandise in dark_market_data['skill']:
+						currency_type = (random.choices(list(dark_market_data['reward_skill'].keys()), k=1))[0]
+						merchandise_quantity = 1
+						currency_type_price = random.randint(int(dark_market_data['reward_skill'][currency_type]['cost_range_min']), int(dark_market_data['reward_skill'][currency_type]['cost_range_max']))
+						if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+							return self._message_typesetting(99, 'database operation error')
+					elif merchandise in dark_market_data['other'].keys():
+						currency_type = (random.choices(list(dark_market_data['other'][merchandise].keys()), k=1))[0]
+						merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
+						currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]['cost_range_min']), int(dark_market_data['other'][merchandise][currency_type]['quantity_max']))
+						if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+							return self._message_typesetting(99, 'database operating error')
+					else:
+						return self._message_typesetting(98, 'Unexpected element, please update the configuration table.')
+					remaining.update({'merchandise%s' % code : merchandise, 'merchandise%s_quantity' % code : merchandise_quantity, 'currency_type%s' % code : currency_type, 'currency_type%s_price' % code : currency_type_price})
+				remaining.update({'refresh_time' : refresh_time, 'refreshable_quantity' : int(refreshable_quantity)})
+				return self._message_typesetting(1, 'refresh market success', {'remaining' : remaining})
+			else:
+				headers = [x[0] for x in list(await self._execute_statement(world, 'desc dark_market;'))]
+				content = (await self._execute_statement(world, f'SELECT * FROM dark_market WHERE unique_id = "{unique_id}";'))[0]
+				for i in range(len(headers)):
+					remaining.update({headers[i] : content[i]})
+				remaining.pop('unique_id')
+				return self._message_typesetting(2, 'Refresh time is not over yet, market information has been obtained', {'remaining' : remaining})
+
+
+	async def manually_refresh_store(self, world: int, unique_id: str) -> dict:
+		"""
+		# 0  - refresh market success
+		# 97 - insufficient refreshable quantity
+		# 98 - unexpected element, please update the configuration table
+		# 99 - database operation error
+		"""
+		dark_market_data = self._player['dark_market']
+		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world, unique_id, code = 1)
+		remaining = {}
+		if refreshable_quantity > 0:
+			if refreshable_quantity == 3:
+				refresh_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+			refreshable_quantity -= 1
+			tier_choice = random.choices(dark_market_data['names'], dark_market_data['weights'], k = 8)
+			key_list = [(random.choices(dark_market_data[tier], k = 1))[0] for tier in tier_choice]
+			for i in range(len(key_list)):
+				merchandise = key_list[i]
+				code = i + 1
+				if merchandise in dark_market_data['weapon']:
+					currency_type = (random.choices(list(dark_market_data['segment'].keys()), k = 1))[0]
+					merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]['quantity_min']), int(dark_market_data['segment'][currency_type]['quantity_max']))
+					currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]['cost_range_min']), int(dark_market_data['segment'][currency_type]['cost_range_max']))
+					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+						return self._message_typesetting(99, 'database operation error')
+				elif merchandise in dark_market_data['skill']:
+					currency_type = (random.choices(list(dark_market_data['reward_skill'].keys()), k=1))[0]
+					merchandise_quantity = 1
+					currency_type_price = random.randint(int(dark_market_data['reward_skill'][currency_type]['cost_range_min']), int(dark_market_data['reward_skill'][currency_type]['cost_range_max']))
+					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+						return self._message_typesetting(99, 'database operation error')
+				elif merchandise in dark_market_data['other'].keys():
+					currency_type = (random.choices(list(dark_market_data['other'][merchandise].keys()), k=1))[0]
+					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
+					currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]['cost_range_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
+					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+						return self._message_typesetting(99, 'database operating error')
+				else:
+					return self._message_typesetting(98, 'Unexpected element, please update the configuration table.')
+				remaining.update({'merchandise%s' % code : merchandise, 'merchandise%s_quantity' % code : merchandise_quantity, 'currency_type%s' % code : currency_type, 'currency_type%s_price' % code : currency_type_price})
+			remaining.update({'refresh_time' : refresh_time, 'refreshable_quantity' : int(refreshable_quantity)})
+			return self._message_typesetting(0, 'refresh market success', {'remaining' : remaining})
+		else:
+			return self._message_typesetting(97, 'insufficient refreshable quantity')
+					
+
+
+	async def diamond_refresh_store(self, world: int, unique_id: str) -> dict:
+		"""
+		# 0  - refresh market success
+		# 97 - insufficient diamond
+		# 98 - unexpected element, please update the configuration table
+		# 99 - database operation error
+		"""
+		dark_market_data = self._player['dark_market']
+		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world, unique_id, code = 1)
+		diamond_data = await self.try_diamond(world, unique_id, -1 * int(dark_market_data['diamond_refresh_store']['diamond']))
+		remaining = {'diamond' : diamond_data['remaining']}
+		if diamond_data['status'] == 1:
+			return self._message_typesetting(97, 'insufficient diamond')
+		else:
+			tier_choice = random.choices(dark_market_data['names'], dark_market_data['weights'], k = 8)
+			key_list = [(random.choices(dark_market_data[tier], k = 1))[0] for tier in tier_choice]
+			for i in range(len(key_list)):
+				merchandise = key_list[i]
+				code = i + 1
+				if merchandise in dark_market_data['weapon']:
+					currency_type = (random.choices(list(dark_market_data['segment'].keys()), k = 1))[0]
+					merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]['quantity_min']), int(dark_market_data['segment'][currency_type]['quantity_max']))
+					currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]['cost_range_min']), int(dark_market_data['segment'][currency_type]['cost_range_max']))
+					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+						return self._message_typesetting(99, 'database operation error')
+				elif merchandise in dark_market_data['skill']:
+					currency_type = (random.choices(list(dark_market_data['reward_skill'].keys()), k=1))[0]
+					merchandise_quantity = 1
+					currency_type_price = random.randint(int(dark_market_data['reward_skill'][currency_type]['cost_range_min']), int(dark_market_data['reward_skill'][currency_type]['cost_range_max']))
+					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+						return self._message_typesetting(99, 'database operation error')
+				elif merchandise in dark_market_data['other'].keys():
+					currency_type = (random.choices(list(dark_market_data['other'][merchandise].keys()), k=1))[0]
+					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
+					currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]['cost_range_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
+					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
+						return self._message_typesetting(99, 'database operating error')
+				else:
+					return self._message_typesetting(98, 'Unexpected element, please update the configuration table.')
+				remaining.update({'merchandise%s' % code : merchandise, 'merchandise%s_quantity' % code : merchandise_quantity, 'currency_type%s' % code : currency_type, 'currency_type%s_price' % code : currency_type_price})
+			remaining.update({'refresh_time' : refresh_time, 'refreshable_quantity' : int(refreshable_quantity)})
+			return self._message_typesetting(0, 'refresh market success', {'remaining' : remaining})
+
+
+	async def black_market_transaction(self, world: int, unique_id: str, code: int) -> dict:
+		# 0  : gain weapon fragments
+		# 1  : gain new skills
+		# 2  : gain a scroll
+		# 3  : gain several materials
+		# 93 : unexpected element, please update configuration table
+		# 94 : other -> database operating error
+		# 95 : skill -> database operating error
+		# 96 : weapon -> database operating error
+		# 97 : (diamond or coin) insufficient
+		# 98 : merchandise has been sold
+		# 99 : parameter error
+		if code < 1 or code > 8:
+			return self._message_typesetting(99, 'parameter error')
+		merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity = await self._get_dark_market_material(world, unique_id, code)
+
+		if merchandise == '':
+			return self._message_typesetting(98, 'merchandise has been sold')
+		dark_market_data = self._player['dark_market']
+		remaining = {}
+		if merchandise in dark_market_data['weapon']:
+			currency_type_data = await self._try_material(world, unique_id, currency_type, -1 * currency_type_price)
+			if currency_type_data['status'] == 1:
+				return self._message_typesetting(97, currency_type + ' insufficient')
+			sql_str = 'UPDATE weapon SET segment="%s" WHERE unique_id="%s" AND weapon_name="%s";' % (merchandise_quantity, unique_id, merchandise)
+			if await self._execute_statement_update(world, sql_str) == 0:
+				return self._message_typesetting(96, 'weapon -> database operating error')
+			segment = (await self._execute_statement(world, 'SELECT segment FROM weapon WHERE unique_id = "%s" AND weapon_name="%s";' % (unique_id, merchandise)))[0][0]
+			remaining.update({'code' : code, 'weapon' : merchandise, 'segment' : segment, currency_type : currency_type_data['remaining']})
+			if await self._set_dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
+				pass # only a print statement found in original code, maybe should return error?
+			return self._message_typesetting(0, 'gain weapon fragments', {'remaining' : remaining})
+		elif merchandise in dark_market_data['skill']:
+			currency_type_data = await self._try_material(world, unique_id, currency_type, -1 * currency_type_price)
+			if currency_type_data['status'] == 1:
+				return self._message_typesetting(97, currency_type + ' insufficient')
+			skill_data = await self.try_unlock_skill(world, unique_id, merchandise)
+			if skill_data['status'] == 0:
+				remaining.update({'code' : code, 'skill' : merchandise, 'level' : 1, currency_type : currency_type_data['remaining']})
+				if await self._set_dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
+					pass # only a print statement found in original code
+				return self._message_typesetting(1, 'gain new skills', {'remaining' : remaining})
+			else:
+				scroll = (random.choices(dark_market_data['skill_scroll'], cum_weights=[0.7, 0.9, 1]))[0]
+				scroll_data = await self._try_material(world, unique_id, scroll, 1)
+				if scroll_data['status'] == 1:
+					return self._message_typesetting(95, 'skill -> database operating error')
+				remaining.update({'code' : code, 'scroll' : scroll, 'quantity' : scroll_data['remaining'], currency_type : currency_type_data['remaining']})
+				if await self._set_Dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
+					pass # only a print statement found in original code
+				return self._message_typesetting(2, 'gain a scroll', {'remaining' : remaining})
+		elif merchandise in dark_market_data['other'].keys():
+			currency_type_data = await self_try_material(world, unique_id, currency_type, -1 * currency_type_price)
+			if currency_type_data['status'] == 1:
+				return self._message_typesetting(97, currency_type + ' insufficient')
+			other_data = await self._try_material(world, unique_id, merchandise, merchandise_quantity)
+			if other_data['status'] == 1:
+				return self._message_typesetting(94, 'other -> database operating error')
+			remaining.update({'code' : code, 'merchandise' : merchandise, 'quantity' : other_data['remaining'], currency_type : currency_type_data['remaining']})
+			if await self._set_dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
+				pass # only a print statement found in original code
+			return self._message_typesetting(3, 'gain several materials', {'remaining' : remaining})
+		else:
+			return self._message_typesetting(93, 'unexpected element, please update the configuration table.')
+
+
+
+
+#############################################################################
+#						End Stage Module Functions							#
+#############################################################################
+
+
+
+
+#############################################################################
+#						Lottery Module Functions							#
+#############################################################################
+
+	async def random_gift_skill(self, world: int, unique_id: str, kind: str) -> dict:
+		# success ===> 0 and 1
+		# 0 - unlocked new skill            {"skill_id": skill_id, "value": value}
+		# 1 - you received a free scroll    {"skill_scroll_id": skill_scroll_id, "value": value}
+		# 2 - invalid skill name
+		# 3 - database operation error
+		tier_choice = (random.choices(self._lottery['skills']['names'], self._lottery['skills']['weights'][kind]))[0]
+		gift_skill  = (random.choices(self._lottery['skills']['items'][tier_choice]))[0]
+		data = await self.try_unlock_skill(world, unique_id, gift_skill)
+		status = int(data['status'])
+		if status == 0:
+			return self._message_typesetting(0, 'unlocked new skill', {'keys' : [gift_skill], 'values': [1]})
+		elif status == 1:  # skill already unlocked
+			if tier_choice == 'skilltier1':
+				skill_scroll_id = 'skill_scroll_10'
+				data = await self.try_skill_scroll_10(world, unique_id, 1)
+			elif tier_choice == 'skilltier2':
+				skill_scroll_id = 'skill_scroll_30'
+				data = await self.try_skill_scroll_30(world, unique_id, 1)
+			else:
+				skill_scroll_id = 'skill_scroll_100'
+				data = await self.try_skill_scroll_100(world, unique_id, 1)
+			if data['status'] != 0:
+				return self._message_typesetting(3, 'Database operation error')
+			return self._message_typesetting(1, 'You received a free scroll', {'keys' : [skill_scroll_id], 'values' : [data['remaining']]})
+		else:
+			return self._message_typesetting(2, 'Invalid skill name')
+
+
+	async def random_gift_segment(self, world: int, unique_id: str, kind: str) -> dict:
+		# success ===> 0 and 1
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
+		tier_choice = (random.choices(self._lottery['weapons']['names'], self._lottery['weapons']['weights'][kind]))[0]
+		gift_weapon = (random.choices(self._lottery['weapons']['items'][tier_choice]))[0]
+		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
+
+	async def random_gift_role(self, world: int, unique_id: str, kind: str) -> dict:
+		# success ===> 0 and 1
+		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
+		# - 2 - no weapon!
+		tier_choice = (random.choices(self._lottery['roles']['names'], self._lottery['roles']['weights'][kind]))[0]
+		gift_role = (random.choices(self._lottery['roles']['items'][tier_choice]))[0]
+		return await self.try_unlock_role(world, unique_id, gift_role)
+
+
+	async def basic_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		return await self._default_summon(world, unique_id, cost_item, 'basic', summon_kind)
+
+	async def pro_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		return await self._default_summon(world, unique_id, cost_item, 'pro', summon_kind)
+
+
+	async def friend_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
+		# 0 - unlocked new skill or weapon
+		# 1 - you received free scroll or segments
+		# 2 - invalid skill name
+		# 3 - database operation error
+		# 4 - insufficient material
+		# 5 - cost_item error
+		return await self._default_summon(world, unique_id, cost_item, 'friend', summon_kind)
+
+	async def prophet_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
+		return await self._default_summon(world, unique_id, cost_item, 'prophe', summon_kind)
+
+	async def fortune_wheel_basic(self, world: int, unique_id: str, cost_item: str) -> dict:
+		return await self._default_fortune_wheel(world, unique_id, cost_item, 'basic')
+
+	async def fortune_wheel_pro(self, world: int, unique_id: str, cost_item: str) -> dict:
+		return await self._default_fortune_wheel(world, unique_id, cost_item, 'pro')
+
+
+
+#############################################################################
+#						End Lottery Module Functions						#
+#############################################################################
+
+
+
+
+
+#############################################################################
+#							Private Functions								#
+#############################################################################
+
+	async def _get_dark_market_material(self, world: int, unique_id: str, code: int) -> tuple:
+		sql_str = 'SELECT merchandise%s, merchandise%s_quantity, currency_type%s, currency_type%s_price, refresh_time, refreshable_quantity FROM dark_market WHERE unique_id = "%s";' % (code, code, code, code, unique_id)
+		data = await self._execute_statement(world, sql_str)
+		return data[0]
+
+	async def _set_dark_market_material(self, world: int, unique_id: str, code: int, merchandise: str, merchandise_quantity: int, currency_type: str, currency_type_price: int, refresh_time: str, refreshable_quantity: int) -> int:
+		sql_str = 'UPDATE dark_market SET merchandise%s="%s", merchandise%s_quantity="%s", currency_type%s="%s", currency_type%s_price="%s", refresh_time="%s", refreshable_quantity="%s" WHERE unique_id="%s";' % (code, merchandise, code, merchandise_quantity, code, currency_type, code, currency_type_price, refresh_time, refreshable_quantity, unique_id)
+		return await self._execute_statement_update(world, sql_str)
+
+	async def _set_role_segment_by_id(self, world: int, unique_id: str, role: str, segment: int):
+		return await self._execute_statement_update(world, 'UPDATE `' + role + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _get_role_segment(self, world: int, unique_id: str, role: str) -> int:
+		data = await self._execute_statement(world, 'SELECT segment FROM `' + role + '` WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
+
+	async def _get_role_star(self, world: int, unique_id: str, role: str) -> dict:
+		data = await self._execute_statement(world, 'SELECT ' + role + ' FROM role_bag WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
+
+	async def _set_role_star(self, world: int, unique_id: str, weapon: str, star: int):
+		return await self._execute_statement_update(world, 'UPDATE role_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _default_fortune_wheel(self, world: int, uid: str, cost_item: str, tier: str):
+		# 0 - get item success
+		# 1 - get weapon item success
+		# 2 - get skill item success
+		# 96 - item name error
+		# 97 - skill operation error
+		# 98 - insufficient material
+		# 99 - cost_item error
+		if cost_item == 'diamond':
+			result = await self.try_diamond(world, uid, -int(self._lottery['fortune_wheel']['cost'][cost_item]))
+		elif cost_item == 'coin':
+			result = await self.try_coin(world, uid, -int(self._lottery['fortune_wheel']['cost'][cost_item]))
+		elif cost_item == 'fortune_wheel_ticket_basic':
+			result = await self.try_fortune_wheel_ticket_basic(world, uid, -int(self._lottery['fortune_wheel']['cost'][cost_item]))
+		elif cost_item == 'fortune_wheel_ticket_pro':
+			result = await self.try_fortune_wheel_ticket_pro(world, uid, -int(self._lottery['fortune_wheel']['cost'][cost_item]))
+		elif cost_item == 'basic_summon_scroll':
+			result = await self.try_basic_summon_scroll(world, uid, -int(self._lottery['fortune_wheel']['cost'][cost_item]))
+		elif cost_item == 'pro_summon_scroll':
+			result = await self.try_pro_summon_scroll(world, uid, -int(self._lottery['fortune_wheel']['cost'][cost_item]))
+		else:
+			return self._message_typesetting(99, 'cost_item error')
+		if result['status'] != 0:
+			return self._message_typesetting(98, 'insufficient materials')
+		tier_choice = (random.choices(self._lottery['fortune_wheel']['names'], self._lottery['fortune_wheel']['weights'][tier]))[0]
+		random_item = (random.choices(self._lottery['fortune_wheel']['items'][tier_choice]))[0]
+		try_result = await self.try_diamond(world, uid, 0)
+
+		# TODO THIS SHIT NEEDS TO BE REFACTORED
+		if random_item == 'coin':
+			try_result = await self.try_coin(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
+		elif random_item == 'energy':
+			try_result = await self.try_energy(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
+			return self._message_typesetting(0, 'get item success', {'remaining' : {'keys' : try_result['data']['keys'], 'values' : try_result['data']['values']}, 'reward' : {'keys' : [random_item], 'values' : [self._lottery['fortune_wheel']['reward'][tier][random_item]]}})
+		elif random_item == 'diamond':
+			try_result = await self.try_diamond(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
+		elif random_item == 'skill_scroll_10':
+			try_result = await self.try_skill_scroll_10(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
+		elif random_item == 'skill_scroll_30':
+			try_result = await self.try_skill_scroll_30(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
+		elif random_item == 'skill_scroll_100':
+			try_result = await self.try_skill_scroll_100(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
+		elif random_item == 'weapon':
+			try_result = await self.random_gift_segment(world, uid, tier)
+			if try_result['status'] == 0 or try_result['status'] == 1:
+				message_dic = {
+					"remaining" :
+					{
+						"weapon" : try_result['data']['values'][0],
+						'star' : try_result['data']['values'][1],
+						'segment' : try_result['data']['values'][2]
+					},
+					'reward':
+					{
+						'weapon' : try_result['data']['values'][0],
+						'segment' : self._standard_segment_count
+					}
+				}
+				return self._message_typesetting(1, 'get weapon item success', message_dic)
+			else:
+				return self._message_typesetting(97, 'skill operation error')
+		elif random_item == 'skill':
+			try_result = await self.random_gift_skill(world, uid, tier)
+			if try_result['status'] == 0 or try_result['status'] == 1:
+				if try_result['status'] == 0:
+					message_dic = {
+						"remaining":
+						{
+							"skill_id" : try_result['data']['keys'][0],
+							'skill_level' : try_result['data']['values'][0]
+						},
+						'reward':
+						{
+							'skill_id' : try_result['data']['keys'][0],
+							'skill_level' : try_result['data']['values'][0]
+						}
+					}
+				else:
+					message_dic = {
+						'remaining' :
+						{
+							'scroll_id' : try_result['data']['keys'][0],
+							'scroll_quantity' : try_result['data']['values'][0]
+						},
+						'reward' :
+						{
+							'scroll_id' : try_result['data']['values'][0],
+							'scroll_quantity' : 1
+						}
+					}
+				return self._message_typesetting(2, 'get skill item success', message_dic)
+			else:
+				return self._message_typesetting(97, 'skill operation error')
+		else:
+			return self._message_typesetting(96, 'item name error')
+		return self._message_typesetting(3, 'get item success', {'remaining' : {'keys' : [random_item], 'values' : [try_result['remaining']]}, 'reward' : {'keys' : [random_item], 'values' : [self._lottery['fortune_wheel']['reward'][tier][random_item]]}})
+
+
+
+
+	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
+		data = await self._execute_statement(world, 'SELECT energy, recover_time, FROM player WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0]), data[0][1]
+
+	async def _decrease_energy(self, world:int, unique_id: str, amount: int) -> dict:
+		current_energy, recover_time = await self._get_energy_information(world, unique_id)
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		full_energy=self._player["energy"]["max_energy"]
+		_cooling_time=self._player["energy"]["cooling_time"]
+		if recover_time == '':  # 此时 current_energy == self._full_energy 成立
+			if amount == 0:  # 成功1：如果没有恢复时间且是获取能量值，则直接拿取数据库的值给客户端
+				return self._message_typesetting(2, 'Get energy successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, -1]})
+			current_energy -= amount
+			# 成功2：如果没有恢复时间且是消耗能量值，则直接用数据库的值减去消耗的能量值，
+			# 然后存入消耗之后的能量值，以及将当前的时间存入 恢复时间项
+			if current_energy >= full_energy: current_time = ""  # 能量超出满能力状态时，不计算恢复时间
+			cooling_time = _cooling_time * 60
+			await self._execute_statement_update(world, 'UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
+			return self._message_typesetting(3, 'Energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, current_time, cooling_time]})
+		else:
+			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
+			recovered_energy = delta_time.seconds // 60 // _cooling_time
+			if amount == 0:
+				# 成功3：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
+				# 满足上限的情况：直接将满能量值和空字符串分别存入能量值项和恢复时间项
+				if current_energy + recovered_energy >= full_energy:
+					recover_time, current_energy, cooling_time = "", full_energy, -1
+					await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
+					return self._message_typesetting(status=4, message='Energy has been fully restored, successful energy update', data={"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
+				# 成功4：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
+				# 不满足上限的情况：将能恢复的能量值计算出来，并且计算恢复后的能量值current_energy
+				# 和恢复时间与恢复能量消耗的时间相减的恢复时间值
+				else:
+					recover_time, current_energy = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * _cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy
+					delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
+					cooling_time = 60 * _cooling_time - delta_time.seconds
+					await self._execute_statement_update(world=world, statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
+					return self._message_typesetting(status=5, message='Energy has not fully recovered, successful energy update', data={"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
+
+				# recover_time, current_energy = ("", self._full_energy) if (current_energy + recovered_energy >= self._full_energy) else ((datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * self._cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy)
+				# await self._execute_statement('UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
+				# return self.message_typesetting(status=0, message='Energy has been recovered and energy is successfully acquired', data={"keys": ['energy', 'recover_time'], "values": [current_energy, recover_time]})
+			if recovered_energy + current_energy >= full_energy:
+				# 成功5：如果有恢复时间且是消耗能量
+				# 满足上限的情况是用上限能量值减去要消耗的能量值，然后设置减去之后的能量值和当前的时间分别存入能量值项和恢复时间项
+				current_energy = full_energy - amount
+				cooling_time = _cooling_time * 60
+				await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + current_time + '" WHERE unique_id = "' + unique_id + '";')
+				return self._message_typesetting(6, 'After refreshing the energy, the energy value and recovery time are successfully updated.', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
+			elif recovered_energy + current_energy - amount >= 0:
+				# 成功6：如果有恢复时间且是消耗能量
+				# 不满足上限的情况是用当前数据库的能量值和当前恢复的能量值相加然后减去消耗的能量值为要存入数据库的能量值项
+				# 数据库中的恢复时间与恢复能量消耗的时间相减的恢复时间值存入到数据库的恢复时间项
+				current_energy = recovered_energy + current_energy - amount
+				recover_time = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=recovered_energy * _cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
+				delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
+				cooling_time = 60 * _cooling_time - delta_time.seconds
+				await self._execute_statement_update(world=world,statement='UPDATE player SET energy = ' + str(current_energy) + ', recover_time = "' + recover_time + '" WHERE unique_id = "' + unique_id + '";')
+				return self._message_typesetting(7, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
+			else:  # 发生的情况是当前能量值和恢复能量值相加比需要消耗的能量值少
+				return self._message_typesetting(status=98, message="Not enough energy consumption")
+
+
+
+
+
+
+
+	# TODO REFACTOR REFACTOR REFACTOR
+	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str, summon_item: str):
+		if cost_item == 'diamond':
+			result = await self.try_diamond(world, unique_id, -1 * int(self._lottery[summon_item]['cost'][cost_item]))
+		elif cost_item == 'coin':
+			result = await self.try_coin(world, unique_id, -1 * int(self._lottery[summon_item]['cost'][cost_item]))
+		elif cost_item == 'basic_summon_scroll':
+			result = await self.try_basic_summon_scroll(world, unique_id, -1 * int(self._lottery[summon_item]['cost'][cost_item]))
+		elif cost_item == 'pro_summon_scroll':
+			result = await self.try_pro_summon_scroll(world, unique_id, -int(self._lottery[summon_item]['cost'][cost_item]))
+		elif cost_item == 'friend_gift':
+			result = await self.try_friend_gift(world, unique_id, -int(self._lottery[summon_item]['cost'][cost_item]))
+		else:
+			return self._message_typesetting(4, 'wrong item name')
+		if result['remaining'] < 0:
+			return self._message_typesetting(97, 'insufficient materials')
+		if summon_item == 'skills':
+			try_result = await self.random_gift_skill(world, unique_id, tier)
+			if try_result['status'] == 0 or try_result['status'] == 1:
+				if try_result['status'] == 0:
+					message_dic = {
+						'remaining':
+						{
+							'skill_id' : try_result['data']['keys'][0],
+							'skill_level' : try_result['data']['values'][0],
+							cost_item : result['remaining']
+						},
+						'reward':
+						{
+							'skill_id' : try_result['data']['keys'][0],
+							'skill_level' : try_result['data']['values'][0]
+						}
+					}
+				else:
+					message_dic = {
+						'remaining':
+						{
+							'scroll_id' : try_result['data']['keys'][0],
+							'scroll_quantity' : try_result['data']['values'][0] + 1,
+							cost_item : result['remaining']
+						},
+						'reward':
+						{
+							'scroll_id' : try_result['data']['keys'][0],
+							'scroll_quantity' : 1
+						}
+					}
+				return self._message_typesetting(2, 'get skill item success', message_dic)
+			else:
+				return self._message_typesetting(97, 'skill operation error')
+		elif summon_item == 'weapons':
+			try_result = await self.random_gift_segment(world, unique_id, tier)
+			if try_result['status'] == 0 or try_result['status'] == 1:
+				message_dic = {
+					'remaining' :
+					{
+						'weapon' : try_result['data']['values'][0],
+						'star' : try_result['data']['values'][1],
+						'segment' : try_result['data']['values'][2] + self._standard_segment_count,
+						cost_item : result['remaining']
+					},
+					'reward':
+					{
+						'weapon' : try_result['data']['values'][0],
+						'segment' : self._standard_segment_count
+					}
+				}
+				if try_result['status'] == 0:
+					return self._message_typesetting(0, 'get weapon success', message_dic)
+				else:
+					return self._message_typesetting(1, 'get weapon segment success', message_dic)
+			else:
+				return self._message_typesetting(96, 'weapons operation error')
+		elif summon_item == 'roles':
+			try_result = await self.random_gift_role(world, unique_id, tier)
+			if try_result['status'] == 0 or try_result['status'] == 1:
+				message_dic = {
+					'remaining' :
+					{
+						'weapon' : try_result['data']['values'][0],
+						'star' : try_result['data']['values'][1],
+						'segment' : try_result['data']['values'][2] + self._standard_segment_count,
+						cost_item : result['remaining']
+					},
+					'reward':
+					{
+						'weapon' : try_result['data']['values'][0],
+						'segment' : self._standard_segment_count
+					}
+				}
+				return self._message_typesetting(1, 'get role item success', message_dic)
+			else:
+				return self._message_typesetting(97, 'operation error')
+
+	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
+		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0]), data[0][1]
+
+
+	async def _get_weapon_bag(self, world: int, unique_id: str):
+		data = await self._execute_statement(world, 'SELECT * FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
+		return list(data[0])
+
+	async def _get_weapon_attributes(self, world: int, unique_id: str, weapon: str):
+		data = await self._execute_statement(world, 'SELECT * FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		return list(data[0])
+
+	async def _reset_skill_point(self, world: int, unique_id: str, weapon: str, skill_point: int):
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET passive_skill_1_level=0, passive_skill_2_level=0, passive_skill_3_level=0, passive_skill_4_level=0, skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
+		return await self._execute_statement_update(world, 'UPDATE weapon_bag SET ' + weapon + ' = "' + str(star) + '" WHERE unique_id = "' + unique_id + '";') 
+
+	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
+		data = await self._execute_statement(world, 'SELECT segment FROM `' + weapon + '` WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
+
+	async def _set_segment_by_id(self, world: int, unique_id: str, weapon: str, segment: int):
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET segment = "' + str(segment) + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _get_weapon_star(self, world: int, unique_id: str, weapon: str) -> int:
+		data = await self._execute_statement(world, 'SELECT ' + weapon + ' FROM weapon_bag WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
+
+	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> list:
+		try:
+			return list((await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'))[0])
+		except:
+			await self._execute_statement(world, f'INSERT INTO weapon (unique_id, weapon_name) VALUES ("{unique_id}", "{weapon}")')
+			return list((await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'))[0])
+
+	async def _set_passive_skill_level_up_data(self, world: int, unique_id: str, weapon: str, passive: str, skill_level: int, skill_point: int) -> dict:
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET ' + passive + ' = "' + str(skill_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
+
+	async def _set_weapon_level_up_data(self, world: int, unique_id: str, weapon: str, weapon_level: int, skill_point: int) -> dict:
+		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET weapon_level = "' + str(weapon_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
+
+
+	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> int:
+		data = await self._execute_statement(world, 'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
+		return int(data[0][0])
+
+
+	def _roll_for_upgrade(self, scroll_id: str) -> bool:
+		return random.random() < self._upgrade_chance[scroll_id]
+
+	async def _try_material(self, world: int, unique_id: str, material: str, value: int) -> dict:
+		"""
+		Try to change the database information
+		A status of 0 is a success and a 1 is a failure.
+		Return json data format
+		尝试更改数据库信息
+		状态为0表示成功，1表示失败。
+		返回json数据格式
+		:param unique_id:用户唯一识别码
+		:param key:材料名
+		:param value: 改变的材料值，正数是加运算，负数是减运算，0是给值
+		:return:返回数据格式为 {"status": status, "remaining": remaining}
+		"""
+		num = await self._get_material(world, unique_id, material)
+		if value == 0: return self._internal_format(0, num)
+		num += value
+		if num < 0: return self._internal_format(1, num)
+		if await self._update_material(world, unique_id, material, num) == 0:
+			return self._internal_format(1, num)
+		return self._internal_format(status=0, remaining=num)
+
+	async def _get_material(self, world: int, unique_id: str, material: str) -> int or str:
+		"""
+		Used to get numeric or string information
+		用于获取数字或字符串信息
+		:param unique_id: 用户的唯一标识
+		:param material:材料名
+		:return:返回材料名对应的值
+		"""
+		data = await self._execute_statement(world, 'SELECT ' + material + ' FROM player WHERE unique_id="' + str(unique_id) + '";')
+		return data[0][0]
+
+	async def _update_material(self, world: int, unique_id: str, material: str, value: int) -> int:
+		"""
+		Used to set information such as numeric values
+		用于设置数值等信息
+		:param unique_id:用户唯一识别码
+		:param material:材料名
+		:param material_value:要设置的材料对应的值
+		:return:返回是否更新成功的标识，1为成功，0为失败
+		"""
+		return await self._execute_statement_update(world, 'UPDATE player SET ' + material + '=' + str(value) + ' where unique_id="' + unique_id + '";')
+
+
+	def _sql_str_operating(self, unique_id: str, material_dict: dict, key_word: list = []) -> (str, str):
+		update_str = "UPDATE player SET "
+		update_end_str = " where unique_id='%s'" % unique_id
+		select_str = "SELECT "
+		select_end_str = " FROM player WHERE unique_id='%s'" % unique_id
+		for key in material_dict.keys():
+			if key in key_word:
+				update_str += "%s='%s', " % (key, material_dict[key])
+			else:
+				update_str += "%s=%s+%s, " % (key, key, material_dict[key])
+			select_str += "%s, " % key
+		update_str = update_str[: len(update_str) - 2] + update_end_str
+		select_str = select_str[: len(select_str) - 2] + select_end_str
+		return update_str, select_str
+
+	async def _execute_statement(self, world: int, statement: str) -> tuple:
+		"""
+		Executes the given statement and returns the result.
+		执行给定的语句并返回结果。
+		:param statement: Mysql执行的语句
+		:return: 返回执行后的二维元组表
+		"""
+		async with await self._pools[world].Connection() as conn:
+			async with conn.cursor() as cursor:
+				await cursor.execute(statement)
+				data = cursor.fetchall()
+				return data
+
+	async def _execute_statement_update(self, world: int, statement: str) -> int:
+		"""
+		Execute the update or set statement and return the result.
+		执行update或set语句并返回结果。
+		:param statement: Mysql执行的语句
+		:return: 返回update或者是set执行的结果
+		"""
+		async with await self._pools[world].Connection() as conn:
+			async with conn.cursor() as cursor:
+				return await cursor.execute(statement)
+
+
+	def _internal_format(self, status: int, remaining: int or tuple or list) -> dict:
+		"""
+		Internal json formatted information
+		内部json格式化信息
+		:param status:状态标识0：成功，1：失败
+		:param remaining:改变后的结果
+		:return:json格式：{"status": status, "remaining": remaining}
+		"""
+		return {"status": status, "remaining": remaining}
+
+	def _message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
+		"""
+		Format the information
+		:param message:说明语句
+		:param data:json数据
+		:return:返回客户端需要的json数据
+		"""
+		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
+
+
+	def _refresh_configuration(self):
+		r = requests.get('http://localhost:8000/get_game_manager_config')
+		d = r.json()
+		self._stage_reward = d['reward']
+		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
+		self._upgrade_chance = d['skill']['upgrade_chance']
+		self._standard_iron_count = d['weapon']['standard_iron_count']
+		self._standard_segment_count = d['weapon']['standard_segment_count']
+		self._standard_reset_weapon_skill_coin_count = d['weapon']['standard_reset_weapon_skill_coin_count']
+		self._valid_passive_skills = d['weapon']['valid_passive_skills']
+		self._lottery = d['lottery']
+		self._player = d['player']
+		self._hang_reward_list = d['hang_reward']
+		self._entry_consumables = d['entry_consumables']
+
+	def _start_timer(self, seconds: int):
+		t = threading.Timer(seconds, self._refresh_configuration)
+		t.daemon = True
+		t.start()
 
 
 
@@ -1676,12 +1838,14 @@ async def __try_unlock_skill(request: web.Request) -> web.Response:
 
 @ROUTES.post('/level_up_weapon')
 async def __level_up_weapon(request: web.Request) -> web.Response:
+	#return _json_response(json.loads(requests.post('http://localhost:8007/level_up_weapon', data=await request.post()).text))
 	post = await request.post()
 	result = await (request.app['MANAGER']).level_up_weapon(int(post['world']), post['unique_id'], post['weapon'], int(post['iron']))
 	return _json_response(result)
 
 @ROUTES.post('/level_up_passive')
 async def __level_up_passive(request: web.Request) -> web.Response:
+	#return _json_response(json.loads(requests.post('http://localhost:8007/level_up_passive', data=await request.post()).text))
 	post = await request.post()
 	result = await (request.app['MANAGER']).level_up_passive(int(post['world']), post['unique_id'], post['weapon'], post['passive'])
 	return _json_response(result)
@@ -1689,18 +1853,21 @@ async def __level_up_passive(request: web.Request) -> web.Response:
 
 @ROUTES.post('/level_up_weapon_star')
 async def __level_up_weapon_star(request: web.Request) -> web.Response:
+	#return _json_response(json.loads(requests.post('http://localhost:8007/level_up_weapon_star', data=await request.post()).text))
 	post = await request.post()
 	result = await (request.app['MANAGER']).level_up_weapon_star(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
 
 @ROUTES.post('/reset_weapon_skill_point')
 async def __reset_weapon_skill_point(request: web.Request) -> web.Response:
+	#return _json_response(json.loads(requests.post('http://localhost:8007/reset_weapon_skill_point', data=await request.post()).text))
 	post = await request.post()
 	result = await (request.app['MANAGER']).reset_weapon_skill_point(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
 
 @ROUTES.post('/get_all_weapon')
 async def __get_all_weapon(request: web.Request) -> web.Response:
+	#return _json_response(json.loads(requests.post('http://localhost:8007/get_all_weapon', data=await request.post()).text))
 	post = await request.post()
 	result = await (request.app['MANAGER']).get_all_weapon(int(post['world']), post['unique_id'])
 	return _json_response(result)
@@ -1714,28 +1881,149 @@ async def __try_unlock_weapon(request: web.Request) -> web.Response:
 @ROUTES.post('/pass_stage')
 async def __pass_stage(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).pass_stage(int(post['world']), post['unique_id'], int(post['stage']))
+	result = await (request.app['MANAGER']).pass_stage(int(post['world']), post['unique_id'], int(post['stage']), post['clear_time'])
+	return _json_response(result)
+
+@ROUTES.post('/enter_tower')
+async def __enter_tower(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).enter_tower(int(post['world']), post['unique_id'], int(post['stage']))
+	return _json_response(result)
+
+@ROUTES.post('/pass_tower')
+async def __pass_tower(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).pass_tower(int(post['world']), post['unique_id'], int(post['stage']), post['clear_time'])
 	return _json_response(result)
 
 
+
+
+# TODO port over
 @ROUTES.post('/basic_summon')
 async def __basic_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).basic_summon(int(post['world']), post['unique_id'], post['cost_item'])
-	return _json_response(result)
+	#return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
+# TODO port over
 @ROUTES.post('/pro_summon')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).pro_summon(int(post['world']), post['unique_id'], post['cost_item'])
-	return _json_response(result)
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/pro_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
 
-
+# TODO port over
 @ROUTES.post('/friend_summon')
 async def __friend_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'])
-	return _json_response(result)
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/friend_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+# TODO port over
+@ROUTES.post('/prophet_summon')
+async def __prophet_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/prophet_summon', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+# TODO port over
+@ROUTES.post('/basic_summon_skill')
+async def __basic_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon_skill', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+# TODO port over
+@ROUTES.post('/pro_summon_skill')
+async def __pro_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/pro_summon_skill', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+# TODO port over
+@ROUTES.post('/friend_summon_skill')
+async def __pro_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/friend_summon_skill', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+# TODO port over
+@ROUTES.post('/basic_summon_roles')
+async def __basic_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/basic_summon_roles', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+# TODO port over
+@ROUTES.post('/pro_summon_roles')
+async def __pro_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/pro_summon_roles', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+# TODO port over
+@ROUTES.post('/friend_summon_roles')
+async def __pro_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/friend_summon_roles', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+# TODO port over
+@ROUTES.post('/fortune_wheel_basic')
+async def __pro_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/fortune_wheel_basic', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+# TODO port over
+@ROUTES.post('/fortune_wheel_pro')
+async def __pro_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/fortune_wheel_pro', data = {'world': post['world'], "unique_id": post['unique_id'],"cost_item":post['cost_item']}).text))
+
+@ROUTES.post('/automatically_refresh_store')
+async def __automatically_refresh_store(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await (request.app['MANAGER']).automatically_refresh_store(int(post['world']), post['unique_id'])
+	return _json_response(data)
+	#return _json_response(json.loads(requests.post('http://localhost:8007' + '/automatically_refresh_store', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+@ROUTES.post('/manually_refresh_store')
+async def __manually_refresh_store(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await (request.app['MANAGER']).manually_refresh_store(int(post['world']), post['unique_id'])
+	return _json_response(data)
+#return _json_response(json.loads(requests.post('http://localhost:8007' + '/manually_refresh_store', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+@ROUTES.post('/diamond_refresh_store')
+async def __diamond_refresh_store(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await (request.app['MANAGER']).diamond_refresh_store(int(post['world']), post['unique_id'])
+	return _json_response(data)
+#return _json_response(json.loads(requests.post('http://localhost:8007' + '/diamond_refresh_store', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+@ROUTES.post('/black_market_transaction')
+async def __black_market_transaction(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = await (request.app['MANAGER']).black_market_transaction(int(post['world']), post['unique_id'], int(post['code']))
+	return _json_response(data)
+#return _json_response(json.loads(requests.post('http://localhost:8007' + '/black_market_transaction', data = {'world': post['world'], "unique_id": post['unique_id'], "code": post['code']}).text))
+
+# TODO port over
+@ROUTES.post('/send_friend_gift')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8006/send_friend_gift', data=await request.post()).text))
+
+# TODO port over
+@ROUTES.post('/send_all_friend_gift')
+async def _send_all_friend_gift(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/send_all_friend_gift', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+# TODO port over
+@ROUTES.post('/get_all_friend_info')
+async def _get_all_friend_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/get_all_friend_info', data = {'world': post['world'], "unique_id": post['unique_id']}).text))
+
+# TODO port over
+@ROUTES.post('/delete_friend')
+async def _get_all_friend_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(json.loads(requests.post('http://localhost:8006' + '/delete_friend', data = {'world': post['world'], "unique_id": post['unique_id'],"friend_name": post['friend_name']}).text))
+
+
 
 @ROUTES.post('/start_hang_up')
 async def __start_hang_up(request: web.Request) -> web.Response:
@@ -1755,12 +2043,6 @@ async def __get_hang_up_info(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).get_hang_up_info(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
-@ROUTES.post('/fortune_wheel_basic')
-async def __fortune_wheel_basic(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).fortune_wheel_basic(int(post['world']), post['unique_id'], post['cost_item'])
-	return _json_response(result)
-
 @ROUTES.post('/fortune_wheel_pro')
 async def __fortune_wheel_pro(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -1773,47 +2055,10 @@ async def __enter_stage(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).enter_stage(int(post['world']), post['unique_id'], int(post['stage']))
 	return _json_response(result)
 
-#  #########################  houyao  ##########################
-@ROUTES.post('/disintegrate_weapon')
-async def __disintegrate_weapon(request: web.Request) -> web.Response:
+@ROUTES.post('/show_energy')
+async def __show_energy(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).disintegrate_weapon(int(post['world']), post['unique_id'], post['weapon'])
-	return _json_response(result)
-
-@ROUTES.post('/automatically_refresh_store')
-async def __automatically_refresh_store(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).automatically_refresh_store(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
-@ROUTES.post('/manually_refresh_store')
-async def __manually_refresh_store(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).manually_refresh_store(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
-@ROUTES.post('/diamond_refresh_store')
-async def __diamond_refresh_store(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).diamond_refresh_store(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
-@ROUTES.post('/black_market_transaction')
-async def __black_market_transaction(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).black_market_transaction(int(post['world']), post['unique_id'], int(post['code']))
-	return _json_response(result)
-
-@ROUTES.post('/enter_tower')
-async def __enter_tower(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).enter_tower(int(post['world']), post['unique_id'], int(post['stage']))
-	return _json_response(result)
-
-@ROUTES.post('/pass_tower')
-async def __pass_tower(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).pass_tower(int(post['world']), post['unique_id'], int(post['stage']))
+	result = await (request.app['MANAGER']).show_energy(world=int(post['world']), unique_id=post['unique_id'])
 	return _json_response(result)
 
 @ROUTES.post('/upgrade_armor')
@@ -1822,14 +2067,13 @@ async def __upgrade_armor(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).upgrade_armor(int(post['world']), post['unique_id'], post["armor_kind"], int(post['armor_id']))
 	return _json_response(result)
 
-@ROUTES.post('/random_gift_segment')
-async def __random_gift_segment(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).random_gift_segment(int(post['world']), post['unique_id'], "basic")
-	return _json_response(result)
-#  #########################  houyao   ##########################
+@ROUTES.post('/redeem_nonce')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8006/redeem_nonce', data=await request.post()).text))
 
-
+@ROUTES.post('/get_new_mail')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8006/get_new_mail', data=await request.post()).text))
 
 
 def get_config() -> configparser.ConfigParser:
@@ -1854,7 +2098,7 @@ def run():
 	app.add_routes(ROUTES)
 	config = get_config()
 	app['MANAGER'] = GameManager()
-	web.run_app(app, port=config.getint('game_manager_houyao', 'port'))
+	web.run_app(app, port=config.getint('game_manager', 'port'))
 
 
 if __name__ == '__main__':
