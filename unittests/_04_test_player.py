@@ -233,6 +233,11 @@ def test():
 	s21k = "939"
 	print(eval("s2%sk"%2))
 
+def all_function(unique_id: str):
+	# result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
+	# result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "roles"})
+	result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "skills"})
+	print(str(result.text))
 """
 json_data = {
 	"world": world,
@@ -285,7 +290,7 @@ if __name__ == "__main__":
 	# get_hang_up_info()
 	# upgrade_armor(1)
 	# random_gift_segment()
-
+	# start ########################################################
 	# send_friend_gift(unique_id="4", friend_id="6")
 	# nonce = get_new_mail(unique_id="6")
 	# redeem_nonce(unique_id="6", nonce=nonce)
@@ -298,10 +303,12 @@ if __name__ == "__main__":
 	# request_friend(unique_id="2", friend_name="g")
 	# request_friend(unique_id="3", friend_name="g")
 
-	send_friend_gift(unique_id="1", friend_name="g")
-	send_friend_gift(unique_id="2", friend_name="g")
-	send_friend_gift(unique_id="3", friend_name="g")
+	# send_friend_gift(unique_id="1", friend_name="g")
+	# send_friend_gift(unique_id="2", friend_name="g")
+	# send_friend_gift(unique_id="3", friend_name="g")
 	# send_all_friend_gift(unique_id="4")
 
-	type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
-	redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
+	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
+	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
+	# end   ########################################################
+	all_function(unique_id="4")
