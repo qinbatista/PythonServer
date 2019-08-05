@@ -595,7 +595,7 @@ class GameManager:
 		# 98 - key insufficient
 		# 99 - parameter error
 		enter_tower_data = self._entry_consumables["tower"]
-		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")) + 1:
+		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "tower_stage")) + 1:
 			return self._message_typesetting(99, "Parameter error")
 		keys = list(enter_tower_data[str(stage)].keys())
 		values = [-v for v in list(enter_tower_data[str(stage)].values())]
