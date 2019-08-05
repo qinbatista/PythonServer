@@ -93,7 +93,7 @@ class GameManager:
 		except:
 			return self._message_typesetting(4, 'parameter error!')
 
-	# houyao 2019-07-30 11:29
+	# houyao
 	# TODO rename function - it is private and only called by pass_stage function
 	async def try_pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		stage_data = self._stage_reward["stage"]
@@ -273,7 +273,7 @@ class GameManager:
 	#						Weapon Module Functions								#
 	#############################################################################
 
-	# 2019年7月30日16点30分 houyao
+	# houyao
 	async def level_up_weapon(self, world: int, unique_id: str, weapon: str, iron: int) -> dict:
 		# - 0 - Success
 		# - 95 - User does not have that weapon
@@ -462,7 +462,7 @@ class GameManager:
 	#						Stage Module Functions								#
 	#############################################################################
 
-	# 2019年7月30日14点44分 houyao
+	# houyao
 	# TODO CHECK SPEED IMPROVEMENTS
 	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
@@ -491,7 +491,7 @@ class GameManager:
 			return self._message_typesetting(status=97, message="database operating error")
 		return self._message_typesetting(0, "success", {"keys": keys, "values": values})
 
-	# houyao 2019-07-30 11:33
+	# houyao
 	async def pass_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		# success ===> 0
 		# 0 : passed customs ===> success
@@ -894,7 +894,7 @@ class GameManager:
 		t.daemon = True
 		t.start()
 
-	#  #########################  houyao 2019-07-26 10：47  ##########################
+	#  #########################  houyao  ##########################
 	async def disintegrate_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# success ===> 0
 		# 0 : Successful weapon decomposition
@@ -1082,7 +1082,7 @@ class GameManager:
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
 
-	#  houyao 2019-07-28 13:56:00  自动刷新商店
+	#  houyao  自动刷新商店
 	async def automatically_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		success ===> 0 and 1
@@ -1185,7 +1185,7 @@ class GameManager:
 				remaining.pop("unique_id")
 				return self._message_typesetting(status=2, message="Refresh time is not over yet, market information has been obtained", data={"remaining": remaining})
 
-	#  houyao 2019-07-28 16:56:00  手动刷新商店
+	#  houyao  手动刷新商店
 	async def manually_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		success ===> 0
@@ -1238,7 +1238,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(status=97, message="Insufficient refreshable quantity")
 
-	#  houyao 2019-07-28 17:56:00  钻石刷新商店
+	#  houyao  钻石刷新商店
 	async def diamond_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		success ===> 0
@@ -1376,7 +1376,7 @@ class GameManager:
 	async def _set_dark_market_material(self, world: int, unique_id: str, code: int, merchandise: str, merchandise_quantity: int, currency_type: str, currency_type_price: int, refresh_time: str, refreshable_quantity: int) -> int:
 		sql_str = "update dark_market set merchandise%s='%s', merchandise%s_quantity=%s, currency_type%s='%s', currency_type%s_price=%s, refresh_time='%s', refreshable_quantity=%s where unique_id='%s'" % (code, merchandise, code, merchandise_quantity, code, currency_type, code, currency_type_price, refresh_time, refreshable_quantity, unique_id)
 		return await self._execute_statement_update(world=world, statement=sql_str)
-#  #########################  houyao 2019-07-29 14：49  ##########################
+#  #########################  houyao   ##########################
 
 	async def enter_tower(self, world: int, unique_id: str, stage: int) -> dict:
 		# success ===> 0
@@ -1475,7 +1475,7 @@ class GameManager:
 			else:
 				return self._message_typesetting(status=96, message="Accidental prize -> " + reward)
 
-	#  #########################  houyao 2019年7月31日10点19分  ##########################
+	#  #########################  houyao   ##########################
 	async def upgrade_armor(self, world: int, unique_id: str, armor_id: str, level: int) -> dict:
 		"""
 		# success ===> 0
@@ -1512,7 +1512,7 @@ class GameManager:
 			await self._execute_statement_update(world=world, statement=f"insert into armor(unique_id, armor_id) values ('{unique_id}','{armor_id}')")
 			return (await self._execute_statement(world=world, statement=sql_str))[0]
 
-	#  #########################  houyao 2019-07-29 14：49  ##########################
+	#  #########################  houyao   ##########################
 
 
 
@@ -1773,7 +1773,7 @@ async def __enter_stage(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).enter_stage(int(post['world']), post['unique_id'], int(post['stage']))
 	return _json_response(result)
 
-#  #########################  houyao 2019-07-26 12：48  ##########################
+#  #########################  houyao  ##########################
 @ROUTES.post('/disintegrate_weapon')
 async def __disintegrate_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -1827,7 +1827,7 @@ async def __random_gift_segment(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).random_gift_segment(int(post['world']), post['unique_id'], "basic")
 	return _json_response(result)
-#  #########################  houyao 2019-07-28 19：49  ##########################
+#  #########################  houyao   ##########################
 
 
 
