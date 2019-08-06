@@ -187,6 +187,14 @@ class GameManager:
 	async def try_small_energy_potion(self, world: int, unique_id: str, value: int) -> dict:
 		return await self._try_material(world, unique_id, 'small_energy_potion', value)
 
+	async def try_basic_summon_scroll(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'basic_summon_scroll', value)
+
+	async def try_pro_summon_scroll(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'pro_summon_scroll', value)
+
+	async def try_friend_gift(self, world: int, unique_id: str, value: int) -> dict:
+		return await self._try_material(world, unique_id, 'friend_gift', value)
 #############################################################################
 #						End Bag Module Functions							#
 #############################################################################
@@ -424,18 +432,23 @@ class GameManager:
 		return self._message_typesetting(0, "gain success", {"remaining": remaining})
 
 	# TODO INTERNAL USE only?????
+	# TODO simplify if/else repeated statements
 	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
 		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
 		# - 2 - no weapon!
 		try:
-			star = await self._get_weapon_star(world, unique_id, weapon)
-			if star != 0:
-				segment = await self._get_segment(world, unique_id, weapon) + 30
-				await self._set_segment_by_id(world, unique_id, weapon, segment)
-				return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'star', 'segment'], "values": [weapon, star, segment]})
-			await self._set_weapon_star(world, unique_id, weapon, 1)
-			return self._message_typesetting(0, 'Unlocked new weapon!', {"keys": ["weapon", 'star', 'segment'], "values": [weapon, 1, 0]})
+			row = await self._get_row_by_id(world, weapon, unique_id)
+			if row[2] != 0:
+				row[9] += 30
+				sql_str = f'UPDATE weapon SET weapon_star = "{row[2]}", segment = "{row[9]}" WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}";'
+				await self._execute_statement_update(world, sql_str)
+				return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'star', 'segment'], "values": [weapon, row[2], row[9]]})
+			else:
+				row[2] += 1
+				sql_str = f'UPDATE weapon SET weapon_star = "{row[2]}", segment = "{row[9]}" WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}";'
+				await self._execute_statement_update(world, sql_str)
+				return self._message_typesetting(0, 'Unlocked new weapon!', {"keys": ["weapon", 'star', 'segment'], "values": [weapon, row[2], row[9]]})
 		except:
 			return self._message_typesetting(2, 'no weapon!')
 
@@ -443,13 +456,20 @@ class GameManager:
 		# - 0 - Unlocked new role!   ===> {"keys": ["role"], "values": [role]}
 		# - 1 - Role already unlocked, got free segment   ===>  {"keys": ['role', 'segment'], "values": [role, segment]}
 		# - 2 - no role!
-		star = await self._get_role_star(world, unique_id, role)
-		if star != 0:
-			segment = await self._get_role_segment(world, unique_id, role) + 30
-			await self._set_role_segment_by_id(world, unique_id, role, segment)
-			return self._message_typesetting(1, 'Role already unlocked, got free segment', {'keys' : ['role', 'star', 'segment'], 'values' : [role, star, segment]})
-		await self._set_role_star(world, unique_id, role, 1)
-		return self._message_typesetting(0, 'Unlocked new role!', {'keys' : ['role', 'star', 'segment'], 'values' : [role, 1, 0]})
+		try:
+			row = await self._get_role_row_by_id(world, role, unique_id)
+			if row[2] != 0:
+				row[9] += 30
+				sql_str = f'UPDATE role SET role_star = "{row[2]}", segment = "{row[9]}" WHERE unique_id = "{unique_id}" AND role_name= "{role}";'
+				await self._execute_statement_update(world, sql_str)
+				return self._message_typesetting(1, 'Role already unlocked, got free segment!', {"keys": ['role', 'star', 'segment'], "values": [role, row[2], row[9]]})
+			else:
+				row[2] += 1
+				sql_str = f'UPDATE role SET role_star = "{row[2]}", segment = "{row[9]}" WHERE unique_id = "{unique_id}" AND role_name = "{role}";'
+				await self._execute_statement_update(world, sql_str)
+				return self._message_typesetting(0, 'Unlocked new role!', {"keys": ["role", 'star', 'segment'], "values": [role, row[2], row[9]]})
+		except:
+			return self._message_typesetting(2, 'no role!')
 
 	async def disintegrate_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# 0 - successful weapon decomposition
@@ -1192,7 +1212,7 @@ class GameManager:
 		return await self._default_summon(world, unique_id, cost_item, 'friend_gift', summon_kind)
 
 	async def prophet_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
-		return await self._default_summon(world, unique_id, cost_item, 'prophe', summon_kind)
+		return await self._default_summon(world, unique_id, cost_item, 'prophet', summon_kind)
 
 	async def fortune_wheel_basic(self, world: int, unique_id: str, cost_item: str) -> dict:
 		return await self._default_fortune_wheel(world, unique_id, cost_item, 'basic')
@@ -1700,6 +1720,14 @@ class GameManager:
 			await self._execute_statement(world, f'INSERT INTO weapon (unique_id, weapon_name) VALUES ("{unique_id}", "{weapon}")')
 			return list((await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'))[0])
 
+	async def _get_role_row_by_id(self, world: int, role: str, unique_id: str) -> list:
+		try:
+			return list((await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"'))[0])
+		except:
+			await self._execute_statement(world, f'INSERT INTO role (unique_id, role_name) VALUES ("{unique_id}", "{role}")')
+			return list((await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"'))[0])
+
+
 	async def _set_passive_skill_level_up_data(self, world: int, unique_id: str, weapon: str, passive: str, skill_level: int, skill_point: int) -> dict:
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET ' + passive + ' = "' + str(skill_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
@@ -2071,6 +2099,12 @@ async def __pro_summon(request: web.Request) -> web.Response:
 async def __friend_summon(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'], 'weapons')
+	return _json_response(result)
+
+@ROUTES.post('/prophet_summon')
+async def __prophet_summon(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).prophet_summon(int(post['world']), post['unique_id'], post['cost_item'], 'weapons')
 	return _json_response(result)
 
 
