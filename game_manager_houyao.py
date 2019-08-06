@@ -432,7 +432,7 @@ class GameManager:
 		try:
 			row = await self._get_row_by_id(world=world, weapon=weapon, unique_id=unique_id)
 			if row[2] != 0:  # weapon_star
-				row[9] += 30  # segment
+				row[9] += self._standard_segment_count  # segment
 				sql_str = f"update weapon set weapon_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and weapon_name='{weapon}'"
 				await self._execute_statement_update(world=world, statement=sql_str)
 				return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'star', 'segment'], "values": [weapon, row[2], row[9]]})
@@ -450,13 +450,13 @@ class GameManager:
 		# - 2 - no role!
 		try:
 			row = await self._get_role_row_by_id(world=world, role=role, unique_id=unique_id)
-			if row[2] != 0:  # weapon_star
-				row[9] += 30  # segment
+			if row[2] != 0:  # role_star
+				row[9] += self._standard_segment_count  # segment
 				sql_str = f"update role set role_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and role_name='{role}'"
 				await self._execute_statement_update(world=world, statement=sql_str)
 				return self._message_typesetting(1, 'Role already unlocked, got free segment', {'keys' : ['role', 'star', 'segment'], 'values' : [role, row[2], row[9]]})
 			else:
-				row[2] += 1  # weapon_star
+				row[2] += 1  # role_star
 				sql_str = f"update role set role_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and role_name='{role}'"
 				await self._execute_statement_update(world=world, statement=sql_str)
 				return self._message_typesetting(0, 'Unlocked new role!', {'keys' : ['role', 'star', 'segment'], 'values' : [role, row[2], row[9]]})
@@ -1170,9 +1170,9 @@ class GameManager:
 
 	async def random_gift_role(self, world: int, unique_id: str, kind: str) -> dict:
 		# success ===> 0 and 1
-		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 2 - no weapon!
+		# - 0 - Unlocked new role!   ===> {"keys": ["role"], "values": [role]}
+		# - 1 - Role already unlocked, got free segment   ===>  {"keys": ['role', 'segment'], "values": [role, segment]}
+		# - 2 - no role!
 		tier_choice = (random.choices(self._lottery['roles']['names'], self._lottery['roles']['weights'][kind]))[0]
 		gift_role = (random.choices(self._lottery['roles']['items'][tier_choice]))[0]
 		return await self.try_unlock_role(world, unique_id, gift_role)
@@ -1275,12 +1275,15 @@ class GameManager:
 		if result["status"] != 0:
 			return self._message_typesetting(status=98, message='insufficient materials')
 
-		result_dict = {}
+		remaining_dict = {}
+		reward_dict = {}
 		for i in range(0, 10):
 			message_dict = await self._default_summon(world, unique_id, "10_times", 'basic', summon_kind)
-			message_dict["data"]["remaining"].update({cost_item: result["remaining"]})
-			result_dict.update({str(i): message_dict["data"]})
-		return self._message_typesetting(status=0, message='10 times basic_summon', data=result_dict)
+			message_dict["data"]["remaining"].update({"cost_item": cost_item, "cost_quantity": result["remaining"], "status": message_dict["status"]})
+			message_dict["data"]["reward"].update({"status": message_dict["status"]})
+			remaining_dict.update({str(i): message_dict["data"]["remaining"]})
+			reward_dict.update({str(i): message_dict["data"]["reward"]})
+		return self._message_typesetting(status=0, message='10 times basic_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 
 	async def pro_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
 		# 0  - 10 times pro_summon
@@ -1301,12 +1304,15 @@ class GameManager:
 		if result["status"] != 0:
 			return self._message_typesetting(status=98, message='insufficient materials')
 
-		result_dict = {}
+		remaining_dict = {}
+		reward_dict = {}
 		for i in range(0, 10):
 			message_dict = await self._default_summon(world, unique_id, "10_times", 'pro', summon_kind)
-			message_dict["data"]["remaining"].update({cost_item: result["remaining"]})
-			result_dict.update({str(i): message_dict["data"]})
-		return self._message_typesetting(status=0, message='10 times pro_summon', data=result_dict)
+			message_dict["data"]["remaining"].update({"cost_item": cost_item, "cost_quantity": result["remaining"], "status": message_dict["status"]})
+			message_dict["data"]["reward"].update({"status": message_dict["status"]})
+			remaining_dict.update({str(i): message_dict["data"]["remaining"]})
+			reward_dict.update({str(i): message_dict["data"]["reward"]})
+		return self._message_typesetting(status=0, message='10 times pro_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 
 	async def friend_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
 		# 0  - 10 times friend_summon
@@ -1327,12 +1333,15 @@ class GameManager:
 		if result["status"] != 0:
 			return self._message_typesetting(status=98, message='insufficient materials')
 
-		result_dict = {}
+		remaining_dict = {}
+		reward_dict = {}
 		for i in range(0, 10):
 			message_dict = await self._default_summon(world, unique_id, "10_times", 'friend_gift', summon_kind)
-			message_dict["data"]["remaining"].update({cost_item: result["remaining"]})
-			result_dict.update({str(i): message_dict["data"]})
-		return self._message_typesetting(status=0, message='10 times friend_summon', data=result_dict)
+			message_dict["data"]["remaining"].update({"cost_item": cost_item, "cost_quantity": result["remaining"], "status": message_dict["status"]})
+			message_dict["data"]["reward"].update({"status": message_dict["status"]})
+			remaining_dict.update({str(i): message_dict["data"]["remaining"]})
+			reward_dict.update({str(i): message_dict["data"]["reward"]})
+		return self._message_typesetting(status=0, message='10 times friend_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 
 	async def prophet_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
 		# 0  - 10 times prophet_summon
@@ -1353,12 +1362,15 @@ class GameManager:
 		if result["status"] != 0:
 			return self._message_typesetting(status=98, message='insufficient materials')
 
-		result_dict = {}
+		remaining_dict = {}
+		reward_dict = {}
 		for i in range(0, 10):
 			message_dict = await self._default_summon(world, unique_id, "10_times", 'prophet', summon_kind)
-			message_dict["data"]["remaining"].update({cost_item: result["remaining"]})
-			result_dict.update({str(i): message_dict["data"]})
-		return self._message_typesetting(status=0, message='10 times prophet_summon', data=result_dict)
+			message_dict["data"]["remaining"].update({"cost_item": cost_item, "cost_quantity": result["remaining"], "status": message_dict["status"]})
+			message_dict["data"]["reward"].update({"status": message_dict["status"]})
+			remaining_dict.update({str(i): message_dict["data"]["remaining"]})
+			reward_dict.update({str(i): message_dict["data"]["reward"]})
+		return self._message_typesetting(status=0, message='10 times prophet_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 # end   2019年8月5日17点53分 houyao
 #############################################################################
 #						End Lottery Module Functions						#
@@ -1568,11 +1580,13 @@ class GameManager:
 		return await self._try_material(world, unique_id, 'fortune_wheel_ticket_pro', value)
 
 	async def _default_summon(self, world: int, unique_id: str, cost_item: str, tier: str, summon_item: str):
-		# success -> 0 , 1 , 2 , 3
+		# success -> 0 , 1 , 2 , 3 , 4 , 5
 		# 0  - get skill item success
-		# 1  - get weapon success
-		# 2  - get weapon segment success
-		# 3  - get role item success
+		# 1  - you already has skill, get scroll
+		# 2  - get weapon success
+		# 3  - get weapon segment success
+		# 4  - get role item success
+		# 5  - get role segment success
 		# 95 - operation error
 		# 96 - weapons operation error
 		# 97 - skill operation error
@@ -1600,68 +1614,100 @@ class GameManager:
 			if try_result['status'] == 0 or try_result['status'] == 1:
 				if try_result['status'] == 0:
 					message_dic = {
-						'remaining':
-						{
-							try_result['data']['keys'][0] : try_result['data']['values'][0],
-							cost_item : result['remaining']
+						'remaining': {
+							"skill_id": try_result['data']["keys"][0],
+							"skill_level": try_result['data']["values"][0],
+							"cost_item": cost_item,
+							"cost_quantity": result["remaining"]
 						},
-						'reward':
-						{
-							try_result['data']['keys'][0] : try_result['data']['values'][0]
+						'reward': {
+							"skill_id": try_result['data']["keys"][0],
+							"skill_level": try_result['data']["values"][0]
 						}
 					}
+					return self._message_typesetting(0, 'get skill item success', message_dic)
 				else:
 					message_dic = {
-						'remaining':
-						{
-							try_result['data']['keys'][0] : try_result['data']['values'][0],
-							cost_item : result['remaining']
+						'remaining': {
+							"scroll_id": try_result['data']["keys"][0],
+							"scroll_quantity": try_result['data']["values"][0],
+							"cost_item": cost_item,
+							"cost_quantity": result["remaining"]
 						},
-						'reward':
-						{
-							try_result['data']['keys'][0] : 1
+						'reward': {
+							"scroll_id": try_result['data']["keys"][0],
+							"scroll_quantity": 1
 						}
 					}
-				if cost_item == "10_times":
-					message_dic["remaining"].pop(cost_item)
-				return self._message_typesetting(0, 'get skill item success', message_dic)
+					return self._message_typesetting(1, 'you already has skill, get scroll', message_dic)
 			else:
 				return self._message_typesetting(97, 'skill operation error')
 		elif summon_item == 'weapons':
 			try_result = await self.random_gift_segment(world, unique_id, tier)
-			if try_result['status'] == 0 or try_result['status'] == 1:
+			if try_result['status'] == 0 :
 				message_dic = {
-					'remaining' :
+					'remaining':
 					{
-						'weapon' : try_result['data']['values'][0],
-						'star' : try_result['data']['values'][1],
-						'segment' : try_result['data']['values'][2],
-						cost_item : result['remaining']
+						'weapon': try_result['data']['values'][0],
+						'star': try_result['data']['values'][1],
+						'segment': try_result['data']['values'][2],
+						"cost_item": cost_item,
+						"cost_quantity": result["remaining"]
 					},
 					'reward':
 					{
-						'weapon' : try_result['data']['values'][0],
-						'segment' : self._standard_segment_count
+						'weapon': try_result['data']['values'][0],
+						'star': 1
 					}
 				}
-				if cost_item == "10_times":
-					message_dic["remaining"].pop(cost_item)
-				if try_result['status'] == 0:
-					return self._message_typesetting(1, 'get weapon success', message_dic)
-				else:
-					return self._message_typesetting(2, 'get weapon segment success', message_dic)
+				return self._message_typesetting(2, 'get weapon success', message_dic)
+			elif try_result['status'] == 1 :
+				message_dic = {
+					'remaining':
+					{
+						'weapon': try_result['data']['values'][0],
+						'star': try_result['data']['values'][1],
+						'segment': try_result['data']['values'][2],
+						"cost_item": cost_item,
+						"cost_quantity": result["remaining"]
+					},
+					'reward':
+					{
+						'weapon': try_result['data']['values'][0],
+						'segment': self._standard_segment_count
+					}
+				}
+				return self._message_typesetting(3, 'get weapon segment success', message_dic)
 			else:
 				return self._message_typesetting(96, 'weapons operation error')
 		elif summon_item == 'roles':
 			try_result = await self.random_gift_role(world, unique_id, tier)
-			if try_result['status'] == 0 or try_result['status'] == 1:
+			if try_result['status'] == 0:
 				message_dic = {
 					'remaining' :
 					{
 						'role' : try_result['data']['values'][0],
 						'star' : try_result['data']['values'][1],
 						'segment' : try_result['data']['values'][2],
-						cost_item : result['remaining']
+						"cost_item": cost_item,
+						"cost_quantity": result["remaining"]
+					},
+					'reward':
+					{
+						'role' : try_result['data']['values'][0],
+						'star' : 1
+					}
+				}
+				return self._message_typesetting(4, 'get role success', message_dic)
+			elif try_result['status'] == 1:
+				message_dic = {
+					'remaining' :
+					{
+						'role' : try_result['data']['values'][0],
+						'star' : try_result['data']['values'][1],
+						'segment' : try_result['data']['values'][2],
+						"cost_item": cost_item,
+						"cost_quantity": result["remaining"]
 					},
 					'reward':
 					{
@@ -1669,9 +1715,7 @@ class GameManager:
 						'segment' : self._standard_segment_count
 					}
 				}
-				if cost_item == "10_times":
-					message_dic["remaining"].pop(cost_item)
-				return self._message_typesetting(3, 'get role item success', message_dic)
+				return self._message_typesetting(5, 'get role segment success', message_dic)
 			else:
 				return self._message_typesetting(95, 'operation error')
 # end    2019年8月5日10点59分 houyao
@@ -2113,7 +2157,7 @@ async def __basic_summon_10_times(request: web.Request) -> web.Response:
 @ROUTES.post('/pro_summon_10_times')
 async def __pro_summon_10_times(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).basic_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'], "weapons")
+	result = await (request.app['MANAGER']).pro_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'], "weapons")
 	return _json_response(result)
 
 
@@ -2161,7 +2205,7 @@ async def __basic_summon_skill_10_times(request: web.Request) -> web.Response:
 @ROUTES.post('/pro_summon_skill_10_times')
 async def __pro_summon_skill_10_times(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).basic_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'], "skills")
+	result = await (request.app['MANAGER']).pro_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'], "skills")
 	return _json_response(result)
 
 
@@ -2204,7 +2248,7 @@ async def __basic_summon_roles_10_times(request: web.Request) -> web.Response:
 @ROUTES.post('/pro_summon_roles_10_times')
 async def __pro_summon_roles_10_times(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).basic_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'], "roles")
+	result = await (request.app['MANAGER']).pro_summon_10_times(int(post['world']), post['unique_id'], post['cost_item'], "roles")
 	return _json_response(result)
 
 
