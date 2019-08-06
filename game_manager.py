@@ -579,7 +579,7 @@ class GameManager:
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
 
-	async def pass_stage(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
+	async def pass_stage(self, world: int, unique_id: str, stage: int, clear_time: str) -> dict:
 		# success ===> 0
 		# 0 : passed customs ===> success
 		# 98 : database operation error
@@ -637,7 +637,7 @@ class GameManager:
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
 
-	async def pass_tower(self, world: int, unique_id: str, stage: int, customs_clearance_time: str) -> dict:
+	async def pass_tower(self, world: int, unique_id: str, stage: int, clear_time: str) -> dict:
 		# 0 - Earn rewards success
 		# 1 - Successfully unlock new skills
 		# 2 - Gain a scroll
@@ -654,8 +654,17 @@ class GameManager:
 
 		if stage % 10 != 0:
 			material_dict = {"tower_stage": 0}
+			remaining = {}
+			energy = 0
 			for key, value in pass_tower_data[str(stage)].items():
-				material_dict.update({key: value})
+				if "energy" == key:
+					energy = value
+					energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=value)
+					keys, values = energy_data["data"]["keys"], energy_data["data"]["values"]
+					for i in range(len(keys)):
+						remaining.update({keys[i]: values[i]})
+				else:
+					material_dict.update({key: value})
 			if sql_stage + 1 == stage:  # 通过新关卡
 				material_dict.update({"tower_stage": 1})
 			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
@@ -663,10 +672,11 @@ class GameManager:
 				return self._message_typesetting(status=97, message="pass_tower_data -> database operating error")
 			keys = list(material_dict.keys())
 			values = list((await self._execute_statement(world=world, statement=select_str))[0])
-			remaining = {}
 			for i in range(len(keys)):
 				remaining.update({keys[i]: values[i]})
 			material_dict.pop("tower_stage")
+			if energy != 0:
+				remaining.update({"energy": energy})
 			return self._message_typesetting(status=0, message="Earn rewards success", data={"remaining": remaining, "reward": material_dict})
 		else:
 			reward = random.choices(population=pass_tower_data[str(stage)])[0]
@@ -2095,6 +2105,7 @@ def _json_response(body: dict = "", **kwargs) -> web.Response:
 	return web.Response(**kwargs)
 
 
+# SERVER PRIVATE
 @ROUTES.post('/get_all_head')
 async def __get_all_head(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -2123,12 +2134,6 @@ async def __add_supplies(request: web.Request) -> web.Response:
 async def __level_up_scroll(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).level_up_scroll(int(post['world']), post['unique_id'], post['scroll_id'])
-	return _json_response(result)
-
-@ROUTES.post('/try_all_material')
-async def __try_all_material(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).try_all_material(int(post['world']), post['unique_id'], int(post['stage']))
 	return _json_response(result)
 
 @ROUTES.post('/try_energy')
