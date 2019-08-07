@@ -1702,7 +1702,7 @@ class GameManager:
 				return self._message_typesetting(97, 'database skill operation error')
 		else:
 			return self._message_typesetting(96, 'item name error')
-		return self._message_typesetting(5, 'get item success', {'remaining' : {"cost_item": cost_item, "cost_quantity": result["remaining"], "item_id": random_item, "item_quantity": [try_result['remaining']]}, 'reward' : {"item_id": random_item, "item_quantity": self._lottery['fortune_wheel']['reward'][tier][random_item]}})
+		return self._message_typesetting(5, 'get item success', {'remaining' : {"cost_item": cost_item, "cost_quantity": result["remaining"], "item_id": random_item, "item_quantity": try_result['remaining']}, 'reward' : {"item_id": random_item, "item_quantity": self._lottery['fortune_wheel']['reward'][tier][random_item]}})
 
 
 	async def _decrease_energy(self, world:int, unique_id: str, amount: int) -> dict:
