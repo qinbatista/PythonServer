@@ -1634,7 +1634,9 @@ class GameManager:
 					{
 						"weapon" : try_result['data']['values'][0],
 						'star' : try_result['data']['values'][1],
-						'segment' : try_result['data']['values'][2]
+						'segment' : try_result['data']['values'][2],
+						"cost_item": cost_item,
+						"cost_quantity": result["remaining"]
 					},
 					'reward':
 					{
@@ -1649,7 +1651,9 @@ class GameManager:
 					{
 						"weapon" : try_result['data']['values'][0],
 						'star' : try_result['data']['values'][1],
-						'segment' : try_result['data']['values'][2]
+						'segment' : try_result['data']['values'][2],
+						"cost_item": cost_item,
+						"cost_quantity": result["remaining"]
 					},
 					'reward':
 					{
@@ -1667,7 +1671,9 @@ class GameManager:
 					"remaining":
 					{
 						"skill_id" : try_result['data']['keys'][0],
-						'skill_level' : try_result['data']['values'][0]
+						'skill_level' : try_result['data']['values'][0],
+						"cost_item": cost_item,
+						"cost_quantity": result["remaining"]
 					},
 					'reward':
 					{
@@ -1681,7 +1687,9 @@ class GameManager:
 					'remaining' :
 					{
 						'scroll_id' : try_result['data']['keys'][0],
-						'scroll_quantity' : try_result['data']['values'][0]
+						'scroll_quantity' : try_result['data']['values'][0],
+						"cost_item": cost_item,
+						"cost_quantity": result["remaining"]
 					},
 					'reward' :
 					{
