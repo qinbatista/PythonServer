@@ -147,7 +147,7 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _disintegrate_weapon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/disintegrate_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
 			return await resp.text()
 	# endregion
 
@@ -360,6 +360,27 @@ class MessageHandler:
 	async def _get_lottery_config_info(self, message: dict, session) -> str:
 		async with session.post('http://localhost:8006/get_lottery_config_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
+	
+	async def _get_hang_up_info(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_hang_up_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _get_all_friend_info(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_friend_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()	
+	async def _request_friend(self, message: dict, session) -> str:
+		async with session.post('http://localhost:8006/request_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
+			return await resp.text()
+	async def _delete_friend(self, message: dict, session) -> str:
+		async with session.post('http://localhost:8006/delete_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
+			return await resp.text()
+			
+	async def _send_all_friend_gift(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/send_all_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+			
+	async def _redeem_all_nonce(self, message: dict, session) -> str:
+		async with session.post('http://localhost:8006/redeem_all_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'type_list': message['data']['type_list'], 'nonce_list': message['data']['nonce_list']}) as resp:
+			return await resp.text()
 ###############################################################################
 
 
@@ -440,6 +461,7 @@ FUNCTION_LIST = {
 	'level_enemy_layouts_config' : MessageHandler._level_enemy_layouts_config,
 	'monster_config' : MessageHandler._monster_config,
 	'get_stage_reward_config' : MessageHandler._get_stage_reward_config,
+	'get_hang_up_info' : MessageHandler._get_hang_up_info,
 	
 	
 	
@@ -447,8 +469,13 @@ FUNCTION_LIST = {
 	
 	
 	
+	'get_all_friend_info': MessageHandler._get_all_friend_info,
+	'delete_friend': MessageHandler._delete_friend,
+	'request_friend': MessageHandler._request_friend,
 	'send_friend_gift': MessageHandler._send_friend_gift,
+	'send_all_friend_gift': MessageHandler._send_all_friend_gift,
 	'redeem_nonce': MessageHandler._redeem_nonce,
+	'redeem_all_nonce': MessageHandler._redeem_all_nonce,
 	'get_new_mail': MessageHandler._get_new_mail,
 	'get_all_mail': MessageHandler._get_all_mail
 

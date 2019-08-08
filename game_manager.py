@@ -1102,7 +1102,7 @@ class GameManager:
 			if await self._execute_statement_update(world, sql_str) == 0:
 				return self._message_typesetting(96, 'weapon -> database operating error')
 			segment = (await self._execute_statement(world, 'SELECT segment FROM weapon WHERE unique_id = "%s" AND weapon_name="%s";' % (unique_id, merchandise)))[0][0]
-			remaining.update({'code' : code, 'weapon' : merchandise, 'segment' : segment, currency_type : currency_type_data['remaining']})
+			remaining.update({'code' : code, 'weapon' : merchandise, 'segment' : segment, 'currency_type' : currency_type, 'cost_remaining' : currency_type_data['remaining']})
 			if await self._set_dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
 				pass # only a print statement found in original code, maybe should return error?
 			return self._message_typesetting(0, 'gain weapon fragments', {'remaining' : remaining})
@@ -1112,7 +1112,7 @@ class GameManager:
 				return self._message_typesetting(97, currency_type + ' insufficient')
 			skill_data = await self.try_unlock_skill(world, unique_id, merchandise)
 			if skill_data['status'] == 0:
-				remaining.update({'code' : code, 'skill' : merchandise, 'level' : 1, currency_type : currency_type_data['remaining']})
+				remaining.update({'code' : code, 'skill' : merchandise, 'level' : 1, 'currency_type' : currency_type, 'cost_remaining' : currency_type_data['remaining']})
 				if await self._set_dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
 					pass # only a print statement found in original code
 				return self._message_typesetting(1, 'gain new skills', {'remaining' : remaining})
@@ -1121,7 +1121,7 @@ class GameManager:
 				scroll_data = await self._try_material(world, unique_id, scroll, 1)
 				if scroll_data['status'] == 1:
 					return self._message_typesetting(95, 'skill -> database operating error')
-				remaining.update({'code' : code, 'scroll' : scroll, 'quantity' : scroll_data['remaining'], currency_type : currency_type_data['remaining']})
+				remaining.update({'code' : code, 'scroll' : scroll, 'quantity' : scroll_data['remaining'], 'currency_type' : currency_type, 'cost_remaining' : currency_type_data['remaining']})
 				if await self._set_dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
 					pass # only a print statement found in original code
 				return self._message_typesetting(2, 'gain a scroll', {'remaining' : remaining})
@@ -1132,7 +1132,7 @@ class GameManager:
 			other_data = await self._try_material(world, unique_id, merchandise, merchandise_quantity)
 			if other_data['status'] == 1:
 				return self._message_typesetting(94, 'other -> database operating error')
-			remaining.update({'code' : code, 'merchandise' : merchandise, 'quantity' : other_data['remaining'], currency_type : currency_type_data['remaining']})
+			remaining.update({'code' : code, 'merchandise' : merchandise, 'quantity' : other_data['remaining'], 'currency_type' : currency_type, 'cost_remaining' : currency_type_data['remaining']})
 			if await self._set_dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
 				pass # only a print statement found in original code
 			return self._message_typesetting(3, 'gain several materials', {'remaining' : remaining})
