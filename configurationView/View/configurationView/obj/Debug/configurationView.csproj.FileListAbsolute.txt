@@ -1,0 +1,13 @@
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\bin\Debug\configurationView.exe.config
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\bin\Debug\configurationView.exe
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\bin\Debug\configurationView.pdb
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\obj\Debug\configurationView.csprojAssemblyReference.cache
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\obj\Debug\configurationView.Form1.resources
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\obj\Debug\configurationView.Properties.Resources.resources
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\obj\Debug\configurationView.csproj.GenerateResource.cache
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\obj\Debug\configurationView.csproj.CoreCompileInputs.cache
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\obj\Debug\configurationView.exe
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\obj\Debug\configurationView.pdb
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\bin\Debug\Newtonsoft.Json.dll
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\bin\Debug\Newtonsoft.Json.xml
+D:\FileDocument\WorkFile\lukseunserversys\configurationView\View\configurationView\obj\Debug\configurationView.csproj.CopyComplete

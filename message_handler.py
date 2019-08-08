@@ -145,6 +145,10 @@ class MessageHandler:
 	async def _get_all_weapon(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
+
+	async def _disintegrate_weapon(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
+			return await resp.text()
 	# endregion
 
 	async def _enter_tower(self, message: dict, session) -> str:
@@ -153,6 +157,14 @@ class MessageHandler:
 
 	async def _pass_tower(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/pass_tower', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage'], 'clear_time' : message['data']['clear_time']}) as resp:
+			return await resp.text()
+
+	async def _get_all_stage_info(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_stage_info') as resp:
+			return await resp.text()
+
+	async def __get_all_armor_info(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_armor_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _pass_stage(self, message: dict, session) -> str:
@@ -380,6 +392,7 @@ FUNCTION_LIST = {
 	'level_up_weapon_star' : MessageHandler._level_up_weapon_star,
 	'reset_weapon_skill_point' : MessageHandler._reset_weapon_skill_point,
 	'get_all_weapon' : MessageHandler._get_all_weapon,
+	'disintegrate_weapon' : MessageHandler._disintegrate_weapon,
 	'try_unlock_weapon' : MessageHandler._try_unlock_weapon,
 	'pass_stage' : MessageHandler._pass_stage,
 	'basic_summon' : MessageHandler._basic_summon,
@@ -420,7 +433,8 @@ FUNCTION_LIST = {
 	'upgrade_armor': MessageHandler._upgrade_armor,
 	'pass_tower' : MessageHandler._pass_tower,
 	'enter_tower' : MessageHandler._enter_tower,
-
+	'get_all_stage_info' : MessageHandler._get_all_stage_info,
+	'get_all_armor_info' : MessageHandler._get_all_armor_info,
 	
 	
 	'get_lottery_config_info' : MessageHandler._get_lottery_config_info,

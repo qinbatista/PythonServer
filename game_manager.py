@@ -464,10 +464,10 @@ class GameManager:
 
 	async def disintegrate_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# 0 - successful weapon decomposition
-		# 1 - User does not have that weapon
-		# 2 - insufficient diamond
-		# 3 - self._player is not updated
-		# 4 - database operation error
+		# 96 - User does not have that weapon
+		# 97 - insufficient diamond
+		# 98 - self._player is not updated
+		# 99 - database operation error
 		cost = self._player["disintegrate_weapon"]["cost"]  # cost is dict
 		reward = self._player["disintegrate_weapon"]["reward"]  # dict
 		weapon_tier = [
@@ -478,11 +478,11 @@ class GameManager:
 		]  # list
 		star = await self._get_weapon_star(world=world, unique_id=unique_id, weapon=weapon)
 		if star == 0:
-			return self._message_typesetting(status=1, message="User does not have this weapon")
+			return self._message_typesetting(status=96, message="User does not have this weapon")
 		#  能分解武器的情况下再扣钻石
 		diamond_data = await self.try_diamond(world=world, unique_id=unique_id, value=-1*int(cost["diamond"]))
 		if int(diamond_data["status"]) == 1:
-			return self._message_typesetting(status=2, message="Insufficient diamond")
+			return self._message_typesetting(status=97, message="Insufficient diamond")
 		reward_weapon_name = weapon
 		for i in range(len(weapon_tier)):
 			if weapon in weapon_tier[i]:
@@ -492,7 +492,7 @@ class GameManager:
 				reward_weapon_name = weapon_tier[i][key]  # 增加武器碎片的武器
 				break
 		if weapon == reward_weapon_name:
-			return self._message_typesetting(status=3, message="self._player not updated")
+			return self._message_typesetting(status=98, message="self._player not updated")
 		#  数据库操作
 		star_code = await self._set_weapon_star(world=world, unique_id=unique_id, weapon=weapon, star=0)  # 武器星数至0
 
@@ -505,20 +505,20 @@ class GameManager:
 		select_result = await self._execute_statement(world=world, statement=select_str)  # 获取含有碎片的查询的结果
 		coin_data = await self.try_coin(world=world, unique_id=unique_id, value=int(reward["coin"])) # 获取添加金币之后的金币数量
 		if star_code == 0 or update_code == 0 or int(coin_data["status"]) == 1:
-			return self._message_typesetting(status=4, message="database operating error ==> update_code: %s, star_code: %s, json_status: %s" % (update_code, star_code, coin_data["status"]))
+			return self._message_typesetting(status=99, message="database operating error ==> update_code: %s, star_code: %s, json_status: %s" % (update_code, star_code, coin_data["status"]))
 		data = {
 			"remaing": {
-				"cost_weapon_name": weapon,  # 武器分解的名字
-				"cost_weapon_star": 0,  # 武器分解之后的星数
+				"cost_weapon": weapon,  # 武器分解的名字
+				"cost_star": 0,  # 武器分解之后的星数
 				"coin": coin_data["remaining"],  # player表中金币的剩余数量
 				"diamond": diamond_data["remaining"],  # player表中钻石的剩余数量
-				"reward_weapon_name": reward_weapon_name,  # 奖励碎片的武器名字
-				"reward_weapon_segment": select_result[0][0]  # 碎片的剩余数量
+				"reward_weapon": reward_weapon_name,  # 奖励碎片的武器名字
+				"reward_segment": select_result[0][0]  # 碎片的剩余数量
 			},
 			"reward": {
 				"coin": reward["coin"],  # 分解武器奖励的金币
-				"reward_weapon_name": reward_weapon_name,  # 奖励碎片的武器名字
-				"reward_weapon_segment": reward_weapon_segment  # 奖励碎片的数量
+				"reward_weapon": reward_weapon_name,  # 奖励碎片的武器名字
+				"reward_segment": reward_weapon_segment  # 奖励碎片的数量
 			}
 		}
 		return self._message_typesetting(status=0, message="Successful weapon decomposition", data=data)
@@ -706,6 +706,13 @@ class GameManager:
 			else:
 				return self._message_typesetting(status=96, message="Accidental prize -> " + reward)
 
+	async def get_all_stage_info(self):
+		# 0 - got all stage info
+		# 99 - configration is empty
+		if self._entry_consumables == "":
+			return self._message_typesetting(99, 'configration is empty')
+		return self._message_typesetting(0, 'got all stage info', data={"remaining": self._entry_consumables})
+
 	async def start_hang_up(self, world: int, unique_id: str, stage: int) -> dict:
 		"""
 		success ===> 0 , 1
@@ -875,7 +882,17 @@ class GameManager:
 			await self._execute_statement_update(world=world, statement=f"insert into armor(unique_id, armor_id) values ('{unique_id}','{armor_id}')")
 			return (await self._execute_statement(world=world, statement=sql_str))[0]
 
-	
+	async def get_all_armor_info(self, world: int, unique_id: str):
+		# 0 - got all armor info
+		result = await self._execute_statement(world, f"SELECT * FROM armor WHERE unique_id='{unique_id}';")
+		remaining = {}
+		for i in range(0,len(result)):
+			remaining.update({result[i][1]:{}})
+			for j in range(1,11):
+				remaining[result[i][1]].update({"armor_level"+str(j):result[i][j+1]})
+		# print("remaining="+str(remaining))
+		return self._message_typesetting(0, 'got all armor info', data={"remaining": remaining})
+
 	async def automatically_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		success -> 0 and 1
@@ -1401,9 +1418,11 @@ class GameManager:
 #############################################################################
 	
 	async def get_all_friend_info(self, world: int, unique_id: str) -> dict:
+		# 0 - Got all friends info
+		# 99 - You do not have any friends. FeelsBadMan.
 		friends = await self._execute_statement(world, f'SELECT * FROM friend WHERE unique_id = "{unique_id}";')
 		if len(friends) == 0:
-			return self._message_typesetting(98, 'You do not have any friends. FeelsBadMan.')
+			return self._message_typesetting(99, 'You do not have any friends. FeelsBadMan.')
 		remaining = {'remaining' : {'f_list_id' : [], 'f_name' : [], 'f_level' : [], 'f_recovery_time' : []}}
 		for friend in friends:
 			remaining['remaining']['f_list_id'].append(friend[1])
@@ -2277,6 +2296,12 @@ async def __get_all_weapon(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).get_all_weapon(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
+@ROUTES.post('/disintegrate_weapon')
+async def __disintegrate_weapon(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).disintegrate_weapon(int(post['world']), post['unique_id'], post['weapon'])
+	return _json_response(result)
+
 @ROUTES.post('/try_unlock_weapon')
 async def __try_unlock_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -2299,6 +2324,11 @@ async def __enter_tower(request: web.Request) -> web.Response:
 async def __pass_tower(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).pass_tower(int(post['world']), post['unique_id'], int(post['stage']), post['clear_time'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_stage_info')
+async def __get_all_stage_info(request: web.Request) -> web.Response:
+	result = await (request.app['MANAGER']).get_all_stage_info()
 	return _json_response(result)
 
 
@@ -2546,6 +2576,12 @@ async def __show_energy(request: web.Request) -> web.Response:
 async def __upgrade_armor(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).upgrade_armor(int(post['world']), post['unique_id'], post["armor_kind"], int(post['armor_id']))
+	return _json_response(result)
+
+@ROUTES.post('/get_all_armor_info')
+async def __get_all_armor_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_all_armor_info(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 @ROUTES.post('/redeem_nonce')
