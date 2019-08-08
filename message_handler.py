@@ -163,7 +163,7 @@ class MessageHandler:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_stage_info') as resp:
 			return await resp.text()
 
-	async def __get_all_armor_info(self, message: dict, session) -> str:
+	async def _get_all_armor_info(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_armor_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
@@ -346,9 +346,6 @@ class MessageHandler:
 	#async def _get_all_tower_info(self, message: dict, session) -> str:
 	#	async with session.post('http://localhost:8006/get_all_tower_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 	#		return await resp.text()
-	async def _get_all_armor_info(self, message: dict, session) -> str:
-		async with session.post('http://localhost:8006/get_all_armor_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
-			return await resp.text()
 			
 	async def _level_enemy_layouts_config(self, message: dict, session) -> str:
 		async with session.post('http://localhost:8006/level_enemy_layouts_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
@@ -439,7 +436,7 @@ FUNCTION_LIST = {
 	
 	'get_lottery_config_info' : MessageHandler._get_lottery_config_info,
 	#'get_all_tower_info' : MessageHandler._get_all_tower_info,
-	'get_all_armor_info' : MessageHandler._get_all_armor_info,
+	#'get_all_armor_info' : MessageHandler._get_all_armor_info,
 	'level_enemy_layouts_config' : MessageHandler._level_enemy_layouts_config,
 	'monster_config' : MessageHandler._monster_config,
 	'get_stage_reward_config' : MessageHandler._get_stage_reward_config,

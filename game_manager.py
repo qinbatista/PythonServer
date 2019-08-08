@@ -928,7 +928,7 @@ class GameManager:
 						return self._message_typesetting(99, 'database operation error')
 				elif merchandise in dark_market_data['other'].keys():
 					currency_type = (random.choices(list(dark_market_data['other'][merchandise].keys()), k=1))[0]
-					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
+					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['quantity_max']))
 					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
 						return self._message_typesetting(99, 'database operating error')
 				else:
@@ -965,8 +965,8 @@ class GameManager:
 							return self._message_typesetting(99, 'database operation error')
 					elif merchandise in dark_market_data['other'].keys():
 						currency_type = (random.choices(list(dark_market_data['other'][merchandise].keys()), k=1))[0]
-						merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
-						currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]['cost_range_min']), int(dark_market_data['other'][merchandise][currency_type]['quantity_max']))
+						merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['quantity_max']))
+						currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]['cost_range_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
 						if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
 							return self._message_typesetting(99, 'database operating error')
 					else:
@@ -1016,7 +1016,7 @@ class GameManager:
 						return self._message_typesetting(99, 'database operation error')
 				elif merchandise in dark_market_data['other'].keys():
 					currency_type = (random.choices(list(dark_market_data['other'][merchandise].keys()), k=1))[0]
-					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
+					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['quantity_max']))
 					currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]['cost_range_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
 					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
 						return self._message_typesetting(99, 'database operating error')
@@ -1063,7 +1063,7 @@ class GameManager:
 						return self._message_typesetting(99, 'database operation error')
 				elif merchandise in dark_market_data['other'].keys():
 					currency_type = (random.choices(list(dark_market_data['other'][merchandise].keys()), k=1))[0]
-					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
+					merchandise_quantity = random.randint(int(dark_market_data['other'][merchandise][currency_type]['quantity_min']), int(dark_market_data['other'][merchandise][currency_type]['quantity_max']))
 					currency_type_price = random.randint(int(dark_market_data['other'][merchandise][currency_type]['cost_range_min']), int(dark_market_data['other'][merchandise][currency_type]['cost_range_max']))
 					if await self._set_dark_market_material(world, unique_id, code, merchandise, merchandise_quantity, currency_type, currency_type_price, refresh_time, refreshable_quantity) == 0:
 						return self._message_typesetting(99, 'database operating error')
