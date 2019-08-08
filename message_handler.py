@@ -18,8 +18,8 @@ DESKey = CONFIG['message_handler']['DESKey']
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 TOKEN_BASE_URL = CONFIG['token_server']['address'] + ":" + CONFIG['token_server']['port']
 MANAGER_ACCOUNT_BASE_URL = CONFIG['account_manager']['address'] + ":" + CONFIG['account_manager']['port']
-#MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager']['port']
-MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager_qin']['port']
+MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager']['port']
+# MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager_qin']['port']
 
 class InvalidHeaderError(Exception):
 	pass
@@ -146,7 +146,15 @@ class MessageHandler:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 	# endregion
-	
+
+	async def _enter_tower(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/enter_tower', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
+			return await resp.text()
+
+	async def _pass_tower(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/pass_tower', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage'], 'clear_time' : message['data']['clear_time']}) as resp:
+			return await resp.text()
+
 	async def _pass_stage(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/pass_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage': message['data']['stage'], 'clear_time' : message['data']['clear_time']}) as resp:
 			return await resp.text()
@@ -321,6 +329,28 @@ class MessageHandler:
 			return await resp.text()
 
 
+
+
+	async def _get_all_tower_info(self, message: dict, session) -> str:
+		async with session.post('http://localhost:8006/get_all_tower_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _get_all_armor_info(self, message: dict, session) -> str:
+		async with session.post('http://localhost:8006/get_all_armor_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+			
+	async def _level_enemy_layouts_config(self, message: dict, session) -> str:
+		async with session.post('http://localhost:8006/level_enemy_layouts_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _monster_config(self, message: dict, session) -> str:
+		async with session.post('http://localhost:8006/monster_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _get_stage_reward_config(self, message: dict, session) -> str:
+		async with session.post('http://localhost:8006/get_stage_reward_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _get_lottery_config_info(self, message: dict, session) -> str:
+		async with session.post('http://localhost:8006/get_lottery_config_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
 ###############################################################################
 
 
@@ -388,7 +418,24 @@ FUNCTION_LIST = {
 	'black_market_transaction': MessageHandler._black_market_transaction,
 	'show_energy': MessageHandler._show_energy,
 	'upgrade_armor': MessageHandler._upgrade_armor,
+	'pass_tower' : MessageHandler._pass_tower,
+	'enter_tower' : MessageHandler._enter_tower,
 
+	
+	
+	'get_lottery_config_info' : MessageHandler._get_lottery_config_info,
+	'get_all_tower_info' : MessageHandler._get_all_tower_info,
+	'get_all_armor_info' : MessageHandler._get_all_armor_info,
+	'level_enemy_layouts_config' : MessageHandler._level_enemy_layouts_config,
+	'monster_config' : MessageHandler._monster_config,
+	'get_stage_reward_config' : MessageHandler._get_stage_reward_config,
+	
+	
+	
+	
+	
+	
+	
 	'send_friend_gift': MessageHandler._send_friend_gift,
 	'redeem_nonce': MessageHandler._redeem_nonce,
 	'get_new_mail': MessageHandler._get_new_mail,
