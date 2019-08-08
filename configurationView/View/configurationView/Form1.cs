@@ -17,7 +17,8 @@ namespace configurationView
     public partial class Form1 : Form
     {
         //DirectoryInfo di1 = new DirectoryInfo(Directory.GetCurrentDirectory());
-        string json_version = "..//..//..//..//..//configuration//config_timer_setting.json";
+        static string main_path = "..//..//..//..//..//configuration//";
+        string json_version = main_path + "config_timer_setting.json";
         StreamReader stream;
         JsonTextReader reader;
         JObject json;
