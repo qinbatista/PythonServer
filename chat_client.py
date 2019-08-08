@@ -3,6 +3,9 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import tkinter
+import requests
+import configparser
+import time
 
 MAXSIZE = 250
 
@@ -69,9 +72,19 @@ send_button.pack()
 
 top.protocol("WM_DELETE_WINDOW", on_closing)
 
+while True:
+	try:
+		r = requests.get('http://localhost:8000/get_server_config_location')
+		parser = configparser.ConfigParser()
+		parser.read(r.json()['file'])
+		break
+	except requests.exceptions.ConnectionError:
+		print('Could not find configuration server, retrying in 5 seconds...')
+		time.sleep(5)
+
 #----Now comes the sockets part----
 HOST = '127.0.0.1'
-PORT = 8888
+PORT = parser.getint('chat_server', 'port')
 
 ADDR = (HOST, PORT)
 
