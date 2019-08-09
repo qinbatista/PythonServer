@@ -1006,6 +1006,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(status=98, message="you don't have this friend")
 
+
 	async def _get_all_resource_info(self, world: int, unique_id: str):
 		data = await self._execute_statement(world, 'SELECT * FROM player WHERE unique_id = "' + unique_id + '";')
 		mylist = list(data[0])
@@ -1078,7 +1079,7 @@ class GameManager:
 		if self._lottery=="":
 			return self._message_typesetting(1, 'configration is empty')
 		data = {"remaining":{"skills":self._lottery["skills"]["cost"],"weapons":self._lottery["weapons"]["cost"],"roles":self._lottery["roles"]["cost"],"fortune_wheel":self._lottery["fortune_wheel"]["cost"]}}
-		return self._message_typesetting(0, 'got all lottery config info',data)
+		return self._message_typesetting(0, 'got all lottery config info', data)
 
 	async def _get_stage_reward_config(self, world: int, unique_id: str):
 		if self._get_stage_reward_config_json=="":
@@ -1360,7 +1361,6 @@ class GameManager:
 			return self._message_typesetting(status=95, message="database operating error")
 
 		return self._message_typesetting(status=0, message="request friend successfully")
-
 
 	async def _response_friend(self, world: int, unique_id: str, nonce: str) -> dict:
 		# success -> 0
