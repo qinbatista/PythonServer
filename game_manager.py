@@ -1553,7 +1553,6 @@ class GameManager:
 			return self._message_typesetting(98, 'you do not have this friend')
 
 
-	
 	async def redeem_nonce(self, world: int, unique_id: str, nonce: str) -> dict:
 		# 0 - successfully redeemed
 		# 99 - database operation error
@@ -1570,13 +1569,115 @@ class GameManager:
 		quantities = (await self._execute_statement(world, sql_str))[0][0]
 		return self._message_typesetting(0, 'successfully redeemed', {'remaining' : {items : quantities}})
 
+	async def request_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
+		# success -> 0
+		# 0 - request friend successfully
+		# 95 - database operating error
+		# 96 - Mailbox error
+		# 97 - You already have this friend
+		# 98 - You have sent a friend request
+		# 99 - No such person
+		friend_data = await self._execute_statement(world=world, statement=f"SELECT unique_id FROM player WHERE game_name='{friend_name}'")
+		if len(friend_data) == 0:
+			return self._message_typesetting(status=99, message="No such person")
+		friend_id = friend_data[0][0]
 
+		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{unique_id}' and friend_id='{friend_id}'")
+		if len(data) != 0:
+			if data[0][5] == "":
+				return self._message_typesetting(status=98, message="You have sent a friend request")
+			return self._message_typesetting(status=97, message="You already have this friend")
 
+		unique_name = (await self._execute_statement(world=world, statement=f"SELECT game_name FROM player WHERE unique_id='{unique_id}'"))[0][0]
+		json_data = {
+			"world": world,
+			"uid_to": friend_id,
+			"kwargs": {
+				"from": "server",
+				"subject": "You have a friend request!",
+				"body": "Friend request",
+				"type": "friend_request",
+				"sender": unique_name,
+				"uid_sender": unique_id
+			}
+		}
+		result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+		if result["status"] != 0:
+			return self._message_typesetting(status=96, message='Mailbox error')
+
+		if await self._execute_statement_update(world=world, statement=f"insert into friend (unique_id, friend_id, friend_name) values ('{unique_id}', '{friend_id}', '{friend_name}')") == 0:
+			return self._message_typesetting(status=95, message="database operating error")
+
+		return self._message_typesetting(status=0, message="request friend successfully")
+
+	async def response_friend(self, world: int, unique_id: str, nonce: str) -> dict:
+		# success -> 0
+		# 0 - Add friends to success
+		# 98 - database operating error
+		# 99 - You already have this friend
+		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
+		print(response.text)
+		data = response.json()
+		friend_name = data[nonce]["sender"]
+		friend_id = data[nonce]["uid_sender"]
+
+		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
+		if data[0][5] != "":
+			return self._message_typesetting(status=99, message="You already have this friend")
+		# friend_name = data[0][2]
+
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		update_str = f"update friend set become_friend_time='{current_time}' where unique_id='{friend_id}' and friend_id='{unique_id}'"
+		insert_str = f"replace into friend(unique_id, friend_id, friend_name, become_friend_time) values('{unique_id}', '{friend_id}', '{friend_name}', '{current_time}')"
+		update_code = await self._execute_statement_update(world=world, statement=update_str)
+		insert_code = await self._execute_statement_update(world=world, statement=insert_str)
+		if update_code == 0 or insert_code == 0:
+			# print(f"update_code:{update_code}, update_str:{update_str}\ninsert_code:{insert_code}, insert_str:{insert_str}")
+			return self._message_typesetting(status=98, message="database operating error")
+		return self._message_typesetting(status=0, message="Add friends to success", data={"remaining": {"friend_name": friend_name, "become_friend_time": current_time}})
 
 #############################################################################
 #						End Friend Module Functions							#
 #############################################################################
 
+#############################################################################
+#                     Start Temp Function Position                          #
+#############################################################################
+
+	async def get_lottery_config_info(self, world: int, unique_id: str):
+		if self._lottery == "":
+			return self._message_typesetting(1, 'configration is empty')
+		data = {
+			"remaining": {
+				"skills": self._lottery["skills"]["cost"],
+				"weapons": self._lottery["weapons"]["cost"],
+				"roles": self._lottery["roles"]["cost"],
+				"fortune_wheel": self._lottery["fortune_wheel"]["cost"]
+			}
+		}
+		return self._message_typesetting(0, 'got all lottery config info', data)
+
+	async def get_stage_reward_config(self, world: int, unique_id: str):
+		if self._get_stage_reward_config_json == "":
+			return self._message_typesetting(1, 'configration is empty')
+		data = {"remaining": {"stage_reward_config": self._get_stage_reward_config_json}}
+		return self._message_typesetting(0, 'got all stage reward config info', data)
+
+	async def monster_config(self, world: int, unique_id: str):
+		if self._monster_config_json == "":
+			return self._message_typesetting(1, 'configration is empty')
+		data = {"remaining": {"monster_config": self._monster_config_json}}
+		return self._message_typesetting(0, 'got all monster config info', data)
+
+	async def level_enemy_layouts_config(self, world: int, unique_id: str):
+		if self._level_enemy_layouts_config_json == "":
+			return self._message_typesetting(1, 'configration is empty')
+		data = {"remaining": {"level_enemy_layouts_config": self._level_enemy_layouts_config_json}}
+		return self._message_typesetting(0, 'got all level enemy layouts config info', data)
+
+#############################################################################
+#                       End Temp Function Position                          #
+#############################################################################
 
 #############################################################################
 #						Start Family Functions								#
@@ -2188,6 +2289,14 @@ class GameManager:
 		self._hang_reward_list = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
 
+
+		result = requests.get('http://localhost:8000/get_stage_reward_config')
+		self._get_stage_reward_config_json = result.json()
+		result = requests.get('http://localhost:8000/get_monster_config')
+		self._monster_config_json = result.json()
+		result = requests.get('http://localhost:8000/get_level_enemy_layouts_config')
+		self._level_enemy_layouts_config_json = result.json()
+
 	def _start_timer(self, seconds: int):
 		t = threading.Timer(seconds, self._refresh_configuration)
 		t.daemon = True
@@ -2624,6 +2733,24 @@ async def _delete_friend(request: web.Request) -> web.Response:
 	return _json_response(data)
 
 
+@ROUTES.post('/request_friend')
+async def _request_friend(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).request_friend(int(post['world']), post['unique_id'], post['friend_name'])
+	return _json_response(result)
+
+
+@ROUTES.post('/response_friend')
+async def _response_friend(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).response_friend(int(post['world']), post['unique_id'], post['nonce'])
+	return _json_response(result)
+
+
+@ROUTES.post('/get_new_mail')
+async def _get_new_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8020/get_new_mail', data=await request.post()).text))
+
 @ROUTES.post('/start_hang_up')
 async def __start_hang_up(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -2687,7 +2814,29 @@ async def _remove_user_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).remove_user_family(int(post['world']), post['unique_id'], post['user']))
 
+@ROUTES.post('/get_lottery_config_info')
+async def _get_lottery_config_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_lottery_config_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
 
+@ROUTES.post('/get_stage_reward_config')
+async def _get_stage_reward_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_stage_reward_config(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/monster_config')
+async def _monster_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).monster_config(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/level_enemy_layouts_config')
+async def _level_enemy_layouts_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).level_enemy_layouts_config(int(post['world']), post['unique_id'])
+	return _json_response(result)
 
 def get_config() -> configparser.ConfigParser:
 	'''
