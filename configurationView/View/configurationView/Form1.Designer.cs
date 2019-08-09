@@ -31,6 +31,8 @@
             this.components = new System.ComponentModel.Container();
             this.label = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label8 = new System.Windows.Forms.Label();
+            this.WaveNumber = new System.Windows.Forms.NumericUpDown();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
@@ -57,13 +59,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.dateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.label8 = new System.Windows.Forms.Label();
-            this.WaveNumber = new System.Windows.Forms.NumericUpDown();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.WaveNumber)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ColdDownTime)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TotalTime)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.WaveNumber)).BeginInit();
             this.SuspendLayout();
             // 
             // label
@@ -102,6 +102,28 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1178, 505);
             this.panel1.TabIndex = 1;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(26, 169);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(80, 18);
+            this.label8.TabIndex = 27;
+            this.label8.Text = "第几波怪";
+            // 
+            // WaveNumber
+            // 
+            this.WaveNumber.Location = new System.Drawing.Point(112, 164);
+            this.WaveNumber.Name = "WaveNumber";
+            this.WaveNumber.Size = new System.Drawing.Size(81, 28);
+            this.WaveNumber.TabIndex = 26;
+            this.WaveNumber.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.WaveNumber.ValueChanged += new System.EventHandler(this.WaveNumber_ValueChanged);
             // 
             // comboBox1
             // 
@@ -169,6 +191,7 @@
             this.button4.TabIndex = 19;
             this.button4.Text = "删除";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.Button4_Click);
             // 
             // comboBox4
             // 
@@ -187,6 +210,7 @@
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(571, 26);
             this.comboBox3.TabIndex = 17;
+            this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.ComboBox3_SelectedIndexChanged);
             // 
             // label6
             // 
@@ -213,7 +237,6 @@
             this.IsPreWaveFinish.Name = "IsPreWaveFinish";
             this.IsPreWaveFinish.Size = new System.Drawing.Size(213, 22);
             this.IsPreWaveFinish.TabIndex = 14;
-            this.IsPreWaveFinish.TabStop = true;
             this.IsPreWaveFinish.Text = "是否等待上一波怪打完";
             this.IsPreWaveFinish.UseVisualStyleBackColor = true;
             // 
@@ -351,28 +374,6 @@
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(26, 169);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(80, 18);
-            this.label8.TabIndex = 27;
-            this.label8.Text = "第几波怪";
-            // 
-            // WaveNumber
-            // 
-            this.WaveNumber.Location = new System.Drawing.Point(112, 164);
-            this.WaveNumber.Name = "WaveNumber";
-            this.WaveNumber.Size = new System.Drawing.Size(81, 28);
-            this.WaveNumber.TabIndex = 26;
-            this.WaveNumber.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.WaveNumber.ValueChanged += new System.EventHandler(this.WaveNumber_ValueChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -392,10 +393,10 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.WaveNumber)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ColdDownTime)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TotalTime)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.WaveNumber)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

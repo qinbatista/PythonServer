@@ -318,11 +318,11 @@ if __name__ == "__main__":
 	# upgrade_armor(1)
 	# random_gift_segment()
 	# start ########################################################
-	send_friend_gift(unique_id="4", friend_name="a")
+	# send_friend_gift(unique_id="4", friend_name="a")
 	# nonce = get_new_mail(unique_id="6")
 	# redeem_nonce(unique_id="6", nonce=nonce)
 
-	# request_friend(unique_id="1", friend_name="d")
+	# request_friend(unique_id="4", friend_name="a")
 	# nonce = get_new_mail(unique_id="4")
 	# response_friend(unique_id="4", nonce=nonce)
 
@@ -333,7 +333,7 @@ if __name__ == "__main__":
 	# send_friend_gift(unique_id="1", friend_name="g")
 	# send_friend_gift(unique_id="2", friend_name="g")
 	# send_friend_gift(unique_id="3", friend_name="g")
-	# send_all_friend_gift(unique_id="1")
+	send_all_friend_gift(unique_id="1")
 
 	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
 	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
