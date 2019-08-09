@@ -261,7 +261,6 @@ namespace configurationView
         private void SettingWaveNumber()
         {
             JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"];
-            WaveNumber.Minimum = 1;
             WaveNumber.Maximum = array.Count;
         }
         /// <summary>

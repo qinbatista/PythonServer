@@ -98,8 +98,12 @@
           "isPreWaveFinish": false,
           "enemyList": [
             {
-              "count": 2,
-              "enemysPrefString": "Enemy1"
+              "count": 11,
+              "enemysPrefString": "Enemy2"
+            },
+            {
+              "count": 22,
+              "enemysPrefString": "Enemy3"
             }
           ],
           "SpawnPointStrings": [

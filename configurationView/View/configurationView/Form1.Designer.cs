@@ -115,6 +115,11 @@
             // WaveNumber
             // 
             this.WaveNumber.Location = new System.Drawing.Point(112, 164);
+            this.WaveNumber.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.WaveNumber.Name = "WaveNumber";
             this.WaveNumber.Size = new System.Drawing.Size(81, 28);
             this.WaveNumber.TabIndex = 26;
@@ -142,9 +147,19 @@
             // numericUpDown3
             // 
             this.numericUpDown3.Location = new System.Drawing.Point(833, 279);
+            this.numericUpDown3.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
             this.numericUpDown3.Name = "numericUpDown3";
             this.numericUpDown3.Size = new System.Drawing.Size(81, 28);
             this.numericUpDown3.TabIndex = 24;
+            this.numericUpDown3.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // label7
             // 
