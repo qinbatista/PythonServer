@@ -1579,6 +1579,59 @@ class GameManager:
 #############################################################################
 
 
+#############################################################################
+#						Start Family Functions								#
+#############################################################################
+
+async def add_user_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
+	# 0 - success, confirmation message to sent target's mailbox
+	# 95 - target is already a member of a family
+	# 96 - family is full
+	# 97 - you must be family owner to add a user
+	# 98 - you do not belong to a family
+	# 99 - invalid target
+	return self._message_typesetting(0, 'success, confirmation message sent')
+
+async def remove_user_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
+	# 0 - success, user removed
+	# 96 - user does not belong to your family
+	# 97 - you must be family owner to remove a user
+	# 98 - you do not belong to a family
+	# 99 - invalid target
+	return self._message_typesetting(0, 'success, user removed')
+
+async def leave_family(self, world: int, unique_id: str) -> dict:
+	# 0 - success, you have been removed from your family
+	# 98 - you do not belong to a family
+	return self._message_typesetting(0, 'success, you have been removed from your family.')
+
+async def create_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
+	# 0 - success, confirmation message sent to target's mailbox
+	# 97 - target is already a member of a family
+	# 98 - you already belong to a family
+	# 99 - invalid target
+	return self._message_typesetting(0, 'success, confirmation message sent')
+
+async def request_join_family(self, world: int, unique_id: str, gamename_family_member: str) -> dict:
+	# 0 - success, join request message sent to family owner's mailbox
+	# 97 - target is not a member of a family
+	# 98 - you already belong to a family
+	# 99 - invalid target
+	return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
+
+async def change_family_name(self, world: int, unique_id: str, new_name: str) -> dict:
+	# 0 - successfully changed family name
+	# 97 - you are not the owner of your family
+	# 98 - you do not belong to a family
+	# 99 - invalid new name
+	return self._message_typesetting(0, 'success')
+
+
+
+#############################################################################
+#							End Family Functions							#
+#############################################################################
+
 
 
 #############################################################################
