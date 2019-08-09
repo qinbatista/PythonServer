@@ -61,7 +61,7 @@ namespace configurationView
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            foreach(var date in json)
+            foreach (var date in json)
             {
                 if (float.Parse(date.Value["server"].ToString()) > float.Parse(current_version))
                 {
@@ -256,7 +256,7 @@ namespace configurationView
             TotalTime.Value = (decimal)enemy["totalTime"];
             ColdDownTime.Value = (decimal)enemy["coldDownTime"];
             IsPreWaveFinish.Checked = (bool)enemy["isPreWaveFinish"];
-            
+
             comboBox3.Items.Clear();
             comboBox4.Items.Clear();
             JArray array = (JArray)enemy["enemyList"];
@@ -298,7 +298,7 @@ namespace configurationView
             {
                 MessageBox.Show(text: "最后一波怪，不可删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else if(array.Count == 0)
+            else if (array.Count == 0)
             {
                 MessageBox.Show(text: "已没有怪物可以增加，可手动增加一波基础怪物！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -315,17 +315,21 @@ namespace configurationView
         }
         private void Button3_Click(object sender, EventArgs e)
         {
-            //add
-            try
-            {
-                //MonsterAdd add = new MonsterAdd(client_stage_json["enemyLayouts"][0]);
-                //add.Show();
+            // add
+            try {
+                new MonsterAdd((JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"]).Show();
+                //JArray array = ;
+                //array.Add(array[array.Count - 1]);
+                //client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"] = array;
+                //File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
+                //comboBox2.Items.Add(comboBox2.Items.Count + 1);
+                //comboBox2.SelectedIndex = comboBox2.Items.IndexOf(comboBox2.Items.Count);
+                //MessageBox.Show(text: "关卡添加成功 ！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch
             {
-                MessageBox.Show(text: String.Format("请选择要修改的关卡！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(text: String.Format("未选择关卡类型！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            //MessageBox.Show(text: add.add_item);
         }
     }
 }
