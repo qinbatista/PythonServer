@@ -322,7 +322,7 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _upgrade_armor(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/upgrade_armor', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'armor_kind': message['data']['armor_kind'], 'armor_id': message['data']['armor_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/upgrade_armor', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'armor_id': message['data']['armor_id'], 'level': message['data']['level']}) as resp:
 			return await resp.text()
 
 	async def _send_friend_gift(self, message: dict, session) -> str:

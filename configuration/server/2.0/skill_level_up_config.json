@@ -1,0 +1,8 @@
+{
+	"skill_scroll_functions" : ["skill_scroll_10", "skill_scroll_30", "skill_scroll_100"],
+	"upgrade_chance" : {
+		"skill_scroll_10" : 0.10,
+		"skill_scroll_30" : 0.30,
+		"skill_scroll_100": 1
+	}
+}

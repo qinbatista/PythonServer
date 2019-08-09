@@ -124,7 +124,7 @@ def enter_tower(stage: int):
 
 
 def disintegrate_weapon():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/disintegrate_weapon', data={"world": 0, 'unique_id': "4", 'weapon': 'weapon1'})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/disintegrate_weapon', data={"world": 0, 'unique_id': "4", 'weapon': 'weapon12'})
 	print(str(result.text))
 
 
@@ -168,8 +168,8 @@ def get_hang_up_info():
 	print(str(result.text))
 
 
-def upgrade_armor(armor_id: int):
-	result = requests.post('http://localhost:8007/upgrade_armor', data={"world": 0, 'unique_id': "4", "armor_kind": "armor1", "armor_id": armor_id})
+def upgrade_armor(level: int):
+	result = requests.post('http://localhost:8004/upgrade_armor', data={"world": 0, 'unique_id': "4", "armor_id": "armor1", "level": level})
 	print(str(result.text))
 
 
@@ -315,7 +315,7 @@ if __name__ == "__main__":
 	# get_all_supplies()
 	# basic_summon()
 	# get_hang_up_info()
-	# upgrade_armor(1)
+	upgrade_armor(1)
 	# random_gift_segment()
 	# start ########################################################
 	# send_friend_gift(unique_id="4", friend_id="6")
@@ -340,4 +340,4 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	all_function(unique_id="4")
+	# all_function(unique_id="4")

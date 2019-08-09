@@ -498,8 +498,8 @@ class GameManager:
 
 		reward_weapon_segment = star * int(reward["segment"])  # 计算奖励武器的碎片数量
 		#  构造更新语句和查询语句
-		update_str = "update %s set segment=segment+%s where unique_id='%s'" % (reward_weapon_name, reward_weapon_segment, unique_id)
-		select_str = "select segment from %s where unique_id='%s'" % (reward_weapon_name, unique_id)
+		update_str = f"update weapon set segment=segment+{reward_weapon_segment} where unique_id='{unique_id}' and weapon_name='{reward_weapon_name}'"
+		select_str = f"select segment from weapon where unique_id='{unique_id}' and weapon_name='{reward_weapon_name}'"
 		update_code = await self._execute_statement_update(world=world, statement=update_str)
 
 		select_result = await self._execute_statement(world=world, statement=select_str)  # 获取含有碎片的查询的结果
@@ -854,7 +854,6 @@ class GameManager:
 		# 97 - database operation error
 		# 98 - Insufficient basic armor
 		# 99 - parameter error
-		:param armor_kind: 盔甲的种类，代表是哪一张表 ==> armor1、armor2、armor3、armor4
 		:param armor_id: 盔甲种类，代表armor1、armor2、armor3   ......
 		:param level: 盔甲种类下的等级，代表armor_level1、armor_level2、armor_level3   ......
 		:return: dict
@@ -862,7 +861,7 @@ class GameManager:
 		if level < 1 or level > 9:
 			return self._message_typesetting(status=99, message="Parameter error")
 		armor1, armor2 = f"armor_level{level}", f"armor_level{level + 1}"
-		armor = {armor1: 0, armor2: 0}
+		armor = {"armor_id": armor_id, armor1: 0, armor2: 0}
 		armor[armor1], armor[armor2] = await self._get_armor(world=world, unique_id=unique_id, armor_id=armor_id, armor1=armor1, armor2=armor2)
 		if armor[armor1] < 3:
 			return self._message_typesetting(status=98, message="Insufficient basic armor")
@@ -2658,7 +2657,7 @@ async def __show_energy(request: web.Request) -> web.Response:
 @ROUTES.post('/upgrade_armor')
 async def __upgrade_armor(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).upgrade_armor(int(post['world']), post['unique_id'], post["armor_kind"], int(post['armor_id']))
+	result = await (request.app['MANAGER']).upgrade_armor(int(post['world']), post['unique_id'], post["armor_id"], int(post['level']))
 	return _json_response(result)
 
 @ROUTES.post('/get_all_armor_info')

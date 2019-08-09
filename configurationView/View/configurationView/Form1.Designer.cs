@@ -1,6 +1,6 @@
 ﻿namespace configurationView
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// 必需的设计器变量。
@@ -28,8 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.version = new System.Windows.Forms.Label();
+            this.components = new System.ComponentModel.Container();
+            this.label = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
             this.button5 = new System.Windows.Forms.Button();
@@ -40,38 +42,44 @@
             this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.IsPreWaveFinish = new System.Windows.Forms.RadioButton();
             this.label4 = new System.Windows.Forms.Label();
-            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.ColdDownTime = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.TotalTime = new System.Windows.Forms.NumericUpDown();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.VersionOption = new System.Windows.Forms.ComboBox();
             this.add = new System.Windows.Forms.Button();
             this.FunctionOption = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.dateTimePicker = new System.Windows.Forms.DateTimePicker();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.label8 = new System.Windows.Forms.Label();
+            this.WaveNumber = new System.Windows.Forms.NumericUpDown();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ColdDownTime)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TotalTime)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.WaveNumber)).BeginInit();
             this.SuspendLayout();
             // 
-            // version
+            // label
             // 
-            this.version.AutoSize = true;
-            this.version.Location = new System.Drawing.Point(130, 31);
-            this.version.Name = "version";
-            this.version.Size = new System.Drawing.Size(44, 18);
-            this.version.TabIndex = 0;
-            this.version.Text = "版本";
+            this.label.AutoSize = true;
+            this.label.Location = new System.Drawing.Point(130, 31);
+            this.label.Name = "label";
+            this.label.Size = new System.Drawing.Size(44, 18);
+            this.label.TabIndex = 0;
+            this.label.Text = "版本";
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.label8);
+            this.panel1.Controls.Add(this.WaveNumber);
+            this.panel1.Controls.Add(this.comboBox1);
             this.panel1.Controls.Add(this.numericUpDown3);
             this.panel1.Controls.Add(this.label7);
             this.panel1.Controls.Add(this.button5);
@@ -82,23 +90,36 @@
             this.panel1.Controls.Add(this.comboBox3);
             this.panel1.Controls.Add(this.label6);
             this.panel1.Controls.Add(this.label5);
-            this.panel1.Controls.Add(this.radioButton1);
+            this.panel1.Controls.Add(this.IsPreWaveFinish);
             this.panel1.Controls.Add(this.label4);
-            this.panel1.Controls.Add(this.numericUpDown2);
+            this.panel1.Controls.Add(this.ColdDownTime);
             this.panel1.Controls.Add(this.label3);
-            this.panel1.Controls.Add(this.numericUpDown1);
+            this.panel1.Controls.Add(this.TotalTime);
             this.panel1.Controls.Add(this.button2);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Controls.Add(this.comboBox2);
-            this.panel1.Controls.Add(this.comboBox1);
             this.panel1.Location = new System.Drawing.Point(0, 191);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1178, 505);
             this.panel1.TabIndex = 1;
             // 
+            // comboBox1
+            // 
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "普通关卡",
+            "冲塔关卡"});
+            this.comboBox1.Location = new System.Drawing.Point(29, 55);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(137, 26);
+            this.comboBox1.TabIndex = 25;
+            this.comboBox1.Tag = "";
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.ComboBox1_SelectedIndexChanged);
+            // 
             // numericUpDown3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(833, 282);
+            this.numericUpDown3.Location = new System.Drawing.Point(833, 279);
             this.numericUpDown3.Name = "numericUpDown3";
             this.numericUpDown3.Size = new System.Drawing.Size(81, 28);
             this.numericUpDown3.TabIndex = 24;
@@ -138,6 +159,7 @@
             this.button3.TabIndex = 20;
             this.button3.Text = "添加";
             this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.Button3_Click);
             // 
             // button4
             // 
@@ -152,7 +174,7 @@
             // 
             this.comboBox4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox4.FormattingEnabled = true;
-            this.comboBox4.Location = new System.Drawing.Point(161, 394);
+            this.comboBox4.Location = new System.Drawing.Point(161, 393);
             this.comboBox4.Name = "comboBox4";
             this.comboBox4.Size = new System.Drawing.Size(755, 26);
             this.comboBox4.TabIndex = 18;
@@ -161,7 +183,7 @@
             // 
             this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(161, 281);
+            this.comboBox3.Location = new System.Drawing.Point(161, 280);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(571, 26);
             this.comboBox3.TabIndex = 17;
@@ -184,66 +206,68 @@
             this.label5.TabIndex = 15;
             this.label5.Text = "怪物生成列表";
             // 
-            // radioButton1
+            // IsPreWaveFinish
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(778, 159);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(213, 22);
-            this.radioButton1.TabIndex = 14;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "是否等待上一波怪打完";
-            this.radioButton1.UseVisualStyleBackColor = true;
+            this.IsPreWaveFinish.AutoSize = true;
+            this.IsPreWaveFinish.Location = new System.Drawing.Point(941, 167);
+            this.IsPreWaveFinish.Name = "IsPreWaveFinish";
+            this.IsPreWaveFinish.Size = new System.Drawing.Size(213, 22);
+            this.IsPreWaveFinish.TabIndex = 14;
+            this.IsPreWaveFinish.TabStop = true;
+            this.IsPreWaveFinish.Text = "是否等待上一波怪打完";
+            this.IsPreWaveFinish.UseVisualStyleBackColor = true;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(400, 163);
+            this.label4.Location = new System.Drawing.Point(608, 169);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(170, 18);
             this.label4.TabIndex = 13;
             this.label4.Text = "每一波结束等待时间";
             // 
-            // numericUpDown2
+            // ColdDownTime
             // 
-            this.numericUpDown2.Location = new System.Drawing.Point(576, 159);
-            this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(81, 28);
-            this.numericUpDown2.TabIndex = 12;
+            this.ColdDownTime.Location = new System.Drawing.Point(784, 164);
+            this.ColdDownTime.Name = "ColdDownTime";
+            this.ColdDownTime.Size = new System.Drawing.Size(81, 28);
+            this.ColdDownTime.TabIndex = 12;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(26, 163);
+            this.label3.Location = new System.Drawing.Point(268, 169);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(170, 18);
             this.label3.TabIndex = 11;
             this.label3.Text = "每波怪的总生成时间";
             // 
-            // numericUpDown1
+            // TotalTime
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(202, 161);
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(81, 28);
-            this.numericUpDown1.TabIndex = 10;
+            this.TotalTime.Location = new System.Drawing.Point(444, 164);
+            this.TotalTime.Name = "TotalTime";
+            this.TotalTime.Size = new System.Drawing.Size(81, 28);
+            this.TotalTime.TabIndex = 10;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(1075, 48);
+            this.button2.Location = new System.Drawing.Point(1075, 49);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(79, 39);
             this.button2.TabIndex = 9;
             this.button2.Text = "添加";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.Button2_Click);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(960, 48);
+            this.button1.Location = new System.Drawing.Point(960, 49);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(79, 39);
             this.button1.TabIndex = 8;
             this.button1.Text = "删除";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // comboBox2
             // 
@@ -253,15 +277,7 @@
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(700, 26);
             this.comboBox2.TabIndex = 7;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(26, 55);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(148, 26);
-            this.comboBox1.TabIndex = 6;
+            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.ComboBox2_SelectedIndexChanged);
             // 
             // VersionOption
             // 
@@ -271,6 +287,7 @@
             this.VersionOption.Name = "VersionOption";
             this.VersionOption.Size = new System.Drawing.Size(700, 26);
             this.VersionOption.TabIndex = 2;
+            this.VersionOption.SelectedIndexChanged += new System.EventHandler(this.VersionOption_SelectedIndexChanged);
             // 
             // add
             // 
@@ -286,6 +303,18 @@
             // 
             this.FunctionOption.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.FunctionOption.FormattingEnabled = true;
+            this.FunctionOption.Items.AddRange(new object[] {
+            "普通关卡怪物生成：level_enemy_layouts_config",
+            "塔怪物生成：level_enemy_layouts_config_tower",
+            "怪物属性：monster_config",
+            "进关消耗：entry_consumables_config",
+            "挂机奖励：hang_reward_config",
+            "抽奖奖励：lottery_config",
+            "玩家配置表：player_config",
+            "卷轴升级技能配置信息：skill_level_up_config",
+            "通关奖励：stage_reward_config",
+            "武器配置：weapon_config",
+            "世界参数：world_distribution"});
             this.FunctionOption.Location = new System.Drawing.Point(216, 81);
             this.FunctionOption.Name = "FunctionOption";
             this.FunctionOption.Size = new System.Drawing.Size(700, 26);
@@ -316,7 +345,35 @@
             this.dateTimePicker.Size = new System.Drawing.Size(200, 28);
             this.dateTimePicker.TabIndex = 9;
             // 
-            // Form1
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(26, 169);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(80, 18);
+            this.label8.TabIndex = 27;
+            this.label8.Text = "第几波怪";
+            // 
+            // WaveNumber
+            // 
+            this.WaveNumber.Location = new System.Drawing.Point(112, 164);
+            this.WaveNumber.Name = "WaveNumber";
+            this.WaveNumber.Size = new System.Drawing.Size(81, 28);
+            this.WaveNumber.TabIndex = 26;
+            this.WaveNumber.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.WaveNumber.ValueChanged += new System.EventHandler(this.WaveNumber_ValueChanged);
+            // 
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -328,16 +385,17 @@
             this.Controls.Add(this.add);
             this.Controls.Add(this.VersionOption);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.version);
-            this.Name = "Form1";
+            this.Controls.Add(this.label);
+            this.Name = "MainForm";
             this.RightToLeftLayout = true;
             this.Text = "View";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ColdDownTime)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TotalTime)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.WaveNumber)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -345,7 +403,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Label version;
+        private System.Windows.Forms.Label label;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ComboBox VersionOption;
         private System.Windows.Forms.Button add;
@@ -354,14 +412,13 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.DateTimePicker dateTimePicker;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown TotalTime;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ComboBox comboBox2;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.RadioButton radioButton1;
+        private System.Windows.Forms.RadioButton IsPreWaveFinish;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.NumericUpDown numericUpDown2;
+        private System.Windows.Forms.NumericUpDown ColdDownTime;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ComboBox comboBox4;
@@ -372,6 +429,10 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.NumericUpDown numericUpDown3;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.NumericUpDown WaveNumber;
     }
 }
 
