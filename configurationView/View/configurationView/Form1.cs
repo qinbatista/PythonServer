@@ -237,22 +237,6 @@ namespace configurationView
                 MessageBox.Show(text: String.Format("未选择关卡类型！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        private void Button3_Click(object sender, EventArgs e)
-        {
-            //add
-            try
-            {
-                //MonsterAdd add = new MonsterAdd(client_stage_json["enemyLayouts"][0]);
-                //add.Show();
-            }
-            catch
-            {
-                MessageBox.Show(text: String.Format("请选择要修改的关卡！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            //MessageBox.Show(text: add.add_item);
-        }
-
         private void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
             SettingWaveNumber();
@@ -272,7 +256,7 @@ namespace configurationView
             TotalTime.Value = (decimal)enemy["totalTime"];
             ColdDownTime.Value = (decimal)enemy["coldDownTime"];
             IsPreWaveFinish.Checked = (bool)enemy["isPreWaveFinish"];
-
+            
             comboBox3.Items.Clear();
             comboBox4.Items.Clear();
             JArray array = (JArray)enemy["enemyList"];
@@ -328,6 +312,20 @@ namespace configurationView
                 MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             }
+        }
+        private void Button3_Click(object sender, EventArgs e)
+        {
+            //add
+            try
+            {
+                //MonsterAdd add = new MonsterAdd(client_stage_json["enemyLayouts"][0]);
+                //add.Show();
+            }
+            catch
+            {
+                MessageBox.Show(text: String.Format("请选择要修改的关卡！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            //MessageBox.Show(text: add.add_item);
         }
     }
 }
