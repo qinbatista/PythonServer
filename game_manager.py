@@ -1583,12 +1583,20 @@ class GameManager:
 #						Start Family Functions								#
 #############################################################################
 
-	async def remove_user_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
+	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
 		# 0 - success, user removed
 		# 96 - user does not belong to your family
 		# 97 - you must be family owner to remove a user
 		# 98 - you do not belong to a family
-		# 99 - invalid target
+		game_name, fid = await self._get_familyid(world, unique_id = uid)
+		if fid is None or fid == '': return self._message_typesetting(98, 'you are not in a family.')
+		owner, fname, members = await self._get_family_information(world, fid)
+		if game_name != owner: return self._message_typesetting(97, 'you are not family owner')
+		try:
+			await self._execute_statement_update(world, f'UPDATE families SET member{members.index(gamename_target)} = "" WHERE familyid = "{fid}";')
+			await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE game_name = "{gamename_target}";')
+		except ValueError:
+			return self._message_typesetting(96, 'user is not in your family')
 		return self._message_typesetting(0, 'success, user removed')
 
 	# TODO refactor code to run both sql statements with asyncio.gather
@@ -2675,6 +2683,10 @@ async def _leave_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).leave_family(int(post['world']), post['unique_id']))
 
+@ROUTES.post('/remove_user_family')
+async def _remove_user_family(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).remove_user_family(int(post['world']), post['unique_id'], post['user']))
 
 
 
