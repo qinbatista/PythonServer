@@ -498,8 +498,8 @@ class GameManager:
 
 		reward_weapon_segment = star * int(reward["segment"])  # 计算奖励武器的碎片数量
 		#  构造更新语句和查询语句
-		update_str = "update %s set segment=segment+%s where unique_id='%s'" % (reward_weapon_name, reward_weapon_segment, unique_id)
-		select_str = "select segment from %s where unique_id='%s'" % (reward_weapon_name, unique_id)
+		update_str = f"update weapon set segment=segment+{reward_weapon_segment} where unique_id='{unique_id}' and weapon_name='{reward_weapon_name}'"
+		select_str = f"select segment from weapon where unique_id='{unique_id}' and weapon_name='{reward_weapon_name}'"
 		update_code = await self._execute_statement_update(world=world, statement=update_str)
 
 		select_result = await self._execute_statement(world=world, statement=select_str)  # 获取含有碎片的查询的结果

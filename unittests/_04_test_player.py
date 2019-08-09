@@ -124,7 +124,7 @@ def enter_tower(stage: int):
 
 
 def disintegrate_weapon():
-	result = requests.post(GAME_MANAGER_BASE_URL + '/disintegrate_weapon', data={"world": 0, 'unique_id': "4", 'weapon': 'weapon1'})
+	result = requests.post(GAME_MANAGER_BASE_URL + '/disintegrate_weapon', data={"world": 0, 'unique_id': "4", 'weapon': 'weapon12'})
 	print(str(result.text))
 
 
@@ -306,7 +306,7 @@ if __name__ == "__main__":
 	# get_hang_up_reward()
 	# enter_stage(stage=1)
 	# enter_tower(stage=3)
-	# disintegrate_weapon()
+	disintegrate_weapon()
 	# automatically_refresh_store()
 	# manually_refresh_store()
 	# diamond_refresh_store()
@@ -340,4 +340,4 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	all_function(unique_id="4")
+	# all_function(unique_id="4")
