@@ -1583,15 +1583,6 @@ class GameManager:
 #						Start Family Functions								#
 #############################################################################
 
-	async def add_user_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
-		# 0 - success, confirmation message to sent target's mailbox
-		# 95 - target is already a member of a family
-		# 96 - family is full
-		# 97 - you must be family owner to add a user
-		# 98 - you do not belong to a family
-		# 99 - invalid target
-		return self._message_typesetting(0, 'success, confirmation message sent')
-
 	async def remove_user_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
 		# 0 - success, user removed
 		# 96 - user does not belong to your family
@@ -1600,10 +1591,23 @@ class GameManager:
 		# 99 - invalid target
 		return self._message_typesetting(0, 'success, user removed')
 
-	async def leave_family(self, world: int, unique_id: str) -> dict:
-		# 0 - success, you have been removed from your family
+	# TODO refactor code to run both sql statements with asyncio.gather
+	# if the person leaving is the owner, disband the entire family
+	async def leave_family(self, world: int, uid: str) -> dict:
+		# 0 - success, you have left your family
 		# 98 - you do not belong to a family
-		return self._message_typesetting(0, 'success, you have been removed from your family.')
+		game_name, fid = await self._get_familyid(world, unique_id = uid)
+		if fid is None or fid == '': return self._message_typesetting(98, 'you are not in a family.')
+		owner, fname, members = await self._get_family_information(world, fid)
+		if game_name == owner: # the owner is leaving, disband the entire family
+			for member in members:
+				if member != '':
+					await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE game_name = "{member}";')
+			await self._execute_statement(world, f'DELETE FROM families WHERE familyid = "{fid}";')
+		else:
+			await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE unique_id = "{uid}";')
+			await self._execute_statement_update(world, f'UPDATE families SET member{members.index(game_name)} = "" WHERE familyid = "{fid}";')
+		return self._message_typesetting(0, 'success, you have left your family.')
 
 	async def create_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
 		# 0 - success, confirmation message sent to target's mailbox
@@ -1619,6 +1623,7 @@ class GameManager:
 		# 99 - invalid target
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
+	# TODO reinforce name validity requirements
 	async def change_family_name(self, world: int, uid: str, new_name: str) -> dict:
 		# 0 - successfully changed family name
 		# 97 - you are not the owner of your family
@@ -2664,6 +2669,14 @@ async def _get_new_mail(request: web.Request) -> web.Response:
 async def _change_family_name(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).change_family_name(int(post['world']), post['unique_id'], post['name']))
+
+@ROUTES.post('/leave_family')
+async def _leave_family(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).leave_family(int(post['world']), post['unique_id']))
+
+
+
 
 def get_config() -> configparser.ConfigParser:
 	'''
