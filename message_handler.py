@@ -348,32 +348,40 @@ class MessageHandler:
 	#		return await resp.text()
 			
 	async def _level_enemy_layouts_config(self, message: dict, session) -> str:
-		async with session.post('http://localhost:8006/level_enemy_layouts_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/level_enemy_layouts_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
+
 	async def _monster_config(self, message: dict, session) -> str:
-		async with session.post('http://localhost:8006/monster_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/monster_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
+
 	async def _get_stage_reward_config(self, message: dict, session) -> str:
-		async with session.post('http://localhost:8006/get_stage_reward_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_stage_reward_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_lottery_config_info(self, message: dict, session) -> str:
-		async with session.post('http://localhost:8006/get_lottery_config_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/get_lottery_config_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
-	
+
 	async def _get_hang_up_info(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_hang_up_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
+
 	async def _get_all_friend_info(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_friend_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
-			return await resp.text()	
+			return await resp.text()
 	async def _request_friend(self, message: dict, session) -> str:
-		async with session.post('http://localhost:8006/request_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/request_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
 			return await resp.text()
+
+	async def _response_friend(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/response_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
+			return await resp.text()
+
 	async def _delete_friend(self, message: dict, session) -> str:
-		async with session.post('http://localhost:8006/delete_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/delete_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
 			return await resp.text()
-			
+
 	async def _send_all_friend_gift(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/send_all_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
