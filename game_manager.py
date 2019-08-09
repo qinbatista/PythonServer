@@ -1491,7 +1491,7 @@ class GameManager:
 		mylist = list(data[0])
 		f_id = mylist[1]
 		f_recovering_time = mylist[4]
-		sql_result = await self._execute_statement(world, f'SELECT game_name, level FROM player WHERE unique_id = "{unique_id}";')
+		sql_result = await self._execute_statement(world, f'SELECT game_name, level FROM player WHERE unique_id = "{friend_id}";')
 		f_game_name = sql_result[0][0]
 		f_level = sql_result[0][1]
 		if f_recovering_time == '':
