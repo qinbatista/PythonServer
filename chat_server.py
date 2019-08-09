@@ -1,0 +1,191 @@
+
+import time
+import requests
+import configparser
+
+import asyncio
+import tormysql
+import contextlib
+
+from collections import defaultdict
+
+
+MAXSIZE = 250
+
+
+class ChatProtocolError(Exception):
+	pass
+
+
+class ChatServer:
+	def __init__(self):
+		self.users = defaultdict(dict)
+		self.families = defaultdict(lambda: defaultdict(set))
+		self.pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
+
+	async def run(self, port):
+		async with await asyncio.start_server(self.handle_client, '127.0.0.1', port) as s:
+			print(f'starting chat server on port {port}...')
+			await s.serve_forever()
+
+	async def handle_client(self, reader, writer):
+		name = ''
+		try:
+			name = await self.client_handshake(reader, writer)
+			print(f'hello, {name}...')
+			while True:
+				command, payload = await self._receive(reader)
+				if command == 'PUBLIC':
+					await self.send_public(name, payload)
+				elif command == 'FAMILY':
+					await self.send_family(name, payload)
+				elif command == 'PRIVATE':
+					await self.send_private(name, payload)
+				elif command == 'UPDATE':
+					await self.update(name)
+				elif command == 'EXIT':
+					break
+				else: raise ChatProtocolError
+		except (ChatProtocolError):
+			print(f'ChatProtocolError raised for user {name}...')
+		finally:
+			await self._cleanup(name, writer)
+			print(f'connection closed for {name}')
+
+
+
+	async def update(self, name):
+		if 'fid' not in self.users[name]:
+			await self._update_fid(name)
+		if 'fid' in self.users[name]:
+			fid = self.users[name]['fid']
+			fname, members = await self._get_family_information(fid)
+			onlinemembers = {m for m in members if m in self.users}
+			for changed in self.families[self.users[name]['fid']]['members'] ^ onlinemembers:
+				await self._update_fid(changed)
+			if fname:
+				self.families[fid]['members'] = onlinemembers
+				await self._send(self._make_message('FNAME', fname), *[self.users[u]['w'] for u in self.families[fid]['members']])
+			else:
+				del self.families[fid]
+
+	async def send_family(self, name, message):
+		if 'fid' not in self.users[name]:
+			await self._send(self._make_message('ERROR', 'You have no family'), self.users[name]['w'])
+		elif len(self.families[self.users[name]['fid']]['members']) == 1:
+			await self._send(self._make_message('ERROR', 'Your family is offline'), self.users[name]['w'])
+		else:
+			await self._send(self._make_message('FAMILY', f'{name}: {message}'), *[self.users[u]['w'] for u in self.families[self.users[name]['fid']]['members']])
+
+	async def send_private(self, name, payload):
+		target, message = payload.split(':', maxsplit = 1)
+		if target == name:
+			await self._send(self._make_message('ERROR', 'Don\'t be an idiot'), self.users[name]['w'])
+		elif target not in self.users:
+			await self._send(self._make_message('ERROR', 'User not online'), self.users[name]['w'])
+		else:
+			await self._send(self._make_message('PRIVATE', f'{name}: {message}'), self.users[name]['w'], self.users[target]['w'])
+
+	async def send_public(self, name, message):
+		await self._send(self._make_message('PUBLIC', f'{name}: {message}'), *[v['w'] for v in self.users.values()])
+
+	async def client_handshake(self, reader, writer):
+		command, name = await self._receive(reader)
+		if command != 'REGISTER' or not self._valid_name(name): raise ChatProtocolError
+		if name in self.users:
+			await self._handle_name_collision(name)
+		self.users[name]['w'] = writer
+		await self._update_fid(name)
+		if 'fid' in self.users[name]:
+			if 'fname' not in self.families[self.users[name]['fid']]:
+				await self._update_families_cache(self.users[name]['fid'])
+			await self._send(self._make_message('FNAME', self.families[self.users[name]['fid']]['fname']), writer)
+		return name
+
+	async def _update_families_cache(self, fid):
+		fname, members = await self._get_family_information(fid)
+		if fname:
+			self.families[fid]['fname'] = fname
+			self.families[fid]['members'] = {m for m in members if m in self.users}
+
+	# cleans up old fid and group membership, and updates with new fid and group membership
+	# does not fetch family_name from database
+	async def _update_fid(self, name):
+		fid = await self._get_familyid(name)
+		if 'fid' in self.users[name]:
+			self.families[self.users[name]['fid']]['members'].remove(name)
+			del self.users[name]['fid']
+		if fid:
+			self.users[name]['fid'] = fid
+			self.families[fid]['members'].add(name)
+	
+	# in the event of name collision, close old connection and remove name from family group
+	async def _handle_name_collision(self, name):
+		if 'fid' in self.users[name]:
+			self.families[self.users[name]['fid']]['members'].remove(name)
+		if 'w' in self.users[name]:
+			await self._close_connection(self.users[name]['w'])
+		del self.users[name]
+
+	# returns (command, arguments) if connection is alive, raises ChatProtocolError otherwise
+	async def _receive(self, reader):
+		raw = await reader.read(MAXSIZE)
+		if raw == b'': raise ChatProtocolError
+		decoded = raw.decode().strip()
+		return decoded[:10].lstrip('0'), decoded[10:]
+
+	# sends a message to the given writers
+	async def _send(self, message, *args):
+		writers = []
+		for writer in args:
+			if not writer.is_closing():
+				writer.write(message)
+				writers.append(writer.drain())
+		await asyncio.gather(*writers)
+	
+	# returns familyid if user is part of a family, None otherwise
+	async def _get_familyid(self, name):
+		async with await self.pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				await cursor.execute(f'SELECT familyid FROM player WHERE game_name = "{name}";')
+				data = cursor.fetchall()
+				return None if data == () else data[0][0]
+
+	# returns (familyname, {set of users}) if family exists, None otherwise
+	async def _get_family_information(self, fid):
+		async with await self.pool.Connection() as conn:
+			async with conn.cursor() as cursor:
+				await cursor.execute(f'SELECT * FROM families WHERE familyid = "{fid}";')
+				data = cursor.fetchall()
+				return (None, {}) if data == () else (data[0][1], {u for u in data[0][2:] if u != ''})
+
+	async def _cleanup(self, name, writer):
+		with contextlib.suppress(KeyError):
+			self.families[self.users[name]['fid']]['members'].remove(name)
+			del self.users[name]
+		await self._close_connection(writer)
+
+	async def _close_connection(self, writer):
+		writer.close()
+		await writer.wait_closed()
+
+	def _make_message(self, command, message = ''):
+		return (command.zfill(10) + message).encode()
+
+	def _valid_name(self, name):
+		return len(name) > 0
+
+def get_port():
+	while True:
+		try:
+			r = requests.get('http://localhost:8000/get_server_config_location')
+			parser = configparser.ConfigParser()
+			parser.read(r.json()['file'])
+			return parser.getint('chat_server', 'port')
+		except requests.exceptions.ConnectionError:
+			print('Could not find configuration server, retrying in 5 seconds...')
+			time.sleep(5)
+
+if __name__ == '__main__':
+	server = ChatServer()
+	asyncio.run(server.run(get_port()))
