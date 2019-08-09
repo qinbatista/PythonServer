@@ -140,6 +140,8 @@ class MailServer:
 		elif msg['type'] == 'friend_request':
 			msg['sender'] = kwargs['sender']
 			msg['uid_sender'] = kwargs['uid_sender']
+		elif msg['type'] == 'family_request':
+			msg['fid'] = kwargs['fid']
 		return msg
 
 	def _message_to_dict(self, msg: mailbox.MaildirMessage, **kwargs) -> dict:
