@@ -68,7 +68,7 @@ namespace configurationView
                     current_version = date.Value["server"].ToString();
                 }
                 //this.VersionOption.Items.Add(date.Key + ":" + date.Value);
-                this.VersionOption.Items.Add(date.Value["server"]);
+                VersionOption.Items.Add(date.Value["server"]);
             }
         }
 
@@ -144,14 +144,15 @@ namespace configurationView
                     }
                     catch
                     {
-                        //json[DateTime.Now.ToString("yyyy-MM-dd")]["client"] = new_version;
-                        //json[DateTime.Now.ToString("yyyy-MM-dd")]["server"] = new_version;
-                        //File.WriteAllText(json_version, json.ToString());
+                        json[DateTime.Now.ToString("yyyy-MM-dd")]["client"] = new_version;
+                        json[DateTime.Now.ToString("yyyy-MM-dd")]["server"] = new_version;
+                        File.WriteAllText(json_version, json.ToString());
                         MessageBox.Show(text: "json文件中已存在此版本！", caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
+                    current_version = new_version;
+                    VersionOption.Items.Add(new_version);
                     //this.FunctionOption.Items.Add(json.ToString());
                 }
-                current_version = new_version;
             }
             catch
             {
@@ -265,11 +266,20 @@ namespace configurationView
         }
         private void SettingPanel(JObject enemy)
         {
-            MessageBox.Show(enemy.ToString());
+            TotalTime.Value = (decimal)enemy["totalTime"];
+            ColdDownTime.Value = (decimal)enemy["coldDownTime"];
+            IsPreWaveFinish.Checked = enemy["isPreWaveFinish"].Equals("true");
         }
         private void WaveNumber_ValueChanged(object sender, EventArgs e)
         {
-            SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]);
+            try
+            {
+                SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]);
+            }
+            catch
+            {
+                MessageBox.Show(text: "未选择关卡类型！暂无波数信息！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
