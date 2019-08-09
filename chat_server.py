@@ -28,6 +28,7 @@ class ChatServer:
 			print(f'starting chat server on port {port}...')
 			await s.serve_forever()
 
+	# the main protocol loop. if chat protocol is not followed, close connection immediately
 	async def handle_client(self, reader, writer):
 		name = ''
 		try:
@@ -53,22 +54,22 @@ class ChatServer:
 			print(f'connection closed for {name}')
 
 
-
+	# propagates database updates to all applicable users within the calling user's circle
 	async def update(self, name):
 		if 'fid' not in self.users[name]:
 			await self._update_fid(name)
 		if 'fid' in self.users[name]:
 			fid = self.users[name]['fid']
-			fname, members = await self._get_family_information(fid)
-			onlinemembers = {m for m in members if m in self.users}
-			for changed in self.families[self.users[name]['fid']]['members'] ^ onlinemembers:
+			oldmembers = self.families[fid]['members']
+			fname, members = await self._update_families_cache(fid)
+			for changed in oldmembers ^ members:
 				await self._update_fid(changed)
 			if fname:
-				self.families[fid]['members'] = onlinemembers
 				await self._send(self._make_message('FNAME', fname), *[self.users[u]['w'] for u in self.families[fid]['members']])
 			else:
 				del self.families[fid]
 
+	# forwards the message to all users in family chat
 	async def send_family(self, name, message):
 		if 'fid' not in self.users[name]:
 			await self._send(self._make_message('ERROR', 'You have no family'), self.users[name]['w'])
@@ -77,6 +78,8 @@ class ChatServer:
 		else:
 			await self._send(self._make_message('FAMILY', f'{name}: {message}'), *[self.users[u]['w'] for u in self.families[self.users[name]['fid']]['members']])
 
+
+	# sends message directly to user specified in payload
 	async def send_private(self, name, payload):
 		target, message = payload.split(':', maxsplit = 1)
 		if target == name:
@@ -86,9 +89,11 @@ class ChatServer:
 		else:
 			await self._send(self._make_message('PRIVATE', f'{name}: {message}'), self.users[name]['w'], self.users[target]['w'])
 
+	# forwards the message to all users in public chat
 	async def send_public(self, name, message):
 		await self._send(self._make_message('PUBLIC', f'{name}: {message}'), *[v['w'] for v in self.users.values()])
 
+	# performs handshake with client on newly established connection. throws ChatProtocolError
 	async def client_handshake(self, reader, writer):
 		command, name = await self._receive(reader)
 		if command != 'REGISTER' or not self._valid_name(name): raise ChatProtocolError
@@ -102,18 +107,20 @@ class ChatServer:
 			await self._send(self._make_message('FNAME', self.families[self.users[name]['fid']]['fname']), writer)
 		return name
 
+	# fetches the latest family information from the database and updates the cached version
 	async def _update_families_cache(self, fid):
 		fname, members = await self._get_family_information(fid)
 		if fname:
 			self.families[fid]['fname'] = fname
 			self.families[fid]['members'] = {m for m in members if m in self.users}
+		return (None, {}) if not fname else (fname, {m for m in members if m in self.users})
 
 	# cleans up old fid and group membership, and updates with new fid and group membership
 	# does not fetch family_name from database
 	async def _update_fid(self, name):
 		fid = await self._get_familyid(name)
 		if 'fid' in self.users[name]:
-			self.families[self.users[name]['fid']]['members'].remove(name)
+			self.families[self.users[name]['fid']]['members'].discard(name)
 			del self.users[name]['fid']
 		if fid:
 			self.users[name]['fid'] = fid
