@@ -1583,48 +1583,54 @@ class GameManager:
 #						Start Family Functions								#
 #############################################################################
 
-async def add_user_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
-	# 0 - success, confirmation message to sent target's mailbox
-	# 95 - target is already a member of a family
-	# 96 - family is full
-	# 97 - you must be family owner to add a user
-	# 98 - you do not belong to a family
-	# 99 - invalid target
-	return self._message_typesetting(0, 'success, confirmation message sent')
+	async def add_user_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
+		# 0 - success, confirmation message to sent target's mailbox
+		# 95 - target is already a member of a family
+		# 96 - family is full
+		# 97 - you must be family owner to add a user
+		# 98 - you do not belong to a family
+		# 99 - invalid target
+		return self._message_typesetting(0, 'success, confirmation message sent')
 
-async def remove_user_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
-	# 0 - success, user removed
-	# 96 - user does not belong to your family
-	# 97 - you must be family owner to remove a user
-	# 98 - you do not belong to a family
-	# 99 - invalid target
-	return self._message_typesetting(0, 'success, user removed')
+	async def remove_user_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
+		# 0 - success, user removed
+		# 96 - user does not belong to your family
+		# 97 - you must be family owner to remove a user
+		# 98 - you do not belong to a family
+		# 99 - invalid target
+		return self._message_typesetting(0, 'success, user removed')
 
-async def leave_family(self, world: int, unique_id: str) -> dict:
-	# 0 - success, you have been removed from your family
-	# 98 - you do not belong to a family
-	return self._message_typesetting(0, 'success, you have been removed from your family.')
+	async def leave_family(self, world: int, unique_id: str) -> dict:
+		# 0 - success, you have been removed from your family
+		# 98 - you do not belong to a family
+		return self._message_typesetting(0, 'success, you have been removed from your family.')
 
-async def create_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
-	# 0 - success, confirmation message sent to target's mailbox
-	# 97 - target is already a member of a family
-	# 98 - you already belong to a family
-	# 99 - invalid target
-	return self._message_typesetting(0, 'success, confirmation message sent')
+	async def create_family(self, world: int, unique_id: str, gamename_target: str) -> dict:
+		# 0 - success, confirmation message sent to target's mailbox
+		# 97 - target is already a member of a family
+		# 98 - you already belong to a family
+		# 99 - invalid target
+		return self._message_typesetting(0, 'success, confirmation message sent')
 
-async def request_join_family(self, world: int, unique_id: str, gamename_family_member: str) -> dict:
-	# 0 - success, join request message sent to family owner's mailbox
-	# 97 - target is not a member of a family
-	# 98 - you already belong to a family
-	# 99 - invalid target
-	return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
+	async def request_join_family(self, world: int, unique_id: str, gamename_family_member: str) -> dict:
+		# 0 - success, join request message sent to family owner's mailbox
+		# 97 - target is not a member of a family
+		# 98 - you already belong to a family
+		# 99 - invalid target
+		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
-async def change_family_name(self, world: int, unique_id: str, new_name: str) -> dict:
-	# 0 - successfully changed family name
-	# 97 - you are not the owner of your family
-	# 98 - you do not belong to a family
-	# 99 - invalid new name
-	return self._message_typesetting(0, 'success')
+	async def change_family_name(self, world: int, uid: str, new_name: str) -> dict:
+		# 0 - successfully changed family name
+		# 97 - you are not the owner of your family
+		# 98 - you do not belong to a family
+		# 99 - invalid new name
+		if new_name == '' or new_name is None: return self._message_typesetting(99, 'invalid name')
+		game_name, fid = await self._get_familyid(world, unique_id = uid)
+		if fid == '': return self._message_typesetting(98, 'you do not belong to a family')
+		owner, fname, members = await self._get_family_information(world, fid)
+		if game_name != owner: return self._message_typesetting(97, 'you are not family owner')
+		await self._execute_statement_update(world, f'UPDATE families SET familyname = "{new_name}" WHERE familyid = "{fid}";')
+		return self._message_typesetting(0, 'success')
 
 
 
@@ -1637,6 +1643,17 @@ async def change_family_name(self, world: int, unique_id: str, new_name: str) ->
 #############################################################################
 #							Private Functions								#
 #############################################################################
+
+	async def _get_family_information(self, world: int, fid: str):
+		q = await self._execute_statement(world, f'SELECT * FROM families WHERE familyid = "{fid}";')
+		return (None, None, []) if q == () else (q[0][0], q[0][1], [u for u in q[0][2:]])
+
+	async def _get_familyid(self, world: int, **kwargs):
+		if 'unique_id' in kwargs:
+			data = await self._execute_statement(world, f'SELECT game_name, familyid FROM player WHERE unique_id = "{kwargs["unique_id"]}";')
+		else:
+			data = await self._execute_statement(world, f'SELECT game_name, familyid FROM player WHERE game_name = "{kwargs["game_name"]}";')
+		return (None, None) if data == () else data[0]
 
 	async def _get_dark_market_material(self, world: int, unique_id: str, code: int) -> tuple:
 		sql_str = 'SELECT merchandise%s, merchandise%s_quantity, currency_type%s, currency_type%s_price, refresh_time, refreshable_quantity FROM dark_market WHERE unique_id = "%s";' % (code, code, code, code, unique_id)
@@ -2643,6 +2660,10 @@ async def _get_new_mail(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).redeem_nonce(int(post['world']), post['unique_id'], post['nonce'])
 	return _json_response(result)
 
+@ROUTES.post('/change_family_name')
+async def _change_family_name(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).change_family_name(int(post['world']), post['unique_id'], post['name']))
 
 def get_config() -> configparser.ConfigParser:
 	'''
