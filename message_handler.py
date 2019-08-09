@@ -326,7 +326,7 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _send_friend_gift(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/send_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_id': message['data']['friend_id']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/send_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
 			return await resp.text()
 
 	async def _redeem_nonce(self, message: dict, session) -> str:
