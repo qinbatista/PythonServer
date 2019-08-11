@@ -90,7 +90,8 @@
         }
       ]
     },
-    {
+    
+	{
       "enemyLayout": [
         {
           "totalTime": 5,

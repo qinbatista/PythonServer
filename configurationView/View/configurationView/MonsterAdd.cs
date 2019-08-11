@@ -25,14 +25,17 @@ namespace configurationView
         {
             try
             {
-                MessageBox.Show(array.ToString());
-                array.Add(JToken.Parse(String.Format("{\"count\": 1,\"enemysPrefString\": \"{0}\"}", comboBox1.SelectedItem.ToString())));
-                MessageBox.Show(array.ToString());
+                array.Add(JObject.Parse("{'count': " + MonstersNumber.Value.ToString() + ",'enemysPrefString': '" + MonstersName.SelectedItem.ToString() + "'}" ));
             }
             catch
             {
                 MessageBox.Show(text: "没有选择怪物类型！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void MonstersName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
