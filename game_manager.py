@@ -1653,13 +1653,16 @@ class GameManager:
 	async def response_friend(self, world: int, unique_id: str, nonce: str) -> dict:
 		# success -> 0
 		# 0 - Add friends to success
+		# 97 - nonce error
 		# 98 - database operating error
 		# 99 - You already have this friend
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
-		print(response.text)
 		data = response.json()
-		friend_name = data[nonce]["sender"]
-		friend_id = data[nonce]["uid_sender"]
+		try:
+			friend_name = data[nonce]["sender"]
+			friend_id = data[nonce]["uid_sender"]
+		except:
+			return self._message_typesetting(status=97, message="nonce error")
 
 		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
 		if data[0][5] != "":
