@@ -1534,9 +1534,9 @@ class GameManager:
 							}
 						}
 				return self._message_typesetting(99, 'send friend gift failed, because cooldown time is not finished', data)
-					
 
-	
+
+
 	async def delete_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# 0 - request friend successfully
 		# 98 - you don't have this friend
@@ -2751,6 +2751,12 @@ async def _response_friend(request: web.Request) -> web.Response:
 async def _get_new_mail(request: web.Request) -> web.Response:
 	return _json_response(json.loads(requests.post('http://localhost:8020/get_new_mail', data=await request.post()).text))
 
+
+@ROUTES.post('/get_all_mail')
+async def _get_all_mail(request: web.Request) -> web.Response:
+	return _json_response(json.loads(requests.post('http://localhost:8020/get_all_mail', data=await request.post()).text))
+
+
 @ROUTES.post('/start_hang_up')
 async def __start_hang_up(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -2794,7 +2800,7 @@ async def __get_all_armor_info(request: web.Request) -> web.Response:
 	return _json_response(result)
 
 @ROUTES.post('/redeem_nonce')
-async def _get_new_mail(request: web.Request) -> web.Response:
+async def _redeem_nonce(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).redeem_nonce(int(post['world']), post['unique_id'], post['nonce'])
 	return _json_response(result)

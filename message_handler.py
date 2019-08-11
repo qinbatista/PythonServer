@@ -336,6 +336,7 @@ class MessageHandler:
 	async def _get_new_mail(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_new_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
+
 	async def _get_all_mail(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
