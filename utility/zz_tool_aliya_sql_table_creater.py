@@ -215,6 +215,8 @@ def create_user_table() -> None:
 
 
 def create_dark_market_table() -> None:
+    for target_list in expression_list:
+        pass
     """
     创建武器背包表以及武器信息表
     """
@@ -314,7 +316,28 @@ def test():
     print("d:" + str(d))
     print("fetchall:" + str(cursor.fetchall()))
     db.commit()
-
+def create_sensitive():
+    if os.path.isfile("/Users/batista/MyProject/lukseunserversys/Utility/SensitiveVocabulary.txt"):
+        file_object = open("/Users/batista/MyProject/lukseunserversys/Utility/SensitiveVocabulary.txt")
+    line = file_object.readline()
+    all_the_text=[]
+    try:
+        while line:
+            line = line.replace(" ","")
+            line = line.replace("\n","")
+            line = line.replace("\\","")
+            ListLine = line.split('、')
+            for i in ListLine:
+                if line!="":
+                    all_the_text.append("\""+i+"\","+"\n")
+            #print(all_the_text)
+            line = file_object.readline()
+    finally:
+        file_object.close( )
+    with open("/Users/batista/MyProject/lukseunserversys/Utility/sensitiveword.txt",'w') as f:
+        for i in all_the_text:
+            if "\"\"" not in i:
+                f.write(i)
 if __name__ == '__main__':
     # 创建数据库表
     # create_player_table()
@@ -324,7 +347,7 @@ if __name__ == '__main__':
     # create_role_table()
     # create_user_table()
     # create_dark_market_table()
-    create_friend_table()
+    # create_friend_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
