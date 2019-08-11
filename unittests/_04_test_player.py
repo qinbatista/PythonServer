@@ -1,8 +1,13 @@
 import json
-
+import time
+import os
 import requests
 import configparser
-
+"""
+print(str(time.time()))
+print(str(time.time() % 1 * 1e6))
+print(str(os.getpid()))
+"""
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
@@ -224,7 +229,7 @@ def get_new_mail_nonce_list(unique_id: str) -> (list, list):
 	return type_list, nonce_list
 
 def redeem_all_nonce(unique_id: str, type_list: list, nonce_list: list):
-	result = requests.post('http://localhost:8006/redeem_all_nonce', json={"world": 0, 'unique_id': unique_id, "type_list": type_list, "nonce_list": nonce_list})
+	result = requests.post('http://localhost:8004/redeem_all_nonce', data={"world": 0, 'unique_id': unique_id, "type_list": type_list, "nonce_list": nonce_list})
 	print(str(result.text))
 
 
@@ -265,6 +270,10 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/friend_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
 	# print(str(result.text))
+	result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	print(str(result.text))
+	result = requests.post('http://localhost:8004/delete_all_mail', data={"world": 0, 'unique_id': unique_id})
+	print(str(result.text))
 	result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
 	print(str(result.text))
 
@@ -333,9 +342,9 @@ if __name__ == "__main__":
 	# request_friend(unique_id="2", friend_name="g")
 	# request_friend(unique_id="3", friend_name="g")
 
-	# send_friend_gift(unique_id="1", friend_name="g")
-	# send_friend_gift(unique_id="2", friend_name="g")
-	# send_friend_gift(unique_id="3", friend_name="g")
+	send_friend_gift(unique_id="1", friend_name="g")
+	send_friend_gift(unique_id="2", friend_name="g")
+	send_friend_gift(unique_id="3", friend_name="g")
 	# send_all_friend_gift(unique_id="1")
 
 	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
@@ -343,4 +352,4 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	all_function(unique_id="4")
+	# all_function(unique_id="4")
