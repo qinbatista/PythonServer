@@ -336,8 +336,17 @@ class MessageHandler:
 	async def _get_new_mail(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_new_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
+
 	async def _get_all_mail(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _delete_mail(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/delete_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
+			return await resp.text()
+
+	async def _delete_all_mail(self, message: dict, session) -> str:
+		async with session.post(MANAGER_GAME_BASE_URL + '/delete_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 
@@ -385,9 +394,9 @@ class MessageHandler:
 	async def _send_all_friend_gift(self, message: dict, session) -> str:
 		async with session.post(MANAGER_GAME_BASE_URL + '/send_all_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
-			
+
 	async def _redeem_all_nonce(self, message: dict, session) -> str:
-		async with session.post('http://localhost:8006/redeem_all_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'type_list': message['data']['type_list'], 'nonce_list': message['data']['nonce_list']}) as resp:
+		async with session.post(MANAGER_GAME_BASE_URL + '/redeem_all_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'type_list': message['data']['type_list'], 'nonce_list': message['data']['nonce_list']}) as resp:
 			return await resp.text()
 ###############################################################################
 
@@ -486,6 +495,8 @@ FUNCTION_LIST = {
 	'redeem_nonce': MessageHandler._redeem_nonce,
 	'redeem_all_nonce': MessageHandler._redeem_all_nonce,
 	'get_new_mail': MessageHandler._get_new_mail,
-	'get_all_mail': MessageHandler._get_all_mail
+	'get_all_mail': MessageHandler._get_all_mail,
+	'delete_mail': MessageHandler._delete_mail,
+	'delete_all_mail': MessageHandler._delete_all_mail
 
 }

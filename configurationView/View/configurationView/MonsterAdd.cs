@@ -14,20 +14,28 @@ namespace configurationView
 {
     public partial class MonsterAdd : Form
     {
-        string add_item;
-        JObject client_stage_json;
-        public MonsterAdd(JObject client_stage_json)
+        JArray array;
+        public MonsterAdd(JArray array)
         {
             InitializeComponent();
-            this.client_stage_json = client_stage_json;
+            this.array = array;
         }
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            //add_item = comboBox1.SelectedItem.ToString();
-            MessageBox.Show(text: client_stage_json.ToString());
-            //client_stage_json.Add("client_stage_json": client_stage_json["client_stage_json"][0]);
-            textBox1.Text = client_stage_json.ToString();
+            try
+            {
+                array.Add(JObject.Parse("{'count': " + MonstersNumber.Value.ToString() + ",'enemysPrefString': '" + MonstersName.SelectedItem.ToString() + "'}" ));
+            }
+            catch
+            {
+                MessageBox.Show(text: "没有选择怪物类型！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void MonstersName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
