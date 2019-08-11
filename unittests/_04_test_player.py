@@ -334,9 +334,9 @@ if __name__ == "__main__":
 	# nonce = get_new_mail(unique_id="6")
 	# redeem_nonce(unique_id="6", nonce=nonce)
 
-	request_friend(unique_id="4", friend_name="a")
-	nonce = get_new_mail(unique_id="1")
-	response_friend(unique_id="1", nonce=nonce)
+	# request_friend(unique_id="4", friend_name="a")
+	# nonce = get_new_mail(unique_id="1")
+	# response_friend(unique_id="1", nonce=nonce)
 	# response_friend(unique_id="1", nonce="64942980375638432564912061770566384876054041984556040131926509775589729375588")
 
 	# request_friend(unique_id="1", friend_name="g")
@@ -346,7 +346,7 @@ if __name__ == "__main__":
 	# send_friend_gift(unique_id="1", friend_name="g")
 	# send_friend_gift(unique_id="2", friend_name="g")
 	# send_friend_gift(unique_id="3", friend_name="g")
-	# send_all_friend_gift(unique_id="1")
+	send_all_friend_gift(unique_id="1")
 
 	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
 	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)

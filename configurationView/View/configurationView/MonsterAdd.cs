@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,10 +16,16 @@ namespace configurationView
     public partial class MonsterAdd : Form
     {
         JArray array;
-        public MonsterAdd(JArray array)
+        JObject json;
+        string path;
+        ComboBox comboBox;
+        public MonsterAdd(JArray array, JObject json, string path, ComboBox comboBox)
         {
             InitializeComponent();
             this.array = array;
+            this.json = json;
+            this.path = path;
+            this.comboBox = comboBox;
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -26,6 +33,10 @@ namespace configurationView
             try
             {
                 array.Add(JObject.Parse("{'count': " + MonstersNumber.Value.ToString() + ",'enemysPrefString': '" + MonstersName.SelectedItem.ToString() + "'}" ));
+                File.WriteAllText(path, json.ToString());
+                comboBox.Items.Add(MonstersName.SelectedItem.ToString());
+                Close();
+                MessageBox.Show(text: "关卡添加成功！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch
             {
@@ -33,9 +44,9 @@ namespace configurationView
             }
         }
 
-        private void MonstersName_SelectedIndexChanged(object sender, EventArgs e)
+        private void Button2_Click(object sender, EventArgs e)
         {
-
+            Close();
         }
     }
 }

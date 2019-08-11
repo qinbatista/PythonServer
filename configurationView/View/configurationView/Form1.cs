@@ -293,42 +293,71 @@ namespace configurationView
         private void Button4_Click(object sender, EventArgs e)
         {
             // delete
-            JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"];
-            if (array.Count == 1)
+            try
             {
-                MessageBox.Show(text: "最后一波怪，不可删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"];
+                if (array.Count == 1)
+                {
+                    MessageBox.Show(text: "最后一波怪，不可删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else if (array.Count == 0)
+                {
+                    MessageBox.Show(text: "已没有怪物可以删除，可手动增加一波怪物再删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    array[comboBox3.SelectedIndex].Remove();
+                    client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"] = array;
+                    File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
+                    comboBox3.Items.Remove(comboBox3.SelectedItem.ToString());
+                    numericUpDown3.Value = 0;
+                    MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-            else if (array.Count == 0)
+            catch
             {
-                MessageBox.Show(text: "已没有怪物可以增加，可手动增加一波基础怪物！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else
-            {
-                array[comboBox3.SelectedIndex].Remove();
-                client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"] = array;
-                File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
-                comboBox3.Items.Remove(comboBox3.SelectedItem.ToString());
-                numericUpDown3.Value = 0;
-                MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+                MessageBox.Show(text: String.Format("请选择一波怪物后再删除！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void Button3_Click(object sender, EventArgs e)
         {
             // add
             try {
-                new MonsterAdd((JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"]).Show();
-                //JArray array = ;
-                //array.Add(array[array.Count - 1]);
-                //client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"] = array;
-                //File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
-                //comboBox2.Items.Add(comboBox2.Items.Count + 1);
-                //comboBox2.SelectedIndex = comboBox2.Items.IndexOf(comboBox2.Items.Count);
-                //MessageBox.Show(text: "关卡添加成功 ！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                new MonsterAdd((JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"], client_stage_json, String.Format(level_enemy_layouts_config, current_version), comboBox3).Show();
             }
             catch
             {
                 MessageBox.Show(text: String.Format("未选择关卡类型！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Button6_Click(object sender, EventArgs e)
+        {
+            // delete
+            try
+            {
+                JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["SpawnPointStrings"];
+                if (array.Count == 1)
+                {
+                    MessageBox.Show(text: "最后一个出生点，不可删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else if (array.Count == 0)
+                {
+                    MessageBox.Show(text: "已没有出生的可以删除，可手动增加一个出生点再删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    array[comboBox4.SelectedIndex].Remove();
+                    client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["SpawnPointStrings"] = array;
+                    File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
+                    comboBox4.Items.Remove(comboBox4.SelectedItem.ToString());
+                    MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                }
+            }
+            catch
+            {
+                MessageBox.Show(text: String.Format("请选择一个出生点后再删除！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

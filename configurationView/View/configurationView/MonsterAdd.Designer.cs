@@ -48,7 +48,6 @@
             this.MonstersName.Name = "MonstersName";
             this.MonstersName.Size = new System.Drawing.Size(219, 26);
             this.MonstersName.TabIndex = 0;
-            this.MonstersName.SelectedIndexChanged += new System.EventHandler(this.MonstersName_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -77,6 +76,7 @@
             this.button2.TabIndex = 3;
             this.button2.Text = "取消";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.Button2_Click);
             // 
             // label2
             // 

@@ -16,8 +16,8 @@
               "enemysPrefString": "ZombieKid2"
             },
             {
-              "count": 12,
-              "enemysPrefString": "ZombieKid3"
+              "count": 100,
+              "enemysPrefString": "Enemy1"
             }
           ],
           "SpawnPointStrings": [
@@ -90,8 +90,7 @@
         }
       ]
     },
-    
-	{
+    {
       "enemyLayout": [
         {
           "totalTime": 5,
