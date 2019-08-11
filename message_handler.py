@@ -480,6 +480,7 @@ FUNCTION_LIST = {
 	'get_all_friend_info': MessageHandler._get_all_friend_info,
 	'delete_friend': MessageHandler._delete_friend,
 	'request_friend': MessageHandler._request_friend,
+	'response_friend': MessageHandler._response_friend,
 	'send_friend_gift': MessageHandler._send_friend_gift,
 	'send_all_friend_gift': MessageHandler._send_all_friend_gift,
 	'redeem_nonce': MessageHandler._redeem_nonce,
