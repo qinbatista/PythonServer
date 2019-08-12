@@ -18,12 +18,17 @@
             {
               "count": 100,
               "enemysPrefString": "Enemy1"
+            },
+            {
+              "count": 8,
+              "enemysPrefString": "Enemy1"
             }
           ],
           "SpawnPointStrings": [
             "Spawn6",
             "Spawn7",
-            "Spawn8"
+            "Spawn8",
+            "Spawn1"
           ]
         },
         {

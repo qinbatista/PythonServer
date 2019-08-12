@@ -22,6 +22,7 @@ namespace configurationView
         public MonsterAdd(JArray array, JObject json, string path, ComboBox comboBox)
         {
             InitializeComponent();
+            StartPosition = FormStartPosition.CenterScreen;
             this.array = array;
             this.json = json;
             this.path = path;
@@ -35,8 +36,8 @@ namespace configurationView
                 array.Add(JObject.Parse("{'count': " + MonstersNumber.Value.ToString() + ",'enemysPrefString': '" + MonstersName.SelectedItem.ToString() + "'}" ));
                 File.WriteAllText(path, json.ToString());
                 comboBox.Items.Add(MonstersName.SelectedItem.ToString());
-                Close();
-                MessageBox.Show(text: "关卡添加成功！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Dispose();
+                MessageBox.Show(text: "怪物添加成功！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch
             {
@@ -46,7 +47,7 @@ namespace configurationView
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            Close();
+            Dispose();
         }
     }
 }

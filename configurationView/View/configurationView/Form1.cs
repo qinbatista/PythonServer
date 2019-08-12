@@ -52,6 +52,7 @@ namespace configurationView
         public MainForm()
         {
             InitializeComponent();
+            StartPosition = FormStartPosition.CenterScreen;
             stream = File.OpenText(json_version);
             reader = new JsonTextReader(stream);
             json = (JObject)JToken.ReadFrom(reader);
@@ -298,11 +299,11 @@ namespace configurationView
                 JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"];
                 if (array.Count == 1)
                 {
-                    MessageBox.Show(text: "最后一波怪，不可删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(text: "最后一种怪，不可删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else if (array.Count == 0)
                 {
-                    MessageBox.Show(text: "已没有怪物可以删除，可手动增加一波怪物再删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(text: "已没有怪物可以删除，可手动增加一种怪物再删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
@@ -311,12 +312,12 @@ namespace configurationView
                     File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
                     comboBox3.Items.Remove(comboBox3.SelectedItem.ToString());
                     numericUpDown3.Value = 0;
-                    MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(text: String.Format("删除怪物成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch
             {
-                MessageBox.Show(text: String.Format("请选择一波怪物后再删除！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(text: String.Format("请选择一种怪后再删除！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void Button3_Click(object sender, EventArgs e)
@@ -359,6 +360,72 @@ namespace configurationView
             {
                 MessageBox.Show(text: String.Format("请选择一个出生点后再删除！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void Button5_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string item = comboBox5.SelectedItem.ToString();
+                if (comboBox4.Items.Contains(item))
+                {
+                    MessageBox.Show(text: String.Format("出生点已添加到该波怪物出生点中！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["SpawnPointStrings"];
+                    array.Add(item);
+                    File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
+                    comboBox4.Items.Add(item);
+                    MessageBox.Show(text: String.Format(String.Format("出生点{0}添加成功！", item), current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch
+            {
+                MessageBox.Show(text: String.Format("请选择一个出生点后再添加！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void FunctionOption_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (FunctionOption.SelectedIndex)
+            {
+                case 0: // 普通关卡怪物生成：level_enemy_layouts_config
+                    {
+
+                    } break;
+                case 1: // 
+                    {
+
+                    }
+                    break;
+                case 2:
+                    {
+
+                    }
+                    break;
+                case 3:
+                    {
+
+                    }
+                    break;
+                case 5:
+                    {
+
+                    }
+                    break;
+                case 6:
+                    {
+
+                    }
+                    break;
+                case 7:
+                    {
+
+                    }
+                    break;
+            }
+            
         }
     }
 }

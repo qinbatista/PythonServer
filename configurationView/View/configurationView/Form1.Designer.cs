@@ -30,6 +30,7 @@
         {
             this.label = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.comboBox5 = new System.Windows.Forms.ComboBox();
             this.IsPreWaveFinish = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.WaveNumber = new System.Windows.Forms.NumericUpDown();
@@ -75,6 +76,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.comboBox5);
             this.panel1.Controls.Add(this.IsPreWaveFinish);
             this.panel1.Controls.Add(this.label8);
             this.panel1.Controls.Add(this.WaveNumber);
@@ -100,6 +102,25 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1178, 505);
             this.panel1.TabIndex = 1;
+            // 
+            // comboBox5
+            // 
+            this.comboBox5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox5.FormattingEnabled = true;
+            this.comboBox5.Items.AddRange(new object[] {
+            "Spawn1",
+            "Spawn2",
+            "Spawn3",
+            "Spawn4",
+            "Spawn5",
+            "Spawn6",
+            "Spawn7",
+            "Spawn8",
+            "Spawn9"});
+            this.comboBox5.Location = new System.Drawing.Point(679, 393);
+            this.comboBox5.Name = "comboBox5";
+            this.comboBox5.Size = new System.Drawing.Size(360, 26);
+            this.comboBox5.TabIndex = 29;
             // 
             // IsPreWaveFinish
             // 
@@ -186,10 +207,11 @@
             this.button5.TabIndex = 22;
             this.button5.Text = "添加";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.Button5_Click);
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(960, 387);
+            this.button6.Location = new System.Drawing.Point(560, 387);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(79, 39);
             this.button6.TabIndex = 21;
@@ -223,7 +245,7 @@
             this.comboBox4.FormattingEnabled = true;
             this.comboBox4.Location = new System.Drawing.Point(161, 393);
             this.comboBox4.Name = "comboBox4";
-            this.comboBox4.Size = new System.Drawing.Size(755, 26);
+            this.comboBox4.Size = new System.Drawing.Size(360, 26);
             this.comboBox4.TabIndex = 18;
             // 
             // comboBox3
@@ -356,6 +378,7 @@
             this.FunctionOption.Name = "FunctionOption";
             this.FunctionOption.Size = new System.Drawing.Size(700, 26);
             this.FunctionOption.TabIndex = 5;
+            this.FunctionOption.SelectedIndexChanged += new System.EventHandler(this.FunctionOption_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -441,6 +464,7 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.NumericUpDown WaveNumber;
         private System.Windows.Forms.CheckBox IsPreWaveFinish;
+        private System.Windows.Forms.ComboBox comboBox5;
     }
 }
 
