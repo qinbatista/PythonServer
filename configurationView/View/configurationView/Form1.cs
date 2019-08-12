@@ -237,7 +237,82 @@ namespace configurationView
                 MessageBox.Show(text: String.Format("未选择关卡类型！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SettingWaveNumber();
+            SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][0]);
+        }
+        private void SettingWaveNumber()
+        {
+            JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"];
+            WaveNumber.Maximum = array.Count;
+        }
+        /// <summary>
+        /// 设置panel下所有的控件属性
+        /// </summary>
+        /// <param name="enemy"></param>
+        private void SettingPanel(JObject enemy)
+        {
+            TotalTime.Value = (decimal)enemy["totalTime"];
+            ColdDownTime.Value = (decimal)enemy["coldDownTime"];
+            IsPreWaveFinish.Checked = (bool)enemy["isPreWaveFinish"];
+            
+            comboBox3.Items.Clear();
+            comboBox4.Items.Clear();
+            JArray array = (JArray)enemy["enemyList"];
+            foreach (var item in array)
+            {
+                comboBox3.Items.Add(item["enemysPrefString"].ToString());
+            }
+            array = (JArray)enemy["SpawnPointStrings"];
+            foreach (var item in array)
+            {
+                comboBox4.Items.Add(item.ToString());
+            }
+        }
 
+        private void WaveNumber_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]);
+            }
+            catch
+            {
+                MessageBox.Show(text: "未选择关卡类型！暂无波数信息！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ComboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            JObject enemyLayout = (JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1];
+            JArray array = (JArray)enemyLayout["enemyList"];
+            numericUpDown3.Value = (decimal)array[comboBox3.SelectedIndex]["count"];
+        }
+
+        private void Button4_Click(object sender, EventArgs e)
+        {
+            // delete
+            JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"];
+            if (array.Count == 1)
+            {
+                MessageBox.Show(text: "最后一波怪，不可删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if(array.Count == 0)
+            {
+                MessageBox.Show(text: "已没有怪物可以增加，可手动增加一波基础怪物！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                array[comboBox3.SelectedIndex].Remove();
+                client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"] = array;
+                File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
+                comboBox3.Items.Remove(comboBox3.SelectedItem.ToString());
+                numericUpDown3.Value = 0;
+                MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            }
+        }
         private void Button3_Click(object sender, EventArgs e)
         {
             //add
@@ -251,35 +326,6 @@ namespace configurationView
                 MessageBox.Show(text: String.Format("请选择要修改的关卡！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             //MessageBox.Show(text: add.add_item);
-        }
-
-        private void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SettingWaveNumber();
-            SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][0]);
-        }
-        private void SettingWaveNumber()
-        {
-            JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"];
-            WaveNumber.Minimum = 1;
-            WaveNumber.Maximum = array.Count;
-        }
-        private void SettingPanel(JObject enemy)
-        {
-            TotalTime.Value = (decimal)enemy["totalTime"];
-            ColdDownTime.Value = (decimal)enemy["coldDownTime"];
-            IsPreWaveFinish.Checked = enemy["isPreWaveFinish"].Equals("true");
-        }
-        private void WaveNumber_ValueChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]);
-            }
-            catch
-            {
-                MessageBox.Show(text: "未选择关卡类型！暂无波数信息！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
     }
 }

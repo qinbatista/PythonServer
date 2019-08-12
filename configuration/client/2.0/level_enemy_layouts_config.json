@@ -1,252 +1,176 @@
 {
-	"enemyLayouts": [
-		{
-			"enemyLayout": [
-				{
-					"totalTime": 5,
-					"coldDownTime": 5,
-					"isPreWaveFinish": false,
-					"enemyList": [
-						{
-							"count": 2,
-							"enemysPrefString": "ZombieKid"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn1",
-						"Spawn2",
-						"Spawn3"
-					]
-				},
-				{
-					"totalTime": 20,
-					"coldDownTime": 6,
-					"isPreWaveFinish": false,
-					"enemyList": [
-						{
-							"count": 2,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn3",
-						"Spawn4",
-						"Spawn5"
-					]
-				},
-				{
-					"totalTime": 15,
-					"coldDownTime": 6,
-					"isPreWaveFinish": true,
-					"enemyList": [
-						{
-							"count": 4,
-							"enemysPrefString": "ZombieKid"
-						},
-						{
-							"count": 5,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn1",
-						"Spawn3",
-						"Spawn5"
-					]
-				},
-				{
-					"totalTime": 30,
-					"coldDownTime": 10,
-					"isPreWaveFinish": true,
-					"enemyList": [
-						{
-							"count": 4,
-							"enemysPrefString": "ZombieKid"
-						},
-						{
-							"count": 5,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn1",
-						"Spawn2",
-						"Spawn3",
-						"Spawn4",
-						"Spawn5"
-					]
-				}
-			]
-		},
-		
-		
-		
-		{
-			"enemyLayout": [
-				{
-					"totalTime": 5,
-					"coldDownTime": 7,
-					"isPreWaveFinish": false,
-					"enemyList": [
-						{
-							"count": 2,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn6",
-						"Spawn7",
-						"Spawn8"
-					]
-				},
-				{
-					"totalTime": 20,
-					"coldDownTime": 6,
-					"isPreWaveFinish": false,
-					"enemyList": [
-						{
-							"count": 2,
-							"enemysPrefString": "ZombieKid"
-						},
-						{
-							"count": 2,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn8",
-						"Spawn9",
-						"Spawn10"
-					]
-				},
-				{
-					"totalTime": 15,
-					"coldDownTime": 6,
-					"isPreWaveFinish": true,
-					"enemyList": [
-						{
-							"count": 4,
-							"enemysPrefString": "ZombieKid"
-						},
-						{
-							"count": 5,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn6",
-						"Spawn8",
-						"Spawn10"
-					]
-				},
-				{
-					"totalTime": 30,
-					"coldDownTime": 10,
-					"isPreWaveFinish": true,
-					"enemyList": [
-						{
-							"count": 4,
-							"enemysPrefString": "ZombieKid"
-						},
-						{
-							"count": 5,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn6",
-						"Spawn7",
-						"Spawn8",
-						"Spawn9",
-						"Spawn10"
-					]
-				}
-			]
-		},
-		
-		
-		
-		{
-			"enemyLayout": [
-				{
-					"totalTime": 5,
-					"coldDownTime": 7,
-					"isPreWaveFinish": false,
-					"enemyList": [
-						{
-							"count": 2,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn6",
-						"Spawn7",
-						"Spawn8"
-					]
-				},
-				{
-					"totalTime": 20,
-					"coldDownTime": 6,
-					"isPreWaveFinish": false,
-					"enemyList": [
-						{
-							"count": 2,
-							"enemysPrefString": "ZombieKid"
-						},
-						{
-							"count": 2,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn8",
-						"Spawn9",
-						"Spawn10"
-					]
-				},
-				{
-					"totalTime": 15,
-					"coldDownTime": 6,
-					"isPreWaveFinish": true,
-					"enemyList": [
-						{
-							"count": 4,
-							"enemysPrefString": "ZombieKid"
-						},
-						{
-							"count": 5,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn6",
-						"Spawn8",
-						"Spawn10"
-					]
-				},
-				{
-					"totalTime": 30,
-					"coldDownTime": 10,
-					"isPreWaveFinish": true,
-					"enemyList": [
-						{
-							"count": 4,
-							"enemysPrefString": "ZombieKid"
-						},
-						{
-							"count": 5,
-							"enemysPrefString": "Enemy1"
-						}
-					],
-					"SpawnPointStrings": [
-						"Spawn6",
-						"Spawn7",
-						"Spawn8",
-						"Spawn9",
-						"Spawn10"
-					]
-				}
-			]
-		}
-	]
+  "enemyLayouts": [
+    {
+      "enemyLayout": [
+        {
+          "totalTime": 5,
+          "coldDownTime": 7,
+          "isPreWaveFinish": false,
+          "enemyList": [
+            {
+              "count": 2,
+              "enemysPrefString": "ZombieKid"
+            },
+            {
+              "count": 33,
+              "enemysPrefString": "ZombieKid2"
+            },
+            {
+              "count": 12,
+              "enemysPrefString": "ZombieKid3"
+            }
+          ],
+          "SpawnPointStrings": [
+            "Spawn6",
+            "Spawn7",
+            "Spawn8"
+          ]
+        },
+        {
+          "totalTime": 20,
+          "coldDownTime": 6,
+          "isPreWaveFinish": false,
+          "enemyList": [
+            {
+              "count": 2,
+              "enemysPrefString": "ZombieKid"
+            },
+            {
+              "count": 2,
+              "enemysPrefString": "Enemy1"
+            }
+          ],
+          "SpawnPointStrings": [
+            "Spawn8",
+            "Spawn9",
+            "Spawn10"
+          ]
+        },
+        {
+          "totalTime": 15,
+          "coldDownTime": 6,
+          "isPreWaveFinish": true,
+          "enemyList": [
+            {
+              "count": 4,
+              "enemysPrefString": "ZombieKid"
+            },
+            {
+              "count": 5,
+              "enemysPrefString": "Enemy1"
+            }
+          ],
+          "SpawnPointStrings": [
+            "Spawn6",
+            "Spawn8",
+            "Spawn10"
+          ]
+        },
+        {
+          "totalTime": 30,
+          "coldDownTime": 10,
+          "isPreWaveFinish": true,
+          "enemyList": [
+            {
+              "count": 4,
+              "enemysPrefString": "ZombieKid"
+            },
+            {
+              "count": 5,
+              "enemysPrefString": "Enemy1"
+            }
+          ],
+          "SpawnPointStrings": [
+            "Spawn6",
+            "Spawn7",
+            "Spawn8",
+            "Spawn9",
+            "Spawn10"
+          ]
+        }
+      ]
+    },
+    {
+      "enemyLayout": [
+        {
+          "totalTime": 5,
+          "coldDownTime": 7,
+          "isPreWaveFinish": false,
+          "enemyList": [
+            {
+              "count": 22,
+              "enemysPrefString": "Enemy3"
+            }
+          ],
+          "SpawnPointStrings": [
+            "Spawn6",
+            "Spawn7",
+            "Spawn8"
+          ]
+        },
+        {
+          "totalTime": 20,
+          "coldDownTime": 6,
+          "isPreWaveFinish": false,
+          "enemyList": [
+            {
+              "count": 2,
+              "enemysPrefString": "ZombieKid"
+            },
+            {
+              "count": 2,
+              "enemysPrefString": "Enemy1"
+            }
+          ],
+          "SpawnPointStrings": [
+            "Spawn8",
+            "Spawn9",
+            "Spawn10"
+          ]
+        },
+        {
+          "totalTime": 15,
+          "coldDownTime": 6,
+          "isPreWaveFinish": true,
+          "enemyList": [
+            {
+              "count": 4,
+              "enemysPrefString": "ZombieKid"
+            },
+            {
+              "count": 5,
+              "enemysPrefString": "Enemy1"
+            }
+          ],
+          "SpawnPointStrings": [
+            "Spawn6",
+            "Spawn8",
+            "Spawn10"
+          ]
+        },
+        {
+          "totalTime": 30,
+          "coldDownTime": 10,
+          "isPreWaveFinish": true,
+          "enemyList": [
+            {
+              "count": 4,
+              "enemysPrefString": "ZombieKid"
+            },
+            {
+              "count": 5,
+              "enemysPrefString": "Enemy1"
+            }
+          ],
+          "SpawnPointStrings": [
+            "Spawn6",
+            "Spawn7",
+            "Spawn8",
+            "Spawn9",
+            "Spawn10"
+          ]
+        }
+      ]
+    }
+  ]
 }

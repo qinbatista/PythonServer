@@ -14,7 +14,6 @@ namespace configurationView
 {
     public partial class MonsterAdd : Form
     {
-        string add_item;
         JObject client_stage_json;
         public MonsterAdd(JObject client_stage_json)
         {
