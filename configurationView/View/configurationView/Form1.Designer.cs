@@ -30,6 +30,7 @@
         {
             this.label = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.comboBox5 = new System.Windows.Forms.ComboBox();
             this.IsPreWaveFinish = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.WaveNumber = new System.Windows.Forms.NumericUpDown();
@@ -57,7 +58,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.dateTimePicker = new System.Windows.Forms.DateTimePicker();
-            this.comboBox5 = new System.Windows.Forms.ComboBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.WaveNumber)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -102,6 +102,25 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1178, 505);
             this.panel1.TabIndex = 1;
+            // 
+            // comboBox5
+            // 
+            this.comboBox5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox5.FormattingEnabled = true;
+            this.comboBox5.Items.AddRange(new object[] {
+            "Spawn1",
+            "Spawn2",
+            "Spawn3",
+            "Spawn4",
+            "Spawn5",
+            "Spawn6",
+            "Spawn7",
+            "Spawn8",
+            "Spawn9"});
+            this.comboBox5.Location = new System.Drawing.Point(679, 393);
+            this.comboBox5.Name = "comboBox5";
+            this.comboBox5.Size = new System.Drawing.Size(360, 26);
+            this.comboBox5.TabIndex = 29;
             // 
             // IsPreWaveFinish
             // 
@@ -359,6 +378,7 @@
             this.FunctionOption.Name = "FunctionOption";
             this.FunctionOption.Size = new System.Drawing.Size(700, 26);
             this.FunctionOption.TabIndex = 5;
+            this.FunctionOption.SelectedIndexChanged += new System.EventHandler(this.FunctionOption_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -384,25 +404,6 @@
             this.dateTimePicker.Name = "dateTimePicker";
             this.dateTimePicker.Size = new System.Drawing.Size(200, 28);
             this.dateTimePicker.TabIndex = 9;
-            // 
-            // comboBox5
-            // 
-            this.comboBox5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox5.FormattingEnabled = true;
-            this.comboBox5.Items.AddRange(new object[] {
-            "Spawn1",
-            "Spawn2",
-            "Spawn3",
-            "Spawn4",
-            "Spawn5",
-            "Spawn6",
-            "Spawn7",
-            "Spawn8",
-            "Spawn9"});
-            this.comboBox5.Location = new System.Drawing.Point(679, 393);
-            this.comboBox5.Name = "comboBox5";
-            this.comboBox5.Size = new System.Drawing.Size(360, 26);
-            this.comboBox5.TabIndex = 29;
             // 
             // MainForm
             // 

@@ -385,5 +385,47 @@ namespace configurationView
                 MessageBox.Show(text: String.Format("请选择一个出生点后再添加！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void FunctionOption_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (FunctionOption.SelectedIndex)
+            {
+                case 0: // 普通关卡怪物生成：level_enemy_layouts_config
+                    {
+
+                    } break;
+                case 1: // 
+                    {
+
+                    }
+                    break;
+                case 2:
+                    {
+
+                    }
+                    break;
+                case 3:
+                    {
+
+                    }
+                    break;
+                case 5:
+                    {
+
+                    }
+                    break;
+                case 6:
+                    {
+
+                    }
+                    break;
+                case 7:
+                    {
+
+                    }
+                    break;
+            }
+            
+        }
     }
 }
