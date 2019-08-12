@@ -41,9 +41,6 @@
             // 
             this.MonstersName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.MonstersName.FormattingEnabled = true;
-            this.MonstersName.Items.AddRange(new object[] {
-            "ZombieKid",
-            "Enemy1"});
             this.MonstersName.Location = new System.Drawing.Point(125, 27);
             this.MonstersName.Name = "MonstersName";
             this.MonstersName.Size = new System.Drawing.Size(219, 26);

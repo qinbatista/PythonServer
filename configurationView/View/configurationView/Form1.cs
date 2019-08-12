@@ -25,16 +25,17 @@ namespace configurationView
         StreamReader stream;
         JsonTextReader reader;
         //DirectoryInfo di1 = new DirectoryInfo(Directory.GetCurrentDirectory());
-        static string main_path = "..//..//..//..//..//configuration//";
+        public static string main_path = "..//..//..//..//..//configuration//";
         string current_version = "0";
         string old_version = "0";
         string new_version;
         JObject json;
-        string json_version = main_path + "//config_timer_setting.json";
+        string json_version = main_path + "config_timer_setting.json";
         /// <summary>
         /// client configuration
         /// </summary>
         string clien_path = main_path + "client//";
+        string level_enemy_layouts_config_path;
         string level_enemy_layouts_config = main_path + "client//{0}//level_enemy_layouts_config.json";
         JObject client_stage_json;
         string level_enemy_layouts_config_tower = main_path + "client//{0}//level_enemy_layouts_config_tower.json";
@@ -79,9 +80,9 @@ namespace configurationView
             }
         }
 
-        private void Add_Click(object sender, EventArgs e)
+        private void AddVersion_Click(object sender, EventArgs e)
         {
-            String version_str = Interaction.InputBox("请输入版本号，将会拷贝最新版本作为当前版本", "输入密码", "");
+            String version_str = Interaction.InputBox("请输入版本号，将会拷贝最新版本作为当前版本", "输入版本号", "");
             try
             {
                 float version = float.Parse(version_str);
@@ -167,44 +168,40 @@ namespace configurationView
             }
         }
 
+        private void VersionOption_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            current_version = VersionOption.SelectedItem.ToString();
+        }
+
         #region Panel1
-        private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void StageType_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
-                comboBox2.Items.Clear();
-                switch (comboBox1.SelectedItem.ToString())
+                StageNumber.Items.Clear();
+                switch (StageType.SelectedItem.ToString())
                 {
                     case "普通关卡":
                         {
-                            stream = File.OpenText(String.Format(level_enemy_layouts_config, current_version));
-                            reader = new JsonTextReader(stream);
-                            client_stage_json = (JObject)JToken.ReadFrom(reader);
-                            stream.Close();
-                            reader.Close();
-                            int i = 1;  // client_stage_json["enemyLayouts"][i-1].ToString()
-                            foreach (var item in client_stage_json["enemyLayouts"])
-                            {
-                                comboBox2.Items.Add(i.ToString());
-                                i++;
-                            }
+                            level_enemy_layouts_config_path = level_enemy_layouts_config;
                         }
                         break;
                     case "冲塔关卡":
                         {
-                            stream = File.OpenText(String.Format(level_enemy_layouts_config_tower, current_version));
-                            reader = new JsonTextReader(stream);
-                            client_stage_json = (JObject)JToken.ReadFrom(reader);
-                            stream.Close();
-                            reader.Close();
-                            int i = 1;  // client_stage_json["enemyLayouts"][i-1].ToString()
-                            foreach (var item in client_stage_json["enemyLayouts"])
-                            {
-                                comboBox2.Items.Add(i.ToString());
-                                i++;
-                            }
+                            level_enemy_layouts_config_path = level_enemy_layouts_config_tower;
                         }
                         break;
+                }
+                stream = File.OpenText(String.Format(level_enemy_layouts_config_path, current_version));
+                reader = new JsonTextReader(stream);
+                client_stage_json = (JObject)JToken.ReadFrom(reader);
+                stream.Close();
+                reader.Close();
+                int i = 1;  // client_stage_json["enemyLayouts"][i-1].ToString()
+                foreach (var item in client_stage_json["enemyLayouts"])
+                {
+                    StageNumber.Items.Add(i.ToString());
+                    i++;
                 }
                 old_version = current_version;
             }
@@ -214,19 +211,14 @@ namespace configurationView
             }
         }
 
-        private void VersionOption_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            current_version = VersionOption.SelectedItem.ToString();
-        }
-
-        private void Button1_Click(object sender, EventArgs e)
+        private void Panel1DelStage_Click(object sender, EventArgs e)
         {
             // delete
             try
             {
-                client_stage_json["enemyLayouts"][comboBox2.SelectedIndex].Remove();
-                File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
-                comboBox2.Items.Remove(comboBox2.SelectedItem.ToString());
+                client_stage_json["enemyLayouts"][StageNumber.SelectedIndex].Remove();
+                File.WriteAllText(String.Format(level_enemy_layouts_config_path, current_version), client_stage_json.ToString());
+                StageNumber.Items.Remove(StageNumber.SelectedItem.ToString());
                 MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch
@@ -235,17 +227,17 @@ namespace configurationView
             }
         }
 
-        private void Button2_Click(object sender, EventArgs e)
+        private void Panel1AddStage_Click(object sender, EventArgs e)
         {
             // add
             try
             {
                 JArray array = (JArray)client_stage_json["enemyLayouts"];
-                array.Add(client_stage_json["enemyLayouts"][comboBox2.Items.Count - 1]);
+                array.Add(client_stage_json["enemyLayouts"][StageNumber.Items.Count - 1]);
                 client_stage_json["enemyLayouts"] = array;
-                File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
-                comboBox2.Items.Add(comboBox2.Items.Count + 1);
-                comboBox2.SelectedIndex = comboBox2.Items.IndexOf(comboBox2.Items.Count);
+                File.WriteAllText(String.Format(level_enemy_layouts_config_path, current_version), client_stage_json.ToString());
+                StageNumber.Items.Add(StageNumber.Items.Count + 1);
+                StageNumber.SelectedIndex = StageNumber.Items.IndexOf(StageNumber.Items.Count);
                 MessageBox.Show(text: "关卡添加成功 ！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch
@@ -253,22 +245,21 @@ namespace configurationView
                 MessageBox.Show(text: String.Format("未选择关卡类型！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        private void StageNumber_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(old_version.Equals(current_version))
+            WaveNumber.Items.Clear();
+            if (old_version.Equals(current_version))
             {
-                SettingWaveNumber();
-                SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][0]);
+                JArray array = (JArray)client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"];
+                for(int i=1; i<=array.Count; i++)
+                {
+                    WaveNumber.Items.Add(i.ToString());
+                }
             }
             else
             {
                 MessageBox.Show(text: "请重新选择关卡类型 ！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-        }
-        private void SettingWaveNumber()
-        {
-            JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"];
-            WaveNumber.Maximum = array.Count;
         }
         /// <summary>
         /// 设置panel下所有的控件属性
@@ -280,25 +271,25 @@ namespace configurationView
             ColdDownTime.Value = (decimal)enemy["coldDownTime"];
             IsPreWaveFinish.Checked = (bool)enemy["isPreWaveFinish"];
 
-            comboBox3.Items.Clear();
-            comboBox4.Items.Clear();
+            MonsterList.Items.Clear();
+            MonsterGenerationPoint.Items.Clear();
             JArray array = (JArray)enemy["enemyList"];
             foreach (var item in array)
             {
-                comboBox3.Items.Add(item["enemysPrefString"].ToString());
+                MonsterList.Items.Add(item["enemysPrefString"].ToString());
             }
             array = (JArray)enemy["SpawnPointStrings"];
             foreach (var item in array)
             {
-                comboBox4.Items.Add(item.ToString());
+                MonsterGenerationPoint.Items.Add(item.ToString());
             }
         }
 
-        private void WaveNumber_ValueChanged(object sender, EventArgs e)
+        private void WaveNumber_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
-                SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]);
+                SettingPanel((JObject)client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]);
             }
             catch
             {
@@ -306,19 +297,19 @@ namespace configurationView
             }
         }
 
-        private void ComboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        private void MonsterList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            JObject enemyLayout = (JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1];
+            JObject enemyLayout = (JObject)client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex];
             JArray array = (JArray)enemyLayout["enemyList"];
-            numericUpDown3.Value = (decimal)array[comboBox3.SelectedIndex]["count"];
+            MonsterAmount.Value = (decimal)array[MonsterList.SelectedIndex]["count"];
         }
 
-        private void Button4_Click(object sender, EventArgs e)
+        private void Panel1DelMonster_Click(object sender, EventArgs e)
         {
             // delete
             try
             {
-                JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"];
+                JArray array = (JArray)client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["enemyList"];
                 if (array.Count == 1)
                 {
                     MessageBox.Show(text: "最后一种怪，不可删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -329,11 +320,11 @@ namespace configurationView
                 }
                 else
                 {
-                    array[comboBox3.SelectedIndex].Remove();
-                    client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"] = array;
-                    File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
-                    comboBox3.Items.Remove(comboBox3.SelectedItem.ToString());
-                    numericUpDown3.Value = 0;
+                    array[MonsterList.SelectedIndex].Remove();
+                    client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["enemyList"] = array;
+                    File.WriteAllText(String.Format(level_enemy_layouts_config_path, current_version), client_stage_json.ToString());
+                    MonsterList.Items.Remove(MonsterList.SelectedItem.ToString());
+                    MonsterAmount.Value = 0;
                     MessageBox.Show(text: String.Format("删除怪物成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
@@ -342,11 +333,12 @@ namespace configurationView
                 MessageBox.Show(text: String.Format("请选择一种怪后再删除！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void Button3_Click(object sender, EventArgs e)
+
+        private void Panel1AddMonster_Click(object sender, EventArgs e)
         {
             // add
             try {
-                new MonsterAdd((JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"], client_stage_json, String.Format(level_enemy_layouts_config, current_version), comboBox3).Show();
+                new MonsterAdd((JArray)client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["enemyList"], client_stage_json, String.Format(level_enemy_layouts_config_path, current_version), MonsterList).Show();
             }
             catch
             {
@@ -354,12 +346,12 @@ namespace configurationView
             }
         }
 
-        private void Button6_Click(object sender, EventArgs e)
+        private void Panel1DelPoint_Click(object sender, EventArgs e)
         {
             // delete
             try
             {
-                JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["SpawnPointStrings"];
+                JArray array = (JArray)client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["SpawnPointStrings"];
                 if (array.Count == 1)
                 {
                     MessageBox.Show(text: "最后一个出生点，不可删除！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -370,10 +362,10 @@ namespace configurationView
                 }
                 else
                 {
-                    array[comboBox4.SelectedIndex].Remove();
-                    client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["SpawnPointStrings"] = array;
-                    File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
-                    comboBox4.Items.Remove(comboBox4.SelectedItem.ToString());
+                    array[MonsterGenerationPoint.SelectedIndex].Remove();
+                    client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["SpawnPointStrings"] = array;
+                    File.WriteAllText(String.Format(level_enemy_layouts_config_path, current_version), client_stage_json.ToString());
+                    MonsterGenerationPoint.Items.Remove(MonsterGenerationPoint.SelectedItem.ToString());
                     MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 }
@@ -384,21 +376,21 @@ namespace configurationView
             }
         }
 
-        private void Button5_Click(object sender, EventArgs e)
+        private void Panel1AddPoint_Click(object sender, EventArgs e)
         {
             try
             {
-                string item = comboBox5.SelectedItem.ToString();
-                if (comboBox4.Items.Contains(item))
+                string item = OptionalGenerationPoint.SelectedItem.ToString();
+                if (MonsterGenerationPoint.Items.Contains(item))
                 {
                     MessageBox.Show(text: String.Format("出生点已添加到该波怪物出生点中！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
-                    JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["SpawnPointStrings"];
+                    JArray array = (JArray)client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["SpawnPointStrings"];
                     array.Add(item);
-                    File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
-                    comboBox4.Items.Add(item);
+                    File.WriteAllText(String.Format(level_enemy_layouts_config_path, current_version), client_stage_json.ToString());
+                    MonsterGenerationPoint.Items.Add(item);
                     MessageBox.Show(text: String.Format("出生点{0}添加成功！", item), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
@@ -408,13 +400,49 @@ namespace configurationView
             }
         }
 
+        private void Panel1DelWave_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex].Remove();
+                File.WriteAllText(String.Format(level_enemy_layouts_config_path, current_version), client_stage_json.ToString());
+                WaveNumber.Items.Remove(WaveNumber.SelectedItem.ToString());
+                TotalTime.Value = 0;
+                ColdDownTime.Value = 0;
+                IsPreWaveFinish.Checked = false;
+                MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show("未选择怪物波数，请选择波数后再删除！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Panel1AddWave_Click(object sender, EventArgs e)
+        {
+            // add
+            try
+            {
+                JArray array = (JArray)client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"];
+                array.Add(array[array.Count - 1]);
+                client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"] = array;
+                File.WriteAllText(String.Format(level_enemy_layouts_config_path, current_version), client_stage_json.ToString());
+                WaveNumber.Items.Add(WaveNumber.Items.Count + 1);
+                MessageBox.Show(text: "关卡添加成功 ！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show(text: String.Format("未选择关卡数！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void TotalTime_ValueChanged(object sender, EventArgs e)
         {
             try
             {
                 if ((int)TotalTime.Value != 0)
                 {
-                    client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["totalTime"] = (int)TotalTime.Value;
+                    client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["totalTime"] = (int)TotalTime.Value;
                 }
             }
             catch
@@ -429,7 +457,7 @@ namespace configurationView
             {
                 if ((int)ColdDownTime.Value != 0)
                 {
-                    client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["coldDownTime"] = (int)ColdDownTime.Value;
+                    client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["coldDownTime"] = (int)ColdDownTime.Value;
                 }
             }
             catch
@@ -442,7 +470,7 @@ namespace configurationView
         {
             try
             {
-                client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["isPreWaveFinish"] = IsPreWaveFinish.Checked;
+                client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["isPreWaveFinish"] = IsPreWaveFinish.Checked;
             }
             catch
             {
@@ -450,25 +478,25 @@ namespace configurationView
             }
         }
 
-        private void NumericUpDown3_ValueChanged(object sender, EventArgs e)
+        private void MonsterAmount_ValueChanged(object sender, EventArgs e)
         {
             try
             {
-                if ((int)numericUpDown3.Value != 0)
+                if ((int)MonsterAmount.Value != 0)
                 {
-                    JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"];
-                    array[comboBox3.SelectedIndex]["count"] = (int)numericUpDown3.Value;
+                    JArray array = (JArray)client_stage_json["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["enemyList"];
+                    array[MonsterList.SelectedIndex]["count"] = (int)MonsterAmount.Value;
                 }
             }
             catch
             {
-                MessageBox.Show("没有选择关卡数或怪物类型！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("没有选择怪物！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void Btn_save_Click(object sender, EventArgs e)
+        private void Panel1Save_Click(object sender, EventArgs e)
         {
-            File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
+            File.WriteAllText(String.Format(level_enemy_layouts_config_path, current_version), client_stage_json.ToString());
             MessageBox.Show("保存成功！", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         #endregion
@@ -492,59 +520,54 @@ namespace configurationView
             Location = new Point(Location.X, 89);
             switch (FunctionOption.SelectedIndex)
             {
-                case 0: // 普通关卡怪物生成：level_enemy_layouts_config
+                case 0: // 怪物生成设置
                     {
-                        panel1.Location = new Point(PanelX, PanelY);
-                        panel1.Width = width;
-                        panel1.Height = height;
-                        panel1.Visible = true;
+                        Panel1.Location = new Point(PanelX, PanelY);
+                        Panel1.Width = width;
+                        Panel1.Height = height;
+                        Panel1.Visible = true;
                     } break;
-                case 1: // 塔怪物生成：level_enemy_layouts_config_tower
+                case 1: // 怪物属性：monster_config
                     {
 
                     }
                     break;
-                case 2: // 怪物属性：monster_config
+                case 2: // 进关消耗：entry_consumables_config
                     {
 
                     }
                     break;
-                case 3: // 进关消耗：entry_consumables_config
+                case 3: // 挂机奖励：hang_reward_config
                     {
 
                     }
                     break;
-                case 4: // 挂机奖励：hang_reward_config
+                case 4: // 抽奖奖励：lottery_config
                     {
 
                     }
                     break;
-                case 5: // 抽奖奖励：lottery_config
+                case 5: // 玩家配置表：player_config
                     {
 
                     }
                     break;
-                case 6: // 玩家配置表：player_config
+                case 6: // 卷轴升级技能配置信息：skill_level_up_config
                     {
 
                     }
                     break;
-                case 7: // 卷轴升级技能配置信息：skill_level_up_config
+                case 7: // 通关奖励：stage_reward_config
                     {
 
                     }
                     break;
-                case 8: // 通关奖励：stage_reward_config
+                case 8: // 武器配置：weapon_config
                     {
 
                     }
                     break;
-                case 9: // 武器配置：weapon_config
-                    {
-
-                    }
-                    break;
-                case 10: // 世界参数：world_distribution
+                case 9: // 世界参数：world_distribution
                     {
 
                     }
