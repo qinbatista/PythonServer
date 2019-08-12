@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,19 +15,38 @@ namespace configurationView
 {
     public partial class MonsterAdd : Form
     {
-        JObject client_stage_json;
-        public MonsterAdd(JObject client_stage_json)
+        JArray array;
+        JObject json;
+        string path;
+        ComboBox comboBox;
+        public MonsterAdd(JArray array, JObject json, string path, ComboBox comboBox)
         {
             InitializeComponent();
-            this.client_stage_json = client_stage_json;
+            this.array = array;
+            this.json = json;
+            this.path = path;
+            this.comboBox = comboBox;
         }
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            //add_item = comboBox1.SelectedItem.ToString();
-            MessageBox.Show(text: client_stage_json.ToString());
-            //client_stage_json.Add("client_stage_json": client_stage_json["client_stage_json"][0]);
-            textBox1.Text = client_stage_json.ToString();
+            try
+            {
+                array.Add(JObject.Parse("{'count': " + MonstersNumber.Value.ToString() + ",'enemysPrefString': '" + MonstersName.SelectedItem.ToString() + "'}" ));
+                File.WriteAllText(path, json.ToString());
+                comboBox.Items.Add(MonstersName.SelectedItem.ToString());
+                Close();
+                MessageBox.Show(text: "关卡添加成功！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show(text: "没有选择怪物类型！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

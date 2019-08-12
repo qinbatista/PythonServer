@@ -1,8 +1,13 @@
 import json
-
+import time
+import os
 import requests
 import configparser
-
+"""
+print(str(time.time()))
+print(str(time.time() % 1 * 1e6))
+print(str(os.getpid()))
+"""
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
@@ -224,7 +229,7 @@ def get_new_mail_nonce_list(unique_id: str) -> (list, list):
 	return type_list, nonce_list
 
 def redeem_all_nonce(unique_id: str, type_list: list, nonce_list: list):
-	result = requests.post('http://localhost:8006/redeem_all_nonce', json={"world": 0, 'unique_id': unique_id, "type_list": type_list, "nonce_list": nonce_list})
+	result = requests.post('http://localhost:8004/redeem_all_nonce', data={"world": 0, 'unique_id': unique_id, "type_list": type_list, "nonce_list": nonce_list})
 	print(str(result.text))
 
 
@@ -234,37 +239,44 @@ def test():
 	print(eval("s2%sk"%2))
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8004/basic_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
+	# result = requests.post('http://localhost:8004/basic_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
+	# print(str(result.text))
+	# # result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "roles"})
+	# # result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "skills"})
+	# # result = requests.post('http://localhost:8004/fortune_wheel_basic', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# # result = requests.post('http://localhost:8004/fortune_wheel_pro', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# result = requests.post('http://localhost:8004/basic_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/pro_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/friend_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/prophet_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	#
+	#
+	# result = requests.post('http://localhost:8004/basic_summon_skill_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/pro_summon_skill_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/friend_summon_skill_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	#
+	# result = requests.post('http://localhost:8004/basic_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/pro_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/friend_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
 	print(str(result.text))
-	result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
+	result = requests.post('http://localhost:8004/delete_all_mail', data={"world": 0, 'unique_id': unique_id})
 	print(str(result.text))
-	# result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "roles"})
-	# result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "skills"})
-	# result = requests.post('http://localhost:8004/fortune_wheel_basic', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# result = requests.post('http://localhost:8004/fortune_wheel_pro', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	result = requests.post('http://localhost:8004/basic_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/pro_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/friend_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/prophet_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
 	print(str(result.text))
 
-
-	result = requests.post('http://localhost:8004/basic_summon_skill_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/pro_summon_skill_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/friend_summon_skill_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
-
-	result = requests.post('http://localhost:8004/basic_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/pro_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/friend_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
 """
 json_data = {
 	"world": world,
@@ -323,8 +335,9 @@ if __name__ == "__main__":
 	# redeem_nonce(unique_id="6", nonce=nonce)
 
 	# request_friend(unique_id="4", friend_name="a")
-	# nonce = get_new_mail(unique_id="4")
-	# response_friend(unique_id="4", nonce=nonce)
+	# nonce = get_new_mail(unique_id="1")
+	# response_friend(unique_id="1", nonce=nonce)
+	# response_friend(unique_id="1", nonce="64942980375638432564912061770566384876054041984556040131926509775589729375588")
 
 	# request_friend(unique_id="1", friend_name="g")
 	# request_friend(unique_id="2", friend_name="g")
