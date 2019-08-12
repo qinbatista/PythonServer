@@ -515,6 +515,8 @@ namespace configurationView
 
         private void FunctionOption_SelectedIndexChanged(object sender, EventArgs e)
         {
+            Panel1.Visible = false;
+            Panel2.Visible = false;
             VersionOption.SelectedItem = current_version.ToString();
             Height = 500;
             Location = new Point(Location.X, 89);
@@ -529,7 +531,10 @@ namespace configurationView
                     } break;
                 case 1: // 怪物属性：monster_config
                     {
-
+                        Panel2.Location = new Point(PanelX, PanelY);
+                        Panel2.Width = width;
+                        Panel2.Height = height;
+                        Panel2.Visible = true;
                     }
                     break;
                 case 2: // 进关消耗：entry_consumables_config
