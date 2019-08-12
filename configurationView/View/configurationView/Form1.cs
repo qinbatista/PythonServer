@@ -18,11 +18,16 @@ namespace configurationView
     public partial class MainForm : Form
     {
         #region 配置信息
+        int PanelX = 0;
+        int PanelY = 141;
+        int width = 1178;
+        int height = 505;
         StreamReader stream;
         JsonTextReader reader;
         //DirectoryInfo di1 = new DirectoryInfo(Directory.GetCurrentDirectory());
         static string main_path = "..//..//..//..//..//configuration//";
         string current_version = "0";
+        string old_version = "0";
         string new_version;
         JObject json;
         string json_version = main_path + "//config_timer_setting.json";
@@ -52,6 +57,7 @@ namespace configurationView
         public MainForm()
         {
             InitializeComponent();
+            Height = 200;
             StartPosition = FormStartPosition.CenterScreen;
             stream = File.OpenText(json_version);
             reader = new JsonTextReader(stream);
@@ -161,6 +167,7 @@ namespace configurationView
             }
         }
 
+        #region Panel1
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
@@ -199,6 +206,7 @@ namespace configurationView
                         }
                         break;
                 }
+                old_version = current_version;
             }
             catch
             {
@@ -214,10 +222,17 @@ namespace configurationView
         private void Button1_Click(object sender, EventArgs e)
         {
             // delete
-            client_stage_json["enemyLayouts"][comboBox2.SelectedIndex].Remove();
-            File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
-            comboBox2.Items.Remove(comboBox2.SelectedItem.ToString());
-            MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                client_stage_json["enemyLayouts"][comboBox2.SelectedIndex].Remove();
+                File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
+                comboBox2.Items.Remove(comboBox2.SelectedItem.ToString());
+                MessageBox.Show(text: String.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show("未选择关卡，请选择关卡后再删除！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void Button2_Click(object sender, EventArgs e)
@@ -240,8 +255,15 @@ namespace configurationView
         }
         private void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            SettingWaveNumber();
-            SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][0]);
+            if(old_version.Equals(current_version))
+            {
+                SettingWaveNumber();
+                SettingPanel((JObject)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][0]);
+            }
+            else
+            {
+                MessageBox.Show(text: "请重新选择关卡类型 ！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
         private void SettingWaveNumber()
         {
@@ -328,7 +350,7 @@ namespace configurationView
             }
             catch
             {
-                MessageBox.Show(text: String.Format("未选择关卡类型！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(text: String.Format("未选择关卡数！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -377,49 +399,152 @@ namespace configurationView
                     array.Add(item);
                     File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
                     comboBox4.Items.Add(item);
-                    MessageBox.Show(text: String.Format(String.Format("出生点{0}添加成功！", item), current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(text: String.Format("出生点{0}添加成功！", item), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch
             {
-                MessageBox.Show(text: String.Format("请选择一个出生点后再添加！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(text: "请选择一个出生点后再添加！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        private void TotalTime_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if ((int)TotalTime.Value != 0)
+                {
+                    client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["totalTime"] = (int)TotalTime.Value;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("没有选择关卡数！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ColdDownTime_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if ((int)ColdDownTime.Value != 0)
+                {
+                    client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["coldDownTime"] = (int)ColdDownTime.Value;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("没有选择关卡数！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void IsPreWaveFinish_CheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["isPreWaveFinish"] = IsPreWaveFinish.Checked;
+            }
+            catch
+            {
+                MessageBox.Show("没有选择关卡数！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void NumericUpDown3_ValueChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if ((int)numericUpDown3.Value != 0)
+                {
+                    JArray array = (JArray)client_stage_json["enemyLayouts"][comboBox2.SelectedIndex]["enemyLayout"][int.Parse(WaveNumber.Value.ToString()) - 1]["enemyList"];
+                    array[comboBox3.SelectedIndex]["count"] = (int)numericUpDown3.Value;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("没有选择关卡数或怪物类型！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Btn_save_Click(object sender, EventArgs e)
+        {
+            File.WriteAllText(String.Format(level_enemy_layouts_config, current_version), client_stage_json.ToString());
+            MessageBox.Show("保存成功！", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        #endregion
+
+        #region Panel2
+        #endregion
+
+        #region Panel3
+        #endregion
+
+        #region Panel4
+        #endregion
+
+        #region Panel5
+        #endregion
+
         private void FunctionOption_SelectedIndexChanged(object sender, EventArgs e)
         {
+            VersionOption.SelectedItem = current_version.ToString();
+            Height = 500;
+            Location = new Point(Location.X, 89);
             switch (FunctionOption.SelectedIndex)
             {
                 case 0: // 普通关卡怪物生成：level_enemy_layouts_config
                     {
-
+                        panel1.Location = new Point(PanelX, PanelY);
+                        panel1.Width = width;
+                        panel1.Height = height;
+                        panel1.Visible = true;
                     } break;
-                case 1: // 
+                case 1: // 塔怪物生成：level_enemy_layouts_config_tower
                     {
 
                     }
                     break;
-                case 2:
+                case 2: // 怪物属性：monster_config
                     {
 
                     }
                     break;
-                case 3:
+                case 3: // 进关消耗：entry_consumables_config
                     {
 
                     }
                     break;
-                case 5:
+                case 4: // 挂机奖励：hang_reward_config
                     {
 
                     }
                     break;
-                case 6:
+                case 5: // 抽奖奖励：lottery_config
                     {
 
                     }
                     break;
-                case 7:
+                case 6: // 玩家配置表：player_config
+                    {
+
+                    }
+                    break;
+                case 7: // 卷轴升级技能配置信息：skill_level_up_config
+                    {
+
+                    }
+                    break;
+                case 8: // 通关奖励：stage_reward_config
+                    {
+
+                    }
+                    break;
+                case 9: // 武器配置：weapon_config
+                    {
+
+                    }
+                    break;
+                case 10: // 世界参数：world_distribution
                     {
 
                     }

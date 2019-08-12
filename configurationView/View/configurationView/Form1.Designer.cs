@@ -58,6 +58,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.dateTimePicker = new System.Windows.Forms.DateTimePicker();
+            this.btn_save = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.WaveNumber)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -76,6 +77,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btn_save);
             this.panel1.Controls.Add(this.comboBox5);
             this.panel1.Controls.Add(this.IsPreWaveFinish);
             this.panel1.Controls.Add(this.label8);
@@ -100,8 +102,9 @@
             this.panel1.Controls.Add(this.comboBox2);
             this.panel1.Location = new System.Drawing.Point(0, 191);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1178, 505);
+            this.panel1.Size = new System.Drawing.Size(1166, 475);
             this.panel1.TabIndex = 1;
+            this.panel1.Visible = false;
             // 
             // comboBox5
             // 
@@ -119,7 +122,7 @@
             "Spawn9"});
             this.comboBox5.Location = new System.Drawing.Point(679, 393);
             this.comboBox5.Name = "comboBox5";
-            this.comboBox5.Size = new System.Drawing.Size(360, 26);
+            this.comboBox5.Size = new System.Drawing.Size(235, 26);
             this.comboBox5.TabIndex = 29;
             // 
             // IsPreWaveFinish
@@ -131,6 +134,7 @@
             this.IsPreWaveFinish.TabIndex = 28;
             this.IsPreWaveFinish.Text = "等待上一波怪打完";
             this.IsPreWaveFinish.UseVisualStyleBackColor = true;
+            this.IsPreWaveFinish.CheckedChanged += new System.EventHandler(this.IsPreWaveFinish_CheckedChanged);
             // 
             // label8
             // 
@@ -189,6 +193,7 @@
             0,
             0,
             0});
+            this.numericUpDown3.ValueChanged += new System.EventHandler(this.NumericUpDown3_ValueChanged);
             // 
             // label7
             // 
@@ -201,7 +206,7 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(1075, 387);
+            this.button5.Location = new System.Drawing.Point(960, 387);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(79, 39);
             this.button5.TabIndex = 22;
@@ -291,6 +296,7 @@
             this.ColdDownTime.Name = "ColdDownTime";
             this.ColdDownTime.Size = new System.Drawing.Size(81, 28);
             this.ColdDownTime.TabIndex = 12;
+            this.ColdDownTime.ValueChanged += new System.EventHandler(this.ColdDownTime_ValueChanged);
             // 
             // label3
             // 
@@ -307,6 +313,7 @@
             this.TotalTime.Name = "TotalTime";
             this.TotalTime.Size = new System.Drawing.Size(81, 28);
             this.TotalTime.TabIndex = 10;
+            this.TotalTime.ValueChanged += new System.EventHandler(this.TotalTime_ValueChanged);
             // 
             // button2
             // 
@@ -405,6 +412,16 @@
             this.dateTimePicker.Size = new System.Drawing.Size(200, 28);
             this.dateTimePicker.TabIndex = 9;
             // 
+            // btn_save
+            // 
+            this.btn_save.Location = new System.Drawing.Point(1075, 386);
+            this.btn_save.Name = "btn_save";
+            this.btn_save.Size = new System.Drawing.Size(79, 39);
+            this.btn_save.TabIndex = 30;
+            this.btn_save.Text = "保存";
+            this.btn_save.UseVisualStyleBackColor = true;
+            this.btn_save.Click += new System.EventHandler(this.Btn_save_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -418,6 +435,8 @@
             this.Controls.Add(this.VersionOption);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.RightToLeftLayout = true;
             this.Text = "View";
@@ -465,6 +484,7 @@
         private System.Windows.Forms.NumericUpDown WaveNumber;
         private System.Windows.Forms.CheckBox IsPreWaveFinish;
         private System.Windows.Forms.ComboBox comboBox5;
+        private System.Windows.Forms.Button btn_save;
     }
 }
 

@@ -4,11 +4,11 @@
       "enemyLayout": [
         {
           "totalTime": 5,
-          "coldDownTime": 7,
-          "isPreWaveFinish": false,
+          "coldDownTime": 13,
+          "isPreWaveFinish": true,
           "enemyList": [
             {
-              "count": 2,
+              "count": 3,
               "enemysPrefString": "ZombieKid"
             },
             {
@@ -95,7 +95,8 @@
         }
       ]
     },
-    {
+    
+	{
       "enemyLayout": [
         {
           "totalTime": 5,
