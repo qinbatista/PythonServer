@@ -28,6 +28,8 @@ LOTTERY = loc() + '/configuration/server/{}/lottery_config.json'
 WEAPON = loc() + '/configuration/server/{}/weapon_config.json'
 SKILL = loc() + '/configuration/server/{}/skill_level_up_config.json'
 PLAYER = loc() + '/configuration/server/{}/player_config.json'
+WORLD_BOSS = loc() + '/configuration/server/{}/world_boss_config.json'
+
 
 class ConfigurationManager:
 	def __init__(self):
@@ -87,7 +89,8 @@ class ConfigurationManager:
 		weapon = json.load(open(WEAPON.format(self._sv), encoding = 'utf-8'))
 		skill = json.load(open(SKILL.format(self._sv), encoding = 'utf-8'))
 		player = json.load(open(PLAYER.format(self._sv), encoding = 'utf-8'))
-		self._game_manager_config = {'reward' : reward, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config,'player':player, 'entry_consumables' : self._entry_consumables_config}
+		world_boss = json.load(open(WORLD_BOSS.format(self._sv), encoding = 'utf-8'))
+		self._game_manager_config = {'reward' : reward, 'lottery' : lottery, 'weapon' : weapon, 'skill' : skill, 'hang_reward' : self._hang_reward_config,'player':player, 'entry_consumables' : self._entry_consumables_config,"world_boss":world_boss}
 
 	def _read_level_enemy_layouts_config(self):
 		self._level_enemy_layouts_config = json.load(open(ENEMY_LAYOUT.format(self._cv), encoding = 'utf-8'))

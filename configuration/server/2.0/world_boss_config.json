@@ -1,0 +1,44 @@
+{
+	"max_enter_time":3,
+	"boss1" :
+	{
+		"life_value":10000
+	},
+	"boss2" :
+	{
+		"life_value":100000
+	},
+	"boss3" :
+	{
+		"life_value":100000
+	},
+	"boss4" :
+	{
+		"life_value":100000
+	},
+	"boss5" :
+	{
+		"life_value":100000
+	},
+	"boss6" :
+	{
+		"life_value":100000
+	},
+	"boss7" :
+	{
+		"life_value":100000
+	},
+	"boss8" :
+	{
+		"life_value":100000
+	},
+	"boss9" :
+	{
+		"life_value":100000
+	},
+	"boss10" :
+	{
+		"life_value":100000
+	}
+}
+
