@@ -89,6 +89,7 @@ def create_player_table() -> None:
         "prophet_summon_scroll": "INT(11) NULL DEFAULT(0) COMMENT '先知召唤卷轴'",
         "fortune_wheel_ticket_basic": "INT(11) NULL DEFAULT(0) COMMENT '低级幸运循环票'",
         "fortune_wheel_ticket_pro": "INT(11) NULL DEFAULT(0) COMMENT '高级幸运循环票'",
+        "familyid": "VARCHAR(64) NULL DEFAULT '' COMMENT '家族ID'",
         "world_boss_enter_time": "VARCHAR(64) NULL DEFAULT '' COMMENT '进入世界boss的时间'",
         "world_boss_remaining_times": "INT(6) NULL DEFAULT(0) COMMENT '进入世界boss的剩余次数'"
     }

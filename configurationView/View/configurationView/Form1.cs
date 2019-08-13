@@ -21,7 +21,7 @@ namespace configurationView
         int PanelX = 0;
         int PanelY = 141;
         int width = 1178;
-        int height = 505;
+        int height = 520;
         StreamReader stream;
         JsonTextReader reader;
         //DirectoryInfo di1 = new DirectoryInfo(Directory.GetCurrentDirectory());
@@ -47,12 +47,12 @@ namespace configurationView
         /// </summary>
         string server_path = main_path + "server//";
         string entry_consumables_config = main_path + "server//{0}//entry_consumables_config.json";
+        string stage_reward_config = main_path + "server//{0}//stage_reward_config.json";
         string hang_reward_config = main_path + "server//{0}//hang_reward_config.json";
         string lottery_config = main_path + "server//{0}//lottery_config.json";
         string mysql_data_config = main_path + "server//{0}//mysql_data_config.json";
         string player_config = main_path + "server//{0}//player_config.json";
         string skill_level_up_config = main_path + "server//{0}//skill_level_up_config.json";
-        string stage_reward_config = main_path + "server//{0}//stage_reward_config.json";
         string weapon_config = main_path + "server//{0}//weapon_config.json";
         string world_distribution = main_path + "server//{0}//world_distribution.json";
         //string ex = string.Format("{ 0}", "ex");
@@ -175,7 +175,7 @@ namespace configurationView
             current_version = VersionOption.SelectedItem.ToString();
         }
 
-        #region Panel1
+        #region Panel1 怪物生成设置
         private void StageType_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
@@ -504,107 +504,7 @@ namespace configurationView
         }
         #endregion
 
-        #region Panel2
-        #endregion
-
-        #region Panel3
-        #endregion
-
-        #region Panel4
-        #endregion
-
-        #region Panel5
-        #endregion
-
-        private void FunctionOption_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Panel1.Visible = false;
-            Panel2.Visible = false;
-            VersionOption.SelectedItem = current_version.ToString();
-            Height = 500;
-            Location = new Point(Location.X, 89);
-            switch (FunctionOption.SelectedIndex)
-            {
-                case 0: // 怪物生成设置
-                    {
-                        Panel1.Location = new Point(PanelX, PanelY);
-                        Panel1.Width = width;
-                        Panel1.Height = height;
-                        Panel1.Visible = true;
-                    } break;
-                case 1: // 怪物属性：monster_config
-                    {
-                        Panel2.Location = new Point(PanelX, PanelY);
-                        Panel2.Width = width;
-                        Panel2.Height = height;
-                        Panel2.Visible = true;
-                        //Panel2MonsterList
-                        public_file_path = monster_config;
-                        stream = File.OpenText(string.Format(public_file_path, current_version));
-                        reader = new JsonTextReader(stream);
-                        public_json_data = (JObject)JToken.ReadFrom(reader);
-                        stream.Close();
-                        reader.Close();
-                        Panel2MonsterList.Items.Clear();
-                        foreach (var item in public_json_data)
-                        {
-                            Panel2MonsterList.Items.Add(item.Key.ToString());
-                        }
-                        old_version = current_version;
-
-
-                        Panel2OptionalMonsterType.Items.Clear();
-                        stream = File.OpenText(monster_path);
-                        reader = new JsonTextReader(stream);
-                        foreach (var item in JToken.ReadFrom(reader)["monsters"])
-                        {
-                            Panel2OptionalMonsterType.Items.Add(item: item.ToString());
-                        }
-                    }
-                    break;
-                case 2: // 进关消耗：entry_consumables_config
-                    {
-
-                    }
-                    break;
-                case 3: // 挂机奖励：hang_reward_config
-                    {
-
-                    }
-                    break;
-                case 4: // 抽奖奖励：lottery_config
-                    {
-
-                    }
-                    break;
-                case 5: // 玩家配置表：player_config
-                    {
-
-                    }
-                    break;
-                case 6: // 卷轴升级技能配置信息：skill_level_up_config
-                    {
-
-                    }
-                    break;
-                case 7: // 通关奖励：stage_reward_config
-                    {
-
-                    }
-                    break;
-                case 8: // 武器配置：weapon_config
-                    {
-
-                    }
-                    break;
-                case 9: // 世界参数：world_distribution
-                    {
-
-                    }
-                    break;
-            }
-        }
-
+        #region Panel2 怪物属性
         private void Panel2MonsterList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (old_version.Equals(current_version))
@@ -730,7 +630,7 @@ namespace configurationView
                     string Panel2_monster = Panel2MonsterList.Items[0].ToString();
                     public_json_data.Add(monsters_name, JToken.Parse("{}"));
                     JObject Panel2_object = (JObject)public_json_data[monsters_name];
-                    foreach ( var item in (JObject)public_json_data[Panel2_monster])
+                    foreach (var item in (JObject)public_json_data[Panel2_monster])
                     {
                         Panel2_object.Add(item.Key, 1);
                     }
@@ -744,5 +644,114 @@ namespace configurationView
                 MessageBox.Show(text: "没有选择怪物类型！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        #endregion
+
+        #region Panel3
+        #endregion
+
+        #region Panel4
+        #endregion
+
+        #region Panel5
+        #endregion
+
+        private void FunctionOption_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Panel1.Visible = false;
+            Panel2.Visible = false;
+            VersionOption.SelectedItem = current_version.ToString();
+            Height = 520;
+            Location = new Point(Location.X, 89);
+            switch (FunctionOption.SelectedIndex)
+            {
+                case 0: // 怪物生成设置
+                    {
+                        Panel1.Location = new Point(PanelX, PanelY);
+                        Panel1.Width = width;
+                        Panel1.Height = height;
+                        Panel1.Visible = true;
+                    } break;
+                case 1: // 怪物属性：monster_config
+                    {
+                        Panel2.Location = new Point(PanelX, PanelY);
+                        Panel2.Width = width;
+                        Panel2.Height = height;
+                        Panel2.Visible = true;
+                        //Panel2MonsterList
+                        public_file_path = monster_config;
+                        stream = File.OpenText(string.Format(public_file_path, current_version));
+                        reader = new JsonTextReader(stream);
+                        public_json_data = (JObject)JToken.ReadFrom(reader);
+                        stream.Close();
+                        reader.Close();
+                        Panel2MonsterList.Items.Clear();
+                        foreach (var item in public_json_data)
+                        {
+                            Panel2MonsterList.Items.Add(item.Key.ToString());
+                        }
+                        old_version = current_version;
+
+
+                        Panel2OptionalMonsterType.Items.Clear();
+                        stream = File.OpenText(monster_path);
+                        reader = new JsonTextReader(stream);
+                        foreach (var item in JToken.ReadFrom(reader)["monsters"])
+                        {
+                            Panel2OptionalMonsterType.Items.Add(item: item.ToString());
+                        }
+                    }
+                    break;
+                case 2: // 关卡配置：entry_consumables_config / stage_reward_config
+                    {
+                        Panel3.Location = new Point(PanelX, PanelY);
+                        Panel3.Width = width;
+                        Panel3.Height = height;
+                        Panel3.Visible = true;
+                        public_json_data = JObject.Parse("{}");
+                        // 加载关卡消耗的json数据
+                        stream = File.OpenText(string.Format(entry_consumables_config, current_version));
+                        reader = new JsonTextReader(stream);
+                        public_json_data.Add("consumption", (JObject)JToken.ReadFrom(reader));
+                        // 加载关卡奖励的json数据
+                        stream = File.OpenText(string.Format(stage_reward_config, current_version));
+                        reader = new JsonTextReader(stream);
+                        public_json_data.Add("reward", (JObject)JToken.ReadFrom(reader));
+
+                        //
+                    }
+                    break;
+                case 3: // 挂机奖励：hang_reward_config
+                    {
+
+                    }
+                    break;
+                case 4: // 抽奖奖励：lottery_config
+                    {
+
+                    }
+                    break;
+                case 5: // 玩家配置表：player_config
+                    {
+
+                    }
+                    break;
+                case 6: // 卷轴升级技能配置信息：skill_level_up_config
+                    {
+
+                    }
+                    break;
+                case 7: // 武器配置：weapon_config
+                    {
+
+                    }
+                    break;
+                case 8: // 世界参数：world_distribution
+                    {
+
+                    }
+                    break;
+            }
+        }
+
     }
 }
