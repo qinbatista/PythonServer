@@ -2582,9 +2582,11 @@ class GameManager:
 			equipment_storage += equipment_increment
 			if iron_storage // cost_iron < equipment_increment:
 				equipment_increment = iron_storage // cost_iron
+			iron_storage -= equipment_increment * cost_iron
 			reward.update({"equipment_increment": equipment_increment})
 			reward.update({"equipment_start_time": equipment_start_time})
 			equipment_start_time = current_time
+			remaining.update({"iron_storage": iron_storage})
 			remaining.update({"equipment_storage": equipment_storage})
 			remaining.update({"equipment_start_time": equipment_start_time})
 			sql_str = f"update factory set equipment_storage={equipment_storage}, equipment_factory_timer='{equipment_start_time}' where unique_id='{unique_id}'"
@@ -2681,14 +2683,17 @@ class GameManager:
 			remaining.update({"crystal_start_time": crystal_start_time})
 		if equipment_start_time != "":
 			cost_iron = equipment_factory["cost"]["iron"]
+			# print(f"equipment==>iron_storage: {iron_storage}")
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
 			equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers
 			equipment_storage += equipment_increment
 			if iron_storage // cost_iron < equipment_increment:
 				equipment_increment = iron_storage // cost_iron
+			iron_storage -= equipment_increment * cost_iron
 			reward.update({"equipment_increment": equipment_increment})
 			reward.update({"equipment_start_time": equipment_start_time})
 			equipment_start_time = current_time
+			remaining.update({"iron_storage": iron_storage})
 			remaining.update({"equipment_storage": equipment_storage})
 			remaining.update({"equipment_start_time": equipment_start_time})
 
@@ -2698,7 +2703,7 @@ class GameManager:
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
 
-	async def distribution_worker(self, world: int, unique_id: str, workers_quantity: int, factory_kind: str) -> dict:
+	async def distribution_workers(self, world: int, unique_id: str, workers_quantity: int, factory_kind: str) -> dict:
 		"""
 		0  - Successful employee assignment, get factory work rewards
 		1  - Successful employee assignment
@@ -2760,15 +2765,6 @@ class GameManager:
 		if reward:
 			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
-
-
-	async def product_food(self, world: int, unique_id: str):
-		"""
-		根据世界unique_id查询工厂表中的（食品工厂的等级、食品工厂的冷却开始时间、食品工厂的工人、存储的食物数量）
-		"""
-		food_config = self._factory_config["food_factory"]
-		food_cool = food_config["time_consuming"]
-		sql_str = f"select food"
 
 #############################################################################################
 #  end   2019年8月18日14点59分 houyao #######################################################
@@ -3492,10 +3488,10 @@ async def _refresh_equipment_storage(request: web.Request) -> web.Response:
 	return _json_response(result)
 
 
-@ROUTES.post('/distribution_worker')
-async def _distribution_worker(request: web.Request) -> web.Response:
+@ROUTES.post('/distribution_workers')
+async def _distribution_workers(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).distribution_worker(int(post['world']), post['unique_id'], int(post['workers_quantity']), post['factory_kind'])
+	result = await (request.app['MANAGER']).distribution_workers(int(post['world']), post['unique_id'], int(post['workers_quantity']), post['factory_kind'])
 	return _json_response(result)
 
 ###############################################################################################

@@ -240,7 +240,7 @@
 	},
 	"mine_factory": {
 		"time_consuming": 30,
-		"cost": {"food": 1},
+		"cost": {"food": 3},
 		"storage_level_limit": 30,
 		"workers_number_limit": {
 			"1": 2,
