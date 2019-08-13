@@ -270,6 +270,18 @@ def create_dark_market_table() -> None:
     sql_table_constructor(table_name=table_name, table_dict=table_dict)  # 创建武器背包表
 
 
+def create_leader_board_table() -> None:
+    """
+    创建打世界Boss信息表
+    """
+    table_name = "leader_board"
+    table_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL COMMENT '玩家唯一标识'",
+        "world_boss_damage": "INT(255) UNSIGNED NULL DEFAULT (0) COMMENT '用户打世界Boss的累计伤害值'"
+    }
+    sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id)")
+
+
 def create_friend_table() -> None:
     """
     创建武器背包表以及武器信息表
@@ -342,13 +354,14 @@ def create_sensitive():
                 f.write(i)
 if __name__ == '__main__':
     # 创建数据库表
-    create_player_table()
+    # create_player_table()
     # create_skill_table()
     # create_weapon_table()
     # create_armor_table()
     # create_role_table()
     # create_user_table()
     # create_dark_market_table()
+    create_leader_board_table()
     # create_friend_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")

@@ -122,67 +122,67 @@
             this.Panel2MonsterList = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.Panel3 = new System.Windows.Forms.Panel();
-            this.groupBox24 = new System.Windows.Forms.GroupBox();
-            this.Panel3DelSatge = new System.Windows.Forms.Button();
-            this.Panel3AddSatge = new System.Windows.Forms.Button();
-            this.Panel3SelectSatge = new System.Windows.Forms.ComboBox();
-            this.Panel3SelectSatgeType = new System.Windows.Forms.ComboBox();
-            this.Panel3Physical = new System.Windows.Forms.CheckBox();
-            this.Panel3PhysicalValue = new System.Windows.Forms.NumericUpDown();
-            this.Panel3CoinValue = new System.Windows.Forms.NumericUpDown();
-            this.Panel3Coin = new System.Windows.Forms.CheckBox();
-            this.Panel3EnergyValue = new System.Windows.Forms.NumericUpDown();
-            this.Panel3Energy = new System.Windows.Forms.CheckBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
+            this.button7 = new System.Windows.Forms.Button();
             this.groupBox25 = new System.Windows.Forms.GroupBox();
-            this.label11 = new System.Windows.Forms.Label();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox3 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown4 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox4 = new System.Windows.Forms.CheckBox();
-            this.label12 = new System.Windows.Forms.Label();
-            this.numericUpDown5 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox5 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox6 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown7 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox7 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown8 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox8 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown9 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox9 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown10 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox10 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown11 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox11 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown12 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox12 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown13 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox13 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown14 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox14 = new System.Windows.Forms.CheckBox();
-            this.numericUpDown15 = new System.Windows.Forms.NumericUpDown();
-            this.checkBox15 = new System.Windows.Forms.CheckBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.numericUpDown16 = new System.Windows.Forms.NumericUpDown();
-            this.label10 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.numericUpDown17 = new System.Windows.Forms.NumericUpDown();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.label14 = new System.Windows.Forms.Label();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.button6 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
+            this.comboBox3 = new System.Windows.Forms.ComboBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.button3 = new System.Windows.Forms.Button();
+            this.Panel3WeaponRoleAdd = new System.Windows.Forms.Button();
+            this.Panel3WeaponRoleDel = new System.Windows.Forms.Button();
+            this.label13 = new System.Windows.Forms.Label();
+            this.Panel3SegmentMax = new System.Windows.Forms.NumericUpDown();
+            this.label10 = new System.Windows.Forms.Label();
+            this.Panel3SegmentMin = new System.Windows.Forms.NumericUpDown();
+            this.Panel3WeaponRoleList = new System.Windows.Forms.ComboBox();
+            this.Panel3WeaponRole = new System.Windows.Forms.ComboBox();
+            this.Panel3RewardIronValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardExperiencePotionValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardIron = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardExperiencePotion = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardExperienceValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardExperience = new System.Windows.Forms.CheckBox();
+            this.Panel3Reward100ScrollValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3Reward100Scroll = new System.Windows.Forms.CheckBox();
+            this.Panel3Reward30ScrollValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3Reward30Scroll = new System.Windows.Forms.CheckBox();
+            this.Panel3Reward10ScrollValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3Reward10Scroll = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardProScrollCValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardProScrollC = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardProScrollZValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardProScrollZ = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardPhysicalValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardPhysical = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardProphetScrollCValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardProphetScrollC = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardBasicScrollCValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardSmallEnergyPotion = new System.Windows.Forms.CheckBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.Panel3RewardLowScrollZValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardLowScrollZ = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardEnergyValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardEnergy = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardCoinValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardCoin = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardSmallEnergyPotionValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardBasicScrollC = new System.Windows.Forms.CheckBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.Panel3SelectSatgeType = new System.Windows.Forms.ComboBox();
+            this.Panel3SelectSatge = new System.Windows.Forms.ComboBox();
+            this.Panel3AddSatge = new System.Windows.Forms.Button();
+            this.Panel3DelSatge = new System.Windows.Forms.Button();
+            this.groupBox24 = new System.Windows.Forms.GroupBox();
+            this.Panel3EnergyValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3Energy = new System.Windows.Forms.CheckBox();
+            this.Panel3CoinValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3Coin = new System.Windows.Forms.CheckBox();
+            this.Panel3PhysicalValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3Physical = new System.Windows.Forms.CheckBox();
             this.Panel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ColdDownTime)).BeginInit();
@@ -243,28 +243,28 @@
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Panel2LV)).BeginInit();
             this.Panel3.SuspendLayout();
-            this.groupBox24.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3PhysicalValue)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3CoinValue)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3EnergyValue)).BeginInit();
             this.groupBox25.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown11)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown12)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown13)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown14)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown15)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown16)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown17)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3SegmentMax)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3SegmentMin)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardIronValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperiencePotionValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperienceValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward100ScrollValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward30ScrollValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward10ScrollValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProScrollCValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProScrollZValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardPhysicalValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProphetScrollCValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardBasicScrollCValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardLowScrollZValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardEnergyValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardCoinValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardSmallEnergyPotionValue)).BeginInit();
+            this.groupBox24.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3EnergyValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3CoinValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3PhysicalValue)).BeginInit();
             this.SuspendLayout();
             // 
             // label
@@ -1327,145 +1327,15 @@
             this.Panel3.TabIndex = 11;
             this.Panel3.Visible = false;
             // 
-            // groupBox24
+            // button7
             // 
-            this.groupBox24.Controls.Add(this.Panel3EnergyValue);
-            this.groupBox24.Controls.Add(this.Panel3Energy);
-            this.groupBox24.Controls.Add(this.Panel3CoinValue);
-            this.groupBox24.Controls.Add(this.Panel3Coin);
-            this.groupBox24.Controls.Add(this.Panel3PhysicalValue);
-            this.groupBox24.Controls.Add(this.Panel3Physical);
-            this.groupBox24.Location = new System.Drawing.Point(41, 55);
-            this.groupBox24.Name = "groupBox24";
-            this.groupBox24.Size = new System.Drawing.Size(1108, 76);
-            this.groupBox24.TabIndex = 0;
-            this.groupBox24.TabStop = false;
-            this.groupBox24.Text = "进关消耗";
-            // 
-            // Panel3DelSatge
-            // 
-            this.Panel3DelSatge.Location = new System.Drawing.Point(939, 8);
-            this.Panel3DelSatge.Name = "Panel3DelSatge";
-            this.Panel3DelSatge.Size = new System.Drawing.Size(79, 39);
-            this.Panel3DelSatge.TabIndex = 4;
-            this.Panel3DelSatge.Text = "删除";
-            this.Panel3DelSatge.UseVisualStyleBackColor = true;
-            // 
-            // Panel3AddSatge
-            // 
-            this.Panel3AddSatge.Location = new System.Drawing.Point(1056, 8);
-            this.Panel3AddSatge.Name = "Panel3AddSatge";
-            this.Panel3AddSatge.Size = new System.Drawing.Size(79, 39);
-            this.Panel3AddSatge.TabIndex = 5;
-            this.Panel3AddSatge.Text = "添加";
-            this.Panel3AddSatge.UseVisualStyleBackColor = true;
-            // 
-            // Panel3SelectSatge
-            // 
-            this.Panel3SelectSatge.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Panel3SelectSatge.DropDownWidth = 320;
-            this.Panel3SelectSatge.FormattingEnabled = true;
-            this.Panel3SelectSatge.Location = new System.Drawing.Point(596, 14);
-            this.Panel3SelectSatge.Name = "Panel3SelectSatge";
-            this.Panel3SelectSatge.Size = new System.Drawing.Size(300, 26);
-            this.Panel3SelectSatge.TabIndex = 6;
-            // 
-            // Panel3SelectSatgeType
-            // 
-            this.Panel3SelectSatgeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Panel3SelectSatgeType.DropDownWidth = 320;
-            this.Panel3SelectSatgeType.FormattingEnabled = true;
-            this.Panel3SelectSatgeType.Location = new System.Drawing.Point(169, 14);
-            this.Panel3SelectSatgeType.Name = "Panel3SelectSatgeType";
-            this.Panel3SelectSatgeType.Size = new System.Drawing.Size(300, 26);
-            this.Panel3SelectSatgeType.TabIndex = 6;
-            // 
-            // Panel3Physical
-            // 
-            this.Panel3Physical.AutoSize = true;
-            this.Panel3Physical.Location = new System.Drawing.Point(121, 30);
-            this.Panel3Physical.Name = "Panel3Physical";
-            this.Panel3Physical.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.Panel3Physical.Size = new System.Drawing.Size(70, 22);
-            this.Panel3Physical.TabIndex = 0;
-            this.Panel3Physical.Text = "体力";
-            this.Panel3Physical.UseVisualStyleBackColor = true;
-            // 
-            // Panel3PhysicalValue
-            // 
-            this.Panel3PhysicalValue.Location = new System.Drawing.Point(197, 27);
-            this.Panel3PhysicalValue.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.Panel3PhysicalValue.Name = "Panel3PhysicalValue";
-            this.Panel3PhysicalValue.Size = new System.Drawing.Size(97, 28);
-            this.Panel3PhysicalValue.TabIndex = 1;
-            // 
-            // Panel3CoinValue
-            // 
-            this.Panel3CoinValue.Location = new System.Drawing.Point(567, 27);
-            this.Panel3CoinValue.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.Panel3CoinValue.Name = "Panel3CoinValue";
-            this.Panel3CoinValue.Size = new System.Drawing.Size(97, 28);
-            this.Panel3CoinValue.TabIndex = 3;
-            // 
-            // Panel3Coin
-            // 
-            this.Panel3Coin.AutoSize = true;
-            this.Panel3Coin.Location = new System.Drawing.Point(491, 30);
-            this.Panel3Coin.Name = "Panel3Coin";
-            this.Panel3Coin.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.Panel3Coin.Size = new System.Drawing.Size(70, 22);
-            this.Panel3Coin.TabIndex = 2;
-            this.Panel3Coin.Text = "金币";
-            this.Panel3Coin.UseVisualStyleBackColor = true;
-            // 
-            // Panel3EnergyValue
-            // 
-            this.Panel3EnergyValue.Location = new System.Drawing.Point(937, 27);
-            this.Panel3EnergyValue.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.Panel3EnergyValue.Name = "Panel3EnergyValue";
-            this.Panel3EnergyValue.Size = new System.Drawing.Size(97, 28);
-            this.Panel3EnergyValue.TabIndex = 5;
-            // 
-            // Panel3Energy
-            // 
-            this.Panel3Energy.AutoSize = true;
-            this.Panel3Energy.Location = new System.Drawing.Point(861, 30);
-            this.Panel3Energy.Name = "Panel3Energy";
-            this.Panel3Energy.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.Panel3Energy.Size = new System.Drawing.Size(70, 22);
-            this.Panel3Energy.TabIndex = 4;
-            this.Panel3Energy.Text = "能量";
-            this.Panel3Energy.UseVisualStyleBackColor = true;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(47, 18);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(116, 18);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "选择关卡类型";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(510, 18);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(80, 18);
-            this.label9.TabIndex = 8;
-            this.label9.Text = "选择关卡";
+            this.button7.Font = new System.Drawing.Font("宋体", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.button7.Location = new System.Drawing.Point(437, 433);
+            this.button7.Name = "button7";
+            this.button7.Size = new System.Drawing.Size(300, 68);
+            this.button7.TabIndex = 49;
+            this.button7.Text = "保  存";
+            this.button7.UseVisualStyleBackColor = true;
             // 
             // groupBox25
             // 
@@ -1475,45 +1345,45 @@
             this.groupBox25.Controls.Add(this.comboBox3);
             this.groupBox25.Controls.Add(this.label14);
             this.groupBox25.Controls.Add(this.button3);
-            this.groupBox25.Controls.Add(this.button2);
-            this.groupBox25.Controls.Add(this.button1);
+            this.groupBox25.Controls.Add(this.Panel3WeaponRoleAdd);
+            this.groupBox25.Controls.Add(this.Panel3WeaponRoleDel);
             this.groupBox25.Controls.Add(this.label13);
-            this.groupBox25.Controls.Add(this.numericUpDown17);
+            this.groupBox25.Controls.Add(this.Panel3SegmentMax);
             this.groupBox25.Controls.Add(this.label10);
-            this.groupBox25.Controls.Add(this.numericUpDown16);
-            this.groupBox25.Controls.Add(this.comboBox2);
-            this.groupBox25.Controls.Add(this.comboBox1);
-            this.groupBox25.Controls.Add(this.numericUpDown15);
-            this.groupBox25.Controls.Add(this.numericUpDown13);
-            this.groupBox25.Controls.Add(this.checkBox15);
-            this.groupBox25.Controls.Add(this.checkBox13);
-            this.groupBox25.Controls.Add(this.numericUpDown14);
-            this.groupBox25.Controls.Add(this.checkBox14);
-            this.groupBox25.Controls.Add(this.numericUpDown9);
-            this.groupBox25.Controls.Add(this.checkBox9);
-            this.groupBox25.Controls.Add(this.numericUpDown10);
-            this.groupBox25.Controls.Add(this.checkBox10);
-            this.groupBox25.Controls.Add(this.numericUpDown11);
-            this.groupBox25.Controls.Add(this.checkBox11);
-            this.groupBox25.Controls.Add(this.numericUpDown12);
-            this.groupBox25.Controls.Add(this.checkBox12);
-            this.groupBox25.Controls.Add(this.numericUpDown5);
-            this.groupBox25.Controls.Add(this.checkBox5);
-            this.groupBox25.Controls.Add(this.numericUpDown6);
-            this.groupBox25.Controls.Add(this.checkBox6);
-            this.groupBox25.Controls.Add(this.numericUpDown7);
-            this.groupBox25.Controls.Add(this.checkBox7);
-            this.groupBox25.Controls.Add(this.numericUpDown8);
-            this.groupBox25.Controls.Add(this.checkBox8);
+            this.groupBox25.Controls.Add(this.Panel3SegmentMin);
+            this.groupBox25.Controls.Add(this.Panel3WeaponRoleList);
+            this.groupBox25.Controls.Add(this.Panel3WeaponRole);
+            this.groupBox25.Controls.Add(this.Panel3RewardIronValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardExperiencePotionValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardIron);
+            this.groupBox25.Controls.Add(this.Panel3RewardExperiencePotion);
+            this.groupBox25.Controls.Add(this.Panel3RewardExperienceValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardExperience);
+            this.groupBox25.Controls.Add(this.Panel3Reward100ScrollValue);
+            this.groupBox25.Controls.Add(this.Panel3Reward100Scroll);
+            this.groupBox25.Controls.Add(this.Panel3Reward30ScrollValue);
+            this.groupBox25.Controls.Add(this.Panel3Reward30Scroll);
+            this.groupBox25.Controls.Add(this.Panel3Reward10ScrollValue);
+            this.groupBox25.Controls.Add(this.Panel3Reward10Scroll);
+            this.groupBox25.Controls.Add(this.Panel3RewardProScrollCValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardProScrollC);
+            this.groupBox25.Controls.Add(this.Panel3RewardProScrollZValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardProScrollZ);
+            this.groupBox25.Controls.Add(this.Panel3RewardPhysicalValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardPhysical);
+            this.groupBox25.Controls.Add(this.Panel3RewardProphetScrollCValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardProphetScrollC);
+            this.groupBox25.Controls.Add(this.Panel3RewardBasicScrollCValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardSmallEnergyPotion);
             this.groupBox25.Controls.Add(this.label12);
-            this.groupBox25.Controls.Add(this.numericUpDown4);
-            this.groupBox25.Controls.Add(this.checkBox4);
-            this.groupBox25.Controls.Add(this.numericUpDown1);
-            this.groupBox25.Controls.Add(this.checkBox1);
-            this.groupBox25.Controls.Add(this.numericUpDown2);
-            this.groupBox25.Controls.Add(this.checkBox2);
-            this.groupBox25.Controls.Add(this.numericUpDown3);
-            this.groupBox25.Controls.Add(this.checkBox3);
+            this.groupBox25.Controls.Add(this.Panel3RewardLowScrollZValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardLowScrollZ);
+            this.groupBox25.Controls.Add(this.Panel3RewardEnergyValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardEnergy);
+            this.groupBox25.Controls.Add(this.Panel3RewardCoinValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardCoin);
+            this.groupBox25.Controls.Add(this.Panel3RewardSmallEnergyPotionValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardBasicScrollC);
             this.groupBox25.Controls.Add(this.label11);
             this.groupBox25.Location = new System.Drawing.Point(41, 133);
             this.groupBox25.Name = "groupBox25";
@@ -1521,481 +1391,6 @@
             this.groupBox25.TabIndex = 9;
             this.groupBox25.TabStop = false;
             this.groupBox25.Text = "通关奖励";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(6, 204);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(116, 18);
-            this.label11.TabIndex = 1;
-            this.label11.Text = "整十关卡奖励";
-            // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Location = new System.Drawing.Point(792, 28);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown1.TabIndex = 11;
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(716, 31);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox1.Size = new System.Drawing.Size(70, 22);
-            this.checkBox1.TabIndex = 10;
-            this.checkBox1.Text = "能量";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown2
-            // 
-            this.numericUpDown2.Location = new System.Drawing.Point(566, 28);
-            this.numericUpDown2.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown2.TabIndex = 9;
-            // 
-            // checkBox2
-            // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(490, 30);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox2.Size = new System.Drawing.Size(70, 22);
-            this.checkBox2.TabIndex = 8;
-            this.checkBox2.Text = "金币";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown3
-            // 
-            this.numericUpDown3.Location = new System.Drawing.Point(340, 28);
-            this.numericUpDown3.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown3.Name = "numericUpDown3";
-            this.numericUpDown3.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown3.TabIndex = 7;
-            // 
-            // checkBox3
-            // 
-            this.checkBox3.AutoSize = true;
-            this.checkBox3.Location = new System.Drawing.Point(210, 86);
-            this.checkBox3.Name = "checkBox3";
-            this.checkBox3.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox3.Size = new System.Drawing.Size(124, 22);
-            this.checkBox3.TabIndex = 6;
-            this.checkBox3.Text = "基础抽卷轴";
-            this.checkBox3.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown4
-            // 
-            this.numericUpDown4.Location = new System.Drawing.Point(1018, 28);
-            this.numericUpDown4.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown4.Name = "numericUpDown4";
-            this.numericUpDown4.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown4.TabIndex = 13;
-            // 
-            // checkBox4
-            // 
-            this.checkBox4.AutoSize = true;
-            this.checkBox4.Location = new System.Drawing.Point(888, 29);
-            this.checkBox4.Name = "checkBox4";
-            this.checkBox4.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox4.Size = new System.Drawing.Size(124, 22);
-            this.checkBox4.TabIndex = 12;
-            this.checkBox4.Text = "低级转卷轴";
-            this.checkBox4.UseVisualStyleBackColor = true;
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(-1, 165);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(1151, 18);
-            this.label12.TabIndex = 14;
-            this.label12.Text = "_________________________________________________________________________________" +
-    "______________________________________________";
-            // 
-            // numericUpDown5
-            // 
-            this.numericUpDown5.Location = new System.Drawing.Point(1018, 85);
-            this.numericUpDown5.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown5.Name = "numericUpDown5";
-            this.numericUpDown5.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown5.TabIndex = 22;
-            // 
-            // checkBox5
-            // 
-            this.checkBox5.AutoSize = true;
-            this.checkBox5.Location = new System.Drawing.Point(888, 86);
-            this.checkBox5.Name = "checkBox5";
-            this.checkBox5.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox5.Size = new System.Drawing.Size(124, 22);
-            this.checkBox5.TabIndex = 21;
-            this.checkBox5.Text = "高级转卷轴";
-            this.checkBox5.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown6
-            // 
-            this.numericUpDown6.Location = new System.Drawing.Point(792, 85);
-            this.numericUpDown6.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown6.Name = "numericUpDown6";
-            this.numericUpDown6.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown6.TabIndex = 20;
-            // 
-            // checkBox6
-            // 
-            this.checkBox6.AutoSize = true;
-            this.checkBox6.Location = new System.Drawing.Point(716, 87);
-            this.checkBox6.Name = "checkBox6";
-            this.checkBox6.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox6.Size = new System.Drawing.Size(70, 22);
-            this.checkBox6.TabIndex = 19;
-            this.checkBox6.Text = "体力";
-            this.checkBox6.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown7
-            // 
-            this.numericUpDown7.Location = new System.Drawing.Point(566, 85);
-            this.numericUpDown7.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown7.Name = "numericUpDown7";
-            this.numericUpDown7.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown7.TabIndex = 18;
-            // 
-            // checkBox7
-            // 
-            this.checkBox7.AutoSize = true;
-            this.checkBox7.Location = new System.Drawing.Point(436, 88);
-            this.checkBox7.Name = "checkBox7";
-            this.checkBox7.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox7.Size = new System.Drawing.Size(124, 22);
-            this.checkBox7.TabIndex = 17;
-            this.checkBox7.Text = "先知抽卷轴";
-            this.checkBox7.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown8
-            // 
-            this.numericUpDown8.Location = new System.Drawing.Point(340, 85);
-            this.numericUpDown8.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown8.Name = "numericUpDown8";
-            this.numericUpDown8.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown8.TabIndex = 16;
-            // 
-            // checkBox8
-            // 
-            this.checkBox8.AutoSize = true;
-            this.checkBox8.Location = new System.Drawing.Point(210, 30);
-            this.checkBox8.Name = "checkBox8";
-            this.checkBox8.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox8.Size = new System.Drawing.Size(124, 22);
-            this.checkBox8.TabIndex = 15;
-            this.checkBox8.Text = "小能量药水";
-            this.checkBox8.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown9
-            // 
-            this.numericUpDown9.Location = new System.Drawing.Point(1018, 142);
-            this.numericUpDown9.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown9.Name = "numericUpDown9";
-            this.numericUpDown9.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown9.TabIndex = 30;
-            // 
-            // checkBox9
-            // 
-            this.checkBox9.AutoSize = true;
-            this.checkBox9.Location = new System.Drawing.Point(906, 144);
-            this.checkBox9.Name = "checkBox9";
-            this.checkBox9.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox9.Size = new System.Drawing.Size(106, 22);
-            this.checkBox9.TabIndex = 29;
-            this.checkBox9.Text = "100%卷轴";
-            this.checkBox9.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown10
-            // 
-            this.numericUpDown10.Location = new System.Drawing.Point(792, 142);
-            this.numericUpDown10.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown10.Name = "numericUpDown10";
-            this.numericUpDown10.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown10.TabIndex = 28;
-            // 
-            // checkBox10
-            // 
-            this.checkBox10.AutoSize = true;
-            this.checkBox10.Location = new System.Drawing.Point(689, 143);
-            this.checkBox10.Name = "checkBox10";
-            this.checkBox10.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox10.Size = new System.Drawing.Size(97, 22);
-            this.checkBox10.TabIndex = 27;
-            this.checkBox10.Text = "30%卷轴";
-            this.checkBox10.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown11
-            // 
-            this.numericUpDown11.Location = new System.Drawing.Point(566, 142);
-            this.numericUpDown11.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown11.Name = "numericUpDown11";
-            this.numericUpDown11.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown11.TabIndex = 26;
-            // 
-            // checkBox11
-            // 
-            this.checkBox11.AutoSize = true;
-            this.checkBox11.Location = new System.Drawing.Point(463, 143);
-            this.checkBox11.Name = "checkBox11";
-            this.checkBox11.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox11.Size = new System.Drawing.Size(97, 22);
-            this.checkBox11.TabIndex = 25;
-            this.checkBox11.Text = "10%卷轴";
-            this.checkBox11.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown12
-            // 
-            this.numericUpDown12.Location = new System.Drawing.Point(340, 142);
-            this.numericUpDown12.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown12.Name = "numericUpDown12";
-            this.numericUpDown12.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown12.TabIndex = 24;
-            // 
-            // checkBox12
-            // 
-            this.checkBox12.AutoSize = true;
-            this.checkBox12.Location = new System.Drawing.Point(210, 144);
-            this.checkBox12.Name = "checkBox12";
-            this.checkBox12.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox12.Size = new System.Drawing.Size(124, 22);
-            this.checkBox12.TabIndex = 23;
-            this.checkBox12.Text = "高级抽卷轴";
-            this.checkBox12.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown13
-            // 
-            this.numericUpDown13.Location = new System.Drawing.Point(114, 142);
-            this.numericUpDown13.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown13.Name = "numericUpDown13";
-            this.numericUpDown13.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown13.TabIndex = 34;
-            // 
-            // checkBox13
-            // 
-            this.checkBox13.AutoSize = true;
-            this.checkBox13.Location = new System.Drawing.Point(2, 144);
-            this.checkBox13.Name = "checkBox13";
-            this.checkBox13.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox13.Size = new System.Drawing.Size(106, 22);
-            this.checkBox13.TabIndex = 33;
-            this.checkBox13.Text = "经验药水";
-            this.checkBox13.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown14
-            // 
-            this.numericUpDown14.Location = new System.Drawing.Point(114, 85);
-            this.numericUpDown14.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown14.Name = "numericUpDown14";
-            this.numericUpDown14.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown14.TabIndex = 32;
-            // 
-            // checkBox14
-            // 
-            this.checkBox14.AutoSize = true;
-            this.checkBox14.Location = new System.Drawing.Point(38, 86);
-            this.checkBox14.Name = "checkBox14";
-            this.checkBox14.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox14.Size = new System.Drawing.Size(70, 22);
-            this.checkBox14.TabIndex = 31;
-            this.checkBox14.Text = "经验";
-            this.checkBox14.UseVisualStyleBackColor = true;
-            // 
-            // numericUpDown15
-            // 
-            this.numericUpDown15.Location = new System.Drawing.Point(114, 28);
-            this.numericUpDown15.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown15.Name = "numericUpDown15";
-            this.numericUpDown15.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown15.TabIndex = 34;
-            // 
-            // checkBox15
-            // 
-            this.checkBox15.AutoSize = true;
-            this.checkBox15.Location = new System.Drawing.Point(56, 29);
-            this.checkBox15.Name = "checkBox15";
-            this.checkBox15.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.checkBox15.Size = new System.Drawing.Size(52, 22);
-            this.checkBox15.TabIndex = 33;
-            this.checkBox15.Text = "铁";
-            this.checkBox15.UseVisualStyleBackColor = true;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox1.DropDownWidth = 320;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "武器",
-            "角色"});
-            this.comboBox1.Location = new System.Drawing.Point(128, 200);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(112, 26);
-            this.comboBox1.TabIndex = 35;
-            // 
-            // comboBox2
-            // 
-            this.comboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox2.DropDownWidth = 320;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(257, 200);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(171, 26);
-            this.comboBox2.TabIndex = 36;
-            // 
-            // numericUpDown16
-            // 
-            this.numericUpDown16.Location = new System.Drawing.Point(545, 199);
-            this.numericUpDown16.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown16.Name = "numericUpDown16";
-            this.numericUpDown16.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown16.TabIndex = 37;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(442, 204);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(98, 18);
-            this.label10.TabIndex = 38;
-            this.label10.Text = "碎片最小值";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(633, 204);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(98, 18);
-            this.label13.TabIndex = 40;
-            this.label13.Text = "碎片最大值";
-            // 
-            // numericUpDown17
-            // 
-            this.numericUpDown17.Location = new System.Drawing.Point(734, 199);
-            this.numericUpDown17.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.numericUpDown17.Name = "numericUpDown17";
-            this.numericUpDown17.Size = new System.Drawing.Size(75, 28);
-            this.numericUpDown17.TabIndex = 39;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(827, 194);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(79, 39);
-            this.button1.TabIndex = 41;
-            this.button1.Text = "删除";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(922, 194);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(79, 39);
-            this.button2.TabIndex = 42;
-            this.button2.Text = "添加";
-            this.button2.UseVisualStyleBackColor = true;
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(1017, 194);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(79, 39);
-            this.button3.TabIndex = 43;
-            this.button3.Text = "查看";
-            this.button3.UseVisualStyleBackColor = true;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(74, 250);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(44, 18);
-            this.label14.TabIndex = 44;
-            this.label14.Text = "技能";
-            // 
-            // comboBox3
-            // 
-            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox3.DropDownWidth = 320;
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(128, 246);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(300, 26);
-            this.comboBox3.TabIndex = 45;
             // 
             // button4
             // 
@@ -2024,15 +1419,620 @@
             this.button6.Text = "删除";
             this.button6.UseVisualStyleBackColor = true;
             // 
-            // button7
+            // comboBox3
             // 
-            this.button7.Font = new System.Drawing.Font("宋体", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button7.Location = new System.Drawing.Point(437, 433);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(300, 68);
-            this.button7.TabIndex = 49;
-            this.button7.Text = "保  存";
-            this.button7.UseVisualStyleBackColor = true;
+            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox3.DropDownWidth = 320;
+            this.comboBox3.FormattingEnabled = true;
+            this.comboBox3.Location = new System.Drawing.Point(128, 246);
+            this.comboBox3.Name = "comboBox3";
+            this.comboBox3.Size = new System.Drawing.Size(300, 26);
+            this.comboBox3.TabIndex = 45;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(74, 250);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(44, 18);
+            this.label14.TabIndex = 44;
+            this.label14.Text = "技能";
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(1017, 194);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(79, 39);
+            this.button3.TabIndex = 43;
+            this.button3.Text = "查看";
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // Panel3WeaponRoleAdd
+            // 
+            this.Panel3WeaponRoleAdd.Location = new System.Drawing.Point(922, 194);
+            this.Panel3WeaponRoleAdd.Name = "Panel3WeaponRoleAdd";
+            this.Panel3WeaponRoleAdd.Size = new System.Drawing.Size(79, 39);
+            this.Panel3WeaponRoleAdd.TabIndex = 42;
+            this.Panel3WeaponRoleAdd.Text = "添加";
+            this.Panel3WeaponRoleAdd.UseVisualStyleBackColor = true;
+            // 
+            // Panel3WeaponRoleDel
+            // 
+            this.Panel3WeaponRoleDel.Location = new System.Drawing.Point(827, 194);
+            this.Panel3WeaponRoleDel.Name = "Panel3WeaponRoleDel";
+            this.Panel3WeaponRoleDel.Size = new System.Drawing.Size(79, 39);
+            this.Panel3WeaponRoleDel.TabIndex = 41;
+            this.Panel3WeaponRoleDel.Text = "删除";
+            this.Panel3WeaponRoleDel.UseVisualStyleBackColor = true;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(633, 204);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(98, 18);
+            this.label13.TabIndex = 40;
+            this.label13.Text = "碎片最大值";
+            // 
+            // Panel3SegmentMax
+            // 
+            this.Panel3SegmentMax.Location = new System.Drawing.Point(734, 199);
+            this.Panel3SegmentMax.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3SegmentMax.Name = "Panel3SegmentMax";
+            this.Panel3SegmentMax.Size = new System.Drawing.Size(75, 28);
+            this.Panel3SegmentMax.TabIndex = 39;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(442, 204);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(98, 18);
+            this.label10.TabIndex = 38;
+            this.label10.Text = "碎片最小值";
+            // 
+            // Panel3SegmentMin
+            // 
+            this.Panel3SegmentMin.Location = new System.Drawing.Point(545, 199);
+            this.Panel3SegmentMin.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3SegmentMin.Name = "Panel3SegmentMin";
+            this.Panel3SegmentMin.Size = new System.Drawing.Size(75, 28);
+            this.Panel3SegmentMin.TabIndex = 37;
+            // 
+            // Panel3WeaponRoleList
+            // 
+            this.Panel3WeaponRoleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.Panel3WeaponRoleList.DropDownWidth = 320;
+            this.Panel3WeaponRoleList.FormattingEnabled = true;
+            this.Panel3WeaponRoleList.Location = new System.Drawing.Point(257, 200);
+            this.Panel3WeaponRoleList.Name = "Panel3WeaponRoleList";
+            this.Panel3WeaponRoleList.Size = new System.Drawing.Size(171, 26);
+            this.Panel3WeaponRoleList.TabIndex = 36;
+            // 
+            // Panel3WeaponRole
+            // 
+            this.Panel3WeaponRole.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.Panel3WeaponRole.DropDownWidth = 320;
+            this.Panel3WeaponRole.FormattingEnabled = true;
+            this.Panel3WeaponRole.Items.AddRange(new object[] {
+            "武器",
+            "角色"});
+            this.Panel3WeaponRole.Location = new System.Drawing.Point(128, 200);
+            this.Panel3WeaponRole.Name = "Panel3WeaponRole";
+            this.Panel3WeaponRole.Size = new System.Drawing.Size(112, 26);
+            this.Panel3WeaponRole.TabIndex = 35;
+            // 
+            // Panel3RewardIronValue
+            // 
+            this.Panel3RewardIronValue.Location = new System.Drawing.Point(114, 28);
+            this.Panel3RewardIronValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardIronValue.Name = "Panel3RewardIronValue";
+            this.Panel3RewardIronValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardIronValue.TabIndex = 34;
+            // 
+            // Panel3RewardExperiencePotionValue
+            // 
+            this.Panel3RewardExperiencePotionValue.Location = new System.Drawing.Point(114, 142);
+            this.Panel3RewardExperiencePotionValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardExperiencePotionValue.Name = "Panel3RewardExperiencePotionValue";
+            this.Panel3RewardExperiencePotionValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardExperiencePotionValue.TabIndex = 34;
+            // 
+            // Panel3RewardIron
+            // 
+            this.Panel3RewardIron.AutoSize = true;
+            this.Panel3RewardIron.Location = new System.Drawing.Point(56, 29);
+            this.Panel3RewardIron.Name = "Panel3RewardIron";
+            this.Panel3RewardIron.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardIron.Size = new System.Drawing.Size(52, 22);
+            this.Panel3RewardIron.TabIndex = 33;
+            this.Panel3RewardIron.Text = "铁";
+            this.Panel3RewardIron.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardExperiencePotion
+            // 
+            this.Panel3RewardExperiencePotion.AutoSize = true;
+            this.Panel3RewardExperiencePotion.Location = new System.Drawing.Point(2, 144);
+            this.Panel3RewardExperiencePotion.Name = "Panel3RewardExperiencePotion";
+            this.Panel3RewardExperiencePotion.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardExperiencePotion.Size = new System.Drawing.Size(106, 22);
+            this.Panel3RewardExperiencePotion.TabIndex = 33;
+            this.Panel3RewardExperiencePotion.Text = "经验药水";
+            this.Panel3RewardExperiencePotion.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardExperienceValue
+            // 
+            this.Panel3RewardExperienceValue.Location = new System.Drawing.Point(114, 85);
+            this.Panel3RewardExperienceValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardExperienceValue.Name = "Panel3RewardExperienceValue";
+            this.Panel3RewardExperienceValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardExperienceValue.TabIndex = 32;
+            // 
+            // Panel3RewardExperience
+            // 
+            this.Panel3RewardExperience.AutoSize = true;
+            this.Panel3RewardExperience.Location = new System.Drawing.Point(38, 86);
+            this.Panel3RewardExperience.Name = "Panel3RewardExperience";
+            this.Panel3RewardExperience.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardExperience.Size = new System.Drawing.Size(70, 22);
+            this.Panel3RewardExperience.TabIndex = 31;
+            this.Panel3RewardExperience.Text = "经验";
+            this.Panel3RewardExperience.UseVisualStyleBackColor = true;
+            // 
+            // Panel3Reward100ScrollValue
+            // 
+            this.Panel3Reward100ScrollValue.Location = new System.Drawing.Point(1018, 142);
+            this.Panel3Reward100ScrollValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3Reward100ScrollValue.Name = "Panel3Reward100ScrollValue";
+            this.Panel3Reward100ScrollValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3Reward100ScrollValue.TabIndex = 30;
+            // 
+            // Panel3Reward100Scroll
+            // 
+            this.Panel3Reward100Scroll.AutoSize = true;
+            this.Panel3Reward100Scroll.Location = new System.Drawing.Point(906, 144);
+            this.Panel3Reward100Scroll.Name = "Panel3Reward100Scroll";
+            this.Panel3Reward100Scroll.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3Reward100Scroll.Size = new System.Drawing.Size(106, 22);
+            this.Panel3Reward100Scroll.TabIndex = 29;
+            this.Panel3Reward100Scroll.Text = "100%卷轴";
+            this.Panel3Reward100Scroll.UseVisualStyleBackColor = true;
+            // 
+            // Panel3Reward30ScrollValue
+            // 
+            this.Panel3Reward30ScrollValue.Location = new System.Drawing.Point(792, 142);
+            this.Panel3Reward30ScrollValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3Reward30ScrollValue.Name = "Panel3Reward30ScrollValue";
+            this.Panel3Reward30ScrollValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3Reward30ScrollValue.TabIndex = 28;
+            // 
+            // Panel3Reward30Scroll
+            // 
+            this.Panel3Reward30Scroll.AutoSize = true;
+            this.Panel3Reward30Scroll.Location = new System.Drawing.Point(689, 143);
+            this.Panel3Reward30Scroll.Name = "Panel3Reward30Scroll";
+            this.Panel3Reward30Scroll.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3Reward30Scroll.Size = new System.Drawing.Size(97, 22);
+            this.Panel3Reward30Scroll.TabIndex = 27;
+            this.Panel3Reward30Scroll.Text = "30%卷轴";
+            this.Panel3Reward30Scroll.UseVisualStyleBackColor = true;
+            // 
+            // Panel3Reward10ScrollValue
+            // 
+            this.Panel3Reward10ScrollValue.Location = new System.Drawing.Point(566, 142);
+            this.Panel3Reward10ScrollValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3Reward10ScrollValue.Name = "Panel3Reward10ScrollValue";
+            this.Panel3Reward10ScrollValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3Reward10ScrollValue.TabIndex = 26;
+            // 
+            // Panel3Reward10Scroll
+            // 
+            this.Panel3Reward10Scroll.AutoSize = true;
+            this.Panel3Reward10Scroll.Location = new System.Drawing.Point(463, 143);
+            this.Panel3Reward10Scroll.Name = "Panel3Reward10Scroll";
+            this.Panel3Reward10Scroll.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3Reward10Scroll.Size = new System.Drawing.Size(97, 22);
+            this.Panel3Reward10Scroll.TabIndex = 25;
+            this.Panel3Reward10Scroll.Text = "10%卷轴";
+            this.Panel3Reward10Scroll.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardProScrollCValue
+            // 
+            this.Panel3RewardProScrollCValue.Location = new System.Drawing.Point(340, 142);
+            this.Panel3RewardProScrollCValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardProScrollCValue.Name = "Panel3RewardProScrollCValue";
+            this.Panel3RewardProScrollCValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardProScrollCValue.TabIndex = 24;
+            // 
+            // Panel3RewardProScrollC
+            // 
+            this.Panel3RewardProScrollC.AutoSize = true;
+            this.Panel3RewardProScrollC.Location = new System.Drawing.Point(210, 144);
+            this.Panel3RewardProScrollC.Name = "Panel3RewardProScrollC";
+            this.Panel3RewardProScrollC.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardProScrollC.Size = new System.Drawing.Size(124, 22);
+            this.Panel3RewardProScrollC.TabIndex = 23;
+            this.Panel3RewardProScrollC.Text = "高级抽卷轴";
+            this.Panel3RewardProScrollC.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardProScrollZValue
+            // 
+            this.Panel3RewardProScrollZValue.Location = new System.Drawing.Point(1018, 85);
+            this.Panel3RewardProScrollZValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardProScrollZValue.Name = "Panel3RewardProScrollZValue";
+            this.Panel3RewardProScrollZValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardProScrollZValue.TabIndex = 22;
+            // 
+            // Panel3RewardProScrollZ
+            // 
+            this.Panel3RewardProScrollZ.AutoSize = true;
+            this.Panel3RewardProScrollZ.Location = new System.Drawing.Point(888, 86);
+            this.Panel3RewardProScrollZ.Name = "Panel3RewardProScrollZ";
+            this.Panel3RewardProScrollZ.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardProScrollZ.Size = new System.Drawing.Size(124, 22);
+            this.Panel3RewardProScrollZ.TabIndex = 21;
+            this.Panel3RewardProScrollZ.Text = "高级转卷轴";
+            this.Panel3RewardProScrollZ.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardPhysicalValue
+            // 
+            this.Panel3RewardPhysicalValue.Location = new System.Drawing.Point(792, 85);
+            this.Panel3RewardPhysicalValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardPhysicalValue.Name = "Panel3RewardPhysicalValue";
+            this.Panel3RewardPhysicalValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardPhysicalValue.TabIndex = 20;
+            // 
+            // Panel3RewardPhysical
+            // 
+            this.Panel3RewardPhysical.AutoSize = true;
+            this.Panel3RewardPhysical.Location = new System.Drawing.Point(716, 87);
+            this.Panel3RewardPhysical.Name = "Panel3RewardPhysical";
+            this.Panel3RewardPhysical.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardPhysical.Size = new System.Drawing.Size(70, 22);
+            this.Panel3RewardPhysical.TabIndex = 19;
+            this.Panel3RewardPhysical.Text = "体力";
+            this.Panel3RewardPhysical.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardProphetScrollCValue
+            // 
+            this.Panel3RewardProphetScrollCValue.Location = new System.Drawing.Point(566, 85);
+            this.Panel3RewardProphetScrollCValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardProphetScrollCValue.Name = "Panel3RewardProphetScrollCValue";
+            this.Panel3RewardProphetScrollCValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardProphetScrollCValue.TabIndex = 18;
+            // 
+            // Panel3RewardProphetScrollC
+            // 
+            this.Panel3RewardProphetScrollC.AutoSize = true;
+            this.Panel3RewardProphetScrollC.Location = new System.Drawing.Point(436, 88);
+            this.Panel3RewardProphetScrollC.Name = "Panel3RewardProphetScrollC";
+            this.Panel3RewardProphetScrollC.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardProphetScrollC.Size = new System.Drawing.Size(124, 22);
+            this.Panel3RewardProphetScrollC.TabIndex = 17;
+            this.Panel3RewardProphetScrollC.Text = "先知抽卷轴";
+            this.Panel3RewardProphetScrollC.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardBasicScrollCValue
+            // 
+            this.Panel3RewardBasicScrollCValue.Location = new System.Drawing.Point(340, 85);
+            this.Panel3RewardBasicScrollCValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardBasicScrollCValue.Name = "Panel3RewardBasicScrollCValue";
+            this.Panel3RewardBasicScrollCValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardBasicScrollCValue.TabIndex = 16;
+            // 
+            // Panel3RewardSmallEnergyPotion
+            // 
+            this.Panel3RewardSmallEnergyPotion.AutoSize = true;
+            this.Panel3RewardSmallEnergyPotion.Location = new System.Drawing.Point(210, 30);
+            this.Panel3RewardSmallEnergyPotion.Name = "Panel3RewardSmallEnergyPotion";
+            this.Panel3RewardSmallEnergyPotion.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardSmallEnergyPotion.Size = new System.Drawing.Size(124, 22);
+            this.Panel3RewardSmallEnergyPotion.TabIndex = 15;
+            this.Panel3RewardSmallEnergyPotion.Text = "小能量药水";
+            this.Panel3RewardSmallEnergyPotion.UseVisualStyleBackColor = true;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(-1, 165);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(1151, 18);
+            this.label12.TabIndex = 14;
+            this.label12.Text = "_________________________________________________________________________________" +
+    "______________________________________________";
+            // 
+            // Panel3RewardLowScrollZValue
+            // 
+            this.Panel3RewardLowScrollZValue.Location = new System.Drawing.Point(1018, 28);
+            this.Panel3RewardLowScrollZValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardLowScrollZValue.Name = "Panel3RewardLowScrollZValue";
+            this.Panel3RewardLowScrollZValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardLowScrollZValue.TabIndex = 13;
+            // 
+            // Panel3RewardLowScrollZ
+            // 
+            this.Panel3RewardLowScrollZ.AutoSize = true;
+            this.Panel3RewardLowScrollZ.Location = new System.Drawing.Point(888, 29);
+            this.Panel3RewardLowScrollZ.Name = "Panel3RewardLowScrollZ";
+            this.Panel3RewardLowScrollZ.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardLowScrollZ.Size = new System.Drawing.Size(124, 22);
+            this.Panel3RewardLowScrollZ.TabIndex = 12;
+            this.Panel3RewardLowScrollZ.Text = "低级转卷轴";
+            this.Panel3RewardLowScrollZ.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardEnergyValue
+            // 
+            this.Panel3RewardEnergyValue.Location = new System.Drawing.Point(792, 28);
+            this.Panel3RewardEnergyValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardEnergyValue.Name = "Panel3RewardEnergyValue";
+            this.Panel3RewardEnergyValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardEnergyValue.TabIndex = 11;
+            // 
+            // Panel3RewardEnergy
+            // 
+            this.Panel3RewardEnergy.AutoSize = true;
+            this.Panel3RewardEnergy.Location = new System.Drawing.Point(716, 31);
+            this.Panel3RewardEnergy.Name = "Panel3RewardEnergy";
+            this.Panel3RewardEnergy.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardEnergy.Size = new System.Drawing.Size(70, 22);
+            this.Panel3RewardEnergy.TabIndex = 10;
+            this.Panel3RewardEnergy.Text = "能量";
+            this.Panel3RewardEnergy.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardCoinValue
+            // 
+            this.Panel3RewardCoinValue.Location = new System.Drawing.Point(566, 28);
+            this.Panel3RewardCoinValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardCoinValue.Name = "Panel3RewardCoinValue";
+            this.Panel3RewardCoinValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardCoinValue.TabIndex = 9;
+            // 
+            // Panel3RewardCoin
+            // 
+            this.Panel3RewardCoin.AutoSize = true;
+            this.Panel3RewardCoin.Location = new System.Drawing.Point(490, 30);
+            this.Panel3RewardCoin.Name = "Panel3RewardCoin";
+            this.Panel3RewardCoin.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardCoin.Size = new System.Drawing.Size(70, 22);
+            this.Panel3RewardCoin.TabIndex = 8;
+            this.Panel3RewardCoin.Text = "金币";
+            this.Panel3RewardCoin.UseVisualStyleBackColor = true;
+            // 
+            // Panel3RewardSmallEnergyPotionValue
+            // 
+            this.Panel3RewardSmallEnergyPotionValue.Location = new System.Drawing.Point(340, 28);
+            this.Panel3RewardSmallEnergyPotionValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RewardSmallEnergyPotionValue.Name = "Panel3RewardSmallEnergyPotionValue";
+            this.Panel3RewardSmallEnergyPotionValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardSmallEnergyPotionValue.TabIndex = 7;
+            // 
+            // Panel3RewardBasicScrollC
+            // 
+            this.Panel3RewardBasicScrollC.AutoSize = true;
+            this.Panel3RewardBasicScrollC.Location = new System.Drawing.Point(210, 86);
+            this.Panel3RewardBasicScrollC.Name = "Panel3RewardBasicScrollC";
+            this.Panel3RewardBasicScrollC.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardBasicScrollC.Size = new System.Drawing.Size(124, 22);
+            this.Panel3RewardBasicScrollC.TabIndex = 6;
+            this.Panel3RewardBasicScrollC.Text = "基础抽卷轴";
+            this.Panel3RewardBasicScrollC.UseVisualStyleBackColor = true;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 204);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(116, 18);
+            this.label11.TabIndex = 1;
+            this.label11.Text = "整十关卡奖励";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(510, 18);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(80, 18);
+            this.label9.TabIndex = 8;
+            this.label9.Text = "选择关卡";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(47, 18);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(116, 18);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "选择关卡类型";
+            // 
+            // Panel3SelectSatgeType
+            // 
+            this.Panel3SelectSatgeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.Panel3SelectSatgeType.DropDownWidth = 320;
+            this.Panel3SelectSatgeType.FormattingEnabled = true;
+            this.Panel3SelectSatgeType.Location = new System.Drawing.Point(169, 14);
+            this.Panel3SelectSatgeType.Name = "Panel3SelectSatgeType";
+            this.Panel3SelectSatgeType.Size = new System.Drawing.Size(300, 26);
+            this.Panel3SelectSatgeType.TabIndex = 6;
+            // 
+            // Panel3SelectSatge
+            // 
+            this.Panel3SelectSatge.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.Panel3SelectSatge.DropDownWidth = 320;
+            this.Panel3SelectSatge.FormattingEnabled = true;
+            this.Panel3SelectSatge.Location = new System.Drawing.Point(596, 14);
+            this.Panel3SelectSatge.Name = "Panel3SelectSatge";
+            this.Panel3SelectSatge.Size = new System.Drawing.Size(300, 26);
+            this.Panel3SelectSatge.TabIndex = 6;
+            // 
+            // Panel3AddSatge
+            // 
+            this.Panel3AddSatge.Location = new System.Drawing.Point(1056, 8);
+            this.Panel3AddSatge.Name = "Panel3AddSatge";
+            this.Panel3AddSatge.Size = new System.Drawing.Size(79, 39);
+            this.Panel3AddSatge.TabIndex = 5;
+            this.Panel3AddSatge.Text = "添加";
+            this.Panel3AddSatge.UseVisualStyleBackColor = true;
+            // 
+            // Panel3DelSatge
+            // 
+            this.Panel3DelSatge.Location = new System.Drawing.Point(939, 8);
+            this.Panel3DelSatge.Name = "Panel3DelSatge";
+            this.Panel3DelSatge.Size = new System.Drawing.Size(79, 39);
+            this.Panel3DelSatge.TabIndex = 4;
+            this.Panel3DelSatge.Text = "删除";
+            this.Panel3DelSatge.UseVisualStyleBackColor = true;
+            // 
+            // groupBox24
+            // 
+            this.groupBox24.Controls.Add(this.Panel3EnergyValue);
+            this.groupBox24.Controls.Add(this.Panel3Energy);
+            this.groupBox24.Controls.Add(this.Panel3CoinValue);
+            this.groupBox24.Controls.Add(this.Panel3Coin);
+            this.groupBox24.Controls.Add(this.Panel3PhysicalValue);
+            this.groupBox24.Controls.Add(this.Panel3Physical);
+            this.groupBox24.Location = new System.Drawing.Point(41, 55);
+            this.groupBox24.Name = "groupBox24";
+            this.groupBox24.Size = new System.Drawing.Size(1108, 76);
+            this.groupBox24.TabIndex = 0;
+            this.groupBox24.TabStop = false;
+            this.groupBox24.Text = "进关消耗";
+            // 
+            // Panel3EnergyValue
+            // 
+            this.Panel3EnergyValue.Location = new System.Drawing.Point(937, 27);
+            this.Panel3EnergyValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3EnergyValue.Name = "Panel3EnergyValue";
+            this.Panel3EnergyValue.Size = new System.Drawing.Size(97, 28);
+            this.Panel3EnergyValue.TabIndex = 5;
+            // 
+            // Panel3Energy
+            // 
+            this.Panel3Energy.AutoSize = true;
+            this.Panel3Energy.Location = new System.Drawing.Point(861, 30);
+            this.Panel3Energy.Name = "Panel3Energy";
+            this.Panel3Energy.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3Energy.Size = new System.Drawing.Size(70, 22);
+            this.Panel3Energy.TabIndex = 4;
+            this.Panel3Energy.Text = "能量";
+            this.Panel3Energy.UseVisualStyleBackColor = true;
+            // 
+            // Panel3CoinValue
+            // 
+            this.Panel3CoinValue.Location = new System.Drawing.Point(567, 27);
+            this.Panel3CoinValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3CoinValue.Name = "Panel3CoinValue";
+            this.Panel3CoinValue.Size = new System.Drawing.Size(97, 28);
+            this.Panel3CoinValue.TabIndex = 3;
+            // 
+            // Panel3Coin
+            // 
+            this.Panel3Coin.AutoSize = true;
+            this.Panel3Coin.Location = new System.Drawing.Point(491, 30);
+            this.Panel3Coin.Name = "Panel3Coin";
+            this.Panel3Coin.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3Coin.Size = new System.Drawing.Size(70, 22);
+            this.Panel3Coin.TabIndex = 2;
+            this.Panel3Coin.Text = "金币";
+            this.Panel3Coin.UseVisualStyleBackColor = true;
+            // 
+            // Panel3PhysicalValue
+            // 
+            this.Panel3PhysicalValue.Location = new System.Drawing.Point(197, 27);
+            this.Panel3PhysicalValue.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3PhysicalValue.Name = "Panel3PhysicalValue";
+            this.Panel3PhysicalValue.Size = new System.Drawing.Size(97, 28);
+            this.Panel3PhysicalValue.TabIndex = 1;
+            // 
+            // Panel3Physical
+            // 
+            this.Panel3Physical.AutoSize = true;
+            this.Panel3Physical.Location = new System.Drawing.Point(121, 30);
+            this.Panel3Physical.Name = "Panel3Physical";
+            this.Panel3Physical.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3Physical.Size = new System.Drawing.Size(70, 22);
+            this.Panel3Physical.TabIndex = 0;
+            this.Panel3Physical.Text = "体力";
+            this.Panel3Physical.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -2118,30 +2118,30 @@
             ((System.ComponentModel.ISupportInitialize)(this.Panel2LV)).EndInit();
             this.Panel3.ResumeLayout(false);
             this.Panel3.PerformLayout();
-            this.groupBox24.ResumeLayout(false);
-            this.groupBox24.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3PhysicalValue)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3CoinValue)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3EnergyValue)).EndInit();
             this.groupBox25.ResumeLayout(false);
             this.groupBox25.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown4)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown6)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown7)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown8)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown9)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown10)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown11)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown12)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown13)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown14)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown15)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown16)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown17)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3SegmentMax)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3SegmentMin)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardIronValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperiencePotionValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperienceValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward100ScrollValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward30ScrollValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward10ScrollValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProScrollCValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProScrollZValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardPhysicalValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProphetScrollCValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardBasicScrollCValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardLowScrollZValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardEnergyValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardCoinValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardSmallEnergyPotionValue)).EndInit();
+            this.groupBox24.ResumeLayout(false);
+            this.groupBox24.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3EnergyValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3CoinValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3PhysicalValue)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2258,46 +2258,46 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox groupBox25;
         private System.Windows.Forms.Label label11;
-        private System.Windows.Forms.NumericUpDown numericUpDown13;
-        private System.Windows.Forms.CheckBox checkBox13;
-        private System.Windows.Forms.NumericUpDown numericUpDown14;
-        private System.Windows.Forms.CheckBox checkBox14;
-        private System.Windows.Forms.NumericUpDown numericUpDown9;
-        private System.Windows.Forms.CheckBox checkBox9;
-        private System.Windows.Forms.NumericUpDown numericUpDown10;
-        private System.Windows.Forms.CheckBox checkBox10;
-        private System.Windows.Forms.NumericUpDown numericUpDown11;
-        private System.Windows.Forms.CheckBox checkBox11;
-        private System.Windows.Forms.NumericUpDown numericUpDown12;
-        private System.Windows.Forms.CheckBox checkBox12;
-        private System.Windows.Forms.NumericUpDown numericUpDown5;
-        private System.Windows.Forms.CheckBox checkBox5;
-        private System.Windows.Forms.NumericUpDown numericUpDown6;
-        private System.Windows.Forms.CheckBox checkBox6;
-        private System.Windows.Forms.NumericUpDown numericUpDown7;
-        private System.Windows.Forms.CheckBox checkBox7;
-        private System.Windows.Forms.NumericUpDown numericUpDown8;
-        private System.Windows.Forms.CheckBox checkBox8;
+        private System.Windows.Forms.NumericUpDown Panel3RewardExperiencePotionValue;
+        private System.Windows.Forms.CheckBox Panel3RewardExperiencePotion;
+        private System.Windows.Forms.NumericUpDown Panel3RewardExperienceValue;
+        private System.Windows.Forms.CheckBox Panel3RewardExperience;
+        private System.Windows.Forms.NumericUpDown Panel3Reward100ScrollValue;
+        private System.Windows.Forms.CheckBox Panel3Reward100Scroll;
+        private System.Windows.Forms.NumericUpDown Panel3Reward30ScrollValue;
+        private System.Windows.Forms.CheckBox Panel3Reward30Scroll;
+        private System.Windows.Forms.NumericUpDown Panel3Reward10ScrollValue;
+        private System.Windows.Forms.CheckBox Panel3Reward10Scroll;
+        private System.Windows.Forms.NumericUpDown Panel3RewardProScrollCValue;
+        private System.Windows.Forms.CheckBox Panel3RewardProScrollC;
+        private System.Windows.Forms.NumericUpDown Panel3RewardProScrollZValue;
+        private System.Windows.Forms.CheckBox Panel3RewardProScrollZ;
+        private System.Windows.Forms.NumericUpDown Panel3RewardPhysicalValue;
+        private System.Windows.Forms.CheckBox Panel3RewardPhysical;
+        private System.Windows.Forms.NumericUpDown Panel3RewardProphetScrollCValue;
+        private System.Windows.Forms.CheckBox Panel3RewardProphetScrollC;
+        private System.Windows.Forms.NumericUpDown Panel3RewardBasicScrollCValue;
+        private System.Windows.Forms.CheckBox Panel3RewardSmallEnergyPotion;
         private System.Windows.Forms.Label label12;
-        private System.Windows.Forms.NumericUpDown numericUpDown4;
-        private System.Windows.Forms.CheckBox checkBox4;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
-        private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.NumericUpDown numericUpDown2;
-        private System.Windows.Forms.CheckBox checkBox2;
-        private System.Windows.Forms.NumericUpDown numericUpDown3;
-        private System.Windows.Forms.CheckBox checkBox3;
-        private System.Windows.Forms.NumericUpDown numericUpDown15;
-        private System.Windows.Forms.CheckBox checkBox15;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.NumericUpDown Panel3RewardLowScrollZValue;
+        private System.Windows.Forms.CheckBox Panel3RewardLowScrollZ;
+        private System.Windows.Forms.NumericUpDown Panel3RewardEnergyValue;
+        private System.Windows.Forms.CheckBox Panel3RewardEnergy;
+        private System.Windows.Forms.NumericUpDown Panel3RewardCoinValue;
+        private System.Windows.Forms.CheckBox Panel3RewardCoin;
+        private System.Windows.Forms.NumericUpDown Panel3RewardSmallEnergyPotionValue;
+        private System.Windows.Forms.CheckBox Panel3RewardBasicScrollC;
+        private System.Windows.Forms.NumericUpDown Panel3RewardIronValue;
+        private System.Windows.Forms.CheckBox Panel3RewardIron;
+        private System.Windows.Forms.ComboBox Panel3WeaponRole;
+        private System.Windows.Forms.Button Panel3WeaponRoleDel;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.NumericUpDown numericUpDown17;
+        private System.Windows.Forms.NumericUpDown Panel3SegmentMax;
         private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.NumericUpDown numericUpDown16;
-        private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.NumericUpDown Panel3SegmentMin;
+        private System.Windows.Forms.ComboBox Panel3WeaponRoleList;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button Panel3WeaponRoleAdd;
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button button6;

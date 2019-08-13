@@ -4,3 +4,6 @@ WorkingTimeRecodderLog
 ErrorRate
 .vscode
 box
+*.csproj
+bin
+obj
