@@ -15,7 +15,7 @@ namespace configurationView
 {
     public partial class MonsterAdd : Form
     {
-        string monster_path = MainForm.main_path + "monster_list.json";
+        string monster_path = MainForm.monster_path;
         JArray array;
         JObject json;
         string path;
