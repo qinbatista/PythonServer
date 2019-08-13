@@ -1,5 +1,6 @@
 {
 	"max_enter_time":3,
+	"max_upload_damage":200000,
 	"boss1" :
 	{
 		"life_value":10000

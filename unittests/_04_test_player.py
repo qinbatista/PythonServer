@@ -232,13 +232,14 @@ def redeem_all_nonce(unique_id: str, type_list: list, nonce_list: list):
 	result = requests.post('http://localhost:8004/redeem_all_nonce', data={"world": 0, 'unique_id': unique_id, "type_list": type_list, "nonce_list": nonce_list})
 	print(str(result.text))
 
-def leave_world_boss_stage(unique_id: str, type_list: list, nonce_list: list):
-	result = requests.post('http://localhost:8006/leave_world_boss_stage', data={"world": 0, 'unique_id': unique_id, "type_list": type_list, "nonce_list": nonce_list})
+def leave_world_boss_stage(unique_id: str,total_damage:int):
+	result = requests.post('http://localhost:8006/leave_world_boss_stage', data={"world": 0, 'unique_id': unique_id, "total_damage": total_damage})
 	print(str(result.text))
 
 def check_boss_status(unique_id: str):
 	result = requests.post('http://localhost:8004/check_boss_status', data={"world": 0, 'unique_id': unique_id})
 	print(str(result.text))
+
 def enter_world_boss_stage(unique_id: str):
 	result = requests.post('http://localhost:8004/enter_world_boss_stage', data={"world": 0, 'unique_id': unique_id})
 	print(str(result.text))

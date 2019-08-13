@@ -2172,6 +2172,9 @@ class GameManager:
 				return self._message_typesetting(95, 'operation error')
 
 	async def _enter_world_boss_stage(self, world: int, unique_id: str):
+		#0 enter world success
+		#1 enter world success and you had never enter before
+		#99 Insufficient energy
 		data = await self._execute_statement(world,f'select world_boss_enter_time,world_boss_remaining_times from player where unique_id ="{unique_id}"')
 		current_time1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		current_time2 = (datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d 00:00:00")
@@ -2191,7 +2194,7 @@ class GameManager:
 					'world_boss_remaining_times' : 1
 				}
 			}
-			return self._message_typesetting(status=99, message="enter boss world success, it is first time to enter boss world", data=message_dic)
+			return self._message_typesetting(status=1, message="enter boss world success, it is first time to enter boss world", data=message_dic)
 		else:
 			delta_time = datetime.strptime(current_time1, '%Y-%m-%d %H:%M:%S') - datetime.strptime(data[0][0], '%Y-%m-%d %H:%M:%S')
 			my_time = int(delta_time.total_seconds()/60/60/24)
@@ -2213,15 +2216,17 @@ class GameManager:
 						'world_boss_remaining_times' : 1
 					}
 				}
-				return self._message_typesetting(status=99, message="enter bass world success",data = message_dic)
+				return self._message_typesetting(status=0, message="enter bass world success",data = message_dic)
 			else:
 				return self._message_typesetting(status=99, message="energy is not enough")
 
-	async def _leave_world_boss_stage(self, world: int, unique_id: str, total_damage:int, ):
-		
+	async def _leave_world_boss_stage(self, world: int, unique_id: str, total_damage: int):
+		if total_damage>=self._max_upload_damage:
+			return self._message_typesetting(status=99, message="abnormal data")
 		return self._message_typesetting(status=99, message="type_list error")
 
 	async def _check_boss_status(self,world: int,unique_id: str):
+		#0 return boss info success
 		data = await self._execute_statement(world,f'select world_boss_enter_time,world_boss_remaining_times from player where unique_id ="{unique_id}"')
 		if data[0][0]=="":
 			current_time1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -2417,6 +2422,7 @@ class GameManager:
 			self._is_first_start = False
 			self._world_boss = d['world_boss']
 			self._max_enter_time = self._world_boss['max_enter_time']
+			self._max_upload_damage = self._world_boss['max_upload_damage']
 			self._boss1_life = self._boss1_life_remaining = self._world_boss["boss1"]["life_value"]
 			self._boss2_life = self._boss2_life_remaining = self._world_boss["boss2"]["life_value"]
 			self._boss3_life = self._boss3_life_remaining = self._world_boss["boss3"]["life_value"]
