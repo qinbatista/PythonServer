@@ -88,7 +88,10 @@ def create_player_table() -> None:
         "friend_gift": "INT(11) NULL DEFAULT(0) COMMENT '朋友礼物'",
         "prophet_summon_scroll": "INT(11) NULL DEFAULT(0) COMMENT '先知召唤卷轴'",
         "fortune_wheel_ticket_basic": "INT(11) NULL DEFAULT(0) COMMENT '低级幸运循环票'",
-        "fortune_wheel_ticket_pro": "INT(11) NULL DEFAULT(0) COMMENT '高级幸运循环票'"
+        "fortune_wheel_ticket_pro": "INT(11) NULL DEFAULT(0) COMMENT '高级幸运循环票'",
+        "familyid": "VARCHAR(64) NULL DEFAULT '' COMMENT '家族ID'",
+        "world_boss_enter_time": "VARCHAR(64) NULL DEFAULT '' COMMENT '进入世界boss的时间'",
+        "world_boss_remaining_times": "INT(6) NULL DEFAULT(0) COMMENT '进入世界boss的剩余次数'"
     }
     sql_table_constructor(table_name=table_name, table_dict=table_dict)
 
@@ -215,8 +218,6 @@ def create_user_table() -> None:
 
 
 def create_dark_market_table() -> None:
-    for target_list in expression_list:
-        pass
     """
     创建武器背包表以及武器信息表
     """
@@ -316,6 +317,7 @@ def test():
     print("d:" + str(d))
     print("fetchall:" + str(cursor.fetchall()))
     db.commit()
+
 def create_sensitive():
     if os.path.isfile("/Users/batista/MyProject/lukseunserversys/Utility/SensitiveVocabulary.txt"):
         file_object = open("/Users/batista/MyProject/lukseunserversys/Utility/SensitiveVocabulary.txt")
@@ -340,7 +342,7 @@ def create_sensitive():
                 f.write(i)
 if __name__ == '__main__':
     # 创建数据库表
-    # create_player_table()
+    create_player_table()
     # create_skill_table()
     # create_weapon_table()
     # create_armor_table()
