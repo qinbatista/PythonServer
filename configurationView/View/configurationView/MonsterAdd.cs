@@ -15,7 +15,7 @@ namespace configurationView
 {
     public partial class MonsterAdd : Form
     {
-        string monster_path = MainForm.monster_path;
+        string view_configuration_path = MainForm.view_configuration_path;
         JArray array;
         JObject json;
         string path;
@@ -29,7 +29,7 @@ namespace configurationView
             this.path = path;
             this.comboBox = comboBox;
 
-            StreamReader stream = File.OpenText(monster_path);
+            StreamReader stream = File.OpenText(view_configuration_path);
             JsonTextReader reader = new JsonTextReader(stream);
             JObject monster = (JObject)JToken.ReadFrom(reader);
             MonstersName.Items.Clear();

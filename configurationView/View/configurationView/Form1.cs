@@ -30,7 +30,7 @@ namespace configurationView
         string current_version = "0";
         string old_version = "0";
         string new_version;
-        public static string monster_path = main_path + "monster_list.json";
+        public static string view_configuration_path = main_path + "view_configuration.json";
         JObject json;
         string json_version = main_path + "config_timer_setting.json";
         /// <summary>
@@ -693,7 +693,7 @@ namespace configurationView
 
 
                         Panel2OptionalMonsterType.Items.Clear();
-                        stream = File.OpenText(monster_path);
+                        stream = File.OpenText(view_configuration_path);
                         reader = new JsonTextReader(stream);
                         foreach (var item in JToken.ReadFrom(reader)["monsters"])
                         {
@@ -778,11 +778,131 @@ namespace configurationView
 
         private void Panel3SelectSatge_SelectedIndexChanged(object sender, EventArgs e)
         {
-            JObject consumption = (JObject)public_json_data["consumption"];
-            JObject reward = (JObject)public_json_data["reward"];
-            foreach(var item in consumption)
+            int stage_value = int.Parse(Panel3SelectSatge.SelectedItem.ToString());
+            JObject consumption = (JObject)public_json_data["consumption"][Panel3SelectSatge.SelectedItem.ToString()];
+            JObject reward = (JObject)public_json_data["reward"][Panel3SelectSatge.SelectedItem.ToString()];
+            foreach (var item in consumption)
             {
+                switch (item.Key)
+                {
+                    case "iron":
+                        {
+                            Panel3Iron.Checked = true;
+                            Panel3IronValue.Value = (decimal)item.Value;
+                        }break;
+                    case "coin":
+                        {
+                            Panel3Coin.Checked = true;
+                            Panel3CoinValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "energy":
+                        {
+                            Panel3Energy.Checked = true;
+                            Panel3EnergyValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                }
+            }
+            if (stage_value % 10 == 0)
+            {
+                foreach (var item in reward)
+                {
 
+                }
+            }
+            else
+            {
+                foreach (var item in reward)
+                {
+                    switch (item.Key)
+                    {
+                        case "small_energy_potion":
+                            {
+                                Panel3RewardSmallEnergyPotion.Checked = true;
+                                Panel3RewardSmallEnergyPotionValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "coin":
+                            {
+                                Panel3RewardCoin.Checked = true;
+                                Panel3RewardCoinValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "energy":
+                            {
+                                Panel3RewardEnergy.Checked = true;
+                                Panel3RewardEnergyValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "fortune_wheel_ticket_basic": // 低级转卷轴
+                            {
+                                Panel3RewardLowScrollZ.Checked = true;
+                                Panel3RewardLowScrollZValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "fortune_wheel_ticket_pro": // 高级转卷轴
+                            {
+                                Panel3RewardProScrollZ.Checked = true;
+                                Panel3RewardProScrollZValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "iron":
+                            {
+                                Panel3RewardIron.Checked = true;
+                                Panel3RewardIronValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "experience": // 经验
+                            {
+                                Panel3RewardExperience.Checked = true;
+                                Panel3RewardExperienceValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "basic_summon_scroll": // 基础抽卷轴
+                            {
+                                Panel3RewardBasicScrollC.Checked = true;
+                                Panel3RewardBasicScrollCValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "prophet_summon_scroll": // 先知抽卷轴
+                            {
+                                Panel3RewardProphetScrollC.Checked = true;
+                                Panel3RewardProphetScrollCValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "pro_summon_scroll": // 高级抽卷轴
+                            {
+                                Panel3RewardProScrollC.Checked = true;
+                                Panel3RewardProScrollCValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "experience_potion": // 经验药水
+                            {
+                                Panel3RewardExperiencePotion.Checked = true;
+                                Panel3RewardExperiencePotionValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "skill_scroll_10": // 低级卷轴
+                            {
+                                Panel3Reward10Scroll.Checked = true;
+                                Panel3Reward10ScrollValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "skill_scroll_30": // 中级卷轴
+                            {
+                                Panel3Reward30Scroll.Checked = true;
+                                Panel3Reward30ScrollValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                        case "skill_scroll_100": // 高级卷轴
+                            {
+                                Panel3Reward100Scroll.Checked = true;
+                                Panel3Reward100ScrollValue.Value = (decimal)item.Value;
+                            }
+                            break;
+                    }
+                }
             }
         }
     }
