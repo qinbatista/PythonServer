@@ -277,6 +277,7 @@ def create_leader_board_table() -> None:
     table_name = "leader_board"
     table_dict = {
         "unique_id": "VARCHAR(128) NOT NULL COMMENT '玩家唯一标识'",
+        "once_top_damage": "INT(255) UNSIGNED NULL DEFAULT (0) COMMENT '用户打世界Boss的单次伤害值'",
         "world_boss_damage": "INT(255) UNSIGNED NULL DEFAULT (0) COMMENT '用户打世界Boss的累计伤害值'"
     }
     sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id)")

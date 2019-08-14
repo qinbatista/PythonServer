@@ -194,6 +194,11 @@ def get_new_mail(unique_id: str):
 	return result.json()['data']['mail'][0]['data']['nonce']
 
 
+def get_all_mail(unique_id: str):
+	result = requests.post('http://localhost:8004/get_new_mail', data={"world": 0, 'unique_id': unique_id})
+	print(str(result.text))
+
+
 def redeem_nonce(unique_id: str, nonce: str):
 	result = requests.post('http://localhost:8004/redeem_nonce', data={"world": 0, 'unique_id': unique_id, "nonce": nonce})
 	print(str(result.text))
@@ -343,14 +348,17 @@ if __name__ == "__main__":
 	# upgrade_armor(1)
 	# random_gift_segment()
 	# start ########################################################
+	get_all_mail(unique_id="1")
 	# send_friend_gift(unique_id="4", friend_name="a")
-	# nonce = get_new_mail(unique_id="6")
-	# redeem_nonce(unique_id="6", nonce=nonce)
+	# nonce = get_new_mail(unique_id="1")
+	# get_all_mail(unique_id="1")
+	# redeem_nonce(unique_id="1", nonce="5238947786014068689996630933856144383091275996565077486443260087176438651269")
+	# get_all_mail(unique_id="1")
 
 	# request_friend(unique_id="4", friend_name="a")
 	# nonce = get_new_mail(unique_id="1")
 	# response_friend(unique_id="1", nonce=nonce)
-	# response_friend(unique_id="1", nonce="64942980375638432564912061770566384876054041984556040131926509775589729375588")
+	# response_friend(unique_id="1", nonce="32963693688928993319733151846953915999978396660497710378095972836181446004813")
 
 	# request_friend(unique_id="1", friend_name="g")
 	# request_friend(unique_id="2", friend_name="g")
@@ -366,7 +374,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	all_function(unique_id="1")
+	# all_function(unique_id="1")
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")

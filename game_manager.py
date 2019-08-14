@@ -1562,6 +1562,7 @@ class GameManager:
 		# 0 - successfully redeemed
 		# 99 - database operation error
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['gift'], 'nonce' : [nonce]})
+		# requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
 		data = response.json()
 		if data[nonce]['status'] != 0:
 			return self._message_typesetting(98, 'nonce already redeemed')
@@ -1572,7 +1573,7 @@ class GameManager:
 			return self._message_typesetting(99, 'database operating error')
 		sql_str = f'SELECT {items} FROM player WHERE unique_id = "{unique_id}";'
 		quantities = (await self._execute_statement(world, sql_str))[0][0]
-		return self._message_typesetting(0, 'successfully redeemed', {'remaining' : {items : quantities}})
+		return self._message_typesetting(0, 'successfully redeemed', {'remaining' : {"nonce": nonce, items : quantities}})
 
 	async def redeem_all_nonce(self, world: int, unique_id: str, type_list: [str], nonce_list: [str]) -> dict:
 		# success -> 0
@@ -1652,7 +1653,6 @@ class GameManager:
 
 		if await self._execute_statement_update(world=world, statement=f"insert into friend (unique_id, friend_id, friend_name) values ('{unique_id}', '{friend_id}', '{friend_name}')") == 0:
 			return self._message_typesetting(status=95, message="database operating error")
-
 		return self._message_typesetting(status=0, message="request friend successfully")
 
 	async def response_friend(self, world: int, unique_id: str, nonce: str) -> dict:
@@ -1666,6 +1666,7 @@ class GameManager:
 		try:
 			friend_name = data[nonce]["sender"]
 			friend_id = data[nonce]["uid_sender"]
+			# requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
 		except:
 			return self._message_typesetting(status=97, message="nonce error")
 
@@ -1682,7 +1683,7 @@ class GameManager:
 		if update_code == 0 or insert_code == 0:
 			# print(f"update_code:{update_code}, update_str:{update_str}\ninsert_code:{insert_code}, insert_str:{insert_str}")
 			return self._message_typesetting(status=98, message="database operating error")
-		return self._message_typesetting(status=0, message="Add friends to success", data={"remaining": {"friend_name": friend_name, "become_friend_time": current_time}})
+		return self._message_typesetting(status=0, message="Add friends to success", data={"remaining": {"nonce": nonce}})
 
 #############################################################################
 #						End Friend Module Functions							#
@@ -2907,12 +2908,12 @@ async def _get_all_mail(request: web.Request) -> web.Response:
 
 
 @ROUTES.post('/delete_mail')
-async def _get_all_mail(request: web.Request) -> web.Response:
+async def _delete_mail(request: web.Request) -> web.Response:
 	return _json_response(json.loads(requests.post('http://localhost:8020/delete_mail', data=await request.post()).text))
 
 
 @ROUTES.post('/delete_all_mail')
-async def _get_all_mail(request: web.Request) -> web.Response:
+async def _delete_all_mail(request: web.Request) -> web.Response:
 	return _json_response(json.loads(requests.post('http://localhost:8020/delete_all_mail', data=await request.post()).text))
 
 

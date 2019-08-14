@@ -86,7 +86,7 @@ class MailServer:
 					folder.discard(mid)
 		except mailbox.NoSuchMailboxError:
 			pass
-		return self._message_typesetting(0, 'successfully deleted message')
+		return self._message_typesetting(status=0, message='successfully deleted message', data={"nonce": nonce})
 
 
 	def delete_all_mail(self, world: int, uid: str):
