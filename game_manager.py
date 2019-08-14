@@ -18,6 +18,7 @@ from datetime import datetime, timedelta
 class GameManager:
 	def __init__(self):
 		self._pools = [tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')]
+		self._is_first_start = True
 		self._refresh_configuration()
 		self._start_timer(600)
 
@@ -2170,6 +2171,89 @@ class GameManager:
 			else:
 				return self._message_typesetting(95, 'operation error')
 
+	async def _enter_world_boss_stage(self, world: int, unique_id: str):
+		#0 enter world success
+		#1 enter world success and you had never enter before
+		#99 Insufficient energy
+		data = await self._execute_statement(world,f'select world_boss_enter_time,world_boss_remaining_times from player where unique_id ="{unique_id}"')
+		current_time1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		current_time2 = (datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d 00:00:00")
+		d1 = datetime.strptime(current_time1, '%Y-%m-%d %H:%M:%S')
+		d2 = datetime.strptime(current_time2, '%Y-%m-%d %H:%M:%S')
+		if data[0][0]=="":
+			data = await self._execute_statement_update(world,f'UPDATE player SET world_boss_enter_time ="{current_time1}",world_boss_remaining_times ="{str(self._max_enter_time-1)}" WHERE unique_id = "{unique_id}"')
+			message_dic={
+				'remaining' :
+				{
+					"world_boss_enter_time":current_time1,
+					'world_boss_remaining_times' : self._max_enter_time-1,
+				},
+				'reward':
+				{
+					"world_boss_enter_time":(d2-d1).seconds,
+					'world_boss_remaining_times' : 1
+				}
+			}
+			return self._message_typesetting(status=1, message="enter boss world success, it is first time to enter boss world", data=message_dic)
+		else:
+			delta_time = datetime.strptime(current_time1, '%Y-%m-%d %H:%M:%S') - datetime.strptime(data[0][0], '%Y-%m-%d %H:%M:%S')
+			my_time = int(delta_time.total_seconds()/60/60/24)
+			if my_time>=1:
+				world_boss_remaining_times = self._max_enter_time
+			else:
+				world_boss_remaining_times = data[0][1]
+			if world_boss_remaining_times-1>=0:
+				data = await self._execute_statement_update(world,f'UPDATE player SET world_boss_enter_time ="{current_time1}",world_boss_remaining_times ="{str(int(world_boss_remaining_times)-1)}" WHERE unique_id = "{unique_id}"')
+				message_dic={
+					'remaining' :
+					{
+						"world_boss_enter_time":current_time1,
+						'world_boss_remaining_times' : world_boss_remaining_times-1,
+					},
+					'reward':
+					{
+						"world_boss_enter_time":(d2-d1).seconds,
+						'world_boss_remaining_times' : 1
+					}
+				}
+				return self._message_typesetting(status=0, message="enter bass world success",data = message_dic)
+			else:
+				return self._message_typesetting(status=99, message="energy is not enough")
+
+	async def _leave_world_boss_stage(self, world: int, unique_id: str, total_damage: int):
+		if total_damage>=self._max_upload_damage:
+			return self._message_typesetting(status=99, message="abnormal data")
+		return self._message_typesetting(status=99, message="type_list error")
+
+	async def _check_boss_status(self,world: int,unique_id: str):
+		#0 return boss info success
+		data = await self._execute_statement(world,f'select world_boss_enter_time,world_boss_remaining_times from player where unique_id ="{unique_id}"')
+		if data[0][0]=="":
+			current_time1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+			data = await self._execute_statement_update(world,f'UPDATE player SET world_boss_enter_time ="{current_time1}",world_boss_remaining_times ="{str(self._max_enter_time)}" WHERE unique_id = "{unique_id}"')
+		current_time1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		current_time2 = (datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d 00:00:00")
+		d1 = datetime.strptime(current_time1, '%Y-%m-%d %H:%M:%S')
+		d2 = datetime.strptime(current_time2, '%Y-%m-%d %H:%M:%S')
+		message_dic = {
+					'remaining' :
+					{
+						'world_boss_enter_time':data[0][0],
+						'world_boss_remaining_times':(d2-d1).seconds,
+						'boss1' : "%.2f" %(int(self._boss1_life_remaining)/int(self._boss1_life)),
+						'boss2' : "%.2f" %(int(self._boss2_life_remaining)/int(self._boss2_life)),
+						'boss3' : "%.2f" %(int(self._boss3_life_remaining)/int(self._boss3_life)),
+						"boss4" : "%.2f" %(int(self._boss4_life_remaining)/int(self._boss4_life)),
+						"boss5" : "%.2f" %(int(self._boss5_life_remaining)/int(self._boss5_life)),
+						'boss6' : "%.2f" %(int(self._boss6_life_remaining)/int(self._boss6_life)),
+						'boss7' : "%.2f" %(int(self._boss7_life_remaining)/int(self._boss7_life)),
+						'boss8' : "%.2f" %(int(self._boss8_life_remaining)/int(self._boss8_life)),
+						"boss9" : "%.2f" %(int(self._boss9_life_remaining)/int(self._boss9_life)),
+						"boss10": "%.2f" %(int(self._boss10_life_remaining)/int(self._boss10_life))
+					}
+				}
+		return self._message_typesetting(status=0, message="you get all boss message",data= message_dic)
+
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, f"SELECT energy, recover_time FROM player WHERE unique_id='{unique_id}';")
 		return int(data[0][0]), data[0][1]
@@ -2317,6 +2401,9 @@ class GameManager:
 		"""
 		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
+	def firstDayOfMonth(self, dt):
+		return (dt + timedelta(days= -dt.day + 1)).replace(hour=0, minute=0, second=0, microsecond=0)
+
 	def _refresh_configuration(self):
 		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
@@ -2331,6 +2418,21 @@ class GameManager:
 		self._player = d['player']
 		self._hang_reward_list = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
+		if(self.firstDayOfMonth(datetime.today()).day == datetime.today().day) or self._is_first_start == True:
+			self._is_first_start = False
+			self._world_boss = d['world_boss']
+			self._max_enter_time = self._world_boss['max_enter_time']
+			self._max_upload_damage = self._world_boss['max_upload_damage']
+			self._boss1_life = self._boss1_life_remaining = self._world_boss["boss1"]["life_value"]
+			self._boss2_life = self._boss2_life_remaining = self._world_boss["boss2"]["life_value"]
+			self._boss3_life = self._boss3_life_remaining = self._world_boss["boss3"]["life_value"]
+			self._boss4_life = self._boss4_life_remaining = self._world_boss["boss4"]["life_value"]
+			self._boss5_life = self._boss5_life_remaining = self._world_boss["boss5"]["life_value"]
+			self._boss7_life = self._boss7_life_remaining = self._world_boss["boss7"]["life_value"]
+			self._boss8_life = self._boss8_life_remaining = self._world_boss["boss8"]["life_value"]
+			self._boss9_life = self._boss9_life_remaining = self._world_boss["boss9"]["life_value"]
+			self._boss6_life = self._boss6_life_remaining = self._world_boss["boss6"]["life_value"]
+			self._boss10_life = self._boss10_life_remaining = self._world_boss["boss10"]["life_value"]
 
 
 		result = requests.get('http://localhost:8000/get_stage_reward_config')
@@ -2902,6 +3004,20 @@ async def _level_enemy_layouts_config(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).level_enemy_layouts_config(int(post['world']), post['unique_id'])
 	return _json_response(result)
+
+@ROUTES.post('/check_boss_status')
+async def _check_boss_status(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._check_boss_status(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/enter_world_boss_stage')
+async def _enter_world_boss_stage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._enter_world_boss_stage(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
 
 def get_config() -> configparser.ConfigParser:
 	'''

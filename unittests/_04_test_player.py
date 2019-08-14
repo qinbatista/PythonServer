@@ -232,7 +232,17 @@ def redeem_all_nonce(unique_id: str, type_list: list, nonce_list: list):
 	result = requests.post('http://localhost:8004/redeem_all_nonce', data={"world": 0, 'unique_id': unique_id, "type_list": type_list, "nonce_list": nonce_list})
 	print(str(result.text))
 
+def leave_world_boss_stage(unique_id: str,total_damage:int):
+	result = requests.post('http://localhost:8006/leave_world_boss_stage', data={"world": 0, 'unique_id': unique_id, "total_damage": total_damage})
+	print(str(result.text))
 
+def check_boss_status(unique_id: str):
+	result = requests.post('http://localhost:8004/check_boss_status', data={"world": 0, 'unique_id': unique_id})
+	print(str(result.text))
+
+def enter_world_boss_stage(unique_id: str):
+	result = requests.post('http://localhost:8004/enter_world_boss_stage', data={"world": 0, 'unique_id': unique_id})
+	print(str(result.text))
 def test():
 	s22k = "999"
 	s21k = "939"
@@ -346,7 +356,7 @@ if __name__ == "__main__":
 	# send_friend_gift(unique_id="1", friend_name="g")
 	# send_friend_gift(unique_id="2", friend_name="g")
 	# send_friend_gift(unique_id="3", friend_name="g")
-	send_all_friend_gift(unique_id="1")
+	# send_all_friend_gift(unique_id="1")
 
 	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
 	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
@@ -354,3 +364,6 @@ if __name__ == "__main__":
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
 	# all_function(unique_id="4")
+	# check_boss_status(unique_id="4")
+	check_boss_status(unique_id="4")
+	# enter_world_boss_stage(unique_id="4")
