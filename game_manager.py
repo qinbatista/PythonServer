@@ -2175,7 +2175,7 @@ class GameManager:
 	async def _enter_world_boss_stage(self, world: int, unique_id: str):
 		#0 enter world success
 		#1 enter world success and you had never enter before
-		#99 Insufficient energy
+		#99 Insufficient enter ticket
 		data = await self._execute_statement(world,f'select world_boss_enter_time,world_boss_remaining_times from player where unique_id ="{unique_id}"')
 		current_time1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		current_time2 = (datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d 00:00:00")
@@ -2222,9 +2222,37 @@ class GameManager:
 				return self._message_typesetting(status=99, message="energy is not enough")
 
 	async def _leave_world_boss_stage(self, world: int, unique_id: str, total_damage: int):
+		# 0 challenge success
 		if total_damage>=self._max_upload_damage:
 			return self._message_typesetting(status=99, message="abnormal data")
-		return self._message_typesetting(status=99, message="type_list error")
+		else:
+			for i in range(0,10):
+				if self._boss_life_remaining[i]>0:
+					self._boss_life_remaining[i] = self._boss_life_remaining[i]-total_damage
+					self._boss_life_remaining[i] = 0 if self._boss_life_remaining[i]<=0 else self._boss_life_remaining[i]
+					data = await self._execute_statement(world,f'select * from leader_board where unique_id ="{unique_id}"')
+					total_damage = data[0][2] if total_damage>data[0][2] else total_damage
+					await self._execute_statement_update(world,f'UPDATE leader_board SET world_boss_damage ="{data[0][2]+total_damage}",once_top_damage ="{total_damage}" WHERE unique_id = "{unique_id}"')
+					break
+				else:
+					self._boss_life_remaining[i] =0
+					continue
+		message_dic = {
+			'remaining' :
+			{
+			'boss1' : "%.2f" %(self._boss_life_remaining[0]/self._boss_life[0]),
+			'boss2' : "%.2f" %(self._boss_life_remaining[1]/self._boss_life[1]),
+			'boss3' : "%.2f" %(self._boss_life_remaining[2]/self._boss_life[2]),
+			"boss4" : "%.2f" %(self._boss_life_remaining[3]/self._boss_life[3]),
+			"boss5" : "%.2f" %(self._boss_life_remaining[4]/self._boss_life[4]),
+			'boss6' : "%.2f" %(self._boss_life_remaining[5]/self._boss_life[5]),
+			'boss7' : "%.2f" %(self._boss_life_remaining[6]/self._boss_life[6]),
+			'boss8' : "%.2f" %(self._boss_life_remaining[7]/self._boss_life[7]),
+			"boss9" : "%.2f" %(self._boss_life_remaining[8]/self._boss_life[8]),
+			"boss10": "%.2f" %(self._boss_life_remaining[9]/self._boss_life[9])
+			}
+		}
+		return self._message_typesetting(status=0, message="challenge success",data=message_dic)
 
 	async def _check_boss_status(self,world: int,unique_id: str):
 		#0 return boss info success
@@ -2239,18 +2267,18 @@ class GameManager:
 		message_dic = {
 					'remaining' :
 					{
-						'world_boss_enter_time':data[0][0],
+						'world_boss_enter_time':current_time1,
 						'world_boss_remaining_times':(d2-d1).seconds,
-						'boss1' : "%.2f" %(int(self._boss1_life_remaining)/int(self._boss1_life)),
-						'boss2' : "%.2f" %(int(self._boss2_life_remaining)/int(self._boss2_life)),
-						'boss3' : "%.2f" %(int(self._boss3_life_remaining)/int(self._boss3_life)),
-						"boss4" : "%.2f" %(int(self._boss4_life_remaining)/int(self._boss4_life)),
-						"boss5" : "%.2f" %(int(self._boss5_life_remaining)/int(self._boss5_life)),
-						'boss6' : "%.2f" %(int(self._boss6_life_remaining)/int(self._boss6_life)),
-						'boss7' : "%.2f" %(int(self._boss7_life_remaining)/int(self._boss7_life)),
-						'boss8' : "%.2f" %(int(self._boss8_life_remaining)/int(self._boss8_life)),
-						"boss9" : "%.2f" %(int(self._boss9_life_remaining)/int(self._boss9_life)),
-						"boss10": "%.2f" %(int(self._boss10_life_remaining)/int(self._boss10_life))
+						'boss1' : "%.2f" %(int(self._boss_life_remaining[0])/int(self._boss_life[0])),
+						'boss2' : "%.2f" %(int(self._boss_life_remaining[1])/int(self._boss_life[1])),
+						'boss3' : "%.2f" %(int(self._boss_life_remaining[2])/int(self._boss_life[2])),
+						"boss4" : "%.2f" %(int(self._boss_life_remaining[3])/int(self._boss_life[3])),
+						"boss5" : "%.2f" %(int(self._boss_life_remaining[4])/int(self._boss_life[4])),
+						'boss6' : "%.2f" %(int(self._boss_life_remaining[5])/int(self._boss_life[5])),
+						'boss7' : "%.2f" %(int(self._boss_life_remaining[6])/int(self._boss_life[6])),
+						'boss8' : "%.2f" %(int(self._boss_life_remaining[7])/int(self._boss_life[7])),
+						"boss9" : "%.2f" %(int(self._boss_life_remaining[8])/int(self._boss_life[8])),
+						"boss10": "%.2f" %(int(self._boss_life_remaining[9])/int(self._boss_life[9]))
 					}
 				}
 		return self._message_typesetting(status=0, message="you get all boss message",data= message_dic)
@@ -2419,22 +2447,16 @@ class GameManager:
 		self._player = d['player']
 		self._hang_reward_list = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
+		self._boss_life=[]
+		self._boss_life_remaining=[]
 		if(self.firstDayOfMonth(datetime.today()).day == datetime.today().day) or self._is_first_start == True:
 			self._is_first_start = False
 			self._world_boss = d['world_boss']
 			self._max_enter_time = self._world_boss['max_enter_time']
 			self._max_upload_damage = self._world_boss['max_upload_damage']
-			self._boss1_life = self._boss1_life_remaining = self._world_boss["boss1"]["life_value"]
-			self._boss2_life = self._boss2_life_remaining = self._world_boss["boss2"]["life_value"]
-			self._boss3_life = self._boss3_life_remaining = self._world_boss["boss3"]["life_value"]
-			self._boss4_life = self._boss4_life_remaining = self._world_boss["boss4"]["life_value"]
-			self._boss5_life = self._boss5_life_remaining = self._world_boss["boss5"]["life_value"]
-			self._boss7_life = self._boss7_life_remaining = self._world_boss["boss7"]["life_value"]
-			self._boss8_life = self._boss8_life_remaining = self._world_boss["boss8"]["life_value"]
-			self._boss9_life = self._boss9_life_remaining = self._world_boss["boss9"]["life_value"]
-			self._boss6_life = self._boss6_life_remaining = self._world_boss["boss6"]["life_value"]
-			self._boss10_life = self._boss10_life_remaining = self._world_boss["boss10"]["life_value"]
-
+			for i in range(0,10):
+				self._boss_life_remaining.append(self._world_boss["boss"+str(i+1)]["life_value"])
+				self._boss_life.append(self._world_boss["boss"+str(i+1)]["life_value"])
 
 		result = requests.get('http://localhost:8000/get_stage_reward_config')
 		self._get_stage_reward_config_json = result.json()
@@ -3018,7 +3040,11 @@ async def _enter_world_boss_stage(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER'])._enter_world_boss_stage(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
-
+@ROUTES.post('/leave_world_boss_stage')
+async def _leave_world_boss_stage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._leave_world_boss_stage(int(post['world']), post['unique_id'],int(post['total_damage']))
+	return _json_response(result)
 
 def get_config() -> configparser.ConfigParser:
 	'''
