@@ -280,11 +280,14 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/friend_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
 	# print(str(result.text))
-	result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/delete_all_mail', data={"world": 0, 'unique_id': unique_id})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+
+	# result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/delete_all_mail', data={"world": 0, 'unique_id': unique_id})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
+	# print(str(result.text))
+	result = requests.post('http://localhost:8004/delete_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": "d"})
 	print(str(result.text))
 
 """
@@ -356,14 +359,14 @@ if __name__ == "__main__":
 	# send_friend_gift(unique_id="1", friend_name="g")
 	# send_friend_gift(unique_id="2", friend_name="g")
 	# send_friend_gift(unique_id="3", friend_name="g")
-	send_all_friend_gift(unique_id="1")
+	# send_all_friend_gift(unique_id="1")
 
 	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
 	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	# all_function(unique_id="4")
+	all_function(unique_id="1")
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")

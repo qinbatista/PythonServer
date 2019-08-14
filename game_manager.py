@@ -1550,7 +1550,9 @@ class GameManager:
 		friend_id = friend_data[0][0]
 		data = await self._execute_statement(world, f'SELECT * FROM friend WHERE unique_id = "{unique_id}" AND friend_id = "{friend_id}";')
 		if len(data) != 0:
-			data = await self._execute_statement(world, f'DELETE FROM friend WHERE unique_id = "{unique_id}" AND friend_id = "{friend_id}";')
+			await self._execute_statement(world, f'DELETE FROM friend WHERE unique_id = "{unique_id}" AND friend_id = "{friend_id}";')
+			if data[0][5] != "":
+				await self._execute_statement(world, f'DELETE FROM friend WHERE unique_id = "{friend_id}" AND friend_id = "{unique_id}";')
 			return self._message_typesetting(0, 'delete friend success', data={"remaining": {"friend_name": friend_name}})
 		else:
 			return self._message_typesetting(98, 'you do not have this friend')
