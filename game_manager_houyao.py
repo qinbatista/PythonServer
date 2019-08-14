@@ -2579,10 +2579,10 @@ class GameManager:
 			cost_iron = equipment_factory["cost"]["iron"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
 			equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers
-			equipment_storage += equipment_increment
 			if iron_storage // cost_iron < equipment_increment:
 				equipment_increment = iron_storage // cost_iron
 			iron_storage -= equipment_increment * cost_iron
+			equipment_storage += equipment_increment
 			reward.update({"equipment_increment": equipment_increment})
 			reward.update({"equipment_start_time": equipment_start_time})
 			equipment_start_time = current_time
@@ -2686,10 +2686,10 @@ class GameManager:
 			# print(f"equipment==>iron_storage: {iron_storage}")
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
 			equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers
-			equipment_storage += equipment_increment
 			if iron_storage // cost_iron < equipment_increment:
 				equipment_increment = iron_storage // cost_iron
 			iron_storage -= equipment_increment * cost_iron
+			equipment_storage += equipment_increment
 			reward.update({"equipment_increment": equipment_increment})
 			reward.update({"equipment_start_time": equipment_start_time})
 			equipment_start_time = current_time
