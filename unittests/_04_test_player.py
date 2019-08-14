@@ -360,11 +360,11 @@ if __name__ == "__main__":
 	# response_friend(unique_id="1", nonce=nonce)
 	# response_friend(unique_id="1", nonce="32963693688928993319733151846953915999978396660497710378095972836181446004813")
 
-	request_friend(unique_id="1", friend_name="g")
+	request_friend(unique_id="4", friend_name="g")
 	# request_friend(unique_id="2", friend_name="g")
 	# request_friend(unique_id="3", friend_name="g")
 
-	# send_friend_gift(unique_id="1", friend_name="g")
+	send_friend_gift(unique_id="1", friend_name="g")
 	send_friend_gift(unique_id="2", friend_name="g")
 	send_friend_gift(unique_id="3", friend_name="g")
 	# send_all_friend_gift(unique_id="1")

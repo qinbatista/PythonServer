@@ -5,6 +5,7 @@
 
 import json
 import os
+import random
 import pymysql  # 数据库连接
 from DBUtils.PooledDB import PooledDB  # 用于数据库连接池
 
@@ -326,9 +327,11 @@ def test():
     cursor = db.cursor()
     # d = cursor.execute('replace into armor(armor_level1,armor_level2,unique_id,armor_id)values(122+2,444+777,"9","6")')
     # d = cursor.execute('replace into armor(armor_level1,armor_level2,unique_id,armor_id)values()')
-    d = cursor.execute('INSERT into armor(armor_level1,armor_level2,unique_id,armor_id) values(122+2,444+777,"9","6"),(13552,447,"9","7"),(6422,12,"8","7")')
-    print("d:" + str(d))
-    print("fetchall:" + str(cursor.fetchall()))
+    # d = cursor.execute('INSERT into armor(armor_level1,armor_level2,unique_id,armor_id) values(122+2,444+777,"9","6"),(13552,447,"9","7"),(6422,12,"8","7")')
+    # print("d:" + str(d))
+    # print("fetchall:" + str(cursor.fetchall()))
+    for i in range(1, 101):
+        cursor.execute(f"INSERT into leader_board(unique_id, world_boss_damage) values ('{i}', {random.randint(1, 1000_000)})")
     db.commit()
 
 def create_sensitive():
