@@ -1423,25 +1423,24 @@ class GameManager:
 		friends = await self._execute_statement(world, f'SELECT * FROM friend WHERE unique_id = "{unique_id}";')
 		if len(friends) == 0:
 			return self._message_typesetting(99, 'You do not have any friends. FeelsBadMan.')
-		remaining = {'remaining' : {'f_list_id' : [], 'f_name' : [], 'f_level' : [], 'f_recovery_time' : []}}
+		remaining = {'remaining' : {'f_name' : [], 'f_level' : [], 'f_recovery_time' : [], 'become_friend_time' : []}}
 		for friend in friends:
-			remaining['remaining']['f_list_id'].append(friend[1])
 			remaining['remaining']['f_name'].append(friend[2])
 			remaining['remaining']['f_level'].append(friend[3])
 			remaining['remaining']['f_recovery_time'].append(friend[4])
+			remaining['remaining']['become_friend_time'].append(friend[5])
 		return self._message_typesetting(0, 'Got all friends info', remaining)
 
 
 	# TODO optimize the subroutine
 	# TODO check to ensure function is working as expected
 	async def send_all_friend_gift(self, world: int, unique_id: str) -> dict:
-		friends = await self._execute_statement(world, f'SELECT * FROM friend WHERE unique_id = "{unique_id}";')
+		friends = await self._execute_statement(world, f'SELECT * FROM friend WHERE unique_id = "{unique_id}" and become_friend_time != "";')
 		if len(friends) == 0:
 			return self._message_typesetting(98, 'You have no friends. FeelsBadMan.')
-		remaining = {'remaining' : {'f_list_id' : [], 'f_name' : [], 'f_level' : [], 'f_recovery_time' : []}}
+		remaining = {'remaining' : {'f_name' : [], 'f_level' : [], 'f_recovery_time' : []}}
 		for friend in friends:
 			d = await self.send_friend_gift(world, unique_id, friend[2])
-			remaining['remaining']['f_list_id'].append(d['data']['remaining']['f_id'])
 			remaining['remaining']['f_name'].append(d['data']['remaining']['f_name'])
 			remaining['remaining']['f_level'].append(d['data']['remaining']['f_level'])
 			remaining['remaining']['f_recovery_time'].append(d['data']['remaining']['current_time'])
@@ -1450,6 +1449,7 @@ class GameManager:
 	async def send_friend_gift(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
+		# 96 - This person has not become your friend
 		# 97 - Mailbox error
 		# 98 - this person is not your friend anymore
 		# 99 - send friend gift failed, because not cooldown time is not finished
@@ -1469,7 +1469,9 @@ class GameManager:
 		sql_result = await self._execute_statement(world, f'SELECT game_name, level FROM player WHERE unique_id = "{friend_id}";')
 		f_game_name = sql_result[0][0]
 		f_level = sql_result[0][1]
-		if f_recovering_time == '':
+		if mylist[5] == '':
+			return self._message_typesetting(status=96, message="This person has not become your friend")
+		elif f_recovering_time == '':
 			json_data = {
 					'world' : world,
 					'uid_to': friend_id,

@@ -356,7 +356,7 @@ if __name__ == "__main__":
 	# send_friend_gift(unique_id="1", friend_name="g")
 	# send_friend_gift(unique_id="2", friend_name="g")
 	# send_friend_gift(unique_id="3", friend_name="g")
-	# send_all_friend_gift(unique_id="1")
+	send_all_friend_gift(unique_id="1")
 
 	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
 	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
@@ -365,5 +365,5 @@ if __name__ == "__main__":
 	# enter_tower(stage=1)
 	# all_function(unique_id="4")
 	# check_boss_status(unique_id="4")
-	check_boss_status(unique_id="4")
+	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")
