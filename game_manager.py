@@ -2175,7 +2175,10 @@ class GameManager:
 	async def _enter_world_boss_stage(self, world: int, unique_id: str):
 		#0 enter world success
 		#1 enter world success and you had never enter before
+		#98 boss all died
 		#99 Insufficient enter ticket
+		if self._boss_life_remaining[9]<=0:
+			return self._message_typesetting(status=98, message="boss all died")
 		data = await self._execute_statement(world,f'select world_boss_enter_time,world_boss_remaining_times from player where unique_id ="{unique_id}"')
 		current_time1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		current_time2 = (datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d 00:00:00")
@@ -2282,7 +2285,7 @@ class GameManager:
 					}
 				}
 		return self._message_typesetting(status=0, message="you get all boss message",data= message_dic)
-
+	
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, f"SELECT energy, recover_time FROM player WHERE unique_id='{unique_id}';")
 		return int(data[0][0]), data[0][1]
