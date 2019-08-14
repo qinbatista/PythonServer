@@ -365,12 +365,12 @@ if __name__ == "__main__":
 	# request_friend(unique_id="3", friend_name="g")
 
 	# send_friend_gift(unique_id="1", friend_name="g")
-	# send_friend_gift(unique_id="2", friend_name="g")
-	# send_friend_gift(unique_id="3", friend_name="g")
+	send_friend_gift(unique_id="2", friend_name="g")
+	send_friend_gift(unique_id="3", friend_name="g")
 	# send_all_friend_gift(unique_id="1")
-
-	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
-	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
+	# enumerate
+	type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
+	redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
