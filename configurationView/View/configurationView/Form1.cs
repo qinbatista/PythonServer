@@ -717,7 +717,6 @@ namespace configurationView
                         reader = new JsonTextReader(stream);
                         public_json_data.Add("reward", (JObject)JToken.ReadFrom(reader));
 
-                        //
                     }
                     break;
                 case 3: // 挂机奖励：hang_reward_config
@@ -755,7 +754,36 @@ namespace configurationView
 
         private void Panel3SelectSatgeType_SelectedIndexChanged(object sender, EventArgs e)
         {
+            Panel3SelectSatge.Items.Clear();
+            switch (Panel3SelectSatgeType.SelectedIndex)
+            {
+                case 0: // 普通关卡
+                    {
+                        foreach(var item in (JObject)public_json_data["consumption"]["stage"])
+                        {
+                            Panel3SelectSatge.Items.Add(item.Key);
+                        }
+                    }
+                    break;
+                case 1: // 冲塔关卡
+                    {
+                        foreach (var item in (JObject)public_json_data["consumption"]["tower"])
+                        {
+                            Panel3SelectSatge.Items.Add(item.Key);
+                        }
+                    }
+                    break;
+            }
+        }
 
+        private void Panel3SelectSatge_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            JObject consumption = (JObject)public_json_data["consumption"];
+            JObject reward = (JObject)public_json_data["reward"];
+            foreach(var item in consumption)
+            {
+
+            }
         }
     }
 }

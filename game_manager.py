@@ -1464,7 +1464,6 @@ class GameManager:
 		if len(data) == 0:
 			return self._message_typesetting(98, 'this person is not your friend anymore')
 		mylist = list(data[0])
-		f_id = mylist[1]
 		f_recovering_time = mylist[4]
 		sql_result = await self._execute_statement(world, f'SELECT game_name, level FROM player WHERE unique_id = "{friend_id}";')
 		f_game_name = sql_result[0][0]
@@ -1491,10 +1490,9 @@ class GameManager:
 			await self._execute_statement_update(world, f'UPDATE friend SET recovery_time = "{current_time}" WHERE unique_id = "{unique_id}" AND friend_id = "{friend_id}";')
 			data = {
 					'remaining' : {
-						'f_id' : f_id,
-						'f_name' : f_game_name,
-						'f_level' : f_level,
-						'current_time' : current_time
+							'f_name' : f_game_name,
+							'f_level' : f_level,
+							'current_time' : current_time
 						}
 					}
 			return self._message_typesetting(0, 'send friend gift success because of f_recovering time is empty', data)
@@ -1520,20 +1518,18 @@ class GameManager:
 				await self._execute_statement_update(world, f'UPDATE friend SET recovery_time = "{current_time}" WHERE unique_id = "{unique_id}" AND friend_id = "{friend_id}";')
 				data = {
 						'remaining' : {
-							'f_id' : f_id,
-							'f_name' : f_game_name,
-							'f_level' : f_level,
-							'current_time' : current_time
+								'f_name' : f_game_name,
+								'f_level' : f_level,
+								'current_time' : current_time
 							}
 						}
 				return self._message_typesetting(1, 'send friend gift success because of f_recovering time is over 1 day', data)
 			else:
 				data = {
 						'remaining' : {
-							'f_id' : f_id,
-							'f_name' : f_game_name,
-							'f_level' : f_level,
-							'current_time' : f_recovering_time
+								'f_name' : f_game_name,
+								'f_level' : f_level,
+								'current_time' : f_recovering_time
 							}
 						}
 				return self._message_typesetting(99, 'send friend gift failed, because cooldown time is not finished', data)

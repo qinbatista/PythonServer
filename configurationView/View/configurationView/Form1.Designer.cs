@@ -127,9 +127,7 @@
             this.Panel3Show = new System.Windows.Forms.Button();
             this.Panel3Add = new System.Windows.Forms.Button();
             this.Panel3Del = new System.Windows.Forms.Button();
-            this.Panel3RewardIronValue = new System.Windows.Forms.NumericUpDown();
             this.Panel3RewardExperiencePotionValue = new System.Windows.Forms.NumericUpDown();
-            this.Panel3RewardIron = new System.Windows.Forms.CheckBox();
             this.Panel3RewardExperiencePotion = new System.Windows.Forms.CheckBox();
             this.Panel3RewardExperienceValue = new System.Windows.Forms.NumericUpDown();
             this.Panel3RewardExperience = new System.Windows.Forms.CheckBox();
@@ -143,8 +141,8 @@
             this.Panel3RewardProScrollC = new System.Windows.Forms.CheckBox();
             this.Panel3RewardProScrollZValue = new System.Windows.Forms.NumericUpDown();
             this.Panel3RewardProScrollZ = new System.Windows.Forms.CheckBox();
-            this.Panel3RewardPhysicalValue = new System.Windows.Forms.NumericUpDown();
-            this.Panel3RewardPhysical = new System.Windows.Forms.CheckBox();
+            this.Panel3RewardIronValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3RewardIron = new System.Windows.Forms.CheckBox();
             this.Panel3RewardProphetScrollCValue = new System.Windows.Forms.NumericUpDown();
             this.Panel3RewardProphetScrollC = new System.Windows.Forms.CheckBox();
             this.Panel3RewardBasicScrollCValue = new System.Windows.Forms.NumericUpDown();
@@ -167,8 +165,8 @@
             this.Panel3Energy = new System.Windows.Forms.CheckBox();
             this.Panel3CoinValue = new System.Windows.Forms.NumericUpDown();
             this.Panel3Coin = new System.Windows.Forms.CheckBox();
-            this.Panel3PhysicalValue = new System.Windows.Forms.NumericUpDown();
-            this.Panel3Physical = new System.Windows.Forms.CheckBox();
+            this.Panel3IronValue = new System.Windows.Forms.NumericUpDown();
+            this.Panel3Iron = new System.Windows.Forms.CheckBox();
             this.groupBox26 = new System.Windows.Forms.GroupBox();
             this.Panel3List = new System.Windows.Forms.ComboBox();
             this.Panel3AllList = new System.Windows.Forms.ComboBox();
@@ -182,6 +180,7 @@
             this.Panel3RoleSegmentMax = new System.Windows.Forms.NumericUpDown();
             this.label13 = new System.Windows.Forms.Label();
             this.Panel3RoleSegmentMin = new System.Windows.Forms.NumericUpDown();
+            this.label10 = new System.Windows.Forms.Label();
             this.Panel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ColdDownTime)).BeginInit();
@@ -243,7 +242,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.Panel2LV)).BeginInit();
             this.Panel3.SuspendLayout();
             this.groupBox25.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardIronValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperiencePotionValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperienceValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward100ScrollValue)).BeginInit();
@@ -251,7 +249,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward10ScrollValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProScrollCValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProScrollZValue)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardPhysicalValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardIronValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProphetScrollCValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardBasicScrollCValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardLowScrollZValue)).BeginInit();
@@ -261,7 +259,7 @@
             this.groupBox24.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3EnergyValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3CoinValue)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3PhysicalValue)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3IronValue)).BeginInit();
             this.groupBox26.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3WeaponSegmentMin)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3WeaponSegmentMax)).BeginInit();
@@ -302,9 +300,9 @@
             this.Panel1.Controls.Add(this.Panel1AddStage);
             this.Panel1.Controls.Add(this.Panel1DelStage);
             this.Panel1.Controls.Add(this.StageNumber);
-            this.Panel1.Location = new System.Drawing.Point(482, 134);
+            this.Panel1.Location = new System.Drawing.Point(477, 137);
             this.Panel1.Name = "Panel1";
-            this.Panel1.Size = new System.Drawing.Size(10, 13);
+            this.Panel1.Size = new System.Drawing.Size(10, 10);
             this.Panel1.TabIndex = 1;
             this.Panel1.Visible = false;
             // 
@@ -1341,6 +1339,7 @@
             // 
             // groupBox25
             // 
+            this.groupBox25.Controls.Add(this.label10);
             this.groupBox25.Controls.Add(this.label11);
             this.groupBox25.Controls.Add(this.Panel3RoleSegmentMax);
             this.groupBox25.Controls.Add(this.label13);
@@ -1354,9 +1353,7 @@
             this.groupBox25.Controls.Add(this.Panel3Show);
             this.groupBox25.Controls.Add(this.Panel3Add);
             this.groupBox25.Controls.Add(this.Panel3Del);
-            this.groupBox25.Controls.Add(this.Panel3RewardIronValue);
             this.groupBox25.Controls.Add(this.Panel3RewardExperiencePotionValue);
-            this.groupBox25.Controls.Add(this.Panel3RewardIron);
             this.groupBox25.Controls.Add(this.Panel3RewardExperiencePotion);
             this.groupBox25.Controls.Add(this.Panel3RewardExperienceValue);
             this.groupBox25.Controls.Add(this.Panel3RewardExperience);
@@ -1370,8 +1367,8 @@
             this.groupBox25.Controls.Add(this.Panel3RewardProScrollC);
             this.groupBox25.Controls.Add(this.Panel3RewardProScrollZValue);
             this.groupBox25.Controls.Add(this.Panel3RewardProScrollZ);
-            this.groupBox25.Controls.Add(this.Panel3RewardPhysicalValue);
-            this.groupBox25.Controls.Add(this.Panel3RewardPhysical);
+            this.groupBox25.Controls.Add(this.Panel3RewardIronValue);
+            this.groupBox25.Controls.Add(this.Panel3RewardIron);
             this.groupBox25.Controls.Add(this.Panel3RewardProphetScrollCValue);
             this.groupBox25.Controls.Add(this.Panel3RewardProphetScrollC);
             this.groupBox25.Controls.Add(this.Panel3RewardBasicScrollCValue);
@@ -1394,7 +1391,7 @@
             // 
             // Panel3Show
             // 
-            this.Panel3Show.Location = new System.Drawing.Point(497, 244);
+            this.Panel3Show.Location = new System.Drawing.Point(530, 244);
             this.Panel3Show.Name = "Panel3Show";
             this.Panel3Show.Size = new System.Drawing.Size(79, 39);
             this.Panel3Show.TabIndex = 43;
@@ -1403,7 +1400,7 @@
             // 
             // Panel3Add
             // 
-            this.Panel3Add.Location = new System.Drawing.Point(390, 244);
+            this.Panel3Add.Location = new System.Drawing.Point(423, 244);
             this.Panel3Add.Name = "Panel3Add";
             this.Panel3Add.Size = new System.Drawing.Size(79, 39);
             this.Panel3Add.TabIndex = 42;
@@ -1412,24 +1409,12 @@
             // 
             // Panel3Del
             // 
-            this.Panel3Del.Location = new System.Drawing.Point(283, 244);
+            this.Panel3Del.Location = new System.Drawing.Point(316, 244);
             this.Panel3Del.Name = "Panel3Del";
             this.Panel3Del.Size = new System.Drawing.Size(79, 39);
             this.Panel3Del.TabIndex = 41;
             this.Panel3Del.Text = "删除";
             this.Panel3Del.UseVisualStyleBackColor = true;
-            // 
-            // Panel3RewardIronValue
-            // 
-            this.Panel3RewardIronValue.Location = new System.Drawing.Point(114, 28);
-            this.Panel3RewardIronValue.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.Panel3RewardIronValue.Name = "Panel3RewardIronValue";
-            this.Panel3RewardIronValue.Size = new System.Drawing.Size(75, 28);
-            this.Panel3RewardIronValue.TabIndex = 34;
             // 
             // Panel3RewardExperiencePotionValue
             // 
@@ -1442,17 +1427,6 @@
             this.Panel3RewardExperiencePotionValue.Name = "Panel3RewardExperiencePotionValue";
             this.Panel3RewardExperiencePotionValue.Size = new System.Drawing.Size(75, 28);
             this.Panel3RewardExperiencePotionValue.TabIndex = 34;
-            // 
-            // Panel3RewardIron
-            // 
-            this.Panel3RewardIron.AutoSize = true;
-            this.Panel3RewardIron.Location = new System.Drawing.Point(56, 29);
-            this.Panel3RewardIron.Name = "Panel3RewardIron";
-            this.Panel3RewardIron.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.Panel3RewardIron.Size = new System.Drawing.Size(52, 22);
-            this.Panel3RewardIron.TabIndex = 33;
-            this.Panel3RewardIron.Text = "铁";
-            this.Panel3RewardIron.UseVisualStyleBackColor = true;
             // 
             // Panel3RewardExperiencePotion
             // 
@@ -1603,28 +1577,28 @@
             this.Panel3RewardProScrollZ.Text = "高级转卷轴";
             this.Panel3RewardProScrollZ.UseVisualStyleBackColor = true;
             // 
-            // Panel3RewardPhysicalValue
+            // Panel3RewardIronValue
             // 
-            this.Panel3RewardPhysicalValue.Location = new System.Drawing.Point(792, 85);
-            this.Panel3RewardPhysicalValue.Maximum = new decimal(new int[] {
+            this.Panel3RewardIronValue.Location = new System.Drawing.Point(792, 85);
+            this.Panel3RewardIronValue.Maximum = new decimal(new int[] {
             10000,
             0,
             0,
             0});
-            this.Panel3RewardPhysicalValue.Name = "Panel3RewardPhysicalValue";
-            this.Panel3RewardPhysicalValue.Size = new System.Drawing.Size(75, 28);
-            this.Panel3RewardPhysicalValue.TabIndex = 20;
+            this.Panel3RewardIronValue.Name = "Panel3RewardIronValue";
+            this.Panel3RewardIronValue.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RewardIronValue.TabIndex = 20;
             // 
-            // Panel3RewardPhysical
+            // Panel3RewardIron
             // 
-            this.Panel3RewardPhysical.AutoSize = true;
-            this.Panel3RewardPhysical.Location = new System.Drawing.Point(716, 87);
-            this.Panel3RewardPhysical.Name = "Panel3RewardPhysical";
-            this.Panel3RewardPhysical.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.Panel3RewardPhysical.Size = new System.Drawing.Size(70, 22);
-            this.Panel3RewardPhysical.TabIndex = 19;
-            this.Panel3RewardPhysical.Text = "体力";
-            this.Panel3RewardPhysical.UseVisualStyleBackColor = true;
+            this.Panel3RewardIron.AutoSize = true;
+            this.Panel3RewardIron.Location = new System.Drawing.Point(734, 88);
+            this.Panel3RewardIron.Name = "Panel3RewardIron";
+            this.Panel3RewardIron.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3RewardIron.Size = new System.Drawing.Size(52, 22);
+            this.Panel3RewardIron.TabIndex = 19;
+            this.Panel3RewardIron.Text = "铁";
+            this.Panel3RewardIron.UseVisualStyleBackColor = true;
             // 
             // Panel3RewardProphetScrollCValue
             // 
@@ -1816,8 +1790,8 @@
             this.groupBox24.Controls.Add(this.Panel3Energy);
             this.groupBox24.Controls.Add(this.Panel3CoinValue);
             this.groupBox24.Controls.Add(this.Panel3Coin);
-            this.groupBox24.Controls.Add(this.Panel3PhysicalValue);
-            this.groupBox24.Controls.Add(this.Panel3Physical);
+            this.groupBox24.Controls.Add(this.Panel3IronValue);
+            this.groupBox24.Controls.Add(this.Panel3Iron);
             this.groupBox24.Location = new System.Drawing.Point(41, 55);
             this.groupBox24.Name = "groupBox24";
             this.groupBox24.Size = new System.Drawing.Size(1108, 76);
@@ -1871,35 +1845,36 @@
             this.Panel3Coin.Text = "金币";
             this.Panel3Coin.UseVisualStyleBackColor = true;
             // 
-            // Panel3PhysicalValue
+            // Panel3IronValue
             // 
-            this.Panel3PhysicalValue.Location = new System.Drawing.Point(197, 27);
-            this.Panel3PhysicalValue.Maximum = new decimal(new int[] {
+            this.Panel3IronValue.Location = new System.Drawing.Point(197, 27);
+            this.Panel3IronValue.Maximum = new decimal(new int[] {
             10000,
             0,
             0,
             0});
-            this.Panel3PhysicalValue.Name = "Panel3PhysicalValue";
-            this.Panel3PhysicalValue.Size = new System.Drawing.Size(97, 28);
-            this.Panel3PhysicalValue.TabIndex = 1;
+            this.Panel3IronValue.Name = "Panel3IronValue";
+            this.Panel3IronValue.Size = new System.Drawing.Size(97, 28);
+            this.Panel3IronValue.TabIndex = 1;
             // 
-            // Panel3Physical
+            // Panel3Iron
             // 
-            this.Panel3Physical.AutoSize = true;
-            this.Panel3Physical.Location = new System.Drawing.Point(121, 30);
-            this.Panel3Physical.Name = "Panel3Physical";
-            this.Panel3Physical.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.Panel3Physical.Size = new System.Drawing.Size(70, 22);
-            this.Panel3Physical.TabIndex = 0;
-            this.Panel3Physical.Text = "体力";
-            this.Panel3Physical.UseVisualStyleBackColor = true;
+            this.Panel3Iron.AutoSize = true;
+            this.Panel3Iron.Location = new System.Drawing.Point(139, 30);
+            this.Panel3Iron.Name = "Panel3Iron";
+            this.Panel3Iron.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.Panel3Iron.Size = new System.Drawing.Size(52, 22);
+            this.Panel3Iron.TabIndex = 0;
+            this.Panel3Iron.Text = "铁";
+            this.Panel3Iron.UseVisualStyleBackColor = true;
             // 
             // groupBox26
             // 
             this.groupBox26.Controls.Add(this.Panel3List);
+            this.groupBox26.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.groupBox26.Location = new System.Drawing.Point(9, 204);
             this.groupBox26.Name = "groupBox26";
-            this.groupBox26.Size = new System.Drawing.Size(218, 83);
+            this.groupBox26.Size = new System.Drawing.Size(268, 83);
             this.groupBox26.TabIndex = 49;
             this.groupBox26.TabStop = false;
             this.groupBox26.Text = "整十关卡奖励列表";
@@ -1908,36 +1883,16 @@
             // 
             this.Panel3List.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Panel3List.FormattingEnabled = true;
-            this.Panel3List.Items.AddRange(new object[] {
-            "怪物生成设置",
-            "怪物属性：monster_config",
-            "关卡配置：entry_consumables_config / stage_reward_config",
-            "挂机奖励：hang_reward_config",
-            "抽奖奖励：lottery_config",
-            "玩家配置表：player_config",
-            "卷轴升级技能配置信息：skill_level_up_config",
-            "武器配置：weapon_config",
-            "世界参数：world_distribution"});
             this.Panel3List.Location = new System.Drawing.Point(6, 46);
             this.Panel3List.Name = "Panel3List";
-            this.Panel3List.Size = new System.Drawing.Size(206, 26);
+            this.Panel3List.Size = new System.Drawing.Size(256, 29);
             this.Panel3List.TabIndex = 12;
             // 
             // Panel3AllList
             // 
             this.Panel3AllList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Panel3AllList.FormattingEnabled = true;
-            this.Panel3AllList.Items.AddRange(new object[] {
-            "怪物生成设置",
-            "怪物属性：monster_config",
-            "关卡配置：entry_consumables_config / stage_reward_config",
-            "挂机奖励：hang_reward_config",
-            "抽奖奖励：lottery_config",
-            "玩家配置表：player_config",
-            "卷轴升级技能配置信息：skill_level_up_config",
-            "武器配置：weapon_config",
-            "世界参数：world_distribution"});
-            this.Panel3AllList.Location = new System.Drawing.Point(283, 198);
+            this.Panel3AllList.Location = new System.Drawing.Point(316, 198);
             this.Panel3AllList.Name = "Panel3AllList";
             this.Panel3AllList.Size = new System.Drawing.Size(293, 26);
             this.Panel3AllList.TabIndex = 13;
@@ -1947,15 +1902,8 @@
             this.Panel3SelectSatgeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Panel3SelectSatgeType.FormattingEnabled = true;
             this.Panel3SelectSatgeType.Items.AddRange(new object[] {
-            "怪物生成设置",
-            "怪物属性：monster_config",
-            "关卡配置：entry_consumables_config / stage_reward_config",
-            "挂机奖励：hang_reward_config",
-            "抽奖奖励：lottery_config",
-            "玩家配置表：player_config",
-            "卷轴升级技能配置信息：skill_level_up_config",
-            "武器配置：weapon_config",
-            "世界参数：world_distribution"});
+            "普通关卡",
+            "冲塔关卡"});
             this.Panel3SelectSatgeType.Location = new System.Drawing.Point(169, 15);
             this.Panel3SelectSatgeType.Name = "Panel3SelectSatgeType";
             this.Panel3SelectSatgeType.Size = new System.Drawing.Size(300, 26);
@@ -1966,25 +1914,16 @@
             // 
             this.Panel3SelectSatge.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.Panel3SelectSatge.FormattingEnabled = true;
-            this.Panel3SelectSatge.Items.AddRange(new object[] {
-            "怪物生成设置",
-            "怪物属性：monster_config",
-            "关卡配置：entry_consumables_config / stage_reward_config",
-            "挂机奖励：hang_reward_config",
-            "抽奖奖励：lottery_config",
-            "玩家配置表：player_config",
-            "卷轴升级技能配置信息：skill_level_up_config",
-            "武器配置：weapon_config",
-            "世界参数：world_distribution"});
             this.Panel3SelectSatge.Location = new System.Drawing.Point(594, 14);
             this.Panel3SelectSatge.Name = "Panel3SelectSatge";
             this.Panel3SelectSatge.Size = new System.Drawing.Size(300, 26);
             this.Panel3SelectSatge.TabIndex = 52;
+            this.Panel3SelectSatge.SelectedIndexChanged += new System.EventHandler(this.Panel3SelectSatge_SelectedIndexChanged);
             // 
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(630, 202);
+            this.label14.Location = new System.Drawing.Point(649, 202);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(134, 18);
             this.label14.TabIndex = 51;
@@ -1992,7 +1931,7 @@
             // 
             // Panel3WeaponSegmentMin
             // 
-            this.Panel3WeaponSegmentMin.Location = new System.Drawing.Point(765, 197);
+            this.Panel3WeaponSegmentMin.Location = new System.Drawing.Point(784, 197);
             this.Panel3WeaponSegmentMin.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -2047,7 +1986,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(631, 254);
+            this.label13.Location = new System.Drawing.Point(650, 254);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(134, 18);
             this.label13.TabIndex = 55;
@@ -2055,7 +1994,7 @@
             // 
             // Panel3RoleSegmentMin
             // 
-            this.Panel3RoleSegmentMin.Location = new System.Drawing.Point(766, 249);
+            this.Panel3RoleSegmentMin.Location = new System.Drawing.Point(785, 249);
             this.Panel3RoleSegmentMin.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -2064,6 +2003,16 @@
             this.Panel3RoleSegmentMin.Name = "Panel3RoleSegmentMin";
             this.Panel3RoleSegmentMin.Size = new System.Drawing.Size(75, 28);
             this.Panel3RoleSegmentMin.TabIndex = 54;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label10.Location = new System.Drawing.Point(18, 32);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(186, 21);
+            this.label10.TabIndex = 58;
+            this.label10.Text = "普通关卡奖励选项";
             // 
             // MainForm
             // 
@@ -2151,7 +2100,6 @@
             this.Panel3.PerformLayout();
             this.groupBox25.ResumeLayout(false);
             this.groupBox25.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardIronValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperiencePotionValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperienceValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward100ScrollValue)).EndInit();
@@ -2159,7 +2107,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.Panel3Reward10ScrollValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProScrollCValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProScrollZValue)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardPhysicalValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardIronValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardProphetScrollCValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardBasicScrollCValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardLowScrollZValue)).EndInit();
@@ -2170,7 +2118,7 @@
             this.groupBox24.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3EnergyValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3CoinValue)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3PhysicalValue)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3IronValue)).EndInit();
             this.groupBox26.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Panel3WeaponSegmentMin)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3WeaponSegmentMax)).EndInit();
@@ -2280,8 +2228,8 @@
         private System.Windows.Forms.Button Panel3AddSatge;
         private System.Windows.Forms.Button Panel3DelSatge;
         private System.Windows.Forms.GroupBox groupBox24;
-        private System.Windows.Forms.CheckBox Panel3Physical;
-        private System.Windows.Forms.NumericUpDown Panel3PhysicalValue;
+        private System.Windows.Forms.CheckBox Panel3Iron;
+        private System.Windows.Forms.NumericUpDown Panel3IronValue;
         private System.Windows.Forms.NumericUpDown Panel3EnergyValue;
         private System.Windows.Forms.CheckBox Panel3Energy;
         private System.Windows.Forms.NumericUpDown Panel3CoinValue;
@@ -2303,8 +2251,8 @@
         private System.Windows.Forms.CheckBox Panel3RewardProScrollC;
         private System.Windows.Forms.NumericUpDown Panel3RewardProScrollZValue;
         private System.Windows.Forms.CheckBox Panel3RewardProScrollZ;
-        private System.Windows.Forms.NumericUpDown Panel3RewardPhysicalValue;
-        private System.Windows.Forms.CheckBox Panel3RewardPhysical;
+        private System.Windows.Forms.NumericUpDown Panel3RewardIronValue;
+        private System.Windows.Forms.CheckBox Panel3RewardIron;
         private System.Windows.Forms.NumericUpDown Panel3RewardProphetScrollCValue;
         private System.Windows.Forms.CheckBox Panel3RewardProphetScrollC;
         private System.Windows.Forms.NumericUpDown Panel3RewardBasicScrollCValue;
@@ -2318,8 +2266,6 @@
         private System.Windows.Forms.CheckBox Panel3RewardCoin;
         private System.Windows.Forms.NumericUpDown Panel3RewardSmallEnergyPotionValue;
         private System.Windows.Forms.CheckBox Panel3RewardBasicScrollC;
-        private System.Windows.Forms.NumericUpDown Panel3RewardIronValue;
-        private System.Windows.Forms.CheckBox Panel3RewardIron;
         private System.Windows.Forms.Button Panel3Del;
         private System.Windows.Forms.Button Panel3Show;
         private System.Windows.Forms.Button Panel3Add;
@@ -2337,6 +2283,7 @@
         private System.Windows.Forms.NumericUpDown Panel3WeaponSegmentMax;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.NumericUpDown Panel3WeaponSegmentMin;
+        private System.Windows.Forms.Label label10;
     }
 }
 
