@@ -753,5 +753,9 @@ namespace configurationView
             }
         }
 
+        private void Panel3SelectSatgeType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

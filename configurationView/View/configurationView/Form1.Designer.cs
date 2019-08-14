@@ -122,22 +122,11 @@
             this.Panel2MonsterList = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.Panel3 = new System.Windows.Forms.Panel();
-            this.button7 = new System.Windows.Forms.Button();
+            this.Panel3Save = new System.Windows.Forms.Button();
             this.groupBox25 = new System.Windows.Forms.GroupBox();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.button6 = new System.Windows.Forms.Button();
-            this.comboBox3 = new System.Windows.Forms.ComboBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
-            this.Panel3WeaponRoleAdd = new System.Windows.Forms.Button();
-            this.Panel3WeaponRoleDel = new System.Windows.Forms.Button();
-            this.label13 = new System.Windows.Forms.Label();
-            this.Panel3SegmentMax = new System.Windows.Forms.NumericUpDown();
-            this.label10 = new System.Windows.Forms.Label();
-            this.Panel3SegmentMin = new System.Windows.Forms.NumericUpDown();
-            this.Panel3WeaponRoleList = new System.Windows.Forms.ComboBox();
-            this.Panel3WeaponRole = new System.Windows.Forms.ComboBox();
+            this.Panel3Show = new System.Windows.Forms.Button();
+            this.Panel3Add = new System.Windows.Forms.Button();
+            this.Panel3Del = new System.Windows.Forms.Button();
             this.Panel3RewardIronValue = new System.Windows.Forms.NumericUpDown();
             this.Panel3RewardExperiencePotionValue = new System.Windows.Forms.NumericUpDown();
             this.Panel3RewardIron = new System.Windows.Forms.CheckBox();
@@ -169,11 +158,8 @@
             this.Panel3RewardCoin = new System.Windows.Forms.CheckBox();
             this.Panel3RewardSmallEnergyPotionValue = new System.Windows.Forms.NumericUpDown();
             this.Panel3RewardBasicScrollC = new System.Windows.Forms.CheckBox();
-            this.label11 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.Panel3SelectSatgeType = new System.Windows.Forms.ComboBox();
-            this.Panel3SelectSatge = new System.Windows.Forms.ComboBox();
             this.Panel3AddSatge = new System.Windows.Forms.Button();
             this.Panel3DelSatge = new System.Windows.Forms.Button();
             this.groupBox24 = new System.Windows.Forms.GroupBox();
@@ -183,6 +169,19 @@
             this.Panel3Coin = new System.Windows.Forms.CheckBox();
             this.Panel3PhysicalValue = new System.Windows.Forms.NumericUpDown();
             this.Panel3Physical = new System.Windows.Forms.CheckBox();
+            this.groupBox26 = new System.Windows.Forms.GroupBox();
+            this.Panel3List = new System.Windows.Forms.ComboBox();
+            this.Panel3AllList = new System.Windows.Forms.ComboBox();
+            this.Panel3SelectSatgeType = new System.Windows.Forms.ComboBox();
+            this.Panel3SelectSatge = new System.Windows.Forms.ComboBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.Panel3WeaponSegmentMin = new System.Windows.Forms.NumericUpDown();
+            this.lable1 = new System.Windows.Forms.Label();
+            this.Panel3WeaponSegmentMax = new System.Windows.Forms.NumericUpDown();
+            this.label11 = new System.Windows.Forms.Label();
+            this.Panel3RoleSegmentMax = new System.Windows.Forms.NumericUpDown();
+            this.label13 = new System.Windows.Forms.Label();
+            this.Panel3RoleSegmentMin = new System.Windows.Forms.NumericUpDown();
             this.Panel1.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ColdDownTime)).BeginInit();
@@ -244,8 +243,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.Panel2LV)).BeginInit();
             this.Panel3.SuspendLayout();
             this.groupBox25.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3SegmentMax)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3SegmentMin)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardIronValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperiencePotionValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperienceValue)).BeginInit();
@@ -265,6 +262,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.Panel3EnergyValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3CoinValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3PhysicalValue)).BeginInit();
+            this.groupBox26.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3WeaponSegmentMin)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3WeaponSegmentMax)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RoleSegmentMax)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RoleSegmentMin)).BeginInit();
             this.SuspendLayout();
             // 
             // label
@@ -1312,12 +1314,12 @@
             // 
             // Panel3
             // 
-            this.Panel3.Controls.Add(this.button7);
+            this.Panel3.Controls.Add(this.Panel3SelectSatgeType);
+            this.Panel3.Controls.Add(this.Panel3SelectSatge);
+            this.Panel3.Controls.Add(this.Panel3Save);
             this.Panel3.Controls.Add(this.groupBox25);
             this.Panel3.Controls.Add(this.label9);
             this.Panel3.Controls.Add(this.label4);
-            this.Panel3.Controls.Add(this.Panel3SelectSatgeType);
-            this.Panel3.Controls.Add(this.Panel3SelectSatge);
             this.Panel3.Controls.Add(this.Panel3AddSatge);
             this.Panel3.Controls.Add(this.Panel3DelSatge);
             this.Panel3.Controls.Add(this.groupBox24);
@@ -1327,32 +1329,31 @@
             this.Panel3.TabIndex = 11;
             this.Panel3.Visible = false;
             // 
-            // button7
+            // Panel3Save
             // 
-            this.button7.Font = new System.Drawing.Font("宋体", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.button7.Location = new System.Drawing.Point(437, 433);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(300, 68);
-            this.button7.TabIndex = 49;
-            this.button7.Text = "保  存";
-            this.button7.UseVisualStyleBackColor = true;
+            this.Panel3Save.Font = new System.Drawing.Font("宋体", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Panel3Save.Location = new System.Drawing.Point(437, 433);
+            this.Panel3Save.Name = "Panel3Save";
+            this.Panel3Save.Size = new System.Drawing.Size(300, 68);
+            this.Panel3Save.TabIndex = 49;
+            this.Panel3Save.Text = "保  存";
+            this.Panel3Save.UseVisualStyleBackColor = true;
             // 
             // groupBox25
             // 
-            this.groupBox25.Controls.Add(this.button4);
-            this.groupBox25.Controls.Add(this.button5);
-            this.groupBox25.Controls.Add(this.button6);
-            this.groupBox25.Controls.Add(this.comboBox3);
-            this.groupBox25.Controls.Add(this.label14);
-            this.groupBox25.Controls.Add(this.button3);
-            this.groupBox25.Controls.Add(this.Panel3WeaponRoleAdd);
-            this.groupBox25.Controls.Add(this.Panel3WeaponRoleDel);
+            this.groupBox25.Controls.Add(this.label11);
+            this.groupBox25.Controls.Add(this.Panel3RoleSegmentMax);
             this.groupBox25.Controls.Add(this.label13);
-            this.groupBox25.Controls.Add(this.Panel3SegmentMax);
-            this.groupBox25.Controls.Add(this.label10);
-            this.groupBox25.Controls.Add(this.Panel3SegmentMin);
-            this.groupBox25.Controls.Add(this.Panel3WeaponRoleList);
-            this.groupBox25.Controls.Add(this.Panel3WeaponRole);
+            this.groupBox25.Controls.Add(this.Panel3RoleSegmentMin);
+            this.groupBox25.Controls.Add(this.lable1);
+            this.groupBox25.Controls.Add(this.Panel3WeaponSegmentMax);
+            this.groupBox25.Controls.Add(this.label14);
+            this.groupBox25.Controls.Add(this.Panel3WeaponSegmentMin);
+            this.groupBox25.Controls.Add(this.Panel3AllList);
+            this.groupBox25.Controls.Add(this.groupBox26);
+            this.groupBox25.Controls.Add(this.Panel3Show);
+            this.groupBox25.Controls.Add(this.Panel3Add);
+            this.groupBox25.Controls.Add(this.Panel3Del);
             this.groupBox25.Controls.Add(this.Panel3RewardIronValue);
             this.groupBox25.Controls.Add(this.Panel3RewardExperiencePotionValue);
             this.groupBox25.Controls.Add(this.Panel3RewardIron);
@@ -1384,7 +1385,6 @@
             this.groupBox25.Controls.Add(this.Panel3RewardCoin);
             this.groupBox25.Controls.Add(this.Panel3RewardSmallEnergyPotionValue);
             this.groupBox25.Controls.Add(this.Panel3RewardBasicScrollC);
-            this.groupBox25.Controls.Add(this.label11);
             this.groupBox25.Location = new System.Drawing.Point(41, 133);
             this.groupBox25.Name = "groupBox25";
             this.groupBox25.Size = new System.Drawing.Size(1108, 294);
@@ -1392,143 +1392,32 @@
             this.groupBox25.TabStop = false;
             this.groupBox25.Text = "通关奖励";
             // 
-            // button4
+            // Panel3Show
             // 
-            this.button4.Location = new System.Drawing.Point(719, 240);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(79, 39);
-            this.button4.TabIndex = 48;
-            this.button4.Text = "查看";
-            this.button4.UseVisualStyleBackColor = true;
+            this.Panel3Show.Location = new System.Drawing.Point(497, 244);
+            this.Panel3Show.Name = "Panel3Show";
+            this.Panel3Show.Size = new System.Drawing.Size(79, 39);
+            this.Panel3Show.TabIndex = 43;
+            this.Panel3Show.Text = "查看";
+            this.Panel3Show.UseVisualStyleBackColor = true;
             // 
-            // button5
+            // Panel3Add
             // 
-            this.button5.Location = new System.Drawing.Point(600, 240);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(79, 39);
-            this.button5.TabIndex = 47;
-            this.button5.Text = "添加";
-            this.button5.UseVisualStyleBackColor = true;
+            this.Panel3Add.Location = new System.Drawing.Point(390, 244);
+            this.Panel3Add.Name = "Panel3Add";
+            this.Panel3Add.Size = new System.Drawing.Size(79, 39);
+            this.Panel3Add.TabIndex = 42;
+            this.Panel3Add.Text = "添加";
+            this.Panel3Add.UseVisualStyleBackColor = true;
             // 
-            // button6
+            // Panel3Del
             // 
-            this.button6.Location = new System.Drawing.Point(481, 240);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(79, 39);
-            this.button6.TabIndex = 46;
-            this.button6.Text = "删除";
-            this.button6.UseVisualStyleBackColor = true;
-            // 
-            // comboBox3
-            // 
-            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBox3.DropDownWidth = 320;
-            this.comboBox3.FormattingEnabled = true;
-            this.comboBox3.Location = new System.Drawing.Point(128, 246);
-            this.comboBox3.Name = "comboBox3";
-            this.comboBox3.Size = new System.Drawing.Size(300, 26);
-            this.comboBox3.TabIndex = 45;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(74, 250);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(44, 18);
-            this.label14.TabIndex = 44;
-            this.label14.Text = "技能";
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(1017, 194);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(79, 39);
-            this.button3.TabIndex = 43;
-            this.button3.Text = "查看";
-            this.button3.UseVisualStyleBackColor = true;
-            // 
-            // Panel3WeaponRoleAdd
-            // 
-            this.Panel3WeaponRoleAdd.Location = new System.Drawing.Point(922, 194);
-            this.Panel3WeaponRoleAdd.Name = "Panel3WeaponRoleAdd";
-            this.Panel3WeaponRoleAdd.Size = new System.Drawing.Size(79, 39);
-            this.Panel3WeaponRoleAdd.TabIndex = 42;
-            this.Panel3WeaponRoleAdd.Text = "添加";
-            this.Panel3WeaponRoleAdd.UseVisualStyleBackColor = true;
-            // 
-            // Panel3WeaponRoleDel
-            // 
-            this.Panel3WeaponRoleDel.Location = new System.Drawing.Point(827, 194);
-            this.Panel3WeaponRoleDel.Name = "Panel3WeaponRoleDel";
-            this.Panel3WeaponRoleDel.Size = new System.Drawing.Size(79, 39);
-            this.Panel3WeaponRoleDel.TabIndex = 41;
-            this.Panel3WeaponRoleDel.Text = "删除";
-            this.Panel3WeaponRoleDel.UseVisualStyleBackColor = true;
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(633, 204);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(98, 18);
-            this.label13.TabIndex = 40;
-            this.label13.Text = "碎片最大值";
-            // 
-            // Panel3SegmentMax
-            // 
-            this.Panel3SegmentMax.Location = new System.Drawing.Point(734, 199);
-            this.Panel3SegmentMax.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.Panel3SegmentMax.Name = "Panel3SegmentMax";
-            this.Panel3SegmentMax.Size = new System.Drawing.Size(75, 28);
-            this.Panel3SegmentMax.TabIndex = 39;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(442, 204);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(98, 18);
-            this.label10.TabIndex = 38;
-            this.label10.Text = "碎片最小值";
-            // 
-            // Panel3SegmentMin
-            // 
-            this.Panel3SegmentMin.Location = new System.Drawing.Point(545, 199);
-            this.Panel3SegmentMin.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.Panel3SegmentMin.Name = "Panel3SegmentMin";
-            this.Panel3SegmentMin.Size = new System.Drawing.Size(75, 28);
-            this.Panel3SegmentMin.TabIndex = 37;
-            // 
-            // Panel3WeaponRoleList
-            // 
-            this.Panel3WeaponRoleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Panel3WeaponRoleList.DropDownWidth = 320;
-            this.Panel3WeaponRoleList.FormattingEnabled = true;
-            this.Panel3WeaponRoleList.Location = new System.Drawing.Point(257, 200);
-            this.Panel3WeaponRoleList.Name = "Panel3WeaponRoleList";
-            this.Panel3WeaponRoleList.Size = new System.Drawing.Size(171, 26);
-            this.Panel3WeaponRoleList.TabIndex = 36;
-            // 
-            // Panel3WeaponRole
-            // 
-            this.Panel3WeaponRole.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Panel3WeaponRole.DropDownWidth = 320;
-            this.Panel3WeaponRole.FormattingEnabled = true;
-            this.Panel3WeaponRole.Items.AddRange(new object[] {
-            "武器",
-            "角色"});
-            this.Panel3WeaponRole.Location = new System.Drawing.Point(128, 200);
-            this.Panel3WeaponRole.Name = "Panel3WeaponRole";
-            this.Panel3WeaponRole.Size = new System.Drawing.Size(112, 26);
-            this.Panel3WeaponRole.TabIndex = 35;
+            this.Panel3Del.Location = new System.Drawing.Point(283, 244);
+            this.Panel3Del.Name = "Panel3Del";
+            this.Panel3Del.Size = new System.Drawing.Size(79, 39);
+            this.Panel3Del.TabIndex = 41;
+            this.Panel3Del.Text = "删除";
+            this.Panel3Del.UseVisualStyleBackColor = true;
             // 
             // Panel3RewardIronValue
             // 
@@ -1885,15 +1774,6 @@
             this.Panel3RewardBasicScrollC.Text = "基础抽卷轴";
             this.Panel3RewardBasicScrollC.UseVisualStyleBackColor = true;
             // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(6, 204);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(116, 18);
-            this.label11.TabIndex = 1;
-            this.label11.Text = "整十关卡奖励";
-            // 
             // label9
             // 
             this.label9.AutoSize = true;
@@ -1911,26 +1791,6 @@
             this.label4.Size = new System.Drawing.Size(116, 18);
             this.label4.TabIndex = 7;
             this.label4.Text = "选择关卡类型";
-            // 
-            // Panel3SelectSatgeType
-            // 
-            this.Panel3SelectSatgeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Panel3SelectSatgeType.DropDownWidth = 320;
-            this.Panel3SelectSatgeType.FormattingEnabled = true;
-            this.Panel3SelectSatgeType.Location = new System.Drawing.Point(169, 14);
-            this.Panel3SelectSatgeType.Name = "Panel3SelectSatgeType";
-            this.Panel3SelectSatgeType.Size = new System.Drawing.Size(300, 26);
-            this.Panel3SelectSatgeType.TabIndex = 6;
-            // 
-            // Panel3SelectSatge
-            // 
-            this.Panel3SelectSatge.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.Panel3SelectSatge.DropDownWidth = 320;
-            this.Panel3SelectSatge.FormattingEnabled = true;
-            this.Panel3SelectSatge.Location = new System.Drawing.Point(596, 14);
-            this.Panel3SelectSatge.Name = "Panel3SelectSatge";
-            this.Panel3SelectSatge.Size = new System.Drawing.Size(300, 26);
-            this.Panel3SelectSatge.TabIndex = 6;
             // 
             // Panel3AddSatge
             // 
@@ -2034,6 +1894,177 @@
             this.Panel3Physical.Text = "体力";
             this.Panel3Physical.UseVisualStyleBackColor = true;
             // 
+            // groupBox26
+            // 
+            this.groupBox26.Controls.Add(this.Panel3List);
+            this.groupBox26.Location = new System.Drawing.Point(9, 204);
+            this.groupBox26.Name = "groupBox26";
+            this.groupBox26.Size = new System.Drawing.Size(218, 83);
+            this.groupBox26.TabIndex = 49;
+            this.groupBox26.TabStop = false;
+            this.groupBox26.Text = "整十关卡奖励列表";
+            // 
+            // Panel3List
+            // 
+            this.Panel3List.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.Panel3List.FormattingEnabled = true;
+            this.Panel3List.Items.AddRange(new object[] {
+            "怪物生成设置",
+            "怪物属性：monster_config",
+            "关卡配置：entry_consumables_config / stage_reward_config",
+            "挂机奖励：hang_reward_config",
+            "抽奖奖励：lottery_config",
+            "玩家配置表：player_config",
+            "卷轴升级技能配置信息：skill_level_up_config",
+            "武器配置：weapon_config",
+            "世界参数：world_distribution"});
+            this.Panel3List.Location = new System.Drawing.Point(6, 46);
+            this.Panel3List.Name = "Panel3List";
+            this.Panel3List.Size = new System.Drawing.Size(206, 26);
+            this.Panel3List.TabIndex = 12;
+            // 
+            // Panel3AllList
+            // 
+            this.Panel3AllList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.Panel3AllList.FormattingEnabled = true;
+            this.Panel3AllList.Items.AddRange(new object[] {
+            "怪物生成设置",
+            "怪物属性：monster_config",
+            "关卡配置：entry_consumables_config / stage_reward_config",
+            "挂机奖励：hang_reward_config",
+            "抽奖奖励：lottery_config",
+            "玩家配置表：player_config",
+            "卷轴升级技能配置信息：skill_level_up_config",
+            "武器配置：weapon_config",
+            "世界参数：world_distribution"});
+            this.Panel3AllList.Location = new System.Drawing.Point(283, 198);
+            this.Panel3AllList.Name = "Panel3AllList";
+            this.Panel3AllList.Size = new System.Drawing.Size(293, 26);
+            this.Panel3AllList.TabIndex = 13;
+            // 
+            // Panel3SelectSatgeType
+            // 
+            this.Panel3SelectSatgeType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.Panel3SelectSatgeType.FormattingEnabled = true;
+            this.Panel3SelectSatgeType.Items.AddRange(new object[] {
+            "怪物生成设置",
+            "怪物属性：monster_config",
+            "关卡配置：entry_consumables_config / stage_reward_config",
+            "挂机奖励：hang_reward_config",
+            "抽奖奖励：lottery_config",
+            "玩家配置表：player_config",
+            "卷轴升级技能配置信息：skill_level_up_config",
+            "武器配置：weapon_config",
+            "世界参数：world_distribution"});
+            this.Panel3SelectSatgeType.Location = new System.Drawing.Point(169, 15);
+            this.Panel3SelectSatgeType.Name = "Panel3SelectSatgeType";
+            this.Panel3SelectSatgeType.Size = new System.Drawing.Size(300, 26);
+            this.Panel3SelectSatgeType.TabIndex = 51;
+            this.Panel3SelectSatgeType.SelectedIndexChanged += new System.EventHandler(this.Panel3SelectSatgeType_SelectedIndexChanged);
+            // 
+            // Panel3SelectSatge
+            // 
+            this.Panel3SelectSatge.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.Panel3SelectSatge.FormattingEnabled = true;
+            this.Panel3SelectSatge.Items.AddRange(new object[] {
+            "怪物生成设置",
+            "怪物属性：monster_config",
+            "关卡配置：entry_consumables_config / stage_reward_config",
+            "挂机奖励：hang_reward_config",
+            "抽奖奖励：lottery_config",
+            "玩家配置表：player_config",
+            "卷轴升级技能配置信息：skill_level_up_config",
+            "武器配置：weapon_config",
+            "世界参数：world_distribution"});
+            this.Panel3SelectSatge.Location = new System.Drawing.Point(594, 14);
+            this.Panel3SelectSatge.Name = "Panel3SelectSatge";
+            this.Panel3SelectSatge.Size = new System.Drawing.Size(300, 26);
+            this.Panel3SelectSatge.TabIndex = 52;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(630, 202);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(134, 18);
+            this.label14.TabIndex = 51;
+            this.label14.Text = "武器碎片最小值";
+            // 
+            // Panel3WeaponSegmentMin
+            // 
+            this.Panel3WeaponSegmentMin.Location = new System.Drawing.Point(765, 197);
+            this.Panel3WeaponSegmentMin.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3WeaponSegmentMin.Name = "Panel3WeaponSegmentMin";
+            this.Panel3WeaponSegmentMin.Size = new System.Drawing.Size(75, 28);
+            this.Panel3WeaponSegmentMin.TabIndex = 50;
+            // 
+            // lable1
+            // 
+            this.lable1.AutoSize = true;
+            this.lable1.Location = new System.Drawing.Point(884, 202);
+            this.lable1.Name = "lable1";
+            this.lable1.Size = new System.Drawing.Size(134, 18);
+            this.lable1.TabIndex = 53;
+            this.lable1.Text = "武器碎片最大值";
+            // 
+            // Panel3WeaponSegmentMax
+            // 
+            this.Panel3WeaponSegmentMax.Location = new System.Drawing.Point(1019, 197);
+            this.Panel3WeaponSegmentMax.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3WeaponSegmentMax.Name = "Panel3WeaponSegmentMax";
+            this.Panel3WeaponSegmentMax.Size = new System.Drawing.Size(75, 28);
+            this.Panel3WeaponSegmentMax.TabIndex = 52;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(885, 254);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(134, 18);
+            this.label11.TabIndex = 57;
+            this.label11.Text = "角色碎片最大值";
+            // 
+            // Panel3RoleSegmentMax
+            // 
+            this.Panel3RoleSegmentMax.Location = new System.Drawing.Point(1020, 249);
+            this.Panel3RoleSegmentMax.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RoleSegmentMax.Name = "Panel3RoleSegmentMax";
+            this.Panel3RoleSegmentMax.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RoleSegmentMax.TabIndex = 56;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(631, 254);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(134, 18);
+            this.label13.TabIndex = 55;
+            this.label13.Text = "角色碎片最小值";
+            // 
+            // Panel3RoleSegmentMin
+            // 
+            this.Panel3RoleSegmentMin.Location = new System.Drawing.Point(766, 249);
+            this.Panel3RoleSegmentMin.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.Panel3RoleSegmentMin.Name = "Panel3RoleSegmentMin";
+            this.Panel3RoleSegmentMin.Size = new System.Drawing.Size(75, 28);
+            this.Panel3RoleSegmentMin.TabIndex = 54;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -2120,8 +2151,6 @@
             this.Panel3.PerformLayout();
             this.groupBox25.ResumeLayout(false);
             this.groupBox25.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3SegmentMax)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.Panel3SegmentMin)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardIronValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperiencePotionValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3RewardExperienceValue)).EndInit();
@@ -2142,6 +2171,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.Panel3EnergyValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3CoinValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Panel3PhysicalValue)).EndInit();
+            this.groupBox26.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3WeaponSegmentMin)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3WeaponSegmentMax)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RoleSegmentMax)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Panel3RoleSegmentMin)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2243,11 +2277,9 @@
         private System.Windows.Forms.GroupBox groupBox23;
         private System.Windows.Forms.ComboBox Panel2OptionalMonsterType;
         private System.Windows.Forms.Panel Panel3;
-        private System.Windows.Forms.ComboBox Panel3SelectSatge;
         private System.Windows.Forms.Button Panel3AddSatge;
         private System.Windows.Forms.Button Panel3DelSatge;
         private System.Windows.Forms.GroupBox groupBox24;
-        private System.Windows.Forms.ComboBox Panel3SelectSatgeType;
         private System.Windows.Forms.CheckBox Panel3Physical;
         private System.Windows.Forms.NumericUpDown Panel3PhysicalValue;
         private System.Windows.Forms.NumericUpDown Panel3EnergyValue;
@@ -2257,7 +2289,6 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.GroupBox groupBox25;
-        private System.Windows.Forms.Label label11;
         private System.Windows.Forms.NumericUpDown Panel3RewardExperiencePotionValue;
         private System.Windows.Forms.CheckBox Panel3RewardExperiencePotion;
         private System.Windows.Forms.NumericUpDown Panel3RewardExperienceValue;
@@ -2289,21 +2320,23 @@
         private System.Windows.Forms.CheckBox Panel3RewardBasicScrollC;
         private System.Windows.Forms.NumericUpDown Panel3RewardIronValue;
         private System.Windows.Forms.CheckBox Panel3RewardIron;
-        private System.Windows.Forms.ComboBox Panel3WeaponRole;
-        private System.Windows.Forms.Button Panel3WeaponRoleDel;
+        private System.Windows.Forms.Button Panel3Del;
+        private System.Windows.Forms.Button Panel3Show;
+        private System.Windows.Forms.Button Panel3Add;
+        private System.Windows.Forms.Button Panel3Save;
+        private System.Windows.Forms.GroupBox groupBox26;
+        private System.Windows.Forms.ComboBox Panel3List;
+        private System.Windows.Forms.ComboBox Panel3AllList;
+        private System.Windows.Forms.ComboBox Panel3SelectSatge;
+        private System.Windows.Forms.ComboBox Panel3SelectSatgeType;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.NumericUpDown Panel3RoleSegmentMax;
         private System.Windows.Forms.Label label13;
-        private System.Windows.Forms.NumericUpDown Panel3SegmentMax;
-        private System.Windows.Forms.Label label10;
-        private System.Windows.Forms.NumericUpDown Panel3SegmentMin;
-        private System.Windows.Forms.ComboBox Panel3WeaponRoleList;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button Panel3WeaponRoleAdd;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.ComboBox comboBox3;
+        private System.Windows.Forms.NumericUpDown Panel3RoleSegmentMin;
+        private System.Windows.Forms.Label lable1;
+        private System.Windows.Forms.NumericUpDown Panel3WeaponSegmentMax;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.NumericUpDown Panel3WeaponSegmentMin;
     }
 }
 
