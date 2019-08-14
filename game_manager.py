@@ -1574,42 +1574,44 @@ class GameManager:
 	async def redeem_all_nonce(self, world: int, unique_id: str, type_list: [str], nonce_list: [str]) -> dict:
 		# success -> 0
 		# 0 - Add friends to success
+		# 97 - There is an expired nonce
 		# 98 - database operating error
 		# 99 - You already have this friend
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : type_list, 'nonce' : nonce_list})
 		data = response.json()
-		remaining = {}
+		remaining = {"nonce_list": []}
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		for i in range(len(type_list)):
-			if type_list[i] == "gift":
-				items = data[nonce_list[i]]["items"]
-				quantities = data[nonce_list[i]]["quantities"]
-				sql_str = f"update player set {items}={items}+{quantities} where unique_id='{unique_id}'"
-				if await self._execute_statement_update(world=world, statement=sql_str) == 0:
-					return self._message_typesetting(status=99, message="database operating error")
-				sql_str = f"select {items} from player where unique_id='{unique_id}'"
-				quantities = (await self._execute_statement(world=world, statement=sql_str))[0][0]
-				remaining.update({items: quantities})
-			elif type_list[i] == "simple":
-				pass
-			elif type_list[i] == "friend_request":
+		try:
+			for i in range(len(type_list)):
+				if type_list[i] == "gift":
+					items = data[nonce_list[i]]["items"]
+					quantities = data[nonce_list[i]]["quantities"]
+					sql_str = f"update player set {items}={items}+{quantities} where unique_id='{unique_id}'"
+					if await self._execute_statement_update(world=world, statement=sql_str) == 0:
+						return self._message_typesetting(status=98, message="database operating error")
+					sql_str = f"select {items} from player where unique_id='{unique_id}'"
+					quantities = (await self._execute_statement(world=world, statement=sql_str))[0][0]
+					remaining["remaining"].append(nonce_list[i])
+					remaining.update({items: quantities})
+				elif type_list[i] == "simple":
+					pass
+				elif type_list[i] == "friend_request":
 
-				friend_name = data[nonce_list[i]]["sender"]
-				friend_id = data[nonce_list[i]]["uid_sender"]
-				unique_data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
-				if unique_data[0][5] == "":
-					# friend_name = data[0][2]
-					update_str = f"update friend set become_friend_time='{current_time}' where unique_id='{friend_id}' and friend_id='{unique_id}'"
-					insert_str = f"replace into friend(unique_id, friend_id, friend_name, become_friend_time) values('{unique_id}', '{friend_id}', '{friend_name}', '{current_time}')"
-					update_code = await self._execute_statement_update(world=world, statement=update_str)
-					insert_code = await self._execute_statement_update(world=world, statement=insert_str)
-					if update_code == 0 or insert_code == 0:
-						print(f"update_code:{update_code}, update_str:{update_str}\ninsert_code:{insert_code}, insert_str:{insert_str}")
-					else:
-						remaining.update({nonce_list[i]: {"friend_name": friend_name, "become_friend_time": current_time}})
-			else:
-				return self._message_typesetting(status=99, message="type_list error")
-		return self._message_typesetting(status=0, message="successfully redeemed", data={"remaining": remaining})
+					friend_name = data[nonce_list[i]]["sender"]
+					friend_id = data[nonce_list[i]]["uid_sender"]
+					unique_data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
+					if unique_data[0][5] == "":
+						# friend_name = data[0][2]
+						update_str = f"update friend set become_friend_time='{current_time}' where unique_id='{friend_id}' and friend_id='{unique_id}'"
+						insert_str = f"replace into friend(unique_id, friend_id, friend_name, become_friend_time) values('{unique_id}', '{friend_id}', '{friend_name}', '{current_time}')"
+						await self._execute_statement_update(world=world, statement=update_str)
+						await self._execute_statement_update(world=world, statement=insert_str)
+						remaining["nonce_list"].append(nonce_list[i])
+				else:
+					return self._message_typesetting(status=99, message="type_list error")
+			return self._message_typesetting(status=0, message="successfully redeemed", data={"remaining": remaining})
+		except:
+			return self._message_typesetting(status=97, message="There is an expired nonce")
 
 	async def request_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# success -> 0
