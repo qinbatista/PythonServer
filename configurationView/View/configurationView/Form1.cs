@@ -779,9 +779,28 @@ namespace configurationView
         private void Panel3SelectSatge_SelectedIndexChanged(object sender, EventArgs e)
         {
             int stage_value = int.Parse(Panel3SelectSatge.SelectedItem.ToString());
-            JObject consumption = (JObject)public_json_data["consumption"][Panel3SelectSatge.SelectedItem.ToString()];
-            JObject reward = (JObject)public_json_data["reward"][Panel3SelectSatge.SelectedItem.ToString()];
-            foreach (var item in consumption)
+            string stage_type = "stage";
+            switch (Panel3SelectSatgeType.SelectedItem.ToString())
+            {
+                case "普通关卡":
+                    stage_type = "stage"; break;
+                case "冲塔关卡":
+                    stage_type = "tower"; break;
+            }
+            JObject consumption_stage = (JObject)public_json_data["consumption"][stage_type][Panel3SelectSatge.SelectedItem.ToString()];
+            JObject reward_stage = (JObject)public_json_data["reward"][stage_type][Panel3SelectSatge.SelectedItem.ToString()];
+            switch (stage_type)
+            {
+                case "stage":
+                    {
+
+                    }break;
+                case "tower":
+                    {
+
+                    }break;
+            }
+            foreach (var item in consumption_stage)
             {
                 switch (item.Key)
                 {
@@ -806,14 +825,14 @@ namespace configurationView
             }
             if (stage_value % 10 == 0)
             {
-                foreach (var item in reward)
+                foreach (var item in reward_stage)
                 {
 
                 }
             }
             else
             {
-                foreach (var item in reward)
+                foreach (var item in reward_stage)
                 {
                     switch (item.Key)
                     {
