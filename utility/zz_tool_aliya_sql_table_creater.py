@@ -330,8 +330,10 @@ def test():
     # d = cursor.execute('INSERT into armor(armor_level1,armor_level2,unique_id,armor_id) values(122+2,444+777,"9","6"),(13552,447,"9","7"),(6422,12,"8","7")')
     # print("d:" + str(d))
     # print("fetchall:" + str(cursor.fetchall()))
-    for i in range(8, 101):
-        cursor.execute(f"INSERT into player(unique_id) values ('{i}')")
+    for i in range(100):
+        game_name = chr(97 + i % 26) * (i//26 + 1)
+        print(game_name)
+        cursor.execute(f"INSERT into player(unique_id, game_name) values ('{i + 1}', '{game_name}')")
     db.commit()
 
 def create_sensitive():
