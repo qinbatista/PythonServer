@@ -1591,7 +1591,7 @@ class GameManager:
 						return self._message_typesetting(status=98, message="database operating error")
 					sql_str = f"select {items} from player where unique_id='{unique_id}'"
 					quantities = (await self._execute_statement(world=world, statement=sql_str))[0][0]
-					remaining["remaining"].append(nonce_list[i])
+					remaining["nonce_list"].append(nonce_list[i])
 					remaining.update({items: quantities})
 				elif type_list[i] == "simple":
 					pass
@@ -2287,7 +2287,22 @@ class GameManager:
 					}
 				}
 		return self._message_typesetting(status=0, message="you get all boss message",data= message_dic)
-	
+
+	async def _get_top_damage(self, world: int, unique_id: int, range_number: int) -> (int, str):
+		# 0 return 10 data successfully
+		# 98 range number should over or equal 1
+		# 99 no data
+		if range_number<=0:
+			return self._message_typesetting(status=98, message="range number should over or equal 1")
+		data_leader_board = await self._execute_statement(world,f'SELECT * FROM leader_board ORDER BY world_boss_damage DESC LIMIT {10*(range_number-1)},{10}')
+		if len(data_leader_board)==0:
+			return self._message_typesetting(status=99, message="no data")
+		data_users = await self._execute_statement(world,f'SELECT game_name FROM player where unique_id in {data_leader_board[0][0],data_leader_board[1][0],data_leader_board[2][0],data_leader_board[3][0],data_leader_board[4][0],data_leader_board[5][0],data_leader_board[6][0],data_leader_board[7][0],data_leader_board[8][0],data_leader_board[9][0]} ORDER BY FIELD(unique_id,{data_leader_board[0][0]},{data_leader_board[1][0]},{data_leader_board[2][0]},{data_leader_board[3][0]},{data_leader_board[4][0]},{data_leader_board[5][0]},{data_leader_board[6][0]},{data_leader_board[7][0]},{data_leader_board[8][0]},{data_leader_board[9][0]})')
+		message_dic={"remaining":{}}
+		for index in range(0,len(data_users)):
+			message_dic["remaining"].update({index:{data_users[index][0]:data_leader_board[index][2]}})
+		return self._message_typesetting(status=0, message="get top "+str(range_number*10)+" damage",data= message_dic)
+
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, f"SELECT energy, recover_time FROM player WHERE unique_id='{unique_id}';")
 		return int(data[0][0]), data[0][1]
@@ -3049,6 +3064,12 @@ async def _enter_world_boss_stage(request: web.Request) -> web.Response:
 async def _leave_world_boss_stage(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER'])._leave_world_boss_stage(int(post['world']), post['unique_id'],int(post['total_damage']))
+	return _json_response(result)
+
+@ROUTES.post('/get_top_damage')
+async def _get_top_damage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER'])._get_top_damage(int(post['world']), post['unique_id'],int(post['range_number']))
 	return _json_response(result)
 
 def get_config() -> configparser.ConfigParser:
