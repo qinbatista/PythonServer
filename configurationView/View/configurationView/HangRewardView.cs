@@ -120,10 +120,14 @@ namespace configurationView
         {
             try
             {
-
+                public_json_data.Remove(HangStageSelect.SelectedItem.ToString());
+                HangStageSelect.Items.Remove(HangStageSelect.SelectedItem.ToString());
+                MessageBox.Show("删除成功", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            public_json_data.Remove(HangStageSelect.Items.ToString());
-            HangStageSelect.Items.Remove(HangStageSelect.Items.ToString());
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("未选择关卡，请选择关卡数", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

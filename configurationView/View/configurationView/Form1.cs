@@ -88,83 +88,90 @@ namespace configurationView
             try
             {
                 float version = float.Parse(version_str);
-                DialogResult result = MessageBox.Show(text: "是否确定使用版本号：" + version_str, caption: "确认提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                if (result.ToString().Equals("Yes"))
+                if (VersionOption.Items.Contains(version_str))
                 {
-                    new_version = version_str;
-                    // client 操作的代码
-                    if (!Directory.Exists(clien_path + new_version))
+                    MessageBox.Show("存在此版本，不可重复添加", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    DialogResult result = MessageBox.Show(text: "是否确定使用版本号：" + version_str, caption: "确认提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                    if (result.ToString().Equals("Yes"))
                     {
-                        Directory.CreateDirectory(clien_path + new_version);
-                        string[] fileList = Directory.GetFileSystemEntries(clien_path + current_version);
-                        foreach (string file in fileList)
+                        new_version = version_str;
+                        // client 操作的代码
+                        if (!Directory.Exists(clien_path + new_version))
                         {
-                            File.Copy(file, clien_path + new_version + "//" + Path.GetFileName(file));
-                        }
-                    }
-                    else
-                    {
-                        result = MessageBox.Show(text: string.Format("客服端版本{0}已存在，是否添加客服端版本{1}中没有的文件", new_version, current_version), caption: "确认提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                        if (result.ToString().Equals("Yes"))
-                        {
+                            Directory.CreateDirectory(clien_path + new_version);
                             string[] fileList = Directory.GetFileSystemEntries(clien_path + current_version);
                             foreach (string file in fileList)
                             {
-                                if (!File.Exists(clien_path + new_version + "//" + Path.GetFileName(file)))
+                                File.Copy(file, clien_path + new_version + "//" + Path.GetFileName(file));
+                            }
+                        }
+                        else
+                        {
+                            result = MessageBox.Show(text: string.Format("客服端版本{0}已存在，是否添加客服端版本{1}中没有的文件", new_version, current_version), caption: "确认提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                            if (result.ToString().Equals("Yes"))
+                            {
+                                string[] fileList = Directory.GetFileSystemEntries(clien_path + current_version);
+                                foreach (string file in fileList)
                                 {
-                                    File.Copy(file, clien_path + new_version + "//" + Path.GetFileName(file));
+                                    if (!File.Exists(clien_path + new_version + "//" + Path.GetFileName(file)))
+                                    {
+                                        File.Copy(file, clien_path + new_version + "//" + Path.GetFileName(file));
+                                    }
                                 }
                             }
                         }
-                    }
-                    // server 操作的代码
-                    if (!Directory.Exists(server_path + new_version))
-                    {
-                        Directory.CreateDirectory(server_path + new_version);
-                        string[] fileList = Directory.GetFileSystemEntries(server_path + current_version);
-                        foreach (string file in fileList)
+                        // server 操作的代码
+                        if (!Directory.Exists(server_path + new_version))
                         {
-                            File.Copy(file, server_path + new_version + "//" + Path.GetFileName(file));
-                        }
-                    }
-                    else
-                    {
-                        result = MessageBox.Show(text: string.Format("服务端版本{0}已存在，是否添加服务端版本{1}中没有的文件", new_version, current_version), caption: "确认提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                        if (result.ToString().Equals("Yes"))
-                        {
+                            Directory.CreateDirectory(server_path + new_version);
                             string[] fileList = Directory.GetFileSystemEntries(server_path + current_version);
                             foreach (string file in fileList)
                             {
-                                if (!File.Exists(server_path + new_version + "//" + Path.GetFileName(file)))
+                                File.Copy(file, server_path + new_version + "//" + Path.GetFileName(file));
+                            }
+                        }
+                        else
+                        {
+                            result = MessageBox.Show(text: string.Format("服务端版本{0}已存在，是否添加服务端版本{1}中没有的文件", new_version, current_version), caption: "确认提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                            if (result.ToString().Equals("Yes"))
+                            {
+                                string[] fileList = Directory.GetFileSystemEntries(server_path + current_version);
+                                foreach (string file in fileList)
                                 {
-                                    File.Copy(file, server_path + new_version + "//" + Path.GetFileName(file));
+                                    if (!File.Exists(server_path + new_version + "//" + Path.GetFileName(file)))
+                                    {
+                                        File.Copy(file, server_path + new_version + "//" + Path.GetFileName(file));
+                                    }
                                 }
                             }
                         }
+                        //修改config_timer_setting.json文件的代码
+                        try
+                        {
+                            JObject temp_json = new JObject();
+                            temp_json.Add("client", new_version);
+                            temp_json.Add("server", new_version);
+                            json.Add(dateTimePicker.Value.ToString("yyyy-MM-dd"), temp_json);
+                            File.WriteAllText(json_version, json.ToString());
+                            MessageBox.Show(text: "添加成功！", caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        catch (ArgumentException)
+                        {
+                            json[DateTime.Now.ToString("yyyy-MM-dd")]["client"] = new_version;
+                            json[DateTime.Now.ToString("yyyy-MM-dd")]["server"] = new_version;
+                            File.WriteAllText(json_version, json.ToString());
+                            MessageBox.Show(text: "json文件中已存在此版本！", caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        current_version = new_version;
+                        VersionOption.Items.Add(new_version);
+                        //this.FunctionOption.Items.Add(json.ToString());
                     }
-                    //修改config_timer_setting.json文件的代码
-                    try
-                    {
-                        JObject temp_json = new JObject();
-                        temp_json.Add("client", new_version);
-                        temp_json.Add("server", new_version);
-                        json.Add(dateTimePicker.Value.ToString("yyyy-MM-dd"), temp_json);
-                        File.WriteAllText(json_version, json.ToString());
-                        MessageBox.Show(text: "添加成功！", caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    catch
-                    {
-                        json[DateTime.Now.ToString("yyyy-MM-dd")]["client"] = new_version;
-                        json[DateTime.Now.ToString("yyyy-MM-dd")]["server"] = new_version;
-                        File.WriteAllText(json_version, json.ToString());
-                        MessageBox.Show(text: "json文件中已存在此版本！", caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                    current_version = new_version;
-                    VersionOption.Items.Add(new_version);
-                    //this.FunctionOption.Items.Add(json.ToString());
                 }
             }
-            catch
+            catch (FormatException)
             {
                 MessageBox.Show(text: "版本信息输入错误！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -207,7 +214,7 @@ namespace configurationView
                 }
                 old_version = current_version;
             }
-            catch
+            catch (NullReferenceException)
             {
                 MessageBox.Show(text: string.Format("不存在版本{0}！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -218,12 +225,26 @@ namespace configurationView
             // delete
             try
             {
-                public_json_data["enemyLayouts"][StageNumber.SelectedIndex].Remove();
-                File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
-                StageNumber.Items.Remove(StageNumber.SelectedItem.ToString());
-                MessageBox.Show(text: string.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                JObject enemyLayout = (JObject)public_json_data["enemyLayouts"][StageNumber.SelectedIndex];
+                if (StageNumber.Items.Count <= 1)
+                {
+                    MessageBox.Show(text: string.Format("最后一关，不可删除！", current_version), caption: "错误信息", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    enemyLayout.Remove();
+                    StageNumber.Items.RemoveAt(StageNumber.SelectedIndex);
+                    File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
+                    WaveNumber.Items.Clear();
+                    Panel1Clear();
+                    MessageBox.Show(text: string.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
-            catch
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("未选择关卡类型", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ArgumentOutOfRangeException)
             {
                 MessageBox.Show("未选择关卡，请选择关卡后再删除！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -236,21 +257,21 @@ namespace configurationView
             {
                 JArray array = (JArray)public_json_data["enemyLayouts"];
                 array.Add(public_json_data["enemyLayouts"][StageNumber.Items.Count - 1]);
-                public_json_data["enemyLayouts"] = array;
                 File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
                 StageNumber.Items.Add(StageNumber.Items.Count + 1);
-                StageNumber.SelectedIndex = StageNumber.Items.IndexOf(StageNumber.Items.Count);
+                //StageNumber.SelectedIndex = StageNumber.Items.IndexOf(StageNumber.Items.Count);
                 MessageBox.Show(text: "关卡添加成功 ！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch
+            catch (NullReferenceException)
             {
-                MessageBox.Show(text: string.Format("未选择关卡类型！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(text: string.Format("未选择关卡类型", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void StageNumber_SelectedIndexChanged(object sender, EventArgs e)
         {
             WaveNumber.Items.Clear();
+            Panel1Clear();
             if (old_version.Equals(current_version))
             {
                 JArray array = (JArray)public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"];
@@ -264,12 +285,10 @@ namespace configurationView
                 MessageBox.Show(text: "请重新选择关卡类型 ！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
-        /// <summary>
-        /// 设置panel下所有的控件属性
-        /// </summary>
-        /// <param name="enemy"></param>
-        private void SettingPanel(JObject enemy)
+
+        private void WaveNumber_SelectedIndexChanged(object sender, EventArgs e)
         {
+            JObject enemy = (JObject)public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex];
             TotalTime.Value = (decimal)enemy["totalTime"];
             ColdDownTime.Value = (decimal)enemy["coldDownTime"];
             IsPreWaveFinish.Checked = (bool)enemy["isPreWaveFinish"];
@@ -285,18 +304,6 @@ namespace configurationView
             foreach (var item in array)
             {
                 MonsterGenerationPoint.Items.Add(item.ToString());
-            }
-        }
-
-        private void WaveNumber_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                SettingPanel((JObject)public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]);
-            }
-            catch
-            {
-                MessageBox.Show(text: "未选择关卡类型！暂无波数信息！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -324,16 +331,19 @@ namespace configurationView
                 else
                 {
                     array[MonsterList.SelectedIndex].Remove();
-                    public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["enemyList"] = array;
                     File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
-                    MonsterList.Items.Remove(MonsterList.SelectedItem.ToString());
+                    MonsterList.Items.RemoveAt(MonsterList.SelectedIndex);
                     MonsterAmount.Value = 0;
                     MessageBox.Show(text: string.Format("删除怪物成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch
+            catch (NullReferenceException)
             {
-                MessageBox.Show(text: string.Format("请选择一种怪后再删除！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(text: string.Format("未选择关卡类型", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                MessageBox.Show(text: string.Format("未选择怪物名字", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -343,9 +353,13 @@ namespace configurationView
             try {
                 new MonsterAdd((JArray)public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["enemyList"], public_json_data, string.Format(public_file_path, current_version), MonsterList).Show();
             }
-            catch
+            catch (NullReferenceException)
             {
-                MessageBox.Show(text: string.Format("未选择关卡数！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(text: string.Format("未选择关卡类型", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                MessageBox.Show(text: string.Format("未选择关卡波数或者关卡数", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -366,16 +380,18 @@ namespace configurationView
                 else
                 {
                     array[MonsterGenerationPoint.SelectedIndex].Remove();
-                    public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["SpawnPointStrings"] = array;
                     File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
-                    MonsterGenerationPoint.Items.Remove(MonsterGenerationPoint.SelectedItem.ToString());
+                    MonsterGenerationPoint.Items.RemoveAt(MonsterGenerationPoint.SelectedIndex);
                     MessageBox.Show(text: string.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
                 }
             }
-            catch
+            catch (NullReferenceException)
             {
-                MessageBox.Show(text: string.Format("请选择一个出生点后再删除！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(text: "未选择关卡类型", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                MessageBox.Show(text: "未选择关卡数", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -397,27 +413,41 @@ namespace configurationView
                     MessageBox.Show(text: string.Format("出生点{0}添加成功！", item), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch
+            catch (NullReferenceException)
             {
-                MessageBox.Show(text: "请选择一个出生点后再添加！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(text: "未选择关卡类型", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                MessageBox.Show(text: "未选择关卡数", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
+        private void Panel1Clear()
+        {
+            TotalTime.Value = 0;
+            ColdDownTime.Value = 0;
+            IsPreWaveFinish.Checked = false;
+            MonsterList.Items.Clear();
+            MonsterGenerationPoint.Items.Clear();
+            MonsterAmount.Value = 0;
+        }
         private void Panel1DelWave_Click(object sender, EventArgs e)
         {
             try
             {
                 public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex].Remove();
                 File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
-                WaveNumber.Items.Remove(WaveNumber.SelectedItem.ToString());
-                TotalTime.Value = 0;
-                ColdDownTime.Value = 0;
-                IsPreWaveFinish.Checked = false;
+                WaveNumber.Items.RemoveAt(WaveNumber.SelectedIndex);
+                Panel1Clear();
                 MessageBox.Show(text: string.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch
+            catch (NullReferenceException)
             {
-                MessageBox.Show("未选择怪物波数，请选择波数后再删除！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("未选择关卡类型", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                MessageBox.Show("未选择怪物波数，请选择波数后再删除", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -431,76 +461,43 @@ namespace configurationView
                 public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"] = array;
                 File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
                 WaveNumber.Items.Add(WaveNumber.Items.Count + 1);
-                MessageBox.Show(text: "关卡添加成功 ！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(text: "成功添加一波怪物！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch
+            catch (NullReferenceException)
+            {
+                MessageBox.Show(text: string.Format("未选择关卡类型", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ArgumentOutOfRangeException)
             {
                 MessageBox.Show(text: string.Format("未选择关卡数！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void TotalTime_ValueChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if ((int)TotalTime.Value != 0)
-                {
-                    public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["totalTime"] = (int)TotalTime.Value;
-                }
-            }
-            catch
-            {
-                MessageBox.Show("没有选择关卡数！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void ColdDownTime_ValueChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if ((int)ColdDownTime.Value != 0)
-                {
-                    public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["coldDownTime"] = (int)ColdDownTime.Value;
-                }
-            }
-            catch
-            {
-                MessageBox.Show("没有选择关卡数！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void IsPreWaveFinish_CheckedChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["isPreWaveFinish"] = IsPreWaveFinish.Checked;
-            }
-            catch
-            {
-                MessageBox.Show("没有选择关卡数！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void MonsterAmount_ValueChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if ((int)MonsterAmount.Value != 0)
-                {
-                    JArray array = (JArray)public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex]["enemyList"];
-                    array[MonsterList.SelectedIndex]["count"] = (int)MonsterAmount.Value;
-                }
-            }
-            catch
-            {
-                MessageBox.Show("没有选择怪物！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
         private void Panel1Save_Click(object sender, EventArgs e)
         {
-            File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
-            MessageBox.Show("保存成功！", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                try
+                {
+                    JObject enemy = (JObject)public_json_data["enemyLayouts"][StageNumber.SelectedIndex]["enemyLayout"][WaveNumber.SelectedIndex];
+                    enemy["totalTime"] = (int)TotalTime.Value;
+                    enemy["coldDownTime"] = (int)ColdDownTime.Value;
+                    enemy["isPreWaveFinish"] = IsPreWaveFinish.Checked;
+                    JArray array = (JArray)enemy["enemyList"];
+                    array[MonsterList.SelectedIndex]["count"] = (int)MonsterAmount.Value;
+                }
+                catch { }
+                File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
+                MessageBox.Show("保存成功！", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (NullReferenceException)
+            {
+                MessageBox.Show("未编辑怪物波数，保存失败", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ArgumentNullException)
+            {
+                MessageBox.Show("所保存的文件信息为空，保存失败", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         #endregion
 
@@ -547,35 +544,42 @@ namespace configurationView
         {
             if (old_version.Equals(current_version))
             {
-                JObject Panel2MonsterData = (JObject)public_json_data[Panel2MonsterList.SelectedItem.ToString()];
-                Panel2MonsterData["LV"] = (int)Panel2LV.Value;
-                Panel2MonsterData["HP"] = (int)Panel2HP.Value;
-                Panel2MonsterData["MP"] = (int)Panel2MP.Value;
-                Panel2MonsterData["Attack"] = (int)Panel2Attack.Value;
-                Panel2MonsterData["PhysicalDefend"] = (int)Panel2PhysicalDefend.Value;
-                Panel2MonsterData["Strength"] = (int)Panel2Strength.Value;
-                Panel2MonsterData["Vitality"] = (int)Panel2Vitality.Value;
-                Panel2MonsterData["Mentality"] = (int)Panel2Mentality.Value;
-                Panel2MonsterData["Agility"] = (int)Panel2Agility.Value;
-                Panel2MonsterData["FlameDefend"] = (int)Panel2FlameDefend.Value;
-                Panel2MonsterData["FrozenDefend"] = (int)Panel2FrozenDefend.Value;
-                Panel2MonsterData["PoisonDefend"] = (int)Panel2PoisonDefend.Value;
-                Panel2MonsterData["LightningDefend"] = (int)Panel2LightningDefend.Value;
-                Panel2MonsterData["Flame"] = (int)Panel2Flame.Value;
-                Panel2MonsterData["Frozen"] = (int)Panel2Frozen.Value;
-                Panel2MonsterData["Poison"] = (int)Panel2Poison.Value;
-                Panel2MonsterData["Lightning"] = (int)Panel2Lightning.Value;
-                Panel2MonsterData["Sacredness"] = Panel2Sacredness.Checked ? 1 : 0;
-                Panel2MonsterData["AttackSpeed"] = (int)Panel2AttackSpeed.Value;
-                Panel2MonsterData["MoveSpeed"] = (int)Panel2MoveSpeed.Value;
-                Panel2MonsterData["RotationSpeed"] = (int)Panel2RotationSpeed.Value;
-                Panel2MonsterData["AttackRange"] = (int)Panel2AttackRange.Value;
-                Panel2MonsterData["CriticalLevel"] = (int)Panel2CriticalLevel.Value;
-                Panel2MonsterData["CriticalDefend"] = (int)Panel2CriticalDefend.Value;
-                Panel2MonsterData["HitRate"] = (int)Panel2HitRate.Value;
-                Panel2MonsterData["CDRate"] = (int)Panel2CDRate.Value;
-                File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
-                MessageBox.Show("保存成功！", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                try
+                {
+                    JObject Panel2MonsterData = (JObject)public_json_data[Panel2MonsterList.SelectedItem.ToString()];
+                    Panel2MonsterData["LV"] = (int)Panel2LV.Value;
+                    Panel2MonsterData["HP"] = (int)Panel2HP.Value;
+                    Panel2MonsterData["MP"] = (int)Panel2MP.Value;
+                    Panel2MonsterData["Attack"] = (int)Panel2Attack.Value;
+                    Panel2MonsterData["PhysicalDefend"] = (int)Panel2PhysicalDefend.Value;
+                    Panel2MonsterData["Strength"] = (int)Panel2Strength.Value;
+                    Panel2MonsterData["Vitality"] = (int)Panel2Vitality.Value;
+                    Panel2MonsterData["Mentality"] = (int)Panel2Mentality.Value;
+                    Panel2MonsterData["Agility"] = (int)Panel2Agility.Value;
+                    Panel2MonsterData["FlameDefend"] = (int)Panel2FlameDefend.Value;
+                    Panel2MonsterData["FrozenDefend"] = (int)Panel2FrozenDefend.Value;
+                    Panel2MonsterData["PoisonDefend"] = (int)Panel2PoisonDefend.Value;
+                    Panel2MonsterData["LightningDefend"] = (int)Panel2LightningDefend.Value;
+                    Panel2MonsterData["Flame"] = (int)Panel2Flame.Value;
+                    Panel2MonsterData["Frozen"] = (int)Panel2Frozen.Value;
+                    Panel2MonsterData["Poison"] = (int)Panel2Poison.Value;
+                    Panel2MonsterData["Lightning"] = (int)Panel2Lightning.Value;
+                    Panel2MonsterData["Sacredness"] = Panel2Sacredness.Checked ? 1 : 0;
+                    Panel2MonsterData["AttackSpeed"] = (int)Panel2AttackSpeed.Value;
+                    Panel2MonsterData["MoveSpeed"] = (int)Panel2MoveSpeed.Value;
+                    Panel2MonsterData["RotationSpeed"] = (int)Panel2RotationSpeed.Value;
+                    Panel2MonsterData["AttackRange"] = (int)Panel2AttackRange.Value;
+                    Panel2MonsterData["CriticalLevel"] = (int)Panel2CriticalLevel.Value;
+                    Panel2MonsterData["CriticalDefend"] = (int)Panel2CriticalDefend.Value;
+                    Panel2MonsterData["HitRate"] = (int)Panel2HitRate.Value;
+                    Panel2MonsterData["CDRate"] = (int)Panel2CDRate.Value;
+                    File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
+                    MessageBox.Show("保存成功！", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch(NullReferenceException)
+                {
+                    MessageBox.Show("未编辑过文件信息，保存失败", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             else
             {
@@ -601,10 +605,11 @@ namespace configurationView
                     public_json_data.Remove(Panel2MonsterList.SelectedItem.ToString());
                     File.WriteAllText(string.Format(public_file_path, current_version), public_json_data.ToString());
                     Panel2MonsterList.Items.Remove(Panel2MonsterList.SelectedItem.ToString());
+                    Panel2Clear();
                     MessageBox.Show(text: string.Format("删除怪物成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch
+            catch (NullReferenceException)
             {
                 MessageBox.Show(text: string.Format("请选择一种怪后再删除！", current_version), caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -639,10 +644,40 @@ namespace configurationView
                     MessageBox.Show(text: "怪物添加成功！", caption: "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch
+            catch (NullReferenceException)
             {
                 MessageBox.Show(text: "没有选择怪物类型！", caption: "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void Panel2Clear()
+        {
+            Panel2LV.Value = 0;
+            Panel2HP.Value = 0;
+            Panel2MP.Value = 0;
+            Panel2Attack.Value = 0;
+            Panel2PhysicalDefend.Value = 0;
+            Panel2Strength.Value = 0;
+            Panel2Vitality.Value = 0;
+            Panel2Mentality.Value = 0;
+            Panel2Agility.Value = 0;
+            Panel2FlameDefend.Value = 0;
+            Panel2FrozenDefend.Value = 0;
+            Panel2PoisonDefend.Value = 0;
+            Panel2LightningDefend.Value = 0;
+            Panel2Flame.Value = 0;
+            Panel2Frozen.Value = 0;
+            Panel2Poison.Value = 0;
+            Panel2Lightning.Value = 0;
+            Panel2Sacredness.Checked = false;
+            Panel2AttackSpeed.Value = 0;
+            Panel2MoveSpeed.Value = 0;
+            Panel2RotationSpeed.Value = 0;
+            Panel2AttackRange.Value = 0;
+            Panel2CriticalLevel.Value = 0;
+            Panel2CriticalDefend.Value = 0;
+            Panel2HitRate.Value = 0;
+            Panel2CDRate.Value = 0;
         }
         #endregion
 
@@ -910,7 +945,7 @@ namespace configurationView
                 Panel3Clear();
                 MessageBox.Show(text: string.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch
+            catch (NullReferenceException)
             {
                 MessageBox.Show("未选择关卡类型或者关卡数，请选择对应关卡后再删除！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -963,7 +998,7 @@ namespace configurationView
                     MessageBox.Show("关卡添加成功", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch
+            catch (NullReferenceException)
             {
                 MessageBox.Show("输入错误，关卡数必须为正整数", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1005,7 +1040,7 @@ namespace configurationView
                     MessageBox.Show("选择的关卡非整十关卡", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            catch
+            catch (NullReferenceException)
             {
                 MessageBox.Show("请选择奖励后再执行删除", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1033,7 +1068,7 @@ namespace configurationView
                     MessageBox.Show("选择的关卡非整十关卡", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            catch
+            catch (NullReferenceException)
             {
                 MessageBox.Show("请选择奖励后再执行删除", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1701,7 +1736,7 @@ namespace configurationView
                 File.WriteAllText(string.Format(stage_reward_config, current_version), public_json_data["reward"].ToString());
                 MessageBox.Show("保存成功！", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch
+            catch (NullReferenceException)
             {
                 MessageBox.Show("请选择需要保存的关卡，保存失败", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -1730,6 +1765,9 @@ namespace configurationView
                         Panel1.Width = width;
                         Panel1.Height = height;
                         Panel1.Visible = true;
+                        StageNumber.Items.Clear();
+                        WaveNumber.Items.Clear();
+                        Panel1Clear();
                     } break;
                 case 1: // 怪物属性：monster_config
                     {
@@ -1761,6 +1799,7 @@ namespace configurationView
                         {
                             Panel2OptionalMonsterType.Items.Add(item: item.ToString());
                         }
+                        Panel2Clear();
                     }
                     break;
                 case 2: // 关卡配置：entry_consumables_config / stage_reward_config
