@@ -284,6 +284,25 @@ def create_leader_board_table() -> None:
     sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id)")
 
 
+def create_factory_table() -> None:
+    """
+    创建打世界Boss信息表
+    """
+    table_name = "factory"
+    table_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL COMMENT '玩家唯一标识'",
+        "food_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '食品工厂的等级'",
+        "mine_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '矿山工厂的等级'",
+        "crystal_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '水晶工厂的等级'",
+        "equipment_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '设备工厂的等级'",
+        "food_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '食品工厂的冷却开始时间'",
+        "mine_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '矿山工厂的冷却开始时间'",
+        "crystal_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '水晶工厂的冷却开始时间'",
+        "equipment_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '设备工厂的冷却开始时间'",
+    }
+    sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id)")
+
+
 def create_friend_table() -> None:
     """
     创建武器背包表以及武器信息表
@@ -372,4 +391,5 @@ if __name__ == '__main__':
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
-    test()
+    create_factory_table()
+    # test()
