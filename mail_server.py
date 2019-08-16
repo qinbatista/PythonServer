@@ -127,7 +127,7 @@ class MailServer:
 			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'friend_request', 'uid_sender' : msg['uid_sender'], 'sender' : msg['sender']})
 			return r.json()['data']['nonce']
 		elif msg['type'] == 'family_request':
-			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'family_request', 'fid' : msg['fid'], 'target' : msg['target']})
+			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'family_request', 'fid' : msg['fid'], 'target' : msg['target'], 'uid' : msg['uid']})
 			return r.json()['data']['nonce']
 
 
@@ -148,6 +148,7 @@ class MailServer:
 			msg['fid'] = kwargs['fid']
 			msg['fname'] = kwargs['fname']
 			msg['target'] = kwargs['target']
+			msg['uid'] = kwargs['uid']
 		return msg
 
 	def _message_to_dict(self, msg: mailbox.MaildirMessage, **kwargs) -> dict:

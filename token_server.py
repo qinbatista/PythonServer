@@ -51,7 +51,9 @@ class TokenServer:
 				self._nonce_table[nonce]['sender'] = kwargs['sender']
 			elif mtype == 'family_request':
 				self._nonce_table[nonce]['fid'] = kwargs['fid']
+				self._nonce_table[nonce]['uid'] = kwargs['uid']
 				self._nonce_table[nonce]['target'] = kwargs['target']
+
 
 		except KeyError:
 			return self._message_typesetting(-1, 'invalid request format')
