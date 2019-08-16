@@ -5,6 +5,7 @@
 
 import json
 import os
+import random
 import pymysql  # 数据库连接
 from DBUtils.PooledDB import PooledDB  # 用于数据库连接池
 
@@ -326,9 +327,13 @@ def test():
     cursor = db.cursor()
     # d = cursor.execute('replace into armor(armor_level1,armor_level2,unique_id,armor_id)values(122+2,444+777,"9","6")')
     # d = cursor.execute('replace into armor(armor_level1,armor_level2,unique_id,armor_id)values()')
-    d = cursor.execute('INSERT into armor(armor_level1,armor_level2,unique_id,armor_id) values(122+2,444+777,"9","6"),(13552,447,"9","7"),(6422,12,"8","7")')
-    print("d:" + str(d))
-    print("fetchall:" + str(cursor.fetchall()))
+    # d = cursor.execute('INSERT into armor(armor_level1,armor_level2,unique_id,armor_id) values(122+2,444+777,"9","6"),(13552,447,"9","7"),(6422,12,"8","7")')
+    # print("d:" + str(d))
+    # print("fetchall:" + str(cursor.fetchall()))
+    for i in range(100):
+        game_name = chr(97 + i % 26) * (i//26 + 1)
+        print(game_name)
+        cursor.execute(f"INSERT into player(unique_id, game_name) values ('{i + 1}', '{game_name}')")
     db.commit()
 
 def create_sensitive():
@@ -362,9 +367,9 @@ if __name__ == '__main__':
     # create_role_table()
     # create_user_table()
     # create_dark_market_table()
-    create_leader_board_table()
+    # create_leader_board_table()
     # create_friend_table()
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
-    # test()
+    test()

@@ -646,7 +646,1066 @@ namespace configurationView
         }
         #endregion
 
-        #region Panel3
+        #region Panel3 关卡配置
+        private void Panel3SelectSatgeType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Panel3SelectSatge.Items.Clear();
+            Panel3AllList.Items.Clear();
+            Panel3Clear();
+            Panel3WeaponSegmentMin.Value = 0;
+            Panel3WeaponSegmentMax.Value = 0;
+            switch (Panel3SelectSatgeType.SelectedItem.ToString())
+            {
+                case "普通关卡": // 普通关卡
+                    {
+                        foreach (var item in (JObject)public_json_data["consumption"]["stage"])
+                        {
+                            Panel3SelectSatge.Items.Add(item.Key);
+                        }
+                    }
+                    break;
+                case "冲塔关卡": // 冲塔关卡
+                    {
+                        foreach (var item in (JObject)public_json_data["consumption"]["tower"])
+                        {
+                            Panel3SelectSatge.Items.Add(item.Key);
+                        }
+                        // Segment
+                        JArray segment_list = (JArray)public_json_data["reward"]["tower"]["segment"];
+                        Panel3WeaponSegmentMax.Value = (decimal)segment_list[1];
+                        Panel3WeaponSegmentMin.Value = (decimal)segment_list[0];
+                    }
+                    break;
+            }
+
+            // Panel3AllList
+            stream = File.OpenText(view_configuration_path);
+            reader = new JsonTextReader(stream);
+            JArray all_list = (JArray)JToken.ReadFrom(reader)["panel3"]["reward_stage_10"];
+            foreach (var item in all_list)
+            {
+                Panel3AllList.Items.Add(item.ToString());
+            }
+        }
+
+        private void Panel3SelectSatge_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int stage_value = int.Parse(Panel3SelectSatge.SelectedItem.ToString());
+            JObject consumption_stage = JObject.Parse("{}");
+            JObject reward_stage = JObject.Parse("{}");
+            JArray reward_stage_list = JArray.Parse("[]");
+            switch (Panel3SelectSatgeType.SelectedItem.ToString())
+            {
+                case "普通关卡":
+                    {
+                        consumption_stage = (JObject)public_json_data["consumption"]["stage"][Panel3SelectSatge.SelectedItem.ToString()];
+                        reward_stage = (JObject)public_json_data["reward"]["stage"][Panel3SelectSatge.SelectedItem.ToString()];
+                    }
+                    break;
+                case "冲塔关卡":
+                    {
+                        consumption_stage = (JObject)public_json_data["consumption"]["tower"][Panel3SelectSatge.SelectedItem.ToString()];
+                        if (stage_value % 10 == 0)
+                        {
+                            reward_stage_list = (JArray)public_json_data["reward"]["tower"][Panel3SelectSatge.SelectedItem.ToString()];
+                        }
+                        else
+                        {
+                            reward_stage = (JObject)public_json_data["reward"]["tower"][Panel3SelectSatge.SelectedItem.ToString()];
+                        }
+                    }
+                    break;
+            }
+            Panel3Clear(); // 清理所有的控件
+            // consumption stage and tower
+            foreach (var item in consumption_stage)
+            {
+                switch (item.Key)
+                {
+                    case "iron":
+                        {
+                            Panel3Iron.Checked = true;
+                            Panel3IronValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "coin":
+                        {
+                            Panel3Coin.Checked = true;
+                            Panel3CoinValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "energy":
+                        {
+                            Panel3Energy.Checked = true;
+                            Panel3EnergyValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                }
+            }
+            // reward stage and  tower
+            foreach (var item in reward_stage_list)
+            {
+                Panel3List.Items.Add(item.ToString());
+            }
+            foreach (var item in reward_stage)
+            {
+                switch (item.Key)
+                {
+                    case "small_energy_potion":
+                        {
+                            Panel3RewardSmallEnergyPotion.Checked = true;
+                            Panel3RewardSmallEnergyPotionValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "coin":
+                        {
+                            Panel3RewardCoin.Checked = true;
+                            Panel3RewardCoinValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "energy":
+                        {
+                            Panel3RewardEnergy.Checked = true;
+                            Panel3RewardEnergyValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "fortune_wheel_ticket_basic": // 低级转卷轴
+                        {
+                            Panel3RewardLowScrollZ.Checked = true;
+                            Panel3RewardLowScrollZValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "fortune_wheel_ticket_pro": // 高级转卷轴
+                        {
+                            Panel3RewardProScrollZ.Checked = true;
+                            Panel3RewardProScrollZValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "iron":
+                        {
+                            Panel3RewardIron.Checked = true;
+                            Panel3RewardIronValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "experience": // 经验
+                        {
+                            Panel3RewardExperience.Checked = true;
+                            Panel3RewardExperienceValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "basic_summon_scroll": // 基础抽卷轴
+                        {
+                            Panel3RewardBasicScrollC.Checked = true;
+                            Panel3RewardBasicScrollCValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "prophet_summon_scroll": // 先知抽卷轴
+                        {
+                            Panel3RewardProphetScrollC.Checked = true;
+                            Panel3RewardProphetScrollCValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "pro_summon_scroll": // 高级抽卷轴
+                        {
+                            Panel3RewardProScrollC.Checked = true;
+                            Panel3RewardProScrollCValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "experience_potion": // 经验药水
+                        {
+                            Panel3RewardExperiencePotion.Checked = true;
+                            Panel3RewardExperiencePotionValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "skill_scroll_10": // 低级卷轴
+                        {
+                            Panel3Reward10Scroll.Checked = true;
+                            Panel3Reward10ScrollValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "skill_scroll_30": // 中级卷轴
+                        {
+                            Panel3Reward30Scroll.Checked = true;
+                            Panel3Reward30ScrollValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                    case "skill_scroll_100": // 高级卷轴
+                        {
+                            Panel3Reward100Scroll.Checked = true;
+                            Panel3Reward100ScrollValue.Value = (decimal)item.Value;
+                        }
+                        break;
+                }
+            }
+        }
+
+        private void Panel3Clear()
+        {
+            // consumption
+            Panel3Iron.Checked = false;
+            Panel3IronValue.Value = 0;
+            Panel3Coin.Checked = false;
+            Panel3CoinValue.Value = 0;
+            Panel3Energy.Checked = false;
+            Panel3EnergyValue.Value = 0;
+            // reward
+            Panel3RewardSmallEnergyPotion.Checked = false;
+            Panel3RewardSmallEnergyPotionValue.Value = 0;
+            Panel3RewardCoin.Checked = false;
+            Panel3RewardCoinValue.Value = 0;
+            Panel3RewardEnergy.Checked = false;
+            Panel3RewardEnergyValue.Value = 0;
+            Panel3RewardLowScrollZ.Checked = false;
+            Panel3RewardLowScrollZValue.Value = 0;
+            Panel3RewardProScrollZ.Checked = false;
+            Panel3RewardProScrollZValue.Value = 0;
+            Panel3RewardIron.Checked = false;
+            Panel3RewardIronValue.Value = 0;
+            Panel3RewardExperience.Checked = false;
+            Panel3RewardExperienceValue.Value = 0;
+            Panel3RewardBasicScrollC.Checked = false;
+            Panel3RewardBasicScrollCValue.Value = 0;
+            Panel3RewardProphetScrollC.Checked = false;
+            Panel3RewardProphetScrollCValue.Value = 0;
+            Panel3RewardProScrollC.Checked = false;
+            Panel3RewardProScrollCValue.Value = 0;
+            Panel3RewardExperiencePotion.Checked = false;
+            Panel3RewardExperiencePotionValue.Value = 0;
+            Panel3Reward10Scroll.Checked = false;
+            Panel3Reward10ScrollValue.Value = 0;
+            Panel3Reward30Scroll.Checked = false;
+            Panel3Reward30ScrollValue.Value = 0;
+            Panel3Reward100Scroll.Checked = false;
+            Panel3Reward100ScrollValue.Value = 0;
+            Panel3List.Items.Clear();
+        }
+
+        private void Panel3DelSatge_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                JObject panel3_del_data;
+                switch (Panel3SelectSatgeType.SelectedItem.ToString())
+                {
+                    case "普通关卡":
+                        {
+                            panel3_del_data = (JObject)public_json_data["consumption"]["stage"];
+                            panel3_del_data.Remove(Panel3SelectSatge.SelectedItem.ToString());
+
+                            panel3_del_data = (JObject)public_json_data["reward"]["stage"];
+                            panel3_del_data.Remove(Panel3SelectSatge.SelectedItem.ToString());
+                        }
+                        break;
+                    case "冲塔关卡":
+                        {
+                            panel3_del_data = (JObject)public_json_data["consumption"]["tower"];
+                            panel3_del_data.Remove(Panel3SelectSatge.SelectedItem.ToString());
+
+                            panel3_del_data = (JObject)public_json_data["reward"]["tower"];
+                            panel3_del_data.Remove(Panel3SelectSatge.SelectedItem.ToString());
+                        }
+                        break;
+                }
+                Panel3SelectSatge.Items.Remove(Panel3SelectSatge.SelectedItem.ToString());
+                Panel3Clear();
+                MessageBox.Show(text: string.Format("删除成功！", current_version), caption: "提示信息", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show("未选择关卡类型或者关卡数，请选择对应关卡后再删除！", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Panel3AddSatge_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int stage = int.Parse(Interaction.InputBox("请输入需要添加的关卡数，关卡数必须为正整数", "输入关卡数", ""));
+                JObject consumption_stage = JObject.Parse("{}");
+                JObject reward_stage = JObject.Parse("{}");
+                if (stage <= 0)
+                {
+                    MessageBox.Show("关卡数必须为正整数，关卡添加失败", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else if (Panel3SelectSatge.Items.Contains(stage.ToString())) // 判断集合中是否存在这个关卡
+                {
+                    MessageBox.Show("关卡已经存在，不需要重复添加，关卡添加失败", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    switch (Panel3SelectSatgeType.SelectedItem.ToString())
+                    {
+                        case "普通关卡":
+                            {
+                                consumption_stage = (JObject)public_json_data["consumption"]["stage"];
+                                reward_stage = (JObject)public_json_data["reward"]["stage"];
+                                consumption_stage.Add(stage.ToString(), JObject.Parse("{}"));
+                                reward_stage.Add(stage.ToString(), JObject.Parse("{}"));
+                            }
+                            break;
+                        case "冲塔关卡":
+                            {
+                                consumption_stage = (JObject)public_json_data["consumption"]["tower"];
+                                reward_stage = (JObject)public_json_data["reward"]["tower"];
+                                consumption_stage.Add(stage.ToString(), JObject.Parse("{}"));
+                                if (stage % 10 == 0) // 整10关卡
+                                {
+                                    reward_stage.Add(stage.ToString(), JArray.Parse("[]"));
+                                }
+                                else
+                                {
+                                    reward_stage.Add(stage.ToString(), JObject.Parse("{}"));
+                                }
+                            }
+                            break;
+                    }
+                    Panel3SelectSatge.Items.Add(stage.ToString());
+                    MessageBox.Show("关卡添加成功", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("输入错误，关卡数必须为正整数", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Panel3WeaponSegmentMax_ValueChanged(object sender, EventArgs e)
+        {
+            if (Panel3WeaponSegmentMax.Value < Panel3WeaponSegmentMin.Value)
+            {
+                Panel3WeaponSegmentMax.Value = Panel3WeaponSegmentMin.Value;
+            }
+        }
+
+        private void Panel3WeaponSegmentMin_ValueChanged(object sender, EventArgs e)
+        {
+            if (Panel3WeaponSegmentMax.Value < Panel3WeaponSegmentMin.Value)
+            {
+                Panel3WeaponSegmentMin.Value = Panel3WeaponSegmentMax.Value;
+            }
+        }
+
+        private void Panel3Del_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int stage_value = int.Parse(Panel3SelectSatge.SelectedItem.ToString());
+                int index = Panel3List.SelectedIndex;
+                if (stage_value % 10 == 0)
+                {
+                    Panel3List.Items.Remove(Panel3List.SelectedItem.ToString());
+                    if (index < Panel3List.Items.Count)
+                    {
+                        Panel3List.SelectedIndex = index;
+                    }
+                    MessageBox.Show("删除成功", "信息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("选择的关卡非整十关卡", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("请选择奖励后再执行删除", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Panel3Add_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int stage_value = int.Parse(Panel3SelectSatge.SelectedItem.ToString());
+                if (stage_value % 10 == 0)
+                {
+                    if (Panel3List.Items.Contains(Panel3AllList.SelectedItem.ToString()))
+                    {
+                        MessageBox.Show("请不要重复添加", "信息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        Panel3List.Items.Add(Panel3AllList.SelectedItem.ToString());
+                        MessageBox.Show("添加成功", "信息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("选择的关卡非整十关卡", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch
+            {
+                MessageBox.Show("请选择奖励后再执行删除", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void Panel3Save_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                JObject consumption_stage = JObject.Parse("{}");
+                JObject reward_stage = JObject.Parse("{}");
+                JArray reward_stage_list = JArray.Parse("[]");
+                int stage_value = int.Parse(Panel3SelectSatge.SelectedItem.ToString());
+                switch (Panel3SelectSatgeType.SelectedItem.ToString())
+                {
+                    case "普通关卡":
+                        {
+                            consumption_stage = (JObject)public_json_data["consumption"]["stage"][Panel3SelectSatge.SelectedItem.ToString()];
+                            reward_stage = (JObject)public_json_data["reward"]["stage"][Panel3SelectSatge.SelectedItem.ToString()];
+                            #region consumption
+                            if (Panel3Iron.Checked)
+                            {
+                                if (consumption_stage.Property("iron") == null) // 判断是否存在属性iron
+                                {
+                                    consumption_stage.Add("iron", (int)Panel3IronValue.Value);
+                                }
+                                else
+                                {
+                                    consumption_stage["iron"] = (int)Panel3IronValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (consumption_stage.Property("iron") != null)
+                                {
+                                    consumption_stage.Remove("iron");
+                                }
+                            }
+                            if (Panel3Coin.Checked)
+                            {
+                                if (consumption_stage.Property("coin") == null) // 判断是否存在属性
+                                {
+                                    consumption_stage.Add("coin", (int)Panel3CoinValue.Value);
+                                }
+                                else
+                                {
+                                    consumption_stage["coin"] = (int)Panel3CoinValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (consumption_stage.Property("coin") != null)
+                                {
+                                    consumption_stage.Remove("coin");
+                                }
+                            }
+                            if (Panel3Energy.Checked)
+                            {
+                                if (consumption_stage.Property("energy") == null) // 判断是否存在属性
+                                {
+                                    consumption_stage.Add("energy", (int)Panel3EnergyValue.Value);
+                                }
+                                else
+                                {
+                                    consumption_stage["energy"] = (int)Panel3EnergyValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (consumption_stage.Property("energy") != null)
+                                {
+                                    consumption_stage.Remove("energy");
+                                }
+                            }
+                            #endregion
+                            #region reward
+                            if (Panel3RewardSmallEnergyPotion.Checked)
+                            {
+                                if (reward_stage.Property("small_energy_potion") == null) // 判断是否存在属性iron
+                                {
+                                    reward_stage.Add("small_energy_potion", (int)Panel3RewardSmallEnergyPotionValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["small_energy_potion"] = (int)Panel3RewardSmallEnergyPotionValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("small_energy_potion") != null)
+                                {
+                                    reward_stage.Remove("small_energy_potion");
+                                }
+                            }
+                            if (Panel3RewardCoin.Checked)
+                            {
+                                if (reward_stage.Property("coin") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("coin", (int)Panel3RewardCoinValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["coin"] = (int)Panel3RewardCoinValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("coin") != null)
+                                {
+                                    reward_stage.Remove("coin");
+                                }
+                            }
+                            if (Panel3RewardEnergy.Checked)
+                            {
+                                if (reward_stage.Property("energy") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("energy", (int)Panel3RewardEnergyValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["energy"] = (int)Panel3RewardEnergyValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("energy") != null)
+                                {
+                                    reward_stage.Remove("energy");
+                                }
+                            }
+                            if (Panel3RewardLowScrollZ.Checked)
+                            {
+                                if (reward_stage.Property("fortune_wheel_ticket_basic") == null) // 判断是否存在属性iron
+                                {
+                                    reward_stage.Add("fortune_wheel_ticket_basic", (int)Panel3RewardLowScrollZValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["fortune_wheel_ticket_basic"] = (int)Panel3RewardLowScrollZValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("fortune_wheel_ticket_basic") != null)
+                                {
+                                    reward_stage.Remove("fortune_wheel_ticket_basic");
+                                }
+                            }
+                            if (Panel3RewardProScrollZ.Checked)
+                            {
+                                if (reward_stage.Property("fortune_wheel_ticket_pro") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("fortune_wheel_ticket_pro", (int)Panel3RewardProScrollZValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["fortune_wheel_ticket_pro"] = (int)Panel3RewardProScrollZValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("fortune_wheel_ticket_pro") != null)
+                                {
+                                    reward_stage.Remove("fortune_wheel_ticket_pro");
+                                }
+                            }
+                            if (Panel3RewardIron.Checked)
+                            {
+                                if (reward_stage.Property("iron") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("iron", (int)Panel3RewardIronValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["iron"] = (int)Panel3RewardIronValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("iron") != null)
+                                {
+                                    reward_stage.Remove("iron");
+                                }
+                            }
+                            if (Panel3RewardExperience.Checked)
+                            {
+                                if (reward_stage.Property("experience") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("experience", (int)Panel3RewardExperienceValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["experience"] = (int)Panel3RewardExperienceValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("experience") != null)
+                                {
+                                    reward_stage.Remove("experience");
+                                }
+                            }
+                            if (Panel3RewardBasicScrollC.Checked)
+                            {
+                                if (reward_stage.Property("basic_summon_scroll") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("basic_summon_scroll", (int)Panel3RewardBasicScrollCValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["basic_summon_scroll"] = (int)Panel3RewardBasicScrollCValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("basic_summon_scroll") != null)
+                                {
+                                    reward_stage.Remove("basic_summon_scroll");
+                                }
+                            }
+                            if (Panel3RewardProphetScrollC.Checked)
+                            {
+                                if (reward_stage.Property("prophet_summon_scroll") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("prophet_summon_scroll", (int)Panel3RewardProphetScrollCValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["prophet_summon_scroll"] = (int)Panel3RewardProphetScrollCValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("prophet_summon_scroll") != null)
+                                {
+                                    reward_stage.Remove("prophet_summon_scroll");
+                                }
+                            }
+                            if (Panel3RewardProScrollC.Checked)
+                            {
+                                if (reward_stage.Property("pro_summon_scroll") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("pro_summon_scroll", (int)Panel3RewardProScrollCValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["pro_summon_scroll"] = (int)Panel3RewardProScrollCValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("pro_summon_scroll") != null)
+                                {
+                                    reward_stage.Remove("pro_summon_scroll");
+                                }
+                            }
+                            if (Panel3RewardExperiencePotion.Checked)
+                            {
+                                if (reward_stage.Property("experience_potion") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("experience_potion", (int)Panel3RewardExperiencePotionValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["experience_potion"] = (int)Panel3RewardExperiencePotionValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("experience_potion") != null)
+                                {
+                                    reward_stage.Remove("experience_potion");
+                                }
+                            }
+                            if (Panel3Reward10Scroll.Checked)
+                            {
+                                if (reward_stage.Property("skill_scroll_10") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("skill_scroll_10", (int)Panel3Reward10ScrollValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["skill_scroll_10"] = (int)Panel3Reward10ScrollValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("skill_scroll_10") != null)
+                                {
+                                    reward_stage.Remove("skill_scroll_10");
+                                }
+                            }
+                            if (Panel3Reward30Scroll.Checked)
+                            {
+                                if (reward_stage.Property("skill_scroll_30") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("skill_scroll_30", (int)Panel3Reward30ScrollValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["skill_scroll_30"] = (int)Panel3Reward30ScrollValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("skill_scroll_30") != null)
+                                {
+                                    reward_stage.Remove("skill_scroll_30");
+                                }
+                            }
+                            if (Panel3Reward100Scroll.Checked)
+                            {
+                                if (reward_stage.Property("skill_scroll_100") == null) // 判断是否存在属性
+                                {
+                                    reward_stage.Add("skill_scroll_100", (int)Panel3Reward100ScrollValue.Value);
+                                }
+                                else
+                                {
+                                    reward_stage["skill_scroll_100"] = (int)Panel3Reward100ScrollValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (reward_stage.Property("skill_scroll_100") != null)
+                                {
+                                    reward_stage.Remove("skill_scroll_100");
+                                }
+                            }
+                            #endregion
+                        }
+                        break;
+                    case "冲塔关卡":
+                        {
+                            consumption_stage = (JObject)public_json_data["consumption"]["tower"][Panel3SelectSatge.SelectedItem.ToString()];
+                            #region consumption
+                            if (Panel3Iron.Checked)
+                            {
+                                if (consumption_stage.Property("iron") == null) // 判断是否存在属性iron
+                                {
+                                    consumption_stage.Add("iron", (int)Panel3IronValue.Value);
+                                }
+                                else
+                                {
+                                    consumption_stage["iron"] = (int)Panel3IronValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (consumption_stage.Property("iron") != null)
+                                {
+                                    consumption_stage.Remove("iron");
+                                }
+                            }
+                            if (Panel3Coin.Checked)
+                            {
+                                if (consumption_stage.Property("coin") == null) // 判断是否存在属性
+                                {
+                                    consumption_stage.Add("coin", (int)Panel3CoinValue.Value);
+                                }
+                                else
+                                {
+                                    consumption_stage["coin"] = (int)Panel3CoinValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (consumption_stage.Property("coin") != null)
+                                {
+                                    consumption_stage.Remove("coin");
+                                }
+                            }
+                            if (Panel3Energy.Checked)
+                            {
+                                if (consumption_stage.Property("energy") == null) // 判断是否存在属性
+                                {
+                                    consumption_stage.Add("energy", (int)Panel3EnergyValue.Value);
+                                }
+                                else
+                                {
+                                    consumption_stage["energy"] = (int)Panel3EnergyValue.Value;
+                                }
+                            }
+                            else
+                            {
+                                if (consumption_stage.Property("energy") != null)
+                                {
+                                    consumption_stage.Remove("energy");
+                                }
+                            }
+                            #endregion
+                            if (stage_value % 10 == 0) // 整十关卡
+                            {
+                                foreach (var item in Panel3List.Items)
+                                {
+                                    reward_stage_list.Add(item.ToString());
+                                }
+                                public_json_data["reward"]["tower"][Panel3SelectSatge.SelectedItem.ToString()] = reward_stage_list;
+                            }
+                            else
+                            {
+                                reward_stage = (JObject)public_json_data["reward"]["tower"][Panel3SelectSatge.SelectedItem.ToString()];
+                                #region reward
+                                if (Panel3RewardSmallEnergyPotion.Checked)
+                                {
+                                    if (reward_stage.Property("small_energy_potion") == null) // 判断是否存在属性iron
+                                    {
+                                        reward_stage.Add("small_energy_potion", (int)Panel3RewardSmallEnergyPotionValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["small_energy_potion"] = (int)Panel3RewardSmallEnergyPotionValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("small_energy_potion") != null)
+                                    {
+                                        reward_stage.Remove("small_energy_potion");
+                                    }
+                                }
+                                if (Panel3RewardCoin.Checked)
+                                {
+                                    if (reward_stage.Property("coin") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("coin", (int)Panel3RewardCoinValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["coin"] = (int)Panel3RewardCoinValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("coin") != null)
+                                    {
+                                        reward_stage.Remove("coin");
+                                    }
+                                }
+                                if (Panel3RewardEnergy.Checked)
+                                {
+                                    if (reward_stage.Property("energy") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("energy", (int)Panel3RewardEnergyValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["energy"] = (int)Panel3RewardEnergyValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("energy") != null)
+                                    {
+                                        reward_stage.Remove("energy");
+                                    }
+                                }
+                                if (Panel3RewardLowScrollZ.Checked)
+                                {
+                                    if (reward_stage.Property("fortune_wheel_ticket_basic") == null) // 判断是否存在属性iron
+                                    {
+                                        reward_stage.Add("fortune_wheel_ticket_basic", (int)Panel3RewardLowScrollZValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["fortune_wheel_ticket_basic"] = (int)Panel3RewardLowScrollZValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("fortune_wheel_ticket_basic") != null)
+                                    {
+                                        reward_stage.Remove("fortune_wheel_ticket_basic");
+                                    }
+                                }
+                                if (Panel3RewardProScrollZ.Checked)
+                                {
+                                    if (reward_stage.Property("fortune_wheel_ticket_pro") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("fortune_wheel_ticket_pro", (int)Panel3RewardProScrollZValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["fortune_wheel_ticket_pro"] = (int)Panel3RewardProScrollZValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("fortune_wheel_ticket_pro") != null)
+                                    {
+                                        reward_stage.Remove("fortune_wheel_ticket_pro");
+                                    }
+                                }
+                                if (Panel3RewardIron.Checked)
+                                {
+                                    if (reward_stage.Property("iron") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("iron", (int)Panel3RewardIronValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["iron"] = (int)Panel3RewardIronValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("iron") != null)
+                                    {
+                                        reward_stage.Remove("iron");
+                                    }
+                                }
+                                if (Panel3RewardExperience.Checked)
+                                {
+                                    if (reward_stage.Property("experience") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("experience", (int)Panel3RewardExperienceValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["experience"] = (int)Panel3RewardExperienceValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("experience") != null)
+                                    {
+                                        reward_stage.Remove("experience");
+                                    }
+                                }
+                                if (Panel3RewardBasicScrollC.Checked)
+                                {
+                                    if (reward_stage.Property("basic_summon_scroll") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("basic_summon_scroll", (int)Panel3RewardBasicScrollCValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["basic_summon_scroll"] = (int)Panel3RewardBasicScrollCValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("basic_summon_scroll") != null)
+                                    {
+                                        reward_stage.Remove("basic_summon_scroll");
+                                    }
+                                }
+                                if (Panel3RewardProphetScrollC.Checked)
+                                {
+                                    if (reward_stage.Property("prophet_summon_scroll") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("prophet_summon_scroll", (int)Panel3RewardProphetScrollCValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["prophet_summon_scroll"] = (int)Panel3RewardProphetScrollCValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("prophet_summon_scroll") != null)
+                                    {
+                                        reward_stage.Remove("prophet_summon_scroll");
+                                    }
+                                }
+                                if (Panel3RewardProScrollC.Checked)
+                                {
+                                    if (reward_stage.Property("pro_summon_scroll") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("pro_summon_scroll", (int)Panel3RewardProScrollCValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["pro_summon_scroll"] = (int)Panel3RewardProScrollCValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("pro_summon_scroll") != null)
+                                    {
+                                        reward_stage.Remove("pro_summon_scroll");
+                                    }
+                                }
+                                if (Panel3RewardExperiencePotion.Checked)
+                                {
+                                    if (reward_stage.Property("experience_potion") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("experience_potion", (int)Panel3RewardExperiencePotionValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["experience_potion"] = (int)Panel3RewardExperiencePotionValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("experience_potion") != null)
+                                    {
+                                        reward_stage.Remove("experience_potion");
+                                    }
+                                }
+                                if (Panel3Reward10Scroll.Checked)
+                                {
+                                    if (reward_stage.Property("skill_scroll_10") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("skill_scroll_10", (int)Panel3Reward10ScrollValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["skill_scroll_10"] = (int)Panel3Reward10ScrollValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("skill_scroll_10") != null)
+                                    {
+                                        reward_stage.Remove("skill_scroll_10");
+                                    }
+                                }
+                                if (Panel3Reward30Scroll.Checked)
+                                {
+                                    if (reward_stage.Property("skill_scroll_30") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("skill_scroll_30", (int)Panel3Reward30ScrollValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["skill_scroll_30"] = (int)Panel3Reward30ScrollValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("skill_scroll_30") != null)
+                                    {
+                                        reward_stage.Remove("skill_scroll_30");
+                                    }
+                                }
+                                if (Panel3Reward100Scroll.Checked)
+                                {
+                                    if (reward_stage.Property("skill_scroll_100") == null) // 判断是否存在属性
+                                    {
+                                        reward_stage.Add("skill_scroll_100", (int)Panel3Reward100ScrollValue.Value);
+                                    }
+                                    else
+                                    {
+                                        reward_stage["skill_scroll_100"] = (int)Panel3Reward100ScrollValue.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    if (reward_stage.Property("skill_scroll_100") != null)
+                                    {
+                                        reward_stage.Remove("skill_scroll_100");
+                                    }
+                                }
+                                #endregion
+                            }
+                            // Segment
+                            JArray segment_list = (JArray)public_json_data["reward"]["tower"]["segment"];
+                            segment_list[0] = (int)Panel3WeaponSegmentMin.Value;
+                            segment_list[1] = (int)Panel3WeaponSegmentMax.Value;
+                        }
+                        break;
+                }
+                File.WriteAllText(string.Format(entry_consumables_config, current_version), public_json_data["consumption"].ToString());
+                File.WriteAllText(string.Format(stage_reward_config, current_version), public_json_data["reward"].ToString());
+                MessageBox.Show("保存成功！", "消息提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch
+            {
+                MessageBox.Show("请选择需要保存的关卡，保存失败", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
         #endregion
 
         #region Panel4
@@ -712,10 +1771,14 @@ namespace configurationView
                         stream = File.OpenText(string.Format(entry_consumables_config, current_version));
                         reader = new JsonTextReader(stream);
                         public_json_data.Add("consumption", (JObject)JToken.ReadFrom(reader));
+                        stream.Close();
+                        reader.Close();
                         // 加载关卡奖励的json数据
                         stream = File.OpenText(string.Format(stage_reward_config, current_version));
                         reader = new JsonTextReader(stream);
                         public_json_data.Add("reward", (JObject)JToken.ReadFrom(reader));
+                        stream.Close();
+                        reader.Close();
 
                     }
                     break;
@@ -752,158 +1815,5 @@ namespace configurationView
             }
         }
 
-        private void Panel3SelectSatgeType_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Panel3SelectSatge.Items.Clear();
-            switch (Panel3SelectSatgeType.SelectedIndex)
-            {
-                case 0: // 普通关卡
-                    {
-                        foreach(var item in (JObject)public_json_data["consumption"]["stage"])
-                        {
-                            Panel3SelectSatge.Items.Add(item.Key);
-                        }
-                    }
-                    break;
-                case 1: // 冲塔关卡
-                    {
-                        foreach (var item in (JObject)public_json_data["consumption"]["tower"])
-                        {
-                            Panel3SelectSatge.Items.Add(item.Key);
-                        }
-                    }
-                    break;
-            }
-        }
-
-        private void Panel3SelectSatge_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            int stage_value = int.Parse(Panel3SelectSatge.SelectedItem.ToString());
-            JObject consumption = (JObject)public_json_data["consumption"][Panel3SelectSatge.SelectedItem.ToString()];
-            JObject reward = (JObject)public_json_data["reward"][Panel3SelectSatge.SelectedItem.ToString()];
-            foreach (var item in consumption)
-            {
-                switch (item.Key)
-                {
-                    case "iron":
-                        {
-                            Panel3Iron.Checked = true;
-                            Panel3IronValue.Value = (decimal)item.Value;
-                        }break;
-                    case "coin":
-                        {
-                            Panel3Coin.Checked = true;
-                            Panel3CoinValue.Value = (decimal)item.Value;
-                        }
-                        break;
-                    case "energy":
-                        {
-                            Panel3Energy.Checked = true;
-                            Panel3EnergyValue.Value = (decimal)item.Value;
-                        }
-                        break;
-                }
-            }
-            if (stage_value % 10 == 0)
-            {
-                foreach (var item in reward)
-                {
-
-                }
-            }
-            else
-            {
-                foreach (var item in reward)
-                {
-                    switch (item.Key)
-                    {
-                        case "small_energy_potion":
-                            {
-                                Panel3RewardSmallEnergyPotion.Checked = true;
-                                Panel3RewardSmallEnergyPotionValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "coin":
-                            {
-                                Panel3RewardCoin.Checked = true;
-                                Panel3RewardCoinValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "energy":
-                            {
-                                Panel3RewardEnergy.Checked = true;
-                                Panel3RewardEnergyValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "fortune_wheel_ticket_basic": // 低级转卷轴
-                            {
-                                Panel3RewardLowScrollZ.Checked = true;
-                                Panel3RewardLowScrollZValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "fortune_wheel_ticket_pro": // 高级转卷轴
-                            {
-                                Panel3RewardProScrollZ.Checked = true;
-                                Panel3RewardProScrollZValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "iron":
-                            {
-                                Panel3RewardIron.Checked = true;
-                                Panel3RewardIronValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "experience": // 经验
-                            {
-                                Panel3RewardExperience.Checked = true;
-                                Panel3RewardExperienceValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "basic_summon_scroll": // 基础抽卷轴
-                            {
-                                Panel3RewardBasicScrollC.Checked = true;
-                                Panel3RewardBasicScrollCValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "prophet_summon_scroll": // 先知抽卷轴
-                            {
-                                Panel3RewardProphetScrollC.Checked = true;
-                                Panel3RewardProphetScrollCValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "pro_summon_scroll": // 高级抽卷轴
-                            {
-                                Panel3RewardProScrollC.Checked = true;
-                                Panel3RewardProScrollCValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "experience_potion": // 经验药水
-                            {
-                                Panel3RewardExperiencePotion.Checked = true;
-                                Panel3RewardExperiencePotionValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "skill_scroll_10": // 低级卷轴
-                            {
-                                Panel3Reward10Scroll.Checked = true;
-                                Panel3Reward10ScrollValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "skill_scroll_30": // 中级卷轴
-                            {
-                                Panel3Reward30Scroll.Checked = true;
-                                Panel3Reward30ScrollValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                        case "skill_scroll_100": // 高级卷轴
-                            {
-                                Panel3Reward100Scroll.Checked = true;
-                                Panel3Reward100ScrollValue.Value = (decimal)item.Value;
-                            }
-                            break;
-                    }
-                }
-            }
-        }
     }
 }
