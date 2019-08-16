@@ -64,9 +64,7 @@ class ChatServer:
 			fname, members = await self._update_families_cache(fid)
 			for changed in oldmembers ^ members:
 				await self._update_fid(changed)
-			if fname:
-				await self._send(self._make_message('FNAME', fname), *[self.users[u]['w'] for u in self.families[fid]['members']])
-			else:
+			if not fname:
 				del self.families[fid]
 
 	# forwards the message to all users in family chat
@@ -101,10 +99,6 @@ class ChatServer:
 			await self._handle_name_collision(name)
 		self.users[name]['w'] = writer
 		await self._update_fid(name)
-		if 'fid' in self.users[name]:
-			if 'fname' not in self.families[self.users[name]['fid']]:
-				await self._update_families_cache(self.users[name]['fid'])
-			await self._send(self._make_message('FNAME', self.families[self.users[name]['fid']]['fname']), writer)
 		return name
 
 	# fetches the latest family information from the database and updates the cached version

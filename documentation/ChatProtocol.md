@@ -58,7 +58,6 @@ Following that, the user can send and receive messages.
 | --- | --- |
 | ERROR | error number : error message |
 | FAMILY | message |
-| FNAME | the name of the family |
 | PRIVATE| game\_name\_from : game\_name\_to : message |
 | PUBLIC | message |
 
@@ -81,7 +80,6 @@ There is a **familyid** column in each player table which is initially set to em
 When the client **REGISTER**s with the server, the server will query the database for this value.
 If the client's **familyid** is empty, he is not a part of any family chat.
 Additionally, there is a **families** table which contains rows of family information, indexed by the unique **familyid**.
-If the client is part of a family, the server will send back an **FNAME** command containing the name of the family of which they are a member.
 
 
 To be a part of a family, a user must either create a new family or be added to an existing one.
