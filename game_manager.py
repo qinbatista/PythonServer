@@ -1789,12 +1789,24 @@ class GameManager:
 		r = requests.post('http://localhost:8020/send_mail', json = j)
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
-	async def invite_user_family(self, world: int, unique_id: str, target: str) -> dict:
+	async def invite_user_family(self, world: int, uid: str, target: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox
-		# 97 - target is not a member of a family
-		# 98 - you already belong to a family
+		# 95 - target does not exist
+		# 96 - target is already in a family
+		# 97 - you must be family owner
+		# 98 - you do not belong to a family
 		# 99 - invalid target
-		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
+		game_name, fid = await self._get_familyid(world, unique_id = uid)
+		if fid is None or fid == '': return self._message_typesetting(98, 'not in a family')
+		owner, fname, members = await self._get_family_information(world, fid)
+		if owner != game_name: return self._message_typesetting(97, 'you must be family owner')
+		tgame_name, tfid = await self._get_familyid(world, game_name = target)
+		if not tgame_name: return self._message_typesetting(95, 'target does not exist')
+		if tfid is not None and tfid != '': return self._message_typesetting(96, 'target already in a family')
+		targetuid = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{target}";')
+		j = {'world' : 0, 'uid_to' : targetuid[0][0], 'kwargs' : {'from' : game_name, 'subject' : 'New join family request', 'body' : f'{game_name} invites you to join their family!', 'type' : 'family_request', 'fid' : fid, 'fname' : fname, 'target' : tgame_name, 'uid' : targetuid[0][0]}}
+		r = requests.post('http://localhost:8020/send_mail', json = j)
+		return self._message_typesetting(0, 'success, request sent')
 
 
 #############################################################################
@@ -3035,6 +3047,11 @@ async def _create_family(request: web.Request) -> web.Response:
 async def _request_join_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).request_join_family(int(post['world']), post['unique_id'], post['fname']))
+
+@ROUTES.post('/invite_user_family')
+async def _invite_user_family(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).invite_user_family(int(post['world']), post['unique_id'], post['target']))
 
 @ROUTES.post('/remove_user_family')
 async def _remove_user_family(request: web.Request) -> web.Response:
