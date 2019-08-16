@@ -293,7 +293,7 @@
             this.Panel1.Controls.Add(this.Panel1AddStage);
             this.Panel1.Controls.Add(this.Panel1DelStage);
             this.Panel1.Controls.Add(this.StageNumber);
-            this.Panel1.Location = new System.Drawing.Point(477, 137);
+            this.Panel1.Location = new System.Drawing.Point(479, 137);
             this.Panel1.Name = "Panel1";
             this.Panel1.Size = new System.Drawing.Size(10, 10);
             this.Panel1.TabIndex = 1;
@@ -335,7 +335,6 @@
             this.ColdDownTime.Name = "ColdDownTime";
             this.ColdDownTime.Size = new System.Drawing.Size(81, 28);
             this.ColdDownTime.TabIndex = 12;
-            this.ColdDownTime.ValueChanged += new System.EventHandler(this.ColdDownTime_ValueChanged);
             // 
             // groupBox2
             // 
@@ -353,7 +352,6 @@
             this.TotalTime.Name = "TotalTime";
             this.TotalTime.Size = new System.Drawing.Size(81, 28);
             this.TotalTime.TabIndex = 10;
-            this.TotalTime.ValueChanged += new System.EventHandler(this.TotalTime_ValueChanged);
             // 
             // WaveNumber
             // 
@@ -425,7 +423,6 @@
             this.IsPreWaveFinish.TabIndex = 28;
             this.IsPreWaveFinish.Text = "等待上一波怪打完";
             this.IsPreWaveFinish.UseVisualStyleBackColor = true;
-            this.IsPreWaveFinish.CheckedChanged += new System.EventHandler(this.IsPreWaveFinish_CheckedChanged);
             // 
             // label8
             // 
@@ -461,7 +458,6 @@
             this.MonsterAmount.Name = "MonsterAmount";
             this.MonsterAmount.Size = new System.Drawing.Size(81, 28);
             this.MonsterAmount.TabIndex = 24;
-            this.MonsterAmount.ValueChanged += new System.EventHandler(this.MonsterAmount_ValueChanged);
             // 
             // label7
             // 
@@ -1316,7 +1312,7 @@
             this.Panel3.Controls.Add(this.groupBox24);
             this.Panel3.Location = new System.Drawing.Point(0, 191);
             this.Panel3.Name = "Panel3";
-            this.Panel3.Size = new System.Drawing.Size(1178, 510);
+            this.Panel3.Size = new System.Drawing.Size(1178, 520);
             this.Panel3.TabIndex = 11;
             this.Panel3.Visible = false;
             // 
