@@ -41,20 +41,35 @@ To initiate communication with the server, the client must send the **REGISTER**
 
 Following that, the user can send and receive messages.
 
-## Valid Commands and Arguments
+## Message Format
+
+### Client Requests
+| command | arguments |
+| --- | --- |
+| EXIT | no arguments |
+| FAMILY | message |
+| PRIVATE| game\_name\_to : message |
+| PUBLIC | message |
+| REGISTER | game\_name of the client |
+| UPDATE | refresh family membership cache, resend family name |
+
+### Server Responses
+| command | arguments |
+| --- | --- |
+| ERROR | error number : error message |
+| FAMILY | message |
+| PRIVATE| game\_name\_from : game\_name\_to : message |
+| PUBLIC | message |
 
 
-| command | arguments | client -\> server | server -\> client|
-| --- | --- | :---: | :---: |
-| REGISTER | game\_name of the client | 是 | 否  |
-| PUBLIC | message | 是 | 是 |
-| FAMILY | message | 是 | 是 |
-| PRIVATE| game\_name\_recipient **:** message | 是 | 是 |
-| EXIT | no arguments | 是 | 否 |
-| ERROR | error message | 否 | 是 |
-| FNAME | the name of the family | 否 | 是 |
-| UPDATE | refresh family membership cache, resend family name| 是 | 否 |
 
+## Error Codes
+| code | message |
+| :---: | --- |
+| 90 | User is not online |
+| 91 | Don't be an idiot |
+| 80 | Your family is offline |
+| 81 | You don't have a family |
 
 
 
@@ -65,7 +80,6 @@ There is a **familyid** column in each player table which is initially set to em
 When the client **REGISTER**s with the server, the server will query the database for this value.
 If the client's **familyid** is empty, he is not a part of any family chat.
 Additionally, there is a **families** table which contains rows of family information, indexed by the unique **familyid**.
-If the client is part of a family, the server will send back an **FNAME** command containing the name of the family of which they are a member.
 
 
 To be a part of a family, a user must either create a new family or be added to an existing one.
