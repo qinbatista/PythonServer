@@ -46,6 +46,9 @@ Depending on the type of message, you can expect to find these additional items 
 - **friend\_request**:
 	- nonce - a one time use code to confirm friend request
 	- sender - the game name of the user who sent the request
+- **family\_request**:
+	- nonce - a one time use code to confirm family request
+	- fname - the name of the family
 
 
 
@@ -162,6 +165,7 @@ Current valid types of messages:
 - **simple** - A simple message containing only text
 - **gift**   - A message containing a gift attachment
 - **friend\_request** - A message containing a friend request
+- **family\_request** - A message containing a family request
 
 If the type of message is **gift**, additional arguments are required (inside kwargs):
 ```json
@@ -179,6 +183,13 @@ If the type of message is **friend\_request**, additional arguments are required
 ```json
 "sender" : the game name of the friend request sender,
 "uid_sender" : the unique_id of the sender
+```
+
+If the type of message is **family\_request**, additional arguments are required (inside kwargs):
+```json
+"fid" : the family id,
+"fname" : the name of the family,
+"target": the game name of the user who might be added to the family
 ```
 
 ##### Sample POST (json format)
