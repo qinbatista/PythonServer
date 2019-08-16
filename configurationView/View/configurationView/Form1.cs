@@ -1718,13 +1718,14 @@ namespace configurationView
         {
             Panel1.Visible = false;
             Panel2.Visible = false;
+            Panel3.Visible = false;
             VersionOption.SelectedItem = current_version.ToString();
-            Height = 520;
-            Location = new Point(Location.X, 89);
             switch (FunctionOption.SelectedIndex)
             {
                 case 0: // 怪物生成设置
                     {
+                        Height = 520;
+                        Location = new Point(Location.X, 89);
                         Panel1.Location = new Point(PanelX, PanelY);
                         Panel1.Width = width;
                         Panel1.Height = height;
@@ -1732,6 +1733,8 @@ namespace configurationView
                     } break;
                 case 1: // 怪物属性：monster_config
                     {
+                        Height = 520;
+                        Location = new Point(Location.X, 89);
                         Panel2.Location = new Point(PanelX, PanelY);
                         Panel2.Width = width;
                         Panel2.Height = height;
@@ -1762,6 +1765,8 @@ namespace configurationView
                     break;
                 case 2: // 关卡配置：entry_consumables_config / stage_reward_config
                     {
+                        Height = 520;
+                        Location = new Point(Location.X, 89);
                         Panel3.Location = new Point(PanelX, PanelY);
                         Panel3.Width = width;
                         Panel3.Height = height;
@@ -1784,7 +1789,10 @@ namespace configurationView
                     break;
                 case 3: // 挂机奖励：hang_reward_config
                     {
-
+                        Height = 200;
+                        Location = new Point(Location.X, 240);
+                        Hide();
+                        new HangRewardView(this, string.Format(hang_reward_config, current_version)).Show();
                     }
                     break;
                 case 4: // 抽奖奖励：lottery_config
