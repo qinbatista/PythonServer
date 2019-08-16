@@ -41,20 +41,36 @@ To initiate communication with the server, the client must send the **REGISTER**
 
 Following that, the user can send and receive messages.
 
-## Valid Commands and Arguments
+## Message Format
+
+### Client Requests
+| command | arguments |
+| --- | --- |
+| EXIT | no arguments |
+| FAMILY | message |
+| PRIVATE| game\_name\_to : message |
+| PUBLIC | message |
+| REGISTER | game\_name of the client |
+| UPDATE | refresh family membership cache, resend family name |
+
+### Server Responses
+| command | arguments |
+| --- | --- |
+| ERROR | error number : error message |
+| FAMILY | message |
+| FNAME | the name of the family |
+| PRIVATE| game\_name\_from : game\_name\_to : message |
+| PUBLIC | message |
 
 
-| command | arguments | client -\> server | server -\> client|
-| --- | --- | :---: | :---: |
-| REGISTER | game\_name of the client | 是 | 否  |
-| PUBLIC | message | 是 | 是 |
-| FAMILY | message | 是 | 是 |
-| PRIVATE| game\_name\_recipient **:** message | 是 | 是 |
-| EXIT | no arguments | 是 | 否 |
-| ERROR | error message | 否 | 是 |
-| FNAME | the name of the family | 否 | 是 |
-| UPDATE | refresh family membership cache, resend family name| 是 | 否 |
 
+## Error Codes
+| code | message |
+| :---: | --- |
+| 90 | User is not online |
+| 91 | Don't be an idiot |
+| 80 | Your family is offline |
+| 81 | You don't have a family |
 
 
 
