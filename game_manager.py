@@ -1574,15 +1574,14 @@ class GameManager:
 	async def redeem_all_nonce(self, world: int, unique_id: str, type_list: [str], nonce_list: [str]) -> dict:
 		# success -> 0
 		# 0 - Add friends to success
-		# 97 - There is an expired nonce
 		# 98 - database operating error
 		# 99 - You already have this friend
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : type_list, 'nonce' : nonce_list})
 		data = response.json()
-		remaining = {"nonce_list": []}
+		remaining = {"nonce_list": nonce_list, "expired_nonce": []}
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		try:
-			for i in range(len(type_list)):
+		for i in range(len(type_list)):
+			if data[nonce_list[i]]["status"] == 0:
 				if type_list[i] == "gift":
 					items = data[nonce_list[i]]["items"]
 					quantities = data[nonce_list[i]]["quantities"]
@@ -1591,12 +1590,10 @@ class GameManager:
 						return self._message_typesetting(status=98, message="database operating error")
 					sql_str = f"select {items} from player where unique_id='{unique_id}'"
 					quantities = (await self._execute_statement(world=world, statement=sql_str))[0][0]
-					remaining["nonce_list"].append(nonce_list[i])
 					remaining.update({items: quantities})
 				elif type_list[i] == "simple":
 					pass
 				elif type_list[i] == "friend_request":
-
 					friend_name = data[nonce_list[i]]["sender"]
 					friend_id = data[nonce_list[i]]["uid_sender"]
 					unique_data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
@@ -1609,9 +1606,9 @@ class GameManager:
 						remaining["nonce_list"].append(nonce_list[i])
 				else:
 					return self._message_typesetting(status=99, message="type_list error")
-			return self._message_typesetting(status=0, message="successfully redeemed", data={"remaining": remaining})
-		except:
-			return self._message_typesetting(status=97, message="There is an expired nonce")
+			else:
+				remaining["expired_nonce"].append(nonce_list[i])
+		return self._message_typesetting(status=0, message="successfully redeemed", data={"remaining": remaining})
 
 	async def request_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# success -> 0

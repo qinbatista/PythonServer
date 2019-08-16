@@ -47,8 +47,6 @@
             this.ProphetScrollC = new System.Windows.Forms.CheckBox();
             this.BasicScrollCValue = new System.Windows.Forms.NumericUpDown();
             this.SmallEnergyPotion = new System.Windows.Forms.CheckBox();
-            this.EnergyValue = new System.Windows.Forms.NumericUpDown();
-            this.Energy = new System.Windows.Forms.CheckBox();
             this.CoinValue = new System.Windows.Forms.NumericUpDown();
             this.Coin = new System.Windows.Forms.CheckBox();
             this.SmallEnergyPotionValue = new System.Windows.Forms.NumericUpDown();
@@ -69,7 +67,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.IronValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ProphetScrollCValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.BasicScrollCValue)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.EnergyValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CoinValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SmallEnergyPotionValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ProphetScrollCProbability)).BeginInit();
@@ -93,7 +90,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(161, 88);
+            this.label2.Location = new System.Drawing.Point(147, 88);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(80, 18);
             this.label2.TabIndex = 1;
@@ -103,14 +100,15 @@
             // 
             this.HangStageSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.HangStageSelect.FormattingEnabled = true;
-            this.HangStageSelect.Location = new System.Drawing.Point(247, 85);
+            this.HangStageSelect.Location = new System.Drawing.Point(233, 84);
             this.HangStageSelect.Name = "HangStageSelect";
             this.HangStageSelect.Size = new System.Drawing.Size(232, 26);
             this.HangStageSelect.TabIndex = 2;
+            this.HangStageSelect.SelectedIndexChanged += new System.EventHandler(this.HangStageSelect_SelectedIndexChanged);
             // 
             // AddSatge
             // 
-            this.AddSatge.Location = new System.Drawing.Point(700, 78);
+            this.AddSatge.Location = new System.Drawing.Point(698, 78);
             this.AddSatge.Name = "AddSatge";
             this.AddSatge.Size = new System.Drawing.Size(79, 39);
             this.AddSatge.TabIndex = 7;
@@ -125,6 +123,7 @@
             this.DelSatge.TabIndex = 6;
             this.DelSatge.Text = "删除";
             this.DelSatge.UseVisualStyleBackColor = true;
+            this.DelSatge.Click += new System.EventHandler(this.DelSatge_Click);
             // 
             // Hang100ScrollValue
             // 
@@ -220,7 +219,7 @@
             // 
             // IronValue
             // 
-            this.IronValue.Location = new System.Drawing.Point(856, 152);
+            this.IronValue.Location = new System.Drawing.Point(783, 156);
             this.IronValue.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -233,7 +232,7 @@
             // Iron
             // 
             this.Iron.AutoSize = true;
-            this.Iron.Location = new System.Drawing.Point(798, 154);
+            this.Iron.Location = new System.Drawing.Point(725, 159);
             this.Iron.Name = "Iron";
             this.Iron.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.Iron.Size = new System.Drawing.Size(52, 22);
@@ -279,7 +278,7 @@
             // SmallEnergyPotion
             // 
             this.SmallEnergyPotion.AutoSize = true;
-            this.SmallEnergyPotion.Location = new System.Drawing.Point(48, 154);
+            this.SmallEnergyPotion.Location = new System.Drawing.Point(103, 159);
             this.SmallEnergyPotion.Name = "SmallEnergyPotion";
             this.SmallEnergyPotion.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.SmallEnergyPotion.Size = new System.Drawing.Size(124, 22);
@@ -287,32 +286,9 @@
             this.SmallEnergyPotion.Text = "小能量药水";
             this.SmallEnergyPotion.UseVisualStyleBackColor = true;
             // 
-            // EnergyValue
-            // 
-            this.EnergyValue.Location = new System.Drawing.Point(630, 152);
-            this.EnergyValue.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-            this.EnergyValue.Name = "EnergyValue";
-            this.EnergyValue.Size = new System.Drawing.Size(75, 28);
-            this.EnergyValue.TabIndex = 64;
-            // 
-            // Energy
-            // 
-            this.Energy.AutoSize = true;
-            this.Energy.Location = new System.Drawing.Point(554, 155);
-            this.Energy.Name = "Energy";
-            this.Energy.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.Energy.Size = new System.Drawing.Size(70, 22);
-            this.Energy.TabIndex = 63;
-            this.Energy.Text = "能量";
-            this.Energy.UseVisualStyleBackColor = true;
-            // 
             // CoinValue
             // 
-            this.CoinValue.Location = new System.Drawing.Point(404, 152);
+            this.CoinValue.Location = new System.Drawing.Point(508, 156);
             this.CoinValue.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -325,7 +301,7 @@
             // Coin
             // 
             this.Coin.AutoSize = true;
-            this.Coin.Location = new System.Drawing.Point(328, 154);
+            this.Coin.Location = new System.Drawing.Point(432, 159);
             this.Coin.Name = "Coin";
             this.Coin.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
             this.Coin.Size = new System.Drawing.Size(70, 22);
@@ -335,7 +311,7 @@
             // 
             // SmallEnergyPotionValue
             // 
-            this.SmallEnergyPotionValue.Location = new System.Drawing.Point(178, 152);
+            this.SmallEnergyPotionValue.Location = new System.Drawing.Point(233, 156);
             this.SmallEnergyPotionValue.Maximum = new decimal(new int[] {
             10000,
             0,
@@ -484,8 +460,6 @@
             this.Controls.Add(this.ProphetScrollC);
             this.Controls.Add(this.BasicScrollCValue);
             this.Controls.Add(this.SmallEnergyPotion);
-            this.Controls.Add(this.EnergyValue);
-            this.Controls.Add(this.Energy);
             this.Controls.Add(this.CoinValue);
             this.Controls.Add(this.Coin);
             this.Controls.Add(this.SmallEnergyPotionValue);
@@ -505,7 +479,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.IronValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ProphetScrollCValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.BasicScrollCValue)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.EnergyValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CoinValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.SmallEnergyPotionValue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ProphetScrollCProbability)).EndInit();
@@ -540,8 +513,6 @@
         private System.Windows.Forms.CheckBox ProphetScrollC;
         private System.Windows.Forms.NumericUpDown BasicScrollCValue;
         private System.Windows.Forms.CheckBox SmallEnergyPotion;
-        private System.Windows.Forms.NumericUpDown EnergyValue;
-        private System.Windows.Forms.CheckBox Energy;
         private System.Windows.Forms.NumericUpDown CoinValue;
         private System.Windows.Forms.CheckBox Coin;
         private System.Windows.Forms.NumericUpDown SmallEnergyPotionValue;

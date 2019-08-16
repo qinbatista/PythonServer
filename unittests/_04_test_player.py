@@ -195,7 +195,7 @@ def get_new_mail(unique_id: str):
 
 
 def get_all_mail(unique_id: str):
-	result = requests.post('http://localhost:8004/get_new_mail', data={"world": 0, 'unique_id': unique_id})
+	result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id})
 	print(str(result.text))
 
 
@@ -222,10 +222,10 @@ def send_all_friend_gift(unique_id: str):
 
 
 def get_new_mail_nonce_list(unique_id: str) -> (list, list):
-	result = requests.post('http://localhost:8004/get_new_mail', data={"world": 0, 'unique_id': unique_id})
+	result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id})
 	print(str(result.text))
-	type_list = []
-	nonce_list = []
+	type_list = ["gift"]
+	nonce_list = ["111"]
 	for data in result.json()['data']['mail']:
 		type_list.append(data['type'])
 		nonce_list.append(data['data']['nonce'])
@@ -351,7 +351,6 @@ if __name__ == "__main__":
 	# get_all_mail(unique_id="1")
 	# send_friend_gift(unique_id="4", friend_name="a")
 	# nonce = get_new_mail(unique_id="1")
-	# get_all_mail(unique_id="1")
 	# redeem_nonce(unique_id="1", nonce="5238947786014068689996630933856144383091275996565077486443260087176438651269")
 	# get_all_mail(unique_id="1")
 
@@ -360,17 +359,20 @@ if __name__ == "__main__":
 	# response_friend(unique_id="1", nonce=nonce)
 	# response_friend(unique_id="1", nonce="32963693688928993319733151846953915999978396660497710378095972836181446004813")
 
-	request_friend(unique_id="4", friend_name="g")
+	# request_friend(unique_id="4", friend_name="g")
 	# request_friend(unique_id="2", friend_name="g")
 	# request_friend(unique_id="3", friend_name="g")
 
-	send_friend_gift(unique_id="1", friend_name="g")
-	send_friend_gift(unique_id="2", friend_name="g")
-	send_friend_gift(unique_id="3", friend_name="g")
+	# send_friend_gift(unique_id="1", friend_name="g")
+	# send_friend_gift(unique_id="2", friend_name="g")
+	# send_friend_gift(unique_id="3", friend_name="g")
 	# send_all_friend_gift(unique_id="1")
+	# get_new_mail(unique_id="7")
+	# get_all_mail(unique_id="7")
 	# enumerate
 	type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
 	redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
+	# get_all_mail(unique_id="7")
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
