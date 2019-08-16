@@ -293,9 +293,9 @@
             this.Panel1.Controls.Add(this.Panel1AddStage);
             this.Panel1.Controls.Add(this.Panel1DelStage);
             this.Panel1.Controls.Add(this.StageNumber);
-            this.Panel1.Location = new System.Drawing.Point(0, 191);
+            this.Panel1.Location = new System.Drawing.Point(479, 137);
             this.Panel1.Name = "Panel1";
-            this.Panel1.Size = new System.Drawing.Size(1178, 505);
+            this.Panel1.Size = new System.Drawing.Size(10, 10);
             this.Panel1.TabIndex = 1;
             this.Panel1.Visible = false;
             // 
@@ -1310,9 +1310,9 @@
             this.Panel3.Controls.Add(this.Panel3AddSatge);
             this.Panel3.Controls.Add(this.Panel3DelSatge);
             this.Panel3.Controls.Add(this.groupBox24);
-            this.Panel3.Location = new System.Drawing.Point(569, 130);
+            this.Panel3.Location = new System.Drawing.Point(0, 191);
             this.Panel3.Name = "Panel3";
-            this.Panel3.Size = new System.Drawing.Size(14, 17);
+            this.Panel3.Size = new System.Drawing.Size(1178, 520);
             this.Panel3.TabIndex = 11;
             this.Panel3.Visible = false;
             // 

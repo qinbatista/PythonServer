@@ -956,8 +956,6 @@ namespace configurationView
             try
             {
                 int stage = int.Parse(Interaction.InputBox("请输入需要添加的关卡数，关卡数必须为正整数", "输入关卡数", ""));
-                JObject consumption_stage = JObject.Parse("{}");
-                JObject reward_stage = JObject.Parse("{}");
                 if (stage <= 0)
                 {
                     MessageBox.Show("关卡数必须为正整数，关卡添加失败", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -968,6 +966,8 @@ namespace configurationView
                 }
                 else
                 {
+                    JObject consumption_stage = JObject.Parse("{}");
+                    JObject reward_stage = JObject.Parse("{}");
                     switch (Panel3SelectSatgeType.SelectedItem.ToString())
                     {
                         case "普通关卡":
@@ -999,6 +999,10 @@ namespace configurationView
                 }
             }
             catch (NullReferenceException)
+            {
+                MessageBox.Show("未选择关卡类型", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (FormatException)
             {
                 MessageBox.Show("输入错误，关卡数必须为正整数", "错误提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
