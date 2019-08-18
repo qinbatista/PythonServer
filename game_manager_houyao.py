@@ -2425,6 +2425,65 @@ class GameManager:
 		select_str = select_str[: len(select_str) - 2] + select_end_str
 		return update_str, select_str
 
+#############################################################################################
+#  start 2019年8月18日14点59分 houyao #######################################################
+#############################################################################################
+	async def _select_factory(self, world: int, unique_id) -> tuple:
+		sql_str = f"select * from factory where unique_id={unique_id}"
+		try:
+			return list((await self._execute_statement(world, sql_str))[0])
+		except:
+			await self._execute_statement(world, f'INSERT INTO factory (unique_id, role_name) VALUES ("{unique_id}", "{role}")')
+			return list((await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"'))[0])
+		pass
+
+	async def refresh_storage(self, world: int, unique_id: str) -> dict:
+		"""
+		思路：根据world和unique_id查询所有工厂的工作时长，获取相应的值
+		"""
+		food_factory = self._factory_config["food_factory"]
+		mine_factory = self._factory_config["mine_factory"]
+		crystal_factory = self._factory_config["crystal_factory"]
+		equipment_factory = self._factory_config["equipment_factory"]
+
+	async def distribution_worker(self, world: int, unique_id: str, workers_quantity: int, factory_kind: str):
+		"""
+		0 - sccuess
+		97 - Insufficient distribution workers
+		98 - Factory type error
+		99 - The number of workers assigned is not a positive integer
+		思路： 判断分配的工人数量workers_quantity是否为为正整数 The number of workers assigned is not a positive integer ==> 代号99，
+		工厂类型factory_kind是否在数据库表中 Factory type error ==> 代号98，查询数据库表中是否存在unique_id的数据，
+		不存在则创建，获取数据库中的所有工人的数量totally_workers和正在此工厂工作的工人数量factory_workers，
+		判断所有工人的数量是否大于等于分配的工人数量
+		分歧思路1.如果小于则分配完所有的工人到指定的工厂下工作
+		# 分歧思路2.如果小于则报错Insufficient distribution workers ==> 代号97
+		# 分歧思路3.判断所有工人数是否大于0，如果大于0则将所有的工人分配到指定的工厂下工作，否则报错Insufficient distribution workers ==> 代号97，
+		最终正确结果返回字典键值对包含以下：==> 代号0
+			1.所有工人的数量：totally_workers
+			2.指定的工厂的工厂类型：factory_kind
+			3.指定的工厂下工作人员数量：factory_workers
+			4.工厂开始工作时间：factory_timer
+			5.此工厂的收获物品类型：factory_reward_kind
+			5.此工厂的收获物品数量：factory_reward_quantity
+		问题：如果指定工厂之前存在工人在工作则结算后的工作时间是否统一成当前时间
+		"""
+		if workers_quantity <= 0:
+			return self._message_typesetting(status=99, message="The number of workers assigned is not a positive integer")
+
+		# if factory_kind not in
+
+	async def product_food(self, world: int, unique_id: str):
+		"""
+		根据世界unique_id查询工厂表中的（食品工厂的等级、食品工厂的冷却开始时间、食品工厂的工人、存储的食物数量）
+		"""
+		food_config = self._factory_config["food_factory"]
+		food_cool = food_config["time_consuming"]
+		sql_str = f"select food"
+
+#############################################################################################
+#  end   2019年8月18日14点59分 houyao #######################################################
+#############################################################################################
 	async def _execute_statement(self, world: int, statement: str) -> tuple:
 		"""
 		Executes the given statement and returns the result.
@@ -2475,6 +2534,7 @@ class GameManager:
 	def _refresh_configuration(self):
 		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
+		self._factory_config = d['factory']
 		self._stage_reward = d['reward']
 		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
 		self._upgrade_chance = d['skill']['upgrade_chance']

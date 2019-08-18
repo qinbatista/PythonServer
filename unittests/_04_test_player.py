@@ -253,9 +253,11 @@ def get_top_damage(unique_id: str,range_number:str):
 	result = requests.post('http://localhost:8004/get_top_damage', data={"world": 0, 'unique_id': unique_id,"range_number":range_number})
 	print(str(result.text))
 def test():
-	s22k = "999"
-	s21k = "939"
-	print(eval("s2%sk"%2))
+	# s22k = "999"
+	# s21k = "939"
+	# print(eval("s2%sk"%2))
+	for i in range(1, 5):
+		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
 	# result = requests.post('http://localhost:8004/basic_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
@@ -374,8 +376,9 @@ if __name__ == "__main__":
 	# get_new_mail(unique_id="7")
 	# get_all_mail(unique_id="7")
 	# enumerate
-	type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
-	redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
+	test()
+	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
+	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
 	# get_all_mail(unique_id="7")
 	# end   ########################################################
 	# enter_stage(stage=1)
