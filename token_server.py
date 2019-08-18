@@ -8,6 +8,7 @@ import configparser
 
 
 from aiohttp import web
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 # NOTE THIS IS NOT PRODUCTION READY
@@ -19,8 +20,7 @@ class TokenServer:
 		self._secret = 'password'
 		self._alg = 'HS256'
 		self._delta = 3600*24*30
-		self._gift_table = {}
-		self._fr_table = {}
+		self._nonce_table = defaultdict(dict)
 
 	
 	async def issue_token(self, unique_id: str, prev_token: str) -> dict:
@@ -44,13 +44,16 @@ class TokenServer:
 		try:
 			nonce = self._generate_nonce()
 			if mtype == 'gift':
-				self._gift_table[nonce] = {}
-				self._gift_table[nonce]['items'] = kwargs['items']
-				self._gift_table[nonce]['quantities'] = kwargs['quantities']
+				self._nonce_table[nonce]['items'] = kwargs['items']
+				self._nonce_table[nonce]['quantities'] = kwargs['quantities']
 			elif mtype == 'friend_request':
-				self._fr_table[nonce] = {}
-				self._fr_table[nonce]['uid_sender'] = kwargs['uid_sender']
-				self._fr_table[nonce]['sender'] = kwargs['sender']
+				self._nonce_table[nonce]['uid_sender'] = kwargs['uid_sender']
+				self._nonce_table[nonce]['sender'] = kwargs['sender']
+			elif mtype == 'family_request':
+				self._nonce_table[nonce]['fid'] = kwargs['fid']
+				self._nonce_table[nonce]['uid'] = kwargs['uid']
+				self._nonce_table[nonce]['target'] = kwargs['target']
+
 
 		except KeyError:
 			return self._message_typesetting(-1, 'invalid request format')
@@ -60,16 +63,10 @@ class TokenServer:
 	async def redeem_nonce(self, types: [str], nonces: [str]) -> dict:
 		results = {}
 		for t, n in zip(types, nonces):
-			if t == 'gift':
-				if n not in self._gift_table:
-					results[n] = {'status' : 1, 'type' : 'gift'}
-				else:
-					results[n] = {'status' : 0, 'type' : 'gift', **self._gift_table.pop(n)}
-			elif t == 'friend_request':
-				if n not in self._fr_table:
-					results[n] = {'status' : 1, 'type' : 'friend_request'}
-				else:
-					results[n] = {'status' : 0, 'type' : 'friend_request', **self._fr_table.pop(n)}
+			if n not in self._nonce_table:
+				results[n] = {'status' : 1, 'type' : t}
+			else:
+				results[n] = {'status' : 0, 'type' : t, **self._nonce_table.pop(n)}
 		return results
 
 

@@ -64,34 +64,32 @@ class ChatServer:
 			fname, members = await self._update_families_cache(fid)
 			for changed in oldmembers ^ members:
 				await self._update_fid(changed)
-			if fname:
-				await self._send(self._make_message('FNAME', fname), *[self.users[u]['w'] for u in self.families[fid]['members']])
-			else:
+			if not fname:
 				del self.families[fid]
 
 	# forwards the message to all users in family chat
 	async def send_family(self, name, message):
 		if 'fid' not in self.users[name]:
-			await self._send(self._make_message('ERROR', 'You have no family'), self.users[name]['w'])
+			await self._send(self._make_message('ERROR', '81:You have no family'), self.users[name]['w'])
 		elif len(self.families[self.users[name]['fid']]['members']) == 1:
-			await self._send(self._make_message('ERROR', 'Your family is offline'), self.users[name]['w'])
+			await self._send(self._make_message('ERROR', '80:Your family is offline'), self.users[name]['w'])
 		else:
-			await self._send(self._make_message('FAMILY', f'{name}: {message}'), *[self.users[u]['w'] for u in self.families[self.users[name]['fid']]['members']])
+			await self._send(self._make_message('FAMILY', f'{name}:{message}'), *[self.users[u]['w'] for u in self.families[self.users[name]['fid']]['members']])
 
 
 	# sends message directly to user specified in payload
 	async def send_private(self, name, payload):
 		target, message = payload.split(':', maxsplit = 1)
 		if target == name:
-			await self._send(self._make_message('ERROR', 'Don\'t be an idiot'), self.users[name]['w'])
+			await self._send(self._make_message('ERROR', '91:Don\'t be an idiot'), self.users[name]['w'])
 		elif target not in self.users:
-			await self._send(self._make_message('ERROR', 'User not online'), self.users[name]['w'])
+			await self._send(self._make_message('ERROR', '90:User not online'), self.users[name]['w'])
 		else:
-			await self._send(self._make_message('PRIVATE', f'{name}: {message}'), self.users[name]['w'], self.users[target]['w'])
+			await self._send(self._make_message('PRIVATE', f'{name}:{target}:{message}'), self.users[name]['w'], self.users[target]['w'])
 
 	# forwards the message to all users in public chat
 	async def send_public(self, name, message):
-		await self._send(self._make_message('PUBLIC', f'{name}: {message}'), *[v['w'] for v in self.users.values()])
+		await self._send(self._make_message('PUBLIC', f'{name}:{message}'), *[v['w'] for v in self.users.values()])
 
 	# performs handshake with client on newly established connection. throws ChatProtocolError
 	async def client_handshake(self, reader, writer):
@@ -101,10 +99,6 @@ class ChatServer:
 			await self._handle_name_collision(name)
 		self.users[name]['w'] = writer
 		await self._update_fid(name)
-		if 'fid' in self.users[name]:
-			if 'fname' not in self.families[self.users[name]['fid']]:
-				await self._update_families_cache(self.users[name]['fid'])
-			await self._send(self._make_message('FNAME', self.families[self.users[name]['fid']]['fname']), writer)
 		return name
 
 	# fetches the latest family information from the database and updates the cached version
