@@ -53,6 +53,8 @@ class TokenServer:
 				self._nonce_table[nonce]['fid'] = kwargs['fid']
 				self._nonce_table[nonce]['uid'] = kwargs['uid']
 				self._nonce_table[nonce]['target'] = kwargs['target']
+			self._nonce_table[nonce]['type'] = mtype
+
 
 
 		except KeyError:
@@ -66,7 +68,7 @@ class TokenServer:
 			if n not in self._nonce_table:
 				results[n] = {'status' : 1, 'type' : t}
 			else:
-				results[n] = {'status' : 0, 'type' : t, **self._nonce_table.pop(n)}
+				results[n] = {'status' : 0, **self._nonce_table.pop(n)}
 		return results
 
 
