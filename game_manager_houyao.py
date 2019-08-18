@@ -2433,9 +2433,8 @@ class GameManager:
 		try:
 			return list((await self._execute_statement(world, sql_str))[0])
 		except:
-			await self._execute_statement(world, f'INSERT INTO factory (unique_id, role_name) VALUES ("{unique_id}", "{role}")')
-			return list((await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"'))[0])
-		pass
+			await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
+			return list((await self._execute_statement(world, sql_str))[0])
 
 	async def refresh_storage(self, world: int, unique_id: str) -> dict:
 		"""
@@ -2445,6 +2444,63 @@ class GameManager:
 		mine_factory = self._factory_config["mine_factory"]
 		crystal_factory = self._factory_config["crystal_factory"]
 		equipment_factory = self._factory_config["equipment_factory"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		# 数据库中存的工厂的等级
+		food_storage_limit = food_factory["storage_limit"][str(factory_data[1])]
+		mine_storage_limit = mine_factory["storage_limit"][str(factory_data[2])]
+		crystal_storage_limit = crystal_factory["storage_limit"][str(factory_data[3])]
+		# 数据库中存的工厂工作的开始时间
+		food_start_time = factory_data[5]
+		mine_start_time = factory_data[6]
+		crystal_start_time = factory_data[7]
+		equipment_start_time = factory_data[8]
+		# 数据库中存的物资数量
+		food_storage = factory_data[14]
+		iron_storage = factory_data[15]
+		crystal_storage = factory_data[16]
+		equipment_storage = factory_data[17]
+
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		remaining = {}
+		reward = {}
+		if food_start_time != "":
+			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
+			food_Increment = time_difference.total_seconds() // food_factory["time_consuming"]
+			if food_storage + food_Increment > food_storage_limit:
+				food_Increment = food_storage_limit - food_storage
+				food_storage = food_storage_limit
+			else:
+				food_storage += food_Increment
+			food_start_time = current_time
+			reward.update({"food_Increment": food_Increment})
+		if mine_start_time != "":
+			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(mine_start_time, '%Y-%m-%d %H:%M:%S')
+			iron_Increment = time_difference.total_seconds() // mine_factory["time_consuming"]
+			if iron_storage + iron_Increment > mine_storage_limit:
+				iron_Increment = mine_storage_limit - iron_storage
+				iron_storage = mine_storage_limit
+			else:
+				iron_storage += iron_Increment
+			mine_start_time = current_time
+			reward.update({"iron_Increment": iron_Increment})
+		if crystal_start_time != "":
+			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
+			crystal_Increment = time_difference.total_seconds() // crystal_factory["time_consuming"]
+			if crystal_storage + crystal_Increment > crystal_storage_limit:
+				crystal_Increment = crystal_storage_limit - crystal_storage
+				crystal_storage = crystal_storage_limit
+			else:
+				crystal_storage += crystal_Increment
+			crystal_start_time = current_time
+			reward.update({"crystal_Increment": crystal_Increment})
+		if equipment_start_time != "":
+			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
+			equipment_Increment = time_difference.total_seconds() // equipment_factory["time_consuming"]
+			equipment_storage += equipment_Increment
+			equipment_start_time = current_time
+			reward.update({"equipment_Increment": equipment_Increment})
+
+		sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{current_time}'"
 
 	async def distribution_worker(self, world: int, unique_id: str, workers_quantity: int, factory_kind: str):
 		"""

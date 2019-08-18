@@ -293,19 +293,19 @@ def create_factory_table() -> None:
     table_name = "factory"
     table_dict = {
         "unique_id": "VARCHAR(128) NOT NULL COMMENT '玩家唯一标识'",
-        "food_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '食品工厂的等级'",
-        "mine_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '矿山工厂的等级'",
-        "crystal_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '水晶工厂的等级'",
-        "equipment_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '设备工厂的等级'",
-        "food_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '食品工厂的冷却开始时间'",
-        "mine_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '矿山工厂的冷却开始时间'",
-        "crystal_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '水晶工厂的冷却开始时间'",
-        "equipment_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '设备工厂的冷却开始时间'",
+        "food_factory_level": "INT(11) UNSIGNED NULL DEFAULT (1) COMMENT '食品工厂的等级'",
+        "mine_factory_level": "INT(11) UNSIGNED NULL DEFAULT (1) COMMENT '矿山工厂的等级'",
+        "crystal_factory_level": "INT(11) UNSIGNED NULL DEFAULT (1) COMMENT '水晶工厂的等级'",
+        "equipment_factory_level": "INT(11) UNSIGNED NULL DEFAULT (1) COMMENT '设备工厂的等级'",
+        "food_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '食品工厂工作的开始时间'",
+        "mine_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '矿山工厂工作的开始时间'",
+        "crystal_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '水晶工厂工作的开始时间'",
+        "equipment_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '设备工厂工作的开始时间'",
         "food_factory_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '食品工厂的工人'",
         "mine_factory_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '矿山工厂的工人'",
         "crystal_factory_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '水晶工厂的工人'",
         "equipment_factory_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '设备工厂的工人'",
-        "totally_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '剩余可调配工人的数量(此工人可分配到各种类型的工厂)'",
+        "totally_workers": "INT(11) UNSIGNED NULL DEFAULT (10) COMMENT '剩余可调配工人的数量(此工人可分配到各种类型的工厂)'",
         "food_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的食物数量'",
         "iron_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的铁数量'",
         "crystal_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的水晶数量'",
@@ -403,4 +403,4 @@ if __name__ == '__main__':
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
     create_factory_table()
-    test()
+    # test()
