@@ -238,15 +238,19 @@ def redeem_all_nonce(unique_id: str, type_list: list, nonce_list: list):
 	print(str(result.text))
 
 def leave_world_boss_stage(unique_id: str,total_damage:int):
-	result = requests.post('http://localhost:8006/leave_world_boss_stage', data={"world": 0, 'unique_id': unique_id, "total_damage": total_damage})
+	result = requests.post('http://localhost:8004/leave_world_boss_stage', data={"world": 0, 'unique_id': unique_id, "total_damage": total_damage})
+	print(str(result.text))
+
+def enter_world_boss_stage(unique_id: str):
+	result = requests.post('http://localhost:8004/enter_world_boss_stage', data={"world": 0, 'unique_id': unique_id})
 	print(str(result.text))
 
 def check_boss_status(unique_id: str):
 	result = requests.post('http://localhost:8004/check_boss_status', data={"world": 0, 'unique_id': unique_id})
 	print(str(result.text))
 
-def enter_world_boss_stage(unique_id: str):
-	result = requests.post('http://localhost:8004/enter_world_boss_stage', data={"world": 0, 'unique_id': unique_id})
+def get_top_damage(unique_id: str,range_number:str):
+	result = requests.post('http://localhost:8004/get_top_damage', data={"world": 0, 'unique_id': unique_id,"range_number":range_number})
 	print(str(result.text))
 def test():
 	s22k = "999"
@@ -380,3 +384,7 @@ if __name__ == "__main__":
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")
+	# check_boss_status('4')
+	# enter_world_boss_stage("4")
+	# leave_world_boss_stage('4','100000')
+	# get_top_damage(4,4)
