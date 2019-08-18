@@ -309,8 +309,7 @@ def create_factory_table() -> None:
         "food_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的食物数量'",
         "iron_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的铁数量'",
         "crystal_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的水晶数量'",
-        "equipment_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的武器碎片数量'",
-        "equipment_factory_production": "VARCHAR(64) NULL DEFAULT '' COMMENT '设备工厂生产武器碎片的类型'"
+        "equipment_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的盔甲1数量'"
     }
     sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id)")
 
@@ -403,5 +402,5 @@ if __name__ == '__main__':
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
-    # create_factory_table()
+    create_factory_table()
     test()
