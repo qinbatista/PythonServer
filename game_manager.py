@@ -1808,6 +1808,28 @@ class GameManager:
 		r = requests.post('http://localhost:8020/send_mail', json = j)
 		return self._message_typesetting(0, 'success, request sent')
 
+	async def respond_family(self, world: int, uid: str, nonce: str) -> dict:
+		# 0 - success
+		# 96 - family does not exist
+		# 97 - target is already in a family
+		# 98 - family is full
+		# 99 - invalid nonce
+		r = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['family_request'], 'nonce' : [nonce]}).json()
+		if r[nonce]['status'] != 0 or r[nonce]['type'] != 'family_request':
+			return self._message_typesetting(99, 'invalid nonce')
+		game_name, fid = await self._get_familyid(world, unique_id = r[nonce]['uid'])
+		if fid is not None and fid != '': return self._message_typesetting(97, 'target already in a family')
+		owner, fname, members = await self._get_family_information(world, r[nonce]['fid'])
+		if owner is None: return self._message_typesetting(96, 'family does not exist')
+		try:
+			next_open = members.index('')
+		except ValueError:
+			return self._message_typesetting(98, 'family is full')
+		await self._execute_statement_update(world, f'UPDATE families SET member{next_open} = "{r[nonce]["target"]}" WHERE familyid = "{r[nonce]["fid"]}";')
+		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{r[nonce]["fid"]}" WHERE unique_id = "{r[nonce]["uid"]}";')
+		return self._message_typesetting(0, 'success')
+
+
 
 #############################################################################
 #							End Family Functions							#
@@ -3057,6 +3079,11 @@ async def _invite_user_family(request: web.Request) -> web.Response:
 async def _remove_user_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).remove_user_family(int(post['world']), post['unique_id'], post['user']))
+
+@ROUTES.post('/respond_family')
+async def _respond_family(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).respond_family(int(post['world']), post['unique_id'], post['nonce']))
 
 @ROUTES.post('/get_lottery_config_info')
 async def _get_lottery_config_info(request: web.Request) -> web.Response:
