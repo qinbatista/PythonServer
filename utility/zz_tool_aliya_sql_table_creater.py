@@ -92,7 +92,9 @@ def create_player_table() -> None:
         "fortune_wheel_ticket_pro": "INT(11) NULL DEFAULT(0) COMMENT '高级幸运循环票'",
         "familyid": "VARCHAR(64) NULL DEFAULT '' COMMENT '家族ID'",
         "world_boss_enter_time": "VARCHAR(64) NULL DEFAULT '' COMMENT '进入世界boss的时间'",
-        "world_boss_remaining_times": "INT(6) NULL DEFAULT(0) COMMENT '进入世界boss的剩余次数'"
+        "world_boss_remaining_times": "INT(6) NULL DEFAULT(0) COMMENT '进入世界boss的剩余次数'",
+        "food": "INT(11) UNSIGNED NULL DEFAULT (0)COMMENT '食物'",
+        "crystal": "INT(11) UNSIGNED NULL DEFAULT (0)COMMENT '水晶'"
     }
     sql_table_constructor(table_name=table_name, table_dict=table_dict)
 
@@ -284,6 +286,35 @@ def create_leader_board_table() -> None:
     sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id)")
 
 
+def create_factory_table() -> None:
+    """
+    创建打世界Boss信息表
+    """
+    table_name = "factory"
+    table_dict = {
+        "unique_id": "VARCHAR(128) NOT NULL COMMENT '玩家唯一标识'",
+        "food_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '食品工厂的等级'",
+        "mine_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '矿山工厂的等级'",
+        "crystal_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '水晶工厂的等级'",
+        "equipment_factory_level": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '设备工厂的等级'",
+        "food_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '食品工厂的冷却开始时间'",
+        "mine_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '矿山工厂的冷却开始时间'",
+        "crystal_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '水晶工厂的冷却开始时间'",
+        "equipment_factory_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '设备工厂的冷却开始时间'",
+        "food_factory_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '食品工厂的工人'",
+        "mine_factory_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '矿山工厂的工人'",
+        "crystal_factory_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '水晶工厂的工人'",
+        "equipment_factory_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '设备工厂的工人'",
+        "totally_workers": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '剩余可调配工人的数量(此工人可分配到各种类型的工厂)'",
+        "food_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的食物数量'",
+        "iron_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的铁数量'",
+        "crystal_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的水晶数量'",
+        "equipment_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的武器碎片数量'",
+        "equipment_factory_production": "VARCHAR(64) NULL DEFAULT '' COMMENT '设备工厂生产武器碎片的类型'"
+    }
+    sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id)")
+
+
 def create_friend_table() -> None:
     """
     创建武器背包表以及武器信息表
@@ -372,4 +403,5 @@ if __name__ == '__main__':
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
+    # create_factory_table()
     test()

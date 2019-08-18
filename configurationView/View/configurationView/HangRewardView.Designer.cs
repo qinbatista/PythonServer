@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
+            this.title = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.HangStageSelect = new System.Windows.Forms.ComboBox();
             this.AddSatge = new System.Windows.Forms.Button();
@@ -60,6 +60,7 @@
             this.Hang100ScrollProbability = new System.Windows.Forms.NumericUpDown();
             this.Hang30ScrollProbability = new System.Windows.Forms.NumericUpDown();
             this.Hang10ScrollProbability = new System.Windows.Forms.NumericUpDown();
+            this.HangClose = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Hang100ScrollValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Hang30ScrollValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Hang10ScrollValue)).BeginInit();
@@ -77,20 +78,20 @@
             ((System.ComponentModel.ISupportInitialize)(this.Hang10ScrollProbability)).BeginInit();
             this.SuspendLayout();
             // 
-            // label1
+            // title
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("宋体", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(384, 20);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(213, 33);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "挂机奖励设置";
+            this.title.AutoSize = true;
+            this.title.Font = new System.Drawing.Font("宋体", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.title.Location = new System.Drawing.Point(344, 23);
+            this.title.Name = "title";
+            this.title.Size = new System.Drawing.Size(213, 33);
+            this.title.TabIndex = 0;
+            this.title.Text = "挂机奖励设置";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(147, 88);
+            this.label2.Location = new System.Drawing.Point(105, 86);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(80, 18);
             this.label2.TabIndex = 1;
@@ -100,24 +101,26 @@
             // 
             this.HangStageSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.HangStageSelect.FormattingEnabled = true;
-            this.HangStageSelect.Location = new System.Drawing.Point(233, 84);
+            this.HangStageSelect.Location = new System.Drawing.Point(191, 82);
             this.HangStageSelect.Name = "HangStageSelect";
             this.HangStageSelect.Size = new System.Drawing.Size(232, 26);
+            this.HangStageSelect.Sorted = true;
             this.HangStageSelect.TabIndex = 2;
             this.HangStageSelect.SelectedIndexChanged += new System.EventHandler(this.HangStageSelect_SelectedIndexChanged);
             // 
             // AddSatge
             // 
-            this.AddSatge.Location = new System.Drawing.Point(698, 78);
+            this.AddSatge.Location = new System.Drawing.Point(643, 75);
             this.AddSatge.Name = "AddSatge";
             this.AddSatge.Size = new System.Drawing.Size(79, 39);
             this.AddSatge.TabIndex = 7;
             this.AddSatge.Text = "添加";
             this.AddSatge.UseVisualStyleBackColor = true;
+            this.AddSatge.Click += new System.EventHandler(this.AddSatge_Click);
             // 
             // DelSatge
             // 
-            this.DelSatge.Location = new System.Drawing.Point(554, 78);
+            this.DelSatge.Location = new System.Drawing.Point(507, 75);
             this.DelSatge.Name = "DelSatge";
             this.DelSatge.Size = new System.Drawing.Size(79, 39);
             this.DelSatge.TabIndex = 6;
@@ -341,41 +344,42 @@
             this.HangSave.TabIndex = 83;
             this.HangSave.Text = "保  存";
             this.HangSave.UseVisualStyleBackColor = true;
+            this.HangSave.Click += new System.EventHandler(this.HangSave_Click);
             // 
             // ProphetScrollCProbability
             // 
             this.ProphetScrollCProbability.Location = new System.Drawing.Point(329, 396);
             this.ProphetScrollCProbability.Maximum = new decimal(new int[] {
-            100000,
+            10000,
             0,
             0,
             0});
             this.ProphetScrollCProbability.Name = "ProphetScrollCProbability";
-            this.ProphetScrollCProbability.Size = new System.Drawing.Size(85, 28);
+            this.ProphetScrollCProbability.Size = new System.Drawing.Size(75, 28);
             this.ProphetScrollCProbability.TabIndex = 89;
             // 
             // ProScrollCProbability
             // 
             this.ProScrollCProbability.Location = new System.Drawing.Point(329, 325);
             this.ProScrollCProbability.Maximum = new decimal(new int[] {
-            100000,
+            10000,
             0,
             0,
             0});
             this.ProScrollCProbability.Name = "ProScrollCProbability";
-            this.ProScrollCProbability.Size = new System.Drawing.Size(85, 28);
+            this.ProScrollCProbability.Size = new System.Drawing.Size(75, 28);
             this.ProScrollCProbability.TabIndex = 88;
             // 
             // BasicScrollCProbability
             // 
             this.BasicScrollCProbability.Location = new System.Drawing.Point(329, 254);
             this.BasicScrollCProbability.Maximum = new decimal(new int[] {
-            100000,
+            10000,
             0,
             0,
             0});
             this.BasicScrollCProbability.Name = "BasicScrollCProbability";
-            this.BasicScrollCProbability.Size = new System.Drawing.Size(85, 28);
+            this.BasicScrollCProbability.Size = new System.Drawing.Size(75, 28);
             this.BasicScrollCProbability.TabIndex = 87;
             // 
             // label4
@@ -383,9 +387,9 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(315, 223);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(134, 18);
+            this.label4.Size = new System.Drawing.Size(125, 18);
             this.label4.TabIndex = 91;
-            this.label4.Text = "概率(n%100000)";
+            this.label4.Text = "概率(n%10000)";
             // 
             // label3
             // 
@@ -432,11 +436,22 @@
             this.Hang10ScrollProbability.Size = new System.Drawing.Size(75, 28);
             this.Hang10ScrollProbability.TabIndex = 92;
             // 
+            // HangClose
+            // 
+            this.HangClose.Location = new System.Drawing.Point(779, 75);
+            this.HangClose.Name = "HangClose";
+            this.HangClose.Size = new System.Drawing.Size(79, 39);
+            this.HangClose.TabIndex = 96;
+            this.HangClose.Text = "关闭";
+            this.HangClose.UseVisualStyleBackColor = true;
+            this.HangClose.Click += new System.EventHandler(this.HangClose_Click);
+            // 
             // HangRewardView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(978, 544);
+            this.Controls.Add(this.HangClose);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.Hang100ScrollProbability);
             this.Controls.Add(this.Hang30ScrollProbability);
@@ -468,7 +483,7 @@
             this.Controls.Add(this.DelSatge);
             this.Controls.Add(this.HangStageSelect);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.title);
             this.Name = "HangRewardView";
             this.Text = "挂机奖励设置";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.HangRewardView_FormClosing);
@@ -494,7 +509,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label title;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox HangStageSelect;
         private System.Windows.Forms.Button AddSatge;
@@ -526,5 +541,6 @@
         private System.Windows.Forms.NumericUpDown Hang100ScrollProbability;
         private System.Windows.Forms.NumericUpDown Hang30ScrollProbability;
         private System.Windows.Forms.NumericUpDown Hang10ScrollProbability;
+        private System.Windows.Forms.Button HangClose;
     }
 }

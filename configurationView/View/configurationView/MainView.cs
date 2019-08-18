@@ -1835,7 +1835,7 @@ namespace configurationView
                         Height = 200;
                         Location = new Point(Location.X, 240);
                         Hide();
-                        new HangRewardView(this, string.Format(hang_reward_config, current_version)).Show();
+                        new HangRewardView(this, string.Format(hang_reward_config, current_version), VersionOption.SelectedItem.ToString()).Show();
                     }
                     break;
                 case 4: // 抽奖奖励：lottery_config
