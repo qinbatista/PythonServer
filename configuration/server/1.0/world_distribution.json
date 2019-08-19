@@ -1,13 +1,17 @@
 {
-	"servers": {
-		"server1" : {
-			"worlds" : "1-5"
+	"gamemanagers":
+	[
+		{
+			"id":"gm1",
+			"worlds":"1"
 		},
-		"server2" : {
-			"worlds" : "6-8"
+		{
+			"id":"gm2",
+			"worlds":"2-3"
 		},
-		"server3" : {
-			"worlds" : "9-10"
+		{
+			"id":"gm3",
+			"worlds":"4-5"
 		}
-	}
+	]
 }

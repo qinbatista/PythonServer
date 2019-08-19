@@ -16,20 +16,19 @@ def loc():
 
 VERSION = loc() + '/configuration/config_timer_setting.json'
 
-ENEMY_LAYOUT = loc() + '/configuration/client/{}/level_enemy_layouts_config.json'
-MONSTER = loc() + '/configuration/client/{}/monster_config.json'
-
-WORLD_DISTRIBUTION = loc() + '/configuration/server/{}/world_distribution.json'
-REWARD = loc() + '/configuration/server/{}/stage_reward_config.json'
-HANG_REWARD = loc() + '/configuration/server/{}/hang_reward_config.json'
-ENTRY_CONSUMABLES = loc() + '/configuration/server/{}/entry_consumables_config.json'
-MYSQL_DATA = loc() + '/configuration/server/{}/mysql_data_config.json'
-LOTTERY = loc() + '/configuration/server/{}/lottery_config.json'
-WEAPON = loc() + '/configuration/server/{}/weapon_config.json'
 SKILL = loc() + '/configuration/server/{}/skill_level_up_config.json'
+REWARD = loc() + '/configuration/server/{}/stage_reward_config.json'
+WEAPON = loc() + '/configuration/server/{}/weapon_config.json'
 PLAYER = loc() + '/configuration/server/{}/player_config.json'
-WORLD_BOSS = loc() + '/configuration/server/{}/world_boss_config.json'
+LOTTERY = loc() + '/configuration/server/{}/lottery_config.json'
 FACTORY = loc() + '/configuration/server/{}/factory_config.json'
+MONSTER = loc() + '/configuration/client/{}/monster_config.json'
+MYSQL_DATA = loc() + '/configuration/server/{}/mysql_data_config.json'
+WORLD_BOSS = loc() + '/configuration/server/{}/world_boss_config.json'
+HANG_REWARD = loc() + '/configuration/server/{}/hang_reward_config.json'
+ENEMY_LAYOUT = loc() + '/configuration/client/{}/level_enemy_layouts_config.json'
+ENTRY_CONSUMABLES = loc() + '/configuration/server/{}/entry_consumables_config.json'
+WORLD_DISTRIBUTION = loc() + '/configuration/server/{}/world_distribution.json'
 
 
 class ConfigurationManager:
@@ -48,8 +47,10 @@ class ConfigurationManager:
 		self._read_mysql_data_config()
 		self._read_entry_consumables_config()
 		self._read_world_distribution_config()
-		self._read_game_manager_config()
 		self._read_factory_config()
+
+		# read this one last
+		self._read_game_manager_config()
 
 	async def get_server_config_location(self):
 		return {'file' : loc() + '/configuration/server/' + self._sv + '/server.conf'}
@@ -108,8 +109,8 @@ class ConfigurationManager:
 
 	def _read_world_distribution_config(self):
 		d = json.load(open(WORLD_DISTRIBUTION.format(self._cv), encoding = 'utf-8'))
-		for server in d['servers']:
-			d['servers'][server]['worlds'] = self._world_range_parser(d['servers'][server]['worlds'])
+		for server in d['gamemanagers']:
+			server['worlds'] = self._world_range_parser(server['worlds'])
 		self._world_distribution_config = d
 
 	def _read_stage_reward_config(self):
