@@ -16,8 +16,8 @@ from datetime import datetime, timedelta
 
 
 class GameManager:
-	def __init__(self):
-		self._pools = [tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')]
+	def __init__(self, worlds = []):
+		self._initialize_pools(worlds)
 		self._is_first_start = True
 		self._refresh_configuration()
 		self._start_timer(600)
@@ -2530,6 +2530,16 @@ class GameManager:
 		t = threading.Timer(seconds, self._refresh_configuration)
 		t.daemon = True
 		t.start()
+	
+	def _initialize_pools(self, worlds):
+		self._pools = {}
+		if len(worlds) == 0:
+			self._pools[0] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
+		else:
+			for world in worlds:
+				self._pools[world] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = f'world{world}', charset = 'utf8')
+
+
 
 
 
