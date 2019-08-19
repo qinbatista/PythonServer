@@ -3164,7 +3164,8 @@ def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
 	config = get_config()
-	app['MANAGER'] = GameManager()
+	r = requests.post('http://localhost:8000/register', data = {'port' : config.getint('game_manager', 'port')})
+	app['MANAGER'] = GameManager(r.json()['worlds'])
 	web.run_app(app, port=config.getint('game_manager', 'port'))
 
 
