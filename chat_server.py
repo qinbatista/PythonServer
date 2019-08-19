@@ -1,10 +1,11 @@
-
 import time
 import requests
 import configparser
 
+import queue
 import asyncio
 import tormysql
+import threading
 import contextlib
 
 from collections import defaultdict
@@ -27,6 +28,15 @@ class ChatServer:
 		async with await asyncio.start_server(self.handle_client, '127.0.0.1', port) as s:
 			print(f'starting chat server on port {port}...')
 			await s.serve_forever()
+	
+	@staticmethod
+	def chat_logger(in_queue):
+		while True:
+			with open('chatlogs/log', 'a') as log:
+				while True:
+					name, command, payload = in_queue.get()
+					log.write(f'{time.time()}~{name}~{command}~{payload}\n')
+
 
 	# the main protocol loop. if chat protocol is not followed, close connection immediately
 	async def handle_client(self, reader, writer):
@@ -52,7 +62,6 @@ class ChatServer:
 		finally:
 			await self._cleanup(name, writer)
 			print(f'connection closed for {name}')
-
 
 	# propagates database updates to all applicable users within the calling user's circle
 	async def update(self, name):
