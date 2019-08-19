@@ -88,6 +88,9 @@ class ConfigurationManager:
 	async def get_mysql_data_config(self):
 		return self._mysql_data_config
 
+	async def get_world_map(self):
+		return self._world_map or {'status' : 'no one has registered yet'}
+
 	async def register(self, ip, port):
 		try:
 			sid = self._unregistered_managers.get(block = False)
@@ -246,6 +249,10 @@ async def __get_entry_consumables_config(request: web.Request) -> web.Response:
 @ROUTES.get('/get_world_distribution_config')
 async def __get_world_distribution_config(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_world_distribution_config())
+
+@ROUTES.get('/get_world_map')
+async def __get_world_map(request: web.Request) -> web.Response:
+	return _json_response(await MANAGER.get_world_map())
 
 @ROUTES.post('/register')
 async def __register(request):
