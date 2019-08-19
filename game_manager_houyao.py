@@ -2437,7 +2437,7 @@ class GameManager:
 			return list((await self._execute_statement(world, sql_str))[0])
 
 	async def refresh_food_storage(self, world: int, unique_id: str) -> dict:
-		# 0 - Food factory update success
+		# 0  - Food factory update success
 		# 99 - Food factory did not start
 		food_factory = self._factory_config["food_factory"]
 		factory_data = await self._select_factory(world=world, unique_id=unique_id)
@@ -2445,6 +2445,8 @@ class GameManager:
 		food_storage_limit = food_factory["storage_limit"][str(factory_data[1])]
 		# 数据库中存的工厂工作的开始时间
 		food_start_time = factory_data[5]
+		# 数据库中存的工人的数量
+		food_factory_workers = factory_data[9]
 		# 数据库中存的物资数量
 		food_storage = factory_data[14]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -2452,12 +2454,10 @@ class GameManager:
 		reward = {}
 		if food_start_time != "":
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
-			food_increment = time_difference.total_seconds() // food_factory["time_consuming"]
+			food_increment = int(time_difference.total_seconds()) // food_factory["time_consuming"] * food_factory_workers
 			if food_storage + food_increment > food_storage_limit:
 				food_increment = food_storage_limit - food_storage
-				food_storage = food_storage_limit
-			else:
-				food_storage += food_increment
+			food_storage += food_increment
 			reward.update({"food_increment": food_increment})
 			reward.update({"food_start_time": food_start_time})
 			food_start_time = current_time
@@ -2470,7 +2470,7 @@ class GameManager:
 			return self._message_typesetting(status=99, message="Food factory did not start")
 
 	async def refresh_mine_storage(self, world: int, unique_id: str) -> dict:
-		# 0 - Mine factory update success
+		# 0  - Mine factory update success
 		# 99 - Mine factory did not start
 		mine_factory = self._factory_config["mine_factory"]
 		factory_data = await self._select_factory(world=world, unique_id=unique_id)
@@ -2478,22 +2478,28 @@ class GameManager:
 		mine_storage_limit = mine_factory["storage_limit"][str(factory_data[2])]
 		# 数据库中存的工厂工作的开始时间
 		mine_start_time = factory_data[6]
+		# 数据库中存的工人的数量
+		mine_factory_workers = factory_data[10]
 		# 数据库中存的物资数量
+		food_storage = factory_data[14]
 		iron_storage = factory_data[15]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		remaining = {}
 		reward = {}
 		if mine_start_time != "":
+			cost_food = mine_factory["cost"]["food"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(mine_start_time, '%Y-%m-%d %H:%M:%S')
-			iron_increment = time_difference.total_seconds() // mine_factory["time_consuming"]
+			iron_increment = int(time_difference.total_seconds()) // mine_factory["time_consuming"] * mine_factory_workers
 			if iron_storage + iron_increment > mine_storage_limit:
 				iron_increment = mine_storage_limit - iron_storage
-				iron_storage = mine_storage_limit
-			else:
-				iron_storage += iron_increment
+			if food_storage // cost_food < iron_increment:  # 1工人生产1铁消耗3食物
+				iron_increment = food_storage // cost_food
+			food_storage -= cost_food * iron_increment
+			iron_storage += iron_increment
 			reward.update({"iron_increment": iron_increment})
 			reward.update({"mine_start_time": mine_start_time})
 			mine_start_time = current_time
+			remaining.update({"food_storage": food_storage})
 			remaining.update({"iron_storage": iron_storage})
 			remaining.update({"mine_start_time": mine_start_time})
 			sql_str = f"update factory set iron_storage={iron_storage}, mine_factory_timer='{mine_start_time}' where unique_id='{unique_id}'"
@@ -2503,30 +2509,47 @@ class GameManager:
 			return self._message_typesetting(status=99, message="Mine factory did not start")
 
 	async def refresh_crystal_storage(self, world: int, unique_id: str) -> dict:
-		# 0 -  Crystal factory update success
+		# 0  - Crystal factory update success
 		# 99 - Crystal factory did not start
+		mine_factory = self._factory_config["mine_factory"]
 		crystal_factory = self._factory_config["crystal_factory"]
 		factory_data = await self._select_factory(world=world, unique_id=unique_id)
 		# 配置文件中工厂等级下的最大容量
 		crystal_storage_limit = crystal_factory["storage_limit"][str(factory_data[3])]
 		# 数据库中存的工厂工作的开始时间
 		crystal_start_time = factory_data[7]
+		# 数据库中存的工人的数量
+		crystal_factory_workers = factory_data[11]
 		# 数据库中存的物资数量
+		food_storage = factory_data[14]
+		iron_storage = factory_data[15]
 		crystal_storage = factory_data[16]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		remaining = {}
 		reward = {}
 		if crystal_start_time != "":
+			cost_food = mine_factory["cost"]["food"]
+			cost_iron = mine_factory["cost"]["iron"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
-			crystal_increment = time_difference.total_seconds() // crystal_factory["time_consuming"]
+			crystal_increment = int(time_difference.total_seconds()) // crystal_factory["time_consuming"] * crystal_factory_workers
+			# 配置文件下的仓库容量约束
 			if crystal_storage + crystal_increment > crystal_storage_limit:
 				crystal_increment = crystal_storage_limit - crystal_storage
-				crystal_storage = crystal_storage_limit
-			else:
-				crystal_storage += crystal_increment
+			# 数据库下的原始材料数量的约束
+			if food_storage // cost_food < iron_storage // cost_iron:
+				if food_storage // cost_food < crystal_increment:
+					crystal_increment = food_storage // cost_food
+			else:  # food_storage // cost_food >= iron_storage // cost_iron
+				if iron_storage // cost_iron < crystal_increment:
+					crystal_increment = iron_storage // cost_iron
+			food_storage -= cost_food * crystal_increment
+			iron_storage -= cost_iron * crystal_increment
+			crystal_storage += crystal_increment
 			reward.update({"crystal_increment": crystal_increment})
 			reward.update({"crystal_start_time": crystal_start_time})
 			crystal_start_time = current_time
+			remaining.update({"food_storage": food_storage})
+			remaining.update({"iron_storage": iron_storage})
 			remaining.update({"crystal_storage": crystal_storage})
 			remaining.update({"crystal_start_time": crystal_start_time})
 			sql_str = f"update factory set crystal_storage={crystal_storage}, crystal_factory_timer='{crystal_start_time}' where unique_id='{unique_id}'"
@@ -2537,22 +2560,29 @@ class GameManager:
 
 	async def refresh_equipment_storage(self, world: int, unique_id: str) -> dict:
 		"""
-		0 -  Equipment factory update success
+		0  - Equipment factory update success
 		99 - Equipment factory did not start
 		"""
+		mine_factory = self._factory_config["mine_factory"]
 		equipment_factory = self._factory_config["equipment_factory"]
 		factory_data = await self._select_factory(world=world, unique_id=unique_id)
 		# 数据库中存的工厂工作的开始时间
 		equipment_start_time = factory_data[8]
+		# 数据库中存的工人的数量
+		equipment_factory_workers = factory_data[12]
 		# 数据库中存的物资数量
+		iron_storage = factory_data[15]
 		equipment_storage = factory_data[17]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		remaining = {}
 		reward = {}
 		if equipment_start_time != "":
+			cost_iron = mine_factory["cost"]["iron"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
-			equipment_increment = time_difference.total_seconds() // equipment_factory["time_consuming"]
+			equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers
 			equipment_storage += equipment_increment
+			if iron_storage // cost_iron < equipment_increment:
+				equipment_increment = iron_storage // cost_iron
 			reward.update({"equipment_increment": equipment_increment})
 			reward.update({"equipment_start_time": equipment_start_time})
 			equipment_start_time = current_time
@@ -2584,6 +2614,11 @@ class GameManager:
 		mine_start_time = factory_data[6]
 		crystal_start_time = factory_data[7]
 		equipment_start_time = factory_data[8]
+		# 数据库中存的工人的数量
+		food_factory_workers = factory_data[9]
+		mine_factory_workers = factory_data[10]
+		crystal_factory_workers = factory_data[11]
+		equipment_factory_workers = factory_data[12]
 		# 数据库中存的物资数量
 		food_storage = factory_data[14]
 		iron_storage = factory_data[15]
@@ -2595,47 +2630,63 @@ class GameManager:
 		reward = {}
 		if food_start_time != "":
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
-			food_increment = time_difference.total_seconds() // food_factory["time_consuming"]
+			food_increment = int(time_difference.total_seconds()) // food_factory["time_consuming"] * food_factory_workers
 			if food_storage + food_increment > food_storage_limit:
 				food_increment = food_storage_limit - food_storage
-				food_storage = food_storage_limit
-			else:
-				food_storage += food_increment
+			food_storage += food_increment
 			reward.update({"food_increment": food_increment})
 			reward.update({"food_start_time": food_start_time})
 			food_start_time = current_time
 			remaining.update({"food_storage": food_storage})
 			remaining.update({"food_start_time": food_start_time})
 		if mine_start_time != "":
+			cost_food = mine_factory["cost"]["food"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(mine_start_time, '%Y-%m-%d %H:%M:%S')
-			iron_increment = time_difference.total_seconds() // mine_factory["time_consuming"]
+			iron_increment = int(time_difference.total_seconds()) // mine_factory["time_consuming"] * mine_factory_workers
 			if iron_storage + iron_increment > mine_storage_limit:
 				iron_increment = mine_storage_limit - iron_storage
-				iron_storage = mine_storage_limit
-			else:
-				iron_storage += iron_increment
+			if food_storage // cost_food < iron_increment:  # 1工人生产1铁消耗3食物
+				iron_increment = food_storage // cost_food
+			food_storage -= cost_food * iron_increment
+			iron_storage += iron_increment
 			reward.update({"iron_increment": iron_increment})
 			reward.update({"mine_start_time": mine_start_time})
 			mine_start_time = current_time
+			remaining.update({"food_storage": food_storage})
 			remaining.update({"iron_storage": iron_storage})
 			remaining.update({"mine_start_time": mine_start_time})
 		if crystal_start_time != "":
+			cost_food = mine_factory["cost"]["food"]
+			cost_iron = mine_factory["cost"]["iron"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
-			crystal_increment = time_difference.total_seconds() // crystal_factory["time_consuming"]
+			crystal_increment = int(time_difference.total_seconds()) // crystal_factory["time_consuming"] * crystal_factory_workers
+			# 配置文件下的仓库容量约束
 			if crystal_storage + crystal_increment > crystal_storage_limit:
 				crystal_increment = crystal_storage_limit - crystal_storage
-				crystal_storage = crystal_storage_limit
-			else:
-				crystal_storage += crystal_increment
+			# 数据库下的原始材料数量的约束
+			if food_storage // cost_food < iron_storage // cost_iron:
+				if food_storage // cost_food < crystal_increment:
+					crystal_increment = food_storage // cost_food
+			else:  # food_storage // cost_food >= iron_storage // cost_iron
+				if iron_storage // cost_iron < crystal_increment:
+					crystal_increment = iron_storage // cost_iron
+			food_storage -= cost_food * crystal_increment
+			iron_storage -= cost_iron * crystal_increment
+			crystal_storage += crystal_increment
 			reward.update({"crystal_increment": crystal_increment})
 			reward.update({"crystal_start_time": crystal_start_time})
 			crystal_start_time = current_time
+			remaining.update({"food_storage": food_storage})
+			remaining.update({"iron_storage": iron_storage})
 			remaining.update({"crystal_storage": crystal_storage})
 			remaining.update({"crystal_start_time": crystal_start_time})
 		if equipment_start_time != "":
+			cost_iron = mine_factory["cost"]["iron"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
-			equipment_increment = time_difference.total_seconds() // equipment_factory["time_consuming"]
+			equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers
 			equipment_storage += equipment_increment
+			if iron_storage // cost_iron < equipment_increment:
+				equipment_increment = iron_storage // cost_iron
 			reward.update({"equipment_increment": equipment_increment})
 			reward.update({"equipment_start_time": equipment_start_time})
 			equipment_start_time = current_time
@@ -2648,7 +2699,7 @@ class GameManager:
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
 
-	async def distribution_worker(self, world: int, unique_id: str, workers_quantity: int, factory_kind: str):
+	async def distribution_worker(self, world: int, unique_id: str, workers_quantity: int, factory_kind: str) -> dict:
 		"""
 		0 - sccuess
 		97 - Insufficient distribution workers
@@ -2670,10 +2721,21 @@ class GameManager:
 			5.此工厂的收获物品数量：factory_reward_quantity
 		问题：如果指定工厂之前存在工人在工作则结算后的工作时间是否统一成当前时间
 		"""
+		all_factory = self._factory_config["factory_kind"]
 		if workers_quantity <= 0:
 			return self._message_typesetting(status=99, message="The number of workers assigned is not a positive integer")
 
-		# if factory_kind not in
+		if factory_kind not in all_factory:
+			return self._message_typesetting(status=98, message="Factory type error")
+
+		result = await eval(f"self.refresh_{factory_kind}_storage({world},{unique_id})")
+		remaining = result["data"]["remaining"]
+		reward = result["data"]["reward"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+
+
+		return result
+
 
 	async def product_food(self, world: int, unique_id: str):
 		"""
@@ -3402,6 +3464,13 @@ async def _refresh_crystal_storage(request: web.Request) -> web.Response:
 async def _refresh_equipment_storage(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).refresh_equipment_storage(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/distribution_worker')
+async def _distribution_worker(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).distribution_worker(int(post['world']), post['unique_id'], int(post['workers_quantity']), post['factory_kind'])
 	return _json_response(result)
 
 ###############################################################################################

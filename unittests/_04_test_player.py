@@ -260,12 +260,14 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8004/refresh_all_storage', data={"world": 0, 'unique_id': unique_id})
+	result = requests.post('http://localhost:8004/distribution_worker', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 1, 'factory_kind': "food_factory"})
 	print(str(result.text))
-	result = requests.post('http://localhost:8004/refresh_food_storage', data={"world": 0, 'unique_id': unique_id})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/refresh_mine_storage', data={"world": 0, 'unique_id': unique_id})
-	print(str(result.text))
+	# result = requests.post('http://localhost:8004/refresh_all_storage', data={"world": 0, 'unique_id': unique_id})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/refresh_food_storage', data={"world": 0, 'unique_id': unique_id})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/refresh_mine_storage', data={"world": 0, 'unique_id': unique_id})
+	# print(str(result.text))
 
 	# result = requests.post('http://localhost:8004/basic_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
 	# print(str(result.text))

@@ -1,5 +1,5 @@
 {
-	"factory_kind": ["food_factory", "mine_factory", "crystal_factory", "equipment_factory"],
+	"factory_kind": ["food", "mine", "crystal", "equipment"],
 	"production_workers_max": 45,
 	"production_workers_max_crystal": 6000,
 	"production_workers_need_crystal": {
@@ -240,6 +240,7 @@
 	},
 	"mine_factory": {
 		"time_consuming": 30,
+		"cost": {"food": 1},
 		"storage_level_limit": 30,
 		"workers_number_limit": {
 			"1": 2,
@@ -339,6 +340,7 @@
 	},
 	"crystal_factory": {
 		"time_consuming": 30,
+		"cost": {"food": 4, "iron": 2},
 		"storage_level_limit": 15,
 		"workers_number_limit": {
 			"1": 1,
@@ -392,6 +394,7 @@
 		}
 	},
 	"equipment_factory": {
-		"time_consuming": 30
+		"time_consuming": 30,
+		"cost": {"iron": 20}
 	}
 }
