@@ -2450,7 +2450,7 @@ class GameManager:
 		# 数据库中存的物资数量
 		food_storage = factory_data[14]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		remaining = {}
+		remaining = {"food_factory_workers": food_factory_workers}
 		reward = {}
 		if food_start_time != "":
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
@@ -2484,7 +2484,7 @@ class GameManager:
 		food_storage = factory_data[14]
 		iron_storage = factory_data[15]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		remaining = {}
+		remaining = {"mine_factory_workers": mine_factory_workers}
 		reward = {}
 		if mine_start_time != "":
 			cost_food = mine_factory["cost"]["food"]
@@ -2525,11 +2525,11 @@ class GameManager:
 		iron_storage = factory_data[15]
 		crystal_storage = factory_data[16]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		remaining = {}
+		remaining = {"crystal_factory_workers": crystal_factory_workers}
 		reward = {}
 		if crystal_start_time != "":
-			cost_food = mine_factory["cost"]["food"]
-			cost_iron = mine_factory["cost"]["iron"]
+			cost_food = crystal_factory["cost"]["food"]
+			cost_iron = crystal_factory["cost"]["iron"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
 			crystal_increment = int(time_difference.total_seconds()) // crystal_factory["time_consuming"] * crystal_factory_workers
 			# 配置文件下的仓库容量约束
@@ -2563,7 +2563,6 @@ class GameManager:
 		0  - Equipment factory update success
 		99 - Equipment factory did not start
 		"""
-		mine_factory = self._factory_config["mine_factory"]
 		equipment_factory = self._factory_config["equipment_factory"]
 		factory_data = await self._select_factory(world=world, unique_id=unique_id)
 		# 数据库中存的工厂工作的开始时间
@@ -2574,10 +2573,10 @@ class GameManager:
 		iron_storage = factory_data[15]
 		equipment_storage = factory_data[17]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		remaining = {}
+		remaining = {"equipment_factory_workers": equipment_factory_workers}
 		reward = {}
 		if equipment_start_time != "":
-			cost_iron = mine_factory["cost"]["iron"]
+			cost_iron = equipment_factory["cost"]["iron"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
 			equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers
 			equipment_storage += equipment_increment
@@ -2626,7 +2625,7 @@ class GameManager:
 		equipment_storage = factory_data[17]
 
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		remaining = {}
+		remaining = {"food_factory_workers": food_factory_workers, "mine_factory_workers": mine_factory_workers, "crystal_factory_workers": crystal_factory_workers, "equipment_factory_workers": equipment_factory_workers}
 		reward = {}
 		if food_start_time != "":
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
@@ -2656,8 +2655,8 @@ class GameManager:
 			remaining.update({"iron_storage": iron_storage})
 			remaining.update({"mine_start_time": mine_start_time})
 		if crystal_start_time != "":
-			cost_food = mine_factory["cost"]["food"]
-			cost_iron = mine_factory["cost"]["iron"]
+			cost_food = crystal_factory["cost"]["food"]
+			cost_iron = crystal_factory["cost"]["iron"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
 			crystal_increment = int(time_difference.total_seconds()) // crystal_factory["time_consuming"] * crystal_factory_workers
 			# 配置文件下的仓库容量约束
@@ -2681,7 +2680,7 @@ class GameManager:
 			remaining.update({"crystal_storage": crystal_storage})
 			remaining.update({"crystal_start_time": crystal_start_time})
 		if equipment_start_time != "":
-			cost_iron = mine_factory["cost"]["iron"]
+			cost_iron = equipment_factory["cost"]["iron"]
 			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
 			equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers
 			equipment_storage += equipment_increment
@@ -2701,7 +2700,9 @@ class GameManager:
 
 	async def distribution_worker(self, world: int, unique_id: str, workers_quantity: int, factory_kind: str) -> dict:
 		"""
-		0 - sccuess
+		0  - Successful employee assignment, get factory work rewards
+		1  - Successful employee assignment
+		2  - Allocation is full
 		97 - Insufficient distribution workers
 		98 - Factory type error
 		99 - The number of workers assigned is not a positive integer
@@ -2728,13 +2729,37 @@ class GameManager:
 		if factory_kind not in all_factory:
 			return self._message_typesetting(status=98, message="Factory type error")
 
+		factory_mark = all_factory.index(factory_kind)
+		remaining = {}
+		reward = {}
 		result = await eval(f"self.refresh_{factory_kind}_storage({world},{unique_id})")
-		remaining = result["data"]["remaining"]
-		reward = result["data"]["reward"]
+		if result["data"]:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
 		factory_data = await self._select_factory(world=world, unique_id=unique_id)
-
-
-		return result
+		factory_config = self._factory_config[f"{factory_kind}_factory"]
+		factory_level = factory_data[1 + factory_mark]
+		factory_workers = factory_data[9 + factory_mark]
+		totally_workers = factory_data[13]
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if factory_kind != "equipment":
+			# 配置文件下的工作人员上限限制
+			workers_number_limit = factory_config["workers_number_limit"][str(factory_level)]
+			if factory_workers + workers_quantity > workers_number_limit:
+				workers_quantity = workers_number_limit - factory_workers
+		# 数据库可分配人员数量的限制
+		if workers_quantity > totally_workers:
+			workers_quantity = totally_workers
+		totally_workers -= workers_quantity
+		factory_workers += workers_quantity
+		sql_str = f"update factory set totally_workers={totally_workers}, {factory_kind}_factory_workers={factory_workers}, {factory_kind}_factory_timer='{current_time}' where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		remaining.update({"totally_workers": totally_workers, f"{factory_kind}_factory_workers": factory_workers, f"{factory_kind}_start_time": current_time})
+		if workers_quantity == 0:
+			return self._message_typesetting(status=2, message="Allocation is full", data={"remaining": remaining, "reward": reward})
+		if reward:
+			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
 
 
 	async def product_food(self, world: int, unique_id: str):
