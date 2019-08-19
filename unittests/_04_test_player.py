@@ -260,6 +260,13 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
+	result = requests.post('http://localhost:8004/refresh_all_storage', data={"world": 0, 'unique_id': unique_id})
+	print(str(result.text))
+	result = requests.post('http://localhost:8004/refresh_food_storage', data={"world": 0, 'unique_id': unique_id})
+	print(str(result.text))
+	result = requests.post('http://localhost:8004/refresh_mine_storage', data={"world": 0, 'unique_id': unique_id})
+	print(str(result.text))
+
 	# result = requests.post('http://localhost:8004/basic_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
@@ -298,8 +305,8 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
 	# print(str(result.text))
-	result = requests.post('http://localhost:8004/delete_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": "d"})
-	print(str(result.text))
+	# result = requests.post('http://localhost:8004/delete_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": "d"})
+	# print(str(result.text))
 
 """
 json_data = {
@@ -376,14 +383,14 @@ if __name__ == "__main__":
 	# get_new_mail(unique_id="7")
 	# get_all_mail(unique_id="7")
 	# enumerate
-	test()
+	# test()
 	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
 	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
 	# get_all_mail(unique_id="7")
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	# all_function(unique_id="1")
+	all_function(unique_id="1")
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")

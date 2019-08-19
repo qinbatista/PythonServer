@@ -309,7 +309,9 @@ def create_factory_table() -> None:
         "food_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的食物数量'",
         "iron_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的铁数量'",
         "crystal_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的水晶数量'",
-        "equipment_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的盔甲1数量'"
+        "equipment_storage": "INT(11) UNSIGNED NULL DEFAULT (0) COMMENT '存储的盔甲1数量'",
+        "wishing_pool_level": "INT(11) UNSIGNED NULL DEFAULT (1) COMMENT '许愿池的等级'",
+        "wishing_pool_timer": "VARCHAR(64) NULL DEFAULT '' COMMENT '许愿的开始时间'"
     }
     sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id)")
 
