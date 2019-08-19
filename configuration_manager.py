@@ -6,6 +6,7 @@
 
 import os
 import json
+import queue
 import threading
 import configparser
 from aiohttp import web
@@ -36,6 +37,7 @@ class ConfigurationManager:
 		self._read_version()
 		self._refresh_configurations()
 		self._start_timer(600)
+		self._registered_managers = {}
 
 
 	def _refresh_configurations(self):
@@ -85,6 +87,14 @@ class ConfigurationManager:
 	async def get_mysql_data_config(self):
 		return self._mysql_data_config
 
+	async def register(self, ip, port):
+		try:
+			sid = self._unregistered_managers.get(block = False)
+		except queue.Empty: return {'status' : 1, 'message' : 'no new work'}
+		self._registered_managers[sid] = {'ip' : ip, 'port' : port}
+		return {'status' : 0, 'message' : 'registered', 'data' : self._registered_managers}
+
+
 	def _read_factory_config(self):
 		self._factory_config = json.load(open(FACTORY.format(self._sv), encoding='utf-8'))
 
@@ -109,8 +119,10 @@ class ConfigurationManager:
 
 	def _read_world_distribution_config(self):
 		d = json.load(open(WORLD_DISTRIBUTION.format(self._cv), encoding = 'utf-8'))
-		for server in d['gamemanagers']:
-			server['worlds'] = self._world_range_parser(server['worlds'])
+		self._unregistered_managers = queue.Queue()
+		for sid, value in d['gamemanagers'].items():
+			value['worlds'] = self._world_range_parser(value['worlds'])
+			self._unregistered_managers.put(sid)
 		self._world_distribution_config = d
 
 	def _read_stage_reward_config(self):
@@ -133,7 +145,7 @@ class ConfigurationManager:
 		Examples of valid input:
 		'1' -> [1]
 		'1, 12-13' -> [1, 12, 13]
-		'4-7, 1, 2-3' -> [1, 2, 3, 4, 5, 6, 7]
+		'4-7, 1, 2-3' -> [4, 5, 6, 7, 1, 2, 3]
 		'''
 		ret = []
 		for sequence in s.split(','):
@@ -232,6 +244,15 @@ async def __get_entry_consumables_config(request: web.Request) -> web.Response:
 @ROUTES.get('/get_world_distribution_config')
 async def __get_world_distribution_config(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_world_distribution_config())
+
+@ROUTES.post('/register')
+async def __register(request):
+	post = await request.post()
+	peername = request.transport.get_extra_info('peername')
+	if peername is None:
+		return _json_response({'status' : 99, 'message' : 'can not resolve ip addr'})
+	return _json_response(await MANAGER.register(peername[0], post['port']))
+
 
 def run():
 	app = web.Application()
