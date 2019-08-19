@@ -40,13 +40,8 @@ Current valid types, and expected additional key-value pairs:
 
 ```json
 {
-	"status" : 0,
-	"message" : "successfully redeemed",
-	"data" :
-	{
-		"nonce" : { "status": int, "type" : type, optional key-value pairs},
-		.....,
-		"nonce" : { "status": int, "type" : type, optional key-value pairs}
-	}
+	"nonce" : { "status": int, "type" : type, optional key-value pairs},
+	.....,
+	"nonce" : { "status": int, "type" : type, optional key-value pairs}
 }
 ```
