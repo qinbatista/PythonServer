@@ -97,6 +97,8 @@ class ConfigurationManager:
 		except queue.Empty: return {'status' : 1, 'message' : 'no new work'}
 		for world in self._world_distribution_config['gamemanagers'][sid]['worlds']:
 			self._world_map[world][sid] = {'ip' : ip, 'port' : port}
+		if len(self._world_distribution_config['gamemanagers'][sid]['worlds']) == 0:
+			self._world_map['test'][sid] = {'ip' : ip, 'port' : port}
 		return {'status' : 0, 'message' : 'registered', 'data' : self._world_map}
 
 
@@ -153,6 +155,7 @@ class ConfigurationManager:
 		'4-7, 1, 2-3' -> [4, 5, 6, 7, 1, 2, 3]
 		'''
 		ret = []
+		if s == '' or s is None: return ret
 		for sequence in s.split(','):
 			end = None
 			start = None
