@@ -330,6 +330,40 @@ def create_friend_table() -> None:
     sql_table_constructor(table_name=table_name, table_dict=table_dict, key_str="PRIMARY KEY(unique_id, friend_id)")  # 创建武器背包表
 
 
+def create_triggers():
+	trigger1 = """
+	CREATE TRIGGER `player_BEFORE_INSERT` BEFORE INSERT ON `player` FOR EACH ROW
+	BEGIN
+	INSERT INTO `skill` (unique_id) VALUES (new.unique_id);
+	INSERT INTO `factory` (unique_id) VALUES (new.unique_id);
+	INSERT INTO `dark_market` (unique_id) VALUES (new.unique_id);
+	INSERT INTO `leader_board` (unique_id) VALUES (new.unique_id);
+	END
+	"""
+
+	trigger2 = """
+	CREATE TRIGGER `player_AFTER_DELETE` AFTER DELETE ON `player` FOR EACH ROW
+	BEGIN
+	DELETE FROM `armor` WHERE unique_id = OLD.unique_id;
+	DELETE FROM `dark_market` WHERE unique_id = OLD.unique_id;
+	DELETE FROM `factory` WHERE unique_id = OLD.unique_id;
+	DELETE FROM `leader_board` WHERE unique_id = OLD.unique_id;
+	DELETE FROM `role` WHERE unique_id = OLD.unique_id;
+	DELETE FROM `skill` WHERE unique_id = OLD.unique_id;
+	DELETE FROM `weapon` WHERE unique_id = OLD.unique_id;
+	DELETE FROM `friend` WHERE unique_id = OLD.unique_id;
+	DELETE FROM `friend` WHERE friend_id = OLD.unique_id;
+	DELETE FROM `families` WHERE familyid = OLD.game_name;
+	END
+	"""
+
+	db = POOL.connection()
+	cursor = db.cursor()
+	cursor.execute(trigger1)
+	cursor.execute(trigger2)
+	db.commit()
+
+
 def update_avatar(table_name: str, unique_id: str, img_path: str):  # png
     """
     更新用户表中的头像
@@ -402,5 +436,7 @@ if __name__ == '__main__':
     # 下面关于头像的方法暂时没测试
     # update_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar.png")
     # load_avatar(table_name="user_info", unique_id="4", img_path="D:/FileDocument/零碎文件/avatar2.png")
-    create_factory_table()
+	#create_factory_table()
+	#create_triggers()
     # test()
+	pass
