@@ -11,6 +11,7 @@ import threading
 import configparser
 from aiohttp import web
 from datetime import datetime
+from collections import defaultdict
 
 def loc():
 	return os.path.dirname(os.path.realpath(__file__))
@@ -37,7 +38,7 @@ class ConfigurationManager:
 		self._read_version()
 		self._refresh_configurations()
 		self._start_timer(600)
-		self._registered_managers = {}
+		self._world_map = defaultdict(dict)
 
 
 	def _refresh_configurations(self):
@@ -91,8 +92,9 @@ class ConfigurationManager:
 		try:
 			sid = self._unregistered_managers.get(block = False)
 		except queue.Empty: return {'status' : 1, 'message' : 'no new work'}
-		self._registered_managers[sid] = {'ip' : ip, 'port' : port}
-		return {'status' : 0, 'message' : 'registered', 'data' : self._registered_managers}
+		for world in self._world_distribution_config['gamemanagers'][sid]['worlds']:
+			self._world_map[world][sid] = {'ip' : ip, 'port' : port}
+		return {'status' : 0, 'message' : 'registered', 'data' : self._world_map}
 
 
 	def _read_factory_config(self):
