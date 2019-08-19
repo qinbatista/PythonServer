@@ -99,7 +99,7 @@ class ConfigurationManager:
 			self._world_map[world][sid] = {'ip' : ip, 'port' : port}
 		if len(self._world_distribution_config['gamemanagers'][sid]['worlds']) == 0:
 			self._world_map['test'][sid] = {'ip' : ip, 'port' : port}
-		return {'status' : 0, 'message' : 'registered', 'data' : self._world_map}
+		return {'status' : 0, 'sid' : sid, 'worlds' : self._world_distribution_config['gamemanagers'][sid]['worlds']}
 
 
 	def _read_factory_config(self):
