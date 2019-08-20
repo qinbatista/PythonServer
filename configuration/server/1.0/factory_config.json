@@ -1,8 +1,8 @@
 {
 	"factory_kind": ["food", "mine", "crystal", "equipment"],
-	"production_workers_max": 45,
-	"production_workers_max_crystal": 6000,
-	"production_workers_need_crystal": {
+	"buy_workers_max": 45,
+	"buy_workers_max_food": 6000,
+	"buy_workers_need_food": {
 		"1": 100,
 		"2": 110,
 		"3": 120,

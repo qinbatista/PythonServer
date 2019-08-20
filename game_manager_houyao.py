@@ -2767,6 +2767,64 @@ class GameManager:
 			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
 
+	async def buy_workers(self, world: int, unique_id: str, workers_quantity: int):
+		"""
+		0  - Buy workers success, storage has been refreshed
+		1  - Buy workers success
+		98 - Buy workers failed, insufficient food
+		99 - The number of workers can only be a positive integer
+		思路：查询所有工人的数量，读取配置文件下的工人数量购买限制，
+		此时需不需要刷新食物工厂？
+		判断购买的工人数量是否大于等于最大工人数限制，
+		判断需要的食物数量是否足够
+		"""
+		if workers_quantity <= 0:
+			return self._message_typesetting(status=99, message="The number of workers can only be a positive integer")
+		result = await self.refresh_all_storage(world=world,unique_id=unique_id)
+		remaining = {}
+		reward = {}
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		workers_max = self._factory_config["buy_workers_max"]
+		workers_max_food = self._factory_config["buy_workers_max_food"]
+		workers_need_food = self._factory_config["buy_workers_need_food"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		food_storage = factory_data[14]
+		all_workers = sum(factory_data[9: 14], 1)  # 多加一人
+		if all_workers >= workers_max:
+			if workers_quantity * workers_max_food > food_storage:
+				workers_quantity = food_storage // workers_max_food
+			food_storage -= workers_quantity * workers_max_food
+		else:
+			for worker in range(workers_quantity):  # 0开始递增，刚好多减一人，与最初平等
+				workers_next = all_workers + worker
+				if workers_next >= workers_max:
+					if workers_max_food > food_storage:
+						workers_quantity = worker  # 此工人没有被购买
+						break
+					else:
+						food_storage -= workers_max_food
+				else:
+					need_food = workers_need_food[str(workers_next)]
+					if need_food > food_storage:
+						workers_quantity = worker  # 此工人没有被购买
+						break
+					else:
+						food_storage -= need_food
+		if workers_quantity == 0:
+			return self._message_typesetting(status=98, message="buy workers failed, insufficient food")
+		all_workers += workers_quantity - 1  # 多减一人，与最初平等
+		totally_workers = all_workers - sum(factory_data[9: 13])
+		sql_str = f"update factory set totally_workers={totally_workers}, food_storage={food_storage} where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		remaining.update({"all_workers": all_workers, "totally_workers": totally_workers, "buy_workers_quantity": workers_quantity, "food_storage": food_storage})
+		if reward:
+			return self._message_typesetting(status=0, message="Buy workers success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=1, message="Buy workers success", data={"remaining": remaining})
+
+
+
 #############################################################################################
 #  end   2019年8月18日14点59分 houyao #######################################################
 #############################################################################################
@@ -3493,6 +3551,13 @@ async def _refresh_equipment_storage(request: web.Request) -> web.Response:
 async def _distribution_workers(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).distribution_workers(int(post['world']), post['unique_id'], int(post['workers_quantity']), post['factory_kind'])
+	return _json_response(result)
+
+
+@ROUTES.post('/buy_workers')
+async def _buy_workers(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).buy_workers(int(post['world']), post['unique_id'], int(post['workers_quantity']))
 	return _json_response(result)
 
 ###############################################################################################
