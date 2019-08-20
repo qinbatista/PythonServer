@@ -1117,11 +1117,15 @@ class GameManager:
 		#99 时间未到
 		basic_segment = 1
 		basic_recover_time = 49
+		
+		return_value = 0
 		random_number = random.randint(0, 100)
 		if 0<=random_number < 10:
 			basic_segment = basic_segment*3
+			return_value=2
 		elif 10<=random_number < 55:
 			basic_segment = basic_segment*2
+			return_value=1
 		await self._set_segment_by_id(world, unique_id, weapon_id, basic_segment)
 		current_time1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		data_json={
@@ -1142,7 +1146,7 @@ class GameManager:
 		if data[0][1] =="":
 			await self._execute_statement_update(world, f'UPDATE factory SET wishing_pool_timer="{current_time1}" WHERE unique_id = "{unique_id}"')
 			data_json["reward"]["wish_pool_timer"] = basic_recover_time*3600-int(data[0][0])*1*3600
-			return self._message_typesetting(0, 'you get segement',data_json)
+			return self._message_typesetting(return_value, 'you get segement',data_json)
 		else:
 			current_time1 = data[0][1]
 			current_time2 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -1163,7 +1167,7 @@ class GameManager:
 				return self._message_typesetting(99, 'it is not time yet',data_json)
 			else:
 				await self._execute_statement_update(world, f'UPDATE factory SET wishing_pool_timer="{current_time2}" WHERE unique_id = "{unique_id}"')
-			return self._message_typesetting(0, 'you get segement',data_json)
+			return self._message_typesetting(return_value, 'you get segement',data_json)
 
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')

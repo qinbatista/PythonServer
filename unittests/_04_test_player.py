@@ -252,6 +252,11 @@ def check_boss_status(unique_id: str):
 def get_top_damage(unique_id: str,range_number:str):
 	result = requests.post('http://localhost:8004/get_top_damage', data={"world": 0, 'unique_id': unique_id,"range_number":range_number})
 	print(str(result.text))
+
+def active_wishing_pool(unique_id: str,range_number:str):
+	result = requests.post('http://localhost:8006/active_wishing_pool', data={"world": 0, 'unique_id': unique_id,"weapon_id":"weapon1"})
+	print(str(result.text))
+	
 def test():
 	# s22k = "999"
 	# s21k = "939"
@@ -404,7 +409,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	all_function(unique_id="1")
+	# all_function(unique_id="1")
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")
@@ -412,3 +417,4 @@ if __name__ == "__main__":
 	# enter_world_boss_stage("4")
 	# leave_world_boss_stage('4','100000')
 	# get_top_damage(4,4)
+	active_wishing_pool(4,"weapon1")
