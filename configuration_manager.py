@@ -38,7 +38,7 @@ class ConfigurationManager:
 		self._read_version()
 		self._refresh_configurations()
 		self._start_timer(600)
-		self._world_map = defaultdict(dict)
+		self._world_map = defaultdict(lambda: defaultdict(dict))
 
 
 	def _refresh_configurations(self):
@@ -88,16 +88,31 @@ class ConfigurationManager:
 	async def get_world_map(self):
 		return self._world_map or {'status' : 'no one has registered yet'}
 
-	async def register(self, ip):
+	async def register_game_manager(self, ip):
 		try:
-			sid = self._unregistered_managers.get(block = False)
+			sid = self._unregistered_game_managers.get(block = False)
 		except queue.Empty: return {'status' : 1, 'message' : 'no new work'}
 		for world in self._world_distribution_config['gamemanager']['servers'][sid]['worlds']:
-			self._world_map[world][sid] = {'ip' : ip, 'port' : self._world_distribution_config['gamemanager']['base_port']}
+			self._world_map[world]['gamemanagers'][sid] = {'ip' : ip, 'port' : self._world_distribution_config['gamemanager']['base_port']}
 		if len(self._world_distribution_config['gamemanager']['servers'][sid]['worlds']) == 0:
-			self._world_map['test'][sid] = {'ip' : ip, 'port' : self._world_distribution_config['gamemanager']['base_port']}
+			self._world_map['test']['gamemanagers'][sid] = {'ip' : ip, 'port' : self._world_distribution_config['gamemanager']['base_port']}
 		self._world_distribution_config['gamemanager']['base_port'] += 1
 		return {'status' : 0, 'sid' : sid, 'worlds' : self._world_distribution_config['gamemanager']['servers'][sid]['worlds'], 'port' : self._world_distribution_config['gamemanager']['base_port'] - 1}
+
+	async def register_chat_server(self, ip):
+		try:
+			for w, servers in self._world_map.items():
+				if 'chatserver' not in servers:
+					world = w
+					break
+			self._world_map[world]['chatserver'] = {'ip' : ip, 'port' : self._world_distribution_config['chatserver']['base_port']}
+			self._world_distribution_config['chatserver']['base_port'] += 1
+			return {'status' : 0, 'world' : world, 'port' : self._world_map[world]['chatserver']['port']}
+		except NameError: return {'status' : 1, 'message' : 'no worlds without chat servers'}
+
+
+
+
 
 
 	def _read_factory_config(self):
@@ -124,10 +139,10 @@ class ConfigurationManager:
 
 	def _read_world_distribution_config(self):
 		d = json.load(open(SERVER_CONFIG.format(self._cv), encoding = 'utf-8'))
-		self._unregistered_managers = queue.Queue()
+		self._unregistered_game_managers = queue.Queue()
 		for sid, value in d['gamemanager']['servers'].items():
 			value['worlds'] = self._world_range_parser(value['worlds'])
-			self._unregistered_managers.put(sid)
+			self._unregistered_game_managers.put(sid)
 		self._world_distribution_config = d
 
 	def _read_stage_reward_config(self):
@@ -141,13 +156,6 @@ class ConfigurationManager:
 
 	def _world_range_parser(self, s: str) -> [int]:
 		'''
-		Parses a valid input sequence into a list containing the specified values.
-		A valid input sequence is a single string containing any number of comma separated valid ranges.
-		A valid range can be either a single positive number, or a positive number followed by a '-' character,
-		followed by an equal or larger number.
-		Raises ValueError if input contains non valid characters.
-
-		Examples of valid input:
 		'1' -> [1]
 		'1, 12-13' -> [1, 12, 13]
 		'4-7, 1, 2-3' -> [4, 5, 6, 7, 1, 2, 3]
@@ -251,12 +259,19 @@ async def __get_entry_consumables_config(request: web.Request) -> web.Response:
 async def __get_world_map(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_world_map())
 
-@ROUTES.get('/register')
-async def __register(request):
+@ROUTES.get('/register_game_manager')
+async def __register_game_manager(request):
 	peername = request.transport.get_extra_info('peername')
 	if peername is None:
 		return _json_response({'status' : 99, 'message' : 'can not resolve ip addr'})
-	return _json_response(await MANAGER.register(peername[0]))
+	return _json_response(await MANAGER.register_game_manager(peername[0]))
+
+@ROUTES.get('/register_chat_server')
+async def __register_chat_server(request):
+	peername = request.transport.get_extra_info('peername')
+	if peername is None:
+		return _json_response({'status' : 99, 'message' : 'can not resolve ip addr'})
+	return _json_response(await MANAGER.register_chat_server(peername[0]))
 
 
 def run():
