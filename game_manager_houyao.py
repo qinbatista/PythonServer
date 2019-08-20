@@ -2902,6 +2902,42 @@ class GameManager:
 		if reward:
 			return self._message_typesetting(status=1, message="Upgrade mine factory success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=0, message="Upgrade mine factory success", data={"remaining": remaining})
+
+	async def upgrade_crystal_factory(self, world: int, unique_id: str) -> dict:
+		"""
+		0  - Upgrade crystal factory success
+		1  - Upgrade crystal factory success, storage has been refreshed
+		2  - Upgrade factory failed, Insufficient crystal, storage has been refreshed
+		# 97 - Upgrade factory failed，Insufficient crystal
+		98 - The factory has reached full level
+		"""
+		storage_level_limit = self._factory_config["crystal_factory"]["storage_level_limit"]
+		upgrade_need_crystals = self._factory_config["crystal_factory"]["upgrade_need_crystals_limit"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_level = factory_data[3]
+		all_crystal = factory_data[16]
+		remaining = {}
+		reward = {}
+		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		if factory_level == storage_level_limit:
+			return self._message_typesetting(status=98, message="The factory has reached full level")
+		factory_level += 1
+		need_crystal = upgrade_need_crystals[str(factory_level)]
+		if need_crystal > all_crystal:
+			return self._message_typesetting(status=2, message="Upgrade factory failed, Insufficient crystal, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+			# return self._message_typesetting(status=97, message="Upgrade factory failed, Insufficient crystal")
+		else:
+			all_crystal -= need_crystal
+		remaining.update({"crystal_factory_level": factory_level, "crystal_storage": all_crystal, "upgrade_level": 1})
+		sql_str = f"update factory set crystal_factory_level={factory_level}, crystal_storage={all_crystal} where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		if reward:
+			return self._message_typesetting(status=1, message="Upgrade crystal factory success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=0, message="Upgrade crystal factory success", data={"remaining": remaining})
+
 #############################################################################################
 #  end   2019年8月18日14点59分 houyao #######################################################
 #############################################################################################
@@ -3649,6 +3685,13 @@ async def _upgrade_food_factory(request: web.Request) -> web.Response:
 async def _upgrade_mine_factory(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).upgrade_mine_factory(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/upgrade_crystal_factory')
+async def _upgrade_crystal_factory(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).upgrade_crystal_factory(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 ###############################################################################################
