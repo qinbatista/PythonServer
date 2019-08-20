@@ -10,3 +10,4 @@ obj
 *.ide-shm
 *.ide-wal
 .vs
+chatlogs
