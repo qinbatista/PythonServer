@@ -45,20 +45,21 @@ def chat_logger(world, in_queue, stopper):
 				except queue.Empty:
 					time.sleep(wait)
 					wait = min(wait + 0.1, 2)
+			print('exitted inner while loop')
 
 class ChatServer:
 	def __init__(self, world = ''):
 		self.world = world
 		self.users = defaultdict(dict)
 		self.families = defaultdict(lambda: defaultdict(set))
-		self.pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
+		self.pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = self.world if self.world != 0 else 'aliya', charset = 'utf8')
 		self.stopper = threading.Event()
 		self.in_queue = queue.Queue()
 		self.logger = threading.Thread(target = chat_logger, args = (self.world, self.in_queue, self.stopper))
 		signal.signal(signal.SIGINT, SignalHandler(self.stopper, self.logger))
 
 	async def run(self, port):
-		async with await asyncio.start_server(self.handle_client, '127.0.0.1', port) as s:
+		async with await asyncio.start_server(self.handle_client, None, port) as s:
 			print(f'starting chat server for world "{self.world}" on port {port}...')
 			self.logger.start()
 			await s.serve_forever()
