@@ -95,11 +95,11 @@ class ConfigurationManager:
 		try:
 			sid = self._unregistered_managers.get(block = False)
 		except queue.Empty: return {'status' : 1, 'message' : 'no new work'}
-		for world in self._world_distribution_config['gamemanagers'][sid]['worlds']:
+		for world in self._world_distribution_config['gamemanager']['servers'][sid]['worlds']:
 			self._world_map[world][sid] = {'ip' : ip, 'port' : port}
-		if len(self._world_distribution_config['gamemanagers'][sid]['worlds']) == 0:
+		if len(self._world_distribution_config['gamemanager']['servers'][sid]['worlds']) == 0:
 			self._world_map['test'][sid] = {'ip' : ip, 'port' : port}
-		return {'status' : 0, 'sid' : sid, 'worlds' : self._world_distribution_config['gamemanagers'][sid]['worlds']}
+		return {'status' : 0, 'sid' : sid, 'worlds' : self._world_distribution_config['gamemanager']['servers'][sid]['worlds']}
 
 
 	def _read_factory_config(self):
@@ -127,7 +127,7 @@ class ConfigurationManager:
 	def _read_world_distribution_config(self):
 		d = json.load(open(WORLD_DISTRIBUTION.format(self._cv), encoding = 'utf-8'))
 		self._unregistered_managers = queue.Queue()
-		for sid, value in d['gamemanagers'].items():
+		for sid, value in d['gamemanager']['servers'].items():
 			value['worlds'] = self._world_range_parser(value['worlds'])
 			self._unregistered_managers.put(sid)
 		self._world_distribution_config = d
