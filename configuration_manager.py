@@ -29,8 +29,8 @@ MYSQL_DATA = loc() + '/configuration/server/{}/mysql_data_config.json'
 WORLD_BOSS = loc() + '/configuration/server/{}/world_boss_config.json'
 HANG_REWARD = loc() + '/configuration/server/{}/hang_reward_config.json'
 ENEMY_LAYOUT = loc() + '/configuration/client/{}/level_enemy_layouts_config.json'
+SERVER_CONFIG = loc() + '/configuration/server/{}/server_config.json'
 ENTRY_CONSUMABLES = loc() + '/configuration/server/{}/entry_consumables_config.json'
-WORLD_DISTRIBUTION = loc() + '/configuration/server/{}/world_distribution.json'
 
 
 class ConfigurationManager:
@@ -69,9 +69,6 @@ class ConfigurationManager:
 
 	async def get_game_manager_config(self):
 		return self._game_manager_config
-
-	async def get_world_distribution_config(self):
-		return self._world_distribution_config
 
 	async def get_level_enemy_layouts_config(self):
 		return self._level_enemy_layouts_config
@@ -126,7 +123,7 @@ class ConfigurationManager:
 		self._monster_config = json.load(open(MONSTER.format(self._cv), encoding = 'utf-8'))
 
 	def _read_world_distribution_config(self):
-		d = json.load(open(WORLD_DISTRIBUTION.format(self._cv), encoding = 'utf-8'))
+		d = json.load(open(SERVER_CONFIG.format(self._cv), encoding = 'utf-8'))
 		self._unregistered_managers = queue.Queue()
 		for sid, value in d['gamemanager']['servers'].items():
 			value['worlds'] = self._world_range_parser(value['worlds'])
@@ -249,10 +246,6 @@ async def __get_server_config_location(request: web.Request) -> web.Response:
 @ROUTES.get('/get_entry_consumables_config')
 async def __get_entry_consumables_config(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_entry_consumables_config())
-
-@ROUTES.get('/get_world_distribution_config')
-async def __get_world_distribution_config(request: web.Request) -> web.Response:
-	return _json_response(await MANAGER.get_world_distribution_config())
 
 @ROUTES.get('/get_world_map')
 async def __get_world_map(request: web.Request) -> web.Response:
