@@ -1,6 +1,7 @@
 import os
 import time
 import subprocess
+import signal
 import requests
 
 def loc():
@@ -43,7 +44,8 @@ def main():
 		pass
 	finally:
 		for process in processes:
-			subprocess.Popen.terminate(process)
+			process.send_signal(signal.SIGINT)
+			process.wait()
 
 
 
