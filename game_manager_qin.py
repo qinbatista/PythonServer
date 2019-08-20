@@ -1113,12 +1113,16 @@ class GameManager:
 		return self._message_typesetting(0, 'got all friends info', data)
 
 	async def _active_wishing_pool(self, world: int, unique_id: str, weapon_id: str):
-		#0 获取碎片成功没有暴击
-		#1 2倍暴击抽奖
-		#2 3倍暴击抽奖
+		#0 免费抽获取碎片成功没有暴击
+		#1 免费抽2倍暴击抽奖
+		#2 免费抽3倍暴击抽奖
+		#10 钻石抽获取碎片成功没有暴击
+		#11 钻石抽2倍暴击抽奖
+		#12 钻石抽3倍暴击抽奖
 		#99 时间未到
 		basic_segment = self._factory_config["wishing_pool"]["basic_segment"]
 		basic_recover_time = self._factory_config["wishing_pool"]["basic_recover_time"]
+		basic_diamond = self._factory_config["wishing_pool"]["basic_diamond"]
 		return_value = 0
 		random_number = random.randint(0, 100)
 		if 0<=random_number < 10:
@@ -1134,16 +1138,18 @@ class GameManager:
 				{
 					"weapon_id": weapon_id,
 					"weapon_segment": basic_segment,
-					"wish_pool_timer": current_time1
+					"wish_pool_timer": current_time1,
+					"diamond":0
 				},
 				"reward":
 				{
 					"weapon_id": weapon_id,
 					"weapon_segment": basic_segment,
-					"wish_pool_timer": 0
+					"wish_pool_timer": 0,
+					"diamond":0
 				}
 			}
-		data = await self._execute_statement(world, 'SELECT wishing_pool_level, wishing_pool_timer FROM factory WHERE unique_id = "' + unique_id + '";')
+		data = await self._execute_statement(world, 'SELECT wishing_pool_level, wishing_pool_timer, wishing_pool_times FROM factory WHERE unique_id = "' + unique_id + '";')
 		if data[0][1] =="":
 			await self._execute_statement_update(world, f'UPDATE factory SET wishing_pool_timer="{current_time1}" WHERE unique_id = "{unique_id}"')
 			data_json["reward"]["wish_pool_timer"] = basic_recover_time*3600-int(data[0][0])*1*3600
@@ -1161,11 +1167,20 @@ class GameManager:
 			#print("抽奖CD减时间:"+ str(basic_recover_time*3600-int(data[0][0])*1*3600-((d2-d1).total_seconds())))
 			reward_time = basic_recover_time*3600-int(data[0][0])*1*3600-(int((d2-d1).total_seconds()))
 			if reward_time<=0:
+				await self._execute_statement_update(world, f'UPDATE factory SET wishing_pool_times="{0}" WHERE unique_id = "{unique_id}"')
 				data_json["reward"]["wish_pool_timer"] = basic_recover_time*3600-int(data[0][0])*1*3600
 			else:
 				data_json["reward"]["wish_pool_timer"] = basic_recover_time*3600-int(data[0][0])*1*3600-(int((d2-d1).total_seconds()))
 			if int((d2-d1).total_seconds()) <(basic_recover_time- int(data[0][0])*1)*3600:
-				return self._message_typesetting(99, 'it is not time yet',data_json)
+				return_data = await self.try_diamond(world, unique_id,-data[0][2]*basic_diamond)
+				#{"status": status, "remaining": remaining}
+				if return_data["status"]==0:
+					data_json["remaining"]["diamond"] = return_data["remaining"]
+					data_json["reward"]["diamond"] = data[0][2]*basic_diamond
+					await self._execute_statement_update(world, f'UPDATE factory SET wishing_pool_times="{data[0][2]+1}" WHERE unique_id = "{unique_id}"')
+					return self._message_typesetting(int("1"+str(return_value)), 'you get segement by diamond',data_json)
+				else:
+					return self._message_typesetting(99, 'insufficient diamond',data_json)
 			else:
 				await self._execute_statement_update(world, f'UPDATE factory SET wishing_pool_timer="{current_time2}" WHERE unique_id = "{unique_id}"')
 			return self._message_typesetting(return_value, 'you get segement',data_json)
