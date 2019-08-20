@@ -2628,7 +2628,7 @@ class GameManager:
 		acceleration_end_time = factory_data[20]
 
 		remaining = {"food_factory_workers": food_factory_workers, "mine_factory_workers": mine_factory_workers, "crystal_factory_workers": crystal_factory_workers, "equipment_factory_workers": equipment_factory_workers}
-		reward = {}
+		reward = {"food_increment": 0, "iron_increment": 0, "crystal_increment": 0, "equipment_increment": 0}
 
 		acceleration_value = 1
 		times = 1
@@ -2645,18 +2645,18 @@ class GameManager:
 			if times == 2 and i == 1:
 				acceleration_value = 1
 				current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-			if food_start_time != "":
+			if food_start_time:  # food_start_time != ""
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
 				food_increment = int(time_difference.total_seconds()) // food_factory["time_consuming"] * food_factory_workers * acceleration_value
 				if food_storage + food_increment > food_storage_limit:
 					food_increment = food_storage_limit - food_storage
 				food_storage += food_increment
-				reward.update({"food_increment": food_increment})
+				reward["food_increment"] += food_increment
 				reward.update({"food_start_time": food_start_time})
 				food_start_time = current_time
 				remaining.update({"food_storage": food_storage})
 				remaining.update({"food_start_time": food_start_time})
-			if mine_start_time != "":
+			if mine_start_time:
 				cost_food = mine_factory["cost"]["food"]
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(mine_start_time, '%Y-%m-%d %H:%M:%S')
 				iron_increment = int(time_difference.total_seconds()) // mine_factory["time_consuming"] * mine_factory_workers * acceleration_value
@@ -2666,13 +2666,13 @@ class GameManager:
 					iron_increment = food_storage // cost_food
 				food_storage -= cost_food * iron_increment
 				iron_storage += iron_increment
-				reward.update({"iron_increment": iron_increment})
+				reward["iron_increment"] += iron_increment
 				reward.update({"mine_start_time": mine_start_time})
 				mine_start_time = current_time
 				remaining.update({"food_storage": food_storage})
 				remaining.update({"iron_storage": iron_storage})
 				remaining.update({"mine_start_time": mine_start_time})
-			if crystal_start_time != "":
+			if crystal_start_time:
 				cost_food = crystal_factory["cost"]["food"]
 				cost_iron = crystal_factory["cost"]["iron"]
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
@@ -2690,14 +2690,14 @@ class GameManager:
 				food_storage -= cost_food * crystal_increment
 				iron_storage -= cost_iron * crystal_increment
 				crystal_storage += crystal_increment
-				reward.update({"crystal_increment": crystal_increment})
+				reward["crystal_increment"] += crystal_increment
 				reward.update({"crystal_start_time": crystal_start_time})
 				crystal_start_time = current_time
 				remaining.update({"food_storage": food_storage})
 				remaining.update({"iron_storage": iron_storage})
 				remaining.update({"crystal_storage": crystal_storage})
 				remaining.update({"crystal_start_time": crystal_start_time})
-			if equipment_start_time != "":
+			if equipment_start_time:
 				cost_iron = equipment_factory["cost"]["iron"]
 				# print(f"equipment==>iron_storage: {iron_storage}")
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
@@ -2706,7 +2706,7 @@ class GameManager:
 					equipment_increment = iron_storage // cost_iron
 				iron_storage -= equipment_increment * cost_iron
 				equipment_storage += equipment_increment
-				reward.update({"equipment_increment": equipment_increment})
+				reward["equipment_increment"] += equipment_increment
 				reward.update({"equipment_start_time": equipment_start_time})
 				equipment_start_time = current_time
 				remaining.update({"iron_storage": iron_storage})
