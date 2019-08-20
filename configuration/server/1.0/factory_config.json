@@ -398,7 +398,7 @@
 		"cost": {"iron": 20}
 	},
 	"wishing_pool": {
-		"storage_level_limit": 15,
+		"storage_level_limit": 30,
 		"upgrade_need_crystals_limit": {
 			"2": 0,
 			"3": 400,
