@@ -91,6 +91,7 @@ def create_table_factory(cursor):
 	  `equipment_storage` int(11) unsigned DEFAULT 0 COMMENT '存储的盔甲1数量',
 	  `wishing_pool_level` int(11) unsigned DEFAULT 1 COMMENT '许愿池的等级',
 	  `wishing_pool_timer` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '许愿的开始时间',
+	  `acceleration_end_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '加速结束时间',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
