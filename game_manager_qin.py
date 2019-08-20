@@ -1152,12 +1152,12 @@ class GameManager:
 			current_time2 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 			d1 = datetime.strptime(current_time1, '%Y-%m-%d %H:%M:%S')
 			d2 = datetime.strptime(current_time2, '%Y-%m-%d %H:%M:%S')
-			print("玩家时间："+current_time1)
-			print("服务器时间:"+current_time2)
-			print("间隔时间:"+str(int((d2-d1).total_seconds())))
-			print("48小时秒钟："+str(basic_recover_time*3600))
-			print("等级减去秒钟："+str(int(data[0][0])*1*3600))
-			print("抽奖CD减时间:"+ str(basic_recover_time*3600-int(data[0][0])*1*3600-((d2-d1).total_seconds())))
+			#print("玩家时间："+current_time1)
+			#print("服务器时间:"+current_time2)
+			#print("间隔时间:"+str(int((d2-d1).total_seconds())))
+			#print("48小时秒钟："+str(basic_recover_time*3600))
+			#print("等级减去秒钟："+str(int(data[0][0])*1*3600))
+			#print("抽奖CD减时间:"+ str(basic_recover_time*3600-int(data[0][0])*1*3600-((d2-d1).total_seconds())))
 			reward_time = basic_recover_time*3600-int(data[0][0])*1*3600-(int((d2-d1).total_seconds()))
 			if reward_time<=0:
 				reward_time = basic_recover_time*3600-int(data[0][0])*1*3600
