@@ -252,6 +252,10 @@ def check_boss_status(unique_id: str):
 def get_top_damage(unique_id: str,range_number:str):
 	result = requests.post('http://localhost:8004/get_top_damage', data={"world": 0, 'unique_id': unique_id,"range_number":range_number})
 	print(str(result.text))
+
+def active_wishing_pool(unique_id: str,weapon_id:str):
+	result = requests.post('http://localhost:8006/active_wishing_pool', data={"world": 0, 'unique_id': unique_id,"weapon_id":weapon_id})
+	print(str(result.text))
 def test():
 	# s22k = "999"
 	# s21k = "939"
@@ -298,26 +302,26 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
 	# print(str(result.text))
-	result = requests.post('http://localhost:8004/delete_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": "d"})
-	print(str(result.text))
+	# result = requests.post('http://localhost:800/delete_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": "d"})
+	# print(str(result.text))
 
-"""
-json_data = {
-	"world": world,
-	"uid_to": unique_id,
-	"kwargs":
-		{
-			"from": "server",
-			"subject": "You have a gift!",
-			"body": "Your gift is waiting",
-			"type": "gift",
-			"items": "friend_gift",
-			"quantities": "1"
-		}
-}
-result = requests.post('http://localhost:8020/send_mail', json=json_data)
-print(str(result.text))
-"""
+	"""
+	json_data = {
+		"world": world,
+		"uid_to": unique_id,
+		"kwargs":
+			{
+				"from": "server",
+				"subject": "You have a gift!",
+				"body": "Your gift is waiting",
+				"type": "gift",
+				"items": "friend_gift",
+				"quantities": "1"
+			}
+	}
+	result = requests.post('http://localhost:8020/send_mail', json=json_data)
+	print(str(result.text))
+	"""
 
 if __name__ == "__main__":
 	# try_coin()
@@ -376,7 +380,7 @@ if __name__ == "__main__":
 	# get_new_mail(unique_id="7")
 	# get_all_mail(unique_id="7")
 	# enumerate
-	test()
+	# test()
 	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
 	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
 	# get_all_mail(unique_id="7")
@@ -391,3 +395,4 @@ if __name__ == "__main__":
 	# enter_world_boss_stage("4")
 	# leave_world_boss_stage('4','100000')
 	# get_top_damage(4,4)
+	active_wishing_pool(4,"weapon1")
