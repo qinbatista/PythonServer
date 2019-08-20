@@ -2714,17 +2714,18 @@ class GameManager:
 		思路： 判断分配的工人数量workers_quantity是否为为正整数 The number of workers assigned is not a positive integer ==> 代号99，
 		工厂类型factory_kind是否在数据库表中 Factory type error ==> 代号98，查询数据库表中是否存在unique_id的数据，
 		不存在则创建，获取数据库中的所有工人的数量totally_workers和正在此工厂工作的工人数量factory_workers，
-		判断所有工人的数量是否大于等于分配的工人数量
-		分歧思路1.如果小于则分配完所有的工人到指定的工厂下工作
-		# 分歧思路2.如果小于则报错Insufficient distribution workers ==> 代号97
-		# 分歧思路3.判断所有工人数是否大于0，如果大于0则将所有的工人分配到指定的工厂下工作，否则报错Insufficient distribution workers ==> 代号97，
+		先判断所有工人的数量是否大于等于工厂等级下限制的工人数量
+		后判断所有工人的数量是否大于等于分配的工人数量
+		如果小于则分配完所有的工人到指定的工厂下工作
 		最终正确结果返回字典键值对包含以下：==> 代号0
-			1.所有工人的数量：totally_workers
-			2.指定的工厂的工厂类型：factory_kind
-			3.指定的工厂下工作人员数量：factory_workers
-			4.工厂开始工作时间：factory_timer
-			5.此工厂的收获物品类型：factory_reward_kind
-			5.此工厂的收获物品数量：factory_reward_quantity
+			remaining：
+				1.所有工人的数量：totally_workers
+				2.指定的工厂下工作人员数量：factory_workers
+				3.工厂开始工作时间：start_time
+				4.工厂生产的所有物品数量：storage
+			reward：
+				5.工厂生产的所有物品增加的数量：increment
+				6.工厂生产物品结算的开始时间：start_time
 		问题：如果指定工厂之前存在工人在工作则结算后的工作时间是否统一成当前时间
 		"""
 		all_factory = self._factory_config["factory_kind"]
