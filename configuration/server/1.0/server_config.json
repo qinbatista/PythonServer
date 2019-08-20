@@ -1,0 +1,17 @@
+{
+	"chatserver" :
+	{
+		"base_port" : 8300
+	},
+	"gamemanager" :
+	{
+		"base_port" : 8100,
+		"servers" :
+		{
+			"gm1" : 
+			{
+				"worlds" : "0"
+			}
+		}
+	}
+}
