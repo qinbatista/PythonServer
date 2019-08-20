@@ -1,8 +1,8 @@
 {
-	"factory_kind": ["food_factory", "mine_factory", "crystal_factory", "equipment_factory"],
-	"production_workers_max": 45,
-	"production_workers_max_crystal": 6000,
-	"production_workers_need_crystal": {
+	"factory_kind": ["food", "mine", "crystal", "equipment"],
+	"buy_workers_max": 45,
+	"buy_workers_max_food": 6000,
+	"buy_workers_need_food": {
 		"1": 100,
 		"2": 110,
 		"3": 120,
@@ -240,6 +240,7 @@
 	},
 	"mine_factory": {
 		"time_consuming": 30,
+		"cost": {"food": 3},
 		"storage_level_limit": 30,
 		"workers_number_limit": {
 			"1": 2,
@@ -339,6 +340,7 @@
 	},
 	"crystal_factory": {
 		"time_consuming": 30,
+		"cost": {"food": 4, "iron": 2},
 		"storage_level_limit": 15,
 		"workers_number_limit": {
 			"1": 1,
@@ -392,6 +394,7 @@
 		}
 	},
 	"equipment_factory": {
-		"time_consuming": 30
+		"time_consuming": 30,
+		"cost": {"iron": 20}
 	}
 }
