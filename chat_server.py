@@ -2,12 +2,16 @@ import time
 import requests
 import configparser
 
+import os
+import sys
 import queue
+import signal
 import asyncio
 import tormysql
 import threading
 import contextlib
 
+from datetime import datetime
 from collections import defaultdict
 
 
@@ -17,6 +21,30 @@ MAXSIZE = 250
 class ChatProtocolError(Exception):
 	pass
 
+class SignalHandler:
+	def __init__(self, stopper, worker):
+		self.stopper = stopper
+		self.worker = worker
+	
+	def __call__(self, signum, frame):
+		self.stopper.set()
+		self.worker.join()
+		sys.exit(0)
+
+# runs in a separate thread, logs all chat messages recieved through the queue
+def chat_logger(world, in_queue, stopper):
+	while not stopper.is_set():
+		today = datetime.today().strftime('%Y/%m/%d')
+		os.makedirs(f'chatlogs/{today}/', exist_ok = True)
+		with open(f'chatlogs/{today}/{world}.log', 'a') as log:
+			while not stopper.is_set() and today == datetime.today().strftime('%Y/%m/%d'):
+				try:
+					wait = 0
+					name, command, payload = in_queue.get(block = False)
+					log.write(f'{time.time()}~{name}~{command}~{payload}\n')
+				except queue.Empty:
+					time.sleep(wait)
+					wait = min(wait + 0.1, 2)
 
 class ChatServer:
 	def __init__(self, world = ''):
@@ -24,22 +52,17 @@ class ChatServer:
 		self.users = defaultdict(dict)
 		self.families = defaultdict(lambda: defaultdict(set))
 		self.pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
+		self.stopper = threading.Event()
+		self.in_queue = queue.Queue()
+		self.logger = threading.Thread(target = chat_logger, args = (self.world, self.in_queue, self.stopper))
+		signal.signal(signal.SIGINT, SignalHandler(self.stopper, self.logger))
 
 	async def run(self, port):
 		async with await asyncio.start_server(self.handle_client, '127.0.0.1', port) as s:
 			print(f'starting chat server for world "{self.world}" on port {port}...')
+			self.logger.start()
 			await s.serve_forever()
 	
-	# runs in a separate thread, logs all chat messages recieved through the queue
-	@staticmethod
-	def chat_logger(in_queue):
-		while True:
-			with open('chatlogs/log', 'a') as log:
-				while True:
-					name, command, payload = in_queue.get()
-					log.write(f'{time.time()}~{name}~{command}~{payload}\n')
-
-
 	# the main protocol loop. if chat protocol is not followed, close connection immediately
 	async def handle_client(self, reader, writer):
 		name = ''
@@ -48,6 +71,7 @@ class ChatServer:
 			print(f'hello, {name}...')
 			while True:
 				command, payload = await self._receive(reader)
+				self.in_queue.put((name, command, payload))
 				if command == 'PUBLIC':
 					await self.send_public(name, payload)
 				elif command == 'FAMILY':
