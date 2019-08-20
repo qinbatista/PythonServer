@@ -18,7 +18,9 @@ DESKey = CONFIG['message_handler']['DESKey']
 MD5_ALIYA = b'e3cb970693574ea75d091a6049f8a3ff'
 TOKEN_BASE_URL = CONFIG['token_server']['address'] + ":" + CONFIG['token_server']['port']
 MANAGER_ACCOUNT_BASE_URL = CONFIG['account_manager']['address'] + ":" + CONFIG['account_manager']['port']
-MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager']['port']
+
+
+#MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager']['port']
 # MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager_qin']['port']
 
 class InvalidHeaderError(Exception):
@@ -29,6 +31,7 @@ class MessageHandler:
 	def __init__(self):
 		self._functions = FUNCTION_LIST
 		self._k = pyDes.triple_des(DESKey, pyDes.CBC, DESIv, pad=None, padmode=pyDes.PAD_PKCS5)
+		self._map = requests.get('http://localhost:8000/get_world_map').json()
 
 	def is_valid_header(self, raw_header: bytes) -> int:
 		'''
@@ -74,6 +77,10 @@ class MessageHandler:
 			return await fn(self, message, session)
 		except KeyError:
 			return json.dumps({'status': 10, 'message': 'Invalid message format', 'data': {}})
+	
+	def _game_manager_base_url(self, world):
+		for gm in self._map[world]['gamemanagers'].values():
+			return f'http://{gm["ip"]}:{gm["port"]}'
 
 	def _format_message_size(self, size: int) -> bytes:
 		'''
@@ -94,259 +101,259 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _level_up_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/level_up_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
 
 	async def _get_all_skill_level(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_skill_level', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_skill_level', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_all_supplies(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_supplies', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_supplies', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _random_gift_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/random_gift_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/random_gift_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _random_gift_segment(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/random_gift_segment', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/random_gift_segment', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id': message["data"]["skill_id"]}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id': message["data"]["skill_id"]}) as resp:
 			return await resp.text()
 
 	async def _update_energy(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/try_energy', data={'unique_id': message['data']['unique_id'], 'amount': message["data"]["amount"]}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/try_energy', data={'unique_id': message['data']['unique_id'], 'amount': message["data"]["amount"]}) as resp:
 			return await resp.text()
 
 	async def _level_up_scroll(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_scroll', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/level_up_scroll', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
 	
 	# region _01_Manager_Weapon.py
 	async def _level_up_weapon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'iron': message['data']['iron']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/level_up_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'iron': message['data']['iron']}) as resp:
 			return await resp.text()
 
 	async def _level_up_passive(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_passive', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'passive': message['data']['passive']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/level_up_passive', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'passive': message['data']['passive']}) as resp:
 			return await resp.text()
 
 	async def _reset_weapon_skill_point(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/reset_weapon_skill_point', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/reset_weapon_skill_point', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
 			return await resp.text()
 
 	async def _level_up_weapon_star(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_up_weapon_star', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/level_up_weapon_star', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
 			return await resp.text()
 
 	async def _get_all_weapon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _disintegrate_weapon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/disintegrate_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/disintegrate_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon']}) as resp:
 			return await resp.text()
 	# endregion
 
 	async def _enter_tower(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/enter_tower', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/enter_tower', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
 			return await resp.text()
 
 	async def _pass_tower(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pass_tower', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage'], 'clear_time' : message['data']['clear_time']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/pass_tower', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage'], 'clear_time' : message['data']['clear_time']}) as resp:
 			return await resp.text()
 
 	async def _get_all_stage_info(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_stage_info') as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_stage_info') as resp:
 			return await resp.text()
 
 	async def _get_all_armor_info(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_armor_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_armor_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _pass_stage(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pass_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage': message['data']['stage'], 'clear_time' : message['data']['clear_time']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/pass_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage': message['data']['stage'], 'clear_time' : message['data']['clear_time']}) as resp:
 			return await resp.text()
 
 	async def _decrease_energy(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/decrease_energy', data={'unique_id': message['data']['unique_id'], 'energy': message['data']['energy']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/decrease_energy', data={'unique_id': message['data']['unique_id'], 'energy': message['data']['energy']}) as resp:
 			return await resp.text()
 
 	async def _increase_energy(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/increase_energy', data={'unique_id': message['data']['unique_id'], 'energy': message['data']['energy']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/increase_energy', data={'unique_id': message['data']['unique_id'], 'energy': message['data']['energy']}) as resp:
 			return await resp.text()
 
 	# 以后会删除这个方法
 	async def _add_supplies(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/add_supplies', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'supply': message['data']['supply'], 'value': message['data']['value']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/add_supplies', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'supply': message['data']['supply'], 'value': message['data']['value']}) as resp:
 			return await resp.text()
 
 	async def _get_all_head(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_head', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'table' : message['data']['table']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_head', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'table' : message['data']['table']}) as resp:
 			return await resp.text()
 
 	async def _get_all_material(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_material', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_material', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _try_all_material(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/try_all_material', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/try_all_material', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
 			return await resp.text()
 
 	async def _try_coin(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/try_coin', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'value' : message['data']['value']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/try_coin', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'value' : message['data']['value']}) as resp:
 			return await resp.text()
 
 	async def _try_unlock_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/try_unlock_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id' : message['data']['skill_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/try_unlock_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id' : message['data']['skill_id']}) as resp:
 			return await resp.text()
 
 	async def _try_unlock_weapon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/try_unlock_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon' : message['data']['weapon']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/try_unlock_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon' : message['data']['weapon']}) as resp:
 			return await resp.text()
 
 	async def _basic_summon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 			
 	async def _basic_summon_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _pro_summon_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 			
 	async def _pro_summon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 
 	async def _friend_summon(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/friend_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _friend_summon_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/friend_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 			
 			
 			
 	async def _basic_summon_roles(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 			
 	async def _basic_summon_roles_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _pro_summon_roles_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 			
 	async def _pro_summon_roles(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 
 	async def _friend_summon_roles(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/friend_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _friend_summon_roles_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/friend_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 			
 		
 
 	
 	async def _basic_summon_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 			
 	async def _basic_summon_skill_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/basic_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _pro_summon_skill_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 			
 	async def _pro_summon_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/pro_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 
 	async def _friend_summon_skill(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/friend_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _friend_summon_skill_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/friend_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/friend_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _prophet_summon_10_times(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/prophet_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/prophet_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _start_hang_up(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/start_hang_up', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/start_hang_up', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
 			return await resp.text()
 
 	async def _get_hang_up_reward(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_hang_up_reward', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_hang_up_reward', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _enter_stage(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/enter_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/enter_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'stage' : message['data']['stage']}) as resp:
 			return await resp.text()
 
 	async def _fortune_wheel_basic(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/fortune_wheel_basic', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/fortune_wheel_basic', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 
 	async def _fortune_wheel_pro(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/fortune_wheel_pro', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/fortune_wheel_pro', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 
 	async def _automatically_refresh_store(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/automatically_refresh_store', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/automatically_refresh_store', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _manually_refresh_store(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/manually_refresh_store', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/manually_refresh_store', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _diamond_refresh_store(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/diamond_refresh_store', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/diamond_refresh_store', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _black_market_transaction(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/black_market_transaction', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'code': message['data']['code']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/black_market_transaction', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'code': message['data']['code']}) as resp:
 			return await resp.text()
 
 	async def _show_energy(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/show_energy', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/show_energy', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _upgrade_armor(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/upgrade_armor', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'armor_id': message['data']['armor_id'], 'level': message['data']['level']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/upgrade_armor', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'armor_id': message['data']['armor_id'], 'level': message['data']['level']}) as resp:
 			return await resp.text()
 
 	async def _send_friend_gift(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/send_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/send_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
 			return await resp.text()
 
 	async def _redeem_nonce(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/redeem_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/redeem_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
 
 	async def _get_new_mail(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_new_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_new_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_all_mail(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _delete_mail(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/delete_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/delete_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
 
 	async def _delete_all_mail(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/delete_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/delete_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 
@@ -357,46 +364,46 @@ class MessageHandler:
 	#		return await resp.text()
 			
 	async def _level_enemy_layouts_config(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/level_enemy_layouts_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/level_enemy_layouts_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _monster_config(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/monster_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/monster_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_stage_reward_config(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_stage_reward_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_stage_reward_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_lottery_config_info(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_lottery_config_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_lottery_config_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_hang_up_info(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_hang_up_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_hang_up_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_all_friend_info(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/get_all_friend_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_friend_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 	async def _request_friend(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/request_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/request_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
 			return await resp.text()
 
 	async def _response_friend(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/response_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/response_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
 
 	async def _delete_friend(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/delete_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/delete_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
 			return await resp.text()
 
 	async def _send_all_friend_gift(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/send_all_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/send_all_friend_gift', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _redeem_all_nonce(self, message: dict, session) -> str:
-		async with session.post(MANAGER_GAME_BASE_URL + '/redeem_all_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'type_list': message['data']['type_list'], 'nonce_list': message['data']['nonce_list']}) as resp:
+		async with session.post(self._game_manager_base_url(message['world']) + '/redeem_all_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'type_list': message['data']['type_list'], 'nonce_list': message['data']['nonce_list']}) as resp:
 			return await resp.text()
 ###############################################################################
 

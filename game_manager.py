@@ -3,6 +3,7 @@
 ###############################################################################
 
 import os
+import sys
 import time
 import json
 import random
@@ -2537,7 +2538,10 @@ class GameManager:
 			self._pools[0] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
 		else:
 			for world in worlds:
-				self._pools[world] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = f'world{world}', charset = 'utf8')
+				if world == 0:
+					self._pools[0] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
+				else:
+					self._pools[world] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = f'world{world}', charset = 'utf8')
 
 
 
@@ -3150,23 +3154,19 @@ def get_config() -> configparser.ConfigParser:
 	'''
 	while True:
 		try:
-			r = requests.get('http://localhost:8000/get_server_config_location')
-			parser = configparser.ConfigParser()
-			parser.read(r.json()['file'])
-			return parser
+			r = requests.get('http://localhost:8000/register_game_manager')
+			return r.json()
 		except requests.exceptions.ConnectionError:
 			print('Could not find configuration server, retrying in 5 seconds...')
 			time.sleep(5)
-
 
 
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
 	config = get_config()
-	r = requests.post('http://localhost:8000/register', data = {'port' : config.getint('game_manager', 'port')})
-	app['MANAGER'] = GameManager(r.json()['worlds'])
-	web.run_app(app, port=config.getint('game_manager', 'port'))
+	app['MANAGER'] = GameManager(config['worlds'])
+	web.run_app(app, port=config['port'])
 
 
 if __name__ == '__main__':

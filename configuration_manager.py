@@ -101,18 +101,20 @@ class ConfigurationManager:
 
 	async def register_chat_server(self, ip):
 		try:
-			for w, servers in self._world_map.items():
-				if 'chatserver' not in servers:
-					world = w
-					break
-			self._world_map[world]['chatserver'] = {'ip' : ip, 'port' : self._world_distribution_config['chatserver']['base_port']}
-			self._world_distribution_config['chatserver']['base_port'] += 1
-			return {'status' : 0, 'world' : world, 'port' : self._world_map[world]['chatserver']['port']}
-		except NameError: return {'status' : 1, 'message' : 'no worlds without chat servers'}
+			world = self._unregistered_chat_servers.get(block = False)
+		except queue.Empty: return {'status' : 1, 'message' : 'no new chat servers needed'}
+		if 'chatserver' in self._world_map[world]: return {'status' : 1, 'message' : 'no new chat servers needed'}
+		self._world_map[world]['chatserver'] = {'ip' : ip, 'port' : self._world_distribution_config['chatserver']['base_port']}
+		self._world_distribution_config['chatserver']['base_port'] += 1
+		return {'status' : 0, 'world' : world, 'port' : self._world_map[world]['chatserver']['port']}
 
-
-
-
+	async def need_server(self, servertype):
+		if servertype == 'gamemanager':
+			return {'status' : 1} if self._unregistered_game_managers.empty() else {'status' : 0}
+		elif servertype == 'chat':
+			return {'status' : 1} if self._unregistered_chat_servers.empty() else {'status' : 0}
+		else:
+			return {'status' : 1, 'message' : 'invalid server type'}
 
 
 	def _read_factory_config(self):
@@ -139,9 +141,14 @@ class ConfigurationManager:
 
 	def _read_world_distribution_config(self):
 		d = json.load(open(SERVER_CONFIG.format(self._cv), encoding = 'utf-8'))
+		self._unregistered_chat_servers = queue.Queue()
 		self._unregistered_game_managers = queue.Queue()
 		for sid, value in d['gamemanager']['servers'].items():
 			value['worlds'] = self._world_range_parser(value['worlds'])
+			for world in value['worlds']:
+				self._unregistered_chat_servers.put(world)
+			if len(value['worlds']) == 0:
+				self._unregistered_chat_servers.put('test')
 			self._unregistered_game_managers.put(sid)
 		self._world_distribution_config = d
 
@@ -272,6 +279,11 @@ async def __register_chat_server(request):
 	if peername is None:
 		return _json_response({'status' : 99, 'message' : 'can not resolve ip addr'})
 	return _json_response(await MANAGER.register_chat_server(peername[0]))
+
+@ROUTES.post('/need_server')
+async def __need_server(request):
+	post = await request.post()
+	return _json_response(await MANAGER.need_server(post['type']))
 
 
 def run():

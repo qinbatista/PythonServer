@@ -27,7 +27,7 @@ class ChatServer:
 
 	async def run(self, port):
 		async with await asyncio.start_server(self.handle_client, '127.0.0.1', port) as s:
-			print(f'starting chat server on port {port}...')
+			print(f'starting chat server for world "{self.world}" on port {port}...')
 			await s.serve_forever()
 	
 	# runs in a separate thread, logs all chat messages recieved through the queue
@@ -187,17 +187,16 @@ class ChatServer:
 	def _valid_name(self, name):
 		return len(name) > 0
 
-def get_port():
+def get_config():
 	while True:
 		try:
-			r = requests.get('http://localhost:8000/get_server_config_location')
-			parser = configparser.ConfigParser()
-			parser.read(r.json()['file'])
-			return parser.getint('chat_server', 'port')
+			r = requests.get('http://localhost:8000/register_chat_server')
+			return r.json()
 		except requests.exceptions.ConnectionError:
 			print('Could not find configuration server, retrying in 5 seconds...')
 			time.sleep(5)
 
 if __name__ == '__main__':
-	server = ChatServer()
-	asyncio.run(server.run(get_port()))
+	config = get_config()
+	server = ChatServer(config['world'])
+	asyncio.run(server.run(config['port']))
