@@ -1113,11 +1113,12 @@ class GameManager:
 		return self._message_typesetting(0, 'got all friends info', data)
 
 	async def _active_wishing_pool(self, world: int, unique_id: str, weapon_id: str):
-		#0 获取碎片成功
+		#0 获取碎片成功没有暴击
+		#1 2倍暴击抽奖
+		#2 3倍暴击抽奖
 		#99 时间未到
-		basic_segment = 1
-		basic_recover_time = 49
-		
+		basic_segment = self._factory_config["wishing_pool"]["basic_segment"]
+		basic_recover_time = self._factory_config["wishing_pool"]["basic_recover_time"]
 		return_value = 0
 		random_number = random.randint(0, 100)
 		if 0<=random_number < 10:
@@ -1160,7 +1161,7 @@ class GameManager:
 			#print("抽奖CD减时间:"+ str(basic_recover_time*3600-int(data[0][0])*1*3600-((d2-d1).total_seconds())))
 			reward_time = basic_recover_time*3600-int(data[0][0])*1*3600-(int((d2-d1).total_seconds()))
 			if reward_time<=0:
-				reward_time = basic_recover_time*3600-int(data[0][0])*1*3600
+				data_json["reward"]["wish_pool_timer"] = basic_recover_time*3600-int(data[0][0])*1*3600
 			else:
 				data_json["reward"]["wish_pool_timer"] = basic_recover_time*3600-int(data[0][0])*1*3600-(int((d2-d1).total_seconds()))
 			if int((d2-d1).total_seconds()) <(basic_recover_time- int(data[0][0])*1)*3600:
@@ -1349,6 +1350,7 @@ class GameManager:
 	def _refresh_configuration(self):
 		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
+		self._factory_config = d['factory']
 		self._reward = d['reward']
 		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
 		self._upgrade_chance = d['skill']['upgrade_chance']
