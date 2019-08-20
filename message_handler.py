@@ -403,13 +403,18 @@ class MessageHandler:
 	async def _redeem_all_nonce(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/redeem_all_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'type_list': message['data']['type_list'], 'nonce_list': message['data']['nonce_list']}) as resp:
 			return await resp.text()
+	
+	async def _get_chat_server(self, message: dict, session):
+		return self._map[message['world']]['chatserver']
 ###############################################################################
 
 
 
-DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
+DOES_NOT_NEED_TOKEN = {'login', 'login_unique', 'get_chat_server'}
 
 FUNCTION_LIST = {
+	# utility
+	'get_chat_server' : MessageHandler._get_chat_server,
 	# account_manager
 	'login': MessageHandler._login,
 	'login_unique': MessageHandler._login_unique,
@@ -484,8 +489,6 @@ FUNCTION_LIST = {
 	'monster_config' : MessageHandler._monster_config,
 	'get_stage_reward_config' : MessageHandler._get_stage_reward_config,
 	'get_hang_up_info' : MessageHandler._get_hang_up_info,
-	
-	
 	
 	
 	
