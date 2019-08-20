@@ -20,8 +20,6 @@ TOKEN_BASE_URL = CONFIG['token_server']['address'] + ":" + CONFIG['token_server'
 MANAGER_ACCOUNT_BASE_URL = CONFIG['account_manager']['address'] + ":" + CONFIG['account_manager']['port']
 
 
-#MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager']['port']
-# MANAGER_GAME_BASE_URL = CONFIG['game_manager']['address'] + ":" + CONFIG['game_manager_qin']['port']
 
 class InvalidHeaderError(Exception):
 	pass
