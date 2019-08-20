@@ -91,15 +91,16 @@ class ConfigurationManager:
 	async def get_world_map(self):
 		return self._world_map or {'status' : 'no one has registered yet'}
 
-	async def register(self, ip, port):
+	async def register(self, ip):
 		try:
 			sid = self._unregistered_managers.get(block = False)
 		except queue.Empty: return {'status' : 1, 'message' : 'no new work'}
 		for world in self._world_distribution_config['gamemanager']['servers'][sid]['worlds']:
-			self._world_map[world][sid] = {'ip' : ip, 'port' : port}
+			self._world_map[world][sid] = {'ip' : ip, 'port' : self._world_distribution_config['gamemanager']['base_port']}
 		if len(self._world_distribution_config['gamemanager']['servers'][sid]['worlds']) == 0:
-			self._world_map['test'][sid] = {'ip' : ip, 'port' : port}
-		return {'status' : 0, 'sid' : sid, 'worlds' : self._world_distribution_config['gamemanager']['servers'][sid]['worlds']}
+			self._world_map['test'][sid] = {'ip' : ip, 'port' : self._world_distribution_config['gamemanager']['base_port']}
+		self._world_distribution_config['gamemanager']['base_port'] += 1
+		return {'status' : 0, 'sid' : sid, 'worlds' : self._world_distribution_config['gamemanager']['servers'][sid]['worlds'], 'port' : self._world_distribution_config['gamemanager']['base_port'] - 1}
 
 
 	def _read_factory_config(self):
@@ -257,13 +258,12 @@ async def __get_world_distribution_config(request: web.Request) -> web.Response:
 async def __get_world_map(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_world_map())
 
-@ROUTES.post('/register')
+@ROUTES.get('/register')
 async def __register(request):
-	post = await request.post()
 	peername = request.transport.get_extra_info('peername')
 	if peername is None:
 		return _json_response({'status' : 99, 'message' : 'can not resolve ip addr'})
-	return _json_response(await MANAGER.register(peername[0], post['port']))
+	return _json_response(await MANAGER.register(peername[0]))
 
 
 def run():
