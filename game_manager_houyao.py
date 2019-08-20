@@ -2595,12 +2595,11 @@ class GameManager:
 		else:
 			return self._message_typesetting(status=99, message="Equipment factory did not start")
 
-	async def refresh_all_storage(self, world: int, unique_id: str, current_time: str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())) -> dict:
+	async def refresh_all_storage(self, world: int, unique_id: str) -> dict:
 		"""
 		0 -  update factory success
 		99 - update factory failed, all factories are not initialized
 		"""
-		print(f"current_time: {current_time}")
 		food_factory = self._factory_config["food_factory"]
 		mine_factory = self._factory_config["mine_factory"]
 		crystal_factory = self._factory_config["crystal_factory"]
@@ -2625,7 +2624,12 @@ class GameManager:
 		iron_storage = factory_data[15]
 		crystal_storage = factory_data[16]
 		equipment_storage = factory_data[17]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+		times = 1
 
+		# if acceleration_end_time != ""
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		remaining = {"food_factory_workers": food_factory_workers, "mine_factory_workers": mine_factory_workers, "crystal_factory_workers": crystal_factory_workers, "equipment_factory_workers": equipment_factory_workers}
 		reward = {}
 		if food_start_time != "":
