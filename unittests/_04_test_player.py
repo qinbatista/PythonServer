@@ -417,7 +417,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	all_function(unique_id="1")
+	# all_function(unique_id="1")
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")
@@ -425,4 +425,4 @@ if __name__ == "__main__":
 	# enter_world_boss_stage("4")
 	# leave_world_boss_stage('4','100000')
 	# get_top_damage(4,4)
-	# active_wishing_pool(4,"weapon1")
+	active_wishing_pool(4,"weapon1")
