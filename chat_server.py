@@ -19,7 +19,8 @@ class ChatProtocolError(Exception):
 
 
 class ChatServer:
-	def __init__(self):
+	def __init__(self, world = ''):
+		self.world = world
 		self.users = defaultdict(dict)
 		self.families = defaultdict(lambda: defaultdict(set))
 		self.pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
@@ -29,6 +30,7 @@ class ChatServer:
 			print(f'starting chat server on port {port}...')
 			await s.serve_forever()
 	
+	# runs in a separate thread, logs all chat messages recieved through the queue
 	@staticmethod
 	def chat_logger(in_queue):
 		while True:
