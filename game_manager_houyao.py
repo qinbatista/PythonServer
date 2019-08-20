@@ -2626,6 +2626,9 @@ class GameManager:
 		equipment_storage = factory_data[17]
 		# 数据库中的加速时间
 		acceleration_end_time = factory_data[20]
+		times = 1
+
+		# if acceleration_end_time != ""
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		remaining = {"food_factory_workers": food_factory_workers, "mine_factory_workers": mine_factory_workers, "crystal_factory_workers": crystal_factory_workers, "equipment_factory_workers": equipment_factory_workers}
 		reward = {}
