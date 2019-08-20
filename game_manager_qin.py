@@ -1113,15 +1113,20 @@ class GameManager:
 		return self._message_typesetting(0, 'got all friends info', data)
 
 	async def _active_wishing_pool(self, world: int, unique_id: str, weapon_id: str):
-		#0 获取碎片成功
+		#0 获取碎片成功没有暴击
+		#1 2倍暴击抽奖
+		#2 3倍暴击抽奖
 		#99 时间未到
-		basic_segment = 1
-		basic_recover_time = 49
+		basic_segment = self._factory_config["wishing_pool"]["basic_segment"]
+		basic_recover_time = self._factory_config["wishing_pool"]["basic_recover_time"]
+		return_value = 0
 		random_number = random.randint(0, 100)
 		if 0<=random_number < 10:
 			basic_segment = basic_segment*3
+			return_value=2
 		elif 10<=random_number < 55:
 			basic_segment = basic_segment*2
+			return_value=1
 		await self._set_segment_by_id(world, unique_id, weapon_id, basic_segment)
 		current_time1 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		data_json={
@@ -1142,28 +1147,28 @@ class GameManager:
 		if data[0][1] =="":
 			await self._execute_statement_update(world, f'UPDATE factory SET wishing_pool_timer="{current_time1}" WHERE unique_id = "{unique_id}"')
 			data_json["reward"]["wish_pool_timer"] = basic_recover_time*3600-int(data[0][0])*1*3600
-			return self._message_typesetting(0, 'you get segement',data_json)
+			return self._message_typesetting(return_value, 'you get segement',data_json)
 		else:
 			current_time1 = data[0][1]
 			current_time2 = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 			d1 = datetime.strptime(current_time1, '%Y-%m-%d %H:%M:%S')
 			d2 = datetime.strptime(current_time2, '%Y-%m-%d %H:%M:%S')
-			print("玩家时间："+current_time1)
-			print("服务器时间:"+current_time2)
-			print("间隔时间:"+str(int((d2-d1).total_seconds())))
-			print("48小时秒钟："+str(basic_recover_time*3600))
-			print("等级减去秒钟："+str(int(data[0][0])*1*3600))
-			print("抽奖CD减时间:"+ str(basic_recover_time*3600-int(data[0][0])*1*3600-((d2-d1).total_seconds())))
+			#print("玩家时间："+current_time1)
+			#print("服务器时间:"+current_time2)
+			#print("间隔时间:"+str(int((d2-d1).total_seconds())))
+			#print("48小时秒钟："+str(basic_recover_time*3600))
+			#print("等级减去秒钟："+str(int(data[0][0])*1*3600))
+			#print("抽奖CD减时间:"+ str(basic_recover_time*3600-int(data[0][0])*1*3600-((d2-d1).total_seconds())))
 			reward_time = basic_recover_time*3600-int(data[0][0])*1*3600-(int((d2-d1).total_seconds()))
 			if reward_time<=0:
-				reward_time = basic_recover_time*3600-int(data[0][0])*1*3600
+				data_json["reward"]["wish_pool_timer"] = basic_recover_time*3600-int(data[0][0])*1*3600
 			else:
 				data_json["reward"]["wish_pool_timer"] = basic_recover_time*3600-int(data[0][0])*1*3600-(int((d2-d1).total_seconds()))
 			if int((d2-d1).total_seconds()) <(basic_recover_time- int(data[0][0])*1)*3600:
 				return self._message_typesetting(99, 'it is not time yet',data_json)
 			else:
 				await self._execute_statement_update(world, f'UPDATE factory SET wishing_pool_timer="{current_time2}" WHERE unique_id = "{unique_id}"')
-			return self._message_typesetting(0, 'you get segement',data_json)
+			return self._message_typesetting(return_value, 'you get segement',data_json)
 
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, 'SELECT energy, recover_time FROM player WHERE unique_id = "' + unique_id + '";')
@@ -1345,6 +1350,7 @@ class GameManager:
 	def _refresh_configuration(self):
 		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
+		self._factory_config = d['factory']
 		self._reward = d['reward']
 		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
 		self._upgrade_chance = d['skill']['upgrade_chance']
