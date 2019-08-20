@@ -254,7 +254,7 @@ def get_top_damage(unique_id: str,range_number:str):
 	print(str(result.text))
 
 def active_wishing_pool(unique_id: str,range_number:str):
-	result = requests.post('http://localhost:8006/active_wishing_pool', data={"world": 0, 'unique_id': unique_id,"weapon_id":"weapon1"})
+	result = requests.post('http://localhost:8100/active_wishing_pool', data={"world": 0, 'unique_id': unique_id,"weapon_id":"weapon1"})
 	print(str(result.text))
 	
 def test():
