@@ -2995,6 +2995,7 @@ class GameManager:
 	async def acceleration_technology(self, world: int, unique_id: str) -> dict:
 		"""
 		0  - Accelerate success
+		1  - Accelerate failed, update factory success
 		99 - update factory failed, all factories are not initialized, accelerate failed
 		"""
 		remaining = {}
@@ -3003,6 +3004,10 @@ class GameManager:
 		if result["status"] == 0:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
+			diamond_data = await self.try_diamond(world=world, unique_id=unique_id, value=-self._factory_config["acceleration_consuming_diamond"])
+			if diamond_data["status"] == 1:
+				return self._message_typesetting(status=1, message="Accelerate failed, update factory success", data={"remaining": remaining, "reward": reward})
+			remaining.update({"diamond": diamond_data["remaining"]})
 		else:
 			return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized, accelerate failed")
 		acceleration_end_time = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
