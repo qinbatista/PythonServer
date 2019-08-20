@@ -2595,7 +2595,6 @@ class GameManager:
 		else:
 			return self._message_typesetting(status=99, message="Equipment factory did not start")
 
-
 	async def refresh_all_storage(self, world: int, unique_id: str) -> dict:
 		"""
 		0 -  update factory success
@@ -2767,7 +2766,7 @@ class GameManager:
 			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
 
-	async def buy_workers(self, world: int, unique_id: str, workers_quantity: int):
+	async def buy_workers(self, world: int, unique_id: str, workers_quantity: int) -> dict:
 		"""
 		0  - Buy workers success, storage has been refreshed
 		1  - Buy workers success
@@ -2780,9 +2779,9 @@ class GameManager:
 		"""
 		if workers_quantity <= 0:
 			return self._message_typesetting(status=99, message="The number of workers can only be a positive integer")
-		result = await self.refresh_all_storage(world=world,unique_id=unique_id)
 		remaining = {}
 		reward = {}
+		result = await self.refresh_all_storage(world=world,unique_id=unique_id)
 		if result["status"] == 0:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
@@ -2823,7 +2822,49 @@ class GameManager:
 			return self._message_typesetting(status=0, message="Buy workers success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=1, message="Buy workers success", data={"remaining": remaining})
 
-
+	async def upgrade_food_factory(self, world: int, unique_id: str, upgrade_level: int = 1) -> dict:
+		"""
+		0  - Upgrade food factory success
+		1  - Upgrade food factory success, storage has been refreshed
+		97 - Upgrade factory failed，Insufficient crystal
+		98 - The factory has reached full level
+		99 - Upgrade level can only be a positive integer
+		思路：判断upgrade_level是否为正整数，查询数据库中的工厂等级是否达到满级
+		读取配置文件下升级工厂需要的材料限制
+		"""
+		if upgrade_level <= 0:
+			return self._message_typesetting(status=99, message="Upgrade level can only be a positive integer")
+		storage_level_limit = self._factory_config["food_factory"]["storage_level_limit"]
+		upgrade_need_crystals = self._factory_config["food_factory"]["upgrade_need_crystals_limit"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_level = factory_data[1]
+		all_crystal = factory_data[16]
+		remaining = {}
+		reward = {}
+		result = await self.refresh_all_storage(world=world,unique_id=unique_id)
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		if factory_level == storage_level_limit:
+			return self._message_typesetting(status=98, message="The factory has reached full level")
+		if factory_level + upgrade_level > storage_level_limit:
+			upgrade_level = storage_level_limit - factory_level
+		for upgrade in range(upgrade_level):
+			need_crystal = upgrade_need_crystals[str(factory_level + upgrade + 1)]
+			if need_crystal > all_crystal:
+				upgrade_level = upgrade
+				break
+			else:
+				all_crystal -= need_crystal
+		if upgrade_level == 0:
+			return self._message_typesetting(status=97, message="Upgrade factory failed, Insufficient crystal")
+		factory_level += upgrade_level
+		remaining.update({"food_factory_level": factory_level, "crystal_storage": all_crystal, "upgrade_level": upgrade_level})
+		sql_str = f"update factory set food_factory_level={factory_level}, crystal_storage={all_crystal} where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		if reward:
+			return self._message_typesetting(status=1, message="Upgrade food factory success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=0, message="Upgrade food factory success", data={"remaining": remaining})
 
 #############################################################################################
 #  end   2019年8月18日14点59分 houyao #######################################################
@@ -3558,6 +3599,13 @@ async def _distribution_workers(request: web.Request) -> web.Response:
 async def _buy_workers(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).buy_workers(int(post['world']), post['unique_id'], int(post['workers_quantity']))
+	return _json_response(result)
+
+
+@ROUTES.post('/upgrade_food_factory')
+async def _upgrade_food_factory(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).upgrade_food_factory(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 ###############################################################################################
