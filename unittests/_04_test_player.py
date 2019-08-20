@@ -265,6 +265,8 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
+	# result = requests.post('http://localhost:8004/acceleration_technology', data={"world": 0, 'unique_id': unique_id})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/upgrade_wishing_pool', data={"world": 0, 'unique_id': unique_id})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/upgrade_crystal_factory', data={"world": 0, 'unique_id': unique_id})
@@ -275,7 +277,7 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/buy_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 10})
 	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/distribution_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 1, 'factory_kind': "food"})
+	# result = requests.post('http://localhost:8004/distribution_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 10, 'factory_kind': "food"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/distribution_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 1, 'factory_kind': "mine"})
 	# print(str(result.text))
@@ -415,7 +417,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	# all_function(unique_id="1")
+	all_function(unique_id="1")
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")
@@ -423,4 +425,4 @@ if __name__ == "__main__":
 	# enter_world_boss_stage("4")
 	# leave_world_boss_stage('4','100000')
 	# get_top_damage(4,4)
-	active_wishing_pool(4,"weapon1")
+	# active_wishing_pool(4,"weapon1")
