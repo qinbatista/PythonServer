@@ -44,6 +44,7 @@ class LukseunServer:
 		'''
 		self._clientsession = aiohttp.ClientSession()
 		server = await asyncio.start_server(self._handle_connection, self._host, self._port)
+		print(f'starting lukseun server on port {self._port}...')
 		async with server:
 			await server.serve_forever()
 		await self._clientsession.close()

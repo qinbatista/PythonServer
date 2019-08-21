@@ -291,6 +291,7 @@ def run():
 	config = get_config()
 	global TOKEN_SERVER_BASE_URL
 	TOKEN_SERVER_BASE_URL = 'http://localhost:' + config['token_server']['port']
+	print(f'starting account_manager on port {config.getint("account_manager", "port")}...')
 	web.run_app(app, port = config.getint('account_manager', 'port'))
 
 

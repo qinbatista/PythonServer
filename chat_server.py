@@ -45,7 +45,6 @@ def chat_logger(world, in_queue, stopper):
 				except queue.Empty:
 					time.sleep(wait)
 					wait = min(wait + 0.1, 2)
-			print('exitted inner while loop')
 
 class ChatServer:
 	def __init__(self, world = ''):

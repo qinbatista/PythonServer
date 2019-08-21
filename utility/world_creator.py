@@ -1,6 +1,8 @@
 # world_creator.py
 
+import os
 import pymysql
+import mailbox
 
 def create_table_armor(cursor):
 	statement = \
@@ -302,7 +304,7 @@ def create_triggers_player(cursor):
 def create_world(world):
 	c = pymysql.connect(host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8mb4', autocommit=True)
 	cursor = c.cursor()
-	cursor.execute(f'CREATE DATABASE {world};')
+	cursor.execute(f'CREATE DATABASE `{world}`;')
 	c.select_db(world)
 	cursor = c.cursor()
 	create_table_armor(cursor)
@@ -317,6 +319,16 @@ def create_world(world):
 	create_table_weapon(cursor)
 	create_triggers_player(cursor)
 
+def create_mailbox(world):
+	boxlocation = os.path.dirname(os.path.realpath(__file__)) + '/../box'
+	box = mailbox.Maildir(boxlocation)
+	try:
+		wbox = box.get_folder(str(world))
+		print('mailbox already exists, skipping...')
+	except mailbox.NoSuchMailboxError:
+		box.add_folder(str(world))
+		print('added mailbox...')
+
 def already_exists(world):
 	try:
 		pymysql.connect(host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8mb4', db = world)
@@ -330,4 +342,5 @@ if __name__ == '__main__':
 	if not already_exists(world):
 		create_world(world)
 	else:
-		print(f'Error, the world: "{world}" already exists')
+		print('world database already exists, skipping...')
+	create_mailbox(world)
