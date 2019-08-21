@@ -3249,6 +3249,7 @@ def run():
 	app.add_routes(ROUTES)
 	config = get_config()
 	app['MANAGER'] = GameManager(config['worlds'])
+	print(f'starting game manager for worlds {config["worlds"]} on port {config["port"]}...')
 	web.run_app(app, port=config['port'])
 
 

@@ -134,7 +134,7 @@ def run():
 	app['MANAGER'] = TokenServer()
 
 	config = get_config()
-
+	print(f'starting token_server on port {config.getint("token_server", "port")}...')
 	web.run_app(app, port = config.getint('token_server', 'port'))
 
 if __name__ == '__main__':
