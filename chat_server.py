@@ -168,10 +168,10 @@ class ChatServer:
 			await self._close_connection(self.users[name]['w'])
 		del self.users[name]
 
-	# returns (command, arguments) if connection is alive, raises ChatProtocolError otherwise
+	# returns (command, arguments) if connection is alive, raises ConnectionResetError otherwise
 	async def _receive(self, reader):
 		raw = await reader.read(MAXSIZE)
-		if raw == b'': raise ChatProtocolError
+		if raw == b'': raise ConnectionResetError
 		decoded = raw.decode().strip()
 		return decoded[:10].lstrip('0'), decoded[10:]
 
