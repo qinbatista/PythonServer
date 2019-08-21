@@ -3,6 +3,7 @@
 ###############################################################################
 
 import os
+import re
 import time
 import json
 import random
@@ -2460,6 +2461,8 @@ class GameManager:
 			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
 				times = 2
 				current_time = acceleration_end_time
+				# eval(re.sub(r"\D", "", "2019-08-21 10:57:49"))
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 		remaining = {"food_factory_workers": food_factory_workers}
 		reward = {"food_increment": 0}
 		if food_start_time:
@@ -2469,6 +2472,7 @@ class GameManager:
 					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
 				food_increment = int(time_difference.total_seconds()) // food_factory["time_consuming"] * food_factory_workers * acceleration_value
+				if food_increment < 0: continue
 				if food_storage + food_increment > food_storage_limit:
 					food_increment = food_storage_limit - food_storage
 				food_storage += food_increment
@@ -2479,8 +2483,6 @@ class GameManager:
 				remaining.update({"food_start_time": food_start_time})
 				sql_str = f"update factory set food_storage={food_storage}, food_factory_timer='{food_start_time}' where unique_id='{unique_id}'"
 				await self._execute_statement_update(world=world, statement=sql_str)
-			if times == 2:
-				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 			return self._message_typesetting(status=0, message="Food factory update success", data={"remaining": remaining, "reward": reward})
 		else:
 			return self._message_typesetting(status=99, message="Food factory did not start")
@@ -2510,6 +2512,7 @@ class GameManager:
 			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
 				times = 2
 				current_time = acceleration_end_time
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 		remaining = {"mine_factory_workers": mine_factory_workers}
 		reward = {"iron_increment": 0}
 		if mine_start_time:
@@ -2520,6 +2523,7 @@ class GameManager:
 				cost_food = mine_factory["cost"]["food"]
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(mine_start_time, '%Y-%m-%d %H:%M:%S')
 				iron_increment = int(time_difference.total_seconds()) // mine_factory["time_consuming"] * mine_factory_workers * acceleration_value
+				if iron_increment < 0: continue
 				if iron_storage + iron_increment > mine_storage_limit:
 					iron_increment = mine_storage_limit - iron_storage
 				if food_storage // cost_food < iron_increment:  # 1工人生产1铁消耗3食物
@@ -2534,8 +2538,6 @@ class GameManager:
 				remaining.update({"mine_start_time": mine_start_time})
 				sql_str = f"update factory set iron_storage={iron_storage}, mine_factory_timer='{mine_start_time}' where unique_id='{unique_id}'"
 				await self._execute_statement_update(world=world, statement=sql_str)
-			if times == 2:
-				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 			return self._message_typesetting(status=0, message="Mine factory update success", data={"remaining": remaining, "reward": reward})
 		else:
 			return self._message_typesetting(status=99, message="Mine factory did not start")
@@ -2567,6 +2569,7 @@ class GameManager:
 			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
 				times = 2
 				current_time = acceleration_end_time
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 		remaining = {"crystal_factory_workers": crystal_factory_workers}
 		reward = {"crystal_increment": 0}
 		if crystal_start_time:
@@ -2578,6 +2581,7 @@ class GameManager:
 				cost_iron = crystal_factory["cost"]["iron"]
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
 				crystal_increment = int(time_difference.total_seconds()) // crystal_factory["time_consuming"] * crystal_factory_workers * acceleration_value
+				if crystal_increment < 0: continue
 				# 配置文件下的仓库容量约束
 				if crystal_storage + crystal_increment > crystal_storage_limit:
 					crystal_increment = crystal_storage_limit - crystal_storage
@@ -2600,8 +2604,6 @@ class GameManager:
 				remaining.update({"crystal_start_time": crystal_start_time})
 				sql_str = f"update factory set crystal_storage={crystal_storage}, crystal_factory_timer='{crystal_start_time}' where unique_id='{unique_id}'"
 				await self._execute_statement_update(world=world, statement=sql_str)
-			if times == 2:
-				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 			return self._message_typesetting(status=0, message="Crystal factory update success", data={"remaining": remaining, "reward": reward})
 		else:
 			return self._message_typesetting(status=99, message="Crystal factory did not start")
@@ -2631,6 +2633,7 @@ class GameManager:
 			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
 				times = 2
 				current_time = acceleration_end_time
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 		remaining = {"equipment_factory_workers": equipment_factory_workers}
 		reward = {"equipment_increment": 0}
 		if equipment_start_time:
@@ -2641,6 +2644,7 @@ class GameManager:
 				cost_iron = equipment_factory["cost"]["iron"]
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
 				equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers * acceleration_value
+				if equipment_increment < 0: continue
 				if iron_storage // cost_iron < equipment_increment:
 					equipment_increment = iron_storage // cost_iron
 				iron_storage -= equipment_increment * cost_iron
@@ -2654,8 +2658,6 @@ class GameManager:
 				sql_str = f"update factory set equipment_storage={equipment_storage}, equipment_factory_timer='{equipment_start_time}' where unique_id='{unique_id}'"
 				await self._execute_statement_update(world=world, statement=sql_str)
 
-			if times == 2:
-				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 			return self._message_typesetting(status=0, message="Equipment factory update success", data={"remaining": remaining, "reward": reward})
 		else:
 			return self._message_typesetting(status=99, message="Equipment factory did not start")
@@ -2705,6 +2707,7 @@ class GameManager:
 			if int(time_difference.total_seconds()) <= 0:
 				times = 2
 				current_time = acceleration_end_time
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 
 		for i in range(times):
 			if times == 2 and i == 1:
@@ -2780,8 +2783,6 @@ class GameManager:
 
 			sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{food_start_time}', mine_factory_timer='{mine_start_time}', crystal_factory_timer='{crystal_start_time}', equipment_factory_timer='{equipment_start_time}' where unique_id='{unique_id}'"
 			await self._execute_statement_update(world=world, statement=sql_str)
-		if times == 2:
-			await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 		if remaining:
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
