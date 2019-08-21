@@ -222,10 +222,10 @@ def send_all_friend_gift(unique_id: str):
 
 
 def get_new_mail_nonce_list(unique_id: str) -> (list, list):
-	result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id})
+	result = requests.post('http://localhost:8100/get_new_mail', data={"world": 0, 'unique_id': unique_id})
 	print(str(result.text))
-	type_list = ["gift"]
-	nonce_list = ["111"]
+	type_list = []
+	nonce_list = []
 	for data in result.json()['data']['mail']:
 		type_list.append(data['type'])
 		nonce_list.append(data['data']['nonce'])
@@ -265,6 +265,21 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
+	# result = requests.post('http://localhost:8100/request_friend', data={"world": 0, "unique_id": unique_id, "friend_name": "a"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8100/leave_family', data={"world": 0, "unique_id": "1", "fname": "a"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8100/create_family', data={"world": 0, "unique_id": unique_id, "fname": "dada"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8100/invite_user_family', data={"world": 0, "unique_id": unique_id, "target": "b"})
+	# print(str(result.text))
+	result = requests.post('http://localhost:8100/respond_family', data={"world": 0, "unique_id": "3", "nonce": "88146219688738132176937121775869700047735257769194545510254590246507913871207"})
+	print(str(result.text))
+	# result = requests.post('http://localhost:8100/remove_user_family', data={"world": 0, "unique_id": "1", "user": "a"})
+	# print(str(result.text))
+	result = requests.post('http://localhost:8100/request_join_family', data={"world": 0, "unique_id": "1", "fname": "dada"})
+	print(str(result.text))
+
 	# result = requests.post('http://localhost:8004/acceleration_technology', data={"world": 0, 'unique_id': unique_id})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/upgrade_wishing_pool', data={"world": 0, 'unique_id': unique_id})
@@ -289,12 +304,12 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/refresh_food_storage', data={"world": 0, 'unique_id': unique_id})
 	# print(str(result.text))
-	result = requests.post('http://localhost:8004/refresh_mine_storage', data={"world": 0, 'unique_id': unique_id})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/refresh_crystal_storage', data={"world": 0, 'unique_id': unique_id})
-	print(str(result.text))
-	result = requests.post('http://localhost:8004/refresh_equipment_storage', data={"world": 0, 'unique_id': unique_id})
-	print(str(result.text))
+	# result = requests.post('http://localhost:8004/refresh_mine_storage', data={"world": 0, 'unique_id': unique_id})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/refresh_crystal_storage', data={"world": 0, 'unique_id': unique_id})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8004/refresh_equipment_storage', data={"world": 0, 'unique_id': unique_id})
+	# print(str(result.text))
 
 	# result = requests.post('http://localhost:8004/basic_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
 	# print(str(result.text))

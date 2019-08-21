@@ -1099,7 +1099,7 @@ class GameManager:
 			currency_type_data = await self._try_material(world, unique_id, currency_type, -1 * currency_type_price)
 			if currency_type_data['status'] == 1:
 				return self._message_typesetting(97, currency_type + ' insufficient')
-			sql_str = 'UPDATE weapon SET segment="%s" WHERE unique_id="%s" AND weapon_name="%s";' % (merchandise_quantity, unique_id, merchandise)
+			sql_str = f"UPDATE weapon SET segment=segment+{merchandise_quantity} WHERE unique_id='{unique_id}' AND weapon_name='{merchandise}';"
 			if await self._execute_statement_update(world, sql_str) == 0:
 				return self._message_typesetting(96, 'weapon -> database operating error')
 			segment = (await self._execute_statement(world, 'SELECT segment FROM weapon WHERE unique_id = "%s" AND weapon_name="%s";' % (unique_id, merchandise)))[0][0]
@@ -1135,7 +1135,7 @@ class GameManager:
 				return self._message_typesetting(94, 'other -> database operating error')
 			remaining.update({'code' : code, 'merchandise' : merchandise, 'quantity' : other_data['remaining'], 'currency_type' : currency_type, 'cost_remaining' : currency_type_data['remaining']})
 			if await self._set_dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
-				pass # only a print statement found in original code
+				pass  # only a print statement found in original code
 			return self._message_typesetting(3, 'gain several materials', {'remaining' : remaining})
 		else:
 			return self._message_typesetting(93, 'unexpected element, please update the configuration table.')
@@ -1559,7 +1559,7 @@ class GameManager:
 		# 0 - successfully redeemed
 		# 99 - database operation error
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['gift'], 'nonce' : [nonce]})
-		# requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
+		requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
 		data = response.json()
 		if data[nonce]['status'] != 0:
 			return self._message_typesetting(98, 'nonce already redeemed')
@@ -1619,7 +1619,7 @@ class GameManager:
 		# 97 - You already have this friend
 		# 98 - You have sent a friend request
 		# 99 - No such person
-		friend_data = await self._execute_statement(world=world, statement=f"SELECT unique_id FROM player WHERE game_name='{friend_name}'")
+		friend_data = await self._execute_statement(world=world, statement=f"SELECT unique_id FROM player WHERE game_name='{friend_name}' and unique_id != '{unique_id}'")
 		if len(friend_data) == 0:
 			return self._message_typesetting(status=99, message="No such person")
 		friend_id = friend_data[0][0]
@@ -1655,14 +1655,14 @@ class GameManager:
 		# success -> 0
 		# 0 - Add friends to success
 		# 97 - nonce error
-		# 98 - database operating error
+		# 98 - The other has deleted the friend request
 		# 99 - You already have this friend
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
 		data = response.json()
 		try:
 			friend_name = data[nonce]["sender"]
 			friend_id = data[nonce]["uid_sender"]
-			# requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
+			requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
 		except:
 			return self._message_typesetting(status=97, message="nonce error")
 
@@ -1675,10 +1675,9 @@ class GameManager:
 		update_str = f"update friend set become_friend_time='{current_time}' where unique_id='{friend_id}' and friend_id='{unique_id}'"
 		insert_str = f"replace into friend(unique_id, friend_id, friend_name, become_friend_time) values('{unique_id}', '{friend_id}', '{friend_name}', '{current_time}')"
 		update_code = await self._execute_statement_update(world=world, statement=update_str)
+		if update_code == 0:
+			return self._message_typesetting(status=98, message="The other has deleted the friend request")
 		insert_code = await self._execute_statement_update(world=world, statement=insert_str)
-		if update_code == 0 or insert_code == 0:
-			# print(f"update_code:{update_code}, update_str:{update_str}\ninsert_code:{insert_code}, insert_str:{insert_str}")
-			return self._message_typesetting(status=98, message="database operating error")
 		return self._message_typesetting(status=0, message="Add friends to success", data={"remaining": {"nonce": nonce}})
 
 #############################################################################
@@ -3142,11 +3141,9 @@ async def _redeem_nonce(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).redeem_all_nonce(int(post['world']), post['unique_id'], post.getall('type_list'), post.getall('nonce_list'))
 	return _json_response(result)
 
-@ROUTES.post('/change_family_name')
-async def _change_family_name(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).change_family_name(int(post['world']), post['unique_id'], post['name']))
-
+#################################################################################################################################
+#################################################################################################################################
+#################################################################################################################################
 @ROUTES.post('/leave_family')
 async def _leave_family(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -3176,7 +3173,9 @@ async def _remove_user_family(request: web.Request) -> web.Response:
 async def _respond_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).respond_family(int(post['world']), post['unique_id'], post['nonce']))
-
+#################################################################################################################################
+#################################################################################################################################
+#################################################################################################################################
 @ROUTES.post('/get_lottery_config_info')
 async def _get_lottery_config_info(request: web.Request) -> web.Response:
 	post = await request.post()
