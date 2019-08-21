@@ -233,6 +233,7 @@ def run():
 	app.add_routes(ROUTES)
 	app['MANAGER'] = MailServer()
 	config = get_config()
+	print(f'starting mail server on port {config.getint("mail_server", "port")}...')
 	web.run_app(app, port = config.getint('mail_server', 'port'))
 
 
