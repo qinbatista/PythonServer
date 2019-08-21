@@ -2449,22 +2449,38 @@ class GameManager:
 		food_factory_workers = factory_data[9]
 		# 数据库中存的物资数量
 		food_storage = factory_data[14]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+		acceleration_value = 1
+		times = 1
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if acceleration_end_time:  # 加速中 存在日期
+			acceleration_value = 2  # 加速的倍数设置
+			time_difference = datetime.strptime(acceleration_end_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
+				times = 2
+				current_time = acceleration_end_time
 		remaining = {"food_factory_workers": food_factory_workers}
-		reward = {}
-		if food_start_time != "":
-			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
-			food_increment = int(time_difference.total_seconds()) // food_factory["time_consuming"] * food_factory_workers
-			if food_storage + food_increment > food_storage_limit:
-				food_increment = food_storage_limit - food_storage
-			food_storage += food_increment
-			reward.update({"food_increment": food_increment})
-			reward.update({"food_start_time": food_start_time})
-			food_start_time = current_time
-			remaining.update({"food_storage": food_storage})
-			remaining.update({"food_start_time": food_start_time})
-			sql_str = f"update factory set food_storage={food_storage}, food_factory_timer='{food_start_time}' where unique_id='{unique_id}'"
-			await self._execute_statement_update(world=world, statement=sql_str)
+		reward = {"food_increment": 0}
+		if food_start_time:
+			for i in range(times):
+				if times == 2 and i == 1:
+					acceleration_value = 1
+					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
+				food_increment = int(time_difference.total_seconds()) // food_factory["time_consuming"] * food_factory_workers * acceleration_value
+				if food_storage + food_increment > food_storage_limit:
+					food_increment = food_storage_limit - food_storage
+				food_storage += food_increment
+				reward["food_increment"] += food_increment
+				reward.update({"food_start_time": food_start_time})
+				food_start_time = current_time
+				remaining.update({"food_storage": food_storage})
+				remaining.update({"food_start_time": food_start_time})
+				sql_str = f"update factory set food_storage={food_storage}, food_factory_timer='{food_start_time}' where unique_id='{unique_id}'"
+				await self._execute_statement_update(world=world, statement=sql_str)
+			if times == 2:
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 			return self._message_typesetting(status=0, message="Food factory update success", data={"remaining": remaining, "reward": reward})
 		else:
 			return self._message_typesetting(status=99, message="Food factory did not start")
@@ -2483,27 +2499,43 @@ class GameManager:
 		# 数据库中存的物资数量
 		food_storage = factory_data[14]
 		iron_storage = factory_data[15]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+		acceleration_value = 1
+		times = 1
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if acceleration_end_time:  # 加速中 存在日期
+			acceleration_value = 2  # 加速的倍数设置
+			time_difference = datetime.strptime(acceleration_end_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
+				times = 2
+				current_time = acceleration_end_time
 		remaining = {"mine_factory_workers": mine_factory_workers}
-		reward = {}
-		if mine_start_time != "":
-			cost_food = mine_factory["cost"]["food"]
-			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(mine_start_time, '%Y-%m-%d %H:%M:%S')
-			iron_increment = int(time_difference.total_seconds()) // mine_factory["time_consuming"] * mine_factory_workers
-			if iron_storage + iron_increment > mine_storage_limit:
-				iron_increment = mine_storage_limit - iron_storage
-			if food_storage // cost_food < iron_increment:  # 1工人生产1铁消耗3食物
-				iron_increment = food_storage // cost_food
-			food_storage -= cost_food * iron_increment
-			iron_storage += iron_increment
-			reward.update({"iron_increment": iron_increment})
-			reward.update({"mine_start_time": mine_start_time})
-			mine_start_time = current_time
-			remaining.update({"food_storage": food_storage})
-			remaining.update({"iron_storage": iron_storage})
-			remaining.update({"mine_start_time": mine_start_time})
-			sql_str = f"update factory set iron_storage={iron_storage}, mine_factory_timer='{mine_start_time}' where unique_id='{unique_id}'"
-			await self._execute_statement_update(world=world, statement=sql_str)
+		reward = {"iron_increment": 0}
+		if mine_start_time:
+			for i in range(times):
+				if times == 2 and i == 1:
+					acceleration_value = 1
+					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+				cost_food = mine_factory["cost"]["food"]
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(mine_start_time, '%Y-%m-%d %H:%M:%S')
+				iron_increment = int(time_difference.total_seconds()) // mine_factory["time_consuming"] * mine_factory_workers * acceleration_value
+				if iron_storage + iron_increment > mine_storage_limit:
+					iron_increment = mine_storage_limit - iron_storage
+				if food_storage // cost_food < iron_increment:  # 1工人生产1铁消耗3食物
+					iron_increment = food_storage // cost_food
+				food_storage -= cost_food * iron_increment
+				iron_storage += iron_increment
+				reward["iron_increment"] += iron_increment
+				reward.update({"mine_start_time": mine_start_time})
+				mine_start_time = current_time
+				remaining.update({"food_storage": food_storage})
+				remaining.update({"iron_storage": iron_storage})
+				remaining.update({"mine_start_time": mine_start_time})
+				sql_str = f"update factory set iron_storage={iron_storage}, mine_factory_timer='{mine_start_time}' where unique_id='{unique_id}'"
+				await self._execute_statement_update(world=world, statement=sql_str)
+			if times == 2:
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 			return self._message_typesetting(status=0, message="Mine factory update success", data={"remaining": remaining, "reward": reward})
 		else:
 			return self._message_typesetting(status=99, message="Mine factory did not start")
@@ -2524,36 +2556,52 @@ class GameManager:
 		food_storage = factory_data[14]
 		iron_storage = factory_data[15]
 		crystal_storage = factory_data[16]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+		acceleration_value = 1
+		times = 1
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if acceleration_end_time:  # 加速中 存在日期
+			acceleration_value = 2  # 加速的倍数设置
+			time_difference = datetime.strptime(acceleration_end_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
+				times = 2
+				current_time = acceleration_end_time
 		remaining = {"crystal_factory_workers": crystal_factory_workers}
-		reward = {}
-		if crystal_start_time != "":
-			cost_food = crystal_factory["cost"]["food"]
-			cost_iron = crystal_factory["cost"]["iron"]
-			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
-			crystal_increment = int(time_difference.total_seconds()) // crystal_factory["time_consuming"] * crystal_factory_workers
-			# 配置文件下的仓库容量约束
-			if crystal_storage + crystal_increment > crystal_storage_limit:
-				crystal_increment = crystal_storage_limit - crystal_storage
-			# 数据库下的原始材料数量的约束
-			if food_storage // cost_food < iron_storage // cost_iron:
-				if food_storage // cost_food < crystal_increment:
-					crystal_increment = food_storage // cost_food
-			else:  # food_storage // cost_food >= iron_storage // cost_iron
-				if iron_storage // cost_iron < crystal_increment:
-					crystal_increment = iron_storage // cost_iron
-			food_storage -= cost_food * crystal_increment
-			iron_storage -= cost_iron * crystal_increment
-			crystal_storage += crystal_increment
-			reward.update({"crystal_increment": crystal_increment})
-			reward.update({"crystal_start_time": crystal_start_time})
-			crystal_start_time = current_time
-			remaining.update({"food_storage": food_storage})
-			remaining.update({"iron_storage": iron_storage})
-			remaining.update({"crystal_storage": crystal_storage})
-			remaining.update({"crystal_start_time": crystal_start_time})
-			sql_str = f"update factory set crystal_storage={crystal_storage}, crystal_factory_timer='{crystal_start_time}' where unique_id='{unique_id}'"
-			await self._execute_statement_update(world=world, statement=sql_str)
+		reward = {"crystal_increment": 0}
+		if crystal_start_time:
+			for i in range(times):
+				if times == 2 and i == 1:
+					acceleration_value = 1
+					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+				cost_food = crystal_factory["cost"]["food"]
+				cost_iron = crystal_factory["cost"]["iron"]
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
+				crystal_increment = int(time_difference.total_seconds()) // crystal_factory["time_consuming"] * crystal_factory_workers * acceleration_value
+				# 配置文件下的仓库容量约束
+				if crystal_storage + crystal_increment > crystal_storage_limit:
+					crystal_increment = crystal_storage_limit - crystal_storage
+				# 数据库下的原始材料数量的约束
+				if food_storage // cost_food < iron_storage // cost_iron:
+					if food_storage // cost_food < crystal_increment:
+						crystal_increment = food_storage // cost_food
+				else:  # food_storage // cost_food >= iron_storage // cost_iron
+					if iron_storage // cost_iron < crystal_increment:
+						crystal_increment = iron_storage // cost_iron
+				food_storage -= cost_food * crystal_increment
+				iron_storage -= cost_iron * crystal_increment
+				crystal_storage += crystal_increment
+				reward["crystal_increment"] += crystal_increment
+				reward.update({"crystal_start_time": crystal_start_time})
+				crystal_start_time = current_time
+				remaining.update({"food_storage": food_storage})
+				remaining.update({"iron_storage": iron_storage})
+				remaining.update({"crystal_storage": crystal_storage})
+				remaining.update({"crystal_start_time": crystal_start_time})
+				sql_str = f"update factory set crystal_storage={crystal_storage}, crystal_factory_timer='{crystal_start_time}' where unique_id='{unique_id}'"
+				await self._execute_statement_update(world=world, statement=sql_str)
+			if times == 2:
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 			return self._message_typesetting(status=0, message="Crystal factory update success", data={"remaining": remaining, "reward": reward})
 		else:
 			return self._message_typesetting(status=99, message="Crystal factory did not start")
@@ -2572,25 +2620,42 @@ class GameManager:
 		# 数据库中存的物资数量
 		iron_storage = factory_data[15]
 		equipment_storage = factory_data[17]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+		acceleration_value = 1
+		times = 1
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if acceleration_end_time:  # 加速中 存在日期
+			acceleration_value = 2  # 加速的倍数设置
+			time_difference = datetime.strptime(acceleration_end_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
+				times = 2
+				current_time = acceleration_end_time
 		remaining = {"equipment_factory_workers": equipment_factory_workers}
-		reward = {}
-		if equipment_start_time != "":
-			cost_iron = equipment_factory["cost"]["iron"]
-			time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
-			equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers
-			if iron_storage // cost_iron < equipment_increment:
-				equipment_increment = iron_storage // cost_iron
-			iron_storage -= equipment_increment * cost_iron
-			equipment_storage += equipment_increment
-			reward.update({"equipment_increment": equipment_increment})
-			reward.update({"equipment_start_time": equipment_start_time})
-			equipment_start_time = current_time
-			remaining.update({"iron_storage": iron_storage})
-			remaining.update({"equipment_storage": equipment_storage})
-			remaining.update({"equipment_start_time": equipment_start_time})
-			sql_str = f"update factory set equipment_storage={equipment_storage}, equipment_factory_timer='{equipment_start_time}' where unique_id='{unique_id}'"
-			await self._execute_statement_update(world=world, statement=sql_str)
+		reward = {"equipment_increment": 0}
+		if equipment_start_time:
+			for i in range(times):
+				if times == 2 and i == 1:
+					acceleration_value = 1
+					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+				cost_iron = equipment_factory["cost"]["iron"]
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
+				equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers * acceleration_value
+				if iron_storage // cost_iron < equipment_increment:
+					equipment_increment = iron_storage // cost_iron
+				iron_storage -= equipment_increment * cost_iron
+				equipment_storage += equipment_increment
+				reward["equipment_increment"] += equipment_increment
+				reward.update({"equipment_start_time": equipment_start_time})
+				equipment_start_time = current_time
+				remaining.update({"iron_storage": iron_storage})
+				remaining.update({"equipment_storage": equipment_storage})
+				remaining.update({"equipment_start_time": equipment_start_time})
+				sql_str = f"update factory set equipment_storage={equipment_storage}, equipment_factory_timer='{equipment_start_time}' where unique_id='{unique_id}'"
+				await self._execute_statement_update(world=world, statement=sql_str)
+
+			if times == 2:
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
 			return self._message_typesetting(status=0, message="Equipment factory update success", data={"remaining": remaining, "reward": reward})
 		else:
 			return self._message_typesetting(status=99, message="Equipment factory did not start")
