@@ -13,6 +13,7 @@ import threading
 import configparser
 from aiohttp import web
 from datetime import datetime, timedelta
+from utility import repeating_timer
 
 
 
@@ -21,7 +22,8 @@ class GameManager:
 		self._initialize_pools(worlds)
 		self._is_first_start = True
 		self._refresh_configuration()
-		self._start_timer(600)
+		self._timer = repeating_timer.RepeatingTimer(600, self._refresh_configuration)
+		self._timer.start()
 
 
 
@@ -1099,7 +1101,7 @@ class GameManager:
 			currency_type_data = await self._try_material(world, unique_id, currency_type, -1 * currency_type_price)
 			if currency_type_data['status'] == 1:
 				return self._message_typesetting(97, currency_type + ' insufficient')
-			sql_str = 'UPDATE weapon SET segment="%s" WHERE unique_id="%s" AND weapon_name="%s";' % (merchandise_quantity, unique_id, merchandise)
+			sql_str = f"UPDATE weapon SET segment=segment+{merchandise_quantity} WHERE unique_id='{unique_id}' AND weapon_name='{merchandise}';"
 			if await self._execute_statement_update(world, sql_str) == 0:
 				return self._message_typesetting(96, 'weapon -> database operating error')
 			segment = (await self._execute_statement(world, 'SELECT segment FROM weapon WHERE unique_id = "%s" AND weapon_name="%s";' % (unique_id, merchandise)))[0][0]
@@ -1135,7 +1137,7 @@ class GameManager:
 				return self._message_typesetting(94, 'other -> database operating error')
 			remaining.update({'code' : code, 'merchandise' : merchandise, 'quantity' : other_data['remaining'], 'currency_type' : currency_type, 'cost_remaining' : currency_type_data['remaining']})
 			if await self._set_dark_market_material(world, unique_id, code, '', 0, '', 0, refresh_time, refreshable_quantity) == 0:
-				pass # only a print statement found in original code
+				pass  # only a print statement found in original code
 			return self._message_typesetting(3, 'gain several materials', {'remaining' : remaining})
 		else:
 			return self._message_typesetting(93, 'unexpected element, please update the configuration table.')
@@ -1559,7 +1561,7 @@ class GameManager:
 		# 0 - successfully redeemed
 		# 99 - database operation error
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['gift'], 'nonce' : [nonce]})
-		# requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
+		requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
 		data = response.json()
 		if data[nonce]['status'] != 0:
 			return self._message_typesetting(98, 'nonce already redeemed')
@@ -1619,7 +1621,7 @@ class GameManager:
 		# 97 - You already have this friend
 		# 98 - You have sent a friend request
 		# 99 - No such person
-		friend_data = await self._execute_statement(world=world, statement=f"SELECT unique_id FROM player WHERE game_name='{friend_name}'")
+		friend_data = await self._execute_statement(world=world, statement=f"SELECT unique_id FROM player WHERE game_name='{friend_name}' and unique_id != '{unique_id}'")
 		if len(friend_data) == 0:
 			return self._message_typesetting(status=99, message="No such person")
 		friend_id = friend_data[0][0]
@@ -1655,14 +1657,14 @@ class GameManager:
 		# success -> 0
 		# 0 - Add friends to success
 		# 97 - nonce error
-		# 98 - database operating error
+		# 98 - The other has deleted the friend request
 		# 99 - You already have this friend
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
 		data = response.json()
 		try:
 			friend_name = data[nonce]["sender"]
 			friend_id = data[nonce]["uid_sender"]
-			# requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
+			requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
 		except:
 			return self._message_typesetting(status=97, message="nonce error")
 
@@ -1675,10 +1677,9 @@ class GameManager:
 		update_str = f"update friend set become_friend_time='{current_time}' where unique_id='{friend_id}' and friend_id='{unique_id}'"
 		insert_str = f"replace into friend(unique_id, friend_id, friend_name, become_friend_time) values('{unique_id}', '{friend_id}', '{friend_name}', '{current_time}')"
 		update_code = await self._execute_statement_update(world=world, statement=update_str)
-		insert_code = await self._execute_statement_update(world=world, statement=insert_str)
-		if update_code == 0 or insert_code == 0:
-			# print(f"update_code:{update_code}, update_str:{update_str}\ninsert_code:{insert_code}, insert_str:{insert_str}")
-			return self._message_typesetting(status=98, message="database operating error")
+		if update_code == 0:
+			return self._message_typesetting(status=98, message="The other has deleted the friend request")
+		await self._execute_statement_update(world=world, statement=insert_str)
 		return self._message_typesetting(status=0, message="Add friends to success", data={"remaining": {"nonce": nonce}})
 
 #############################################################################
@@ -1836,12 +1837,671 @@ class GameManager:
 #							End Family Functions							#
 #############################################################################
 
+#############################################################################
+#							Start Factory Functions							#
+#############################################################################
+
+	async def refresh_food_storage(self, world: int, unique_id: str) -> dict:
+		# 0  - Food factory update success
+		# 99 - Food factory did not start
+		food_factory = self._factory_config["food_factory"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		# 配置文件中工厂等级下的最大容量
+		food_storage_limit = food_factory["storage_limit"][str(factory_data[1])]
+		# 数据库中存的工厂工作的开始时间
+		food_start_time = factory_data[5]
+		# 数据库中存的工人的数量
+		food_factory_workers = factory_data[9]
+		# 数据库中存的物资数量
+		food_storage = factory_data[14]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+		acceleration_value = 1
+		times = 1
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if acceleration_end_time:  # 加速中 存在日期
+			acceleration_value = 2  # 加速的倍数设置
+			time_difference = datetime.strptime(acceleration_end_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
+				times = 2
+				current_time = acceleration_end_time
+				# eval(re.sub(r"\D", "", "2019-08-21 10:57:49"))
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
+		remaining = {"food_factory_workers": food_factory_workers}
+		reward = {"food_increment": 0}
+		if food_start_time:
+			for i in range(times):
+				if times == 2 and i == 1:
+					acceleration_value = 1
+					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
+				food_increment = int(time_difference.total_seconds()) // food_factory["time_consuming"] * food_factory_workers * acceleration_value
+				if food_increment < 0: continue
+				if food_storage + food_increment > food_storage_limit:
+					food_increment = food_storage_limit - food_storage
+				food_storage += food_increment
+				reward["food_increment"] += food_increment
+				reward.update({"food_start_time": food_start_time})
+				food_start_time = current_time
+				remaining.update({"food_storage": food_storage})
+				remaining.update({"food_start_time": food_start_time})
+				sql_str = f"update factory set food_storage={food_storage}, food_factory_timer='{food_start_time}' where unique_id='{unique_id}'"
+				await self._execute_statement_update(world=world, statement=sql_str)
+			return self._message_typesetting(status=0, message="Food factory update success", data={"remaining": remaining, "reward": reward})
+		else:
+			return self._message_typesetting(status=99, message="Food factory did not start")
+
+	async def refresh_mine_storage(self, world: int, unique_id: str) -> dict:
+		# 0  - Mine factory update success
+		# 99 - Mine factory did not start
+		mine_factory = self._factory_config["mine_factory"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		# 配置文件中工厂等级下的最大容量
+		mine_storage_limit = mine_factory["storage_limit"][str(factory_data[2])]
+		# 数据库中存的工厂工作的开始时间
+		mine_start_time = factory_data[6]
+		# 数据库中存的工人的数量
+		mine_factory_workers = factory_data[10]
+		# 数据库中存的物资数量
+		food_storage = factory_data[14]
+		iron_storage = factory_data[15]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+		acceleration_value = 1
+		times = 1
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if acceleration_end_time:  # 加速中 存在日期
+			acceleration_value = 2  # 加速的倍数设置
+			time_difference = datetime.strptime(acceleration_end_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
+				times = 2
+				current_time = acceleration_end_time
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
+		remaining = {"mine_factory_workers": mine_factory_workers}
+		reward = {"iron_increment": 0}
+		if mine_start_time:
+			for i in range(times):
+				if times == 2 and i == 1:
+					acceleration_value = 1
+					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+				cost_food = mine_factory["cost"]["food"]
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(mine_start_time, '%Y-%m-%d %H:%M:%S')
+				iron_increment = int(time_difference.total_seconds()) // mine_factory["time_consuming"] * mine_factory_workers * acceleration_value
+				if iron_increment < 0: continue
+				if iron_storage + iron_increment > mine_storage_limit:
+					iron_increment = mine_storage_limit - iron_storage
+				if food_storage // cost_food < iron_increment:  # 1工人生产1铁消耗3食物
+					iron_increment = food_storage // cost_food
+				food_storage -= cost_food * iron_increment
+				iron_storage += iron_increment
+				reward["iron_increment"] += iron_increment
+				reward.update({"mine_start_time": mine_start_time})
+				mine_start_time = current_time
+				remaining.update({"food_storage": food_storage})
+				remaining.update({"iron_storage": iron_storage})
+				remaining.update({"mine_start_time": mine_start_time})
+				sql_str = f"update factory set iron_storage={iron_storage}, mine_factory_timer='{mine_start_time}' where unique_id='{unique_id}'"
+				await self._execute_statement_update(world=world, statement=sql_str)
+			return self._message_typesetting(status=0, message="Mine factory update success", data={"remaining": remaining, "reward": reward})
+		else:
+			return self._message_typesetting(status=99, message="Mine factory did not start")
+
+	async def refresh_crystal_storage(self, world: int, unique_id: str) -> dict:
+		# 0  - Crystal factory update success
+		# 99 - Crystal factory did not start
+		mine_factory = self._factory_config["mine_factory"]
+		crystal_factory = self._factory_config["crystal_factory"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		# 配置文件中工厂等级下的最大容量
+		crystal_storage_limit = crystal_factory["storage_limit"][str(factory_data[3])]
+		# 数据库中存的工厂工作的开始时间
+		crystal_start_time = factory_data[7]
+		# 数据库中存的工人的数量
+		crystal_factory_workers = factory_data[11]
+		# 数据库中存的物资数量
+		food_storage = factory_data[14]
+		iron_storage = factory_data[15]
+		crystal_storage = factory_data[16]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+		acceleration_value = 1
+		times = 1
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if acceleration_end_time:  # 加速中 存在日期
+			acceleration_value = 2  # 加速的倍数设置
+			time_difference = datetime.strptime(acceleration_end_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
+				times = 2
+				current_time = acceleration_end_time
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
+		remaining = {"crystal_factory_workers": crystal_factory_workers}
+		reward = {"crystal_increment": 0}
+		if crystal_start_time:
+			for i in range(times):
+				if times == 2 and i == 1:
+					acceleration_value = 1
+					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+				cost_food = crystal_factory["cost"]["food"]
+				cost_iron = crystal_factory["cost"]["iron"]
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
+				crystal_increment = int(time_difference.total_seconds()) // crystal_factory["time_consuming"] * crystal_factory_workers * acceleration_value
+				if crystal_increment < 0: continue
+				# 配置文件下的仓库容量约束
+				if crystal_storage + crystal_increment > crystal_storage_limit:
+					crystal_increment = crystal_storage_limit - crystal_storage
+				# 数据库下的原始材料数量的约束
+				if food_storage // cost_food < iron_storage // cost_iron:
+					if food_storage // cost_food < crystal_increment:
+						crystal_increment = food_storage // cost_food
+				else:  # food_storage // cost_food >= iron_storage // cost_iron
+					if iron_storage // cost_iron < crystal_increment:
+						crystal_increment = iron_storage // cost_iron
+				food_storage -= cost_food * crystal_increment
+				iron_storage -= cost_iron * crystal_increment
+				crystal_storage += crystal_increment
+				reward["crystal_increment"] += crystal_increment
+				reward.update({"crystal_start_time": crystal_start_time})
+				crystal_start_time = current_time
+				remaining.update({"food_storage": food_storage})
+				remaining.update({"iron_storage": iron_storage})
+				remaining.update({"crystal_storage": crystal_storage})
+				remaining.update({"crystal_start_time": crystal_start_time})
+				sql_str = f"update factory set crystal_storage={crystal_storage}, crystal_factory_timer='{crystal_start_time}' where unique_id='{unique_id}'"
+				await self._execute_statement_update(world=world, statement=sql_str)
+			return self._message_typesetting(status=0, message="Crystal factory update success", data={"remaining": remaining, "reward": reward})
+		else:
+			return self._message_typesetting(status=99, message="Crystal factory did not start")
+
+	async def refresh_equipment_storage(self, world: int, unique_id: str) -> dict:
+		"""
+		0  - Equipment factory update success
+		99 - Equipment factory did not start
+		"""
+		equipment_factory = self._factory_config["equipment_factory"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		# 数据库中存的工厂工作的开始时间
+		equipment_start_time = factory_data[8]
+		# 数据库中存的工人的数量
+		equipment_factory_workers = factory_data[12]
+		# 数据库中存的物资数量
+		iron_storage = factory_data[15]
+		equipment_storage = factory_data[17]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+		acceleration_value = 1
+		times = 1
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if acceleration_end_time:  # 加速中 存在日期
+			acceleration_value = 2  # 加速的倍数设置
+			time_difference = datetime.strptime(acceleration_end_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			if int(time_difference.total_seconds()) <= 0:  # 加速卡过期
+				times = 2
+				current_time = acceleration_end_time
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
+		remaining = {"equipment_factory_workers": equipment_factory_workers}
+		reward = {"equipment_increment": 0}
+		if equipment_start_time:
+			for i in range(times):
+				if times == 2 and i == 1:
+					acceleration_value = 1
+					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+				cost_iron = equipment_factory["cost"]["iron"]
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
+				equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers * acceleration_value
+				if equipment_increment < 0: continue
+				if iron_storage // cost_iron < equipment_increment:
+					equipment_increment = iron_storage // cost_iron
+				iron_storage -= equipment_increment * cost_iron
+				equipment_storage += equipment_increment
+				reward["equipment_increment"] += equipment_increment
+				reward.update({"equipment_start_time": equipment_start_time})
+				equipment_start_time = current_time
+				remaining.update({"iron_storage": iron_storage})
+				remaining.update({"equipment_storage": equipment_storage})
+				remaining.update({"equipment_start_time": equipment_start_time})
+				sql_str = f"update factory set equipment_storage={equipment_storage}, equipment_factory_timer='{equipment_start_time}' where unique_id='{unique_id}'"
+				await self._execute_statement_update(world=world, statement=sql_str)
+
+			return self._message_typesetting(status=0, message="Equipment factory update success", data={"remaining": remaining, "reward": reward})
+		else:
+			return self._message_typesetting(status=99, message="Equipment factory did not start")
+
+	async def refresh_all_storage(self, world: int, unique_id: str) -> dict:
+		"""
+		0 -  update factory success
+		99 - update factory failed, all factories are not initialized
+		"""
+		food_factory = self._factory_config["food_factory"]
+		mine_factory = self._factory_config["mine_factory"]
+		crystal_factory = self._factory_config["crystal_factory"]
+		equipment_factory = self._factory_config["equipment_factory"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		# 配置文件中工厂等级下的最大容量
+		food_storage_limit = food_factory["storage_limit"][str(factory_data[1])]
+		mine_storage_limit = mine_factory["storage_limit"][str(factory_data[2])]
+		crystal_storage_limit = crystal_factory["storage_limit"][str(factory_data[3])]
+		# 数据库中存的工厂工作的开始时间
+		food_start_time = factory_data[5]
+		mine_start_time = factory_data[6]
+		crystal_start_time = factory_data[7]
+		equipment_start_time = factory_data[8]
+		# 数据库中存的工人的数量
+		food_factory_workers = factory_data[9]
+		mine_factory_workers = factory_data[10]
+		crystal_factory_workers = factory_data[11]
+		equipment_factory_workers = factory_data[12]
+		# 数据库中存的物资数量
+		food_storage = factory_data[14]
+		iron_storage = factory_data[15]
+		crystal_storage = factory_data[16]
+		equipment_storage = factory_data[17]
+		# 数据库中的加速时间
+		acceleration_end_time = factory_data[20]
+
+		remaining = {"food_factory_workers": food_factory_workers, "mine_factory_workers": mine_factory_workers, "crystal_factory_workers": crystal_factory_workers, "equipment_factory_workers": equipment_factory_workers}
+		reward = {"food_increment": 0, "iron_increment": 0, "crystal_increment": 0, "equipment_increment": 0}
+
+		acceleration_value = 1
+		times = 1
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+
+		if acceleration_end_time:  # 加速中 存在日期
+			acceleration_value = 2  # 加速的倍数设置
+			time_difference = datetime.strptime(acceleration_end_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S')
+			if int(time_difference.total_seconds()) <= 0:
+				times = 2
+				current_time = acceleration_end_time
+				await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='' where unique_id='{unique_id}'")
+
+		for i in range(times):
+			if times == 2 and i == 1:
+				acceleration_value = 1
+				current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+			if food_start_time:  # food_start_time != ""
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(food_start_time, '%Y-%m-%d %H:%M:%S')
+				food_increment = int(time_difference.total_seconds()) // food_factory["time_consuming"] * food_factory_workers * acceleration_value
+				if food_storage + food_increment > food_storage_limit:
+					food_increment = food_storage_limit - food_storage
+				food_storage += food_increment
+				reward["food_increment"] += food_increment
+				reward.update({"food_start_time": food_start_time})
+				food_start_time = current_time
+				remaining.update({"food_storage": food_storage})
+				remaining.update({"food_start_time": food_start_time})
+			if mine_start_time:
+				cost_food = mine_factory["cost"]["food"]
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(mine_start_time, '%Y-%m-%d %H:%M:%S')
+				iron_increment = int(time_difference.total_seconds()) // mine_factory["time_consuming"] * mine_factory_workers * acceleration_value
+				if iron_storage + iron_increment > mine_storage_limit:
+					iron_increment = mine_storage_limit - iron_storage
+				if food_storage // cost_food < iron_increment:  # 1工人生产1铁消耗3食物
+					iron_increment = food_storage // cost_food
+				food_storage -= cost_food * iron_increment
+				iron_storage += iron_increment
+				reward["iron_increment"] += iron_increment
+				reward.update({"mine_start_time": mine_start_time})
+				mine_start_time = current_time
+				remaining.update({"food_storage": food_storage})
+				remaining.update({"iron_storage": iron_storage})
+				remaining.update({"mine_start_time": mine_start_time})
+			if crystal_start_time:
+				cost_food = crystal_factory["cost"]["food"]
+				cost_iron = crystal_factory["cost"]["iron"]
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(crystal_start_time, '%Y-%m-%d %H:%M:%S')
+				crystal_increment = int(time_difference.total_seconds()) // crystal_factory["time_consuming"] * crystal_factory_workers * acceleration_value
+				# 配置文件下的仓库容量约束
+				if crystal_storage + crystal_increment > crystal_storage_limit:
+					crystal_increment = crystal_storage_limit - crystal_storage
+				# 数据库下的原始材料数量的约束
+				if food_storage // cost_food < iron_storage // cost_iron:
+					if food_storage // cost_food < crystal_increment:
+						crystal_increment = food_storage // cost_food
+				else:  # food_storage // cost_food >= iron_storage // cost_iron
+					if iron_storage // cost_iron < crystal_increment:
+						crystal_increment = iron_storage // cost_iron
+				food_storage -= cost_food * crystal_increment
+				iron_storage -= cost_iron * crystal_increment
+				crystal_storage += crystal_increment
+				reward["crystal_increment"] += crystal_increment
+				reward.update({"crystal_start_time": crystal_start_time})
+				crystal_start_time = current_time
+				remaining.update({"food_storage": food_storage})
+				remaining.update({"iron_storage": iron_storage})
+				remaining.update({"crystal_storage": crystal_storage})
+				remaining.update({"crystal_start_time": crystal_start_time})
+			if equipment_start_time:
+				cost_iron = equipment_factory["cost"]["iron"]
+				# print(f"equipment==>iron_storage: {iron_storage}")
+				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
+				equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers * acceleration_value
+				if iron_storage // cost_iron < equipment_increment:
+					equipment_increment = iron_storage // cost_iron
+				iron_storage -= equipment_increment * cost_iron
+				equipment_storage += equipment_increment
+				reward["equipment_increment"] += equipment_increment
+				reward.update({"equipment_start_time": equipment_start_time})
+				equipment_start_time = current_time
+				remaining.update({"iron_storage": iron_storage})
+				remaining.update({"equipment_storage": equipment_storage})
+				remaining.update({"equipment_start_time": equipment_start_time})
+
+			sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{food_start_time}', mine_factory_timer='{mine_start_time}', crystal_factory_timer='{crystal_start_time}', equipment_factory_timer='{equipment_start_time}' where unique_id='{unique_id}'"
+			await self._execute_statement_update(world=world, statement=sql_str)
+		if remaining:
+			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
+
+	async def distribution_workers(self, world: int, unique_id: str, workers_quantity: int, factory_kind: str) -> dict:
+		"""
+		0  - Successful employee assignment, get factory work rewards
+		1  - Successful employee assignment
+		2  - Allocation is full
+		97 - Insufficient distribution workers
+		98 - Factory type error
+		99 - The number of workers assigned is not a positive integer
+		思路： 判断分配的工人数量workers_quantity是否为为正整数 The number of workers assigned is not a positive integer ==> 代号99，
+		工厂类型factory_kind是否在数据库表中 Factory type error ==> 代号98，查询数据库表中是否存在unique_id的数据，
+		不存在则创建，获取数据库中的所有工人的数量totally_workers和正在此工厂工作的工人数量factory_workers，
+		先判断所有工人的数量是否大于等于工厂等级下限制的工人数量
+		后判断所有工人的数量是否大于等于分配的工人数量
+		如果小于则分配完所有的工人到指定的工厂下工作
+		最终正确结果返回字典键值对包含以下：==> 代号0
+			remaining：
+				1.所有工人的数量：totally_workers
+				2.指定的工厂下工作人员数量：factory_workers
+				3.工厂开始工作时间：start_time
+				4.工厂生产的所有物品数量：storage
+			reward：
+				5.工厂生产的所有物品增加的数量：increment
+				6.工厂生产物品结算的开始时间：start_time
+		问题：如果指定工厂之前存在工人在工作则结算后的工作时间是否统一成当前时间
+		"""
+		all_factory = self._factory_config["factory_kind"]
+		if workers_quantity <= 0:
+			return self._message_typesetting(status=99, message="The number of workers assigned is not a positive integer")
+
+		if factory_kind not in all_factory:
+			return self._message_typesetting(status=98, message="Factory type error")
+
+		factory_mark = all_factory.index(factory_kind)
+		remaining = {}
+		reward = {}
+		result = await eval(f"self.refresh_{factory_kind}_storage({world},{unique_id})")
+		if result["data"]:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_config = self._factory_config[f"{factory_kind}_factory"]
+		factory_level = factory_data[1 + factory_mark]
+		factory_workers = factory_data[9 + factory_mark]
+		totally_workers = factory_data[13]
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if factory_kind != "equipment":
+			# 配置文件下的工作人员上限限制
+			workers_number_limit = factory_config["workers_number_limit"][str(factory_level)]
+			if factory_workers + workers_quantity > workers_number_limit:
+				workers_quantity = workers_number_limit - factory_workers
+		# 数据库可分配人员数量的限制
+		if workers_quantity > totally_workers:
+			workers_quantity = totally_workers
+		totally_workers -= workers_quantity
+		factory_workers += workers_quantity
+		sql_str = f"update factory set totally_workers={totally_workers}, {factory_kind}_factory_workers={factory_workers}, {factory_kind}_factory_timer='{current_time}' where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		remaining.update({"totally_workers": totally_workers, f"{factory_kind}_factory_workers": factory_workers, f"{factory_kind}_start_time": current_time})
+		if workers_quantity == 0:
+			return self._message_typesetting(status=2, message="Allocation is full", data={"remaining": remaining, "reward": reward})
+		if reward:
+			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
+
+	async def buy_workers(self, world: int, unique_id: str, workers_quantity: int) -> dict:
+		"""
+		0  - Buy workers success, storage has been refreshed
+		1  - Buy workers success
+		98 - Buy workers failed, insufficient food
+		99 - The number of workers can only be a positive integer
+		思路：查询所有工人的数量，读取配置文件下的工人数量购买限制，
+		此时需不需要刷新食物工厂？
+		判断购买的工人数量是否大于等于最大工人数限制，
+		判断需要的食物数量是否足够
+		"""
+		if workers_quantity <= 0:
+			return self._message_typesetting(status=99, message="The number of workers can only be a positive integer")
+		remaining = {}
+		reward = {}
+		result = await self.refresh_all_storage(world=world,unique_id=unique_id)
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		workers_max = self._factory_config["buy_workers_max"]
+		workers_max_food = self._factory_config["buy_workers_max_food"]
+		workers_need_food = self._factory_config["buy_workers_need_food"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		food_storage = factory_data[14]
+		all_workers = sum(factory_data[9: 14], 1)  # 多加一人
+		if all_workers >= workers_max:
+			if workers_quantity * workers_max_food > food_storage:
+				workers_quantity = food_storage // workers_max_food
+			food_storage -= workers_quantity * workers_max_food
+		else:
+			for worker in range(workers_quantity):  # 0开始递增，刚好多减一人，与最初平等
+				workers_next = all_workers + worker
+				if workers_next >= workers_max:
+					if workers_max_food > food_storage:
+						workers_quantity = worker  # 此工人没有被购买
+						break
+					else:
+						food_storage -= workers_max_food
+				else:
+					need_food = workers_need_food[str(workers_next)]
+					if need_food > food_storage:
+						workers_quantity = worker  # 此工人没有被购买
+						break
+					else:
+						food_storage -= need_food
+		if workers_quantity == 0:
+			return self._message_typesetting(status=98, message="buy workers failed, insufficient food")
+		all_workers += workers_quantity - 1  # 多减一人，与最初平等
+		totally_workers = all_workers - sum(factory_data[9: 13])
+		sql_str = f"update factory set totally_workers={totally_workers}, food_storage={food_storage} where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		remaining.update({"all_workers": all_workers, "totally_workers": totally_workers, "buy_workers_quantity": workers_quantity, "food_storage": food_storage})
+		if reward:
+			return self._message_typesetting(status=0, message="Buy workers success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=1, message="Buy workers success", data={"remaining": remaining})
+
+	async def upgrade_food_factory(self, world: int, unique_id: str, upgrade_level: int = 1) -> dict:
+		"""
+		0  - Upgrade food factory success
+		1  - Upgrade food factory success, storage has been refreshed
+		2  - Upgrade factory failed, Insufficient crystal, storage has been refreshed
+		# 97 - Upgrade factory failed，Insufficient crystal
+		98 - The factory has reached full level
+		99 - Upgrade level can only be a positive integer
+		思路：判断upgrade_level是否为正整数，查询数据库中的工厂等级是否达到满级
+		读取配置文件下升级工厂需要的材料限制
+		"""
+		if upgrade_level <= 0:
+			return self._message_typesetting(status=99, message="Upgrade level can only be a positive integer")
+		storage_level_limit = self._factory_config["food_factory"]["storage_level_limit"]
+		upgrade_need_crystals = self._factory_config["food_factory"]["upgrade_need_crystals_limit"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_level = factory_data[1]
+		all_crystal = factory_data[16]
+		remaining = {}
+		reward = {}
+		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		if factory_level == storage_level_limit:
+			return self._message_typesetting(status=98, message="The factory has reached full level")
+		if factory_level + upgrade_level > storage_level_limit:
+			upgrade_level = storage_level_limit - factory_level
+		for upgrade in range(upgrade_level):
+			need_crystal = upgrade_need_crystals[str(factory_level + upgrade + 1)]
+			if need_crystal > all_crystal:
+				upgrade_level = upgrade
+				break
+			else:
+				all_crystal -= need_crystal
+		if upgrade_level == 0:
+			return self._message_typesetting(status=2, message="Upgrade factory failed, Insufficient crystal, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+			# return self._message_typesetting(status=97, message="Upgrade factory failed, Insufficient crystal")
+		factory_level += upgrade_level
+		remaining.update({"food_factory_level": factory_level, "crystal_storage": all_crystal, "upgrade_level": upgrade_level})
+		sql_str = f"update factory set food_factory_level={factory_level}, crystal_storage={all_crystal} where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		if reward:
+			return self._message_typesetting(status=1, message="Upgrade food factory success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=0, message="Upgrade food factory success", data={"remaining": remaining})
+
+	async def upgrade_mine_factory(self, world: int, unique_id: str) -> dict:
+		"""
+		0  - Upgrade mine factory success
+		1  - Upgrade mine factory success, storage has been refreshed
+		2  - Upgrade factory failed, Insufficient crystal, storage has been refreshed
+		# 97 - Upgrade factory failed，Insufficient crystal
+		98 - The factory has reached full level
+		"""
+		storage_level_limit = self._factory_config["mine_factory"]["storage_level_limit"]
+		upgrade_need_crystals = self._factory_config["mine_factory"]["upgrade_need_crystals_limit"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_level = factory_data[2]
+		all_crystal = factory_data[16]
+		remaining = {}
+		reward = {}
+		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		if factory_level == storage_level_limit:
+			return self._message_typesetting(status=98, message="The factory has reached full level")
+		factory_level += 1
+		need_crystal = upgrade_need_crystals[str(factory_level)]
+		if need_crystal > all_crystal:
+			return self._message_typesetting(status=2, message="Upgrade factory failed, Insufficient crystal, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+			# return self._message_typesetting(status=97, message="Upgrade factory failed, Insufficient crystal")
+		else:
+			all_crystal -= need_crystal
+		remaining.update({"mine_factory_level": factory_level, "crystal_storage": all_crystal, "upgrade_level": 1})
+		sql_str = f"update factory set mine_factory_level={factory_level}, crystal_storage={all_crystal} where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		if reward:
+			return self._message_typesetting(status=1, message="Upgrade mine factory success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=0, message="Upgrade mine factory success", data={"remaining": remaining})
+
+	async def upgrade_crystal_factory(self, world: int, unique_id: str) -> dict:
+		"""
+		0  - Upgrade crystal factory success
+		1  - Upgrade crystal factory success, storage has been refreshed
+		2  - Upgrade factory failed, Insufficient crystal, storage has been refreshed
+		# 97 - Upgrade factory failed，Insufficient crystal
+		98 - The factory has reached full level
+		"""
+		storage_level_limit = self._factory_config["crystal_factory"]["storage_level_limit"]
+		upgrade_need_crystals = self._factory_config["crystal_factory"]["upgrade_need_crystals_limit"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_level = factory_data[3]
+		all_crystal = factory_data[16]
+		remaining = {}
+		reward = {}
+		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		if factory_level == storage_level_limit:
+			return self._message_typesetting(status=98, message="The factory has reached full level")
+		factory_level += 1
+		need_crystal = upgrade_need_crystals[str(factory_level)]
+		if need_crystal > all_crystal:
+			return self._message_typesetting(status=2, message="Upgrade factory failed, Insufficient crystal, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+			# return self._message_typesetting(status=97, message="Upgrade factory failed, Insufficient crystal")
+		else:
+			all_crystal -= need_crystal
+		remaining.update({"crystal_factory_level": factory_level, "crystal_storage": all_crystal, "upgrade_level": 1})
+		sql_str = f"update factory set crystal_factory_level={factory_level}, crystal_storage={all_crystal} where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		if reward:
+			return self._message_typesetting(status=1, message="Upgrade crystal factory success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=0, message="Upgrade crystal factory success", data={"remaining": remaining})
+
+	async def upgrade_wishing_pool(self, world: int, unique_id: str) -> dict:
+		"""
+		0  - Upgrade wishing pool success
+		1  - Upgrade wishing pool success, storage has been refreshed
+		2  - Upgrade wishing pool failed, Insufficient crystal, storage has been refreshed
+		# 97 - Upgrade wishing pool failed，Insufficient crystal
+		98 - The wishing pool has reached full level
+		"""
+		storage_level_limit = self._factory_config["wishing_pool"]["storage_level_limit"]
+		upgrade_need_crystals = self._factory_config["wishing_pool"]["upgrade_need_crystals_limit"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_level = factory_data[18]
+		all_crystal = factory_data[16]
+		remaining = {}
+		reward = {}
+		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		if factory_level == storage_level_limit:
+			return self._message_typesetting(status=98, message="The wishing pool has reached full level")
+		factory_level += 1
+		need_crystal = upgrade_need_crystals[str(factory_level)]
+		if need_crystal > all_crystal:
+			return self._message_typesetting(status=2, message="Upgrade wishing pool failed, Insufficient crystal, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+			# return self._message_typesetting(status=97, message="Upgrade factory failed, Insufficient crystal")
+		else:
+			all_crystal -= need_crystal
+		remaining.update({"wishing_pool_level": factory_level, "crystal_storage": all_crystal, "upgrade_level": 1})
+		sql_str = f"update factory set wishing_pool_level={factory_level}, crystal_storage={all_crystal} where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=sql_str)
+		if reward:
+			return self._message_typesetting(status=1, message="Upgrade wishing pool success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
+		return self._message_typesetting(status=0, message="Upgrade wishing pool success", data={"remaining": remaining})
+
+	async def acceleration_technology(self, world: int, unique_id: str) -> dict:
+		"""
+		0  - Accelerate success
+		1  - Accelerate failed, update factory success
+		99 - update factory failed, all factories are not initialized, accelerate failed
+		"""
+		remaining = {}
+		reward = {}
+		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+			diamond_data = await self.try_diamond(world=world, unique_id=unique_id, value=-self._factory_config["acceleration_consuming_diamond"])
+			if diamond_data["status"] == 1:
+				return self._message_typesetting(status=1, message="Accelerate failed, update factory success", data={"remaining": remaining, "reward": reward})
+			remaining.update({"diamond": diamond_data["remaining"]})
+		else:
+			return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized, accelerate failed")
+		acceleration_end_time = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+		await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='{acceleration_end_time}' where unique_id='{unique_id}'")
+		remaining.update({"acceleration_end_time": acceleration_end_time})
+		return self._message_typesetting(status=0, message="Accelerate success", data={"remaining": remaining, "reward": reward})
+
+#############################################################################
+#							End Factory Functions							#
+#############################################################################
+
 
 
 #############################################################################
 #							Private Functions								#
 #############################################################################
 
+	async def _select_factory(self, world: int, unique_id) -> list:
+		sql_str = f"select * from factory where unique_id={unique_id}"
+		try:
+			return list((await self._execute_statement(world, sql_str))[0])
+		except:
+			await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
+			return list((await self._execute_statement(world, sql_str))[0])
 
 	async def _family_exists(self, world: int, fname: str):
 		return (0,) not in (await self._execute_statement(world, f'SELECT COUNT(1) FROM families WHERE familyname = "{fname}";'))
@@ -2604,11 +3264,6 @@ class GameManager:
 		self._monster_config_json = result.json()
 		result = requests.get('http://localhost:8000/get_level_enemy_layouts_config')
 		self._level_enemy_layouts_config_json = result.json()
-
-	def _start_timer(self, seconds: int):
-		t = threading.Timer(seconds, self._refresh_configuration)
-		t.daemon = True
-		t.start()
 	
 	def _initialize_pools(self, worlds):
 		self._pools = {}
@@ -3142,11 +3797,9 @@ async def _redeem_nonce(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).redeem_all_nonce(int(post['world']), post['unique_id'], post.getall('type_list'), post.getall('nonce_list'))
 	return _json_response(result)
 
-@ROUTES.post('/change_family_name')
-async def _change_family_name(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).change_family_name(int(post['world']), post['unique_id'], post['name']))
-
+#################################################################################################################################
+#################################################################################################################################
+#################################################################################################################################
 @ROUTES.post('/leave_family')
 async def _leave_family(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -3176,7 +3829,9 @@ async def _remove_user_family(request: web.Request) -> web.Response:
 async def _respond_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).respond_family(int(post['world']), post['unique_id'], post['nonce']))
-
+#################################################################################################################################
+#################################################################################################################################
+#################################################################################################################################
 @ROUTES.post('/get_lottery_config_info')
 async def _get_lottery_config_info(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -3230,6 +3885,90 @@ async def _active_wishing_pool(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER'])._active_wishing_pool(int(post['world']), post['unique_id'], post['weapon_id'])
 	return _json_response(result)
+
+@ROUTES.post('/refresh_all_storage')
+async def _refresh_all_storage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).refresh_all_storage(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/refresh_food_storage')
+async def _refresh_food_storage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).refresh_food_storage(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/refresh_mine_storage')
+async def _refresh_mine_storage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).refresh_mine_storage(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/refresh_crystal_storage')
+async def _refresh_crystal_storage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).refresh_crystal_storage(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/refresh_equipment_storage')
+async def _refresh_equipment_storage(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).refresh_equipment_storage(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/distribution_workers')
+async def _distribution_workers(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).distribution_workers(int(post['world']), post['unique_id'], int(post['workers_quantity']), post['factory_kind'])
+	return _json_response(result)
+
+
+@ROUTES.post('/buy_workers')
+async def _buy_workers(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).buy_workers(int(post['world']), post['unique_id'], int(post['workers_quantity']))
+	return _json_response(result)
+
+
+@ROUTES.post('/upgrade_food_factory')
+async def _upgrade_food_factory(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).upgrade_food_factory(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/upgrade_mine_factory')
+async def _upgrade_mine_factory(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).upgrade_mine_factory(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/upgrade_crystal_factory')
+async def _upgrade_crystal_factory(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).upgrade_crystal_factory(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/upgrade_wishing_pool')
+async def _upgrade_wishing_pool(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).upgrade_wishing_pool(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/acceleration_technology')
+async def _acceleration_technology(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).acceleration_technology(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
 	
 def get_config() -> configparser.ConfigParser:
 	'''
