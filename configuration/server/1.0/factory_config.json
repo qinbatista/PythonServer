@@ -1,5 +1,6 @@
 {
 	"factory_kind": ["food", "mine", "crystal", "equipment"],
+	"acceleration_consuming_diamond": 30,
 	"buy_workers_max": 45,
 	"buy_workers_max_food": 6000,
 	"buy_workers_need_food": {
