@@ -13,6 +13,7 @@ import threading
 import configparser
 from aiohttp import web
 from datetime import datetime, timedelta
+from utility import repeating_timer
 
 
 
@@ -21,7 +22,8 @@ class GameManager:
 		self._initialize_pools(worlds)
 		self._is_first_start = True
 		self._refresh_configuration()
-		self._start_timer(600)
+		self._timer = repeating_timer.RepeatingTimer(600, self._refresh_configuration)
+		self._timer.start()
 
 
 
@@ -3262,11 +3264,6 @@ class GameManager:
 		self._monster_config_json = result.json()
 		result = requests.get('http://localhost:8000/get_level_enemy_layouts_config')
 		self._level_enemy_layouts_config_json = result.json()
-
-	def _start_timer(self, seconds: int):
-		t = threading.Timer(seconds, self._refresh_configuration)
-		t.daemon = True
-		t.start()
 	
 	def _initialize_pools(self, worlds):
 		self._pools = {}
