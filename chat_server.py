@@ -85,6 +85,11 @@ class ChatServer:
 				else: raise ChatProtocolError
 		except (ChatProtocolError):
 			print(f'ChatProtocolError raised for user {name}...')
+		except ConnectionResetError:
+			print(f'ConnectionReset for user {name}...')
+		except KeyError as e:
+			print(e)
+			print(f'KeyError for user {name}...')
 		finally:
 			await self._cleanup(name, writer)
 			print(f'connection closed for {name}')
