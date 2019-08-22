@@ -45,6 +45,7 @@ namespace configurationView
 
         private void HangStageSelect_SelectedIndexChanged(object sender, EventArgs e)
         {
+            HangClear();
             foreach (var item in (JObject)public_json_data[HangStageSelect.SelectedItem.ToString()])
             {
                 switch (item.Key)
