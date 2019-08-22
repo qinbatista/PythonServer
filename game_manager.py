@@ -1690,6 +1690,40 @@ class GameManager:
 #############################################################################
 
 #############################################################################
+#                     Start Mall Function Position                          #
+#############################################################################
+	async def purchase_scroll_mall(self, world: int, unique_id: str, scroll_type: str, purchase_type: str, quantity: int):
+		"""
+		0 - Purchase success
+		96 - Insufficient {mall_consume}
+		97 - No such purchase type
+		98 - This scroll cannot be purchased
+		99 - The quantity purchased must be a positive integer
+		"""
+		scroll_config = self._mall_config["scroll"]
+		if quantity <= 0:
+			return self._message_typesetting(status=99, message="The quantity purchased must be a positive integer")
+		mall_scroll_type = scroll_config["scroll_type"]
+		if scroll_type not in mall_scroll_type:
+			return self._message_typesetting(status=98, message="This scroll cannot be purchased")
+		mall_purchase_type = scroll_config[scroll_type]["purchase_type"]
+		if purchase_type not in mall_purchase_type:
+			return self._message_typesetting(status=97, message="No such purchase type")
+		mall_consume = scroll_config[scroll_type][purchase_type]["consume"]
+		mall_quantity = -1 * scroll_config[scroll_type][purchase_type]["quantity"] * quantity
+		mall_scroll_quantity = scroll_config[scroll_type][purchase_type]["scroll_quantity"] * quantity
+		consume_data = await eval(f"self.try_{mall_consume}({world}, {unique_id}, {mall_quantity})")
+		if consume_data["status"] == 1:
+			return self._message_typesetting(status=96, message=f"Insufficient {mall_consume}")
+		await self._execute_statement_update(world=world, statement=f"update player set {scroll_type}={scroll_type}+{mall_scroll_quantity} where unique_id='{unique_id}'")
+		scroll_quantity = await self._get_material(world=world, unique_id=unique_id, material=scroll_type)
+		return self._message_typesetting(status=0, message="Purchase success", data={"remaining": {mall_consume: consume_data["remaining"], scroll_type: scroll_quantity}, "reward": {scroll_type: mall_scroll_quantity}})
+#############################################################################
+#                     Start Mall Function Position                          #
+#############################################################################
+
+
+#############################################################################
 #                     Start Temp Function Position                          #
 #############################################################################
 
@@ -3172,7 +3206,7 @@ class GameManager:
 		:param material_value:要设置的材料对应的值
 		:return:返回是否更新成功的标识，1为成功，0为失败
 		"""
-		return await self._execute_statement_update(world, 'UPDATE player SET ' + material + '=' + str(value) + ' where unique_id="' + unique_id + '";')
+		return await self._execute_statement_update(world, f"UPDATE player SET {material}={value} where unique_id='{unique_id}'")
 
 
 	def _sql_str_operating(self, unique_id: str, material_dict: dict, key_word: list = []) -> (str, str):
@@ -3240,6 +3274,7 @@ class GameManager:
 	def _refresh_configuration(self):
 		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
+		self._mall_config = d['mall']
 		self._factory_config = d['factory']
 		self._stage_reward = d['reward']
 		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
@@ -3841,6 +3876,19 @@ async def _remove_user_family(request: web.Request) -> web.Response:
 async def _respond_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).respond_family(int(post['world']), post['unique_id'], post['nonce']))
+#################################################################################################################################
+#################################################################################################################################
+#################################################################################################################################
+
+@ROUTES.post('/purchase_scroll_mall')
+async def _purchase_scroll_mall(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], "1", int(post['quantity'])))
+
+@ROUTES.post('/purchase_scroll_mall2')
+async def _purchase_scroll_mall2(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], "2", int(post['quantity'])))
 #################################################################################################################################
 #################################################################################################################################
 #################################################################################################################################
