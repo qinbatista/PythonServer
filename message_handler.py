@@ -406,6 +406,41 @@ class MessageHandler:
 	
 	async def _get_chat_server(self, message: dict, session):
 		return self._map[message['world']]['chatserver']
+		
+	async def _check_boss_status(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/check_boss_status', data={'world' : message['world'], 'unique_id': message['data']['unique_id']) as resp:
+			return await resp.text()		
+	async def _enter_world_boss_stage(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/enter_world_boss_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']) as resp:
+			return await resp.text()	
+	async def _leave_world_boss_stage(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/leave_world_boss_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'total_damage': message['data']['total_damage']) as resp:
+			return await resp.text()	
+	async def _get_top_damage(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_top_damage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'range_number': message['data']['range_number']) as resp:
+			return await resp.text()
+			
+			
+	async def _leave_family(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/leave_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id']) as resp:
+			return await resp.text()	
+	async def _create_family(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/create_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'fname': message['data']['fname']) as resp:
+			return await resp.text()		
+			
+	async def _invite_user_family(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/invite_user_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'target': message['data']['target']) as resp:
+			return await resp.text()			
+	async def _remove_user_family(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/remove_user_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'user': message['data']['user']) as resp:
+			return await resp.text()		
+	async def _request_join_family(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/request_join_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'fname': message['data']['fname']) as resp:
+			return await resp.text()				
+	async def _response_family(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/response_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'nonce': message['data']['nonce']) as resp:
+			return await resp.text()
+			
 ###############################################################################
 
 
@@ -490,10 +525,7 @@ FUNCTION_LIST = {
 	'get_stage_reward_config' : MessageHandler._get_stage_reward_config,
 	'get_hang_up_info' : MessageHandler._get_hang_up_info,
 	
-	
-	
-	
-	
+
 	'get_all_friend_info': MessageHandler._get_all_friend_info,
 	'delete_friend': MessageHandler._delete_friend,
 	'request_friend': MessageHandler._request_friend,
@@ -505,6 +537,25 @@ FUNCTION_LIST = {
 	'get_new_mail': MessageHandler._get_new_mail,
 	'get_all_mail': MessageHandler._get_all_mail,
 	'delete_mail': MessageHandler._delete_mail,
-	'delete_all_mail': MessageHandler._delete_all_mail
+	'delete_all_mail': MessageHandler._delete_all_mail,
+	
+	'check_boss_status' : MessageHandler._check_boss_status,
+	'enter_world_boss_stage' : MessageHandler._enter_world_boss_stage,
+	'leave_world_boss_stage' : MessageHandler._leave_world_boss_stage,
+	'get_top_damage' : MessageHandler._get_top_damage,
+	
+	'check_boss_status' : MessageHandler._check_boss_status,
+	'enter_world_boss_stage' : MessageHandler._enter_world_boss_stage,
+	'leave_world_boss_stage' : MessageHandler._leave_world_boss_stage,
+	'get_top_damage' : MessageHandler._get_top_damage,
+	
+	'leave_family' : MessageHandler._leave_family,
+	'create_family' : MessageHandler._create_family,
+	'invite_user_family' : MessageHandler._invite_user_family,
+	'remove_user_family' : MessageHandler._remove_user_family,
+	'request_join_family' : MessageHandler._request_join_family,
+	'response_family' : MessageHandler._response_family,
 
-}
+
+}   
+    
