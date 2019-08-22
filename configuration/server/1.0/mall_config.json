@@ -1,6 +1,24 @@
 {
 	"scroll": {
-		"scroll_type": ["pro_summon_scroll"],
+		"scroll_type": ["basic_summon_scroll", "pro_summon_scroll"],
+		"basic_summon_scroll": {
+			"purchase_type": ["1", "2", "3"],
+			"1": {
+				"consume": "diamond",
+				"quantity": 10,
+				"scroll_quantity": 1
+			},
+			"2": {
+				"consume": "diamond",
+				"quantity": 90,
+				"scroll_quantity": 10
+			},
+			"3": {
+				"consume": "diamond",
+				"quantity": 800,
+				"scroll_quantity": 100
+			}
+		},
 		"pro_summon_scroll": {
 			"purchase_type": ["1", "2"],
 			"1": {
