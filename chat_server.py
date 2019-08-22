@@ -207,8 +207,9 @@ class ChatServer:
 		await self._close_connection(writer)
 
 	async def _close_connection(self, writer):
-		writer.close()
-		await writer.wait_closed()
+		with contextlib.suppress(ConnectionResetError):
+			writer.close()
+			await writer.wait_closed()
 
 	def _make_message(self, command, message = ''):
 		return (command.zfill(10) + message).encode()
