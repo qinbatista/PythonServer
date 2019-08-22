@@ -21,8 +21,11 @@ class GameManager:
 	def __init__(self, worlds = []):
 		self._initialize_pools(worlds)
 		self._is_first_start = True
+		self.is_first_month = False
+		self._boss_life=[]
+		self._boss_life_remaining=[]
 		self._refresh_configuration()
-		self._timer = repeating_timer.RepeatingTimer(600, self._refresh_configuration)
+		self._timer = repeating_timer.RepeatingTimer(3, self._refresh_configuration)
 		self._timer.start()
 
 
@@ -3249,9 +3252,16 @@ class GameManager:
 		self._player = d['player']
 		self._hang_reward_list = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
-		self._boss_life=[]
-		self._boss_life_remaining=[]
-		if(self.firstDayOfMonth(datetime.today()).day == datetime.today().day) or self._is_first_start == True:
+		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
+			print("firstDayOfMonth")
+			self._is_first_start = True
+			self.is_first_month=True
+		if self.firstDayOfMonth(datetime.today()).day != datetime.today().day and self.is_first_month==True:
+			self.is_first_month=False
+		if self._is_first_start:
+			print("refresh")
+			self._boss_life=[]
+			self._boss_life_remaining=[]
 			self._is_first_start = False
 			self._world_boss = d['world_boss']
 			self._max_enter_time = self._world_boss['max_enter_time']
