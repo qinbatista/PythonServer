@@ -37,10 +37,11 @@ def chat_logger(world, in_queue, stopper):
 		today = datetime.today().strftime('%Y/%m/%d')
 		os.makedirs(f'chatlogs/{today}/', exist_ok = True)
 		with open(f'chatlogs/{today}/{world}.log', 'a') as log:
+			wait = 0
 			while not stopper.is_set() and today == datetime.today().strftime('%Y/%m/%d'):
 				try:
-					wait = 0
 					name, command, payload = in_queue.get(block = False)
+					wait = 0
 					log.write(f'{time.time()}~{name}~{command}~{payload}\n')
 				except queue.Empty:
 					time.sleep(wait)
