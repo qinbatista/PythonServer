@@ -1734,11 +1734,13 @@ class GameManager:
 
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
 		# 0 - success, user removed
+		# 95 - you can not remove yourself using this function
 		# 96 - user does not belong to your family
 		# 97 - you must be family owner to remove a user
 		# 98 - you do not belong to a family
 		game_name, fid = await self._get_familyid(world, unique_id = uid)
 		if fid is None or fid == '': return self._message_typesetting(98, 'you are not in a family.')
+		if game_name == gamename_target: return self._message_typsetting(95, 'you can not remove yourself using this function')
 		owner, fname, members = await self._get_family_information(world, fid)
 		if game_name != owner: return self._message_typesetting(97, 'you are not family owner')
 		try:
