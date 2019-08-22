@@ -409,7 +409,7 @@ class MessageHandler:
 		
 	async def _check_boss_status(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/check_boss_status', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
-			return await resp.text()
+			return await resp.text()	
 	async def _enter_world_boss_stage(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/enter_world_boss_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()	
@@ -427,7 +427,6 @@ class MessageHandler:
 	async def _create_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/create_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'fname': message['data']['fname']}) as resp:
 			return await resp.text()		
-			
 	async def _invite_user_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/invite_user_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'target': message['data']['target']}) as resp:
 			return await resp.text()			
@@ -436,9 +435,9 @@ class MessageHandler:
 			return await resp.text()		
 	async def _request_join_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/request_join_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'fname': message['data']['fname']}) as resp:
-			return await resp.text()				
-	async def _respond_family(self, message: dict, session) -> str:
-		async with session.post(self._game_manager_base_url(message['world']) + '/respond_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'nonce': message['data']['nonce']}) as resp:
+			return await resp.text()			
+	async def _respond_family(self, message: dict, session) -> str:		
+		async with session.post(self._game_manager_base_url(message['world']) + '/response_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
 			
 ###############################################################################

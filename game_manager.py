@@ -21,8 +21,11 @@ class GameManager:
 	def __init__(self, worlds = []):
 		self._initialize_pools(worlds)
 		self._is_first_start = True
+		self.is_first_month = False
+		self._boss_life=[]
+		self._boss_life_remaining=[]
 		self._refresh_configuration()
-		self._timer = repeating_timer.RepeatingTimer(600, self._refresh_configuration)
+		self._timer = repeating_timer.RepeatingTimer(3, self._refresh_configuration)
 		self._timer.start()
 
 
@@ -1731,11 +1734,13 @@ class GameManager:
 
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
 		# 0 - success, user removed
+		# 95 - you can not remove yourself using this function
 		# 96 - user does not belong to your family
 		# 97 - you must be family owner to remove a user
 		# 98 - you do not belong to a family
 		game_name, fid = await self._get_familyid(world, unique_id = uid)
 		if fid is None or fid == '': return self._message_typesetting(98, 'you are not in a family.')
+		if game_name == gamename_target: return self._message_typsetting(95, 'you can not remove yourself using this function')
 		owner, fname, members = await self._get_family_information(world, fid)
 		if game_name != owner: return self._message_typesetting(97, 'you are not family owner')
 		try:
@@ -3247,9 +3252,16 @@ class GameManager:
 		self._player = d['player']
 		self._hang_reward_list = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
-		self._boss_life=[]
-		self._boss_life_remaining=[]
-		if(self.firstDayOfMonth(datetime.today()).day == datetime.today().day) or self._is_first_start == True:
+		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
+			print("firstDayOfMonth")
+			self._is_first_start = True
+			self.is_first_month=True
+		if self.firstDayOfMonth(datetime.today()).day != datetime.today().day and self.is_first_month==True:
+			self.is_first_month=False
+		if self._is_first_start:
+			print("refresh")
+			self._boss_life=[]
+			self._boss_life_remaining=[]
 			self._is_first_start = False
 			self._world_boss = d['world_boss']
 			self._max_enter_time = self._world_boss['max_enter_time']
