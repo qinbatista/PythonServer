@@ -1740,7 +1740,7 @@ class GameManager:
 		# 98 - you do not belong to a family
 		game_name, fid = await self._get_familyid(world, unique_id = uid)
 		if fid is None or fid == '': return self._message_typesetting(98, 'you are not in a family.')
-		if game_name == gamename_target: return self._message_typsetting(95, 'you can not remove yourself using this function')
+		if game_name == gamename_target: return self._message_typesetting(95, 'you can not remove yourself using this function')
 		owner, fname, members = await self._get_family_information(world, fid)
 		if game_name != owner: return self._message_typesetting(97, 'you are not family owner')
 		try:
