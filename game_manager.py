@@ -277,11 +277,14 @@ class GameManager:
 
 	async def level_up_weapon(self, world: int, unique_id: str, weapon: str, iron: int) -> dict:
 		# - 0 - Success
+		# - 94 - Invalid weapon name
 		# - 95 - User does not have that weapon
 		# - 96 - Incoming materials are not upgraded enough
 		# - 97 - Insufficient materials, upgrade failed
 		# - 98 - Database operation error
 		# - 99 - Weapon already max level
+		if weapon not in self._weapon_config["weapons"]:
+			return self._message_typesetting(status=94, message="Invalid weapon name")
 		row = await self._get_row_by_id(world, weapon, unique_id)
 		if row[2] == 0:
 			return self._message_typesetting(95, 'User does not have that weapon')
@@ -319,10 +322,13 @@ class GameManager:
 
 	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str) -> dict:
 		# - 0 - Success
+		# - 94 - Invalid weapon name
 		# - 96 - User does not have that weapon
 		# - 97 - Insufficient skill points, upgrade failed
 		# - 98 - Database operation error
 		# - 99 - Passive skill does not exist
+		if weapon not in self._weapon_config["weapons"]:
+			return self._message_typesetting(status=94, message="Invalid weapon name")
 		row = await self._get_row_by_id(world, weapon, unique_id)
 		if row[2] == 0:
 			return self._message_typesetting(status=96, message="User does not have that weapon")
@@ -382,13 +388,16 @@ class GameManager:
 
 	async def reset_weapon_skill_point(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Success
+		# - 94 - Invalid weapon name
 		# - 97 - no weapon
 		# - 98 - insufficient gold coins, upgrade failed
 		# - 99 - database operation error!
 
+		if weapon not in self._weapon_config["weapons"]:
+			return self._message_typesetting(status=94, message="Invalid weapon name")
 		row = await self._get_row_by_id(world, weapon, unique_id)
 		if row[2] == 0:
-			return self._message_typesetting(97, 'no weapon!')
+			return self._message_typesetting(97, 'no weapon')
 		data = await self.try_coin(world, unique_id, -1 * self._weapon_config["standard_reset_weapon_skill_coin_count"])
 		if int(data["status"]) == 1:
 			return self._message_typesetting(98, "Insufficient gold coins, upgrade failed")
@@ -431,42 +440,40 @@ class GameManager:
 
 	# TODO INTERNAL USE only?????
 	async def try_unlock_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
-		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 2 - no weapon!
-		try:
-			row = await self._get_row_by_id(world=world, weapon=weapon, unique_id=unique_id)
-			if row[2] != 0:  # weapon_star
-				row[9] += self._weapon_config["standard_segment_count"]  # segment
-				sql_str = f"update weapon set weapon_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and weapon_name='{weapon}'"
-				await self._execute_statement_update(world=world, statement=sql_str)
-				return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'star', 'segment'], "values": [weapon, row[2], row[9]]})
-			else:
-				row[2] += 1  # weapon_star
-				sql_str = f"update weapon set weapon_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and weapon_name='{weapon}'"
-				await self._execute_statement_update(world=world, statement=sql_str)
-				return self._message_typesetting(0, 'Unlocked new weapon!', {"keys": ["weapon", 'star', 'segment'], "values": [weapon, row[2], row[9]]})
-		except:
-			return self._message_typesetting(2, 'no weapon!')
+		# - 0 - Unlocked new weapon!   ===> {"keys": ['weapon', 'star', 'segment'], "values": [weapon, star, segment]}
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'star', 'segment'], "values": [weapon, star, segment]}
+		# - 99 - Invalid weapon name
+		if weapon not in self._weapon_config["weapons"]:
+			return self._message_typesetting(status=99, message="Invalid weapon name")
+		row = await self._get_row_by_id(world=world, weapon=weapon, unique_id=unique_id)
+		if row[2] != 0:  # weapon_star
+			row[9] += self._weapon_config["standard_segment_count"]  # segment
+			sql_str = f"update weapon set weapon_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and weapon_name='{weapon}'"
+			await self._execute_statement_update(world=world, statement=sql_str)
+			return self._message_typesetting(1, 'Weapon already unlocked, got free segment!', {"keys": ['weapon', 'star', 'segment'], "values": [weapon, row[2], row[9]]})
+		else:
+			row[2] += 1  # weapon_star
+			sql_str = f"update weapon set weapon_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and weapon_name='{weapon}'"
+			await self._execute_statement_update(world=world, statement=sql_str)
+			return self._message_typesetting(0, 'Unlocked new weapon!', {"keys": ["weapon", 'star', 'segment'], "values": [weapon, row[2], row[9]]})
 
 	async def try_unlock_role(self, world: int, unique_id: str, role: str) -> dict:
-		# - 0 - Unlocked new role!   ===> {"keys": ["role"], "values": [role]}
-		# - 1 - Role already unlocked, got free segment   ===>  {"keys": ['role', 'segment'], "values": [role, segment]}
-		# - 2 - no role!
-		try:
-			row = await self._get_role_row_by_id(world=world, role=role, unique_id=unique_id)
-			if row[2] != 0:  # role_star
-				row[9] += self._role_config["standard_segment_count"]  # segment
-				sql_str = f"update role set role_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and role_name='{role}'"
-				await self._execute_statement_update(world=world, statement=sql_str)
-				return self._message_typesetting(1, 'Role already unlocked, got free segment', {'keys' : ['role', 'star', 'segment'], 'values' : [role, row[2], row[9]]})
-			else:
-				row[2] += 1  # role_star
-				sql_str = f"update role set role_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and role_name='{role}'"
-				await self._execute_statement_update(world=world, statement=sql_str)
-				return self._message_typesetting(0, 'Unlocked new role!', {'keys' : ['role', 'star', 'segment'], 'values' : [role, row[2], row[9]]})
-		except:
-			return self._message_typesetting(2, 'no role!')
+		# - 0 - Unlocked new role!   ===> {"keys": ['role', 'star', 'segment'], "values": [role, star, segment]}
+		# - 1 - Role already unlocked, got free segment   ===>  {"keys": ['role', 'star', 'segment'], "values": [role, star, segment]}
+		# - 99 - Invalid role name
+		if role not in self._role_config["roles"]:
+			return self._message_typesetting(status=99, message="Invalid role name")
+		row = await self._get_role_row_by_id(world=world, role=role, unique_id=unique_id)
+		if row[2] != 0:  # role_star
+			row[9] += self._role_config["standard_segment_count"]  # segment
+			sql_str = f"update role set role_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and role_name='{role}'"
+			await self._execute_statement_update(world=world, statement=sql_str)
+			return self._message_typesetting(1, 'Role already unlocked, got free segment', {'keys' : ['role', 'star', 'segment'], 'values' : [role, row[2], row[9]]})
+		else:
+			row[2] += 1  # role_star
+			sql_str = f"update role set role_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and role_name='{role}'"
+			await self._execute_statement_update(world=world, statement=sql_str)
+			return self._message_typesetting(0, 'Unlocked new role!', {'keys' : ['role', 'star', 'segment'], 'values' : [role, row[2], row[9]]})
 
 	async def disintegrate_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# 0 - successful weapon decomposition
@@ -542,11 +549,14 @@ class GameManager:
 
 	async def upgrade_role_level(self, world: int, unique_id: str, role: str, experience_potion: int) -> dict:
 		# - 0 - Success
+		# - 94 - Invalid role name
 		# - 95 - User does not have that role
 		# - 96 - Incoming materials are not upgraded enough
 		# - 97 - Insufficient materials, upgrade failed
 		# - 98 - Database operation error
 		# - 99 - role already max level
+		if role not in self._role_config["roles"]:
+			return self._message_typesetting(status=94, message="Invalid role name")
 		row = await self._get_role_row_by_id(world, role, unique_id)
 		if row[2] == 0:
 			return self._message_typesetting(95, 'User does not have that role')
@@ -584,8 +594,11 @@ class GameManager:
 
 	async def upgrade_role_star(self, world: int, unique_id: str, role: str) -> dict:
 		# - 0 - role upgrade success
+		# - 94 - Invalid role name
 		# - 98 - insufficient segment, upgrade failed
 		# - 99 - Skill has been reset or database operation error!
+		if role not in self._role_config["roles"]:
+			return self._message_typesetting(status=94, message="Invalid role name")
 		data_tuple = (await self.get_all_head(world, 'role'))["remaining"]
 		head = [x[0] for x in data_tuple]
 		row = await self._get_role_row_by_id(world, role, unique_id)
@@ -1263,7 +1276,7 @@ class GameManager:
 		# success ===> 0 and 1
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
 		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 2 - no weapon!
+		# - 99 - Invalid weapon name
 		tier_choice = (random.choices(self._lottery['weapons']['names'], self._lottery['weapons']['weights'][kind]))[0]
 		gift_weapon = (random.choices(self._lottery['weapons']['items'][tier_choice]))[0]
 		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
@@ -1271,8 +1284,8 @@ class GameManager:
 	async def random_gift_role(self, world: int, unique_id: str, kind: str) -> dict:
 		# success ===> 0 and 1
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
-		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['weapon', 'segment'], "values": [weapon, segment]}
-		# - 2 - no weapon!
+		# - 1 - Weapon already unlocked, got free segment   ===>  {"keys": ['role', 'segment'], "values": [weapon, segment]}
+		# - 99 - Invalid role name
 		tier_choice = (random.choices(self._lottery['roles']['names'], self._lottery['roles']['weights'][kind]))[0]
 		gift_role = (random.choices(self._lottery['roles']['items'][tier_choice]))[0]
 		return await self.try_unlock_role(world, unique_id, gift_role)
