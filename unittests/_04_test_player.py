@@ -265,8 +265,12 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8100/purchase_scroll_mall', data={"world": 0, "unique_id": unique_id, "scroll_type": "pro_summon_scroll", "quantity": 2})
+	result = requests.post('http://localhost:8100/level_up_role_star', data={"world": 0, "unique_id": "4", "role": "role1"})
 	print(str(result.text))
+	# result = requests.post('http://localhost:8100/level_up_role', data={"world": 0, "unique_id": "4", "role": "role1", "experience_potion": 60})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8100/purchase_scroll_mall', data={"world": 0, "unique_id": unique_id, "scroll_type": "pro_summon_scroll", "quantity": 2})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/request_friend', data={"world": 0, "unique_id": unique_id, "friend_name": "a"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/leave_family', data={"world": 0, "unique_id": "1", "fname": "a"})
