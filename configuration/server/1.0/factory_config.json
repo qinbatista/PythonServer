@@ -396,7 +396,48 @@
 	},
 	"equipment_factory": {
 		"time_consuming": 30,
-		"cost": {"iron": 20}
+		"cost": {"iron": 20},
+		"armor_kind": ["armor1", "armor2", "armor3", "armor4", "armor5", "armor6", "armor7", "armor8", "armor9", "armor10"],
+		"armor1": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		},
+		"armor2": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		},
+		"armor3": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		},
+		"armor4": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		},
+		"armor5": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		},
+		"armor6": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		},
+		"armor7": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		},
+		"armor8": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		},
+		"armor9": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		},
+		"armor10": {
+			"time_consuming": 30,
+			"cost": {"iron": 20}
+		}
 	},
 	"wishing_pool": {
 		"storage_level_limit": 30,

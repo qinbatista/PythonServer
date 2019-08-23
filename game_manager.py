@@ -1072,7 +1072,6 @@ class GameManager:
 				remaining.pop('unique_id')
 				return self._message_typesetting(2, 'Refresh time is not over yet, market information has been obtained', {'remaining' : remaining})
 
-
 	async def manually_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		# 0  - refresh market success
@@ -1117,8 +1116,6 @@ class GameManager:
 			return self._message_typesetting(0, 'refresh market success', {'remaining' : remaining})
 		else:
 			return self._message_typesetting(97, 'insufficient refreshable quantity')
-					
-
 
 	async def diamond_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
@@ -1162,7 +1159,6 @@ class GameManager:
 				remaining.update({'merchandise%s' % code : merchandise, 'merchandise%s_quantity' % code : merchandise_quantity, 'currency_type%s' % code : currency_type, 'currency_type%s_price' % code : currency_type_price})
 			remaining.update({'refresh_time' : refresh_time, 'refreshable_quantity' : int(refreshable_quantity)})
 			return self._message_typesetting(0, 'refresh market success', {'remaining' : remaining})
-
 
 	async def black_market_transaction(self, world: int, unique_id: str, code: int) -> dict:
 		# 0  : gain weapon fragments
@@ -1270,7 +1266,6 @@ class GameManager:
 			return self._message_typesetting(1, 'You received a free scroll', {'keys' : [skill_scroll_id], 'values' : [data['remaining']]})
 		else:
 			return self._message_typesetting(2, 'Invalid skill name')
-
 
 	async def random_gift_weapon(self, world: int, unique_id: str, kind: str) -> dict:
 		# success ===> 0 and 1
@@ -2377,6 +2372,9 @@ class GameManager:
 		if reward:
 			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
+
+	async def equipment_manufacturing_armor(self, world: int, unique_id: str, armor_kind: str) -> dict:
+		pass
 
 	async def buy_workers(self, world: int, unique_id: str, workers_quantity: int) -> dict:
 		"""
