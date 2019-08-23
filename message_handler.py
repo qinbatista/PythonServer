@@ -409,7 +409,7 @@ class MessageHandler:
 		
 	async def _check_boss_status(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/check_boss_status', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
-			return await resp.text()		
+			return await resp.text()	
 	async def _enter_world_boss_stage(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/enter_world_boss_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()	
@@ -427,7 +427,6 @@ class MessageHandler:
 	async def _create_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/create_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'fname': message['data']['fname']}) as resp:
 			return await resp.text()		
-			
 	async def _invite_user_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/invite_user_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'target': message['data']['target']}) as resp:
 			return await resp.text()			
@@ -436,8 +435,8 @@ class MessageHandler:
 			return await resp.text()		
 	async def _request_join_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/request_join_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'fname': message['data']['fname']}) as resp:
-			return await resp.text()				
-	async def _response_family(self, message: dict, session) -> str:
+			return await resp.text()			
+	async def _respond_family(self, message: dict, session) -> str:		
 		async with session.post(self._game_manager_base_url(message['world']) + '/response_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
 			
@@ -539,10 +538,6 @@ FUNCTION_LIST = {
 	'delete_mail': MessageHandler._delete_mail,
 	'delete_all_mail': MessageHandler._delete_all_mail,
 	
-	'check_boss_status' : MessageHandler._check_boss_status,
-	'enter_world_boss_stage' : MessageHandler._enter_world_boss_stage,
-	'leave_world_boss_stage' : MessageHandler._leave_world_boss_stage,
-	'get_top_damage' : MessageHandler._get_top_damage,
 	
 	'check_boss_status' : MessageHandler._check_boss_status,
 	'enter_world_boss_stage' : MessageHandler._enter_world_boss_stage,
@@ -554,7 +549,7 @@ FUNCTION_LIST = {
 	'invite_user_family' : MessageHandler._invite_user_family,
 	'remove_user_family' : MessageHandler._remove_user_family,
 	'request_join_family' : MessageHandler._request_join_family,
-	'response_family' : MessageHandler._response_family,
+	'respond_family' : MessageHandler._respond_family
 
 
 }   
