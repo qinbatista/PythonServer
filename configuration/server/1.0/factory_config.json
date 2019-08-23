@@ -395,8 +395,6 @@
 		}
 	},
 	"equipment_factory": {
-		"time_consuming": 30,
-		"cost": {"iron": 20},
 		"armor_kind": ["armor1", "armor2", "armor3", "armor4", "armor5", "armor6", "armor7", "armor8", "armor9", "armor10"],
 		"armor1": {
 			"time_consuming": 30,
