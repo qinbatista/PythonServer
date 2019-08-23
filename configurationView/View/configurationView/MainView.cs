@@ -1747,12 +1747,6 @@ namespace configurationView
         }
         #endregion
 
-        #region Panel4
-        #endregion
-
-        #region Panel5
-        #endregion
-
         private void FunctionOption_SelectedIndexChanged(object sender, EventArgs e)
         {
             Panel1.Visible = false;
