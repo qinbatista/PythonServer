@@ -540,7 +540,7 @@ class GameManager:
 #						Start Role Module Functions							#
 #############################################################################
 
-	async def level_up_role(self, world: int, unique_id: str, role: str, experience_potion: int) -> dict:
+	async def upgrade_role_level(self, world: int, unique_id: str, role: str, experience_potion: int) -> dict:
 		# - 0 - Success
 		# - 95 - User does not have that role
 		# - 96 - Incoming materials are not upgraded enough
@@ -582,7 +582,7 @@ class GameManager:
 		remaining.pop('unique_id')
 		return self._message_typesetting(status=0, message='success', data={'remaining': remaining})
 
-	async def level_up_role_star(self, world: int, unique_id: str, role: str) -> dict:
+	async def upgrade_role_star(self, world: int, unique_id: str, role: str) -> dict:
 		# - 0 - role upgrade success
 		# - 98 - insufficient segment, upgrade failed
 		# - 99 - Skill has been reset or database operation error!
@@ -3618,16 +3618,16 @@ async def __get_all_stage_info(request: web.Request) -> web.Response:
 ####################    role      ####################
 ######################################################
 
-@ROUTES.post('/level_up_role')
-async def _level_up_role(request: web.Request) -> web.Response:
+@ROUTES.post('/upgrade_role_level')
+async def _upgrade_role_level(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).level_up_role(int(post['world']), post['unique_id'], post['role'], int(post['experience_potion']))
+	result = await (request.app['MANAGER']).upgrade_role_level(int(post['world']), post['unique_id'], post['role'], int(post['experience_potion']))
 	return _json_response(result)
 
-@ROUTES.post('/level_up_role_star')
-async def _level_up_role_star(request: web.Request) -> web.Response:
+@ROUTES.post('/upgrade_role_star')
+async def _upgrade_role_star(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).level_up_role_star(int(post['world']), post['unique_id'], post['role'])
+	result = await (request.app['MANAGER']).upgrade_role_star(int(post['world']), post['unique_id'], post['role'])
 	return _json_response(result)
 
 
