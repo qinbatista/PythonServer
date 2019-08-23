@@ -95,6 +95,7 @@ def create_table_factory(cursor):
 	  `wishing_pool_timer` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '许愿的开始时间',
 	  `acceleration_end_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '加速结束时间',
 	  `wishing_pool_times` int(11) unsigned DEFAULT 0 COMMENT '许愿池次数',
+	  `equipment_product_type` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '设备工厂产品类型',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
@@ -338,6 +339,7 @@ def already_exists(world):
 	return True
 
 if __name__ == '__main__':
+	# create_world("aliya")
 	world = input('Enter world name: ')
 	if not already_exists(world):
 		create_world(world)
