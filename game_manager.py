@@ -194,6 +194,23 @@ class GameManager:
 	async def try_small_energy_potion(self, world: int, unique_id: str, value: int) -> dict:
 		return await self._try_material(world, unique_id, 'small_energy_potion', value)
 
+	async def try_armor(self, world: int, unique_id: str, armor_id: str, armor_level: str, value: int) -> dict:
+		select_str = f"select {armor_level} from armor where unique_id='{unique_id}' and armor_id='{armor_id}'"
+		insert_str = f"insert into armor(unique_id, armor_id, {armor_level}) values('{unique_id}', '{armor_id}', {value})"
+		update_str = f"update armor set {armor_level}={armor_level}+{value} where unique_id='{unique_id}' and armor_id='{armor_id}'"
+		select_data = await self._execute_statement(world=world, statement=select_str)
+		if select_data:
+			if not value:
+				return self._internal_format(status=0, remaining=select_data[0][0])
+			remaining = select_data[0][0] + value
+			if remaining < 0:
+				return self._internal_format(status=1, remaining=remaining)
+			status = await self._execute_statement_update(world=world, statement=update_str)
+			return self._internal_format(status=1 - status, remaining=remaining)
+		else:
+			status = await self._execute_statement_update(world=world, statement=insert_str)
+			return self._internal_format(status=1 - status, remaining=value)
+
 #############################################################################
 #						End Bag Module Functions							#
 #############################################################################
@@ -2161,10 +2178,6 @@ class GameManager:
 		remaining = {"equipment_factory_workers": equipment_factory_workers}
 		reward = {"equipment_increment": 0}
 		if equipment_start_time:
-			##############################################################
-			# 将equipment_storage中的数量写入盔甲表中                    #
-			# 2019年8月23日17点52分 houyao                               #
-			##############################################################
 			if not equipment_product_type:
 				equipment_product_type = "armor1"
 			for i in range(times):
@@ -2298,14 +2311,9 @@ class GameManager:
 				remaining.update({"crystal_storage": crystal_storage})
 				remaining.update({"crystal_start_time": crystal_start_time})
 			if equipment_start_time:
-				##############################################################
-				# 将equipment_storage中的数量写入盔甲表中                    #
-				# 2019年8月23日17点52分 houyao                               #
-				##############################################################
 				if not equipment_product_type:
 					equipment_product_type = "armor1"
 				cost_iron = equipment_factory[equipment_product_type]["cost"]["iron"]
-				# print(f"equipment==>iron_storage: {iron_storage}")
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
 				equipment_increment = int(time_difference.total_seconds()) // equipment_factory[equipment_product_type]["time_consuming"] * equipment_factory_workers * acceleration_value
 				if iron_storage // cost_iron < equipment_increment:
@@ -2391,13 +2399,34 @@ class GameManager:
 			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
 
-	async def equipment_manufacturing_armor(self, world: int, unique_id: str, armor_kind: str) -> dict:
-		##############################################################
-		# 将equipment_storage中的数量写入盔甲表中                    #
-		# 然后计算所有的盔甲，放入盔甲表中                           #
-		# 2019年8月23日17点52分 houyao                               #
-		##############################################################
-		pass
+	async def equipment_manufacturing_armor(self, world: int, unique_id: str, armor_id: str) -> dict:
+		"""
+		0 - Successfully opened manufacturing armor
+		1 - Armor table update failed, factory has been updated
+		99 - No such armor type
+		"""
+		equipment_factory = self._factory_config["equipment_factory"]
+		if armor_id not in equipment_factory["armor_id"]:
+			return self._message_typesetting(status=99, message="No such armor type")
+		remaining = {}
+		reward = {}
+		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		if result["status"] == 0:
+			remaining = result["data"]["remaining"]
+			reward = result["data"]["reward"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		sql_armor_quantity = factory_data[17]
+		sql_armor_id = factory_data[22]
+		if sql_armor_id and sql_armor_quantity:
+			reward.update({"armor_id": sql_armor_id, "armor_quantity": sql_armor_quantity})
+			armor_data = await self.try_armor(world=world, unique_id=unique_id, armor_id=sql_armor_id, armor_level="armor_level1", value=sql_armor_quantity)
+			if armor_data["status"]:
+				return self._message_typesetting(status=1, message="Armor table update failed, factory has been updated", data={"remaining": remaining, "reward": reward})
+			remaining.update({"armor_id": sql_armor_id, "armor_quantity": armor_data["remaining"]})
+		update_str = f"update factory set equipment_storage=0, equipment_product_type='{armor_id}' where unique_id='{unique_id}'"
+		await self._execute_statement_update(world=world, statement=update_str)
+		remaining.update({"finally_equipment_storage": 0, "finally_equipment_product_type": armor_id})
+		return self._message_typesetting(status=0, message="Successfully opened manufacturing armor", data={"remaining": remaining, "reward": reward})
 
 	async def buy_workers(self, world: int, unique_id: str, workers_quantity: int) -> dict:
 		"""
@@ -4104,6 +4133,13 @@ async def _refresh_equipment_storage(request: web.Request) -> web.Response:
 async def _distribution_workers(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).distribution_workers(int(post['world']), post['unique_id'], int(post['workers_quantity']), post['factory_kind'])
+	return _json_response(result)
+
+
+@ROUTES.post('/equipment_manufacturing_armor')
+async def _equipment_manufacturing_armor(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).equipment_manufacturing_armor(int(post['world']), post['unique_id'], post['armor_kind'])
 	return _json_response(result)
 
 
