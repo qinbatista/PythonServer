@@ -204,6 +204,7 @@ class ChatServer:
 	async def _cleanup(self, name, writer):
 		with contextlib.suppress(KeyError):
 			self.families[self.users[name]['fid']]['members'].remove(name)
+		with contextlib.suppress(KeyError):
 			del self.users[name]
 		await self._close_connection(writer)
 
