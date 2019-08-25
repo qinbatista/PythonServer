@@ -9,7 +9,8 @@
 	},
 	"2":{
 		"iron": 20,
-		"coin": 60
+		"coin": 60,
+		"basic_summon_scroll": [1, 50000]
 	},
 	"3":{
 		"iron": 30,

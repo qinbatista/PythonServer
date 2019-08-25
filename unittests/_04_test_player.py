@@ -12,7 +12,7 @@ print(str(os.getpid()))
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-GAME_MANAGER_BASE_URL = 'http://localhost:8004'
+GAME_MANAGER_BASE_URL = 'http://localhost:8100'
 # GAME_MANAGER_BASE_URL = 'http://localhost:8007'
 # GAME_MANAGER_BASE_URL = 'http://localhost:8006'
 
@@ -398,7 +398,7 @@ if __name__ == "__main__":
 	# try_all_material()
 	# try_energy()
 	# start_hang_up()
-	# get_hang_up_reward()
+	get_hang_up_reward()
 	# enter_stage(stage=1)
 	# enter_tower(stage=3)
 	# disintegrate_weapon()
@@ -442,7 +442,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	all_function(unique_id="1")
+	# all_function(unique_id="1")
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")

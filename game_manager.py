@@ -841,11 +841,11 @@ class GameManager:
 		# 此时的material_dict字典的值是给奖励列表的，
 		# 所以hang_stage是奖励之前的关卡，
 		# hang_up_time是之前挂起的开始时间
+		probability_reward = self._hang_reward_list["probability_reward"]
 		material_dict = {}
-		probability_reward = self._hang_reward_list["self._hang_reward_list"]
-		probability_head = {}
+		probability_dict = {}
 		for key, value in self._hang_reward_list[str(hang_stage)].items():
-			if key in probability_reward: probability_head.update({key: value})
+			if key in probability_reward: probability_dict.update({key: value})
 			else: material_dict.update({key: value})
 		material_dict.update({"hang_stage": hang_stage})
 		material_dict.update({"hang_up_time": hang_up_time})
@@ -871,6 +871,9 @@ class GameManager:
 			for key in material_dict.keys():
 				if key not in key_word:
 					material_dict[key] = int(material_dict[key]) * minute
+
+			for key, value in probability_dict.items():  # 完成minute次十万分之value[1]的概率抽到value[0]个特殊的key奖励
+				material_dict.update({key: sum(random.choices(value[1]*[value[0]] + (100000 - value[1])*[0], k=minute))})
 			keys = list(material_dict.keys())
 
 			# 此时的material_dict中的数据是用于数据库操作的数据
@@ -905,9 +908,12 @@ class GameManager:
 			# 此时的material_dict字典的值是给奖励列表的，
 			# 所以hang_stage是奖励之前的关卡，
 			# hang_up_time是之前挂起的开始时间
+			probability_reward = self._hang_reward_list["probability_reward"]
 			material_dict = {}
+			probability_dict = {}
 			for key, value in self._hang_reward_list[str(hang_stage)].items():
-				material_dict.update({key: value})
+				if key in probability_reward: probability_dict.update({key: value})
+				else: material_dict.update({key: value})
 			material_dict.update({"hang_stage": hang_stage})
 			material_dict.update({"hang_up_time": hang_up_time})
 			key_word = ["hang_stage", "hang_up_time"]
@@ -919,6 +925,9 @@ class GameManager:
 			for key in material_dict.keys():
 				if key not in key_word:
 					material_dict[key] = int(material_dict[key]) * minute
+
+			for key, value in probability_dict.items():  # 完成minute次十万分之value[1]的概率抽到value[0]个特殊的key奖励
+				material_dict.update({key: sum(random.choices(value[1]*[value[0]] + (100000 - value[1])*[0], k=minute))})
 			keys = list(material_dict.keys())
 
 			# 此时的material_dict中的数据是用于数据库操作的数据
