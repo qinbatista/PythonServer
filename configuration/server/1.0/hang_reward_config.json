@@ -34,5 +34,13 @@
 	"8":{
 		"iron": 80,
 		"coin": 240
-	}
+	},
+	"probability_reward": [
+		"basic_summon_scroll",
+		"pro_summon_scroll",
+		"prophet_summon_scroll",
+		"skill_scroll_10",
+		"skill_scroll_30",
+		"skill_scroll_100"
+	]
 }

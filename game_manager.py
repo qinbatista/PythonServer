@@ -842,8 +842,11 @@ class GameManager:
 		# 所以hang_stage是奖励之前的关卡，
 		# hang_up_time是之前挂起的开始时间
 		material_dict = {}
+		probability_reward = self._hang_reward_list["self._hang_reward_list"]
+		probability_head = {}
 		for key, value in self._hang_reward_list[str(hang_stage)].items():
-			material_dict.update({key: value})
+			if key in probability_reward: probability_head.update({key: value})
+			else: material_dict.update({key: value})
 		material_dict.update({"hang_stage": hang_stage})
 		material_dict.update({"hang_up_time": hang_up_time})
 		key_word = ["hang_stage", "hang_up_time"]
