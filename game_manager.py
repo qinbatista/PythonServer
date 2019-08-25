@@ -1072,7 +1072,6 @@ class GameManager:
 				remaining.pop('unique_id')
 				return self._message_typesetting(2, 'Refresh time is not over yet, market information has been obtained', {'remaining' : remaining})
 
-
 	async def manually_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		# 0  - refresh market success
@@ -1117,8 +1116,6 @@ class GameManager:
 			return self._message_typesetting(0, 'refresh market success', {'remaining' : remaining})
 		else:
 			return self._message_typesetting(97, 'insufficient refreshable quantity')
-					
-
 
 	async def diamond_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
@@ -1162,7 +1159,6 @@ class GameManager:
 				remaining.update({'merchandise%s' % code : merchandise, 'merchandise%s_quantity' % code : merchandise_quantity, 'currency_type%s' % code : currency_type, 'currency_type%s_price' % code : currency_type_price})
 			remaining.update({'refresh_time' : refresh_time, 'refreshable_quantity' : int(refreshable_quantity)})
 			return self._message_typesetting(0, 'refresh market success', {'remaining' : remaining})
-
 
 	async def black_market_transaction(self, world: int, unique_id: str, code: int) -> dict:
 		# 0  : gain weapon fragments
@@ -1270,7 +1266,6 @@ class GameManager:
 			return self._message_typesetting(1, 'You received a free scroll', {'keys' : [skill_scroll_id], 'values' : [data['remaining']]})
 		else:
 			return self._message_typesetting(2, 'Invalid skill name')
-
 
 	async def random_gift_weapon(self, world: int, unique_id: str, kind: str) -> dict:
 		# success ===> 0 and 1
@@ -2151,6 +2146,8 @@ class GameManager:
 		equipment_storage = factory_data[17]
 		# 数据库中的加速时间
 		acceleration_end_time = factory_data[20]
+		# 数据库中的制造的盔甲类型
+		equipment_product_type = factory_data[22]
 		acceleration_value = 1
 		times = 1
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -2164,13 +2161,19 @@ class GameManager:
 		remaining = {"equipment_factory_workers": equipment_factory_workers}
 		reward = {"equipment_increment": 0}
 		if equipment_start_time:
+			##############################################################
+			# 将equipment_storage中的数量写入盔甲表中                    #
+			# 2019年8月23日17点52分 houyao                               #
+			##############################################################
+			if not equipment_product_type:
+				equipment_product_type = "armor1"
 			for i in range(times):
 				if times == 2 and i == 1:
 					acceleration_value = 1
 					current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-				cost_iron = equipment_factory["cost"]["iron"]
+				cost_iron = equipment_factory[equipment_product_type]["cost"]["iron"]
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
-				equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers * acceleration_value
+				equipment_increment = int(time_difference.total_seconds()) // equipment_factory[equipment_product_type]["time_consuming"] * equipment_factory_workers * acceleration_value
 				if equipment_increment < 0: continue
 				if iron_storage // cost_iron < equipment_increment:
 					equipment_increment = iron_storage // cost_iron
@@ -2182,7 +2185,7 @@ class GameManager:
 				remaining.update({"iron_storage": iron_storage})
 				remaining.update({"equipment_storage": equipment_storage})
 				remaining.update({"equipment_start_time": equipment_start_time})
-				sql_str = f"update factory set equipment_storage={equipment_storage}, equipment_factory_timer='{equipment_start_time}' where unique_id='{unique_id}'"
+				sql_str = f"update factory set equipment_storage={equipment_storage}, equipment_factory_timer='{equipment_start_time}', equipment_product_type='{equipment_product_type}' where unique_id='{unique_id}'"
 				await self._execute_statement_update(world=world, statement=sql_str)
 
 			return self._message_typesetting(status=0, message="Equipment factory update success", data={"remaining": remaining, "reward": reward})
@@ -2220,6 +2223,8 @@ class GameManager:
 		equipment_storage = factory_data[17]
 		# 数据库中的加速时间
 		acceleration_end_time = factory_data[20]
+		# 数据库中的制造的盔甲类型
+		equipment_product_type = factory_data[22]
 
 		remaining = {"food_factory_workers": food_factory_workers, "mine_factory_workers": mine_factory_workers, "crystal_factory_workers": crystal_factory_workers, "equipment_factory_workers": equipment_factory_workers}
 		reward = {"food_increment": 0, "iron_increment": 0, "crystal_increment": 0, "equipment_increment": 0}
@@ -2293,22 +2298,30 @@ class GameManager:
 				remaining.update({"crystal_storage": crystal_storage})
 				remaining.update({"crystal_start_time": crystal_start_time})
 			if equipment_start_time:
-				cost_iron = equipment_factory["cost"]["iron"]
+				##############################################################
+				# 将equipment_storage中的数量写入盔甲表中                    #
+				# 2019年8月23日17点52分 houyao                               #
+				##############################################################
+				if not equipment_product_type:
+					equipment_product_type = "armor1"
+				cost_iron = equipment_factory[equipment_product_type]["cost"]["iron"]
 				# print(f"equipment==>iron_storage: {iron_storage}")
 				time_difference = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(equipment_start_time, '%Y-%m-%d %H:%M:%S')
-				equipment_increment = int(time_difference.total_seconds()) // equipment_factory["time_consuming"] * equipment_factory_workers * acceleration_value
+				equipment_increment = int(time_difference.total_seconds()) // equipment_factory[equipment_product_type]["time_consuming"] * equipment_factory_workers * acceleration_value
 				if iron_storage // cost_iron < equipment_increment:
 					equipment_increment = iron_storage // cost_iron
 				iron_storage -= equipment_increment * cost_iron
 				equipment_storage += equipment_increment
 				reward["equipment_increment"] += equipment_increment
 				reward.update({"equipment_start_time": equipment_start_time})
+				reward.update({"equipment_product_type": equipment_product_type})
 				equipment_start_time = current_time
 				remaining.update({"iron_storage": iron_storage})
 				remaining.update({"equipment_storage": equipment_storage})
 				remaining.update({"equipment_start_time": equipment_start_time})
+				remaining.update({"equipment_product_type": equipment_product_type})
 
-			sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{food_start_time}', mine_factory_timer='{mine_start_time}', crystal_factory_timer='{crystal_start_time}', equipment_factory_timer='{equipment_start_time}' where unique_id='{unique_id}'"
+			sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{food_start_time}', mine_factory_timer='{mine_start_time}', crystal_factory_timer='{crystal_start_time}', equipment_factory_timer='{equipment_start_time}', equipment_product_type='{equipment_product_type}' where unique_id='{unique_id}'"
 			await self._execute_statement_update(world=world, statement=sql_str)
 		if remaining:
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
@@ -2377,6 +2390,14 @@ class GameManager:
 		if reward:
 			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
+
+	async def equipment_manufacturing_armor(self, world: int, unique_id: str, armor_kind: str) -> dict:
+		##############################################################
+		# 将equipment_storage中的数量写入盔甲表中                    #
+		# 然后计算所有的盔甲，放入盔甲表中                           #
+		# 2019年8月23日17点52分 houyao                               #
+		##############################################################
+		pass
 
 	async def buy_workers(self, world: int, unique_id: str, workers_quantity: int) -> dict:
 		"""
