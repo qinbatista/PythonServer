@@ -3032,6 +3032,7 @@ class GameManager:
 			else:
 				return self._message_typesetting(95, 'operation error')
 
+
 	async def _enter_world_boss_stage(self, world: int, unique_id: str):
 		#0 enter world success
 		#1 enter world success and you had never enter before
@@ -3054,7 +3055,7 @@ class GameManager:
 				},
 				'reward':
 				{
-					"world_boss_enter_time":(d2-d1).seconds,
+					"world_boss_enter_time": int((d2-d1).total_seconds()),
 					'world_boss_remaining_times' : 1
 				}
 			}
@@ -3076,7 +3077,7 @@ class GameManager:
 					},
 					'reward':
 					{
-						"world_boss_enter_time":(d2-d1).seconds,
+						"world_boss_enter_time": int((d2-d1).total_seconds()),
 						'world_boss_remaining_times' : 1
 					}
 				}
@@ -3131,7 +3132,7 @@ class GameManager:
 					'remaining' :
 					{
 						'world_boss_enter_time':current_time1,
-						'world_boss_remaining_times':(d2-d1).seconds,
+						'world_boss_remaining_times':int((d2-d1).total_seconds()),
 						'boss1' : "%.2f" %(int(self._boss_life_remaining[0])/int(self._boss_life[0])),
 						'boss2' : "%.2f" %(int(self._boss_life_remaining[1])/int(self._boss_life[1])),
 						'boss3' : "%.2f" %(int(self._boss_life_remaining[2])/int(self._boss_life[2])),
@@ -3233,6 +3234,7 @@ class GameManager:
 		for index in range(0,len(data_users)):
 			message_dic["remaining"].update({index:{data_users[index][0]:data_leader_board[index][2]}})
 		return self._message_typesetting(status=0, message="get top "+str(range_number*10)+" damage",data= message_dic)
+
 
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, f"SELECT energy, recover_time FROM player WHERE unique_id='{unique_id}';")
