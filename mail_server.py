@@ -14,6 +14,7 @@ import configparser
 
 from aiohttp import web
 from datetime import datetime
+from collections import defaultdict
 
 DIRNAME = os.path.dirname(os.path.realpath(__file__)) + '/box'
 
@@ -22,6 +23,7 @@ class MailServer:
 		self._box = mailbox.Maildir(DIRNAME)
 	
 	# TODO refactor code
+	''''''
 	def send_mail(self, world: int, uid_to: str, **kwargs):
 		# 0 - successfully sent mail
 		# 60 - invalid request format
@@ -35,11 +37,21 @@ class MailServer:
 			return self._message_typesetting(60, 'invalid request format')
 		except mailbox.NoSuchMailboxError:
 			recipient_folder = self._box.get_folder(str(world)).add_folder(uid_to)
-		recipient_folder.add(msg)
+		key = recipient_folder.add(msg)
+		m = recipient_folder[key]
+		m['key'] = key
+		recipient_folder[key] = m
 		return self._message_typesetting(0, 'success')
 
 
 
+	'''
+	Returns all the previously un-fetched mail in the 'new' folder.
+	'simple' typed messages will be moved to the 'cur' folder.
+	Messages requiring a nonce will request a nonce from the token server
+	if they have not done that already.
+	Non-'simple' typed messages are kept in the 'new' folder.
+	'''
 	def get_new_mail(self, world: int, uid: str):
 		# 0 - successfully got new mail
 		# 62 - mailbox empty
@@ -49,16 +61,24 @@ class MailServer:
 			return self._message_typesetting(62, 'mailbox empty')
 		messages = []
 		for mid, msg in folder.iteritems():
-			if msg.get_subdir() == 'new':
-				msg['nonce'] = self._request_nonce(msg)
-				messages.append(self._message_to_dict(msg))
-				msg.set_subdir('cur')
+			if msg.get_subdir() == 'new' and 'S' not in msg.get_flags():
+				if msg['type'] == 'simple':
+					msg.set_subdir('cur')
+				elif 'nonce' not in msg:
+					msg['nonce'] = self._request_nonce(msg)
+				msg.set_flags('S')
 				folder[mid] = msg
+				messages.append(self._message_to_dict(msg))
 		if not messages:
 			return self._message_typesetting(62, 'mailbox empty')
 		return self._message_typesetting(0, 'got new mail', {'mail' : messages})
 
 
+	'''
+	Returns all messages located in the 'new' and 'cur' folders.
+	Previously un-fetched messages in the 'new' folder follow the same
+	procedure as documented in the get_new_mail function.
+	'''
 	def get_all_mail(self, world:int, uid: str):
 		# 0 - successfully got all mail
 		# 62 - mailbox empty
@@ -66,41 +86,65 @@ class MailServer:
 			folder = self._box.get_folder(str(world)).get_folder(uid)
 		except mailbox.NoSuchMailboxError:
 			return self._message_typesetting(62, 'mailbox empty')
-		messages = []
+		messages = defaultdict(list)
 		for mid, msg in folder.iteritems():
 			if msg.get_subdir() == 'new':
-				msg['nonce'] = self._request_nonce(msg)
-				msg.set_subdir('cur')
+				if msg['type'] == 'simple':
+					msg.set_subdir('cur')
+				elif 'nonce' not in msg:
+					msg['nonce'] = self._request_nonce(msg)
+				msg.set_flags('S')
 				folder[mid] = msg
-			messages.append(self._message_to_dict(msg))
+				messages['new'].append(self._message_to_dict(msg))
+			else:
+				messages['cur'].append(self._message_to_dict(msg))
 		if not messages:
 			return self._message_typesetting(62, 'mailbox empty')
 		return self._message_typesetting(0, 'got all mail', {'mail' : messages})
 
-	def delete_mail(self, world: int, unique_id: str, nonce: str) -> dict:
+	''''''
+	def delete_mail(self, world: int, unique_id: str, key: str) -> dict:
 		# 0 - successfully deleted mail
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(unique_id)
 			for mid, message in folder.iteritems():
-				if message['nonce'] == nonce:
+				if mid == key:
 					folder.discard(mid)
+					return self._message_typesetting(status=0, message='successfully deleted message')
 		except mailbox.NoSuchMailboxError:
 			pass
-		return self._message_typesetting(status=0, message='successfully deleted message', data={"nonce": nonce})
+		return self._message_typesetting(status=0, message='mailbox does not exist')
 
 
-	def delete_all_mail(self, world: int, uid: str):
-		# 0 - successfully deleted all mail
+	''''''
+	def delete_cur_mail(self, world: int, uid: str):
+		# 0 - successfully deleted cur mail
 		try:
 			folder = self._box.get_folder(str(world)).get_folder(uid)
 		except mailbox.NoSuchMailboxError:
-			return self._message_typesetting(0, 'deleted all mail')
+			return self._message_typesetting(0, 'deleted cur mail')
 		for mid, msg in folder.iteritems():
 			if msg.get_subdir() == 'cur':
 				folder.discard(mid)
-		return self._message_typesetting(0, 'deleted all mail')
+		return self._message_typesetting(0, 'deleted cur mail')
+
+	''''''
+	def move_nonce_mail(self, world: int, uid: str, nonce: str):
+		# 0 - success
+		try:
+			folder = self._box.get_folder(str(world)).get_folder(uid)
+			for mid, msg in folder.iteritems():
+				if msg.get_subdir() == 'new' and msg['nonce'] == nonce:
+					msg.set_subdir('cur')
+					folder[mid] = msg
+		except mailbox.NoSuchMailboxError:
+			pass
+		return self._message_typesetting(0, 'success')
+
+
 
 	# TODO map for loop to run concurrently
+	''''''
 	def broadcast_mail(self, world: int, users: [str], **kwargs) -> dict:
 		# 0 - successfully sent mail
 		# 60 - invalid request format
@@ -153,6 +197,7 @@ class MailServer:
 
 	def _message_to_dict(self, msg: mailbox.MaildirMessage, **kwargs) -> dict:
 		d = {}
+		d['key'] = msg['key']
 		d['subject'] = msg['subject']
 		d['time'] = msg['time']
 		d['from'] = msg['from']
@@ -210,16 +255,22 @@ async def __get_all_mail(request: web.Request) -> web.Response:
 	data = (request.app['MANAGER']).get_all_mail(post['world'], post['unique_id'])
 	return _json_response(data)
 
-@ROUTES.post('/delete_all_mail')
-async def __delete_all_mail(request: web.Request) -> web.Response:
+@ROUTES.post('/delete_cur_mail')
+async def __delete_cur_mail(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = (request.app['MANAGER']).delete_all_mail(post['world'], post['unique_id'])
+	data = (request.app['MANAGER']).delete_cur_mail(post['world'], post['unique_id'])
 	return _json_response(data)
 
 @ROUTES.post('/delete_mail')
 async def __delete_mail(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = (request.app['MANAGER']).delete_mail(post['world'], post['unique_id'], post['nonce'])
+	data = (request.app['MANAGER']).delete_mail(post['world'], post['unique_id'], post['key'])
+	return _json_response(data)
+
+@ROUTES.post('/move_nonce_mail')
+async def __move_nonce_mail(request: web.Request) -> web.Response:
+	post = await request.post()
+	data = (request.app['MANAGER']).move_nonce_mail(post['world'], post['unique_id'], post['nonce'])
 	return _json_response(data)
 
 @ROUTES.post('/broadcast_mail')
