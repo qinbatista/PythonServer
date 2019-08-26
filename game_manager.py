@@ -3032,7 +3032,6 @@ class GameManager:
 			else:
 				return self._message_typesetting(95, 'operation error')
 
-
 	async def _enter_world_boss_stage(self, world: int, unique_id: str):
 		#0 enter world success
 		#1 enter world success and you had never enter before
@@ -3234,7 +3233,6 @@ class GameManager:
 		for index in range(0,len(data_users)):
 			message_dic["remaining"].update({index:{data_users[index][0]:data_leader_board[index][2]}})
 		return self._message_typesetting(status=0, message="get top "+str(range_number*10)+" damage",data= message_dic)
-
 
 	async def _get_energy_information(self, world: int, unique_id: str) -> (int, str):
 		data = await self._execute_statement(world, f"SELECT energy, recover_time FROM player WHERE unique_id='{unique_id}';")
@@ -3998,22 +3996,18 @@ async def _remove_user_family(request: web.Request) -> web.Response:
 async def _respond_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).respond_family(int(post['world']), post['unique_id'], post['nonce']))
-#################################################################################################################################
-#################################################################################################################################
-#################################################################################################################################
+#  ################################################################################
+#  ########################## start mall  #########################################
+#  ################################################################################
 
 @ROUTES.post('/purchase_scroll_mall')
 async def _purchase_scroll_mall(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], "1", int(post['quantity'])))
+	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], post["purchase_type"], int(post['quantity'])))
 
-@ROUTES.post('/purchase_scroll_mall2')
-async def _purchase_scroll_mall2(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], "2", int(post['quantity'])))
-#################################################################################################################################
-#################################################################################################################################
-#################################################################################################################################
+#  ################################################################################
+#  ##########################   end mall  #########################################
+#  ################################################################################
 @ROUTES.post('/get_lottery_config_info')
 async def _get_lottery_config_info(request: web.Request) -> web.Response:
 	post = await request.post()
