@@ -7,20 +7,26 @@ import requests
 import configparser
 import time
 
-MAXSIZE = 250
+MAXSIZE = 4096
+BUFFER = b''
 
 def make_message(command, message = ''):
-	return (command.zfill(10) + message).encode()
+	return (command.zfill(10) + message + '\r\n').encode()
 
 def receive():
 	"""Handles receiving of messages."""
+	global BUFFER
 	while True:
 		try:
-			decoded = client_socket.recv(MAXSIZE).decode("utf8")
-			if decoded == '' or decoded == None:
-				break
-			command, payload = decoded[:10].lstrip('0'), decoded[10:]
-			msg_list.insert(tkinter.END, f'<{command}> ' + payload)
+			if b'\r\n' in BUFFER:
+				msg, BUFFER = BUFFER.split(b'\r\n', maxsplit = 1)
+				msg = msg.decode('utf8')
+				if msg == '' or msg == None:
+					break
+				command, payload = msg[:10].lstrip('0'), msg[10:]
+				msg_list.insert(tkinter.END, f'<{command}> ' + payload)
+			else:
+				BUFFER += client_socket.recv(MAXSIZE)
 		except OSError:  # Possibly client has left the chat.
 			break
 	msg_list.insert(tkinter.END, 'Disconnected from server...')
@@ -31,18 +37,18 @@ def send(event=None):  # event is passed by binders.
 	msg = my_msg.get()
 	my_msg.set("")	# Clears input field.
 	if msg == 'EXIT':
-		client_socket.send(make_message('EXIT'))
+		client_socket.sendall(make_message('EXIT'))
 		client_socket.close()
 		top.quit()
 	elif msg == 'UPDATE':
-		client_socket.send(make_message('UPDATE'))
+		client_socket.sendall(make_message('UPDATE'))
 	elif len(msg) > 3 and msg[0] == '/' and msg[1] == '/':
-		client_socket.send(make_message('FAMILY', msg.lstrip('/')))
+		client_socket.sendall(make_message('FAMILY', msg.lstrip('/')))
 	elif len(msg) > 2 and msg[0] == '/':
 		target, message = msg[1:].split(' ', maxsplit = 1)
-		client_socket.send(make_message('PRIVATE', f'{target}:{message}'))
+		client_socket.sendall(make_message('PRIVATE', f'{target}:{message}'))
 	elif msg != '':
-		client_socket.send(make_message('PUBLIC', msg))
+		client_socket.sendall(make_message('PUBLIC', msg))
 
 
 def on_closing(event=None):

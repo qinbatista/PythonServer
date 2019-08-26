@@ -84,10 +84,14 @@ class ChatServer:
 				elif command == 'EXIT':
 					break
 				else: raise ChatProtocolError
+		except asyncio.LimitOverrunError:
+			print('Limit overrun error')
 		except (ChatProtocolError):
 			print(f'ChatProtocolError raised for user {name}...')
 		except ConnectionResetError:
 			print(f'ConnectionReset for user {name}...')
+		except asyncio.IncompleteReadError:
+			pass
 		except KeyError as e:
 			print(e)
 			print(f'KeyError for user {name}...')
@@ -171,7 +175,7 @@ class ChatServer:
 
 	# returns (command, arguments) if connection is alive, raises ConnectionResetError otherwise
 	async def _receive(self, reader):
-		raw = await reader.read(MAXSIZE)
+		raw = await reader.readuntil(b'\r\n')
 		if raw == b'': raise ConnectionResetError
 		decoded = raw.decode().strip()
 		return decoded[:10].lstrip('0'), decoded[10:]
@@ -214,7 +218,7 @@ class ChatServer:
 			await writer.wait_closed()
 
 	def _make_message(self, command, message = ''):
-		return (command.zfill(10) + message).encode()
+		return (command.zfill(10) + message + '\r\n').encode()
 
 	def _valid_name(self, name):
 		return len(name) > 0
