@@ -34,16 +34,6 @@ def receive():
 			break
 
 
-def spam():  # event is passed by binders.
-	"""Handles sending of messages."""
-	while True:
-		try:
-			client_socket.sendall(make_message('PUBLIC', ''.join([random.choice(string.ascii_letters + string.digits) for n in range(random.randint(1, 100))])))
-			time.sleep(1)
-		except OSError:
-			break
-
-
 def on_closing(event=None):
 	"""This function is to be called when the window is closed."""
 	client_socket.sendall(make_message('EXIT'))
@@ -63,16 +53,13 @@ if len(sys.argv) != 2:
 	print('missing required argument: chatter number')
 	sys.exit(-1)
 
-name = f'chatter{sys.argv[1]}'
+name = f'listener{sys.argv[1]}'
 
 client_socket.sendall(make_message('REGISTER', name))
 
 
 receive_thread = Thread(target=receive, daemon = True)
 receive_thread.start()
-
-spam_thread = Thread(target = spam, daemon = True)
-spam_thread.start()
 
 while True:
 	time.sleep(5)
