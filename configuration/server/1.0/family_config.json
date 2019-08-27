@@ -1,0 +1,29 @@
+{
+	"union_restrictions": {
+		"create_need_diamond": 2000,
+		"modify_name_diamond": 500,
+		"experience": {
+			"max_level": 11,
+			"experience_standard": {
+				"1": 20,
+				"2": 70,
+				"3": 170,
+				"4": 370,
+				"5": 870,
+				"6": 1870,
+				"7": 3870,
+				"8": 6870,
+				"9": 10870,
+				"10": 15870
+			}
+		},
+		"people_number": {
+			"basis_people": 30,
+			"increment": 2,
+			"max_people": 50
+		}
+	},
+	"union_store": {
+
+	}
+}

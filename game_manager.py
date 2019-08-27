@@ -1856,17 +1856,33 @@ class GameManager:
 
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
 		# 0 - success, user removed
+		# 94 - No such union
 		# 95 - you can not remove yourself using this function
 		# 96 - user does not belong to your family
 		# 97 - you must be family owner to remove a user
 		# 98 - you do not belong to a family
-		game_name, fid = await self._get_familyid(world, unique_id = uid)
+		# 99 - He is not your family member
+		game_name, fid, union_login, union_contribution = await self._get_familyid(world, unique_id = uid)
 		if not fid: return self._message_typesetting(98, 'you are not in a family.')
+		members = [gname[0] for gname in await self._execute_statement(world, f"select game_name from player where familyid='{fid}'")]
+		if gamename_target not in members: return self._message_typesetting(99, 'He is not your family member')
 		if game_name == gamename_target: return self._message_typesetting(95, 'you can not remove yourself using this function')
-		owner, fname, members = await self._get_family_information(world, fid)
-		if game_name != owner: return self._message_typesetting(97, 'you are not family owner')
+		family_info = await self._get_family_information(world, fid)
+		if not family_info: return self._message_typesetting(94, 'No such union')
+		family_info = list(family_info[0])
+		president = family_info[7]
+		admins = []
+		members.remove(president)
+		for admin in family_info[8: 11]:
+			if admin:
+				admins.append(admin)
+				members.remove(admin)
+		if game_name != president and game_name not in admins: return self._message_typesetting(97, 'you are not family admin')
 		try:
-			await self._execute_statement_update(world, f'UPDATE families SET member{members.index(gamename_target)} = "" WHERE familyid = "{fid}";')
+			if game_name == president:  # 会长权限
+				for i in range(len(family_info[8: 11])):
+					if gamename_target == family_info[i + 8]:
+						await self._execute_statement_update(world, f'UPDATE families SET admin{i + 1} = "" WHERE familyid = "{fid}";')
 			await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE game_name = "{gamename_target}";')
 		except ValueError:
 			return self._message_typesetting(96, 'user is not in your family')
@@ -2669,16 +2685,15 @@ class GameManager:
 	async def _family_exists(self, world: int, fname: str):
 		return (0,) not in (await self._execute_statement(world, f'SELECT COUNT(1) FROM families WHERE familyname = "{fname}";'))
 
-	async def _get_family_information(self, world: int, fid: str):
-		q = await self._execute_statement(world, f'SELECT * FROM families WHERE familyid = "{fid}";')
-		return (None, None, []) if q == () else (q[0][0], q[0][1], [u for u in q[0][2:]])
+	async def _get_family_information(self, world: int, fid: str) -> tuple:
+		return await self._execute_statement(world, f'SELECT * FROM families WHERE familyid = "{fid}";')
 
 	async def _get_familyid(self, world: int, **kwargs):
 		if 'unique_id' in kwargs:
-			data = await self._execute_statement(world, f'SELECT game_name, familyid FROM player WHERE unique_id = "{kwargs["unique_id"]}";')
+			data = await self._execute_statement(world, f'SELECT game_name, familyid, union_login, union_contribution FROM player WHERE unique_id = "{kwargs["unique_id"]}";')
 		else:
-			data = await self._execute_statement(world, f'SELECT game_name, familyid FROM player WHERE game_name = "{kwargs["game_name"]}";')
-		return data[0] if data else ('', '')
+			data = await self._execute_statement(world, f'SELECT game_name, familyid, union_login, union_contribution FROM player WHERE game_name = "{kwargs["game_name"]}";')
+		return data[0] if data else ('', '', '', 0)
 
 	async def _get_dark_market_material(self, world: int, unique_id: str, code: int) -> tuple:
 		sql_str = 'SELECT merchandise%s, merchandise%s_quantity, currency_type%s, currency_type%s_price, refresh_time, refreshable_quantity FROM dark_market WHERE unique_id = "%s";' % (code, code, code, code, unique_id)
