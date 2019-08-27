@@ -664,7 +664,7 @@ class GameManager:
 			if values[i] < 0:
 				return self._message_typesetting(98, "%s insufficient" % keys[i])
 		if "energy" in keys:
-			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")])
+			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=material_dict["energy"])
 			if energy_data["status"] >= 97:
 				return self._message_typesetting(status=96, message="Insufficient energy")
 			material_dict.pop("energy")
@@ -721,7 +721,7 @@ class GameManager:
 			if values[i] < 0:
 				return self._message_typesetting(98, "%s insufficient" % keys[i])
 		if "energy" in keys:
-			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")])
+			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=material_dict["energy"])
 			if energy_data["status"] >= 97:
 				return self._message_typesetting(status=96, message="Insufficient physical strength")
 			material_dict.pop("energy")
