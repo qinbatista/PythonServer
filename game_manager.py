@@ -2669,9 +2669,9 @@ class GameManager:
 	async def _family_exists(self, world: int, fname: str):
 		return (0,) not in (await self._execute_statement(world, f'SELECT COUNT(1) FROM families WHERE familyname = "{fname}";'))
 
-	async def _get_family_information(self, world: int, fid: str):
+	async def _get_family_information(self, world: int, fid: str) -> tuple:
 		q = await self._execute_statement(world, f'SELECT * FROM families WHERE familyid = "{fid}";')
-		return (None, None, []) if q == () else (q[0][0], q[0][1], [u for u in q[0][2:]])
+		return (q[0][0], q[0][1], [u for u in q[0][2:7]], q[0][7], q[0][8]) if q else (None, None, [], None, None)
 
 	async def _get_familyid(self, world: int, **kwargs):
 		if 'unique_id' in kwargs:

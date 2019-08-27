@@ -107,14 +107,22 @@ def create_table_families(cursor):
 	CREATE TABLE `families` (
 	  `familyid` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `familyname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-	  `member0` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '',
-	  `member1` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '',
-	  `member2` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '',
-	  `member3` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '',
-	  `member4` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '',
-	  `member5` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '',
-	  `remove_start_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '删除家族成员的开始时间',
-	  `remove_times` int(6) DEFAULT 5 COMMENT '可删除的次数',
+	  `level` int(11) DEFAULT 0 COMMENT '工会等级',
+	  `icon` BLOB NULL DEFAULT 0x0 COMMENT '工会图标',
+	  `experience` int(11) DEFAULT 0 COMMENT '工会经验',
+	  `announcement` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会公告',
+	  `news` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会动态',
+	  `president` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '会长游戏名',
+	  `admin1` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '管理员1游戏名',
+	  `admin2` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '管理员2游戏名',
+	  `admin3` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '管理员3游戏名',
+	  `elite1` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '精英1游戏名',
+	  `elite2` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '精英2游戏名',
+	  `elite3` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '精英3游戏名',
+	  `elite4` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '精英4游戏名',
+	  `elite5` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '精英5游戏名',
+	  `remove_start_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '删除成员的开始时间',
+	  `remove_times` int(6) DEFAULT 5 COMMENT '当天可删除的次数',
 	  PRIMARY KEY (`familyid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
@@ -181,6 +189,8 @@ def create_table_player(cursor):
 	  `world_boss_remaining_times` int(6) DEFAULT 0 COMMENT '进入世界boss的剩余次数',
 	  `food` int(11) unsigned DEFAULT 0 COMMENT '食物',
 	  `crystal` int(11) unsigned DEFAULT 0 COMMENT '水晶',
+	  `union_login` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会签到的日期',
+	  `union_contribution` int(11) unsigned DEFAULT 0 COMMENT '工会贡献值',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
@@ -344,14 +354,15 @@ def operating_test():
 	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
 	c.select_db("aliya")
 	cursor = c.cursor()
+	create_table_player(cursor)
 	create_table_families(cursor)
 
 
 if __name__ == '__main__':
-	# operating_test()
-	world = input('Enter world name: ')
-	if not already_exists(world):
-		create_world(world)
-	else:
-		print('world database already exists, skipping...')
-	create_mailbox(world)
+	operating_test()
+	# world = input('Enter world name: ')
+	# if not already_exists(world):
+	# 	create_world(world)
+	# else:
+	# 	print('world database already exists, skipping...')
+	# create_mailbox(world)
