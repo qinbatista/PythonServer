@@ -284,25 +284,33 @@ def registered_account(world:str, unique_id: str):
 def enter_level():
 	global token
 	while True:
-		my_number = random.randint(0,0)
+		my_number = random.randint(1,5)
 		if my_number==0:#剧情
+			print("[registered_account][enter_level] play normal level")
 			stage = random.randint(1,8)
 			msg = {'world' : world, 'function' : 'enter_stage', 'data' : {'token' : token, 'stage' : str(stage)}}
-			response = send_tcp_message(msg)
+			response = send_tcp_message(msg)#进入关卡
 			if response["status"]==0:
 				msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : token, 'stage' : str(stage), 'clear_time' : 'we dont care what this string is'}}
-				response = send_tcp_message(msg)
-				print(response)
+				response = send_tcp_message(msg)#挑战成功
 			else:
 				purchase_energy()
 		if my_number==1:#世界boss
-			pass
+			print("[registered_account][enter_level] play world boss")
+			msg = {'world' : world, 'function' : 'enter_world_boss_stage', 'data' : {'token' : token}}
+			response = send_tcp_message(msg)
+			if response["status"]==0:
+				msg = {'world' : world, 'function' : 'leave_world_boss_stage', 'data' : {'token' : token,"total_damage":random.randint(1,100000)}}
+				response = send_tcp_message(msg)
+			else:
+				pass
 		if my_number==2:#无尽试炼
-			pass
-		if my_number==3:#剧情
-			pass
+			print("[registered_account][enter_level] endless training")
+		if my_number==3:#活动试炼
+			print("[registered_account][enter_level] party training")
 		if my_number==4:#退出
-			break
+			print("[registered_account][enter_level] quit level playing")
+			# break
 
 if __name__ == "__main__":
 	token = registered_account("0",unique_id)

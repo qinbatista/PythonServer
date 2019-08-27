@@ -75,7 +75,7 @@ class MessageHandler:
 			return await fn(self, message, session)
 		except KeyError:
 			return json.dumps({'status': 10, 'message': 'Invalid message format', 'data': {}})
-	
+
 	def _game_manager_base_url(self, world):
 		for gm in self._map[world]['gamemanagers'].values():
 			return f'http://{gm["ip"]}:{gm["port"]}'
@@ -129,7 +129,7 @@ class MessageHandler:
 	async def _level_up_scroll(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/level_up_scroll', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
-	
+
 	# region _01_Manager_Weapon.py
 	async def _level_up_weapon(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/level_up_weapon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'weapon': message['data']['weapon'], 'iron': message['data']['iron']}) as resp:
@@ -216,14 +216,14 @@ class MessageHandler:
 	async def _basic_summon(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-			
+
 	async def _basic_summon_10_times(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _pro_summon_10_times(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-			
+
 	async def _pro_summon(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
@@ -234,20 +234,20 @@ class MessageHandler:
 	async def _friend_summon_10_times(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/friend_summon_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-			
-			
-			
+
+
+
 	async def _basic_summon_roles(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-			
+
 	async def _basic_summon_roles_10_times(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _pro_summon_roles_10_times(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-			
+
 	async def _pro_summon_roles(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
@@ -258,21 +258,21 @@ class MessageHandler:
 	async def _friend_summon_roles_10_times(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/friend_summon_roles_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-			
-		
 
-	
+
+
+
 	async def _basic_summon_skill(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-			
+
 	async def _basic_summon_skill_10_times(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/basic_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
 	async def _pro_summon_skill_10_times(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_skill_10_times', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
-			
+
 	async def _pro_summon_skill(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/pro_summon_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'cost_item' : message['data']['cost_item']}) as resp:
 			return await resp.text()
@@ -356,11 +356,11 @@ class MessageHandler:
 
 
 
-	
+
 	#async def _get_all_tower_info(self, message: dict, session) -> str:
 	#	async with session.post('http://localhost:8006/get_all_tower_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 	#		return await resp.text()
-			
+
 	async def _level_enemy_layouts_config(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/level_enemy_layouts_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
@@ -403,43 +403,43 @@ class MessageHandler:
 	async def _redeem_all_nonce(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/redeem_all_nonce', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'type_list': message['data']['type_list'], 'nonce_list': message['data']['nonce_list']}) as resp:
 			return await resp.text()
-	
+
 	async def _get_chat_server(self, message: dict, session):
 		return self._map[message['world']]['chatserver']
-		
+
 	async def _check_boss_status(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/check_boss_status', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
-			return await resp.text()	
+			return await resp.text()
 	async def _enter_world_boss_stage(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/enter_world_boss_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
-			return await resp.text()	
+			return await resp.text()
 	async def _leave_world_boss_stage(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/leave_world_boss_stage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'total_damage': message['data']['total_damage']}) as resp:
-			return await resp.text()	
+			return await resp.text()
 	async def _get_top_damage(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/get_top_damage', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'range_number': message['data']['range_number']}) as resp:
 			return await resp.text()
-			
-			
+
+
 	async def _leave_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/leave_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
-			return await resp.text()	
+			return await resp.text()
 	async def _create_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/create_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'fname': message['data']['fname']}) as resp:
-			return await resp.text()		
+			return await resp.text()
 	async def _invite_user_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/invite_user_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'target': message['data']['target']}) as resp:
-			return await resp.text()			
+			return await resp.text()
 	async def _remove_user_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/remove_user_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'user': message['data']['user']}) as resp:
-			return await resp.text()		
+			return await resp.text()
 	async def _request_join_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/request_join_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'fname': message['data']['fname']}) as resp:
-			return await resp.text()			
-	async def _respond_family(self, message: dict, session) -> str:		
+			return await resp.text()
+	async def _respond_family(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/response_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
-			
+
 ###############################################################################
 
 
@@ -486,8 +486,8 @@ FUNCTION_LIST = {
 	'pro_summon_roles_10_times' : MessageHandler._pro_summon_roles_10_times,
 	'friend_summon_roles' : MessageHandler._friend_summon_roles,
 	'friend_summon_roles_10_times' : MessageHandler._friend_summon_roles_10_times,
-	
-	
+
+
 	'basic_summon_skill' : MessageHandler._basic_summon_skill,
 	'basic_summon_skill_10_times' : MessageHandler._basic_summon_skill_10_times,
 	'pro_summon_skill' : MessageHandler._pro_summon_skill,
@@ -495,9 +495,9 @@ FUNCTION_LIST = {
 	'friend_summon_skill' : MessageHandler._friend_summon_skill,
 	'friend_summon_skill_10_times' : MessageHandler._friend_summon_skill_10_times,
 	'prophet_summon_10_times' : MessageHandler._prophet_summon_10_times,
-	
-	
-	
+
+
+
 	'start_hang_up' : MessageHandler._start_hang_up,
 	'get_hang_up_reward' : MessageHandler._get_hang_up_reward,
 	'enter_stage' : MessageHandler._enter_stage,
@@ -514,8 +514,8 @@ FUNCTION_LIST = {
 	'enter_tower' : MessageHandler._enter_tower,
 	'get_all_stage_info' : MessageHandler._get_all_stage_info,
 	'get_all_armor_info' : MessageHandler._get_all_armor_info,
-	
-	
+
+
 	'get_lottery_config_info' : MessageHandler._get_lottery_config_info,
 	#'get_all_tower_info' : MessageHandler._get_all_tower_info,
 	#'get_all_armor_info' : MessageHandler._get_all_armor_info,
@@ -523,7 +523,7 @@ FUNCTION_LIST = {
 	'monster_config' : MessageHandler._monster_config,
 	'get_stage_reward_config' : MessageHandler._get_stage_reward_config,
 	'get_hang_up_info' : MessageHandler._get_hang_up_info,
-	
+
 
 	'get_all_friend_info': MessageHandler._get_all_friend_info,
 	'delete_friend': MessageHandler._delete_friend,
@@ -537,13 +537,13 @@ FUNCTION_LIST = {
 	'get_all_mail': MessageHandler._get_all_mail,
 	'delete_mail': MessageHandler._delete_mail,
 	'delete_all_mail': MessageHandler._delete_all_mail,
-	
-	
+
+
 	'check_boss_status' : MessageHandler._check_boss_status,
 	'enter_world_boss_stage' : MessageHandler._enter_world_boss_stage,
 	'leave_world_boss_stage' : MessageHandler._leave_world_boss_stage,
 	'get_top_damage' : MessageHandler._get_top_damage,
-	
+
 	'leave_family' : MessageHandler._leave_family,
 	'create_family' : MessageHandler._create_family,
 	'invite_user_family' : MessageHandler._invite_user_family,
@@ -552,5 +552,5 @@ FUNCTION_LIST = {
 	'respond_family' : MessageHandler._respond_family
 
 
-}   
-    
+}
+
