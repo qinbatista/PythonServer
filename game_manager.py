@@ -1867,10 +1867,10 @@ class GameManager:
 		if game_name == gamename_target: return self._message_typesetting(95, 'you can not remove yourself using this function')
 		family_info = await self._get_family_information(world, fid)
 		if not family_info: return self._message_typesetting(94, 'No such union')
+		remaining = {}
 		family_info = list(family_info[0])
 		remove_times = family_info[17]
 		remove_start_time = family_info[16]
-		announcement = family_info[5]
 		news = family_info[6]
 		president = family_info[7]
 		admins = []
@@ -1897,17 +1897,19 @@ class GameManager:
 			if news == "":
 				news = {"1": announcement}
 			else:
-				pass
-				# news = json.loads(news, encoding='utf-8')
-				# if len(news) >= 30:
-				# 	news
-				# news.append(announcement)
+				content = list(json.loads(news.replace("'", "\""), encoding='utf-8').values())
+				if len(content) >= 30:
+					content.pop(0)
+				content.append(announcement)
+				news = {}
+				for i, value in enumerate(content):
+					news.update({str(i + 1): value})
 			await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{news}" WHERE familyid = "{fid}";')
 			await self._execute_statement_update(world, f'UPDATE player SET familyid = "", cumulative_contribution=0 WHERE game_name = "{gamename_target}";')
-
+			remaining.update({"announcement": announcement, "news": str(news)})
 		except ValueError:
 			return self._message_typesetting(96, 'user is not in your family')
-		return self._message_typesetting(0, 'success, user removed')
+		return self._message_typesetting(0, 'success, user removed', data={"remaining": remaining})
 
 	# TODO refactor code to run both sql statements with asyncio.gather
 	# if the person leaving is the owner, disband the entire family

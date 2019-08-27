@@ -356,7 +356,7 @@ def operating_test():
 	c.select_db("aliya")
 	cursor = c.cursor()
 	create_table_player(cursor)
-	create_table_families(cursor)
+	# create_table_families(cursor)
 
 
 if __name__ == '__main__':
