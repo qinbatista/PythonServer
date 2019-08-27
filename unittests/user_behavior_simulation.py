@@ -3,6 +3,9 @@ import time
 import os
 import requests
 import configparser
+import asyncio
+import lukseun_client
+import random
 """
 print(str(time.time()))
 print(str(time.time() % 1 * 1e6))
@@ -256,198 +259,51 @@ def get_top_damage(unique_id: str,range_number:str):
 def active_wishing_pool(unique_id: str,range_number:str):
 	result = requests.post('http://localhost:8100/active_wishing_pool', data={"world": 0, 'unique_id': unique_id,"weapon_id":"weapon1"})
 	print(str(result.text))
-	
-def test():
-	# s22k = "999"
-	# s21k = "939"
-	# print(eval("s2%sk"%2))
-	for i in range(1, 5):
-		print(f'"{11+i}": {250+30*i},')
 
-def all_function(unique_id: str):
-	result = requests.post('http://localhost:8100/equipment_manufacturing_armor', data={"world": 0, "unique_id": "4", "armor_kind": "armor3"})
-	print(str(result.text))
-	# result = requests.post('http://localhost:8100/level_up_role_star', data={"world": 0, "unique_id": "4", "role": "role1"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/level_up_role', data={"world": 0, "unique_id": "4", "role": "role1", "experience_potion": 60})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/purchase_scroll_mall', data={"world": 0, "unique_id": unique_id, "scroll_type": "pro_summon_scroll", "quantity": 2})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/request_friend', data={"world": 0, "unique_id": unique_id, "friend_name": "a"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/leave_family', data={"world": 0, "unique_id": "1", "fname": "a"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/create_family', data={"world": 0, "unique_id": "4", "fname": "dadaed"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/invite_user_family', data={"world": 0, "unique_id": unique_id, "target": "b"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/respond_family', data={"world": 0, "unique_id": "2", "nonce": "76423808527358951453001346758379398626552379051138955107055357315188545186541"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/remove_user_family', data={"world": 0, "unique_id": "1", "user": "a"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/request_join_family', data={"world": 0, "unique_id": "2", "fname": "dadaed"})
-	# print(str(result.text))
 
-	# result = requests.post('http://localhost:8100/acceleration_technology', data={"world": 0, 'unique_id': unique_id})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/upgrade_wishing_pool', data={"world": 0, 'unique_id': unique_id})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/upgrade_crystal_factory', data={"world": 0, 'unique_id': unique_id})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/upgrade_mine_factory', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 10})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/upgrade_food_factory', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 10})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/buy_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 10})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/distribution_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 1, 'factory_kind': "food"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/distribution_workers', data={"world": 0, 'unique_id': "4", 'workers_quantity': 1, 'factory_kind': "mine"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/distribution_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 1, 'factory_kind': "crystal"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/distribution_workers', data={"world": 0, 'unique_id': "4", 'workers_quantity': 2, 'factory_kind': "equipment"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/refresh_all_storage', data={"world": 0, 'unique_id': unique_id})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/refresh_food_storage', data={"world": 0, 'unique_id': unique_id})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/refresh_mine_storage', data={"world": 0, 'unique_id': unique_id})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/refresh_crystal_storage', data={"world": 0, 'unique_id': unique_id})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/refresh_equipment_storage', data={"world": 0, 'unique_id': unique_id})
-	# print(str(result.text))
-
-	# result = requests.post('http://localhost:8004/basic_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "weapons"})
-	# print(str(result.text))
-	# # result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "roles"})
-	# # result = requests.post('http://localhost:8004/friend_summon', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond", "summon_kind": "skills"})
-	# # result = requests.post('http://localhost:8004/fortune_wheel_basic', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# # result = requests.post('http://localhost:8004/fortune_wheel_pro', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# result = requests.post('http://localhost:8004/basic_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/pro_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/friend_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/prophet_summon_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	#
-	#
-	# result = requests.post('http://localhost:8004/basic_summon_skill_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/pro_summon_skill_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/friend_summon_skill_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	#
-	# result = requests.post('http://localhost:8004/basic_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/pro_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/friend_summon_roles_10_times', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-
-	# result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/delete_all_mail', data={"world": 0, 'unique_id': unique_id})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/get_all_mail', data={"world": 0, 'unique_id': unique_id, "cost_item": "diamond"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/delete_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": "d"})
-	# print(str(result.text))
-
-"""
-json_data = {
-	"world": world,
-	"uid_to": unique_id,
-	"kwargs":
-		{
-			"from": "server",
-			"subject": "You have a gift!",
-			"body": "Your gift is waiting",
-			"type": "gift",
-			"items": "friend_gift",
-			"quantities": "1"
-		}
-}
-result = requests.post('http://localhost:8020/send_mail', json=json_data)
-print(str(result.text))
-"""
+lukseun = lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
+world = "0"
+unique_id = "4"
+token = ""
+def send_tcp_message(msg):
+	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
+def purchase_energy():
+	global token
+	# msg = {'world' : world, 'function' : 'enter_stage', 'data' : {'token' : token, 'stage' : '1'}}
+	# response = send_tcp_message(msg)
+	return True
+def registered_account(world:str, unique_id: str):
+	msg = {'function' : 'login_unique', 'data' : {'unique_id' : unique_id}}
+	response = asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
+	myjson = response
+	if myjson["status"]==0:
+		print("[registered_account] login success")
+		return myjson["data"]["token"]
+	print("[registered_account] login failed, try login again")
+	registered_account(world,unique_id)
+def enter_level():
+	global token
+	while True:
+		my_number = random.randint(0,0)
+		if my_number==0:#剧情
+			stage = random.randint(1,8)
+			msg = {'world' : world, 'function' : 'enter_stage', 'data' : {'token' : token, 'stage' : str(stage)}}
+			response = send_tcp_message(msg)
+			if response["status"]==0:
+				msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : token, 'stage' : str(stage), 'clear_time' : 'we dont care what this string is'}}
+				response = send_tcp_message(msg)
+				print(response)
+			else:
+				purchase_energy()
+		if my_number==1:#世界boss
+			pass
+		if my_number==2:#无尽试炼
+			pass
+		if my_number==3:#剧情
+			pass
+		if my_number==4:#退出
+			break
 
 if __name__ == "__main__":
-	# try_coin()
-	# try_iron()
-	# try_diamond()
-	# level_up_weapon()
-	# pass_stage(stage=6)
-	# pass_tower(stage=3)
-	# get_skill()
-	# get_all_skill_level()
-	# level_up_skill()
-	# random_gift_skill()
-	# random_gift_weapon()
-	# level_up_scroll()
-	# get_all_weapon()
-	# level_up_passive()
-	# reset_weapon_skill_point()
-	# level_up_weapon_star()
-	# try_all_material()
-	# try_energy()
-	# start_hang_up()
-	get_hang_up_reward()
-	# enter_stage(stage=1)
-	# enter_tower(stage=3)
-	# disintegrate_weapon()
-	# automatically_refresh_store()
-	# manually_refresh_store()
-	# diamond_refresh_store()
-	# black_market_transaction(1)
-	# show_energy()
-	# get_all_supplies()
-	# basic_summon()
-	# get_hang_up_info()
-	# upgrade_armor(1)
-	# random_gift_segment()
-	# start ########################################################
-	# get_all_mail(unique_id="1")
-	# send_friend_gift(unique_id="4", friend_name="a")
-	# nonce = get_new_mail(unique_id="1")
-	# redeem_nonce(unique_id="1", nonce="5238947786014068689996630933856144383091275996565077486443260087176438651269")
-	# get_all_mail(unique_id="1")
-
-	# request_friend(unique_id="4", friend_name="a")
-	# nonce = get_new_mail(unique_id="1")
-	# response_friend(unique_id="1", nonce=nonce)
-	# response_friend(unique_id="1", nonce="32963693688928993319733151846953915999978396660497710378095972836181446004813")
-
-	# request_friend(unique_id="4", friend_name="g")
-	# request_friend(unique_id="2", friend_name="g")
-	# request_friend(unique_id="3", friend_name="g")
-
-	# send_friend_gift(unique_id="1", friend_name="g")
-	# send_friend_gift(unique_id="2", friend_name="g")
-	# send_friend_gift(unique_id="3", friend_name="g")
-	# send_all_friend_gift(unique_id="1")
-	# get_new_mail(unique_id="7")
-	# get_all_mail(unique_id="7")
-	# enumerate
-	# test()
-	# type_list, nonce_list=get_new_mail_nonce_list(unique_id="7")
-	# redeem_all_nonce(unique_id="7", type_list=type_list, nonce_list=nonce_list)
-	# get_all_mail(unique_id="7")
-	# end   ########################################################
-	# enter_stage(stage=1)
-	# enter_tower(stage=1)
-	# all_function(unique_id="1")
-	# check_boss_status(unique_id="4")
-	# check_boss_status(unique_id="4")
-	# enter_world_boss_stage(unique_id="4")
-	# check_boss_status('4')
-	# enter_world_boss_stage("4")
-	# leave_world_boss_stage('4','10000')
-	# get_top_damage(4,4)
-	# active_wishing_pool(4,"weapon1")
+	token = registered_account("0",unique_id)
+	enter_level()
