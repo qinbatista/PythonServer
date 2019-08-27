@@ -723,7 +723,7 @@ class GameManager:
 		if "energy" in keys:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=material_dict["energy"])
 			if energy_data["status"] >= 97:
-				return self._message_typesetting(status=96, message="Insufficient physical strength")
+				return self._message_typesetting(status=96, message="Insufficient energy")
 			material_dict.pop("energy")
 			for i in range(len(energy_data["data"]["keys"])):
 				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
