@@ -658,7 +658,7 @@ class GameManager:
 		if "energy" in keys:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")])
 			if energy_data["status"] >= 97:
-				return self._message_typesetting(status=96, message="Insufficient physical strength")
+				return self._message_typesetting(status=96, message="Insufficient energy")
 			num = keys.index("energy")
 			keys.pop(num)
 			values.pop(num)
@@ -667,15 +667,16 @@ class GameManager:
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
 
-		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-		select_values = (await self._execute_statement(world, select_str))[0]
-		for i in range(len(select_values)):
-			values[i] = int(values[i]) + int(select_values[i])
-			if values[i] < 0:
-				return self._message_typesetting(98, "%s insufficient" % keys[i])
+		if material_dict:
+			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
+			select_values = (await self._execute_statement(world, select_str))[0]
+			for i in range(len(select_values)):
+				values[i] = int(values[i]) + int(select_values[i])
+				if values[i] < 0:
+					return self._message_typesetting(98, "%s insufficient" % keys[i])
 
-		if await self._execute_statement_update(world, update_str) == 0:
-			return self._message_typesetting(status=97, message="database operating error")
+			if await self._execute_statement_update(world, update_str) == 0:
+				return self._message_typesetting(status=97, message="database operating error")
 		for i in range(len(keys)):
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
@@ -724,16 +725,16 @@ class GameManager:
 				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
+		if material_dict:
+			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
+			select_values = (await self._execute_statement(world, select_str))[0]
+			for i in range(len(select_values)):
+				values[i] = int(values[i]) + int(select_values[i])
+				if values[i] < 0:
+					return self._message_typesetting(98, "%s insufficient" % keys[i])
 
-		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-		select_values = (await self._execute_statement(world, select_str))[0]
-		for i in range(len(select_values)):
-			values[i] = int(values[i]) + int(select_values[i])
-			if values[i] < 0:
-				return self._message_typesetting(98, "%s insufficient" % keys[i])
-
-		if await self._execute_statement_update(world, update_str) == 0:
-			return self._message_typesetting(status=97, message="database operating error")
+			if await self._execute_statement_update(world, update_str) == 0:
+				return self._message_typesetting(status=97, message="database operating error")
 		for i in range(len(keys)):
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
@@ -1856,6 +1857,7 @@ class GameManager:
 
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
 		# 0 - success, user removed
+		# 93 - You have reached the upper limit of the number of union removals today.
 		# 94 - No such union
 		# 95 - you can not remove yourself using this function
 		# 96 - user does not belong to your family
@@ -1870,6 +1872,10 @@ class GameManager:
 		family_info = await self._get_family_information(world, fid)
 		if not family_info: return self._message_typesetting(94, 'No such union')
 		family_info = list(family_info[0])
+		remove_times = family_info[17]
+		remove_start_time = family_info[16]
+		announcement = family_info[5]
+		news = family_info[6]
 		president = family_info[7]
 		admins = []
 		members.remove(president)
@@ -1877,13 +1883,32 @@ class GameManager:
 			if admin:
 				admins.append(admin)
 				members.remove(admin)
+		if remove_times == 0: return self._message_typesetting(93, 'You have reached the upper limit of the number of union removals today.')
 		if game_name != president and game_name not in admins: return self._message_typesetting(97, 'you are not family admin')
 		try:
+			current_time = datetime.now().strftime("%Y-%m-%d")
+			if remove_start_time == "" or (datetime.strptime(remove_start_time, '%Y-%m-%d') - datetime.strptime(current_time, '%Y-%m-%d')).total_seconds() != 0:
+				remove_times = 4
+				remove_start_time = current_time
+			else:
+				remove_times -= 1
 			if game_name == president:  # 会长权限
-				for i in range(len(family_info[8: 11])):
+				for i in range(len(family_info[8: 16])):
 					if gamename_target == family_info[i + 8]:
 						await self._execute_statement_update(world, f'UPDATE families SET admin{i + 1} = "" WHERE familyid = "{fid}";')
-			await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE game_name = "{gamename_target}";')
+
+			announcement = f"玩家{gamename_target}已被管理员{game_name}移除了工会"
+			if news == "":
+				news = {"1": announcement}
+			else:
+				pass
+				# news = json.loads(news, encoding='utf-8')
+				# if len(news) >= 30:
+				# 	news
+				# news.append(announcement)
+			await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{news}" WHERE familyid = "{fid}";')
+			await self._execute_statement_update(world, f'UPDATE player SET familyid = "", cumulative_contribution=0 WHERE game_name = "{gamename_target}";')
+
 		except ValueError:
 			return self._message_typesetting(96, 'user is not in your family')
 		return self._message_typesetting(0, 'success, user removed')

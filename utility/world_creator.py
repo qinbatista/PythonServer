@@ -191,6 +191,7 @@ def create_table_player(cursor):
 	  `crystal` int(11) unsigned DEFAULT 0 COMMENT '水晶',
 	  `union_login` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会签到的日期',
 	  `union_contribution` int(11) unsigned DEFAULT 0 COMMENT '工会贡献值',
+	  `cumulative_contribution` int(11) unsigned DEFAULT 0 COMMENT '工会累积贡献值',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
