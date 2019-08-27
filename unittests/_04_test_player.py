@@ -119,7 +119,7 @@ def get_hang_up_reward():
 
 
 def enter_stage(stage: int):
-	result = requests.post('http://localhost:8004/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': stage})
+	result = requests.post('http://localhost:8100/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': stage})
 	print(str(result.text))
 
 
@@ -398,8 +398,8 @@ if __name__ == "__main__":
 	# try_all_material()
 	# try_energy()
 	# start_hang_up()
-	get_hang_up_reward()
-	# enter_stage(stage=1)
+	# get_hang_up_reward()
+	enter_stage(stage=2)
 	# enter_tower(stage=3)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
