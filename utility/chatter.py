@@ -3,7 +3,6 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import sys
-import tkinter
 import requests
 import configparser
 import time
@@ -51,7 +50,7 @@ def on_closing(event=None):
 
 #----Now comes the sockets part----
 HOST = '127.0.0.1'
-#HOST = 'remote4.magicwandai.com'
+HOST = 'remote4.magicwandai.com'
 PORT = 8300
 
 ADDR = (HOST, PORT)

@@ -53,6 +53,7 @@ class ChatServer:
 		self.users = defaultdict(dict)
 		self.families = defaultdict(lambda: defaultdict(set))
 		self.pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = self.world if self.world != 0 else 'aliya', charset = 'utf8')
+		self.drain_lock = asyncio.Lock()
 		self.stopper = threading.Event()
 		self.in_queue = queue.Queue()
 		self.logger = threading.Thread(target = chat_logger, args = (self.world, self.in_queue, self.stopper))
@@ -184,12 +185,11 @@ class ChatServer:
 
 	# sends a message to the given writers
 	async def _send(self, message, *args):
-		writers = []
 		for writer in args:
 			if not writer.is_closing():
 				writer.write(message)
-				writers.append(writer.drain())
-		await asyncio.gather(*writers)
+				async with self.drain_lock:
+					await writer.drain()
 	
 	# returns familyid if user is part of a family, None otherwise
 	async def _get_familyid(self, name):
