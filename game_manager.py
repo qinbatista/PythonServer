@@ -1882,6 +1882,7 @@ class GameManager:
 		if remove_times == 0: return self._message_typesetting(93, 'You have reached the upper limit of the number of union removals today.')
 		if game_name != president and game_name not in admins: return self._message_typesetting(97, 'you are not family admin')
 		try:
+			announcement = ""
 			current_time = datetime.now().strftime("%Y-%m-%d")
 			if remove_start_time == "" or (datetime.strptime(remove_start_time, '%Y-%m-%d') - datetime.strptime(current_time, '%Y-%m-%d')).total_seconds() != 0:
 				remove_times = 4
@@ -1889,11 +1890,13 @@ class GameManager:
 			else:
 				remove_times -= 1
 			if game_name == president:  # 会长权限
-				for i in range(len(family_info[8: 16])):
+				for i in range(len(family_info[8: 11])):
 					if gamename_target == family_info[i + 8]:
 						await self._execute_statement_update(world, f'UPDATE families SET admin{i + 1} = "" WHERE familyid = "{fid}";')
-
-			announcement = f"玩家{gamename_target}已被管理员{game_name}移除了工会"
+			for i in range(len(family_info[11: 16])):
+				if gamename_target == family_info[i + 11]:
+					await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
+			announcement = f"{game_name} {gamename_target} 1"  # 需要写详细
 			if news == "":
 				news = {"1": announcement}
 			else:
