@@ -90,6 +90,8 @@ class ChatServer:
 			print(f'ChatProtocolError raised for user {name}...')
 		except ConnectionResetError:
 			print(f'ConnectionReset for user {name}...')
+		except BrokenPipeError:
+			print(f'BrokenPipeError for user {name}...')
 		except asyncio.IncompleteReadError:
 			pass
 		except KeyError as e:
