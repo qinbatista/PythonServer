@@ -34,7 +34,10 @@ namespace configurationView
             reader.Close();
             foreach(var item in public_json_data)
             {
-                HangStageSelect.Items.Add(int.Parse(item.Key));
+                if (!item.Key.Equals("probability_reward"))
+                {
+                    HangStageSelect.Items.Add(int.Parse(item.Key));
+                }
             }
         }
 

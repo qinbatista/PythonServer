@@ -28,8 +28,6 @@ class GameManager:
 		self._timer = repeating_timer.RepeatingTimer(3, self._refresh_configuration)
 		self._timer.start()
 
-
-
 #############################################################################
 #						 Bag Module Functions								#
 #############################################################################
@@ -246,7 +244,6 @@ class GameManager:
 		await self._execute_statement(world, 'UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
 		return self._message_typesetting(0, 'upgrade success', {'remaining': {skill_id: skill_level + 1, scroll_id: resp['remaining']}})
 
-
 	async def get_all_skill_level(self, world: int, unique_id: str) -> dict:
 		# success ===> 0
 		# 0 - Success
@@ -256,7 +253,6 @@ class GameManager:
 		for num, val in enumerate(zip(names[1:], values[0][1:])):
 			remaining.update({val[0][0]: val[1]})
 		return self._message_typesetting(0, 'success', {"remaining": remaining})
-
 
 	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
 		# success ===> 0
@@ -281,7 +277,6 @@ class GameManager:
 			return self._internal_format(1, 'Skill already unlocked')
 		except:
 			return self._internal_format(2, 'Invalid skill name')
-
 
 #############################################################################
 #						End Skill Module Functions							#
@@ -552,8 +547,6 @@ class GameManager:
 			}
 		}
 		return self._message_typesetting(status=0, message="Successful weapon decomposition", data=data)
-
-
 
 #############################################################################
 #						End Weapon Module Functions							#
@@ -841,9 +834,12 @@ class GameManager:
 		# 此时的material_dict字典的值是给奖励列表的，
 		# 所以hang_stage是奖励之前的关卡，
 		# hang_up_time是之前挂起的开始时间
+		probability_reward = self._hang_reward_list["probability_reward"]
 		material_dict = {}
+		probability_dict = {}
 		for key, value in self._hang_reward_list[str(hang_stage)].items():
-			material_dict.update({key: value})
+			if key in probability_reward: probability_dict.update({key: value})
+			else: material_dict.update({key: value})
 		material_dict.update({"hang_stage": hang_stage})
 		material_dict.update({"hang_up_time": hang_up_time})
 		key_word = ["hang_stage", "hang_up_time"]
@@ -868,6 +864,9 @@ class GameManager:
 			for key in material_dict.keys():
 				if key not in key_word:
 					material_dict[key] = int(material_dict[key]) * minute
+
+			for key, value in probability_dict.items():  # 完成minute次十万分之value[1]的概率抽到value[0]个特殊的key奖励
+				material_dict.update({key: sum(random.choices(value[1]*[value[0]] + (100000 - value[1])*[0], k=minute))})
 			keys = list(material_dict.keys())
 
 			# 此时的material_dict中的数据是用于数据库操作的数据
@@ -902,9 +901,12 @@ class GameManager:
 			# 此时的material_dict字典的值是给奖励列表的，
 			# 所以hang_stage是奖励之前的关卡，
 			# hang_up_time是之前挂起的开始时间
+			probability_reward = self._hang_reward_list["probability_reward"]
 			material_dict = {}
+			probability_dict = {}
 			for key, value in self._hang_reward_list[str(hang_stage)].items():
-				material_dict.update({key: value})
+				if key in probability_reward: probability_dict.update({key: value})
+				else: material_dict.update({key: value})
 			material_dict.update({"hang_stage": hang_stage})
 			material_dict.update({"hang_up_time": hang_up_time})
 			key_word = ["hang_stage", "hang_up_time"]
@@ -916,6 +918,9 @@ class GameManager:
 			for key in material_dict.keys():
 				if key not in key_word:
 					material_dict[key] = int(material_dict[key]) * minute
+
+			for key, value in probability_dict.items():  # 完成minute次十万分之value[1]的概率抽到value[0]个特殊的key奖励
+				material_dict.update({key: sum(random.choices(value[1]*[value[0]] + (100000 - value[1])*[0], k=minute))})
 			keys = list(material_dict.keys())
 
 			# 此时的material_dict中的数据是用于数据库操作的数据
@@ -1242,9 +1247,6 @@ class GameManager:
 		else:
 			return self._message_typesetting(93, 'unexpected element, please update the configuration table.')
 
-
-
-
 #############################################################################
 #						End Stage Module Functions							#
 #############################################################################
@@ -1301,8 +1303,6 @@ class GameManager:
 		tier_choice = (random.choices(self._lottery['roles']['names'], self._lottery['roles']['weights'][kind]))[0]
 		gift_role = (random.choices(self._lottery['roles']['items'][tier_choice]))[0]
 		return await self.try_unlock_role(world, unique_id, gift_role)
-
-
 
 	async def basic_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
 		# success -> 0 , 1 , 2 , 3 , 4 , 5
@@ -1363,7 +1363,6 @@ class GameManager:
 		# 98 - insufficient materials
 		# 99 - wrong item name
 		return await self._default_summon(world, unique_id, cost_item, 'prophet', summon_kind)
-
 
 	async def basic_summon_10_times(self, world: int, unique_id: str, cost_item: str, summon_kind:str) -> dict:
 		# 0  - 10 times basic_summon
@@ -1481,7 +1480,6 @@ class GameManager:
 			reward_dict.update({str(i): message_dict["data"]["reward"]})
 		return self._message_typesetting(status=0, message='10 times prophet_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 
-
 	async def fortune_wheel_basic(self, world: int, unique_id: str, cost_item: str) -> dict:
 		# 0  - get energy success
 		# 1  - get weapon success
@@ -1508,8 +1506,6 @@ class GameManager:
 		# 99 - cost_item error
 		return await self._default_fortune_wheel(world, unique_id, cost_item, 'pro')
 
-
-
 #############################################################################
 #						End Lottery Module Functions						#
 #############################################################################
@@ -1518,7 +1514,7 @@ class GameManager:
 #############################################################################
 #						Start Friend Module Functions						#
 #############################################################################
-	
+
 	async def get_all_friend_info(self, world: int, unique_id: str) -> dict:
 		# 0 - Got all friends info
 		# 99 - You do not have any friends. FeelsBadMan.
@@ -1532,7 +1528,6 @@ class GameManager:
 			remaining['remaining']['f_recovery_time'].append(friend[4])
 			remaining['remaining']['become_friend_time'].append(friend[5])
 		return self._message_typesetting(0, 'Got all friends info', remaining)
-
 
 	# TODO optimize the subroutine
 	# TODO check to ensure function is working as expected
@@ -1636,8 +1631,6 @@ class GameManager:
 						}
 				return self._message_typesetting(99, 'send friend gift failed, because cooldown time is not finished', data)
 
-
-
 	async def delete_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# 0 - request friend successfully
 		# 98 - you don't have this friend
@@ -1654,7 +1647,6 @@ class GameManager:
 			return self._message_typesetting(0, 'delete friend success', data={"remaining": {"friend_name": friend_name}})
 		else:
 			return self._message_typesetting(98, 'you do not have this friend')
-
 
 	async def redeem_nonce(self, world: int, unique_id: str, nonce: str) -> dict:
 		# 0 - successfully redeemed
@@ -1965,8 +1957,6 @@ class GameManager:
 		await self._execute_statement_update(world, f'UPDATE families SET member{next_open} = "{r[nonce]["target"]}" WHERE familyid = "{r[nonce]["fid"]}";')
 		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{r[nonce]["fid"]}" WHERE unique_id = "{r[nonce]["uid"]}";')
 		return self._message_typesetting(0, 'success')
-
-
 
 #############################################################################
 #							End Family Functions							#
@@ -2828,7 +2818,6 @@ class GameManager:
 			return self._message_typesetting(96, 'item name error')
 		return self._message_typesetting(5, 'get item success', {'remaining' : {"cost_item": cost_item, "cost_quantity": result["remaining"], "item_id": random_item, "item_quantity": try_result['remaining']}, 'reward' : {"item_id": random_item, "item_quantity": self._lottery['fortune_wheel']['reward'][tier][random_item]}})
 
-
 	async def _decrease_energy(self, world:int, unique_id: str, amount: int) -> dict:
 		current_energy, recover_time = await self._get_energy_information(world, unique_id)
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -2886,12 +2875,6 @@ class GameManager:
 				return self._message_typesetting(7, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {"keys": ['energy', 'recover_time', 'cooling_time'], "values": [current_energy, recover_time, cooling_time]})
 			else:  # 发生的情况是当前能量值和恢复能量值相加比需要消耗的能量值少
 				return self._message_typesetting(status=98, message="Not enough energy consumption")
-
-
-
-
-
-
 
 	async def try_basic_summon_scroll(self, world: int, unique_id: str, value: int) -> dict:
 		return await self._try_material(world, unique_id, 'basic_summon_scroll', value)
@@ -3071,7 +3054,7 @@ class GameManager:
 				},
 				'reward':
 				{
-					"world_boss_enter_time":(d2-d1).seconds,
+					"world_boss_enter_time": int((d2-d1).total_seconds()),
 					'world_boss_remaining_times' : 1
 				}
 			}
@@ -3093,7 +3076,7 @@ class GameManager:
 					},
 					'reward':
 					{
-						"world_boss_enter_time":(d2-d1).seconds,
+						"world_boss_enter_time": int((d2-d1).total_seconds()),
 						'world_boss_remaining_times' : 1
 					}
 				}
@@ -3148,7 +3131,7 @@ class GameManager:
 					'remaining' :
 					{
 						'world_boss_enter_time':current_time1,
-						'world_boss_remaining_times':(d2-d1).seconds,
+						'world_boss_remaining_times':int((d2-d1).total_seconds()),
 						'boss1' : "%.2f" %(int(self._boss_life_remaining[0])/int(self._boss_life[0])),
 						'boss2' : "%.2f" %(int(self._boss_life_remaining[1])/int(self._boss_life[1])),
 						'boss3' : "%.2f" %(int(self._boss_life_remaining[2])/int(self._boss_life[2])),
@@ -3236,7 +3219,6 @@ class GameManager:
 				await self._execute_statement_update(world, f'UPDATE factory SET wishing_pool_timer="{current_time2}" WHERE unique_id = "{unique_id}"')
 			return self._message_typesetting(return_value, 'you get segement',data_json)
 
-	
 	async def _get_top_damage(self, world: int, unique_id: int, range_number: int) -> (int, str):
 		# 0 return 10 data successfully
 		# 98 range number should over or equal 1
@@ -3290,11 +3272,9 @@ class GameManager:
 	async def _set_weapon_level_up_data(self, world: int, unique_id: str, weapon: str, weapon_level: int, skill_point: int) -> dict:
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET weapon_level = "' + str(weapon_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')
 
-
 	async def _get_skill_level(self, world: int, unique_id: str, skill_id: str) -> int:
 		data = await self._execute_statement(world, 'SELECT ' + skill_id + ' FROM skill WHERE unique_id = "' + unique_id + '";')
 		return int(data[0][0])
-
 
 	def _roll_for_upgrade(self, scroll_id: str) -> bool:
 		return random.random() < self._upgrade_chance[scroll_id]
@@ -3342,7 +3322,6 @@ class GameManager:
 		"""
 		return await self._execute_statement_update(world, f"UPDATE player SET {material}={value} where unique_id='{unique_id}'")
 
-
 	def _sql_str_operating(self, unique_id: str, material_dict: dict, key_word: list = []) -> (str, str):
 		update_str = "UPDATE player SET "
 		update_end_str = " where unique_id='%s'" % unique_id
@@ -3381,7 +3360,6 @@ class GameManager:
 		async with await self._pools[world].Connection() as conn:
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
-
 
 	def _internal_format(self, status: int, remaining: int or tuple or list) -> dict:
 		"""
@@ -3455,16 +3433,13 @@ class GameManager:
 				else:
 					self._pools[world] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = f'world{world}', charset = 'utf8')
 
-
-
-
-
 #############################################################################
 #
 #
 #
 #
 #############################################################################
+
 
 ROUTES = web.RouteTableDef()
 
@@ -3623,7 +3598,6 @@ async def __level_up_passive(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).level_up_passive(int(post['world']), post['unique_id'], post['weapon'], post['passive'])
 	return _json_response(result)
 
-
 @ROUTES.post('/level_up_weapon_star')
 async def __level_up_weapon_star(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -3692,8 +3666,6 @@ async def _upgrade_role_star(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).upgrade_role_star(int(post['world']), post['unique_id'], post['role'])
 	return _json_response(result)
-
-
 
 # ############################################################ #
 # ######                  summon weapons                ###### #
@@ -4024,22 +3996,18 @@ async def _remove_user_family(request: web.Request) -> web.Response:
 async def _respond_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).respond_family(int(post['world']), post['unique_id'], post['nonce']))
-#################################################################################################################################
-#################################################################################################################################
-#################################################################################################################################
+#  ################################################################################
+#  ########################## start mall  #########################################
+#  ################################################################################
 
 @ROUTES.post('/purchase_scroll_mall')
 async def _purchase_scroll_mall(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], "1", int(post['quantity'])))
+	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], post["purchase_type"], int(post['quantity'])))
 
-@ROUTES.post('/purchase_scroll_mall2')
-async def _purchase_scroll_mall2(request: web.Request) -> web.Response:
-	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], "2", int(post['quantity'])))
-#################################################################################################################################
-#################################################################################################################################
-#################################################################################################################################
+#  ################################################################################
+#  ##########################   end mall  #########################################
+#  ################################################################################
 @ROUTES.post('/get_lottery_config_info')
 async def _get_lottery_config_info(request: web.Request) -> web.Response:
 	post = await request.post()
