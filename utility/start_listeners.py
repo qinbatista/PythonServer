@@ -8,13 +8,13 @@ import requests
 def loc():
 	return os.path.dirname(os.path.realpath(__file__))
 
-def main(chatters):
+def main(listeners):
 	processes = []
 	try:
-		for chatter in range(int(chatters)):
-			processes.append(subprocess.Popen(['python', loc() + '/chatter.py', str(chatter)]))
+		for listener in range(int(listeners)):
+			processes.append(subprocess.Popen(['python', loc() + '/listener.py', str(listener)]))
 			time.sleep(0.2)
-		print('Done spawning chatters...')
+		print('Done spawning listener...')
 		while (len(processes) > 0):
 			time.sleep(5)
 	except KeyboardInterrupt:
@@ -26,6 +26,6 @@ def main(chatters):
 
 if __name__ == '__main__':
 	if len(sys.argv) != 2:
-		print('missing required argument: number of chatters')
+		print('missing required argument: number of listeners')
 	else:
 		main(sys.argv[1])

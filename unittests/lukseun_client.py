@@ -80,7 +80,7 @@ class LukseunClient:
 		return response
 	
 	def _make_header(self, message_len: int) -> bytes:
-		return MD5_ALIYA + str(message_len).zfill(4).encode()
+		return MD5_ALIYA + str(message_len).zfill(5).encode()
 	
 	def _encode_message(self, message: str) -> bytes:
 		return base64.encodebytes(self._k.encrypt(message.encode()))
@@ -92,8 +92,6 @@ class LukseunClient:
 async def main():
 	lukseun = LukseunClient()
 	# await lukseun.send_message("{'session': '', 'function': 'get_staff_current_status', 'random': '744', 'data': {'unique_id': '', 'account': '', 'password': ''}}")
-	await lukseun.send_message(
-		"{'session': '989E4221-BFB1-4ED7-B0D4-15164E93F69B', 'function': 'get_someday_information', 'random': '744', 'data': {'date': '2019-05-28'}}")
 
 
 if __name__ == "__main__":
