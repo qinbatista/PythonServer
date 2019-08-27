@@ -655,26 +655,24 @@ class GameManager:
 		values = [-v for v in list(enter_stage_data[str(stage)].values())]
 		remaining = {}
 		material_dict = {}
+		for i in range(len(keys)):
+			material_dict.update({keys[i]: values[i]})
+		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
+		select_values = (await self._execute_statement(world, select_str))[0]
+		for i in range(len(select_values)):
+			values[i] = int(values[i]) + int(select_values[i])
+			if values[i] < 0:
+				return self._message_typesetting(98, "%s insufficient" % keys[i])
 		if "energy" in keys:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")])
 			if energy_data["status"] >= 97:
 				return self._message_typesetting(status=96, message="Insufficient energy")
-			num = keys.index("energy")
-			keys.pop(num)
-			values.pop(num)
+			material_dict.pop("energy")
 			for i in range(len(energy_data["data"]["keys"])):
 				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
-		for i in range(len(keys)):
-			material_dict.update({keys[i]: values[i]})
 
 		if material_dict:
 			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-			select_values = (await self._execute_statement(world, select_str))[0]
-			for i in range(len(select_values)):
-				values[i] = int(values[i]) + int(select_values[i])
-				if values[i] < 0:
-					return self._message_typesetting(98, "%s insufficient" % keys[i])
-
 			if await self._execute_statement_update(world, update_str) == 0:
 				return self._message_typesetting(status=97, message="database operating error")
 		for i in range(len(keys)):
@@ -714,25 +712,23 @@ class GameManager:
 		values = [-v for v in list(enter_tower_data[str(stage)].values())]
 		remaining = {}
 		material_dict = {}
+		for i in range(len(keys)):
+			material_dict.update({keys[i]: values[i]})
+		update_str, select_str = self._sql_str_operating(unique_id, material_dict)
+		select_values = (await self._execute_statement(world, select_str))[0]
+		for i in range(len(select_values)):
+			values[i] = int(values[i]) + int(select_values[i])
+			if values[i] < 0:
+				return self._message_typesetting(98, "%s insufficient" % keys[i])
 		if "energy" in keys:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=values[keys.index("energy")])
 			if energy_data["status"] >= 97:
 				return self._message_typesetting(status=96, message="Insufficient physical strength")
-			num = keys.index("energy")
-			keys.pop(num)
-			values.pop(num)
+			material_dict.pop("energy")
 			for i in range(len(energy_data["data"]["keys"])):
 				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
-		for i in range(len(keys)):
-			material_dict.update({keys[i]: values[i]})
 		if material_dict:
 			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-			select_values = (await self._execute_statement(world, select_str))[0]
-			for i in range(len(select_values)):
-				values[i] = int(values[i]) + int(select_values[i])
-				if values[i] < 0:
-					return self._message_typesetting(98, "%s insufficient" % keys[i])
-
 			if await self._execute_statement_update(world, update_str) == 0:
 				return self._message_typesetting(status=97, message="database operating error")
 		for i in range(len(keys)):
