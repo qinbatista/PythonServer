@@ -1861,7 +1861,7 @@ class GameManager:
 		# 97 - you must be family owner to remove a user
 		# 98 - you do not belong to a family
 		game_name, fid = await self._get_familyid(world, unique_id = uid)
-		if fid is None or fid == '': return self._message_typesetting(98, 'you are not in a family.')
+		if not fid: return self._message_typesetting(98, 'you are not in a family.')
 		if game_name == gamename_target: return self._message_typesetting(95, 'you can not remove yourself using this function')
 		owner, fname, members = await self._get_family_information(world, fid)
 		if game_name != owner: return self._message_typesetting(97, 'you are not family owner')
@@ -2678,7 +2678,7 @@ class GameManager:
 			data = await self._execute_statement(world, f'SELECT game_name, familyid FROM player WHERE unique_id = "{kwargs["unique_id"]}";')
 		else:
 			data = await self._execute_statement(world, f'SELECT game_name, familyid FROM player WHERE game_name = "{kwargs["game_name"]}";')
-		return (None, None) if data == () else data[0]
+		return data[0] if data else ('', '')
 
 	async def _get_dark_market_material(self, world: int, unique_id: str, code: int) -> tuple:
 		sql_str = 'SELECT merchandise%s, merchandise%s_quantity, currency_type%s, currency_type%s_price, refresh_time, refreshable_quantity FROM dark_market WHERE unique_id = "%s";' % (code, code, code, code, unique_id)

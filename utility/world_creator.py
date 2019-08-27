@@ -113,6 +113,8 @@ def create_table_families(cursor):
 	  `member3` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '',
 	  `member4` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '',
 	  `member5` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '',
+	  `remove_start_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '删除家族成员的开始时间',
+	  `remove_times` int(6) DEFAULT 5 COMMENT '可删除的次数',
 	  PRIMARY KEY (`familyid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
@@ -338,8 +340,15 @@ def already_exists(world):
 		if code == 1049: return False
 	return True
 
+def operating_test():
+	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
+	c.select_db("aliya")
+	cursor = c.cursor()
+	create_table_families(cursor)
+
+
 if __name__ == '__main__':
-	# create_world("aliya")
+	# operating_test()
 	world = input('Enter world name: ')
 	if not already_exists(world):
 		create_world(world)
