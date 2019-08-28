@@ -14,8 +14,10 @@ import configparser
 from aiohttp import web
 from datetime import datetime, timedelta
 from utility import repeating_timer
+from utility import metrics
 
 
+C = metrics.Collector()
 
 class GameManager:
 	def __init__(self, worlds = []):
@@ -50,6 +52,7 @@ class GameManager:
 		data = await self._execute_statement(world, "SELECT * FROM player WHERE unique_id='" + str(unique_id) + "'")
 		return self._internal_format(0, data[0])
 
+	@C.collect_async
 	async def get_all_supplies(self, world: int, unique_id: str) -> dict:
 		# success ===> 0
 		data_tuple = (await self.get_all_head(world, table="player"))["remaining"]
@@ -67,6 +70,7 @@ class GameManager:
 			return self._message_typesetting(status=0, message="success", data={"remaining": {supply: data["remaining"]}})
 		return self._message_typesetting(status=1, message="failure")
 
+	@C.collect_async
 	async def level_up_scroll(self, world: int, unique_id: str, scroll_id: str) -> dict:
 		# 0 success
 		# 95 advanced reels are not upgradeable
@@ -221,6 +225,7 @@ class GameManager:
 
 	# TODO ensure SQL UPDATE statement succeeds
 	# TODO error checking for valid skill_id?
+	@C.collect_async
 	async def level_up_skill(self, world: int, unique_id: str, skill_id: str, scroll_id: str):
 		# success ===> 0 and 1
 		# 0 - upgrade success
@@ -244,6 +249,7 @@ class GameManager:
 		await self._execute_statement(world, 'UPDATE skill SET `' + skill_id + '` = ' + str(skill_level + 1) + ' WHERE unique_id = "' + unique_id + '";')
 		return self._message_typesetting(0, 'upgrade success', {'remaining': {skill_id: skill_level + 1, scroll_id: resp['remaining']}})
 
+	@C.collect_async
 	async def get_all_skill_level(self, world: int, unique_id: str) -> dict:
 		# success ===> 0
 		# 0 - Success
@@ -254,6 +260,7 @@ class GameManager:
 			remaining.update({val[0][0]: val[1]})
 		return self._message_typesetting(0, 'success', {"remaining": remaining})
 
+	@C.collect_async
 	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
 		# success ===> 0
 		# 0 - Success
@@ -287,6 +294,7 @@ class GameManager:
 #						Weapon Module Functions								#
 #############################################################################
 
+	@C.collect_async
 	async def level_up_weapon(self, world: int, unique_id: str, weapon: str, iron: int) -> dict:
 		# - 0 - Success
 		# - 94 - Invalid weapon name
@@ -332,6 +340,7 @@ class GameManager:
 		remaining.pop('unique_id')
 		return self._message_typesetting(status=0, message='success', data={'remaining': remaining})
 
+	@C.collect_async
 	async def level_up_passive(self, world: int, unique_id: str, weapon: str, passive: str) -> dict:
 		# - 0 - Success
 		# - 94 - Invalid weapon name
@@ -369,6 +378,7 @@ class GameManager:
 		remaining.pop('unique_id')
 		return self._message_typesetting(status=0, message="success", data={"remaining": remaining})
 
+	@C.collect_async
 	async def level_up_weapon_star(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Weapon upgrade success
 		# - 98 - insufficient segment, upgrade failed
@@ -398,6 +408,7 @@ class GameManager:
 		remaining.pop('unique_id')
 		return self._message_typesetting(0, weapon + " upgrade success!", {"remaining": remaining})
 
+	@C.collect_async
 	async def reset_weapon_skill_point(self, world: int, unique_id: str, weapon: str) -> dict:
 		# - 0 - Success
 		# - 94 - Invalid weapon name
@@ -436,6 +447,7 @@ class GameManager:
 		return self._message_typesetting(0, weapon + " reset skill point success!", {"remaining": remaining})
 
 	# TODO CHECK FOR SPEED IMPROVEMENTS
+	@C.collect_async
 	async def get_all_weapon(self, world: int, unique_id: str) -> dict:
 		# - 0 - gain success
 		data_tuple = (await self.get_all_head(world, "weapon"))["remaining"]
@@ -487,6 +499,7 @@ class GameManager:
 			await self._execute_statement_update(world=world, statement=sql_str)
 			return self._message_typesetting(0, 'Unlocked new role!', {'keys' : ['role', 'star', 'segment'], 'values' : [role, row[2], row[9]]})
 
+	@C.collect_async
 	async def disintegrate_weapon(self, world: int, unique_id: str, weapon: str) -> dict:
 		# 0 - successful weapon decomposition
 		# 96 - User does not have that weapon
@@ -557,6 +570,7 @@ class GameManager:
 #						Start Role Module Functions							#
 #############################################################################
 
+	@C.collect_async
 	async def upgrade_role_level(self, world: int, unique_id: str, role: str, experience_potion: int) -> dict:
 		# - 0 - Success
 		# - 94 - Invalid role name
@@ -602,6 +616,7 @@ class GameManager:
 		remaining.pop('unique_id')
 		return self._message_typesetting(status=0, message='success', data={'remaining': remaining})
 
+	@C.collect_async
 	async def upgrade_role_star(self, world: int, unique_id: str, role: str) -> dict:
 		# - 0 - role upgrade success
 		# - 94 - Invalid role name
@@ -643,6 +658,7 @@ class GameManager:
 #############################################################################
 
 	# TODO CHECK SPEED IMPROVEMENTS
+	@C.collect_async
 	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
 		# 97 - database operation error
@@ -681,6 +697,7 @@ class GameManager:
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
 
+	@C.collect_async
 	async def pass_stage(self, world: int, unique_id: str, stage: int, clear_time: str) -> dict:
 		# success ===> 0
 		# 0 : passed customs ===> success
@@ -702,6 +719,7 @@ class GameManager:
 			reward.pop("stage")
 			return self._message_typesetting(status=0, message="passed customs!", data={"remaining": remaining, "reward": reward})
 
+	@C.collect_async
 	async def enter_tower(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
 		# 97 - database operation error
@@ -739,6 +757,7 @@ class GameManager:
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
 
+	@C.collect_async
 	async def pass_tower(self, world: int, unique_id: str, stage: int, clear_time: str) -> dict:
 		# 0 - Earn rewards success
 		# 1 - Successfully unlock new skills
@@ -815,6 +834,7 @@ class GameManager:
 			return self._message_typesetting(99, 'configration is empty')
 		return self._message_typesetting(0, 'got all stage info', data={"remaining": self._entry_consumables})
 
+	@C.collect_async
 	async def start_hang_up(self, world: int, unique_id: str, stage: int) -> dict:
 		"""
 		success ===> 0 , 1
@@ -886,6 +906,7 @@ class GameManager:
 			material_dict.update({"hang_up_time": hang_up_time})
 			return self._message_typesetting(status=1, message="Repeated hang up successfully", data={"remaining": remaining, "reward": material_dict})
 
+	@C.collect_async
 	async def get_hang_up_reward(self, world: int, unique_id: str) -> dict:
 		"""
 		success ===> 0
@@ -938,6 +959,7 @@ class GameManager:
 			material_dict.update({"hang_up_time": hang_up_time})
 			return self._message_typesetting(status=0, message="Settlement reward success", data={"remaining": remaining, "reward": material_dict})
 
+	@C.collect_async
 	async def get_hang_up_info(self, world: int, unique_id: str) -> dict:
 		"""
 		success ===> 0
@@ -949,6 +971,7 @@ class GameManager:
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
 
+	@C.collect_async
 	async def show_energy(self, world: int, unique_id: str):
 		data = await self.try_energy(world=world, unique_id=unique_id, amount=0)
 		_data = data["data"]
@@ -961,6 +984,7 @@ class GameManager:
 			data["data"] = {"remaining": data_dict}
 		return data
 
+	@C.collect_async
 	async def upgrade_armor(self, world: int, unique_id: str, armor_id: str, level: int) -> dict:
 		"""
 		# success ===> 0
@@ -995,6 +1019,7 @@ class GameManager:
 			await self._execute_statement_update(world=world, statement=f"insert into armor(unique_id, armor_id) values ('{unique_id}','{armor_id}')")
 			return (await self._execute_statement(world=world, statement=sql_str))[0]
 
+	@C.collect_async
 	async def get_all_armor_info(self, world: int, unique_id: str):
 		# 0 - got all armor info
 		result = await self._execute_statement(world, f"SELECT * FROM armor WHERE unique_id='{unique_id}';")
@@ -1006,6 +1031,7 @@ class GameManager:
 		# print("remaining="+str(remaining))
 		return self._message_typesetting(0, 'got all armor info', data={"remaining": remaining})
 
+	@C.collect_async
 	async def automatically_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		success -> 0 and 1
@@ -1095,6 +1121,7 @@ class GameManager:
 				remaining.pop('unique_id')
 				return self._message_typesetting(2, 'Refresh time is not over yet, market information has been obtained', {'remaining' : remaining})
 
+	@C.collect_async
 	async def manually_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		# 0  - refresh market success
@@ -1140,6 +1167,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(97, 'insufficient refreshable quantity')
 
+	@C.collect_async
 	async def diamond_refresh_store(self, world: int, unique_id: str) -> dict:
 		"""
 		# 0  - refresh market success
@@ -1183,6 +1211,7 @@ class GameManager:
 			remaining.update({'refresh_time' : refresh_time, 'refreshable_quantity' : int(refreshable_quantity)})
 			return self._message_typesetting(0, 'refresh market success', {'remaining' : remaining})
 
+	@C.collect_async
 	async def black_market_transaction(self, world: int, unique_id: str, code: int) -> dict:
 		# 0  : gain weapon fragments
 		# 1  : gain new skills
@@ -1259,6 +1288,7 @@ class GameManager:
 #						Lottery Module Functions							#
 #############################################################################
 
+	@C.collect_async
 	async def random_gift_skill(self, world: int, unique_id: str, kind: str) -> dict:
 		# success ===> 0 and 1
 		# 0 - unlocked new skill            {"skill_id": skill_id, "value": value}
@@ -1287,6 +1317,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(2, 'Invalid skill name')
 
+	@C.collect_async
 	async def random_gift_weapon(self, world: int, unique_id: str, kind: str) -> dict:
 		# success ===> 0 and 1
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
@@ -1296,6 +1327,7 @@ class GameManager:
 		gift_weapon = (random.choices(self._lottery['weapons']['items'][tier_choice]))[0]
 		return await self.try_unlock_weapon(world, unique_id, gift_weapon)
 
+	@C.collect_async
 	async def random_gift_role(self, world: int, unique_id: str, kind: str) -> dict:
 		# success ===> 0 and 1
 		# - 0 - Unlocked new weapon!   ===> {"keys": ["weapon"], "values": [weapon]}
@@ -1305,6 +1337,7 @@ class GameManager:
 		gift_role = (random.choices(self._lottery['roles']['items'][tier_choice]))[0]
 		return await self.try_unlock_role(world, unique_id, gift_role)
 
+	@C.collect_async
 	async def basic_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
 		# success -> 0 , 1 , 2 , 3 , 4 , 5
 		# 0  - get skill item success
@@ -1320,6 +1353,7 @@ class GameManager:
 		# 99 - wrong item name
 		return await self._default_summon(world, unique_id, cost_item, 'basic', summon_kind)
 
+	@C.collect_async
 	async def pro_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
 		# success -> 0 , 1 , 2 , 3 , 4 , 5
 		# 0  - get skill item success
@@ -1335,6 +1369,7 @@ class GameManager:
 		# 99 - wrong item name
 		return await self._default_summon(world, unique_id, cost_item, 'pro', summon_kind)
 
+	@C.collect_async
 	async def friend_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
 		# success -> 0 , 1 , 2 , 3 , 4 , 5
 		# 0  - get skill item success
@@ -1350,6 +1385,7 @@ class GameManager:
 		# 99 - wrong item name
 		return await self._default_summon(world, unique_id, cost_item, 'friend_gift', summon_kind)
 
+	@C.collect_async
 	async def prophet_summon(self, world: int, unique_id: str, cost_item: str, summon_kind: str) -> dict:
 		# success -> 0 , 1 , 2 , 3 , 4 , 5
 		# 0  - get skill item success
@@ -1365,6 +1401,7 @@ class GameManager:
 		# 99 - wrong item name
 		return await self._default_summon(world, unique_id, cost_item, 'prophet', summon_kind)
 
+	@C.collect_async
 	async def basic_summon_10_times(self, world: int, unique_id: str, cost_item: str, summon_kind:str) -> dict:
 		# 0  - 10 times basic_summon
 		# 98 - insufficient materials
@@ -1394,6 +1431,7 @@ class GameManager:
 			reward_dict.update({str(i): message_dict["data"]["reward"]})
 		return self._message_typesetting(status=0, message='10 times basic_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 
+	@C.collect_async
 	async def pro_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
 		# 0  - 10 times pro_summon
 		# 98 - insufficient materials
@@ -1423,6 +1461,7 @@ class GameManager:
 			reward_dict.update({str(i): message_dict["data"]["reward"]})
 		return self._message_typesetting(status=0, message='10 times pro_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 
+	@C.collect_async
 	async def friend_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
 		# 0  - 10 times friend_summon
 		# 98 - insufficient materials
@@ -1452,6 +1491,7 @@ class GameManager:
 			reward_dict.update({str(i): message_dict["data"]["reward"]})
 		return self._message_typesetting(status=0, message='10 times friend_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 
+	@C.collect_async
 	async def prophet_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
 		# 0  - 10 times prophet_summon
 		# 98 - insufficient materials
@@ -1481,6 +1521,7 @@ class GameManager:
 			reward_dict.update({str(i): message_dict["data"]["reward"]})
 		return self._message_typesetting(status=0, message='10 times prophet_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 
+	@C.collect_async
 	async def fortune_wheel_basic(self, world: int, unique_id: str, cost_item: str) -> dict:
 		# 0  - get energy success
 		# 1  - get weapon success
@@ -1494,6 +1535,7 @@ class GameManager:
 		# 99 - cost_item error
 		return await self._default_fortune_wheel(world, unique_id, cost_item, 'basic')
 
+	@C.collect_async
 	async def fortune_wheel_pro(self, world: int, unique_id: str, cost_item: str) -> dict:
 		# 0  - get energy success
 		# 1  - get weapon success
@@ -1516,6 +1558,7 @@ class GameManager:
 #						Start Friend Module Functions						#
 #############################################################################
 
+	@C.collect_async
 	async def get_all_friend_info(self, world: int, unique_id: str) -> dict:
 		# 0 - Got all friends info
 		# 99 - You do not have any friends. FeelsBadMan.
@@ -1532,6 +1575,7 @@ class GameManager:
 
 	# TODO optimize the subroutine
 	# TODO check to ensure function is working as expected
+	@C.collect_async
 	async def send_all_friend_gift(self, world: int, unique_id: str) -> dict:
 		friends = await self._execute_statement(world, f'SELECT * FROM friend WHERE unique_id = "{unique_id}" and become_friend_time != "";')
 		if len(friends) == 0:
@@ -1544,6 +1588,7 @@ class GameManager:
 			remaining['remaining']['f_recovery_time'].append(d['data']['remaining']['current_time'])
 		return self._message_typesetting(0, 'sent all friends gifts', remaining)
 
+	@C.collect_async
 	async def send_friend_gift(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
@@ -1632,6 +1677,7 @@ class GameManager:
 						}
 				return self._message_typesetting(99, 'send friend gift failed, because cooldown time is not finished', data)
 
+	@C.collect_async
 	async def delete_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# 0 - request friend successfully
 		# 98 - you don't have this friend
@@ -1649,6 +1695,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(98, 'you do not have this friend')
 
+	@C.collect_async
 	async def redeem_nonce(self, world: int, unique_id: str, nonce: str) -> dict:
 		# 0 - successfully redeemed
 		# 99 - database operation error
@@ -1666,6 +1713,7 @@ class GameManager:
 		quantities = (await self._execute_statement(world, sql_str))[0][0]
 		return self._message_typesetting(0, 'successfully redeemed', {'remaining' : {"nonce": nonce, items : quantities}})
 
+	@C.collect_async
 	async def redeem_all_nonce(self, world: int, unique_id: str, type_list: [str], nonce_list: [str]) -> dict:
 		# success -> 0
 		# 0 - Add friends to success
@@ -1705,6 +1753,7 @@ class GameManager:
 				remaining["expired_nonce"].append(nonce_list[i])
 		return self._message_typesetting(status=0, message="successfully redeemed", data={"remaining": remaining})
 
+	@C.collect_async
 	async def request_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# success -> 0
 		# 0 - request friend successfully
@@ -1745,6 +1794,7 @@ class GameManager:
 			return self._message_typesetting(status=95, message="database operating error")
 		return self._message_typesetting(status=0, message="request friend successfully")
 
+	@C.collect_async
 	async def response_friend(self, world: int, unique_id: str, nonce: str) -> dict:
 		# success -> 0
 		# 0 - Add friends to success
@@ -1781,6 +1831,7 @@ class GameManager:
 #############################################################################
 #                     Start Mall Function Position                          #
 #############################################################################
+	@C.collect_async
 	async def purchase_scroll_mall(self, world: int, unique_id: str, scroll_type: str, purchase_type: str, quantity: int):
 		"""
 		0 - Purchase success
@@ -1855,6 +1906,7 @@ class GameManager:
 #						Start Family Functions								#
 #############################################################################
 
+	@C.collect_async
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
 		# 0 - success, user removed
 		# 93 - You have reached the upper limit of the number of union removals today.
@@ -1915,6 +1967,7 @@ class GameManager:
 
 	# TODO refactor code to run both sql statements with asyncio.gather
 	# if the person leaving is the owner, disband the entire family
+	@C.collect_async
 	async def leave_family(self, world: int, uid: str) -> dict:
 		# 0 - success, you have left your family
 		# 98 - you do not belong to a family
@@ -1931,6 +1984,7 @@ class GameManager:
 			await self._execute_statement_update(world, f'UPDATE families SET member{members.index(game_name)} = "" WHERE familyid = "{fid}";')
 		return self._message_typesetting(0, 'success, you have left your family.')
 
+	@C.collect_async
 	async def create_family(self, world: int, uid: str, fname: str) -> dict:
 		# 0 - success, family created
 		# 98 - you are already in a family
@@ -1946,6 +2000,7 @@ class GameManager:
 
 		return self._message_typesetting(0, 'success, family created')
 
+	@C.collect_async
 	async def request_join_family(self, world: int, uid: str, fname: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox
 		# 98 - you already belong to a family
@@ -1959,6 +2014,7 @@ class GameManager:
 		r = requests.post('http://localhost:8020/send_mail', json = j)
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
+	@C.collect_async
 	async def invite_user_family(self, world: int, uid: str, target: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox
 		# 95 - target does not exist
@@ -1978,6 +2034,7 @@ class GameManager:
 		r = requests.post('http://localhost:8020/send_mail', json = j)
 		return self._message_typesetting(0, 'success, request sent')
 
+	@C.collect_async
 	async def respond_family(self, world: int, uid: str, nonce: str) -> dict:
 		# 0 - success
 		# 96 - family does not exist
@@ -2007,6 +2064,7 @@ class GameManager:
 #							Start Factory Functions							#
 #############################################################################
 
+	@C.collect_async
 	async def refresh_food_storage(self, world: int, unique_id: str) -> dict:
 		# 0  - Food factory update success
 		# 99 - Food factory did not start
@@ -2057,6 +2115,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(status=99, message="Food factory did not start")
 
+	@C.collect_async
 	async def refresh_mine_storage(self, world: int, unique_id: str) -> dict:
 		# 0  - Mine factory update success
 		# 99 - Mine factory did not start
@@ -2112,6 +2171,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(status=99, message="Mine factory did not start")
 
+	@C.collect_async
 	async def refresh_crystal_storage(self, world: int, unique_id: str) -> dict:
 		# 0  - Crystal factory update success
 		# 99 - Crystal factory did not start
@@ -2178,6 +2238,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(status=99, message="Crystal factory did not start")
 
+	@C.collect_async
 	async def refresh_equipment_storage(self, world: int, unique_id: str) -> dict:
 		"""
 		0  - Equipment factory update success
@@ -2236,6 +2297,7 @@ class GameManager:
 		else:
 			return self._message_typesetting(status=99, message="Equipment factory did not start")
 
+	@C.collect_async
 	async def refresh_all_storage(self, world: int, unique_id: str) -> dict:
 		"""
 		0 -  update factory success
@@ -2366,6 +2428,7 @@ class GameManager:
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
 
+	@C.collect_async
 	async def distribution_workers(self, world: int, unique_id: str, workers_quantity: int, factory_kind: str) -> dict:
 		"""
 		0  - Successful employee assignment, get factory work rewards
@@ -2430,6 +2493,7 @@ class GameManager:
 			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
 
+	@C.collect_async
 	async def equipment_manufacturing_armor(self, world: int, unique_id: str, armor_id: str) -> dict:
 		"""
 		0 - Successfully opened manufacturing armor
@@ -2459,6 +2523,7 @@ class GameManager:
 		remaining.update({"finally_equipment_storage": 0, "finally_equipment_product_type": armor_id})
 		return self._message_typesetting(status=0, message="Successfully opened manufacturing armor", data={"remaining": remaining, "reward": reward})
 
+	@C.collect_async
 	async def buy_workers(self, world: int, unique_id: str, workers_quantity: int) -> dict:
 		"""
 		0  - Buy workers success, storage has been refreshed
@@ -2515,6 +2580,7 @@ class GameManager:
 			return self._message_typesetting(status=0, message="Buy workers success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=1, message="Buy workers success", data={"remaining": remaining})
 
+	@C.collect_async
 	async def upgrade_food_factory(self, world: int, unique_id: str, upgrade_level: int = 1) -> dict:
 		"""
 		0  - Upgrade food factory success
@@ -2561,6 +2627,7 @@ class GameManager:
 			return self._message_typesetting(status=1, message="Upgrade food factory success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=0, message="Upgrade food factory success", data={"remaining": remaining})
 
+	@C.collect_async
 	async def upgrade_mine_factory(self, world: int, unique_id: str) -> dict:
 		"""
 		0  - Upgrade mine factory success
@@ -2596,6 +2663,7 @@ class GameManager:
 			return self._message_typesetting(status=1, message="Upgrade mine factory success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=0, message="Upgrade mine factory success", data={"remaining": remaining})
 
+	@C.collect_async
 	async def upgrade_crystal_factory(self, world: int, unique_id: str) -> dict:
 		"""
 		0  - Upgrade crystal factory success
@@ -2631,6 +2699,7 @@ class GameManager:
 			return self._message_typesetting(status=1, message="Upgrade crystal factory success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=0, message="Upgrade crystal factory success", data={"remaining": remaining})
 
+	@C.collect_async
 	async def upgrade_wishing_pool(self, world: int, unique_id: str) -> dict:
 		"""
 		0  - Upgrade wishing pool success
@@ -2666,6 +2735,7 @@ class GameManager:
 			return self._message_typesetting(status=1, message="Upgrade wishing pool success, storage has been refreshed", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=0, message="Upgrade wishing pool success", data={"remaining": remaining})
 
+	@C.collect_async
 	async def acceleration_technology(self, world: int, unique_id: str) -> dict:
 		"""
 		0  - Accelerate success
