@@ -273,7 +273,7 @@ def purchase_energy():
 	# response = send_tcp_message(msg)
 	return True
 def registered_account(world:str, unique_id: str):
-	print_module("[registered_account][registered_account]")
+	print_module("[registered_account]")
 	msg = {'function' : 'login_unique', 'data' : {'unique_id' : unique_id}}
 	response = asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 	myjson = response
@@ -290,7 +290,7 @@ def print_module(my_string):
 def enter_level():
 	global token
 	while True:
-		print_module("[registered_account][enter_level] enter_level")
+		print_module("[enter_level]")
 		my_number = random.randint(0,4)
 		if my_number==0:#剧情
 			print_method("[registered_account][enter_level] play normal level")
@@ -322,28 +322,93 @@ def enter_level():
 			print_method("[registered_account][enter_level] quit level playing")
 			break
 def freind_dialog():
-	print_module("[registered_account][enter_level] enter_level")
+	print_module("[freind_dialog]")
 	global token
 	msg = {'world' : '0', 'function' : 'get_all_friend_info', 'data' : {'token' : token}}
 	response = send_tcp_message(msg)#获取所有好友信息
 	# print(str(response))
-	int_random = random.randint(1,1)
-	if int_random==0:
-		for i in range(0,len(response["data"]["remaining"]["f_name"])):
-			send_msg = {'world' : '0', 'function' : 'send_friend_gift', 'data' : {'token' : token,"friend_name":str(response["data"]["remaining"]["f_name"][i])}}
+	while True:
+		int_random = random.randint(0,4)
+		if int_random==0:#发送一个好友
+			for i in range(0,len(response["data"]["remaining"]["f_name"])):
+				send_msg = {'world' : '0', 'function' : 'send_friend_gift', 'data' : {'token' : token,"friend_name":str(response["data"]["remaining"]["f_name"][i])}}
+				new_response = send_tcp_message(send_msg)#发送好友信息
+				if new_response["status"]=="0":
+					print_method("[freind_dialog] send friend gift:"+new_response["data"]["remaining"]["f_name"][i])
+				else:
+					print_method(f'[freind_dialog] send {response["data"]["remaining"]["f_name"][i]} gift but failed, error:{new_response["message"]}')
+		elif int_random==1:#发送所有好友信息
+			send_msg = {'world' : '0', 'function' : 'send_all_friend_gift', 'data' : {'token' : token}}
+			new_response = send_tcp_message(send_msg)#发送好友信息s
+			print_method("[freind_dialog] send all gift:"+str(new_response))
+		elif int_random==2:#加好友
+			friend_name = random.randint(0,100)
+			send_msg = {'world' : '0', 'function' : 'request_friend', 'data' : {'token' : token,"friend_name":str(friend_name)}}
 			new_response = send_tcp_message(send_msg)#发送好友信息
-			if new_response["status"]=="0":
-				print_method("[registered_account][enter_level] send friend gift:"+new_response["data"]["remaining"]["f_name"][i])
+			print_method("[freind_dialog] requst_friend:"+str(friend_name)+" "+str(new_response))
+		elif int_random==3:#删好友
+			friend_name = random.randint(0,100)
+			send_msg = {'world' : '0', 'function' : 'delete_friend', 'data' : {'token' : token,"friend_name":str(friend_name)}}
+			new_response = send_tcp_message(send_msg)#发送好友信息
+			print_method("[freind_dialog] delete_friend:"+str(friend_name)+" "+str(new_response))
+		elif int_random ==4:
+			print_method("[freind_dialog] quit friend dialog")
+			break
+def get_random_skill():
+	print_module("[get_random_skill]")
+	while True:
+		int_n = random.randint(0,1)
+		if int_n == 0: #朋友召唤
+			print_method("[freind_dialog] friend gift to get skill")
+			is_10 = random.choice([0,1])
+			if is_10==0:
+				send_msg = {'world' : '0', 'function' : 'basic_summon_skill', 'data' : {'token' : token,"cost_item":"friend_gift"}}
 			else:
-				print_method(f'[registered_account][enter_level] send {response["data"]["remaining"]["f_name"][i]} gift but failed, error:{new_response["message"]}')
-	elif int_random==1:
-		send_msg = {'world' : '0', 'function' : 'send_all_friend_gift', 'data' : {'token' : token}}
-		new_response = send_tcp_message(send_msg)#发送好友信息s
-		print_method("[registered_account][enter_level] send all gift:"+str(new_response))
-	# while True:
-	# 	pass
+				send_msg = {'world' : '0', 'function' : 'basic_summon_skill_10_times', 'data' : {'token' : token,"cost_item":"friend_gift"}}
+			new_response = send_tcp_message(send_msg)#发送好友信息
+		elif int_n == 1:#高级召唤
+			print_method("[freind_dialog] diamond gift to get skill")
+			is_10 = random.choice([0,1])
+			if is_10==0:
+				send_msg = {'world' : '0', 'function' : 'pro_summon_skill', 'data' : {'token' : token,"cost_item":"basic_summon_scroll"}}
+			else:
+				send_msg = {'world' : '0', 'function' : 'pro_summon_skill_10_times', 'data' : {'token' : token,"cost_item":"basic_summon_scroll"}}
+			new_response = send_tcp_message(send_msg)#发送好友信息
+			if new_response["status"]!=0:
+				pass#购买卷轴
+				if random.choice([0,1])==0:
+					continue
+				else:
+					break
+			else:
+				break
+	#朋友召唤
+	#高级召唤
+def skill_dialog():
+	print_module("[skill_dialog]")
+	send_msg = {'world' : '0', 'function' : 'get_all_skill_level', 'data' : {'token' : token}}
+	new_response = send_tcp_message(send_msg)#升级请求
+	while True:
+		skill_id = random.choice(["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", 
+				"m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level",
+				"p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level",
+				"g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"])
+		skill_level = new_response["data"]["remaining"][skill_id]
+		print("skill_level="+str(skill_level))
+		if skill_level==0:
+			int_n = random.randint(0,1)
+			if int_n == 0:
+				get_random_skill()
+			else:
+				break
+		else:
+			scroll_id = random.choice(["m1_level", "p1_level", "g1_level"])
+			send_msg = {'world' : '0', 'function' : 'level_up_skill', 'data' : {'token' : token,"skill_id":skill_id,"scroll_id":scroll_id}}
+			new_response = send_tcp_message(send_msg)#升级请求
+			print_method("[skill_dialog] level up skill success" + str(new_response))
 if __name__ == "__main__":
 	token = registered_account("0",unique_id)#账号注册
 	# enter_level()#关卡界面
-	freind_dialog()#朋友界面
-
+	# freind_dialog()#朋友界面
+	# skill_dialog()#技能界面
+	get_random_skill()
