@@ -399,7 +399,7 @@ if __name__ == "__main__":
 	# try_energy()
 	# start_hang_up()
 	# get_hang_up_reward()
-	enter_stage(stage=2)
+	enter_stage(stage=1)
 	# enter_tower(stage=3)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
