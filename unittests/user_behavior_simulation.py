@@ -273,20 +273,27 @@ def purchase_energy():
 	# response = send_tcp_message(msg)
 	return True
 def registered_account(world:str, unique_id: str):
+	print_module("[registered_account][registered_account]")
 	msg = {'function' : 'login_unique', 'data' : {'unique_id' : unique_id}}
 	response = asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 	myjson = response
 	if myjson["status"]==0:
-		print("[registered_account] login success")
+		print_method("[registered_account] login success")
 		return myjson["data"]["token"]
-	print("[registered_account] login failed, try login again")
-	registered_account(world,unique_id)
+	else:
+		print_method("[registered_account] login failed, try login again")
+		registered_account(world,unique_id)
+def print_method(my_string):
+	print("\033[0;37;44m\t"+my_string+"\033[0m")
+def print_module(my_string):
+	print("\033[0;37;41m\t"+my_string+"\033[0m")
 def enter_level():
 	global token
 	while True:
-		my_number = random.randint(1,5)
+		print_module("[registered_account][enter_level] enter_level")
+		my_number = random.randint(0,4)
 		if my_number==0:#剧情
-			print("[registered_account][enter_level] play normal level")
+			print_method("[registered_account][enter_level] play normal level")
 			stage = random.randint(1,8)
 			msg = {'world' : world, 'function' : 'enter_stage', 'data' : {'token' : token, 'stage' : str(stage)}}
 			response = send_tcp_message(msg)#进入关卡
@@ -295,23 +302,48 @@ def enter_level():
 				response = send_tcp_message(msg)#挑战成功
 			else:
 				purchase_energy()
-		if my_number==1:#世界boss
-			print("[registered_account][enter_level] play world boss")
+		elif my_number==1:#世界boss
+			print_method("[registered_account][enter_level] play world boss")
 			msg = {'world' : world, 'function' : 'enter_world_boss_stage', 'data' : {'token' : token}}
 			response = send_tcp_message(msg)
 			if response["status"]==0:
 				msg = {'world' : world, 'function' : 'leave_world_boss_stage', 'data' : {'token' : token,"total_damage":random.randint(1,100000)}}
 				response = send_tcp_message(msg)
+				print_method("[registered_account][enter_level] challange boss success")
 			else:
-				pass
-		if my_number==2:#无尽试炼
-			print("[registered_account][enter_level] endless training")
-		if my_number==3:#活动试炼
-			print("[registered_account][enter_level] party training")
-		if my_number==4:#退出
-			print("[registered_account][enter_level] quit level playing")
-			# break
-
+				msg = {'world' : world, 'function' : 'get_top_damage', 'data' : {'token' : token,"range_number":random.randint(1,5)}}
+				response = send_tcp_message(msg)
+				print_method("[registered_account][enter_level] get top damage")
+		elif my_number==2:#无尽试炼
+			print_method("[registered_account][enter_level] endless training")
+		elif my_number==3:#活动试炼
+			print_method("[registered_account][enter_level] party training")
+		elif my_number==4:#退出
+			print_method("[registered_account][enter_level] quit level playing")
+			break
+def freind_dialog():
+	print_module("[registered_account][enter_level] enter_level")
+	global token
+	msg = {'world' : '0', 'function' : 'get_all_friend_info', 'data' : {'token' : token}}
+	response = send_tcp_message(msg)#获取所有好友信息
+	# print(str(response))
+	int_random = random.randint(1,1)
+	if int_random==0:
+		for i in range(0,len(response["data"]["remaining"]["f_name"])):
+			send_msg = {'world' : '0', 'function' : 'send_friend_gift', 'data' : {'token' : token,"friend_name":str(response["data"]["remaining"]["f_name"][i])}}
+			new_response = send_tcp_message(send_msg)#发送好友信息
+			if new_response["status"]=="0":
+				print_method("[registered_account][enter_level] send friend gift:"+new_response["data"]["remaining"]["f_name"][i])
+			else:
+				print_method(f'[registered_account][enter_level] send {response["data"]["remaining"]["f_name"][i]} gift but failed, error:{new_response["message"]}')
+	elif int_random==1:
+		send_msg = {'world' : '0', 'function' : 'send_all_friend_gift', 'data' : {'token' : token}}
+		new_response = send_tcp_message(send_msg)#发送好友信息s
+		print_method("[registered_account][enter_level] send all gift:"+str(new_response))
+	# while True:
+	# 	pass
 if __name__ == "__main__":
-	token = registered_account("0",unique_id)
-	enter_level()
+	token = registered_account("0",unique_id)#账号注册
+	# enter_level()#关卡界面
+	freind_dialog()#朋友界面
+

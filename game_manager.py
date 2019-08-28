@@ -1579,15 +1579,20 @@ class GameManager:
 		remaining = {'remaining' : {'f_name' : [], 'f_level' : [], 'f_recovery_time' : []}}
 		for friend in friends:
 			d = await self.send_friend_gift(world, unique_id, friend[2])
-			remaining['remaining']['f_name'].append(d['data']['remaining']['f_name'])
-			remaining['remaining']['f_level'].append(d['data']['remaining']['f_level'])
-			remaining['remaining']['f_recovery_time'].append(d['data']['remaining']['current_time'])
-		return self._message_typesetting(0, 'sent all friends gifts', remaining)
+			if d["status"]==0:
+				remaining['remaining']['f_name'].append(d['data']['remaining']['f_name'])
+				remaining['remaining']['f_level'].append(d['data']['remaining']['f_level'])
+				remaining['remaining']['f_recovery_time'].append(d['data']['remaining']['current_time'])
+		if len(remaining['remaining']['f_name'])==0:
+			return self._message_typesetting(1, 'sent all friends gifts, but all your friends are not exist', remaining)
+		else:
+			return self._message_typesetting(0, 'sent all friends gifts', remaining)
 
 	@C.collect_async
 	async def send_friend_gift(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# 0 - send friend gift success because of f_recovering_time is empty
 		# 1 - send friend gift success because time is over 1 day
+		# 95 - this person is not exist anymore
 		# 96 - This person has not become your friend
 		# 97 - Mailbox error
 		# 98 - this person is not your friend anymore
@@ -1597,7 +1602,9 @@ class GameManager:
 		# {
 		#	{'f_id' : str, 'f_name' : str, 'f_level': int}
 		# }
-
+		data = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{friend_name}";')
+		if len(data)==0:
+			return self._message_typesetting(95, 'this person is not exist anymore')
 		friend_id = (await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{friend_name}";'))[0][0]
 		data = await self._execute_statement(world, f'SELECT * FROM friend WHERE unique_id = "{unique_id}" AND friend_id = "{friend_id}";')
 		if len(data) == 0:
