@@ -49,8 +49,8 @@ def on_closing(event=None):
 	client_socket.close()
 
 #----Now comes the sockets part----
-HOST = '127.0.0.1'
-#HOST = 'remote4.magicwandai.com'
+#HOST = '127.0.0.1'
+HOST = 'remote4.magicwandai.com'
 PORT = 8300
 
 ADDR = (HOST, PORT)
@@ -73,5 +73,8 @@ receive_thread.start()
 spam_thread = Thread(target = spam, daemon = True)
 spam_thread.start()
 
-while True:
-	time.sleep(5)
+try:
+	while True:
+		time.sleep(5)
+except:
+	client_socket.close()

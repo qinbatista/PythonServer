@@ -53,7 +53,6 @@ class ChatServer:
 		self.users = defaultdict(dict)
 		self.families = defaultdict(lambda: defaultdict(set))
 		self.pool = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = self.world if self.world != 0 else 'aliya', charset = 'utf8')
-		self.drain_lock = asyncio.Lock()
 		self.stopper = threading.Event()
 		self.in_queue = queue.Queue()
 		self.logger = threading.Thread(target = chat_logger, args = (self.world, self.in_queue, self.stopper))
@@ -64,6 +63,7 @@ class ChatServer:
 	async def run(self, port):
 		async with await asyncio.start_server(self.handle_client, None, port) as s:
 			print(f'starting chat server for world "{self.world}" on port {port}...')
+			self.drain_lock = asyncio.Lock()
 			self.logger.start()
 			await s.serve_forever()
 	
