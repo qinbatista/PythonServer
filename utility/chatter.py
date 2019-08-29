@@ -26,7 +26,7 @@ def receive():
 				if msg == '' or msg == None:
 					break
 				command, payload = msg[:10].lstrip('0'), msg[10:]
-				print(f'<{command}> {payload}')
+				#print(f'<{command}> {payload}')
 			else:
 				BUFFER += client_socket.recv(MAXSIZE)
 		except OSError:  # Possibly client has left the chat.
@@ -38,7 +38,7 @@ def spam():  # event is passed by binders.
 	while True:
 		try:
 			client_socket.sendall(make_message('PUBLIC', ''.join([random.choice(string.ascii_letters + string.digits) for n in range(random.randint(1, 100))])))
-			time.sleep(1)
+			time.sleep(random.random() * 1)
 		except OSError:
 			break
 
@@ -50,7 +50,7 @@ def on_closing(event=None):
 
 #----Now comes the sockets part----
 HOST = '127.0.0.1'
-HOST = 'remote4.magicwandai.com'
+#HOST = 'remote4.magicwandai.com'
 PORT = 8300
 
 ADDR = (HOST, PORT)
