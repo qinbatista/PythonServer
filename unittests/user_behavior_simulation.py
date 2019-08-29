@@ -36,18 +36,23 @@ def print_method(my_string):
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 def enter_level():
+	print_module("[enter_level]")
 	global token
+	msg = {'world' : world, 'function' : 'get_hang_up_info', 'data' : {'token' : token}}
+	response = send_tcp_message(msg)#挑战成功
 	while True:
-		print_module("[enter_level]")
-		my_number = random.randint(0,4)
+		my_number = random.randint(0,0)
 		if my_number==0:#剧情
+			print(response)
+			yourstage = response["data"]["remaining"]["stage"]
 			print_method("[enter_level] play normal level")
-			stage = random.randint(1,8)
+			stage = random.randint(1,yourstage+1)
 			msg = {'world' : world, 'function' : 'enter_stage', 'data' : {'token' : token, 'stage' : str(stage)}}
-			response = send_tcp_message(msg)#进入关卡
-			if response["status"]==0:
+			response_enter = send_tcp_message(msg)#进入关卡
+			print(response_enter)
+			if response_enter["status"]==0:
 				msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : token, 'stage' : str(stage), 'clear_time' : 'we dont care what this string is'}}
-				response = send_tcp_message(msg)#挑战成功
+				response_enter = send_tcp_message(msg)#挑战成功
 				print_method("[enter_level] normal level passed")
 			else:
 				my_choice = random.choice([0,1])
@@ -58,22 +63,23 @@ def enter_level():
 		elif my_number==1:#世界boss
 			print_method("[enter_level] play world boss")
 			msg = {'world' : world, 'function' : 'enter_world_boss_stage', 'data' : {'token' : token}}
-			response = send_tcp_message(msg)
-			if response["status"]==0:
+			response_enter = send_tcp_message(msg)
+			if response_enter["status"]==0:
 				msg = {'world' : world, 'function' : 'leave_world_boss_stage', 'data' : {'token' : token,"total_damage":random.randint(1,100000)}}
-				response = send_tcp_message(msg)
+				response_enter = send_tcp_message(msg)
 				print_method("[enter_level] challange boss success")
 			else:
 				my_choice = random.choice([0,1])
 				if my_choice==0:
 					msg = {'world' : world, 'function' : 'get_top_damage', 'data' : {'token' : token,"range_number":random.randint(1,5)}}
-					response = send_tcp_message(msg)
+					response_enter = send_tcp_message(msg)
 					print_method("[enter_level] get top damage")
 				else:
 					break
 		elif my_number==2:#无尽试炼
 			print_method("[enter_level] endless training")
 		elif my_number==3:#活动试炼
+			yourstage = response["remaining"]["tower_stage"]
 			print_method("[enter_level] party training")
 		elif my_number==4:#退出
 			print_method("[enter_level] quit level playing")
@@ -290,8 +296,8 @@ def factory_dialog():
 if __name__ == "__main__":
 	token = registered_account("0",unique_id)#账号注册
 	enter_level()#关卡界面
-	freind_dialog()#朋友界面
-	skill_dialog()#技能界面
-	weapon_dialog()#武器界面
-	factory_dialog()#工厂界面%
+	# freind_dialog()#朋友界面
+	# skill_dialog()#技能界面
+	# weapon_dialog()#武器界面
+	# factory_dialog()#工厂界面%
 

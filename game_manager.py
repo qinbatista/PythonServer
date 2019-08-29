@@ -961,11 +961,11 @@ class GameManager:
 		success ===> 0
 		# 0 - get hang up info
 		"""
-		sql_str = "SELECT hang_up_time, hang_stage FROM player WHERE unique_id='%s'" % unique_id
-		hang_up_time, hang_stage = (await self._execute_statement(world=world, statement=sql_str))[0]
+		sql_str = "SELECT hang_up_time, hang_stage, stage, tower_stage FROM player WHERE unique_id='%s'" % unique_id
+		hang_up_time, hang_stage,stage,tower_stage = (await self._execute_statement(world=world, statement=sql_str))[0]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
-		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
+		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"tower_stage":tower_stage,"stage":stage,"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
 
 	@C.collect_async
 	async def show_energy(self, world: int, unique_id: str):
