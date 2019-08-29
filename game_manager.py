@@ -2773,6 +2773,30 @@ class GameManager:
 
 
 
+	@C.collect_async
+	async def join_world(self, world: int, unique_id) -> dict:
+		# 0 - success, world joined
+		# 99 - you need to create a new gamename for this world
+		query = await self._execute_statement(world, f'SELECT COUNT(1) FROM player WHERE unique_id = "{unique_id}";')
+		if int(query[0][0]) == 0:
+			return self._message_typesetting(99, 'you need to create a gamename')
+		return self._message_typesetting(0, 'success')
+
+
+	@C.collect_async
+	async def bind_gamename(self, world: int, unique_id, game_name) -> dict:
+		# 0 - success, you may now join the world
+		# 98 - gamename is not unique
+		# 99 - you have already bound a gamename to this world
+		query = await self._execute_statement(world, f'SELECT COUNT(1) FROM player WHERE unique_id = "{unique_id}";')
+		if int(query[0][0]) != 0: return self._message_typesetting(99, 'already bound a gamename before')
+		query = await self._execute_statement(world, f'SELECT COUNT(1) FROM player WHERE game_name = "{game_name}";')
+		if int(query[0][0]) != 0: return self._message_typesetting(98, 'gamename is not unique')
+		await self._execute_statement(world, f'INSERT INTO player (unique_id, game_name) VALUES ("{unique_id}", "{game_name}");')
+		return self._message_typesetting(0, 'you many now join the world')
+
+
+
 #############################################################################
 #							Private Functions								#
 #############################################################################
@@ -4268,6 +4292,18 @@ async def _upgrade_wishing_pool(request: web.Request) -> web.Response:
 async def _acceleration_technology(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).acceleration_technology(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/join_world')
+async def _join_world(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).join_world(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/bind_gamename')
+async def _bind_gamename(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).bind_gamename(int(post['world']), post['unique_id'], post['gamename'])
 	return _json_response(result)
 
 	
