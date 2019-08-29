@@ -3791,21 +3791,21 @@ async def _upgrade_role_star(request: web.Request) -> web.Response:
 @ROUTES.post('/basic_summon')
 async def __basic_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).basic_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="weapons")
+	result = await (request.app['MANAGER']).basic_summon(int(post['world']), post['unique_id'], post['cost_item'], "weapons")
 	return _json_response(result)
 
 
 @ROUTES.post('/pro_summon')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).pro_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="weapons")
+	result = await (request.app['MANAGER']).pro_summon(int(post['world']), post['unique_id'], post['cost_item'], "weapons")
 	return _json_response(result)
 
 
 @ROUTES.post('/friend_summon')
 async def __friend_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).friend_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="weapons")
+	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'], "weapons")
 	return _json_response(result)
 
 
@@ -3844,21 +3844,21 @@ async def __prophet_summon_10_times(request: web.Request) -> web.Response:
 @ROUTES.post('/basic_summon_skill')
 async def __basic_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).basic_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="skills")
+	result = await (request.app['MANAGER']).basic_summon(int(post['world']), post['unique_id'], post['cost_item'], "skills")
 	return _json_response(result)
 
 
 @ROUTES.post('/pro_summon_skill')
 async def __pro_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).pro_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="skills")
+	result = await (request.app['MANAGER']).pro_summon(int(post['world']), post['unique_id'], post['cost_item'], "skills")
 	return _json_response(result)
 
 
 @ROUTES.post('/friend_summon_skill')
 async def __friend_summon_skill(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).friend_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="skills")
+	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'], "skills")
 	return _json_response(result)
 
 
@@ -3890,21 +3890,21 @@ async def __friend_summon_skill_10_times(request: web.Request) -> web.Response:
 @ROUTES.post('/basic_summon_roles')
 async def __basic_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).basic_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="roles")
+	result = await (request.app['MANAGER']).basic_summon(int(post['world']), post['unique_id'], post['cost_item'], "roles")
 	return _json_response(result)
 
 
 @ROUTES.post('/pro_summon_roles')
 async def __pro_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).pro_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="roles")
+	result = await (request.app['MANAGER']).pro_summon(int(post['world']), post['unique_id'], post['cost_item'], "roles")
 	return _json_response(result)
 
 
 @ROUTES.post('/friend_summon_roles')
 async def __friend_summon(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).friend_summon(world=int(post['world']), unique_id=post['unique_id'], cost_item=post['cost_item'], summon_kind="roles")
+	result = await (request.app['MANAGER']).friend_summon(int(post['world']), post['unique_id'], post['cost_item'], "roles")
 	return _json_response(result)
 
 
@@ -4055,7 +4055,7 @@ async def __enter_stage(request: web.Request) -> web.Response:
 @ROUTES.post('/show_energy')
 async def __show_energy(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).show_energy(world=int(post['world']), unique_id=post['unique_id'])
+	result = await (request.app['MANAGER']).show_energy(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 @ROUTES.post('/upgrade_armor')
