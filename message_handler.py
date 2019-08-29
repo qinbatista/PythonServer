@@ -469,6 +469,13 @@ class MessageHandler:
 	async def _distribution_workers(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/distribution_workers', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'workers_quantity': message['data']['workers_quantity'],'factory_kind': message['data']['factory_kind']}) as resp:
 			return await resp.text()
+
+	async def _join_world(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/join_world', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _bind_gamename(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/bind_gamename', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'gamename' : message['data']['gamename']}) as resp:
+			return await resp.text()
 ###############################################################################
 
 
@@ -484,6 +491,8 @@ FUNCTION_LIST = {
 	'bind_account': MessageHandler._bind_account,
 
 	# game_manager
+	'join_world' : MessageHandler._join_world,
+	'bind_gamename' : MessageHandler._bind_gamename,
 	'get_all_head' : MessageHandler._get_all_head,
 	'get_all_material' : MessageHandler._get_all_material,
 	'get_all_supplies' : MessageHandler._get_all_supplies,
