@@ -2513,21 +2513,21 @@ class GameManager:
 			return self._message_typesetting(status=99, message="No such armor type")
 		remaining = {}
 		reward = {}
-		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		result = await self.refresh_all_storage(world, unique_id)
 		if result["status"] == 0:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
-		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_data = await self._select_factory(world, unique_id)
 		sql_armor_quantity = factory_data[17]
 		sql_armor_id = factory_data[22]
 		if sql_armor_id and sql_armor_quantity:
 			reward.update({"armor_id": sql_armor_id, "armor_quantity": sql_armor_quantity})
-			armor_data = await self.try_armor(world=world, unique_id=unique_id, armor_id=sql_armor_id, armor_level="armor_level1", value=sql_armor_quantity)
+			armor_data = await self.try_armor(world, unique_id, armor_id, "armor_level1", sql_armor_quantity)
 			if armor_data["status"]:
 				return self._message_typesetting(status=1, message="Armor table update failed, factory has been updated", data={"remaining": remaining, "reward": reward})
 			remaining.update({"armor_id": sql_armor_id, "armor_quantity": armor_data["remaining"]})
 		update_str = f"update factory set equipment_storage=0, equipment_product_type='{armor_id}' where unique_id='{unique_id}'"
-		await self._execute_statement_update(world=world, statement=update_str)
+		await self._execute_statement_update(world, update_str)
 		remaining.update({"finally_equipment_storage": 0, "finally_equipment_product_type": armor_id})
 		return self._message_typesetting(status=0, message="Successfully opened manufacturing armor", data={"remaining": remaining, "reward": reward})
 
@@ -2547,14 +2547,14 @@ class GameManager:
 			return self._message_typesetting(status=99, message="The number of workers can only be a positive integer")
 		remaining = {}
 		reward = {}
-		result = await self.refresh_all_storage(world=world,unique_id=unique_id)
+		result = await self.refresh_all_storage(world,unique_id)
 		if result["status"] == 0:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
 		workers_max = self._factory_config["buy_workers_max"]
 		workers_max_food = self._factory_config["buy_workers_max_food"]
 		workers_need_food = self._factory_config["buy_workers_need_food"]
-		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_data = await self._select_factory(world, unique_id)
 		food_storage = factory_data[14]
 		all_workers = sum(factory_data[9: 14], 1)  # 多加一人
 		if all_workers >= workers_max:
@@ -2604,12 +2604,12 @@ class GameManager:
 			return self._message_typesetting(status=99, message="Upgrade level can only be a positive integer")
 		storage_level_limit = self._factory_config["food_factory"]["storage_level_limit"]
 		upgrade_need_crystals = self._factory_config["food_factory"]["upgrade_need_crystals_limit"]
-		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_data = await self._select_factory(world, unique_id)
 		factory_level = factory_data[1]
 		all_crystal = factory_data[16]
 		remaining = {}
 		reward = {}
-		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		result = await self.refresh_all_storage(world, unique_id)
 		if result["status"] == 0:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
@@ -2646,12 +2646,12 @@ class GameManager:
 		"""
 		storage_level_limit = self._factory_config["mine_factory"]["storage_level_limit"]
 		upgrade_need_crystals = self._factory_config["mine_factory"]["upgrade_need_crystals_limit"]
-		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_data = await self._select_factory(world, unique_id)
 		factory_level = factory_data[2]
 		all_crystal = factory_data[16]
 		remaining = {}
 		reward = {}
-		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		result = await self.refresh_all_storage(world, unique_id)
 		if result["status"] == 0:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
@@ -2682,12 +2682,12 @@ class GameManager:
 		"""
 		storage_level_limit = self._factory_config["crystal_factory"]["storage_level_limit"]
 		upgrade_need_crystals = self._factory_config["crystal_factory"]["upgrade_need_crystals_limit"]
-		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_data = await self._select_factory(world, unique_id)
 		factory_level = factory_data[3]
 		all_crystal = factory_data[16]
 		remaining = {}
 		reward = {}
-		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		result = await self.refresh_all_storage(world, unique_id)
 		if result["status"] == 0:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
@@ -2718,12 +2718,12 @@ class GameManager:
 		"""
 		storage_level_limit = self._factory_config["wishing_pool"]["storage_level_limit"]
 		upgrade_need_crystals = self._factory_config["wishing_pool"]["upgrade_need_crystals_limit"]
-		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		factory_data = await self._select_factory(world, unique_id)
 		factory_level = factory_data[18]
 		all_crystal = factory_data[16]
 		remaining = {}
 		reward = {}
-		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		result = await self.refresh_all_storage(world, unique_id)
 		if result["status"] == 0:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
@@ -2752,7 +2752,7 @@ class GameManager:
 		"""
 		remaining = {}
 		reward = {}
-		result = await self.refresh_all_storage(world=world, unique_id=unique_id)
+		result = await self.refresh_all_storage(world, unique_id)
 		if result["status"] == 0:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]

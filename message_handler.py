@@ -440,6 +440,35 @@ class MessageHandler:
 		async with session.post(self._game_manager_base_url(message['world']) + '/response_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
 
+
+	async def _buy_workers(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/buy_workers', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'workers_quantity': message['data']['workers_quantity']}) as resp:
+			return await resp.text()
+	async def _refresh_all_storage(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/refresh_all_storage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _upgrade_food_factory(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/upgrade_food_factory', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _upgrade_crystal_factory(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/upgrade_crystal_factory', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _upgrade_mine_factory(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/upgrade_mine_factory', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _upgrade_wishing_pool(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/upgrade_wishing_pool', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _equipment_manufacturing_armor(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/equipment_manufacturing_armor', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],"armor_kind":message['data']['armor_kind']}) as resp:
+			return await resp.text()
+	async def _active_wishing_pool(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/active_wishing_pool', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],"weapon_id":message['data']['weapon_id']}) as resp:
+			return await resp.text()
+	async def _distribution_workers(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/distribution_workers', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'workers_quantity': message['data']['workers_quantity'],'factory_kind': message['data']['factory_kind']}) as resp:
+			return await resp.text()
 ###############################################################################
 
 
@@ -549,7 +578,18 @@ FUNCTION_LIST = {
 	'invite_user_family' : MessageHandler._invite_user_family,
 	'remove_user_family' : MessageHandler._remove_user_family,
 	'request_join_family' : MessageHandler._request_join_family,
-	'respond_family' : MessageHandler._respond_family
+	'respond_family' : MessageHandler._respond_family,
+
+	'refresh_all_storage' : MessageHandler._refresh_all_storage,
+	'buy_workers' : MessageHandler._buy_workers,
+	'upgrade_food_factory' : MessageHandler._upgrade_food_factory,
+	'upgrade_crystal_factory' : MessageHandler._upgrade_crystal_factory,
+	'upgrade_mine_factory' : MessageHandler._upgrade_mine_factory,
+	'upgrade_wishing_pool' : MessageHandler._upgrade_wishing_pool,
+	'distribution_workers':MessageHandler._distribution_workers,
+	'equipment_manufacturing_armor':MessageHandler._equipment_manufacturing_armor,
+	'active_wishing_pool':MessageHandler._active_wishing_pool
+
 
 
 }
