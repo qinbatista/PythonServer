@@ -440,6 +440,15 @@ class MessageHandler:
 		async with session.post(self._game_manager_base_url(message['world']) + '/response_family', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
 
+	async def _join_world(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/join_world', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _bind_gamename(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/bind_gamename', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'gamename' : message['data']['gamename']}) as resp:
+			return await resp.text()
+
+
 ###############################################################################
 
 
@@ -449,12 +458,15 @@ DOES_NOT_NEED_TOKEN = {'login', 'login_unique', 'get_chat_server'}
 FUNCTION_LIST = {
 	# utility
 	'get_chat_server' : MessageHandler._get_chat_server,
+
 	# account_manager
 	'login': MessageHandler._login,
 	'login_unique': MessageHandler._login_unique,
 	'bind_account': MessageHandler._bind_account,
 
 	# game_manager
+	'join_world' : MessageHandler._join_world,
+	'bind_gamename' : MessageHandler._bind_gamename,
 	'get_all_head' : MessageHandler._get_all_head,
 	'get_all_material' : MessageHandler._get_all_material,
 	'get_all_supplies' : MessageHandler._get_all_supplies,
