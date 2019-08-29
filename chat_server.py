@@ -58,6 +58,8 @@ class ChatServer:
 		self.in_queue = queue.Queue()
 		self.logger = threading.Thread(target = chat_logger, args = (self.world, self.in_queue, self.stopper))
 		signal.signal(signal.SIGINT, SignalHandler(self.stopper, self.logger))
+		self.sent_messages = 0
+		self.start = time.time()
 
 	async def run(self, port):
 		async with await asyncio.start_server(self.handle_client, None, port) as s:
@@ -72,6 +74,10 @@ class ChatServer:
 			name = await self.client_handshake(reader, writer)
 			print(f'hello, {name}...')
 			while True:
+				if time.time() - self.start > 1:
+					print('messages/second = ', self.sent_messages)
+					self.sent_messages = 0
+					self.start = time.time()
 				command, payload = await self._receive(reader)
 				self.in_queue.put((name, command, payload))
 				if command == 'PUBLIC':
@@ -185,6 +191,7 @@ class ChatServer:
 
 	# sends a message to the given writers
 	async def _send(self, message, *args):
+		self.sent_messages += len(args)
 		for writer in args:
 			if not writer.is_closing():
 				writer.write(message)
