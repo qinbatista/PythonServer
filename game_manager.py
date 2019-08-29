@@ -661,14 +661,14 @@ class GameManager:
 	@C.collect_async
 	async def enter_stage(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
-		# 97 - database operation error
+		# 97 - Insufficient energy
 		# 98 - key insufficient
 		# 99 - parameter error
 		enter_stage_data = self._entry_consumables["stage"]
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")) + 1:
 			return self._message_typesetting(99, "Parameter error")
 		keys = list(enter_stage_data[str(stage)].keys())
-		values = [-v for v in list(enter_stage_data[str(stage)].values())]
+		values = [-1*int(v) for v in list(enter_stage_data[str(stage)].values())]
 		remaining = {}
 		material_dict = {}
 		for i in range(len(keys)):
@@ -682,15 +682,16 @@ class GameManager:
 		if "energy" in keys:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=material_dict["energy"])
 			if energy_data["status"] >= 97:
-				return self._message_typesetting(status=96, message="Insufficient energy")
+				return self._message_typesetting(status=97, message="Insufficient energy")
+			values.pop(keys.index("energy"))
+			keys.remove("energy")
 			material_dict.pop("energy")
 			for i in range(len(energy_data["data"]["keys"])):
 				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
 
 		if material_dict:
 			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-			if await self._execute_statement_update(world, update_str) == 0:
-				return self._message_typesetting(status=97, message="database operating error")
+			await self._execute_statement_update(world, update_str)
 		for i in range(len(keys)):
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
@@ -720,14 +721,14 @@ class GameManager:
 	@C.collect_async
 	async def enter_tower(self, world: int, unique_id: str, stage: int) -> dict:
 		# 0 - success
-		# 97 - database operation error
+		# 97 - Insufficient energy
 		# 98 - key insufficient
 		# 99 - parameter error
 		enter_tower_data = self._entry_consumables["tower"]
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "tower_stage")) + 1:
 			return self._message_typesetting(99, "Parameter error")
 		keys = list(enter_tower_data[str(stage)].keys())
-		values = [-v for v in list(enter_tower_data[str(stage)].values())]
+		values = [-1*int(v) for v in list(enter_tower_data[str(stage)].values())]
 		remaining = {}
 		material_dict = {}
 		for i in range(len(keys)):
@@ -741,14 +742,15 @@ class GameManager:
 		if "energy" in keys:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=material_dict["energy"])
 			if energy_data["status"] >= 97:
-				return self._message_typesetting(status=96, message="Insufficient energy")
+				return self._message_typesetting(status=97, message="Insufficient energy")
+			values.pop(keys.index("energy"))
+			keys.remove("energy")
 			material_dict.pop("energy")
 			for i in range(len(energy_data["data"]["keys"])):
 				remaining.update({energy_data["data"]["keys"][i]: energy_data["data"]["values"][i]})
 		if material_dict:
 			update_str, select_str = self._sql_str_operating(unique_id, material_dict)
-			if await self._execute_statement_update(world, update_str) == 0:
-				return self._message_typesetting(status=97, message="database operating error")
+			await self._execute_statement_update(world, update_str)
 		for i in range(len(keys)):
 			remaining.update({keys[i]: values[i]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})

@@ -23,13 +23,13 @@
 			"energy": 1
 		},
 		"1":{
-			"iron": 0,
+			"iron": -10,
 			"coin": 0,
 			"energy": 1
 		},
 		"2":{
 			"iron": 0,
-			"coin": 0,
+			"coin": 10,
 			"energy": 1
 		},
 		"3":{

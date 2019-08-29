@@ -108,7 +108,7 @@ def create_table_families(cursor):
 	  `familyid` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `familyname` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 	  `level` int(11) DEFAULT 0 COMMENT '工会等级',
-	  `icon` BLOB NULL DEFAULT 0x0 COMMENT '工会图标',
+	  `icon` BLOB NULL DEFAULT (0x0) COMMENT '工会图标',
 	  `experience` int(11) DEFAULT 0 COMMENT '工会经验',
 	  `announcement` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会公告',
 	  `news` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会动态',
