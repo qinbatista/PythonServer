@@ -24,7 +24,10 @@ class Collector:
 			start = timeit.default_timer()
 			retval = await fn(*args, **kwargs)
 			end = timeit.default_timer()
-			self.inqueue.put((args[1], fn.__name__.lstrip('_'), time.time(), end - start))
+			if len(args) > 1:
+				self.inqueue.put((args[1], fn.__name__.lstrip('_'), time.time(), end - start))
+			else:
+				self.inqueue.put((kwargs['world'], fn.__name__.lstrip('_'), time.time(), end - start))
 			return retval
 		return wrapper
 	
@@ -33,7 +36,10 @@ class Collector:
 			start = timeit.default_timer()
 			retval = fn(*args, **kwargs)
 			end = timeit.default_timer()
-			self.inqueue.put((args[1], fn.__name__.lstrip('_'), time.time(), end - start))
+			if len(args) > 1:
+				self.inqueue.put((args[1], fn.__name__.lstrip('_'), time.time(), end - start))
+			else:
+				self.inqueue.put((kwargs['world'], fn.__name__.lstrip('_'), time.time(), end - start))
 			return retval
 		return wrapper
 
