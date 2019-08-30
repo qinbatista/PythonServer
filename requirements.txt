@@ -9,3 +9,4 @@ pymysql==0.9.3
 aiohttp==3.5.4
 tormysql==0.4.2
 requests==2.22.0
+aiomysql==0.0.20
