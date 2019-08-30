@@ -470,6 +470,13 @@ class MessageHandler:
 		async with session.post(self._game_manager_base_url(message['world']) + '/distribution_workers', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'workers_quantity': message['data']['workers_quantity'],'factory_kind': message['data']['factory_kind']}) as resp:
 			return await resp.text()
 
+	async def _upgrade_role_level(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/upgrade_role_level', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'role': message['data']['role'],'experience_potion': message['data']['experience_potion']}) as resp:
+			return await resp.text()
+	async def _upgrade_role_star(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/upgrade_role_star', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'role': message['data']['role']}) as resp:
+			return await resp.text()
+
 	async def _join_world(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/join_world', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
@@ -597,7 +604,10 @@ FUNCTION_LIST = {
 	'upgrade_wishing_pool' : MessageHandler._upgrade_wishing_pool,
 	'distribution_workers':MessageHandler._distribution_workers,
 	'equipment_manufacturing_armor':MessageHandler._equipment_manufacturing_armor,
-	'active_wishing_pool':MessageHandler._active_wishing_pool
+	'active_wishing_pool':MessageHandler._active_wishing_pool,
+
+	'upgrade_role_level':MessageHandler._upgrade_role_level,
+	'upgrade_role_star':MessageHandler._upgrade_role_star
 
 
 

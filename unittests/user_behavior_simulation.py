@@ -43,13 +43,11 @@ def enter_level():
 	while True:
 		my_number = random.randint(0,0)
 		if my_number==0:#剧情
-			print(response)
 			yourstage = response["data"]["remaining"]["stage"]
 			print_method("[enter_level] play normal level")
 			stage = random.randint(1,yourstage+1)
 			msg = {'world' : world, 'function' : 'enter_stage', 'data' : {'token' : token, 'stage' : str(stage)}}
 			response_enter = send_tcp_message(msg)#进入关卡
-			print(response_enter)
 			if response_enter["status"]==0:
 				msg = {'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : token, 'stage' : str(stage), 'clear_time' : 'we dont care what this string is'}}
 				response_enter = send_tcp_message(msg)#挑战成功
@@ -187,6 +185,54 @@ def get_random_weapon():
 					break
 			else:
 				break
+def get_random_role():
+	print_module("[get_random_role]")
+	while True:
+		int_n = random.randint(0,2)
+		if int_n == 0: #金币召唤
+			print_method("[get_random_role] coin to get role")
+			is_10 = random.choice([0,1])
+			if is_10==0:
+				send_msg = {'world' : world, 'function' : 'basic_summon_roles', 'data' : {'token' : token,"cost_item":"coin"}}
+			else:
+				send_msg = {'world' : world, 'function' : 'basic_summon_roles_10_times', 'data' : {'token' : token,"cost_item":"coin"}}
+			new_response = send_tcp_message(send_msg)#发送好友信息
+			if new_response["status"]!=0:
+				purchase_item_success("basic_summon_scroll")#购买卷轴
+				coin_item = random.choice([0,2])
+				if coin_item==0:
+					continue#继续抽
+				elif coin_item==1:
+					enter_level()#进入关卡
+					break
+				elif coin_item==2:
+					break#不抽
+			else:
+				break
+		elif int_n == 1:#高级召唤
+			print_method("[get_random_role] diamond gift to get role")
+			is_10 = random.choice([0,1])
+			if is_10==0:
+				send_msg = {'world' : world, 'function' : 'pro_summon_roles', 'data' : {'token' : token,"cost_item":"basic_summon_scroll"}}
+			else:
+				send_msg = {'world' : world, 'function' : 'pro_summon_roles_10_times', 'data' : {'token' : token,"cost_item":"basic_summon_scroll"}}
+			new_response = send_tcp_message(send_msg)#发送好友信息
+			if new_response["status"]!=0:
+				purchase_item_success("basic_summon_scroll")#购买卷轴
+				if random.choice([0,1])==0:
+					continue
+				else:
+					break
+			else:
+				break
+		elif int_n == 2:#朋友召唤
+			print_method("[get_random_role] coin to get role")
+			is_10 = random.choice([0,1])
+			if is_10==0:
+				send_msg = {'world' : world, 'function' : 'basic_summon_roles', 'data' : {'token' : token,"cost_item":"friend_gift"}}
+			else:
+				send_msg = {'world' : world, 'function' : 'basic_summon_roles_10_times', 'data' : {'token' : token,"cost_item":"friend_gift"}}
+			new_response = send_tcp_message(send_msg)#朋友抽
 
 
 def skill_dialog():
@@ -200,14 +246,9 @@ def skill_dialog():
 				"g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"])
 		skill_level = new_response["data"]["remaining"][skill_id]
 		if skill_level==0:
-			int_n = random.randint(0,1)
-			if int_n == 0:
-				get_random_skill()
-			else:
-				print_method("[skill_dialog] quit skill dialog")
-				break
+			get_random_skill()
 		else:
-			scroll_id = random.choice(["m1_level", "p1_level", "g1_level"])
+			scroll_id = random.choice(["skill_scroll_10","skill_scroll_30","skill_scroll_100"])
 			send_msg = {'world' : world, 'function' : 'level_up_skill', 'data' : {'token' : token,"skill_id":skill_id,"scroll_id":scroll_id}}
 			new_response = send_tcp_message(send_msg)#升级请求
 			print_method("[skill_dialog] level up skill success" + "")
@@ -293,11 +334,41 @@ def factory_dialog():
 		elif int_number==5:#不做选择
 			print_method("[factory_dialog]quit")
 			break
+def get_random_item():
+	print_module("[get_random_item]")
+	while True:
+		int_number = random.randint(0,3)
+		if int_number==0: get_random_role()
+		if int_number==1: get_random_skill()
+		if int_number==2: get_random_weapon()
+		if int_number==3: break
+def role_dialog():
+	print_module("[role_dialog]")
+	while True:
+		random_int = random.randint(0,0)
+		if random_int ==0:#升级角色
+			send_msg = {'world' : world, 'function' : 'upgrade_role_level', 'data' : {'token' : token, "role":random.choice(["role1", "role2", "role3", "role4", "role5", "role6", "role7", "role8", "role9", "role10", "role11", "role12", "role13", "role14", "role15", "role16", "role17", "role18", "role19", "role20", "role21", "role22", "role23", "role24", "role25", "role26", "role27", "role28", "role29", "role30", "role31", "role32", "role33", "role34", "role35", "role36", "role37", "role38", "role39", "role40"]),"experience_potion":random.randint(30,400)}}
+			new_response = send_tcp_message(send_msg)#升级请求
+			print_method("[role_dialog] level up role:")
+			if new_response["status"]==95:#没有此角色
+				get_random_role()
+			if new_response["status"]==97:#材料不足冲关卡
+				enter_level()
+		elif random_int ==1:#突破角色
+			send_msg = {'world' : world, 'function' : 'upgrade_role_star', 'data' : {'token' : token, "role":random.choice(["role1", "role2", "role3", "role4", "role5", "role6", "role7", "role8", "role9", "role10", "role11", "role12", "role13", "role14", "role15", "role16", "role17", "role18", "role19", "role20", "role21", "role22", "role23", "role24", "role25", "role26", "role27", "role28", "role29", "role30", "role31", "role32", "role33", "role34", "role35", "role36", "role37", "role38", "role39", "role40"])}}
+			new_response = send_tcp_message(send_msg)#升级请求
+			print_method("[role_dialog] level up role star:")
+			if new_response["status"]==98:
+				get_random_role()
+		elif random_int ==2:#退出
+			print_method("[role_dialog] quit role_dialog")
+			break
 if __name__ == "__main__":
 	token = registered_account("0",unique_id)#账号注册
 	enter_level()#关卡界面
-	# freind_dialog()#朋友界面
-	# skill_dialog()#技能界面
-	# weapon_dialog()#武器界面
-	# factory_dialog()#工厂界面%
-
+	freind_dialog()#朋友界面
+	skill_dialog()#技能界面
+	weapon_dialog()#武器界面
+	factory_dialog()#工厂界面
+	get_random_item()#抽奖界面
+	role_dialog()#角色界面

@@ -20,12 +20,12 @@
 		"0":{
 			"iron": 0,
 			"coin": 0,
-			"energy": 1
+			"energy": 2
 		},
 		"1":{
-			"iron": -10,
+			"iron": 0,
 			"coin": 0,
-			"energy": 1
+			"energy": 2
 		},
 		"2":{
 			"iron": 0,
