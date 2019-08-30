@@ -107,7 +107,10 @@ class GameManager:
 		if stage <= 0 or sql_stage + 1 < stage:
 			return self._internal_format(status=9, remaining=0)  # abnormal data!
 		material_dict = {"stage": 0}
-		for key, value in stage_data[str(stage)].items():
+		stages = [int(x) if str.isdigit(x) else 1 for x in stage_data.keys()]
+		if stage not in stages: stage_reward = stage_data[str(max(stages))]
+		else: stage_reward = stage_data[str(stage)]
+		for key, value in stage_reward.items():
 			material_dict.update({key: value})
 		if sql_stage + 1 == stage:  # 通过新关卡
 			material_dict.update({"stage": 1})
@@ -778,13 +781,22 @@ class GameManager:
 		if stage <= 0 or stage > sql_stage + 1:
 			return self._message_typesetting(99, "Parameter error")
 
+		stages = [int(x) if str.isdigit(x) else 1 for x in pass_tower_data.keys()]
+		if stage not in stages:
+			if stage % 10 != 0:
+				while max(stages) % 10 == 0:
+					stages.remove(max(stages))
+			else:
+				while max(stages) % 10 != 0:
+					stages.remove(max(stages))
+			tower_reward = pass_tower_data[str(max(stages))]
+		else:
+			tower_reward = pass_tower_data[str(stage)]
 		if stage % 10 != 0:
 			material_dict = {"tower_stage": 0}
 			remaining = {}
-			energy = 0
-			for key, value in pass_tower_data[str(stage)].items():
+			for key, value in tower_reward.items():
 				if "energy" == key:
-					energy = value
 					energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=value)
 					keys, values = energy_data["data"]["keys"], energy_data["data"]["values"]
 					for i in range(len(keys)):
@@ -801,11 +813,9 @@ class GameManager:
 			for i in range(len(keys)):
 				remaining.update({keys[i]: values[i]})
 			material_dict.pop("tower_stage")
-			if energy != 0:
-				remaining.update({"energy": energy})
 			return self._message_typesetting(status=0, message="Earn rewards success", data={"remaining": remaining, "reward": material_dict})
 		else:
-			reward = random.choices(population=pass_tower_data[str(stage)])[0]
+			reward = random.choices(population=tower_reward)[0]
 			if reward in pass_tower_data["skill"]:
 				reward_data = await self.try_unlock_skill(world=world, unique_id=unique_id, skill_id=reward)
 				if reward_data["status"] == 0:
