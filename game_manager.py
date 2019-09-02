@@ -1919,6 +1919,15 @@ class GameManager:
 		data = {"remaining": {"level_enemy_layouts_config": self._level_enemy_layouts_config_json}}
 		return self._message_typesetting(0, 'got all level enemy layouts config info', data)
 
+	async def get_account_world_info(self, world: int, unique_id: str):
+		remaining = {}
+		for w in range(len(self._pools)):
+			if await self._execute_statement(w, f"select * from player where unique_id='{unique_id}'"):
+				remaining.update({w: {"world": w, "info": "true"}})
+			else:
+				remaining.update({w: {"world": w, "info": "false"}})
+		return self._message_typesetting(0, 'Get all world information', data={"remaining": remaining})
+
 #############################################################################
 #                       End Temp Function Position                          #
 #############################################################################
@@ -4288,7 +4297,14 @@ async def _acceleration_technology(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).acceleration_technology(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
-	
+
+@ROUTES.post('/get_account_world_info')
+async def _get_account_world_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_account_world_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
 def get_config() -> configparser.ConfigParser:
 	'''
 	Fetches the server's configuration file from the config server.
