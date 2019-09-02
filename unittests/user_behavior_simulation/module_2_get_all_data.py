@@ -88,18 +88,7 @@ def get_all_info(_token,_world):
 	world = _world
 	token = _token
 
-	get_level_info()
-	get_all_friend_info()
-	get_all_skill_level()
-	get_all_weapon()
-	refresh_all_storage()
-	get_all_roles()
-	get_stage_info()
-	get_monster_info()
-	get_factory_info()
-	get_all_family_info()
-	get_all_mail()
-	get_all_armor_info()
+	return get_level_info(),get_all_friend_info(),get_all_skill_level(),get_all_weapon(),refresh_all_storage(),get_all_roles(),get_stage_info(),get_monster_info(),get_factory_info(),get_all_family_info(),get_all_mail(),get_all_armor_info()
 
 if __name__ == "__main__":
 	pass
