@@ -1922,6 +1922,7 @@ class GameManager:
 		return self._message_typesetting(0, 'got all level enemy layouts config info', data)
 
 	async def get_account_world_info(self, world: int, unique_id: str):
+		# 0 - Get all world information
 		remaining = {}
 		for w in range(len(self._pools)):
 			if await self._execute_statement(w, f"select * from player where unique_id='{unique_id}'"):
@@ -1929,6 +1930,21 @@ class GameManager:
 			else:
 				remaining.update({w: {"world": w, "info": "false"}})
 		return self._message_typesetting(0, 'Get all world information', data={"remaining": remaining})
+
+	async def choice_world(self, world: int, unique_id: str, target_world: int):
+		# 0 - You have successfully switched to another world
+		# 98 - You have been in this world
+		# 99 - No such world
+		remaining = {}
+		if target_world < 0 or target_world >= len(self._pools):
+			return self._message_typesetting(99, "No such world")
+		if world == target_world:
+			return self._message_typesetting(98, "You have been in this world")
+		if await self._execute_statement(target_world, f"select * from player where unique_id='{unique_id}'"):
+			remaining.update({"world": target_world, "info": "true"})
+		else:
+			remaining.update({"world": target_world, "info": "false"})
+		return self._message_typesetting(0, 'You have successfully switched to another world', data={"remaining": remaining})
 
 #############################################################################
 #                       End Temp Function Position                          #
@@ -4306,6 +4322,13 @@ async def _acceleration_technology(request: web.Request) -> web.Response:
 async def _get_account_world_info(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).get_account_world_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/choice_world')
+async def _choice_world(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).choice_world(int(post['world']), post['unique_id'], int(post['target_world']))
 	return _json_response(result)
 
 
