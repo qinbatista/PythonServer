@@ -265,8 +265,10 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8100/equipment_manufacturing_armor', data={"world": 0, "unique_id": "4", "armor_kind": "armor3"})
+	result = requests.post('http://localhost:8100/get_account_world_info', data={"world": 0, "unique_id": "4"})
 	print(str(result.text))
+	# result = requests.post('http://localhost:8100/equipment_manufacturing_armor', data={"world": 0, "unique_id": "4", "armor_kind": "armor3"})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/level_up_role_star', data={"world": 0, "unique_id": "4", "role": "role1"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/level_up_role', data={"world": 0, "unique_id": "4", "role": "role1", "experience_potion": 60})
@@ -384,7 +386,7 @@ if __name__ == "__main__":
 	# try_diamond()
 	# level_up_weapon()
 	# pass_stage(stage=11)
-	pass_tower(stage=33)
+	# pass_tower(stage=33)
 	# get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
@@ -442,7 +444,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	# all_function(unique_id="1")
+	all_function(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")
