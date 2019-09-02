@@ -4,11 +4,11 @@ import os
 import requests
 import configparser
 import asyncio
-import lukseun_client
+import tool_lukseun_client
 import random
 
 
-lukseun = lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
 world = "0"
 unique_id = "4"
 token = ""

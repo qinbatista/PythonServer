@@ -1,12 +1,20 @@
 import tool_lukseun_client
 import module_1_login
+import module_2_get_all_data
 world = "0"
-unique_id = "4"
 token = ""
-
+def call_login(unique_id):
+	global world,token
+	while True:
+		world = module_1_login.login_module(unique_id)
+		if world!=None:
+			token,world = world
+			if token!="":break
+def call_get_all_info():
+	module_2_get_all_data.get_all_info(token,world)
 if __name__ == "__main__":
-	token = module_1_login.login_module("unique_id0",unique_id)
-	# enter_level(token)#关卡界面
+	call_login("unique_id0")
+	print(call_get_all_info())#关卡界面
 	# freind_dialog(token)#朋友界面
 	# skill_dialog(token)#技能界面
 	# weapon_dialog(token)#武器界面
