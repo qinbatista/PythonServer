@@ -73,11 +73,11 @@ class MessageHandler:
 						return json.dumps({'status': 11, 'message': 'Authorization required', 'data': {'bad_token': message['data']['token']}})
 					message['data']['unique_id'] = data['data']['unique_id']
 			return await fn(self, message, session)
-		except KeyError:
+		except KeyError as e:
 			return json.dumps({'status': 10, 'message': 'Invalid message format', 'data': {}})
 
 	def _game_manager_base_url(self, world):
-		for gm in self._map[world]['gamemanagers'].values():
+		for gm in self._map[str(world)]['gamemanagers'].values():
 			return f'http://{gm["ip"]}:{gm["port"]}'
 
 	def _format_message_size(self, size: int) -> bytes:

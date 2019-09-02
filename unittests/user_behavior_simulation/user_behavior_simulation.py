@@ -13,8 +13,8 @@ def call_login(unique_id):
 def call_get_all_info():
 	module_2_get_all_data.get_all_info(token,world)
 if __name__ == "__main__":
-	call_login("unique_id0")
-	print(call_get_all_info())#关卡界面
+	call_login("0")
+	call_get_all_info()#加载所有参数信息
 	# freind_dialog(token)#朋友界面
 	# skill_dialog(token)#技能界面
 	# weapon_dialog(token)#武器界面

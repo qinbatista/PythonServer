@@ -980,8 +980,10 @@ class GameManager:
 		# 0 - get hang up info
 		"""
 		sql_str = "SELECT hang_up_time, hang_stage, stage, tower_stage FROM player WHERE unique_id='%s'" % unique_id
+		data = await self._execute_statement(world=world, statement=sql_str)
 		hang_up_time, hang_stage,stage,tower_stage = (await self._execute_statement(world=world, statement=sql_str))[0]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if hang_up_time=="": hang_up_time = current_time
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"tower_stage":tower_stage,"stage":stage,"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
 
@@ -2796,12 +2798,14 @@ class GameManager:
 #############################################################################
 
 	async def _select_factory(self, world: int, unique_id) -> list:
-		sql_str = f"select * from factory where unique_id={unique_id}"
+		sql_str = f"select * from factory where unique_id='{unique_id}'"
+		# data = await self._execute_statement(world, sql_str)
+		# print("data = " +str(data))
 		try:
 			return list((await self._execute_statement(world, sql_str))[0])
 		except:
 			await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
-			return list((await self._execute_statement(world, sql_str))[0])
+		return list((await self._execute_statement(world, sql_str))[0])
 
 	async def _family_exists(self, world: int, fname: str):
 		return (0,) not in (await self._execute_statement(world, f'SELECT COUNT(1) FROM families WHERE familyname = "{fname}";'))

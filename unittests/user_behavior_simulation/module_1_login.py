@@ -34,7 +34,7 @@ def login_unique():#游客登陆
 	elif response["status"]==2:#账户已经被绑定
 		int_number = random.choice([0,1])
 		if int_number==0:
-			login_account()
+			return login_account()
 		else:
 			return "",""
 	else:
@@ -53,6 +53,7 @@ def login_account():#账户登陆
 	if num =="email": account = my_unique_id+"@email.com"
 	if num =="phone_number": account = "86"+my_unique_id[9:]
 	response = send_tcp_message({'function' : 'login', 'data' : {'identifier':num, "value":account, "password":"123456"}})
+	world = random.choice([0])#随机选择世界,目前世界只有0,未完成
 	if response["status"]==0:#登陆成功返回数据
 		print_method("[login_account] login success")
 		return response["data"]["token"],world
@@ -64,7 +65,24 @@ def login_account():#账户登陆
 		else:
 			print_method("[login_account] login failed, give up login")
 			return "",""
-
+def create_player(token):
+	response = send_tcp_message({'function' : 'get_account_world_info', 'data' : {"token":token}})
+	if response["status"]=="0":
+		pass#创建新账户成功
+	elif response["status"]=="1":
+		pass#角色名字重复
+	elif response["status"]=="2":
+		pass#已经创建过角色，返回用户信息直接开始进入游戏流程
+	else:
+		pass#角色信息错误
+def choice_world(token):
+	response = send_tcp_message({'function' : 'choice_world', 'data' : {"token":token}})
+	if response["status"]=="0":
+		pass#没有角色，需要创建角色
+	elif response["status"]=="1":
+		pass#已有角色，直接开始进入游戏流程
+def get_account_world_info(token):
+	pass#返回此玩家所有世界的数据
 def login_module(unique_id_p: str):
 	global world,unique_id
 	unique_id = "unique_id"+unique_id_p
