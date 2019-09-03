@@ -3378,7 +3378,7 @@ class GameManager:
 		if len(data_leader_board)==0:
 			return self._message_typesetting(status=99, message="no data")
 		data_users = await self._execute_statement(world,f'SELECT game_name FROM player where unique_id in {data_leader_board[0][0],data_leader_board[1][0],data_leader_board[2][0],data_leader_board[3][0],data_leader_board[4][0],data_leader_board[5][0],data_leader_board[6][0],data_leader_board[7][0],data_leader_board[8][0],data_leader_board[9][0]} ORDER BY FIELD(unique_id,{data_leader_board[0][0]},{data_leader_board[1][0]},{data_leader_board[2][0]},{data_leader_board[3][0]},{data_leader_board[4][0]},{data_leader_board[5][0]},{data_leader_board[6][0]},{data_leader_board[7][0]},{data_leader_board[8][0]},{data_leader_board[9][0]})')
-		message_dic={"remaining":{}}
+		message_dic={"remaining":{}, "page" : range_number}
 		for index in range(0,len(data_users)):
 			message_dic["remaining"].update({index:{data_users[index][0]:data_leader_board[index][2]}})
 		return self._message_typesetting(status=0, message="get top "+str(range_number*10)+" damage",data= message_dic)
