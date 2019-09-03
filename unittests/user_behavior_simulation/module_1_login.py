@@ -25,7 +25,7 @@ def login_unique():#游客登陆
 	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : my_unique_id}})
 	if response["status"]==0 or response["status"]==1:#登陆成功返回数据
 		world = random.choice([0])#随机选择世界,目前世界只有0,未完成
-		print_method("[login_unique] login success， world="+str(world))
+		print_method("[login_unique] login success, token="+response["data"]["token"] + ",world="+str(world))
 		token = response["data"]["token"]
 		int_number = random.choice([0,0])#登陆成功是否绑定账户0账号绑定，1手机绑定，2邮箱绑定，目前手机和邮箱未完成
 		if int_number==0:
@@ -55,13 +55,13 @@ def login_account():#账户登陆
 	response = send_tcp_message({'function' : 'login', 'data' : {'identifier':num, "value":account, "password":"123456"}})
 	world = random.choice([0])#随机选择世界,目前世界只有0,未完成
 	if response["status"]==0:#登陆成功返回数据
-		print_method("[login_account] login success")
+		print_method("[login_account] login success, response="+str(response))
 		return response["data"]["token"],world
 	else:#登陆失败, 0:继续尝试登陆, 1:返回空放弃登陆
 		int_number = random.choice([0,1])
 		if int_number==0:
 			print_method("[login_account] login failed, try login again")
-			login_account()
+			return login_account()
 		else:
 			print_method("[login_account] login failed, give up login")
 			return "",""
