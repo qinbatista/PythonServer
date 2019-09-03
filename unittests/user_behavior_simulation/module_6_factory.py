@@ -25,7 +25,7 @@ def factory_dialog(token,world,get_all_weapon):
 	print_module("[factory_dialog]")
 	new_response = get_all_weapon
 	while True:
-		int_number = random.randint(0,0)
+		int_number = random.randint(0,5)
 		#获取所有工厂信息
 		if int_number==0:#购买工人
 			print_method("[factory_dialog]buy workers")

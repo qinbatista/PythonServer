@@ -20,3 +20,6 @@ def print_method(my_string):
 	print("\033[0;37;44m\t"+my_string+"\033[0m")
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
+
+def mail_dialog(token,world,respons):
+	pass

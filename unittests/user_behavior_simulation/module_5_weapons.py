@@ -71,22 +71,22 @@ def weapon_dialog(_token,_world,get_all_skill_info):
 		random_int = random.randint(0,4)
 		if random_int ==0:#升级武器
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_weapon', 'data' : {'token' : token, "weapon":random.choice(weapon_list),"iron":random.randint(30,400)}})#升级请求
-			print_method("[weapon_dialog] level up weapon:"+new_response)
+			print_method("[weapon_dialog] level up weapon:"+str(new_response))
 			if new_response["status"]==95:#武器没有抽武器
 				get_random_weapon()
 			if new_response["status"]==95:#材料不足冲关卡
 				enter_level()
 		elif random_int ==1:#突破武器
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_weapon_star', 'data' : {'token' : token, "weapon":random.choice(weapon_list)}})#升级请求
-			print_method("[weapon_dialog] level up weapon star:"+weapon_dialog)
+			print_method("[weapon_dialog] level up weapon star:"+str(new_response))
 			if new_response["status"]==98:
 				get_random_weapon()
 		elif random_int ==2:#升级被动
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_passive', 'data' : {'token' : token, "weapon":random.choice(weapon_list)}})#升级请求
-			print_method("[weapon_dialog] level up weapon skill"+weapon_dialog)
+			print_method("[weapon_dialog] level up weapon skill"+str(new_response))
 		elif random_int ==3:#重制技能
 			new_response = send_tcp_message({'world' : world, 'function' : 'reset_weapon_skill_point', 'data' : {'token' : token, "weapon":random.choice(weapon_list)}})#升级请求
-			print_method("[weapon_dialog] reset weapon skill"+weapon_dialog)
+			print_method("[weapon_dialog] reset weapon skill"+str(new_response))
 		elif random_int ==4:#退出
-			print_method("[weapon_dialog] quit weapon_dialog"+weapon_dialog)
+			print_method("[weapon_dialog] quit weapon_dialog")
 			break
