@@ -265,8 +265,10 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8100/choice_world', data={"world": 0, "unique_id": "4", "target_world": 2})
+	result = requests.post('http://localhost:8100/create_player', data={"world": 0, "unique_id": "5", "game_name": "jink"})
 	print(str(result.text))
+	# result = requests.post('http://localhost:8100/choice_world', data={"world": 0, "unique_id": "4", "target_world": 1})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_account_world_info', data={"world": 0, "unique_id": "4"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/equipment_manufacturing_armor', data={"world": 0, "unique_id": "4", "armor_kind": "armor3"})

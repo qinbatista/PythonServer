@@ -1941,10 +1941,32 @@ class GameManager:
 		if world == target_world:
 			return self._message_typesetting(98, "You have been in this world")
 		if await self._execute_statement(target_world, f"select * from player where unique_id='{unique_id}'"):
-			remaining.update({"world": target_world, "info": "true"})
+			weapons = (await self.get_all_weapon(world, unique_id))["data"]
+			supplies = (await self.get_all_supplies(world, unique_id))["data"]
+			skills = (await self.get_all_skill_level(world, unique_id))["data"]
+			armors = (await self.get_all_armor_info(world, unique_id))["data"]
+			remaining.update({"world": target_world, "info": {"weapons": weapons, "supplies": supplies, "skills": skills, "armors": armors}})
 		else:
-			remaining.update({"world": target_world, "info": "false"})
+			remaining.update({"world": target_world})
 		return self._message_typesetting(0, 'You have successfully switched to another world', data={"remaining": remaining})
+
+	async def create_player(self, world: int, unique_id: str, game_name: str):
+		# 0 - You have successfully created a player in this world
+		# 1 - You have a player in this world
+		remaining = {}
+		data_tuple = (await self.get_all_head(world, 'player'))['remaining']
+		head = [x[0] for x in data_tuple]
+		data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
+		if data:
+			for i in range(len(head)):
+				remaining.update({head[i]: data[0][i]})
+			return self._message_typesetting(1, 'You have a player in this world', data={"remaining": remaining})
+		else:
+			await self._execute_statement_update(world, f"insert into player(unique_id, game_name) values('{unique_id}', '{game_name}')")
+			data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
+			for i in range(len(head)):
+				remaining.update({head[i]: data[0][i]})
+			return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
 
 #############################################################################
 #                       End Temp Function Position                          #
@@ -4329,6 +4351,13 @@ async def _get_account_world_info(request: web.Request) -> web.Response:
 async def _choice_world(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).choice_world(int(post['world']), post['unique_id'], int(post['target_world']))
+	return _json_response(result)
+
+
+@ROUTES.post('/create_player')
+async def _create_player(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).create_player(int(post['world']), post['unique_id'], post['game_name'])
 	return _json_response(result)
 
 
