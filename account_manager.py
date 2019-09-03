@@ -64,6 +64,7 @@ class AccountManager:
 	# TODO run check_exists as a task
 	# TODO refactor code for speed improvements
 	async def bind_account(self, unique_id: str, password: str, account: str, email: str, phone: str) -> dict:
+		bound = {'account' : '', 'email' : '', 'phone_number' : ''}
 		if await self._account_is_bound(unique_id): # trying to bind additional items
 			if email == '' and phone == '':
 				return self.message_typesetting(9, 'could not bind additional items')
@@ -87,8 +88,10 @@ class AccountManager:
 
 			if email != '':
 				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
+				bound['email'] = email
 			if phone != '':
 				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
+				bound['phone_number'] = phone
 
 		else: # trying to bind for the first time
 			retvals = await asyncio.gather(self._check_exists('account', account), self._check_exists('email', email), self._check_exists('phone_number', phone))
@@ -117,12 +120,14 @@ class AccountManager:
 				random_salt = '0' + random_salt
 			hashed_password = hashlib.scrypt(password.encode(), salt=random_salt.encode(), n = self._n, r = self._r, p = self._p).hex()
 			await self._execute_statement('UPDATE info SET account = "' + account + '", password = "' + hashed_password + '", salt = "' + random_salt + '" WHERE unique_id = "' + unique_id + '";')
-
+			bound['account'] = account
 			if email != '':
 				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
+				bound['email'] = email
 			if phone != '':
 				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
-		return self.message_typesetting(0, 'success')
+				bound['phone_number'] = phone
+		return self.message_typesetting(0, 'success', bound)
 
 
 
