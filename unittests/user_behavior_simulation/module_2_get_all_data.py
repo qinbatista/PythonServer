@@ -36,6 +36,7 @@ def get_monster_info():#获取怪物参数
 def get_all_friend_info():#获取所有朋友信息
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_friend_info', 'data' : {'token' : token}})#获取所有好友信息
 	print_method("[get_all_friend_info]"+str(response))
+	return response
 
 def get_all_skill_level():#获取所有技能信息
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_skill_level', 'data' : {'token' : token}})#升级请求
@@ -87,7 +88,6 @@ def get_all_info(_token,_world):
 	global world,token
 	world = _world
 	token = _token
-
 	return get_level_info(),get_all_friend_info(),get_all_skill_level(),get_all_weapon(),refresh_all_storage(),get_all_roles(),get_stage_info(),get_monster_info(),get_factory_info(),get_all_family_info(),get_all_mail(),get_all_armor_info()
 
 if __name__ == "__main__":
