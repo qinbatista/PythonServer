@@ -110,8 +110,8 @@ def create_table_families(cursor):
 	  `level` int(11) DEFAULT 0 COMMENT '工会等级',
 	  `icon` BLOB NULL DEFAULT (0x0) COMMENT '工会图标',
 	  `experience` int(11) DEFAULT 0 COMMENT '工会经验',
-	  `announcement` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会公告',
-	  `news` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会动态',
+	  `announcement` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会公告',
+	  `news` varchar(4095) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会动态',
 	  `president` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '会长游戏名',
 	  `admin1` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '管理员1游戏名',
 	  `admin2` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '管理员2游戏名',
@@ -356,7 +356,7 @@ def operating_test():
 	c.select_db("aliya")
 	cursor = c.cursor()
 	create_table_player(cursor)
-	# create_table_families(cursor)
+	create_table_families(cursor)
 
 
 if __name__ == '__main__':

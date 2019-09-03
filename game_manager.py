@@ -1941,10 +1941,32 @@ class GameManager:
 		if world == target_world:
 			return self._message_typesetting(98, "You have been in this world")
 		if await self._execute_statement(target_world, f"select * from player where unique_id='{unique_id}'"):
-			remaining.update({"world": target_world, "info": "true"})
+			weapons = (await self.get_all_weapon(world, unique_id))["data"]
+			supplies = (await self.get_all_supplies(world, unique_id))["data"]
+			skills = (await self.get_all_skill_level(world, unique_id))["data"]
+			armors = (await self.get_all_armor_info(world, unique_id))["data"]
+			remaining.update({"world": target_world, "info": {"weapons": weapons, "supplies": supplies, "skills": skills, "armors": armors}})
 		else:
-			remaining.update({"world": target_world, "info": "false"})
+			remaining.update({"world": target_world})
 		return self._message_typesetting(0, 'You have successfully switched to another world', data={"remaining": remaining})
+
+	async def create_player(self, world: int, unique_id: str, game_name: str):
+		# 0 - You have successfully created a player in this world
+		# 1 - You have a player in this world
+		remaining = {}
+		data_tuple = (await self.get_all_head(world, 'player'))['remaining']
+		head = [x[0] for x in data_tuple]
+		data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
+		if data:
+			for i in range(len(head)):
+				remaining.update({head[i]: data[0][i]})
+			return self._message_typesetting(1, 'You have a player in this world', data={"remaining": remaining})
+		else:
+			await self._execute_statement_update(world, f"insert into player(unique_id, game_name) values('{unique_id}', '{game_name}')")
+			data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
+			for i in range(len(head)):
+				remaining.update({head[i]: data[0][i]})
+			return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
 
 #############################################################################
 #                       End Temp Function Position                          #
@@ -1956,7 +1978,10 @@ class GameManager:
 
 	@C.collect_async
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
+		# announcement = "执行人:执行目标:执行方式:执行人的身份:执行目标的身份"
 		# 0 - success, user removed
+		# 91 - You don't have permission to delete the administrator
+		# 92 - You can't remove the patriarch.
 		# 93 - You have reached the upper limit of the number of union removals today.
 		# 94 - No such union
 		# 95 - you can not remove yourself using this function
@@ -1983,37 +2008,49 @@ class GameManager:
 			if admin:
 				admins.append(admin)
 				members.remove(admin)
+		if president == gamename_target: return self._message_typesetting(92, "You can't remove the patriarch")
+		# 获得当前时间用于比较开始删除的时间，并判断是否重置当前的次数
+		current_time = datetime.now().strftime("%Y-%m-%d")
+		if remove_start_time == "" or (datetime.strptime(remove_start_time, '%Y-%m-%d') - datetime.strptime(current_time, '%Y-%m-%d')).total_seconds() != 0:
+			remove_start_time = current_time
+			remove_times = 5
 		if remove_times == 0: return self._message_typesetting(93, 'You have reached the upper limit of the number of union removals today.')
+		else: remove_times -= 1
 		if game_name != president and game_name not in admins: return self._message_typesetting(97, 'you are not family admin')
 		try:
 			announcement = ""
-			current_time = datetime.now().strftime("%Y-%m-%d")
-			if remove_start_time == "" or (datetime.strptime(remove_start_time, '%Y-%m-%d') - datetime.strptime(current_time, '%Y-%m-%d')).total_seconds() != 0:
-				remove_times = 4
-				remove_start_time = current_time
-			else:
-				remove_times -= 1
 			if game_name == president:  # 会长权限
-				for i in range(len(family_info[8: 11])):
+				for i in range(len(family_info[8: 11])):  # 管理员admin
 					if gamename_target == family_info[i + 8]:
+						announcement = f"{game_name}:{gamename_target}:1:president:admin"
 						await self._execute_statement_update(world, f'UPDATE families SET admin{i + 1} = "" WHERE familyid = "{fid}";')
-			for i in range(len(family_info[11: 16])):
-				if gamename_target == family_info[i + 11]:
-					await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
-			announcement = f"{game_name} {gamename_target} 1"  # 需要写详细
+				if not announcement:
+					for i in range(len(family_info[11: 16])):  # 精英elite
+						if gamename_target == family_info[i + 11]:
+							announcement = f"{game_name}:{gamename_target}:1:president:elite"
+							await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
+				if not announcement:
+					announcement = f"{game_name}:{gamename_target}:1:president:member"
+			else:
+				if gamename_target in admins: return self._message_typesetting(91, "You don't have permission to delete the administrator")
+				for i in range(len(family_info[11: 16])):  # 精英elite
+					if gamename_target == family_info[i + 11]:
+						announcement = f"{game_name}:{gamename_target}:1:admin:elite"
+						await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
+				if not announcement:
+					announcement = f"{game_name}:{gamename_target}:1:admin:member"
 			if news == "":
 				news = {"1": announcement}
 			else:
 				content = list(json.loads(news.replace("'", "\""), encoding='utf-8').values())
-				if len(content) >= 30:
-					content.pop(0)
+				if len(content) >= 30: content.pop(0)
 				content.append(announcement)
 				news = {}
 				for i, value in enumerate(content):
 					news.update({str(i + 1): value})
-			await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{news}" WHERE familyid = "{fid}";')
+			await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{str(news)}" WHERE familyid = "{fid}";')
 			await self._execute_statement_update(world, f'UPDATE player SET familyid = "", cumulative_contribution=0 WHERE game_name = "{gamename_target}";')
-			remaining.update({"announcement": announcement, "news": str(news)})
+			remaining.update({"announcement": announcement, "news": news, "remove_start_time": remove_start_time, "remove_times": remove_times})
 		except ValueError:
 			return self._message_typesetting(96, 'user is not in your family')
 		return self._message_typesetting(0, 'success, user removed', data={"remaining": remaining})
@@ -2517,7 +2554,14 @@ class GameManager:
 		factory_mark = all_factory.index(factory_kind)
 		remaining = {}
 		reward = {}
-		result = await eval(f"self.refresh_{factory_kind}_storage({world},{unique_id})")
+		if factory_kind == "food":
+			result = await self.refresh_food_storage(world, unique_id)
+		elif factory_kind == "mine":
+			result = await self.refresh_mine_storage(world, unique_id)
+		elif factory_kind == "crystal":
+			result = await self.refresh_crystal_storage(world, unique_id)
+		else:
+			result = await self.refresh_equipment_storage(world, unique_id)
 		if result["data"]:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
@@ -4329,6 +4373,13 @@ async def _get_account_world_info(request: web.Request) -> web.Response:
 async def _choice_world(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).choice_world(int(post['world']), post['unique_id'], int(post['target_world']))
+	return _json_response(result)
+
+
+@ROUTES.post('/create_player')
+async def _create_player(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).create_player(int(post['world']), post['unique_id'], post['game_name'])
 	return _json_response(result)
 
 
