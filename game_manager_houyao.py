@@ -2561,6 +2561,7 @@ class GameManager:
 			result = await self.refresh_crystal_storage(world, unique_id)
 		else:
 			result = await self.refresh_equipment_storage(world, unique_id)
+		# result = await eval(f"self.refresh_{factory_kind}_storage({world},{unique_id})")
 		if result["data"]:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
