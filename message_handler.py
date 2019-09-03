@@ -469,7 +469,22 @@ class MessageHandler:
 	async def _distribution_workers(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/distribution_workers', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'workers_quantity': message['data']['workers_quantity'],'factory_kind': message['data']['factory_kind']}) as resp:
 			return await resp.text()
-
+	async def _acceleration_technology(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/acceleration_technology', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _refresh_food_storage(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/refresh_food_storage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()	
+	async def _refresh_mine_storage(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/refresh_mine_storage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _refresh_crystal_storage(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/refresh_crystal_storage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+	async def _refresh_equipment_storage(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/refresh_equipment_storage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()		
+			
 	async def _upgrade_role_level(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/upgrade_role_level', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'role': message['data']['role'],'experience_potion': message['data']['experience_potion']}) as resp:
 			return await resp.text()
@@ -605,7 +620,13 @@ FUNCTION_LIST = {
 	'distribution_workers':MessageHandler._distribution_workers,
 	'equipment_manufacturing_armor':MessageHandler._equipment_manufacturing_armor,
 	'active_wishing_pool':MessageHandler._active_wishing_pool,
+	'acceleration_technology':MessageHandler._acceleration_technology,
+	'refresh_food_storage':MessageHandler._refresh_food_storage,
+	'refresh_mine_storage':MessageHandler._refresh_mine_storage,
+	'refresh_crystal_storage':MessageHandler._refresh_crystal_storage,
+	'refresh_equipment_storage':MessageHandler._refresh_equipment_storage,
 
+	
 	'upgrade_role_level':MessageHandler._upgrade_role_level,
 	'upgrade_role_star':MessageHandler._upgrade_role_star
 
