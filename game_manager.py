@@ -1978,7 +1978,10 @@ class GameManager:
 
 	@C.collect_async
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
+		# announcement = "执行人:执行目标:执行方式:执行人的身份:执行目标的身份"
 		# 0 - success, user removed
+		# 91 - You don't have permission to delete the administrator
+		# 92 - You can't remove the patriarch.
 		# 93 - You have reached the upper limit of the number of union removals today.
 		# 94 - No such union
 		# 95 - you can not remove yourself using this function
@@ -2005,37 +2008,49 @@ class GameManager:
 			if admin:
 				admins.append(admin)
 				members.remove(admin)
+		if president == gamename_target: return self._message_typesetting(92, "You can't remove the patriarch")
+		# 获得当前时间用于比较开始删除的时间，并判断是否重置当前的次数
+		current_time = datetime.now().strftime("%Y-%m-%d")
+		if remove_start_time == "" or (datetime.strptime(remove_start_time, '%Y-%m-%d') - datetime.strptime(current_time, '%Y-%m-%d')).total_seconds() != 0:
+			remove_start_time = current_time
+			remove_times = 5
 		if remove_times == 0: return self._message_typesetting(93, 'You have reached the upper limit of the number of union removals today.')
+		else: remove_times -= 1
 		if game_name != president and game_name not in admins: return self._message_typesetting(97, 'you are not family admin')
 		try:
 			announcement = ""
-			current_time = datetime.now().strftime("%Y-%m-%d")
-			if remove_start_time == "" or (datetime.strptime(remove_start_time, '%Y-%m-%d') - datetime.strptime(current_time, '%Y-%m-%d')).total_seconds() != 0:
-				remove_times = 4
-				remove_start_time = current_time
-			else:
-				remove_times -= 1
 			if game_name == president:  # 会长权限
-				for i in range(len(family_info[8: 11])):
+				for i in range(len(family_info[8: 11])):  # 管理员admin
 					if gamename_target == family_info[i + 8]:
+						announcement = f"{game_name}:{gamename_target}:1:president:admin"
 						await self._execute_statement_update(world, f'UPDATE families SET admin{i + 1} = "" WHERE familyid = "{fid}";')
-			for i in range(len(family_info[11: 16])):
-				if gamename_target == family_info[i + 11]:
-					await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
-			announcement = f"{game_name} {gamename_target} 1"  # 需要写详细
+				if not announcement:
+					for i in range(len(family_info[11: 16])):  # 精英elite
+						if gamename_target == family_info[i + 11]:
+							announcement = f"{game_name}:{gamename_target}:1:president:elite"
+							await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
+				if not announcement:
+					announcement = f"{game_name}:{gamename_target}:1:president:member"
+			else:
+				if gamename_target in admins: return self._message_typesetting(91, "You don't have permission to delete the administrator")
+				for i in range(len(family_info[11: 16])):  # 精英elite
+					if gamename_target == family_info[i + 11]:
+						announcement = f"{game_name}:{gamename_target}:1:admin:elite"
+						await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
+				if not announcement:
+					announcement = f"{game_name}:{gamename_target}:1:admin:member"
 			if news == "":
 				news = {"1": announcement}
 			else:
 				content = list(json.loads(news.replace("'", "\""), encoding='utf-8').values())
-				if len(content) >= 30:
-					content.pop(0)
+				if len(content) >= 30: content.pop(0)
 				content.append(announcement)
 				news = {}
 				for i, value in enumerate(content):
 					news.update({str(i + 1): value})
-			await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{news}" WHERE familyid = "{fid}";')
+			await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{str(news)}" WHERE familyid = "{fid}";')
 			await self._execute_statement_update(world, f'UPDATE player SET familyid = "", cumulative_contribution=0 WHERE game_name = "{gamename_target}";')
-			remaining.update({"announcement": announcement, "news": str(news)})
+			remaining.update({"announcement": announcement, "news": news, "remove_start_time": remove_start_time, "remove_times": remove_times})
 		except ValueError:
 			return self._message_typesetting(96, 'user is not in your family')
 		return self._message_typesetting(0, 'success, user removed', data={"remaining": remaining})
