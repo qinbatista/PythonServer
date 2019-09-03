@@ -2553,7 +2553,14 @@ class GameManager:
 		factory_mark = all_factory.index(factory_kind)
 		remaining = {}
 		reward = {}
-		result = await eval(f"self.refresh_{factory_kind}_storage({world},{unique_id})")
+		if factory_kind == "food":
+			result = await self.refresh_food_storage(world, unique_id)
+		elif factory_kind == "mine":
+			result = await self.refresh_mine_storage(world, unique_id)
+		elif factory_kind == "crystal":
+			result = await self.refresh_crystal_storage(world, unique_id)
+		else:
+			result = await self.refresh_equipment_storage(world, unique_id)
 		if result["data"]:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
