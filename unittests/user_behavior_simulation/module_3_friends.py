@@ -25,6 +25,8 @@ def send_friend_gift():
 		new_response = send_tcp_message({'world' : world, 'function' : 'send_friend_gift', 'data' : {'token' : token,"friend_name":str(all_info["data"]["remaining"]["f_name"][i])}})
 		if new_response["status"]=="0":
 			print_method("[freind_dialog] send friend gift:"+new_response["data"]["remaining"]["f_name"][i])
+		elif new_response["status"]=="99":
+			print_method("[freind_dialog] you don't have friend")
 		else:
 			print_method(f'[freind_dialog] send {all_info["data"]["remaining"]["f_name"][i]} gift but failed, error:{new_response["message"]}')
 
@@ -44,14 +46,16 @@ def delete_friend():
 	new_response = send_tcp_message(send_msg)#发送好友信息
 	print_method("[freind_dialog] delete_friend:"+str(friend_name)+" "+"")
 
+
 def freind_dialog(_token,_world,_all_info):
 	print_module("[freind_dialog]")
 	global world,token,all_info
 	token = _token
 	world = _world
 	all_info = _all_info
+	print("_all_info="+str(_all_info))
 	while True:
-		int_random = random.randint(0,4)
+		int_random = random.randint(0,0)
 		if int_random==0:#挨个发送好友爱心
 			send_friend_gift()
 		elif int_random==1:#发送所有好友信息

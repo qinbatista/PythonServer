@@ -20,6 +20,7 @@ def call_friend_dialog(get_all_friend_info):
 if __name__ == "__main__":
 	call_login("0")
 	get_level_info,get_all_friend_info,get_all_skill_level,get_all_weapon,refresh_all_storage,get_all_roles,get_stage_info,get_monster_info,get_factory_info,get_all_family_info,get_all_mail,get_all_armor_info = call_get_all_info()#加载所有参数信息
+	print(get_all_friend_info)
 	call_friend_dialog(get_all_friend_info)#朋友界面
 	# skill_dialog(token)#技能界面
 	# weapon_dialog(token)#武器界面
