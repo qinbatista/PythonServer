@@ -1921,14 +1921,21 @@ class GameManager:
 		data = {"remaining": {"level_enemy_layouts_config": self._level_enemy_layouts_config_json}}
 		return self._message_typesetting(0, 'got all level enemy layouts config info', data)
 
-	async def get_account_world_info(self, world: int, unique_id: str):
+	async def get_account_world_info(self, unique_id: str):
 		# 0 - Get all world information
-		remaining = {}
+		remaining = []
 		for w in range(len(self._pools)):
-			if await self._execute_statement(w, f"select game_name, level from player where unique_id='{unique_id}'"):
-				remaining.update({w: {"world": w, "info": "true"}})
+			data = await self._execute_statement(w, f"select game_name,level from player where unique_id='{unique_id}'")
+			if data:
+				if w == 0:
+					remaining.append({"server_status": 0, "world": w, "world_name": "aliya", "game_name": data[0][0], "level": data[0][1]})
+				else:
+					remaining.append({"server_status": 0, "world": w, "world_name": f"world{w}", "game_name": data[0][0], "level": data[0][1]})
 			else:
-				remaining.update({w: {"world": w, "info": "false"}})
+				if w == 0:
+					remaining.append({"server_status": 0, "world": w, "world_name": "aliya"})
+				else:
+					remaining.append({"server_status": 0, "world": w, "world_name": f"world{w}"})
 		return self._message_typesetting(0, 'Get all world information', data={"remaining": remaining})
 
 	async def choice_world(self, unique_id: str, target_world: int):
@@ -1953,21 +1960,30 @@ class GameManager:
 
 	async def create_player(self, world: int, unique_id: str, game_name: str):
 		# 0 - You have successfully created a player in this world
-		# 1 - You have a player in this world
+		# 1 - Create failed, you have a player in this world
+		# 98 - The player's name has been used
+		# 99 - Player name cannot be a null character
 		remaining = {}
-		data_tuple = (await self.get_all_head(world, 'player'))['remaining']
-		head = [x[0] for x in data_tuple]
+		data_head = (await self.get_all_head(world, 'player'))['remaining']
+		head = [x[0] for x in data_head]
 		data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
 		if data:
 			for i in range(len(head)):
 				remaining.update({head[i]: data[0][i]})
-			return self._message_typesetting(1, 'You have a player in this world', data={"remaining": remaining})
-		else:
-			await self._execute_statement_update(world, f"insert into player(unique_id, game_name) values('{unique_id}', '{game_name}')")
-			data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
-			for i in range(len(head)):
-				remaining.update({head[i]: data[0][i]})
-			return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
+			return self._message_typesetting(1, 'Create failed, you have a player in this world', data={"remaining": remaining})
+
+		data_name = await self._execute_statement(world, f"select game_name from player")
+		game_names = [x[0] for x in data_name]
+		if game_name == "":
+			return self._message_typesetting(99, "Player name cannot be a null character")
+		if game_name in game_names:
+			return self._message_typesetting(98, "The player's name has been used")
+
+		await self._execute_statement_update(world, f"insert into player(unique_id, game_name) values('{unique_id}', '{game_name}')")
+		data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
+		for i in range(len(head)):
+			remaining.update({head[i]: data[0][i]})
+		return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
 
 #############################################################################
 #                       End Temp Function Position                          #
@@ -4366,7 +4382,7 @@ async def _acceleration_technology(request: web.Request) -> web.Response:
 @ROUTES.post('/get_account_world_info')
 async def _get_account_world_info(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).get_account_world_info(int(post['world']), post['unique_id'])
+	result = await (request.app['MANAGER']).get_account_world_info(post['unique_id'])
 	return _json_response(result)
 
 
