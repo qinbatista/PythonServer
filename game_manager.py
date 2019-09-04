@@ -1925,7 +1925,7 @@ class GameManager:
 		# 0 - Get all world information
 		remaining = {}
 		for w in range(len(self._pools)):
-			if await self._execute_statement(w, f"select * from player where unique_id='{unique_id}'"):
+			if await self._execute_statement(w, f"select game_name, level from player where unique_id='{unique_id}'"):
 				remaining.update({w: {"world": w, "info": "true"}})
 			else:
 				remaining.update({w: {"world": w, "info": "false"}})
@@ -1936,7 +1936,7 @@ class GameManager:
 		# 98 - You have been in this world
 		# 99 - No such world
 		# world=0
-		remaining = {}
+		# remaining = {}
 		if target_world < 0 or target_world >= len(self._pools):
 			return self._message_typesetting(99, "No such world")
 		# if world == target_world:

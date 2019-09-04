@@ -102,6 +102,10 @@ class MessageHandler:
 		print("_choice_world="+str(message))
 		async with session.post(self._game_manager_base_url(message['data']['target_world']) + '/choice_world', data={'unique_id': "unique_id0",'target_world': message['data']['target_world']}) as resp:
 			return await resp.text()
+	async def get_account_world_info(self, message: dict, session) -> str:
+		print("_get_account_world_info="+str(message))
+		async with session.post(self._game_manager_base_url(message['data']['target_world']) + '/get_account_world_info', data={'unique_id': "unique_id0"}) as resp:
+			return await resp.text()
 
 	async def _level_up_skill(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/level_up_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
@@ -517,6 +521,7 @@ FUNCTION_LIST = {
 	'login_unique': MessageHandler._login_unique,
 	'bind_account': MessageHandler._bind_account,
 	'choice_world': MessageHandler._choice_world,
+	'get_account_world_info': MessageHandler._get_account_world_info,
 
 	# game_manager
 	'join_world' : MessageHandler._join_world,
