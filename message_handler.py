@@ -103,7 +103,8 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _get_account_world_info(self, message: dict, session) -> str:
-		async with session.post(self._game_manager_base_url(message['data']['target_world']) + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
+		print("message="+str(message))
+		async with session.post(self._game_manager_base_url("0") + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _create_player(self, message: dict, session) -> str:

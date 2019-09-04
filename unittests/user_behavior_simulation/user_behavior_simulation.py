@@ -19,7 +19,7 @@ def call_login(unique_id):
 		world = module_1_login.login_module(unique_id)
 		if world!=None:
 			token,world = world
-			if token!="":break
+			if token!="" and world!="":break
 def call_get_all_info():
 	return module_2_get_all_data.get_all_info(token,world)
 
@@ -64,8 +64,9 @@ def run_task(name):
 	mail_dialog(get_all_mail)#邮箱界面
 
 if __name__ == "__main__":
-	p = multiprocessing.Pool(processes=3)
-	for i in range(0,1):
-		p.apply_async(run_task, args=(i,))
-	p.close()
-	p.join()
+	run_task("0")
+	# p = multiprocessing.Pool(processes=3)
+	# for i in range(0,1):
+	# 	p.apply_async(run_task, args=(i,))
+	# p.close()
+	# p.join()
