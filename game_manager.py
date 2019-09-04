@@ -1940,26 +1940,28 @@ class GameManager:
 
 	async def choice_world(self, unique_id: str, target_world: int):
 		# 0 - enter world success
+		# 1 - enter world success, you have initialized all the information
 		# 97 - enter world failed, the world is full
 		# 98 - You have been in this world
 		# 99 - No such world
 		# world=0
-		# remaining = {}
+		remaining = {}
 		if target_world < 0 or target_world >= len(self._pools):
 			return self._message_typesetting(99, "No such world")
 		# if world == target_world:
 		# 	return self._message_typesetting(98, "You have been in this world")
-		# if await self._execute_statement(target_world, f"select * from player where unique_id='{unique_id}'"):
-		# 	weapons = (await self.get_all_weapon(world, unique_id))["data"]
-		# 	supplies = (await self.get_all_supplies(world, unique_id))["data"]
-		# 	skills = (await self.get_all_skill_level(world, unique_id))["data"]
-		# 	armors = (await self.get_all_armor_info(world, unique_id))["data"]
-		# 	remaining.update({"world": target_world, "info": {"weapons": weapons, "supplies": supplies, "skills": skills, "armors": armors}})
-		# else:
-		# 	remaining.update({"world": target_world})
-		server_status = -1  # 获取系统方法赋值 含世界参数target_world
+		server_status = 1  # 获取系统方法赋值 含世界参数target_world
 		if server_status == -1:
 			return self._message_typesetting(97, 'enter world failed, the world is full')
+		data = await self._execute_statement(target_world, f"select game_name, level, role from player where unique_id='{unique_id}'")
+		if data:
+			# weapons = (await self.get_all_weapon(target_world, unique_id))["data"]
+			# supplies = (await self.get_all_supplies(target_world, unique_id))["data"]
+			# skills = (await self.get_all_skill_level(target_world, unique_id))["data"]
+			# armors = (await self.get_all_armor_info(target_world, unique_id))["data"]
+			# remaining.update({"world": target_world, "info": {"weapons": weapons, "supplies": supplies, "skills": skills, "armors": armors}})
+			remaining.update({"world": target_world, "game_name": data[0][0], "level": data[0][1], "role": data[0][2]})
+			return self._message_typesetting(1, 'enter world success, you have initialized all the information', data={"remaining": remaining})
 		return self._message_typesetting(0, 'enter world success', data={"remaining": {"world": target_world}})
 
 	async def create_player(self, world: int, unique_id: str, game_name: str):
