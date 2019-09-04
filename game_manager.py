@@ -1939,7 +1939,8 @@ class GameManager:
 		return self._message_typesetting(0, 'Get all world information', data={"remaining": remaining})
 
 	async def choice_world(self, unique_id: str, target_world: int):
-		# 0 - You have successfully switched to another world
+		# 0 - enter world success
+		# 97 - enter world failed, the world is full
 		# 98 - You have been in this world
 		# 99 - No such world
 		# world=0
@@ -1956,6 +1957,9 @@ class GameManager:
 		# 	remaining.update({"world": target_world, "info": {"weapons": weapons, "supplies": supplies, "skills": skills, "armors": armors}})
 		# else:
 		# 	remaining.update({"world": target_world})
+		server_status = -1  # 获取系统方法赋值 含世界参数target_world
+		if server_status == -1:
+			return self._message_typesetting(97, 'enter world failed, the world is full')
 		return self._message_typesetting(0, 'enter world success', data={"remaining": {"world": target_world}})
 
 	async def create_player(self, world: int, unique_id: str, game_name: str):
@@ -2571,14 +2575,7 @@ class GameManager:
 		factory_mark = all_factory.index(factory_kind)
 		remaining = {}
 		reward = {}
-		if factory_kind == "food":
-			result = await self.refresh_food_storage(world, unique_id)
-		elif factory_kind == "mine":
-			result = await self.refresh_mine_storage(world, unique_id)
-		elif factory_kind == "crystal":
-			result = await self.refresh_crystal_storage(world, unique_id)
-		else:
-			result = await self.refresh_equipment_storage(world, unique_id)
+		result = await self.refresh_all_storage(world, unique_id)
 		if result["data"]:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
