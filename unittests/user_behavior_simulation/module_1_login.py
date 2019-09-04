@@ -92,9 +92,9 @@ def create_player(token,target_world,game_name):
 	response = send_tcp_message({'function' : 'create_player', 'data' : {"token":token,"world":target_world,"game_name":game_name}})
 	if response["status"]==0:#角色创建成功,返回世界
 		return target_world
-	elif response["status"]==98 or response["status"]==99:#角色名字重复或者为空
+	elif response["status"]==98 or response["status"]==99:#角色名字重复
 		print_method(f"repeated name name_{unique_id}, renamed again")
-		create_player(token,target_world,"name_fix_"+str(random.randint(0,999)))
+		return create_player(token,target_world,"name_fix_"+str(random.randint(0,999)))
 	elif response["status"]==1:
 		return target_world#已经创建过角色，返回用户信息直接开始进入游戏流程
 

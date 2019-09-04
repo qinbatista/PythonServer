@@ -65,7 +65,7 @@ def run_task(name):
 
 if __name__ == "__main__":
 	run_task("0")
-	# p = multiprocessing.Pool(processes=3)
+	# p = multiprocessing.Pool()
 	# for i in range(0,1):
 	# 	p.apply_async(run_task, args=(i,))
 	# p.close()
