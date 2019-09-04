@@ -36,7 +36,6 @@ def login_unique():#游客登陆
 		if int_number==0:
 			response = send_tcp_message({'function' : 'bind_account', 'data' : {"token":token, "password":"123456","account":my_unique_id+"account","email":"","phone_number":""}})
 		return token,world
-
 	elif response["status"]==2:#账户已经被绑定
 		int_number = random.choice([0,1])
 		if int_number==0:
@@ -91,10 +90,10 @@ def create_player(token,target_world,user_name):
 	response = send_tcp_message({'function' : 'create_player', 'data' : {"token":token,"world":world,"user_name":user_name}})
 	if response["status"]==0:#角色创建成功,返回世界
 		return target_world
-	elif response["status"]=="1":#角色名字重复
+	elif response["status"]==1:#角色名字重复
 		print_method(f"repeated name name_{unique_id}, renamed again")
 		create_player(token,target_world,"name_fix_"+str(random.randint(0,999)))
-	elif response["status"]=="2":
+	elif response["status"]==2:
 		return target_world#已经创建过角色，返回用户信息直接开始进入游戏流程
 
 def get_account_world_info(token):

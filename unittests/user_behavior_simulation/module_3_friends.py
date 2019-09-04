@@ -22,13 +22,13 @@ def print_module(my_string):
 
 def send_friend_gift():
 	print_method("[send_friend_gift]="+str(all_info))
-	if all_info["status"]=="99":
+	if all_info["status"]==99:
 		print_method(f'[freind_dialog] you have no friend')
 		request_friend()
 		return
 	for i in range(0,len(all_info["data"]["remaining"]["f_name"])):
 		new_response = send_tcp_message({'world' : world, 'function' : 'send_friend_gift', 'data' : {'token' : token,"friend_name":str(all_info["data"]["remaining"]["f_name"][i])}})
-		if new_response["status"]=="0":#给一个好友发送礼物
+		if new_response["status"]==0:#给一个好友发送礼物
 			print_method("[freind_dialog] send friend gift:"+new_response["data"]["remaining"]["f_name"][i])
 		else:#朋友发送失败
 			print_method(f'[freind_dialog] send {all_info["data"]["remaining"]["f_name"][i]} gift but failed, error:{new_response["message"]}')
