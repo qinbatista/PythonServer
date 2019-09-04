@@ -94,7 +94,7 @@ def choice_world(token,target_world):
 		return -1
 def get_account_world_info(token):
 	response = send_tcp_message({'function' : 'get_account_world_info', 'data' : {"token":token}})
-	if response["status"]=="0":
+	if response["status"]==0:
 		return response["data"]["target_world"]
 	else:
 		return -1
