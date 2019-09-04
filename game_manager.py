@@ -1931,24 +1931,25 @@ class GameManager:
 				remaining.update({w: {"world": w, "info": "false"}})
 		return self._message_typesetting(0, 'Get all world information', data={"remaining": remaining})
 
-	async def choice_world(self, world: int, unique_id: str, target_world: int):
+	async def choice_world(self, unique_id: str, target_world: int):
 		# 0 - You have successfully switched to another world
 		# 98 - You have been in this world
 		# 99 - No such world
+		# world=0
 		remaining = {}
 		if target_world < 0 or target_world >= len(self._pools):
 			return self._message_typesetting(99, "No such world")
-		if world == target_world:
-			return self._message_typesetting(98, "You have been in this world")
-		if await self._execute_statement(target_world, f"select * from player where unique_id='{unique_id}'"):
-			weapons = (await self.get_all_weapon(world, unique_id))["data"]
-			supplies = (await self.get_all_supplies(world, unique_id))["data"]
-			skills = (await self.get_all_skill_level(world, unique_id))["data"]
-			armors = (await self.get_all_armor_info(world, unique_id))["data"]
-			remaining.update({"world": target_world, "info": {"weapons": weapons, "supplies": supplies, "skills": skills, "armors": armors}})
-		else:
-			remaining.update({"world": target_world})
-		return self._message_typesetting(0, 'You have successfully switched to another world', data={"remaining": remaining})
+		# if world == target_world:
+		# 	return self._message_typesetting(98, "You have been in this world")
+		# if await self._execute_statement(target_world, f"select * from player where unique_id='{unique_id}'"):
+		# 	weapons = (await self.get_all_weapon(world, unique_id))["data"]
+		# 	supplies = (await self.get_all_supplies(world, unique_id))["data"]
+		# 	skills = (await self.get_all_skill_level(world, unique_id))["data"]
+		# 	armors = (await self.get_all_armor_info(world, unique_id))["data"]
+		# 	remaining.update({"world": target_world, "info": {"weapons": weapons, "supplies": supplies, "skills": skills, "armors": armors}})
+		# else:
+		# 	remaining.update({"world": target_world})
+		return self._message_typesetting(0, 'enter world success', data={"remaining": {"world": target_world}})
 
 	async def create_player(self, world: int, unique_id: str, game_name: str):
 		# 0 - You have successfully created a player in this world
@@ -4372,7 +4373,8 @@ async def _get_account_world_info(request: web.Request) -> web.Response:
 @ROUTES.post('/choice_world')
 async def _choice_world(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).choice_world(int(post['world']), post['unique_id'], int(post['target_world']))
+	print(str(post))
+	result = await (request.app['MANAGER']).choice_world(post['unique_id'], int(post['target_world']))
 	return _json_response(result)
 
 

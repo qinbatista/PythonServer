@@ -25,7 +25,7 @@ def purchase_energy():
 	pass
 
 def enter_stage(token,world,response):
-	print_module("[enter_level]")
+	print_module("[enter_level]:"+str(response))
 	while True:
 		my_number = random.randint(0,4)
 		if my_number==0:#剧情

@@ -10,7 +10,7 @@ import module_8_roles
 import module_9_family
 import module_10_stage
 import module_11_mail
-
+import multiprocessing
 world = "0"
 token = ""
 def call_login(unique_id):
@@ -33,7 +33,7 @@ def weapon_dialog(get_all_weapon):
 	module_5_weapons.weapon_dialog(token,world,get_all_weapon)
 
 def factory_dialog(refresh_all_storage):
-	module_6_factory.factory_dialog(token,world,get_all_weapon)
+	module_6_factory.factory_dialog(token,world,refresh_all_storage)
 
 def get_random_item():
 	module_7_lottery.get_random_item(token,world)
@@ -44,14 +44,14 @@ def role_dialog():
 def family_dialog(get_all_family_info):
 	module_9_family.family_dialog(token,world,get_all_family_info)
 
-def stage_dialog(get_stage_info):
-	module_10_stage.enter_stage(token,world,get_stage_info)
+def stage_dialog(get_level_info):
+	module_10_stage.enter_stage(token,world,get_level_info)
 
 def mail_dialog(get_all_mail):
 	module_11_mail.mail_dialog(token,world,get_all_mail)
 
-if __name__ == "__main__":
-	call_login("0")
+def run_task(name):
+	call_login(str(name))
 	get_level_info,get_all_friend_info,get_all_skill_level,get_all_weapon,refresh_all_storage,get_all_roles,get_stage_info,get_monster_info,get_factory_info,get_all_family_info,get_all_mail,get_all_armor_info = call_get_all_info()#加载所有参数信息
 	call_friend_dialog(get_all_friend_info)#朋友界面
 	skill_dialog(get_all_skill_level)#技能界面
@@ -60,5 +60,12 @@ if __name__ == "__main__":
 	get_random_item()#抽奖界面
 	role_dialog()#角色界面
 	family_dialog(get_all_family_info)#家族界面*暂时不需要
-	stage_dialog(get_stage_info)#关卡界面
+	stage_dialog(get_level_info)#关卡界面
 	mail_dialog(get_all_mail)#邮箱界面
+
+if __name__ == "__main__":
+	p = multiprocessing.Pool(processes=3)
+	for i in range(0,1):
+		p.apply_async(run_task, args=(i,))
+	p.close()
+	p.join()
