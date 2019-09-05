@@ -1011,6 +1011,12 @@ class GameManager:
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"tower_stage":tower_stage,"stage":stage,"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
 
+	def get_monster_info(self) -> dict:
+		"""
+		# 0 - Get all monster information to get success
+		"""
+		return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config_json}})
+
 	@C.collect_async
 	async def show_energy(self, world: int, unique_id: str):
 		data = await self.try_energy(world=world, unique_id=unique_id, amount=0)
@@ -4206,6 +4212,11 @@ async def __get_hang_up_reward(request: web.Request) -> web.Response:
 async def __get_hang_up_info(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).get_hang_up_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_monster_info')
+async def _get_monster_info(request: web.Request) -> web.Response:
+	result = (request.app['MANAGER']).get_monster_info()
 	return _json_response(result)
 
 @ROUTES.post('/enter_stage')
