@@ -659,6 +659,19 @@ class GameManager:
 		remaining.pop('unique_id')
 		return self._message_typesetting(0, role + " upgrade success!", {"remaining": remaining})
 
+	async def get_all_roles(self, world: int, unique_id: str) -> dict:
+		# - 0 - Get all the role information
+		data_tuple = (await self.get_all_head(world, 'role'))["remaining"]
+		head = [x[0] for x in data_tuple]
+		content = await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}"')
+		remaining = []
+		for i in range(len(content)):
+			role_info = {}
+			for j in range(1, len(head)):
+				role_info.update({head[j]: content[i][j]})
+			remaining.append(role_info)
+		return self._message_typesetting(0, "Get all the role information", {"remaining": remaining})
+
 #############################################################################
 #						End Role Module Functions							#
 #############################################################################
@@ -3916,6 +3929,12 @@ async def _upgrade_role_level(request: web.Request) -> web.Response:
 async def _upgrade_role_star(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).upgrade_role_star(int(post['world']), post['unique_id'], post['role'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_roles')
+async def _get_all_roles(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_all_roles(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 # ############################################################ #
