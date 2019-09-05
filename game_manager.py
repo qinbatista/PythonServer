@@ -891,10 +891,10 @@ class GameManager:
 		# 此时的material_dict字典的值是给奖励列表的，
 		# 所以hang_stage是奖励之前的关卡，
 		# hang_up_time是之前挂起的开始时间
-		probability_reward = self._hang_reward_list["probability_reward"]
+		probability_reward = self._hang_reward["probability_reward"]
 		material_dict = {}
 		probability_dict = {}
-		for key, value in self._hang_reward_list[str(hang_stage)].items():
+		for key, value in self._hang_reward[str(hang_stage)].items():
 			if key in probability_reward: probability_dict.update({key: value})
 			else: material_dict.update({key: value})
 		material_dict.update({"hang_stage": hang_stage})
@@ -959,10 +959,10 @@ class GameManager:
 			# 此时的material_dict字典的值是给奖励列表的，
 			# 所以hang_stage是奖励之前的关卡，
 			# hang_up_time是之前挂起的开始时间
-			probability_reward = self._hang_reward_list["probability_reward"]
+			probability_reward = self._hang_reward["probability_reward"]
 			material_dict = {}
 			probability_dict = {}
-			for key, value in self._hang_reward_list[str(hang_stage)].items():
+			for key, value in self._hang_reward[str(hang_stage)].items():
 				if key in probability_reward: probability_dict.update({key: value})
 				else: material_dict.update({key: value})
 			material_dict.update({"hang_stage": hang_stage})
@@ -1016,6 +1016,28 @@ class GameManager:
 		# 0 - Get all monster information to get success
 		"""
 		return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config_json}})
+
+	async def get_stage_info(self, world: int, unique_id: str) -> dict:
+		"""
+		# 0 - Successfully obtained level information
+		# 1 - No information found for this user, successfully obtained general level configuration information
+		"""
+		server_config = {
+			"entry_consumables": self._entry_consumables,
+			"hang_reward": self._hang_reward,
+			"stage_reward": self._stage_reward,
+			"level_enemy_layouts": self._level_enemy_layouts_config_json,
+			"world_boss": self._world_boss
+		}
+		remaining = {"server_config": server_config}
+		data = await self._execute_statement(world, f"select stage, tower_stage, hang_stage, hang_up_time from player where unique_id='{unique_id}'")
+		if data:
+			stage, tower_stage, hang_stage, hang_up_time = data[0]
+			sql_data = {"stage": stage, "tower_stage": tower_stage, "hang_stage": hang_stage, "hang_up_time": hang_up_time}
+			remaining.update({"sql_data": sql_data})
+			return self._message_typesetting(status=0, message="Successfully obtained level information", data={"remaining": remaining})
+		return self._message_typesetting(status=1, message="No information found for this user, successfully obtained general level configuration information", data={"remaining": remaining})
+
 
 	@C.collect_async
 	async def show_energy(self, world: int, unique_id: str):
@@ -3663,7 +3685,7 @@ class GameManager:
 		self._role_config = d['role']
 		self._lottery = d['lottery']
 		self._player = d['player']
-		self._hang_reward_list = d['hang_reward']
+		self._hang_reward = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			print("firstDayOfMonth")
@@ -4217,6 +4239,12 @@ async def __get_hang_up_info(request: web.Request) -> web.Response:
 @ROUTES.post('/get_monster_info')
 async def _get_monster_info(request: web.Request) -> web.Response:
 	result = (request.app['MANAGER']).get_monster_info()
+	return _json_response(result)
+
+@ROUTES.post('/get_stage_info')
+async def _get_stage_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_stage_info(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 @ROUTES.post('/enter_stage')

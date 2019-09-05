@@ -1375,7 +1375,7 @@ class GameManager:
 		self._valid_passive_skills = d['weapon']['valid_passive_skills']
 		self._lottery = d['lottery']
 		self._player = d['player']
-		self._hang_reward_list = d['hang_reward']
+		self._hang_reward = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
 
 		result = requests.get('http://localhost:8000/get_level_enemy_layouts_config')
