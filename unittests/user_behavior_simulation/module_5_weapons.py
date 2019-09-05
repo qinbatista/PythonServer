@@ -6,8 +6,8 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
-
-
+import module_12_store
+import module_10_stage
 lukseun = tool_lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
 world = "0"
 token = ""
@@ -26,46 +26,44 @@ def get_random_weapon():
 	while True:
 		int_n = random.randint(0,1)
 		if int_n == 0: #金币召唤
-			print_method("[get_random_weapon] coin to get weapon")
 			is_10 = random.choice([0,1])
 			if is_10==0:
-				send_msg = {'world' : world, 'function' : 'basic_summon', 'data' : {'token' : token,"cost_item":"coin"}}
+				new_response = send_tcp_message({'world' : world, 'function' : 'basic_summon', 'data' : {'token' : token,"cost_item":"coin"}})
 			else:
-				send_msg = {'world' : world, 'function' : 'basic_summon_10_times', 'data' : {'token' : token,"cost_item":"coin"}}
-			new_response = send_tcp_message(send_msg)#发送好友信息
+				new_response = send_tcp_message({'world' : world, 'function' : 'basic_summon_10_times', 'data' : {'token' : token,"cost_item":"coin"}})#发送好友信息
+			print_method("[get_random_weapon] coin to get weapon="+str(new_response))
 			if new_response["status"]!=0:
 				purchase_item_success("coin")#购买金币
-				coin_item = random.choice([0,2])
+				coin_item = random.randint(0,2)
 				if coin_item==0:
 					continue#继续抽
-				elif coin_item==1:
-					enter_level()#进入关卡
-					break
 				elif coin_item==2:
 					break#不抽
-			else:
-				break
+
+
 		elif int_n == 1:#高级召唤
 			print_method("[get_random_weapon] diamond gift to get weapon")
 			is_10 = random.choice([0,1])
 			if is_10==0:
-				send_msg = {'world' : world, 'function' : 'pro_summon', 'data' : {'token' : token,"cost_item":"basic_summon_scroll"}}
+				new_response = send_tcp_message({'world' : world, 'function' : 'pro_summon', 'data' : {'token' : token,"cost_item":"basic_summon_scroll"}})
 			else:
-				send_msg = {'world' : world, 'function' : 'pro_summon_10_times', 'data' : {'token' : token,"cost_item":"basic_summon_scroll"}}
-			new_response = send_tcp_message(send_msg)#发送好友信息
+				new_response = send_tcp_message({'world' : world, 'function' : 'pro_summon_10_times', 'data' : {'token' : token,"cost_item":"basic_summon_scroll"}})
 			if new_response["status"]!=0:
 				purchase_item_success("basic_summon_scroll")#购买卷轴
 				if random.choice([0,1])==0:
 					continue
 				else:
 					break
-			else:
-				break
-def enter_level():
-	pass#未完成
+
 def purchase_item_success(item_id):
-	pass#未完成
+	if item_id =="coin":
+		module_12_store.purchase_coin()
+	else:
+		module_12_store.purchase_basic_summon_scroll()
 def weapon_dialog(_token,_world,get_all_skill_info):
+	global token, world
+	token = _token
+	world = _world
 	print_module("[weapon_dialog]")
 	while True:
 		random_int = random.randint(0,4)
@@ -74,8 +72,6 @@ def weapon_dialog(_token,_world,get_all_skill_info):
 			print_method("[weapon_dialog] level up weapon:"+str(new_response))
 			if new_response["status"]==95:#武器没有抽武器
 				get_random_weapon()
-			if new_response["status"]==95:#材料不足冲关卡
-				enter_level()
 		elif random_int ==1:#突破武器
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_weapon_star', 'data' : {'token' : token, "weapon":random.choice(weapon_list)}})#升级请求
 			print_method("[weapon_dialog] level up weapon star:"+str(new_response))
