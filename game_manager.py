@@ -2540,7 +2540,7 @@ class GameManager:
 
 			sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{food_start_time}', mine_factory_timer='{mine_start_time}', crystal_factory_timer='{crystal_start_time}', equipment_factory_timer='{equipment_start_time}', equipment_product_type='{equipment_product_type}' where unique_id='{unique_id}'"
 			await self._execute_statement_update(world=world, statement=sql_str)
-		if remaining:
+		if len(reward) > 4:
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
 
@@ -2875,6 +2875,21 @@ class GameManager:
 		remaining.update({"acceleration_end_time": acceleration_end_time})
 		return self._message_typesetting(status=0, message="Accelerate success", data={"remaining": remaining, "reward": reward})
 
+	@C.collect_async
+	async def get_factory_info(self, world: int, unique_id: str) -> dict:
+		"""
+		0  - Successfully obtained configuration information
+		"""
+		remaining = {}
+		sql_info = {}
+		data_head = (await self.get_all_head(world, table="factory"))["remaining"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		for i in range(1, len(data_head)):
+			sql_info.update({data_head[i][0]: factory_data[i]})
+		remaining.update({"sql_info": sql_info})
+		remaining.update({"server_config": self._factory_config})
+		return self._message_typesetting(status=0, message="Successfully obtained configuration information", data={"remaining": remaining})
+
 #############################################################################
 #							End Factory Functions							#
 #############################################################################
@@ -2886,13 +2901,10 @@ class GameManager:
 #############################################################################
 
 	async def _select_factory(self, world: int, unique_id) -> list:
-		sql_str = f"select * from factory where unique_id='{unique_id}'"
-		# data = await self._execute_statement(world, sql_str)
-		# print("data = " +str(data))
-		try:
-			return list((await self._execute_statement(world, sql_str))[0])
-		except:
-			await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
+		sql_str = f"select * from factory where unique_id={unique_id}"
+		data = await self._execute_statement(world, sql_str)
+		if data: return data[0]
+		await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
 		return list((await self._execute_statement(world, sql_str))[0])
 
 	async def _family_exists(self, world: int, fname: str):
@@ -4378,6 +4390,13 @@ async def _upgrade_wishing_pool(request: web.Request) -> web.Response:
 async def _acceleration_technology(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).acceleration_technology(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/get_factory_info')
+async def _get_factory_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_factory_info(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 
