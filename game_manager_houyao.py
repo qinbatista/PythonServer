@@ -672,6 +672,9 @@ class GameManager:
 			remaining.append(role_info)
 		return self._message_typesetting(0, "Get all the role information", {"remaining": remaining})
 
+	def get_role_config(self) -> dict:
+		# - 0 - Get role configuration information
+		return self._message_typesetting(0, "Get role configuration information", {"remaining": {"role_config": self._role_config}})
 #############################################################################
 #						End Role Module Functions							#
 #############################################################################
@@ -3935,6 +3938,12 @@ async def _upgrade_role_star(request: web.Request) -> web.Response:
 async def _get_all_roles(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).get_all_roles(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_role_config')
+async def _get_role_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = (request.app['MANAGER']).get_role_config()
 	return _json_response(result)
 
 # ############################################################ #
