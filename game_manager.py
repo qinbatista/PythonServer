@@ -2956,7 +2956,7 @@ class GameManager:
 #############################################################################
 
 	async def _select_factory(self, world: int, unique_id) -> list:
-		sql_str = f"select * from factory where unique_id={unique_id}"
+		sql_str = f"select * from factory where unique_id='{unique_id}'"
 		data = await self._execute_statement(world, sql_str)
 		if data: return data[0]
 		await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
