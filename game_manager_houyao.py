@@ -265,6 +265,11 @@ class GameManager:
 			remaining.update({val[0][0]: val[1]})
 		return self._message_typesetting(0, 'success', {"remaining": remaining})
 
+	def get_skill_level_up_config(self) -> dict:
+		# success ===> 0
+		# 0 - Success
+		return self._message_typesetting(0, 'success', {"remaining": {"skill_scroll_functions": self._skill_scroll_functions, "upgrade_chance": self._upgrade_chance}})
+
 	#@C.collect_async
 	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
 		# success ===> 0
@@ -3628,7 +3633,7 @@ class GameManager:
 		self._mall_config = d['mall']
 		self._factory_config = d['factory']
 		self._stage_reward = d['reward']
-		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
+		self._skill_scroll_functions = d['skill']['skill_scroll_functions']
 		self._upgrade_chance = d['skill']['upgrade_chance']
 		self._weapon_config = d['weapon']
 		self._role_config = d['role']
@@ -3811,6 +3816,13 @@ async def __level_up_skill(request: web.Request) -> web.Response:
 async def __get_all_skill_level(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).get_all_skill_level(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_skill_level_up_config')
+async def _get_skill_level_up_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = (request.app['MANAGER']).get_skill_level_up_config()
+	print(f"result:{result}")
 	return _json_response(result)
 
 @ROUTES.post('/get_skill')
