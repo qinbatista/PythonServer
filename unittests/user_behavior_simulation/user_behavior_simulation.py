@@ -64,9 +64,9 @@ def run_task(name):
 	mail_dialog(get_all_mail)#邮箱界面
 
 if __name__ == "__main__":
-	run_task("0")
+	run_task("2")
 	# p = multiprocessing.Pool()
-	# for i in range(0,1):
+	# for i in range(0,10):
 	# 	p.apply_async(run_task, args=(i,))
 	# p.close()
 	# p.join()

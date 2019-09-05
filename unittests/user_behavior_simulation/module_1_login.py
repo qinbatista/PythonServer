@@ -51,7 +51,7 @@ def login_unique():#游客登陆
 			return "",""
 
 def login_account():#账户登陆
-	my_unique_id = random.choice(["error_test_account",unique_id])
+	my_unique_id = unique_id
 	print_module("[login_account] unique_id="+my_unique_id)
 	num = random.choice(["account","account","account"])
 	if num =="account": account = my_unique_id+"account"
@@ -82,7 +82,7 @@ def login_account():#账户登陆
 def choice_world(token,target_world):
 	print_module("[choice_world]")
 	response = send_tcp_message({'function' : 'choice_world', 'data' : {"token":token,"target_world":target_world}})
-	if response["status"]==0:#已有角色，正常进入
+	if response["status"]==1:#已有角色，正常进入
 		return target_world
 	else:
 		return create_player(token,target_world,"name_"+unique_id)

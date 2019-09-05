@@ -99,7 +99,7 @@ class MessageHandler:
 			return await resp.text()
 
 	async def _choice_world(self, message: dict, session) -> str:
-		async with session.post(self._game_manager_base_url(message['data']['target_world']) + '/choice_world', data={'unique_id': "unique_id0",'target_world': message['data']['target_world']}) as resp:
+		async with session.post(self._game_manager_base_url(message['data']['target_world']) + '/choice_world', data={'unique_id': message['data']['unique_id'],'target_world': message['data']['target_world']}) as resp:
 			return await resp.text()
 
 	async def _get_account_world_info(self, message: dict, session) -> str:

@@ -980,7 +980,6 @@ class GameManager:
 		# 0 - get hang up info
 		"""
 		sql_str = "SELECT hang_up_time, hang_stage, stage, tower_stage FROM player WHERE unique_id='%s'" % unique_id
-		data = await self._execute_statement(world=world, statement=sql_str)
 		hang_up_time, hang_stage,stage,tower_stage = (await self._execute_statement(world=world, statement=sql_str))[0]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		if hang_up_time=="": hang_up_time = current_time
@@ -1940,7 +1939,7 @@ class GameManager:
 
 	async def choice_world(self, unique_id: str, target_world: int):
 		# 0 - enter world success
-		# 1 - enter world success, you have initialized all the information
+		# 1 - enter world success, have role in world
 		# 97 - enter world failed, the world is full
 		# 98 - You have been in this world
 		# 99 - No such world
