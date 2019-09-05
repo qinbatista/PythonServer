@@ -265,6 +265,11 @@ class GameManager:
 			remaining.update({val[0][0]: val[1]})
 		return self._message_typesetting(0, 'success', {"remaining": remaining})
 
+	def get_skill_level_up_config(self) -> dict:
+		# success ===> 0
+		# 0 - Success
+		return self._message_typesetting(0, 'success', {"remaining": {"skill_scroll_functions": self._skill_scroll_functions, "upgrade_chance": self._upgrade_chance}})
+
 	#@C.collect_async
 	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
 		# success ===> 0
@@ -654,6 +659,22 @@ class GameManager:
 		remaining.pop('unique_id')
 		return self._message_typesetting(0, role + " upgrade success!", {"remaining": remaining})
 
+	async def get_all_roles(self, world: int, unique_id: str) -> dict:
+		# - 0 - Get all the role information
+		data_tuple = (await self.get_all_head(world, 'role'))["remaining"]
+		head = [x[0] for x in data_tuple]
+		content = await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}"')
+		remaining = []
+		for i in range(len(content)):
+			role_info = {}
+			for j in range(1, len(head)):
+				role_info.update({head[j]: content[i][j]})
+			remaining.append(role_info)
+		return self._message_typesetting(0, "Get all the role information", {"remaining": remaining})
+
+	def get_role_config(self) -> dict:
+		# - 0 - Get role configuration information
+		return self._message_typesetting(0, "Get role configuration information", {"remaining": {"role_config": self._role_config}})
 #############################################################################
 #						End Role Module Functions							#
 #############################################################################
@@ -988,6 +1009,12 @@ class GameManager:
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"tower_stage":tower_stage,"stage":stage,"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
+
+	def get_monster_info(self) -> dict:
+		"""
+		# 0 - Get all monster information to get success
+		"""
+		return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config_json}})
 
 	#@C.collect_async
 	async def show_energy(self, world: int, unique_id: str):
@@ -2530,7 +2557,7 @@ class GameManager:
 
 			sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{food_start_time}', mine_factory_timer='{mine_start_time}', crystal_factory_timer='{crystal_start_time}', equipment_factory_timer='{equipment_start_time}', equipment_product_type='{equipment_product_type}' where unique_id='{unique_id}'"
 			await self._execute_statement_update(world=world, statement=sql_str)
-		if remaining:
+		if len(reward) > 4:
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
 
@@ -2875,6 +2902,20 @@ class GameManager:
 		remaining.update({"acceleration_end_time": acceleration_end_time})
 		return self._message_typesetting(status=0, message="Accelerate success", data={"remaining": remaining, "reward": reward})
 
+	async def get_factory_info(self, world: int, unique_id: str) -> dict:
+		"""
+		0  - Successfully obtained configuration information
+		"""
+		remaining = {}
+		sql_info = {}
+		data_head = (await self.get_all_head(world, table="factory"))["remaining"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		for i in range(1, len(data_head)):
+			sql_info.update({data_head[i][0]: factory_data[i]})
+		remaining.update({"sql_info": sql_info})
+		remaining.update({"server_config": self._factory_config})
+		return self._message_typesetting(status=0, message="Successfully obtained configuration information", data={"remaining": remaining})
+
 #############################################################################
 #							End Factory Functions							#
 #############################################################################
@@ -2887,11 +2928,10 @@ class GameManager:
 
 	async def _select_factory(self, world: int, unique_id) -> list:
 		sql_str = f"select * from factory where unique_id={unique_id}"
-		try:
-			return list((await self._execute_statement(world, sql_str))[0])
-		except:
-			await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
-			return list((await self._execute_statement(world, sql_str))[0])
+		data = await self._execute_statement(world, sql_str)
+		if data: return data[0]
+		await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
+		return list((await self._execute_statement(world, sql_str))[0])
 
 	async def _family_exists(self, world: int, fname: str):
 		return (0,) not in (await self._execute_statement(world, f'SELECT COUNT(1) FROM families WHERE familyname = "{fname}";'))
@@ -3615,7 +3655,7 @@ class GameManager:
 		self._mall_config = d['mall']
 		self._factory_config = d['factory']
 		self._stage_reward = d['reward']
-		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
+		self._skill_scroll_functions = d['skill']['skill_scroll_functions']
 		self._upgrade_chance = d['skill']['upgrade_chance']
 		self._weapon_config = d['weapon']
 		self._role_config = d['role']
@@ -3800,6 +3840,13 @@ async def __get_all_skill_level(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).get_all_skill_level(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
+@ROUTES.post('/get_skill_level_up_config')
+async def _get_skill_level_up_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = (request.app['MANAGER']).get_skill_level_up_config()
+	print(f"result:{result}")
+	return _json_response(result)
+
 @ROUTES.post('/get_skill')
 async def __get_skill(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -3891,6 +3938,18 @@ async def _upgrade_role_level(request: web.Request) -> web.Response:
 async def _upgrade_role_star(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).upgrade_role_star(int(post['world']), post['unique_id'], post['role'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_roles')
+async def _get_all_roles(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_all_roles(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_role_config')
+async def _get_role_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = (request.app['MANAGER']).get_role_config()
 	return _json_response(result)
 
 # ############################################################ #
@@ -4154,6 +4213,11 @@ async def __get_hang_up_info(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).get_hang_up_info(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
+@ROUTES.post('/get_monster_info')
+async def _get_monster_info(request: web.Request) -> web.Response:
+	result = (request.app['MANAGER']).get_monster_info()
+	return _json_response(result)
+
 @ROUTES.post('/enter_stage')
 async def __enter_stage(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -4376,6 +4440,13 @@ async def _upgrade_wishing_pool(request: web.Request) -> web.Response:
 async def _acceleration_technology(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).acceleration_technology(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
+@ROUTES.post('/get_factory_info')
+async def _get_factory_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_factory_info(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 
