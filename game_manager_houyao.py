@@ -571,6 +571,10 @@ class GameManager:
 		}
 		return self._message_typesetting(status=0, message="Successful weapon decomposition", data=data)
 
+	def get_weapon_config(self) -> dict:
+		# 0 - Successfully get all weapon configuration information
+		return self._message_typesetting(status=0, message="Successfully get all weapon configuration information", data={"remaining": {"weapon_config": self._weapon_config}})
+
 #############################################################################
 #						End Weapon Module Functions							#
 #############################################################################
@@ -3914,6 +3918,11 @@ async def __get_all_weapon(request: web.Request) -> web.Response:
 async def __disintegrate_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).disintegrate_weapon(int(post['world']), post['unique_id'], post['weapon'])
+	return _json_response(result)
+
+@ROUTES.post('/get_weapon_config')
+async def _get_weapon_config(request: web.Request) -> web.Response:
+	result = (request.app['MANAGER']).get_weapon_config()
 	return _json_response(result)
 
 @ROUTES.post('/try_unlock_weapon')
