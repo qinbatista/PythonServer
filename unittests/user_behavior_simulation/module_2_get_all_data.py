@@ -83,6 +83,32 @@ def get_lottery_config():#获取抽奖数值信息
 	print_method("[get_lottery_config]"+str(response))
 	return response
 
+def player_config():#获取玩家配置文件
+	response = send_tcp_message({'world' : world, 'function' : 'player_config', 'data' : {'token' : token}})#升级请求
+	print_method("[player_config]"+str(response))
+	return response
+
+def weapon_config():#获取武器配置
+	response = send_tcp_message({'world' : world, 'function' : 'weapon_config', 'data' : {'token' : token}})#升级请求
+	print_method("[weapon_config]"+str(response))
+	return response
+
+def skill_level_up_config():#获取技能配置
+	response = send_tcp_message({'world' : world, 'function' : 'skill_level_up_config', 'data' : {'token' : token}})#升级请求
+	print_method("[skill_level_up_config]"+str(response))
+	return response
+
+def get_family_config():#获取家族配置
+	response = send_tcp_message({'world' : world, 'function' : 'get_family_config', 'data' : {'token' : token}})#升级请求
+	print_method("[get_family_config]"+str(response))
+	return response
+
+def role_config():#获取角色配置
+	response = send_tcp_message({'world' : world, 'function' : 'role_config', 'data' : {'token' : token}})#升级请求
+	print_method("[role_config]"+str(response))
+	return response
+
+
 def get_all_info(_token,_world):
 	print_module("[module_2_get_all_data] get_all_info")
 	global world,token
