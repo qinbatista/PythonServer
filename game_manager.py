@@ -978,9 +978,12 @@ class GameManager:
 		"""
 		success ===> 0
 		# 0 - get hang up info
+		# 99 - This data does not exist in the database
 		"""
 		sql_str = "SELECT hang_up_time, hang_stage, stage, tower_stage FROM player WHERE unique_id='%s'" % unique_id
-		hang_up_time, hang_stage,stage,tower_stage = (await self._execute_statement(world=world, statement=sql_str))[0]
+		data = await self._execute_statement(world=world, statement=sql_str)
+		if not data: return self._message_typesetting(99, 'This data does not exist in the database')
+		hang_up_time, hang_stage, stage, tower_stage = data[0]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		if hang_up_time=="": hang_up_time = current_time
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
@@ -1028,9 +1031,10 @@ class GameManager:
 
 	async def _get_armor(self, world: int, unique_id: str, armor_id: str, armor1: str, armor2: str) -> tuple:
 		sql_str = f"select {armor1}, {armor2} from armor where unique_id='{unique_id}' and armor_id='{armor_id}'"
-		try:
-			return (await self._execute_statement(world=world, statement=sql_str))[0]
-		except:
+		data = await self._execute_statement(world=world, statement=sql_str)
+		if data:
+			return data[0]
+		else:
 			await self._execute_statement_update(world=world, statement=f"insert into armor(unique_id, armor_id) values ('{unique_id}','{armor_id}')")
 			return (await self._execute_statement(world=world, statement=sql_str))[0]
 
