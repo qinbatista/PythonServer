@@ -11,8 +11,11 @@ import module_9_family
 import module_10_stage
 import module_11_mail
 import multiprocessing
+import time
+from datetime import datetime, timedelta
 world = "0"
 token = ""
+testing_people_number = 100
 def call_login(unique_id):
 	global world,token
 	while True:
@@ -20,6 +23,8 @@ def call_login(unique_id):
 		if world!=None:
 			token,world = world
 			if token!="" and world!="":break
+def get_number():
+	return testing_people_number
 def call_get_all_info():
 	return module_2_get_all_data.get_all_info(token,world)
 
@@ -55,18 +60,22 @@ def run_task(name):
 	get_level_info,get_all_friend_info,get_all_skill_level,get_all_weapon,refresh_all_storage,get_all_roles,get_stage_info,get_monster_info,get_factory_info,get_all_family_info,get_all_mail,get_all_armor_info = call_get_all_info()#加载所有参数信息
 	# call_friend_dialog(get_all_friend_info)#朋友界面
 	# skill_dialog(get_all_skill_level)#技能界面
-	# weapon_dialog(get_all_weapon)#武器界面
+	weapon_dialog(get_all_weapon)#武器界面
 	# factory_dialog(refresh_all_storage)#工厂界面
 	# get_random_item()#抽奖界面
 	# role_dialog()#角色界面
 	# family_dialog(get_all_family_info)#家族界面*暂时不需要
 	# stage_dialog(get_level_info)#关卡界面
 	# mail_dialog(get_all_mail)#邮箱界面
-
+def run_all_task():
+	starttime = datetime.now()
+	p = multiprocessing.Pool()
+	for i in range(0,testing_people_number):
+		p.apply_async(run_task, args=(i,))
+	p.close()
+	p.join()
+	endtime = datetime.now()
+	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("2")
-	# p = multiprocessing.Pool()
-	# for i in range(0,10):
-	# 	p.apply_async(run_task, args=(i,))
-	# p.close()
-	# p.join()
+	run_task("10")
+	# run_all_task()
