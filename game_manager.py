@@ -1559,6 +1559,10 @@ class GameManager:
 		return self._message_typesetting(status=0, message='10 times friend_summon', data={"remaining": remaining_dict, "reward": reward_dict})
 
 	@C.collect_async
+	async def basic_summon(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
+		return basic_summon(world,unique_id,cost_item,"roles")
+
+	@C.collect_async
 	async def prophet_summon_10_times(self, world: int, unique_id: str, cost_item: str,summon_kind:str) -> dict:
 		# 0  - 10 times prophet_summon
 		# 98 - insufficient materials
@@ -1941,7 +1945,7 @@ class GameManager:
 #                     Start Temp Function Position                          #
 #############################################################################
 
-	async def get_lottery_config_info(self, world: int, unique_id: str):
+	async def get_lottery_config_info(self):
 		if self._lottery == "":
 			return self._message_typesetting(1, 'configration is empty')
 		data = {
@@ -1954,7 +1958,7 @@ class GameManager:
 		}
 		return self._message_typesetting(0, 'got all lottery config info', data)
 
-	async def get_stage_reward_config(self, world: int, unique_id: str):
+	async def get_stage_reward_config(self):
 		if self._get_stage_reward_config_json == "":
 			return self._message_typesetting(1, 'configration is empty')
 		data = {"remaining": {"stage_reward_config": self._get_stage_reward_config_json}}

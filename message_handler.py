@@ -132,13 +132,13 @@ class MessageHandler:
 		return json.dumps(await self.gm.friend_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'weapons'))
 
 	async def _basic_summon_roles(self, data: dict) -> str:
-		return json.dumps(await self.gm.basic_summon_roles(data['world'], data['unique_id'], data['cost_item'], 'roles'))
+		return json.dumps(await self.gm.basic_summon(data['world'], data['unique_id'], data['cost_item'], 'roles'))
 
 	async def _pro_summon_roles(self, data: dict) -> str:
-		return json.dumps(await self.gm.pro_summon_roles(data['world'], data['unique_id'], data['cost_item'], 'roles'))
+		return json.dumps(await self.gm.pro_summon(data['world'], data['unique_id'], data['cost_item'], 'roles'))
 
 	async def _friend_summon_roles(self, data: dict) -> str:
-		return json.dumps(await self.gm.friend_summon_roles(data['world'], data['unique_id'], data['cost_item'], 'roles'))
+		return json.dumps(await self.gm.friend_summon(data['world'], data['unique_id'], data['cost_item'], 'roles'))
 
 	async def _basic_summon_roles_10_times(self, data: dict) -> str:
 		return json.dumps(await self.gm.basic_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'roles'))
@@ -150,13 +150,13 @@ class MessageHandler:
 		return json.dumps(await self.gm.friend_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'roles'))
 
 	async def _basic_summon_skill(self, data: dict) -> str:
-		return json.dumps(await self.gm.basic_summon_skill(data['world'], data['unique_id'], data['cost_item'], 'skills'))
+		return json.dumps(await self.gm.basic_summon(data['world'], data['unique_id'], data['cost_item'], 'skills'))
 
 	async def _pro_summon_skill(self, data: dict) -> str:
-		return json.dumps(await self.gm.pro_summon_skill(data['world'], data['unique_id'], data['cost_item'], 'skills'))
+		return json.dumps(await self.gm.pro_summon(data['world'], data['unique_id'], data['cost_item'], 'skills'))
 
 	async def _friend_summon_skill(self, data: dict) -> str:
-		return json.dumps(await self.gm.friend_summon_skill(data['world'], data['unique_id'], data['cost_item'], 'skills'))
+		return json.dumps(await self.gm.friend_summon(data['world'], data['unique_id'], data['cost_item'], 'skills'))
 
 	async def _basic_summon_skill_10_times(self, data: dict) -> str:
 		return json.dumps(await self.gm.basic_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'skills'))
@@ -195,7 +195,7 @@ class MessageHandler:
 		return json.dumps(await self.gm.diamond_refresh_store(data['world'], data['unique_id']))
 
 	async def _black_market_transaction(self, data: dict) -> str:
-		return json.dumps(await self.gm.diamond_refresh_store(data['world'], data['unique_id'], data['code']))
+		return json.dumps(await self.gm.black_market_transaction(data['world'], data['unique_id'], data['code']))
 
 	async def _show_energy(self, data: dict) -> str:
 		return json.dumps(await self.gm.show_energy(data['world'], data['unique_id']))
@@ -216,10 +216,7 @@ class MessageHandler:
 		return json.dumps(await self.gm.monster_config(data['world'], data['unique_id']))
 
 	async def _get_stage_reward_config(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_stage_reward_config(data['world'], data['unique_id']))
-
-	async def _get_lottery_config_info(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_lottery_config_info(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_stage_reward_config())
 
 	async def _get_hang_up_info(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_hang_up_info(data['world'], data['unique_id']))
@@ -298,6 +295,103 @@ class MessageHandler:
 
 	async def _distribution_workers(self, data: dict) -> str:
 		return json.dumps(await self.gm.distribution_workers(data['world'], data['unique_id'], data['workers_quantity'], data['factory_kind']))
+
+
+	async def _get_account_world_info(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_account_world_info(data['unique_id']))
+
+	# not designed yet
+	# async def _get_chat_server(self, data: dict):
+	# 	return self._map[data['world']]['chatserver']
+
+	async def _choice_world(self, data: dict) -> str:
+		return json.dumps(await self.gm.choice_world(data['unique_id'], data['data']['target_world']))
+
+	async def _create_player(self, data: dict) -> str:
+		return json.dumps(await self.gm.create_player(data['world'], data['unique_id'], data['data']['game_name']))
+	#not sure where to use them
+	# async def _join_world(self, data: dict) -> str:
+	# 	return json.dumps(await self.gm.join_world(data['world'], data['unique_id'], data['data']['game_name']))
+
+	# async def _bind_gamename(self, data: dict) -> str:
+	# 	return json.dumps(await self.gm.bind_gamename(data['world'], data['unique_id'], data['data']['game_name']))
+
+	# async def _try_all_material(self, data: dict) -> str:
+	# 	return json.dumps(await self.gm.try_all_material(data['world'], data['unique_id'], data['data']['stage']))
+
+	async def _get_stage_info(self) -> str:
+		return json.dumps(await self.gm.get_stage_info())
+
+	async def _get_monster_info(self) -> str:
+		return json.dumps(await self.gm.get_monster_info())
+
+	async def _get_all_roles(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_all_roles(data['world'], data['unique_id']))
+
+	async def _get_factory_info(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_factory_info(data['world'], data['unique_id']))
+	#未完成
+	# async def _get_all_family_info(self, data: dict) -> str:
+	# 	return json.dumps(await self.gm.get_all_family_info(data['world'], data['unique_id']))
+
+	#未完成
+	# async def _get_all_mail(self, data: dict) -> str:
+	# 	return json.dumps(await self.gm.get_all_mail(data['world'], data['unique_id']))
+
+	async def _get_lottery_config_info(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_lottery_config_info())
+	#未完成
+	# async def _player_config(self, data: dict) -> str:
+	# 	return json.dumps(await self.gm.player_config())
+
+	async def _get_weapon_config(self) -> str:
+		return json.dumps(await self.gm.get_weapon_config())
+
+	async def _get_skill_level_up_config(self) -> str:
+		return json.dumps(await self.gm.get_skill_level_up_config())
+
+	#未完成
+	# async def _get_family_config(self) -> str:
+	# 	return json.dumps(await self.gm.get_family_config())
+
+	async def _get_role_config(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_role_config())
+
+	async def _redeem_all_nonce(self, data: dict) -> str:
+		return json.dumps(await self.gm.redeem_all_nonce(data['world'], data['unique_id'],data['data']['type_list'],data['data']['nonce_list']))
+
+	#未完成 邮件为不同系统
+	# async def _get_new_mail(self, data: dict) -> str:
+	# 	return json.dumps(await self.gm.get_new_mail(data['world'], data['unique_id']))
+	# async def _delete_mail(self, data: dict) -> str:
+	# 	return json.dumps(await self.gm.delete_mail(data['world'], data['unique_id'],data['data']['nonce']))
+	# async def _delete_all_mail(self, data: dict) -> str:
+	# 	return json.dumps(await self.gm.delete_all_mail(data['world'], data['unique_id']))
+
+	async def _acceleration_technology(self, data: dict) -> str:
+		return json.dumps(await self.gm.acceleration_technology(data['world'], data['unique_id']))
+
+	async def _refresh_food_storage(self, data: dict) -> str:
+		return json.dumps(await self.gm.refresh_food_storage(data['world'], data['unique_id']))
+
+	async def _refresh_mine_storage(self, data: dict) -> str:
+		return json.dumps(await self.gm.refresh_mine_storage(data['world'], data['unique_id']))
+
+	async def _refresh_crystal_storage(self, data: dict) -> str:
+		return json.dumps(await self.gm.refresh_crystal_storage(data['world'], data['unique_id']))
+
+	async def _refresh_equipment_storage(self, data: dict) -> str:
+		return json.dumps(await self.gm.refresh_equipment_storage(data['world'], data['unique_id']))
+
+	async def _upgrade_role_level(self, data: dict) -> str:
+		return json.dumps(await self.gm.upgrade_role_level(data['world'], data['unique_id'],data['data']['role'],data['data']['experience_potion']))
+
+	async def _upgrade_role_star(self, data: dict) -> str:
+		return json.dumps(await self.gm.upgrade_role_star(data['world'], data['unique_id'],data['data']['role']))
+
+
+		# async with session.post(self._game_manager_base_url("0") + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
+		# 	return await resp.text()
 ###############################################################################
 
 
@@ -305,17 +399,25 @@ class MessageHandler:
 DOES_NOT_NEED_TOKEN = {'login', 'login_unique'}
 
 FUNCTION_LIST = {
+		# utility
+	# 'get_chat_server' : MessageHandler._get_chat_server,
 	# account_manager
 	'login': MessageHandler._login,
 	'login_unique': MessageHandler._login_unique,
 	'bind_account': MessageHandler._bind_account,
+	'choice_world': MessageHandler._choice_world,
+	'get_account_world_info': MessageHandler._get_account_world_info,
+	'create_player': MessageHandler._create_player,
 
 	# game_manager
+	# 'join_world' : MessageHandler._join_world,
+	# 'bind_gamename' : MessageHandler._bind_gamename,
 	'get_all_head' : MessageHandler._get_all_head,
 	'get_all_material' : MessageHandler._get_all_material,
 	'get_all_supplies' : MessageHandler._get_all_supplies,
 	'add_supplies' : MessageHandler._add_supplies,
 	'level_up_scroll' : MessageHandler._level_up_scroll,
+	# 'try_all_material' : MessageHandler._try_all_material,
 	'try_coin' : MessageHandler._try_coin,
 	'level_up_skill' : MessageHandler._level_up_skill,
 	'get_all_skill_level' : MessageHandler._get_all_skill_level,
@@ -325,7 +427,6 @@ FUNCTION_LIST = {
 	'level_up_passive' : MessageHandler._level_up_passive,
 	'level_up_weapon_star' : MessageHandler._level_up_weapon_star,
 	'reset_weapon_skill_point' : MessageHandler._reset_weapon_skill_point,
-	'get_all_weapon' : MessageHandler._get_all_weapon,
 	'disintegrate_weapon' : MessageHandler._disintegrate_weapon,
 	'try_unlock_weapon' : MessageHandler._try_unlock_weapon,
 	'pass_stage' : MessageHandler._pass_stage,
@@ -370,10 +471,27 @@ FUNCTION_LIST = {
 	'get_all_stage_info' : MessageHandler._get_all_stage_info,
 	'get_all_armor_info' : MessageHandler._get_all_armor_info,
 
+	#'get_level_info' : MessageHandler._get_level_info,未完成
+	'get_stage_info' : MessageHandler._get_stage_info,
+	'get_monster_info' : MessageHandler._get_monster_info,
+	'get_all_friend_info' : MessageHandler._get_all_friend_info,
+	'get_all_weapon' : MessageHandler._get_all_weapon,
+	'refresh_all_storage' : MessageHandler._refresh_all_storage,
+	'get_all_roles' : MessageHandler._get_all_roles,
+	'get_factory_info' : MessageHandler._get_factory_info,
+	# 'get_all_family_info' : MessageHandler._get_all_family_info,
+	# 'get_all_mail' : MessageHandler._get_all_mail,
+	# 'player_config' : MessageHandler._player_config,
+	'get_weapon_config' : MessageHandler._get_weapon_config,
+	'get_skill_level_up_config' : MessageHandler._get_skill_level_up_config,
+	# 'get_family_config' : MessageHandler._get_family_config,
+	'get_role_config' : MessageHandler._get_role_config,
+
+
+
 
 	'get_lottery_config_info' : MessageHandler._get_lottery_config_info,
 	#'get_all_tower_info' : MessageHandler._get_all_tower_info,
-	#'get_all_armor_info' : MessageHandler._get_all_armor_info,
 	'level_enemy_layouts_config' : MessageHandler._level_enemy_layouts_config,
 	'monster_config' : MessageHandler._monster_config,
 	'get_stage_reward_config' : MessageHandler._get_stage_reward_config,
@@ -387,6 +505,10 @@ FUNCTION_LIST = {
 	'send_friend_gift': MessageHandler._send_friend_gift,
 	'send_all_friend_gift': MessageHandler._send_all_friend_gift,
 	'redeem_nonce': MessageHandler._redeem_nonce,
+	'redeem_all_nonce': MessageHandler._redeem_all_nonce,
+	# 'get_new_mail': MessageHandler._get_new_mail,
+	# 'delete_mail': MessageHandler._delete_mail,
+	# 'delete_all_mail': MessageHandler._delete_all_mail,
 
 
 	'check_boss_status' : MessageHandler._check_boss_status,
@@ -401,7 +523,6 @@ FUNCTION_LIST = {
 	'request_join_family' : MessageHandler._request_join_family,
 	'respond_family' : MessageHandler._respond_family,
 
-	'refresh_all_storage' : MessageHandler._refresh_all_storage,
 	'buy_workers' : MessageHandler._buy_workers,
 	'upgrade_food_factory' : MessageHandler._upgrade_food_factory,
 	'upgrade_crystal_factory' : MessageHandler._upgrade_crystal_factory,
@@ -409,6 +530,15 @@ FUNCTION_LIST = {
 	'upgrade_wishing_pool' : MessageHandler._upgrade_wishing_pool,
 	'distribution_workers':MessageHandler._distribution_workers,
 	'equipment_manufacturing_armor':MessageHandler._equipment_manufacturing_armor,
-	'active_wishing_pool':MessageHandler._active_wishing_pool
+	'active_wishing_pool':MessageHandler._active_wishing_pool,
+	'acceleration_technology':MessageHandler._acceleration_technology,
+	'refresh_food_storage':MessageHandler._refresh_food_storage,
+	'refresh_mine_storage':MessageHandler._refresh_mine_storage,
+	'refresh_crystal_storage':MessageHandler._refresh_crystal_storage,
+	'refresh_equipment_storage':MessageHandler._refresh_equipment_storage,
+
+
+	'upgrade_role_level':MessageHandler._upgrade_role_level,
+	'upgrade_role_star':MessageHandler._upgrade_role_star
 }
 
