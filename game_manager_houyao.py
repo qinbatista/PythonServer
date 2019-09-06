@@ -265,6 +265,11 @@ class GameManager:
 			remaining.update({val[0][0]: val[1]})
 		return self._message_typesetting(0, 'success', {"remaining": remaining})
 
+	def get_skill_level_up_config(self) -> dict:
+		# success ===> 0
+		# 0 - Success
+		return self._message_typesetting(0, 'success', {"remaining": {"skill_scroll_functions": self._skill_scroll_functions, "upgrade_chance": self._upgrade_chance}})
+
 	#@C.collect_async
 	async def get_skill(self, world: int, unique_id: str, skill_id: str) -> dict:
 		# success ===> 0
@@ -566,6 +571,10 @@ class GameManager:
 		}
 		return self._message_typesetting(status=0, message="Successful weapon decomposition", data=data)
 
+	def get_weapon_config(self) -> dict:
+		# 0 - Successfully get all weapon configuration information
+		return self._message_typesetting(status=0, message="Successfully get all weapon configuration information", data={"remaining": {"weapon_config": self._weapon_config}})
+
 #############################################################################
 #						End Weapon Module Functions							#
 #############################################################################
@@ -654,6 +663,22 @@ class GameManager:
 		remaining.pop('unique_id')
 		return self._message_typesetting(0, role + " upgrade success!", {"remaining": remaining})
 
+	async def get_all_roles(self, world: int, unique_id: str) -> dict:
+		# - 0 - Get all the role information
+		data_tuple = (await self.get_all_head(world, 'role'))["remaining"]
+		head = [x[0] for x in data_tuple]
+		content = await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}"')
+		remaining = []
+		for i in range(len(content)):
+			role_info = {}
+			for j in range(1, len(head)):
+				role_info.update({head[j]: content[i][j]})
+			remaining.append(role_info)
+		return self._message_typesetting(0, "Get all the role information", {"remaining": remaining})
+
+	def get_role_config(self) -> dict:
+		# - 0 - Get role configuration information
+		return self._message_typesetting(0, "Get role configuration information", {"remaining": {"role_config": self._role_config}})
 #############################################################################
 #						End Role Module Functions							#
 #############################################################################
@@ -870,10 +895,10 @@ class GameManager:
 		# 此时的material_dict字典的值是给奖励列表的，
 		# 所以hang_stage是奖励之前的关卡，
 		# hang_up_time是之前挂起的开始时间
-		probability_reward = self._hang_reward_list["probability_reward"]
+		probability_reward = self._hang_reward["probability_reward"]
 		material_dict = {}
 		probability_dict = {}
-		for key, value in self._hang_reward_list[str(hang_stage)].items():
+		for key, value in self._hang_reward[str(hang_stage)].items():
 			if key in probability_reward: probability_dict.update({key: value})
 			else: material_dict.update({key: value})
 		material_dict.update({"hang_stage": hang_stage})
@@ -938,10 +963,10 @@ class GameManager:
 			# 此时的material_dict字典的值是给奖励列表的，
 			# 所以hang_stage是奖励之前的关卡，
 			# hang_up_time是之前挂起的开始时间
-			probability_reward = self._hang_reward_list["probability_reward"]
+			probability_reward = self._hang_reward["probability_reward"]
 			material_dict = {}
 			probability_dict = {}
-			for key, value in self._hang_reward_list[str(hang_stage)].items():
+			for key, value in self._hang_reward[str(hang_stage)].items():
 				if key in probability_reward: probability_dict.update({key: value})
 				else: material_dict.update({key: value})
 			material_dict.update({"hang_stage": hang_stage})
@@ -979,12 +1004,42 @@ class GameManager:
 		"""
 		success ===> 0
 		# 0 - get hang up info
+		# 99 - This data does not exist in the database
 		"""
 		sql_str = "SELECT hang_up_time, hang_stage, stage, tower_stage FROM player WHERE unique_id='%s'" % unique_id
-		hang_up_time, hang_stage,stage,tower_stage = (await self._execute_statement(world=world, statement=sql_str))[0]
+		data = await self._execute_statement(world=world, statement=sql_str)
+		if not data: return self._message_typesetting(99, 'This data does not exist in the database')
+		hang_up_time, hang_stage, stage, tower_stage = data[0]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"tower_stage":tower_stage,"stage":stage,"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
+
+	def get_monster_info(self) -> dict:
+		"""
+		# 0 - Get all monster information to get success
+		"""
+		return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config_json}})
+
+	async def get_stage_info(self, world: int, unique_id: str) -> dict:
+		"""
+		# 0 - Successfully obtained level information
+		# 1 - No information found for this user, successfully obtained general level configuration information
+		"""
+		server_config = {
+			"entry_consumables": self._entry_consumables,
+			"hang_reward": self._hang_reward,
+			"stage_reward": self._stage_reward,
+			"level_enemy_layouts": self._level_enemy_layouts_config_json,
+			"world_boss": self._world_boss
+		}
+		remaining = {"server_config": server_config}
+		data = await self._execute_statement(world, f"select stage, tower_stage, hang_stage, hang_up_time from player where unique_id='{unique_id}'")
+		if data:
+			stage, tower_stage, hang_stage, hang_up_time = data[0]
+			sql_data = {"stage": stage, "tower_stage": tower_stage, "hang_stage": hang_stage, "hang_up_time": hang_up_time}
+			remaining.update({"sql_data": sql_data})
+			return self._message_typesetting(status=0, message="Successfully obtained level information", data={"remaining": remaining})
+		return self._message_typesetting(status=1, message="No information found for this user, successfully obtained general level configuration information", data={"remaining": remaining})
 
 	#@C.collect_async
 	async def show_energy(self, world: int, unique_id: str):
@@ -1028,9 +1083,10 @@ class GameManager:
 
 	async def _get_armor(self, world: int, unique_id: str, armor_id: str, armor1: str, armor2: str) -> tuple:
 		sql_str = f"select {armor1}, {armor2} from armor where unique_id='{unique_id}' and armor_id='{armor_id}'"
-		try:
-			return (await self._execute_statement(world=world, statement=sql_str))[0]
-		except:
+		data = await self._execute_statement(world=world, statement=sql_str)
+		if data:
+			return data[0]
+		else:
 			await self._execute_statement_update(world=world, statement=f"insert into armor(unique_id, armor_id) values ('{unique_id}','{armor_id}')")
 			return (await self._execute_statement(world=world, statement=sql_str))[0]
 
@@ -1920,30 +1976,34 @@ class GameManager:
 		data = {"remaining": {"level_enemy_layouts_config": self._level_enemy_layouts_config_json}}
 		return self._message_typesetting(0, 'got all level enemy layouts config info', data)
 
-	async def get_account_world_info(self, world: int, unique_id: str):
+	async def get_account_world_info(self, unique_id: str):
 		# 0 - Get all world information
-		remaining = {}
+		remaining = []
 		for w in range(len(self._pools)):
-			if await self._execute_statement(w, f"select * from player where unique_id='{unique_id}'"):
-				remaining.update({w: {"world": w, "info": "true"}})
+			data = await self._execute_statement(w, f"select game_name,level from player where unique_id='{unique_id}'")
+			if data:
+				if w == 0:
+					remaining.append({"server_status": 0, "world": w, "world_name": "aliya", "game_name": data[0][0], "level": data[0][1]})
+				else:
+					remaining.append({"server_status": 0, "world": w, "world_name": f"world{w}", "game_name": data[0][0], "level": data[0][1]})
 			else:
-				remaining.update({w: {"world": w, "info": "false"}})
+				if w == 0:
+					remaining.append({"server_status": 0, "world": w, "world_name": "aliya"})
+				else:
+					remaining.append({"server_status": 0, "world": w, "world_name": f"world{w}"})
 		return self._message_typesetting(0, 'Get all world information', data={"remaining": remaining})
 
-	async def choice_world(self, world: int, unique_id: str, target_world: int):
+	async def choice_world(self, target_world: int, unique_id: str):
 		# 0 - You have successfully switched to another world
-		# 98 - You have been in this world
 		# 99 - No such world
 		remaining = {}
 		if target_world < 0 or target_world >= len(self._pools):
 			return self._message_typesetting(99, "No such world")
-		if world == target_world:
-			return self._message_typesetting(98, "You have been in this world")
 		if await self._execute_statement(target_world, f"select * from player where unique_id='{unique_id}'"):
-			weapons = (await self.get_all_weapon(world, unique_id))["data"]
-			supplies = (await self.get_all_supplies(world, unique_id))["data"]
-			skills = (await self.get_all_skill_level(world, unique_id))["data"]
-			armors = (await self.get_all_armor_info(world, unique_id))["data"]
+			weapons = (await self.get_all_weapon(target_world, unique_id))["data"]
+			supplies = (await self.get_all_supplies(target_world, unique_id))["data"]
+			skills = (await self.get_all_skill_level(target_world, unique_id))["data"]
+			armors = (await self.get_all_armor_info(target_world, unique_id))["data"]
 			remaining.update({"world": target_world, "info": {"weapons": weapons, "supplies": supplies, "skills": skills, "armors": armors}})
 		else:
 			remaining.update({"world": target_world})
@@ -1951,21 +2011,30 @@ class GameManager:
 
 	async def create_player(self, world: int, unique_id: str, game_name: str):
 		# 0 - You have successfully created a player in this world
-		# 1 - You have a player in this world
+		# 1 - Create failed, you have a player in this world
+		# 98 - The player's name has been used
+		# 99 - Player name cannot be a null character
 		remaining = {}
-		data_tuple = (await self.get_all_head(world, 'player'))['remaining']
-		head = [x[0] for x in data_tuple]
+		data_head = (await self.get_all_head(world, 'player'))['remaining']
+		head = [x[0] for x in data_head]
 		data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
 		if data:
 			for i in range(len(head)):
 				remaining.update({head[i]: data[0][i]})
-			return self._message_typesetting(1, 'You have a player in this world', data={"remaining": remaining})
-		else:
-			await self._execute_statement_update(world, f"insert into player(unique_id, game_name) values('{unique_id}', '{game_name}')")
-			data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
-			for i in range(len(head)):
-				remaining.update({head[i]: data[0][i]})
-			return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
+			return self._message_typesetting(1, 'Create failed, you have a player in this world', data={"remaining": remaining})
+
+		data_name = await self._execute_statement(world, f"select game_name from player")
+		game_names = [x[0] for x in data_name]
+		if game_name == "":
+			return self._message_typesetting(99, "Player name cannot be a null character")
+		if game_name in game_names:
+			return self._message_typesetting(98, "The player's name has been used")
+
+		await self._execute_statement_update(world, f"insert into player(unique_id, game_name) values('{unique_id}', '{game_name}')")
+		data = await self._execute_statement(world, f"select * from player where unique_id='{unique_id}'")
+		for i in range(len(head)):
+			remaining.update({head[i]: data[0][i]})
+		return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
 
 #############################################################################
 #                       End Temp Function Position                          #
@@ -2513,7 +2582,7 @@ class GameManager:
 
 			sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{food_start_time}', mine_factory_timer='{mine_start_time}', crystal_factory_timer='{crystal_start_time}', equipment_factory_timer='{equipment_start_time}', equipment_product_type='{equipment_product_type}' where unique_id='{unique_id}'"
 			await self._execute_statement_update(world=world, statement=sql_str)
-		if remaining:
+		if len(reward) > 4:
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
 
@@ -2553,14 +2622,16 @@ class GameManager:
 		factory_mark = all_factory.index(factory_kind)
 		remaining = {}
 		reward = {}
-		if factory_kind == "food":
-			result = await self.refresh_food_storage(world, unique_id)
-		elif factory_kind == "mine":
-			result = await self.refresh_mine_storage(world, unique_id)
-		elif factory_kind == "crystal":
-			result = await self.refresh_crystal_storage(world, unique_id)
-		else:
-			result = await self.refresh_equipment_storage(world, unique_id)
+		result = await self.refresh_all_storage(world, unique_id)
+
+		# if factory_kind == "food":
+		# 	result = await self.refresh_food_storage(world, unique_id)
+		# elif factory_kind == "mine":
+		# 	result = await self.refresh_mine_storage(world, unique_id)
+		# elif factory_kind == "crystal":
+		# 	result = await self.refresh_crystal_storage(world, unique_id)
+		# else:
+		# 	result = await self.refresh_equipment_storage(world, unique_id)
 		# result = await eval(f"self.refresh_{factory_kind}_storage({world},{unique_id})")
 		if result["data"]:
 			remaining = result["data"]["remaining"]
@@ -2856,6 +2927,20 @@ class GameManager:
 		remaining.update({"acceleration_end_time": acceleration_end_time})
 		return self._message_typesetting(status=0, message="Accelerate success", data={"remaining": remaining, "reward": reward})
 
+	async def get_factory_info(self, world: int, unique_id: str) -> dict:
+		"""
+		0  - Successfully obtained configuration information
+		"""
+		remaining = {}
+		sql_info = {}
+		data_head = (await self.get_all_head(world, table="factory"))["remaining"]
+		factory_data = await self._select_factory(world=world, unique_id=unique_id)
+		for i in range(1, len(data_head)):
+			sql_info.update({data_head[i][0]: factory_data[i]})
+		remaining.update({"sql_info": sql_info})
+		remaining.update({"server_config": self._factory_config})
+		return self._message_typesetting(status=0, message="Successfully obtained configuration information", data={"remaining": remaining})
+
 #############################################################################
 #							End Factory Functions							#
 #############################################################################
@@ -2868,11 +2953,10 @@ class GameManager:
 
 	async def _select_factory(self, world: int, unique_id) -> list:
 		sql_str = f"select * from factory where unique_id={unique_id}"
-		try:
-			return list((await self._execute_statement(world, sql_str))[0])
-		except:
-			await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
-			return list((await self._execute_statement(world, sql_str))[0])
+		data = await self._execute_statement(world, sql_str)
+		if data: return data[0]
+		await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
+		return list((await self._execute_statement(world, sql_str))[0])
 
 	async def _family_exists(self, world: int, fname: str):
 		return (0,) not in (await self._execute_statement(world, f'SELECT COUNT(1) FROM families WHERE familyname = "{fname}";'))
@@ -3596,13 +3680,13 @@ class GameManager:
 		self._mall_config = d['mall']
 		self._factory_config = d['factory']
 		self._stage_reward = d['reward']
-		self._skill_scroll_functions = set(d['skill']['skill_scroll_functions'])
+		self._skill_scroll_functions = d['skill']['skill_scroll_functions']
 		self._upgrade_chance = d['skill']['upgrade_chance']
 		self._weapon_config = d['weapon']
 		self._role_config = d['role']
 		self._lottery = d['lottery']
 		self._player = d['player']
-		self._hang_reward_list = d['hang_reward']
+		self._hang_reward = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			print("firstDayOfMonth")
@@ -3781,6 +3865,13 @@ async def __get_all_skill_level(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).get_all_skill_level(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
+@ROUTES.post('/get_skill_level_up_config')
+async def _get_skill_level_up_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = (request.app['MANAGER']).get_skill_level_up_config()
+	print(f"result:{result}")
+	return _json_response(result)
+
 @ROUTES.post('/get_skill')
 async def __get_skill(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -3829,6 +3920,11 @@ async def __disintegrate_weapon(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).disintegrate_weapon(int(post['world']), post['unique_id'], post['weapon'])
 	return _json_response(result)
 
+@ROUTES.post('/get_weapon_config')
+async def _get_weapon_config(request: web.Request) -> web.Response:
+	result = (request.app['MANAGER']).get_weapon_config()
+	return _json_response(result)
+
 @ROUTES.post('/try_unlock_weapon')
 async def __try_unlock_weapon(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -3872,6 +3968,18 @@ async def _upgrade_role_level(request: web.Request) -> web.Response:
 async def _upgrade_role_star(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).upgrade_role_star(int(post['world']), post['unique_id'], post['role'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_roles')
+async def _get_all_roles(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_all_roles(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_role_config')
+async def _get_role_config(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = (request.app['MANAGER']).get_role_config()
 	return _json_response(result)
 
 # ############################################################ #
@@ -4135,6 +4243,17 @@ async def __get_hang_up_info(request: web.Request) -> web.Response:
 	result = await (request.app['MANAGER']).get_hang_up_info(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
+@ROUTES.post('/get_monster_info')
+async def _get_monster_info(request: web.Request) -> web.Response:
+	result = (request.app['MANAGER']).get_monster_info()
+	return _json_response(result)
+
+@ROUTES.post('/get_stage_info')
+async def _get_stage_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_stage_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
 @ROUTES.post('/enter_stage')
 async def __enter_stage(request: web.Request) -> web.Response:
 	post = await request.post()
@@ -4360,17 +4479,24 @@ async def _acceleration_technology(request: web.Request) -> web.Response:
 	return _json_response(result)
 
 
+@ROUTES.post('/get_factory_info')
+async def _get_factory_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_factory_info(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+
 @ROUTES.post('/get_account_world_info')
 async def _get_account_world_info(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).get_account_world_info(int(post['world']), post['unique_id'])
+	result = await (request.app['MANAGER']).get_account_world_info(post['unique_id'])
 	return _json_response(result)
 
 
 @ROUTES.post('/choice_world')
 async def _choice_world(request: web.Request) -> web.Response:
 	post = await request.post()
-	result = await (request.app['MANAGER']).choice_world(int(post['world']), post['unique_id'], int(post['target_world']))
+	result = await (request.app['MANAGER']).choice_world(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 

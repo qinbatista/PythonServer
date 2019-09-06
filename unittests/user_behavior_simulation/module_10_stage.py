@@ -25,7 +25,7 @@ def purchase_energy():
 	pass
 
 def enter_stage(token,world,response):
-	print_module("[enter_level]")
+	print_module("[enter_level]:"+str(response))
 	while True:
 		my_number = random.randint(0,4)
 		if my_number==0:#剧情
@@ -58,7 +58,6 @@ def enter_stage(token,world,response):
 		elif my_number==2:#无尽试炼
 			print_method("[enter_level] endless training")
 		elif my_number==3:#活动试炼
-			yourstage = response["remaining"]["tower_stage"]
 			print_method("[enter_level] party training")
 		elif my_number==4:#退出
 			print_method("[enter_level] quit level playing")
