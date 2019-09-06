@@ -438,20 +438,20 @@ class MessageHandler:
 		async with session.post(self._game_manager_base_url(message['world']) + '/player_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
-	async def _weapon_config(self, message: dict, session) -> str:
-		async with session.post(self._game_manager_base_url(message['world']) + '/weapon_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+	async def _get_weapon_config(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_weapon_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
-	async def _skill_level_up_config(self, message: dict, session) -> str:
-		async with session.post(self._game_manager_base_url(message['world']) + '/skill_level_up_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+	async def _get_skill_level_up_config(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_skill_level_up_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _get_family_config(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/get_family_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
-	async def _role_config(self, message: dict, session) -> str:
-		async with session.post(self._game_manager_base_url(message['world']) + '/role_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+	async def _get_role_config(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_role_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 
@@ -664,10 +664,10 @@ FUNCTION_LIST = {
 	'get_all_mail' : MessageHandler._get_all_mail,
 	'get_lottery_config' : MessageHandler._get_lottery_config,
 	'player_config' : MessageHandler._player_config,
-	'weapon_config' : MessageHandler._weapon_config,
-	'skill_level_up_config' : MessageHandler._skill_level_up_config,
+	'get_weapon_config' : MessageHandler._get_weapon_config,
+	'get_skill_level_up_config' : MessageHandler._get_skill_level_up_config,
 	'get_family_config' : MessageHandler._get_family_config,
-	'role_config' : MessageHandler._role_config,
+	'get_role_config' : MessageHandler._get_role_config,
 
 
 

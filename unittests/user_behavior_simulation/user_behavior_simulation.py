@@ -57,7 +57,7 @@ def mail_dialog(get_all_mail):
 
 def run_task(name):
 	call_login(str(name))
-	get_level_info,get_all_friend_info,get_all_skill_level,get_all_weapon,refresh_all_storage,get_all_roles,get_stage_info,get_monster_info,get_factory_info,get_all_family_info,get_all_mail,get_all_armor_info = call_get_all_info()#加载所有参数信息
+	info_list = call_get_all_info()#加载所有参数信息
 	# call_friend_dialog(get_all_friend_info)#朋友界面
 	# skill_dialog(get_all_skill_level)#技能界面
 	# weapon_dialog(get_all_weapon)#武器界面

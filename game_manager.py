@@ -1028,13 +1028,12 @@ class GameManager:
 		# 1 - No information found for this user, successfully obtained general level configuration information
 		"""
 		server_config = {
-			"entry_consumables": self._entry_consumables,
-			"hang_reward": self._hang_reward,
-			"stage_reward": self._stage_reward,
-			"level_enemy_layouts": self._level_enemy_layouts_config_json,
-			"world_boss": self._world_boss
+			"entry_consumables": self._entry_consumables
+			# "hang_reward": self._hang_reward
+			# "stage_reward": self._stage_reward,
+			# "level_enemy_layouts": self._level_enemy_layouts_config_json,
 		}
-		return self._message_typesetting(status=0, message="get all stage info", data={"remaining": remaining})
+		return self._message_typesetting(status=0, message="get all stage info", data={"remaining": server_config})
 
 
 	@C.collect_async
@@ -2929,12 +2928,8 @@ class GameManager:
 		0  - Successfully obtained configuration information
 		"""
 		remaining = {}
-		sql_info = {}
 		data_head = (await self.get_all_head(world, table="factory"))["remaining"]
 		factory_data = await self._select_factory(world=world, unique_id=unique_id)
-		for i in range(1, len(data_head)):
-			sql_info.update({data_head[i][0]: factory_data[i]})
-		remaining.update({"sql_info": sql_info})
 		remaining.update({"server_config": self._factory_config})
 		return self._message_typesetting(status=0, message="Successfully obtained configuration information", data={"remaining": remaining})
 

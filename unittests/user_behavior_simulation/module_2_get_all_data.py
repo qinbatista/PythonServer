@@ -78,9 +78,9 @@ def get_all_armor_info():#获取所有护甲信息
 	print_method("[get_all_armor_info]"+str(response))
 	return response
 
-def get_lottery_config():#获取抽奖数值信息
-	response = send_tcp_message({'world' : world, 'function' : 'get_lottery_config', 'data' : {'token' : token}})#升级请求
-	print_method("[get_lottery_config]"+str(response))
+def get_lottery_config_info():#获取抽奖数值信息
+	response = send_tcp_message({'world' : world, 'function' : 'get_lottery_config_info', 'data' : {'token' : token}})#升级请求
+	print_method("[get_lottery_config_info]"+str(response))
 	return response
 
 def player_config():#获取玩家配置文件
@@ -88,9 +88,9 @@ def player_config():#获取玩家配置文件
 	print_method("[player_config]"+str(response))
 	return response
 
-def weapon_config():#获取武器配置
-	response = send_tcp_message({'world' : world, 'function' : 'weapon_config', 'data' : {'token' : token}})#升级请求
-	print_method("[weapon_config]"+str(response))
+def get_weapon_config():#获取武器配置
+	response = send_tcp_message({'world' : world, 'function' : 'get_weapon_config', 'data' : {'token' : token}})#升级请求
+	print_method("[get_weapon_config]"+str(response))
 	return response
 
 def skill_level_up_config():#获取技能配置
@@ -103,78 +103,45 @@ def get_family_config():#获取家族配置
 	print_method("[get_family_config]"+str(response))
 	return response
 
-def role_config():#获取角色配置
-	response = send_tcp_message({'world' : world, 'function' : 'role_config', 'data' : {'token' : token}})#升级请求
-	print_method("[role_config]"+str(response))
+def get_role_config():#获取角色配置
+	response = send_tcp_message({'world' : world, 'function' : 'get_role_config', 'data' : {'token' : token}})#升级请求
+	print_method("[get_role_config]"+str(response))
 	return response
 
 def get_hang_up_info():
 	response = send_tcp_message({'world' : world, 'function' : 'get_hang_up_info', 'data' : {'token' : token}})#升级请求
 	print_method("[get_hang_up_info]"+str(response))
 	return response
-get_level_info_str=""
-get_stage_info_str=""
-get_monster_info_str=""
-get_all_friend_info_str=""
-get_all_skill_level_str=""
-get_all_weapon_str=""
-refresh_all_storage_str=""
-get_all_roles_str=""
-get_factory_info_str=""
-get_all_family_info_str=""
-get_all_mail_str=""
-get_all_armor_info_str=""
-get_lottery_config_str=""
-player_config_str=""
-weapon_config_str=""
-skill_level_up_config_str=""
-get_family_config_str=""
-role_config_str=""
+
 def get_all_info(_token,_world):
 	print_module("[module_2_get_all_data] get_all_info")
 	global world,token
 	world = _world
 	token = _token
 
-	global get_level_info_str
-	global get_stage_info_str
-	global get_monster_info_str
-	global get_all_friend_info_str
-	global get_all_skill_level_str
-	global get_all_weapon_str
-	global refresh_all_storage_str
-	global get_all_roles_str
-	global get_factory_info_str
-	global get_all_family_info_str
-	global get_all_mail_str
-	global get_all_armor_info_str
-	global get_lottery_config_str
-	global player_config_str
-	global weapon_config_str
-	global skill_level_up_config_str
-	global get_family_config_str
-	global role_config_str
-
-	# get_level_info_str = get_level_info()#未完成
+	get_level_info_str = get_level_info()#未完成
 	get_stage_info_str = get_stage_info()
-	# get_monster_info_str = get_monster_info()
-	# get_all_friend_info_str = get_all_friend_info()
-	# get_all_skill_level_str = get_all_skill_level()
-	# get_all_weapon_str = get_all_weapon()
-	# refresh_all_storage_str = refresh_all_storage()
-	# get_all_roles_str = get_all_roles()
-	# get_factory_info_str = get_factory_info()
-	# get_all_family_info_str = get_all_family_info()
-	# get_all_mail_str = get_all_mail()
-	# get_all_armor_info_str = get_all_armor_info()
-	# get_lottery_config_str = get_lottery_config()
-	# player_config_str = player_config()
-	# weapon_config_str = weapon_config()
-	# skill_level_up_config_str = skill_level_up_config()
-	# get_family_config_str = get_family_config()
-	# role_config_str = role_config()
-	# get_hang_up_info_str = get_hang_up_info()
-	return get_level_info_str,get_stage_info_str,get_monster_info_str,get_all_friend_info_str,get_all_skill_level_str,get_all_weapon_str,refresh_all_storage_str,get_all_roles_str,get_factory_info_str,get_all_family_info_str,get_all_mail_str,get_all_armor_info_str,get_lottery_config_str,player_config_str,weapon_config_str,skill_level_up_config_str,get_family_config_str,role_config_str
+	get_monster_info_str = get_monster_info()
+	get_all_friend_info_str = get_all_friend_info()
+	get_all_skill_level_str = get_all_skill_level()
+	get_all_weapon_str = get_all_weapon()
+	refresh_all_storage_str = refresh_all_storage()
+	get_all_roles_str = get_all_roles()
+	get_factory_info_str = get_factory_info()
+	get_all_family_info_str = get_all_family_info()#家族还未开始制作
+	get_all_mail_str = get_all_mail()
+	get_all_armor_info_str = get_all_armor_info()
+	get_lottery_config_info_str = get_lottery_config_info()
+	player_config_str = player_config()#未完成
+	get_weapon_config_str = get_weapon_config()
+	skill_level_up_config_str = skill_level_up_config()
+	get_family_config_str = get_family_config()#家族还未开始制作
+	get_role_config_str = get_role_config()
+	get_hang_up_info_str = get_hang_up_info()
+	return [get_level_info_str,get_stage_info_str,get_monster_info_str,get_all_friend_info_str,
+	get_all_skill_level_str,get_all_weapon_str,refresh_all_storage_str,get_all_roles_str,
+	get_factory_info_str,get_all_family_info_str,get_all_mail_str,get_all_armor_info_str,
+	get_lottery_config_info_str,player_config_str,get_weapon_config_str,skill_level_up_config_str,get_family_config_str,get_role_config_str,get_hang_up_info_str]
 
 if __name__ == "__main__":
 	pass
