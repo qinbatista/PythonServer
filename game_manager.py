@@ -1035,14 +1035,7 @@ class GameManager:
 			"level_enemy_layouts": self._level_enemy_layouts_config_json,
 			"world_boss": self._world_boss
 		}
-		remaining = {"server_config": server_config}
-		data = await self._execute_statement(world, f"select stage, tower_stage, hang_stage, hang_up_time from player where unique_id='{unique_id}'")
-		if data:
-			stage, tower_stage, hang_stage, hang_up_time = data[0]
-			sql_data = {"stage": stage, "tower_stage": tower_stage, "hang_stage": hang_stage, "hang_up_time": hang_up_time}
-			remaining.update({"sql_data": sql_data})
-			return self._message_typesetting(status=0, message="Successfully obtained level information", data={"remaining": remaining})
-		return self._message_typesetting(status=1, message="No information found for this user, successfully obtained general level configuration information", data={"remaining": remaining})
+		return self._message_typesetting(status=0, message="get all stage info", data={"remaining": remaining})
 
 
 	@C.collect_async
