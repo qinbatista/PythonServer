@@ -19,7 +19,7 @@ def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
 def get_level_info():#获取所有关卡信息
-	response = send_tcp_message({'world' : int(world), 'function' : 'get_hang_up_info', 'data' : {'token' : token}})#挑战成功
+	response = send_tcp_message({'world' : int(world), 'function' : 'get_level_info', 'data' : {'token' : token}})#挑战成功
 	print_method("[get_level_info]"+str(response))
 	return response
 
@@ -108,13 +108,73 @@ def role_config():#获取角色配置
 	print_method("[role_config]"+str(response))
 	return response
 
-
+def get_hang_up_info():
+	response = send_tcp_message({'world' : world, 'function' : 'get_hang_up_info', 'data' : {'token' : token}})#升级请求
+	print_method("[get_hang_up_info]"+str(response))
+	return response
+get_level_info_str=""
+get_stage_info_str=""
+get_monster_info_str=""
+get_all_friend_info_str=""
+get_all_skill_level_str=""
+get_all_weapon_str=""
+refresh_all_storage_str=""
+get_all_roles_str=""
+get_factory_info_str=""
+get_all_family_info_str=""
+get_all_mail_str=""
+get_all_armor_info_str=""
+get_lottery_config_str=""
+player_config_str=""
+weapon_config_str=""
+skill_level_up_config_str=""
+get_family_config_str=""
+role_config_str=""
 def get_all_info(_token,_world):
 	print_module("[module_2_get_all_data] get_all_info")
 	global world,token
 	world = _world
 	token = _token
-	return get_level_info(),get_all_friend_info(),get_all_skill_level(),get_all_weapon(),refresh_all_storage(),get_all_roles(),get_stage_info(),get_monster_info(),get_factory_info(),get_all_family_info(),get_all_mail(),get_all_armor_info()
+
+	global get_level_info_str
+	global get_stage_info_str
+	global get_monster_info_str
+	global get_all_friend_info_str
+	global get_all_skill_level_str
+	global get_all_weapon_str
+	global refresh_all_storage_str
+	global get_all_roles_str
+	global get_factory_info_str
+	global get_all_family_info_str
+	global get_all_mail_str
+	global get_all_armor_info_str
+	global get_lottery_config_str
+	global player_config_str
+	global weapon_config_str
+	global skill_level_up_config_str
+	global get_family_config_str
+	global role_config_str
+
+	# get_level_info_str = get_level_info()#未完成
+	get_stage_info_str = get_stage_info()
+	# get_monster_info_str = get_monster_info()
+	# get_all_friend_info_str = get_all_friend_info()
+	# get_all_skill_level_str = get_all_skill_level()
+	# get_all_weapon_str = get_all_weapon()
+	# refresh_all_storage_str = refresh_all_storage()
+	# get_all_roles_str = get_all_roles()
+	# get_factory_info_str = get_factory_info()
+	# get_all_family_info_str = get_all_family_info()
+	# get_all_mail_str = get_all_mail()
+	# get_all_armor_info_str = get_all_armor_info()
+	# get_lottery_config_str = get_lottery_config()
+	# player_config_str = player_config()
+	# weapon_config_str = weapon_config()
+	# skill_level_up_config_str = skill_level_up_config()
+	# get_family_config_str = get_family_config()
+	# role_config_str = role_config()
+	# get_hang_up_info_str = get_hang_up_info()
+	return get_level_info_str,get_stage_info_str,get_monster_info_str,get_all_friend_info_str,get_all_skill_level_str,get_all_weapon_str,refresh_all_storage_str,get_all_roles_str,get_factory_info_str,get_all_family_info_str,get_all_mail_str,get_all_armor_info_str,get_lottery_config_str,player_config_str,weapon_config_str,skill_level_up_config_str,get_family_config_str,role_config_str
 
 if __name__ == "__main__":
 	pass
