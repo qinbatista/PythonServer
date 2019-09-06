@@ -1041,6 +1041,21 @@ class GameManager:
 			return self._message_typesetting(status=0, message="Successfully obtained level information", data={"remaining": remaining})
 		return self._message_typesetting(status=1, message="No information found for this user, successfully obtained general level configuration information", data={"remaining": remaining})
 
+	# game_manager 2019年9月6日
+	# def get_stage_info(self) -> dict:
+	# 	"""
+	# 	# 0 - Successfully obtained level information
+	# 	# 1 - No information found for this user, successfully obtained general level configuration information
+	# 	"""
+	# 	server_config = {
+	# 		"entry_consumables": self._entry_consumables,
+	# 		"hang_reward": self._hang_reward,
+	# 		"stage_reward": self._stage_reward,
+	# 		"level_enemy_layouts": self._level_enemy_layouts_config_json,
+	# 		"world_boss": self._world_boss
+	# 	}
+	# 	return self._message_typesetting(status=0, message="get all stage info", data={"remaining": {"server_config": server_config}})
+
 	#@C.collect_async
 	async def show_energy(self, world: int, unique_id: str):
 		data = await self.try_energy(world=world, unique_id=unique_id, amount=0)
@@ -2594,7 +2609,7 @@ class GameManager:
 		2  - Allocation is full
 		97 - Insufficient distribution workers
 		98 - Factory type error
-		99 - The number of workers assigned is not a positive integer
+		99 - The number of staff assigned cannot be 0
 		思路： 判断分配的工人数量workers_quantity是否为为正整数 The number of workers assigned is not a positive integer ==> 代号99，
 		工厂类型factory_kind是否在数据库表中 Factory type error ==> 代号98，查询数据库表中是否存在unique_id的数据，
 		不存在则创建，获取数据库中的所有工人的数量totally_workers和正在此工厂工作的工人数量factory_workers，
@@ -2613,17 +2628,12 @@ class GameManager:
 		问题：如果指定工厂之前存在工人在工作则结算后的工作时间是否统一成当前时间
 		"""
 		all_factory = self._factory_config["factory_kind"]
-		if workers_quantity <= 0:
-			return self._message_typesetting(status=99, message="The number of workers assigned is not a positive integer")
-
 		if factory_kind not in all_factory:
 			return self._message_typesetting(status=98, message="Factory type error")
-
 		factory_mark = all_factory.index(factory_kind)
 		remaining = {}
 		reward = {}
 		result = await self.refresh_all_storage(world, unique_id)
-
 		# if factory_kind == "food":
 		# 	result = await self.refresh_food_storage(world, unique_id)
 		# elif factory_kind == "mine":
@@ -2642,24 +2652,32 @@ class GameManager:
 		factory_workers = factory_data[9 + factory_mark]
 		totally_workers = factory_data[13]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		if factory_kind != "equipment":
-			# 配置文件下的工作人员上限限制
-			workers_number_limit = factory_config["workers_number_limit"][str(factory_level)]
-			if factory_workers + workers_quantity > workers_number_limit:
-				workers_quantity = workers_number_limit - factory_workers
-		# 数据库可分配人员数量的限制
-		if workers_quantity > totally_workers:
-			workers_quantity = totally_workers
-		totally_workers -= workers_quantity
-		factory_workers += workers_quantity
-		sql_str = f"update factory set totally_workers={totally_workers}, {factory_kind}_factory_workers={factory_workers}, {factory_kind}_factory_timer='{current_time}' where unique_id='{unique_id}'"
-		await self._execute_statement_update(world=world, statement=sql_str)
-		remaining.update({"totally_workers": totally_workers, f"{factory_kind}_factory_workers": factory_workers, f"{factory_kind}_start_time": current_time})
-		if workers_quantity == 0:
-			return self._message_typesetting(status=2, message="Allocation is full", data={"remaining": remaining, "reward": reward})
-		if reward:
-			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
-		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
+
+		if not workers_quantity:
+			return self._message_typesetting(status=99, message="The number of staff assigned cannot be 0")
+		elif workers_quantity < 0:
+			factory_workers += workers_quantity
+			if factory_workers < 0:
+				factory_workers = 0
+		else:
+			if factory_kind != "equipment":
+				# 配置文件下的工作人员上限限制
+				workers_number_limit = factory_config["workers_number_limit"][str(factory_level)]
+				if factory_workers + workers_quantity > workers_number_limit:
+					workers_quantity = workers_number_limit - factory_workers
+			# 数据库可分配人员数量的限制
+			if workers_quantity > totally_workers:
+				workers_quantity = totally_workers
+			totally_workers -= workers_quantity
+			factory_workers += workers_quantity
+			sql_str = f"update factory set totally_workers={totally_workers}, {factory_kind}_factory_workers={factory_workers}, {factory_kind}_factory_timer='{current_time}' where unique_id='{unique_id}'"
+			await self._execute_statement_update(world=world, statement=sql_str)
+			remaining.update({"totally_workers": totally_workers, f"{factory_kind}_factory_workers": factory_workers, f"{factory_kind}_start_time": current_time})
+			if workers_quantity == 0:
+				return self._message_typesetting(status=2, message="Allocation is full", data={"remaining": remaining, "reward": reward})
+			if reward:
+				return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
+			return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
 
 	#@C.collect_async
 	async def equipment_manufacturing_armor(self, world: int, unique_id: str, armor_id: str) -> dict:
@@ -2952,7 +2970,7 @@ class GameManager:
 #############################################################################
 
 	async def _select_factory(self, world: int, unique_id) -> list:
-		sql_str = f"select * from factory where unique_id={unique_id}"
+		sql_str = f"select * from factory where unique_id='{unique_id}'"
 		data = await self._execute_statement(world, sql_str)
 		if data: return data[0]
 		await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
@@ -3530,7 +3548,7 @@ class GameManager:
 		return int(data[0][0]), data[0][1]
 
 	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
-		return await self._execute_statement_update(world, 'UPDATE weapon SET weapon_star = "' + str(star) + '" WHERE unique_id = "' + unique_id + '" AND weapon_name = "' + weapon + '";') 
+		return await self._execute_statement_update(world, 'UPDATE weapon SET weapon_star = "' + str(star) + '" WHERE unique_id = "' + unique_id + '" AND weapon_name = "' + weapon + '";')
 
 	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
 		data = await self._execute_statement(world, 'SELECT segment FROM weapon WHERE unique_id = "' + unique_id + '" AND weapon_name = "' + weapon + '";')
@@ -3712,7 +3730,7 @@ class GameManager:
 		self._monster_config_json = result.json()
 		result = requests.get('http://localhost:8000/get_level_enemy_layouts_config')
 		self._level_enemy_layouts_config_json = result.json()
-	
+
 	def _initialize_pools(self, worlds):
 		self._pools = {}
 		if len(worlds) == 0:
