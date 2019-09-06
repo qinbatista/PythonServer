@@ -27,7 +27,7 @@ class GameManager:
 		self._boss_life=[]
 		self._boss_life_remaining=[]
 		self._refresh_configuration()
-		self._timer = repeating_timer.RepeatingTimer(3, self._refresh_configuration)
+		self._timer = repeating_timer.RepeatingTimer(30, self._refresh_configuration)
 		self._timer.start()
 
 #############################################################################

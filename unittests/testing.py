@@ -87,11 +87,12 @@ def test_multiple_message(n: int):
 
 
 def send_single_message(message_id: int):
-	client = LukseunClient(client_type, host, port=8880)
+	client = LukseunClient(client_type)
 	start = time.time()
 	MESSAGE_LIST[message_id]["data"]['token']=token
 	MESSAGE_LIST[message_id]["data"]['world']=0
 	newstring  =  str(MESSAGE_LIST[message_id]).replace("'","\"")
+	print('sending message...')
 	asyncio.run(client.send_message(newstring))
 	print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
 	return client.token
@@ -271,7 +272,7 @@ def main() -> None:
 	# send_single_message(ADD_IRON)
 	# send_single_message(ADD_SCROLL_10)
 	# send_single_message(ADD_SCROLL_30)
-	send_single_message(AUTOMATICALLY_REFRESH_STORE)
+	#send_single_message(AUTOMATICALLY_REFRESH_STORE)
 	# send_single_message(MANUALLY_REFRESH_STORE)
 	# send_single_message(DIAMOND_REFRESH_STORE)
 	# send_single_message(BLACK_MARKET_TRANSACTION)
