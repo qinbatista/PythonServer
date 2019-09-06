@@ -115,10 +115,6 @@ class MessageHandler:
 		async with session.post(self._game_manager_base_url(message['world']) + '/level_up_skill', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'skill_id': message['data']['skill_id'], 'scroll_id': message['data']['scroll_id']}) as resp:
 			return await resp.text()
 
-	async def _get_all_skill_level(self, message: dict, session) -> str:
-		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_skill_level', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
-			return await resp.text()
-
 	async def _get_all_supplies(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_supplies', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
@@ -355,10 +351,6 @@ class MessageHandler:
 		async with session.post(self._game_manager_base_url(message['world']) + '/get_new_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
-	async def _get_all_mail(self, message: dict, session) -> str:
-		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
-			return await resp.text()
-
 	async def _delete_mail(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/delete_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'nonce': message['data']['nonce']}) as resp:
 			return await resp.text()
@@ -366,6 +358,11 @@ class MessageHandler:
 	async def _delete_all_mail(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/delete_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
+
+	async def _get_lottery_config(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_lottery_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
 
 
 
@@ -394,9 +391,77 @@ class MessageHandler:
 		async with session.post(self._game_manager_base_url(message['world']) + '/get_hang_up_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
+
+
+
 	async def _get_all_friend_info(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_friend_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
+
+	async def _get_level_info(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_level_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _get_stage_info(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_stage_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _get_monster_info(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_monster_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _get_all_skill_level(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_skill_level', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _refresh_all_storage(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/refresh_all_storage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _get_all_roles(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_roles', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _get_factory_info(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_factory_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _get_all_family_info(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_family_info', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _get_all_mail(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_all_mail', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _player_config(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/player_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _weapon_config(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/weapon_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _skill_level_up_config(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/skill_level_up_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _get_family_config(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/get_family_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+	async def _role_config(self, message: dict, session) -> str:
+		async with session.post(self._game_manager_base_url(message['world']) + '/role_config', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
+			return await resp.text()
+
+
+
+
+
+
+
+
+
 	async def _request_friend(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/request_friend', data={'world' : message['world'], 'unique_id': message['data']['unique_id'], 'friend_name': message['data']['friend_name']}) as resp:
 			return await resp.text()
@@ -456,9 +521,6 @@ class MessageHandler:
 
 	async def _buy_workers(self, message: dict, session) -> str:
 		async with session.post(self._game_manager_base_url(message['world']) + '/buy_workers', data={'world' : message['world'], 'unique_id': message['data']['unique_id'],'workers_quantity': message['data']['workers_quantity']}) as resp:
-			return await resp.text()
-	async def _refresh_all_storage(self, message: dict, session) -> str:
-		async with session.post(self._game_manager_base_url(message['world']) + '/refresh_all_storage', data={'world' : message['world'], 'unique_id': message['data']['unique_id']}) as resp:
 			return await resp.text()
 
 	async def _upgrade_food_factory(self, message: dict, session) -> str:
@@ -546,7 +608,6 @@ FUNCTION_LIST = {
 	'level_up_passive' : MessageHandler._level_up_passive,
 	'level_up_weapon_star' : MessageHandler._level_up_weapon_star,
 	'reset_weapon_skill_point' : MessageHandler._reset_weapon_skill_point,
-	'get_all_weapon' : MessageHandler._get_all_weapon,
 	'disintegrate_weapon' : MessageHandler._disintegrate_weapon,
 	'try_unlock_weapon' : MessageHandler._try_unlock_weapon,
 	'pass_stage' : MessageHandler._pass_stage,
@@ -591,10 +652,28 @@ FUNCTION_LIST = {
 	'get_all_stage_info' : MessageHandler._get_all_stage_info,
 	'get_all_armor_info' : MessageHandler._get_all_armor_info,
 
+	#'get_level_info' : MessageHandler._get_level_info,未完成
+	'get_stage_info' : MessageHandler._get_stage_info,
+	'get_monster_info' : MessageHandler._get_monster_info,
+	'get_all_friend_info' : MessageHandler._get_all_friend_info,
+	'get_all_weapon' : MessageHandler._get_all_weapon,
+	'refresh_all_storage' : MessageHandler._refresh_all_storage,
+	'get_all_roles' : MessageHandler._get_all_roles,
+	'get_factory_info' : MessageHandler._get_factory_info,
+	'get_all_family_info' : MessageHandler._get_all_family_info,
+	'get_all_mail' : MessageHandler._get_all_mail,
+	'get_lottery_config' : MessageHandler._get_lottery_config,
+	'player_config' : MessageHandler._player_config,
+	'weapon_config' : MessageHandler._weapon_config,
+	'skill_level_up_config' : MessageHandler._skill_level_up_config,
+	'get_family_config' : MessageHandler._get_family_config,
+	'role_config' : MessageHandler._role_config,
+
+
+
 
 	'get_lottery_config_info' : MessageHandler._get_lottery_config_info,
 	#'get_all_tower_info' : MessageHandler._get_all_tower_info,
-	#'get_all_armor_info' : MessageHandler._get_all_armor_info,
 	'level_enemy_layouts_config' : MessageHandler._level_enemy_layouts_config,
 	'monster_config' : MessageHandler._monster_config,
 	'get_stage_reward_config' : MessageHandler._get_stage_reward_config,
@@ -610,7 +689,6 @@ FUNCTION_LIST = {
 	'redeem_nonce': MessageHandler._redeem_nonce,
 	'redeem_all_nonce': MessageHandler._redeem_all_nonce,
 	'get_new_mail': MessageHandler._get_new_mail,
-	'get_all_mail': MessageHandler._get_all_mail,
 	'delete_mail': MessageHandler._delete_mail,
 	'delete_all_mail': MessageHandler._delete_all_mail,
 
@@ -627,7 +705,6 @@ FUNCTION_LIST = {
 	'request_join_family' : MessageHandler._request_join_family,
 	'respond_family' : MessageHandler._respond_family,
 
-	'refresh_all_storage' : MessageHandler._refresh_all_storage,
 	'buy_workers' : MessageHandler._buy_workers,
 	'upgrade_food_factory' : MessageHandler._upgrade_food_factory,
 	'upgrade_crystal_factory' : MessageHandler._upgrade_crystal_factory,
@@ -642,7 +719,7 @@ FUNCTION_LIST = {
 	'refresh_crystal_storage':MessageHandler._refresh_crystal_storage,
 	'refresh_equipment_storage':MessageHandler._refresh_equipment_storage,
 
-	
+
 	'upgrade_role_level':MessageHandler._upgrade_role_level,
 	'upgrade_role_star':MessageHandler._upgrade_role_star
 
