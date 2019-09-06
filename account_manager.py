@@ -18,7 +18,7 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 
-TOKEN_SERVER_BASE_URL = ''
+TOKEN_SERVER_BASE_URL = 'http://127.0.0.1:8001'
 
 # Part (1 / 2)
 class AccountManager:
@@ -64,7 +64,6 @@ class AccountManager:
 	# TODO run check_exists as a task
 	# TODO refactor code for speed improvements
 	async def bind_account(self, unique_id: str, password: str, account: str, email: str, phone: str) -> dict:
-		bound = {'account' : '', 'email' : '', 'phone_number' : ''}
 		if await self._account_is_bound(unique_id): # trying to bind additional items
 			if email == '' and phone == '':
 				return self.message_typesetting(9, 'could not bind additional items')
@@ -88,10 +87,8 @@ class AccountManager:
 
 			if email != '':
 				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
-				bound['email'] = email
 			if phone != '':
 				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
-				bound['phone_number'] = phone
 
 		else: # trying to bind for the first time
 			retvals = await asyncio.gather(self._check_exists('account', account), self._check_exists('email', email), self._check_exists('phone_number', phone))
@@ -120,14 +117,12 @@ class AccountManager:
 				random_salt = '0' + random_salt
 			hashed_password = hashlib.scrypt(password.encode(), salt=random_salt.encode(), n = self._n, r = self._r, p = self._p).hex()
 			await self._execute_statement('UPDATE info SET account = "' + account + '", password = "' + hashed_password + '", salt = "' + random_salt + '" WHERE unique_id = "' + unique_id + '";')
-			bound['account'] = account
+
 			if email != '':
 				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
-				bound['email'] = email
 			if phone != '':
 				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
-				bound['phone_number'] = phone
-		return self.message_typesetting(0, 'success', bound)
+		return self.message_typesetting(0, 'success')
 
 
 
@@ -235,70 +230,3 @@ class AccountManager:
 	def message_typesetting(self, status: int, message: str, data: dict={}) -> dict:
 		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
 
-
-
-
-# Part (2 / 2)
-ROUTES = web.RouteTableDef()
-
-
-
-# Call this method whenever you return from any of the following functions.
-# This makes it very easy to construct a json response back to the caller.
-def _json_response(body: dict = '', **kwargs) -> web.Response:
-	'''
-	A simple wrapper for aiohttp.web.Response return value.
-	'''
-	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
-	kwargs['content_type'] = 'text/json'
-	return web.Response(**kwargs)
-
-
-@ROUTES.post('/login')
-async def __login(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await (request.app['MANAGER']).login(post['identifier'], post['value'], post['password'])
-	return _json_response(data)
-
-
-@ROUTES.post('/login_unique')
-async def __login(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await (request.app['MANAGER']).login_unique(post['unique_id'])
-	return _json_response(data)
-
-@ROUTES.post('/bind_account')
-async def __login(request: web.Request) -> web.Response:
-	post = await request.post()
-	data = await (request.app['MANAGER']).bind_account(post['unique_id'], post['password'], post['account'], post['email'], post['phone_number'])
-	return _json_response(data)
-
-
-def get_config() -> configparser.ConfigParser:
-	'''
-	Fetches the server's configuration file from the config server.
-	Waits until the configuration server is online.
-	'''
-	while True:
-		try:
-			r = requests.get('http://localhost:8000/get_server_config_location')
-			parser = configparser.ConfigParser()
-			parser.read(r.json()['file'])
-			return parser
-		except requests.exceptions.ConnectionError:
-			print('Could not find configuration server, retrying in 5 seconds...')
-			time.sleep(5)
-
-def run():
-	app = web.Application()
-	app.add_routes(ROUTES)
-	app['MANAGER'] = AccountManager()
-	config = get_config()
-	global TOKEN_SERVER_BASE_URL
-	TOKEN_SERVER_BASE_URL = 'http://localhost:' + config['token_server']['port']
-	print(f'starting account_manager on port {config.getint("account_manager", "port")}...')
-	web.run_app(app, port = config.getint('account_manager', 'port'))
-
-
-if __name__ == '__main__':
-	run()

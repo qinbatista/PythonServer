@@ -7,7 +7,7 @@ import sys
 import time
 import json
 import random
-import tormysql
+import aiomysql
 import requests
 import threading
 import configparser
@@ -21,13 +21,14 @@ C = metrics.Collector()
 
 class GameManager:
 	def __init__(self, worlds = []):
-		self._initialize_pools(worlds)
+		#self._initialize_pools(worlds)
+		self._pool = None
 		self._is_first_start = True
 		self.is_first_month = False
 		self._boss_life=[]
 		self._boss_life_remaining=[]
 		self._refresh_configuration()
-		self._timer = repeating_timer.RepeatingTimer(3, self._refresh_configuration)
+		self._timer = repeating_timer.RepeatingTimer(30, self._refresh_configuration)
 		self._timer.start()
 
 #############################################################################
@@ -3620,6 +3621,14 @@ class GameManager:
 		select_str = select_str[: len(select_str) - 2] + select_end_str
 		return update_str, select_str
 
+	async def _connect_sql(self):
+		self._pool = await aiomysql.create_pool(
+				maxsize = 20,
+				host = '192.168.1.102',
+				user = 'root',
+				password = 'lukseun',
+				charset = 'utf8')
+
 	async def _execute_statement(self, world: int, statement: str) -> tuple:
 		"""
 		Executes the given statement and returns the result.
@@ -3627,11 +3636,12 @@ class GameManager:
 		:param statement: Mysql执行的语句
 		:return: 返回执行后的二维元组表
 		"""
-		async with await self._pools[world].Connection() as conn:
+		if self._pool is None: await self._connect_sql()
+		async with self._pool.acquire() as conn:
+			await conn.select_db(str(world) if world != 0 else 'aliya')
 			async with conn.cursor() as cursor:
 				await cursor.execute(statement)
-				data = cursor.fetchall()
-				return data
+				return await cursor.fetchall()
 
 	async def _execute_statement_update(self, world: int, statement: str) -> int:
 		"""
@@ -3640,7 +3650,9 @@ class GameManager:
 		:param statement: Mysql执行的语句
 		:return: 返回update或者是set执行的结果
 		"""
-		async with await self._pools[world].Connection() as conn:
+		if self._pool is None: await self._connect_sql()
+		async with self._pool.acquire() as conn:
+			await conn.select_db(str(world) if world != 0 else 'aliya')
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
