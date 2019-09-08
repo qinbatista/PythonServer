@@ -119,7 +119,7 @@ def get_all_info(_token,_world):
 	world = _world
 	token = _token
 
-	get_level_info_str = get_level_info()#未完成
+	get_level_info_str = ""#get_level_info()#未完成
 	get_stage_info_str = get_stage_info()
 	get_monster_info_str = get_monster_info()
 	get_all_friend_info_str = get_all_friend_info()
@@ -128,14 +128,14 @@ def get_all_info(_token,_world):
 	refresh_all_storage_str = refresh_all_storage()
 	get_all_roles_str = get_all_roles()
 	get_factory_info_str = get_factory_info()
-	get_all_family_info_str = get_all_family_info()#家族还未开始制作
+	get_all_family_info_str = ""#get_all_family_info()#家族还未开始制作
 	get_all_mail_str = get_all_mail()
 	get_all_armor_info_str = get_all_armor_info()
 	get_lottery_config_info_str = get_lottery_config_info()
-	player_config_str = player_config()#未完成
+	player_config_str = ""#player_config()#未完成
 	get_weapon_config_str = get_weapon_config()
 	skill_level_up_config_str = skill_level_up_config()
-	get_family_config_str = get_family_config()#家族还未开始制作
+	get_family_config_str = ""#get_family_config()#家族还未开始制作
 	get_role_config_str = get_role_config()
 	get_hang_up_info_str = get_hang_up_info()
 	return [get_level_info_str,get_stage_info_str,get_monster_info_str,get_all_friend_info_str,

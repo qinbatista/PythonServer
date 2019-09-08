@@ -21,5 +21,19 @@ def print_method(my_string):
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
-def mail_dialog(token,world,respons):
-	pass
+def friend_request(nonce):
+	print_method("friend_request")
+	new_response = send_tcp_message({'world' : world, 'function' : 'response_friend', 'data' : {'token' : token,"nonce":nonce}})
+	return new_response
+
+def mail_dialog(_token,_world,_all_info):
+	global world,token,all_info
+	token = _token
+	world = _world
+	all_info = _all_info
+	print_module("mail_dialog")
+	for i in range(len(_all_info["data"]["mail"]["new"])):
+		request_type = _all_info["data"]["mail"]["new"][i]["type"]
+		print("request_type:"+request_type)
+		if request_type == "friend_request":
+			print(friend_request(_all_info["data"]["mail"]["new"][i]["data"]["nonce"]))
