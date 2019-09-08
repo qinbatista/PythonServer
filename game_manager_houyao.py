@@ -2062,6 +2062,7 @@ class GameManager:
 	#@C.collect_async
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
 		# announcement = "执行人:执行目标:执行方式:执行人的身份:执行目标的身份"
+		# 需要清空被移除者的工会贡献值和签到时间
 		# 0 - success, user removed
 		# 91 - You don't have permission to delete the administrator
 		# 92 - You can't remove the patriarch.
@@ -2132,7 +2133,7 @@ class GameManager:
 			for i, value in enumerate(content):
 				news.update({str(i + 1): value})
 		await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{str(news)}" WHERE familyid = "{fid}";')
-		await self._execute_statement_update(world, f'UPDATE player SET familyid = "", cumulative_contribution=0 WHERE game_name = "{gamename_target}";')
+		await self._execute_statement_update(world, f'UPDATE player SET familyid="", union_login="", cumulative_contribution=0 WHERE game_name = "{gamename_target}";')
 		remaining = {"announcement": announcement, "news": news, "remove_start_time": remove_start_time, "remove_times": remove_times}
 		return self._message_typesetting(0, 'success, user removed', data={"remaining": remaining})
 
@@ -2161,7 +2162,7 @@ class GameManager:
 		# 98 - you are already in a family
 		# 97 - fname already taken
 		# 99 - invalid fname
-		if fname == '' or not fname: return self._message_typesetting(99, 'invalid fname');
+		if not fname: return self._message_typesetting(99, 'invalid fname');
 		if await self._family_exists(world, fname):
 			return self._message_typesetting(97, 'fname already taken')
 		game_name, fid = await self._get_familyid(world, unique_id = uid)
