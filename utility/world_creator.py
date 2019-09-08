@@ -123,6 +123,7 @@ def create_table_families(cursor):
 	  `elite5` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '精英5游戏名',
 	  `remove_start_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '删除成员的开始时间',
 	  `remove_times` int(6) DEFAULT 5 COMMENT '当天可删除的次数',
+	  `disbanded_family_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '解散工会的开始时间',
 	  PRIMARY KEY (`familyid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
@@ -189,9 +190,11 @@ def create_table_player(cursor):
 	  `world_boss_remaining_times` int(6) DEFAULT 0 COMMENT '进入世界boss的剩余次数',
 	  `food` int(11) unsigned DEFAULT 0 COMMENT '食物',
 	  `crystal` int(11) unsigned DEFAULT 0 COMMENT '水晶',
-	  `union_login` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会签到的日期',
+	  `sign_in_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会签到的日期',
 	  `union_contribution` int(11) unsigned DEFAULT 0 COMMENT '工会贡献值',
 	  `cumulative_contribution` int(11) unsigned DEFAULT 0 COMMENT '工会累积贡献值',
+	  `leave_family_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '离开工会的开始时间',
+	  `login_in_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '用户登录的时间',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
@@ -352,7 +355,7 @@ def already_exists(world):
 	return True
 
 def operating_test():
-	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
+	c = pymysql.connect(host='127.0.0.1', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
 	c.select_db("aliya")
 	cursor = c.cursor()
 	create_table_player(cursor)
