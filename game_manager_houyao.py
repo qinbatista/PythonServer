@@ -2165,11 +2165,10 @@ class GameManager:
 		if not fname: return self._message_typesetting(99, 'invalid fname');
 		if await self._family_exists(world, fname):
 			return self._message_typesetting(97, 'fname already taken')
-		game_name, fid = await self._get_familyid(world, unique_id = uid)
-		if fid is not None and fid != '': return self._message_typesetting(98, 'already in a family')
+		game_name, fid, union_login, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if fid: return self._message_typesetting(98, 'already in a family')
 		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{game_name}" WHERE unique_id = "{uid}";')
-		await self._execute_statement(world, f'INSERT INTO families (familyid, familyname, member0) VALUES("{game_name}", "{fname}", "{game_name}");')
-
+		await self._execute_statement(world, f'INSERT INTO families (familyid, familyname, president) VALUES("{game_name}", "{fname}", "{game_name}");')
 		return self._message_typesetting(0, 'success, family created')
 
 	#@C.collect_async
