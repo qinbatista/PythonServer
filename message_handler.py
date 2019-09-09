@@ -29,6 +29,7 @@ class MessageHandler:
 					message['data']['unique_id'] = await self.validate_token(message['data']['token'], session)
 				except KeyError:
 					return '{"status" : 10, "message" : "missing required token"}'
+			message['session'] = session
 			return await fn(self, message)
 		except InvalidTokenError:
 			return '{"status" : 11, "message" : "unauthorized. invalid token."}'
@@ -342,7 +343,8 @@ class MessageHandler:
 
 	#未完成
 	async def _get_all_mail(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_all_mail(data['world'], data['data']['unique_id']))
+		async with data['session'].post('http://localhost:8020/get_all_mail', data = {'world' : data['world'], 'unique_id' : data['data']['unique_id']}) as r:
+			return await r.text()
 
 	async def _get_lottery_config_info(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_lottery_config_info())
@@ -367,9 +369,13 @@ class MessageHandler:
 		return json.dumps(await self.gm.redeem_all_nonce(data['world'], data['data']['unique_id'],data['data']['type_list'],data['data']['nonce_list']))
 
 	#未完成 邮件为不同系统
-	# async def _get_new_mail(self, data: dict) -> str:
+	async def _get_new_mail(self, data: dict) -> str:
+		async with data['session'].post('http://localhost:8020/get_new_mail', data = {'world' : data['world'], 'unique_id' : data['data']['unique_id']}) as r:
+			return await r.text()
 	# 	return json.dumps(await self.gm.get_new_mail(data['world'], data['data']['unique_id']))
-	# async def _delete_mail(self, data: dict) -> str:
+	async def _delete_mail(self, data: dict) -> str:
+		async with data['session'].post('http://localhost:8020/delete_mail', data = {'world' : data['world'], 'unique_id' : data['data']['unique_id'], 'key' : data['data']['key']}) as r:
+			return await r.text()
 	# 	return json.dumps(await self.gm.delete_mail(data['world'], data['data']['unique_id'],data['data']['nonce']))
 	# async def _delete_all_mail(self, data: dict) -> str:
 	# 	return json.dumps(await self.gm.delete_all_mail(data['world'], data['data']['unique_id']))
@@ -511,8 +517,8 @@ FUNCTION_LIST = {
 	'send_all_friend_gift': MessageHandler._send_all_friend_gift,
 	'redeem_nonce': MessageHandler._redeem_nonce,
 	'redeem_all_nonce': MessageHandler._redeem_all_nonce,
-	# 'get_new_mail': MessageHandler._get_new_mail,
-	# 'delete_mail': MessageHandler._delete_mail,
+	'get_new_mail': MessageHandler._get_new_mail,
+	'delete_mail': MessageHandler._delete_mail,
 	# 'delete_all_mail': MessageHandler._delete_all_mail,
 
 
