@@ -25,6 +25,7 @@ ROLE = loc() + '/configuration/server/{}/role_config.json'
 PLAYER = loc() + '/configuration/server/{}/player_config.json'
 LOTTERY = loc() + '/configuration/server/{}/lottery_config.json'
 FACTORY = loc() + '/configuration/server/{}/factory_config.json'
+FAMILY = loc() + '/configuration/server/{}/family_config.json'
 MALL = loc() + '/configuration/server/{}/mall_config.json'
 MONSTER = loc() + '/configuration/client/{}/monster_config.json'
 MYSQL_DATA = loc() + '/configuration/server/{}/mysql_data_config.json'
@@ -53,6 +54,7 @@ class ConfigurationManager:
 		self._read_entry_consumables_config()
 		self._read_world_distribution_config()
 		self._read_factory_config()
+		self._read_family_config()
 		self._read_mall_config()
 
 		# read this one last
@@ -123,6 +125,9 @@ class ConfigurationManager:
 	def _read_factory_config(self):
 		self._factory_config = json.load(open(FACTORY.format(self._sv), encoding='utf-8'))
 
+	def _read_family_config(self):
+		self._family_config = json.load(open(FAMILY.format(self._sv), encoding='utf-8'))
+
 	def _read_mall_config(self):
 		self._mall_config = json.load(open(MALL.format(self._sv), encoding='utf-8'))
 
@@ -135,7 +140,7 @@ class ConfigurationManager:
 		skill = json.load(open(SKILL.format(self._sv), encoding = 'utf-8'))
 		player = json.load(open(PLAYER.format(self._sv), encoding = 'utf-8'))
 		world_boss = json.load(open(WORLD_BOSS.format(self._sv), encoding = 'utf-8'))
-		self._game_manager_config = {'reward' : reward, 'lottery' : lottery, 'weapon' : weapon, 'role' : role, 'skill' : skill, 'hang_reward' : self._hang_reward_config,'player':player, 'entry_consumables' : self._entry_consumables_config,"world_boss":world_boss, "factory": self._factory_config, "mall": self._mall_config}
+		self._game_manager_config = {'reward' : reward, 'lottery' : lottery, 'weapon' : weapon, 'role' : role, 'skill' : skill, 'hang_reward' : self._hang_reward_config,'player':player, 'entry_consumables' : self._entry_consumables_config,"world_boss":world_boss, "factory": self._factory_config, 'family': self._family_config, "mall": self._mall_config}
 
 	def _read_level_enemy_layouts_config(self):
 		self._level_enemy_layouts_config = json.load(open(ENEMY_LAYOUT.format(self._cv), encoding = 'utf-8'))

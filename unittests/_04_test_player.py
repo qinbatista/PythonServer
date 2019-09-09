@@ -189,7 +189,7 @@ def send_friend_gift(unique_id: str, friend_name: str):
 
 
 def get_new_mail(unique_id: str):
-	result = requests.post('http://localhost:8004/get_new_mail', data={"world": 0, 'unique_id': unique_id})
+	result = requests.post('http://localhost:8100/get_new_mail', data={"world": 0, 'unique_id': unique_id})
 	print(str(result.text))
 	return result.json()['data']['mail'][0]['data']['nonce']
 
@@ -207,7 +207,7 @@ def redeem_nonce(unique_id: str, nonce: str):
 def request_friend(unique_id: str, friend_name: str):
 	# result = requests.post('http://localhost:8006/request_friend', data={"world": 0, 'unique_id': 4, "friend_name": "曲永杰"})
 	# result = requests.post('http://localhost:8006/request_friend', data={"world": 0, 'unique_id': 4, "friend_name": "quyongjie"})
-	result = requests.post('http://localhost:8004/request_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": friend_name})
+	result = requests.post('http://localhost:8100/request_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": friend_name})
 	print(str(result.text))
 
 
@@ -265,8 +265,8 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8100/get_weapon_config')
-	print(str(result.text))
+	# result = requests.post('http://localhost:8100/get_weapon_config')
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_stage_info', data={"world": 0, "unique_id": "8"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_monster_info', data={"world": 0, "unique_id": "5"})
@@ -295,15 +295,15 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/request_friend', data={"world": 0, "unique_id": unique_id, "friend_name": "a"})
 	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/leave_family', data={"world": 0, "unique_id": "1", "fname": "a"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/create_family', data={"world": 0, "unique_id": "4", "fname": "dadaed"})
+	result = requests.post('http://localhost:8100/leave_family', data={"world": 0, "unique_id": "1"})
+	print(str(result.text))
+	# result = requests.post('http://localhost:8100/create_family', data={"world": 0, "unique_id": "5", "fname": "dad"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/invite_user_family', data={"world": 0, "unique_id": unique_id, "target": "b"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/respond_family', data={"world": 0, "unique_id": "2", "nonce": "76423808527358951453001346758379398626552379051138955107055357315188545186541"})
 	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/remove_user_family', data={"world": 0, "unique_id": "1", "user": "c"})
+	# result = requests.post('http://localhost:8100/remove_user_family', data={"world": 0, "unique_id": "1", "user": "b"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/request_join_family', data={"world": 0, "unique_id": "2", "fname": "dadaed"})
 	# print(str(result.text))
@@ -463,6 +463,7 @@ if __name__ == "__main__":
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
 	all_function(unique_id="4")
+
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
 	# enter_world_boss_stage(unique_id="4")

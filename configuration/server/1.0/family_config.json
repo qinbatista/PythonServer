@@ -2,8 +2,9 @@
 	"union_restrictions": {
 		"create_need_diamond": 2000,
 		"modify_name_diamond": 500,
+		"disbanded_cooling_time": 86400,
 		"experience": {
-			"max_level": 11,
+			"max_level": 10,
 			"experience_standard": {
 				"1": 20,
 				"2": 70,
