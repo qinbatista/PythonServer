@@ -62,9 +62,11 @@ class Gate:
 			self.running = False
 			self.cs.sockets[0].close()
 			print(f'gate {self.gid}: closing listening socket. not accepting new connections.')
-			while (self.cs._active_count > 0):
-				print(f'gate {self.gid}: waiting on {self.cs._active_count}...')
+			timeout = 4
+			while self.cs._active_count > 0 and timeout > 0:
+				print(f'gate {self.gid}: waiting on {self.cs._active_count}, timing out in {timeout} seconds...')
 				await asyncio.sleep(0.5)
+				timeout -= 1
 			if self.nats.is_connected:
 				await self.nats.close()
 				print(f'gate {self.gid}: nats closed')

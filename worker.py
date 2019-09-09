@@ -49,7 +49,10 @@ class Worker:
 	async def process_job(self, job):
 		self.ujobs += 1
 		cid, work = job.data.decode().split('~', maxsplit = 1)
-		response  = await self.mh.resolve(work, self.session)
+		try:
+			response  = await self.mh.resolve(work, self.session)
+		except:
+			respose = '{"status" : -1, "message" : "programming error"}'
 		await self._return_response(cid, response, await self._get_gid(cid))
 		self.ujobs -= 1
 
@@ -73,9 +76,11 @@ class Worker:
 		await self.nats._unsubscribe(self.sid)
 		await self.nats.flush()
 		print('worker: unsubscribed from job queue. not accepting new jobs')
-		while self.ujobs > 0:
-			print(f'worker: there are {self.ujobs} outstanding jobs')
+		timeout = 4
+		while self.ujobs > 0 and timeout > 0:
+			print(f'worker: there are {self.ujobs} outstanding jobs, timing out in {timeout} seconds...')
 			await asyncio.sleep(1)
+			timeout -= 1
 		print('worker: closing gate connections')
 		for r,w in self.gates.values():
 			w.close()
