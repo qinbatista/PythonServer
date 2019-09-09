@@ -20,9 +20,15 @@ class MessageHandler:
 		'''
 		try:
 			message = json.loads(message)
-			fn = self._functions[message['function']]
+			try:
+				fn = self._functions[message['function']]
+			except KeyError:
+				return '{"status" : 10, "message" : "function is not in function list"}'
 			if message['function'] not in DOES_NOT_NEED_TOKEN:
-				message['data']['unique_id'] = await self.validate_token(message['data']['token'], session)
+				try:
+					message['data']['unique_id'] = await self.validate_token(message['data']['token'], session)
+				except KeyError:
+					return '{"status" : 10, "message" : "missing required token"}'
 			return await fn(self, message['data'])
 		except InvalidTokenError:
 			return '{"status" : 11, "message" : "unauthorized. invalid token."}'
