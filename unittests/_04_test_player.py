@@ -399,7 +399,7 @@ print(str(result.text))
 """
 
 if __name__ == "__main__":
-	result = requests.post('http://localhost:8100/choice_world', data={"world": 0, 'unique_id': "unique_id10", "target_world": 0})
+	result = requests.post('http://localhost:8100/get_stage_info', data={})
 	print(str(result.text))
 	# try_coin()
 	# try_iron()

@@ -66,7 +66,7 @@ def run_task(name):
 	# role_dialog()#角色界面
 	# family_dialog(get_all_family_info)#家族界面*暂时不需要
 	# stage_dialog(get_level_info)#关卡界面
-	mail_dialog(info_list[10])#邮箱界面
+	# mail_dialog(info_list[10])#邮箱界面
 def run_all_task():
 	starttime = datetime.now()
 	print("cpu:"+str(multiprocessing.cpu_count()))

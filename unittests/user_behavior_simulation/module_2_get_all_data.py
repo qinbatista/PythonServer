@@ -24,12 +24,12 @@ def get_level_info():#获取所有关卡信息
 	return response
 
 def get_stage_info():#获取关卡信息消耗，奖励和设置
-	response = send_tcp_message({'world' : world, 'function' : 'get_stage_info', 'data' : {'token' : token}})#升级请求
+	response = send_tcp_message({'function' : 'get_stage_info','data':{'token' : token}})#升级请求
 	print_method("[get_stage_info]"+str(response))
 	return response
 
 def get_monster_info():#获取怪物参数
-	response = send_tcp_message({'world' : world, 'function' : 'get_monster_info', 'data' : {'token' : token}})#升级请求
+	response = send_tcp_message({'function' : 'get_monster_info', 'data' : {'token' : token}})#升级请求
 	print_method("[get_monster_info]"+str(response))
 	return response
 

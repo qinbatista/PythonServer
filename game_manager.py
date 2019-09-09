@@ -266,7 +266,7 @@ class GameManager:
 			remaining.update({val[0][0]: val[1]})
 		return self._message_typesetting(0, 'success', {"remaining": remaining})
 
-	def get_skill_level_up_config(self) -> dict:
+	async def get_skill_level_up_config(self) -> dict:
 		# success ===> 0
 		# 0 - Success
 		return self._message_typesetting(0, 'success', {"remaining": {"skill_scroll_functions": self._skill_scroll_functions, "upgrade_chance": self._upgrade_chance}})
@@ -1017,13 +1017,13 @@ class GameManager:
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"tower_stage":tower_stage,"stage":stage,"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
 
-	def get_monster_info(self) -> dict:
+	async def get_monster_info(self) -> dict:
 		"""
 		# 0 - Get all monster information to get success
 		"""
 		return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config_json}})
 
-	def get_stage_info(self) -> dict:
+	async def get_stage_info(self) -> dict:
 		"""
 		# 0 - Successfully obtained level information
 		# 1 - No information found for this user, successfully obtained general level configuration information
@@ -4326,7 +4326,7 @@ async def _get_monster_info(request: web.Request) -> web.Response:
 
 @ROUTES.post('/get_stage_info')
 async def _get_stage_info(request: web.Request) -> web.Response:
-	result = (request.app['MANAGER']).get_stage_info()
+	result = (request.app['MANAGER']).get_stage_info(int(post['world']))
 	return _json_response(result)
 
 @ROUTES.post('/enter_stage')

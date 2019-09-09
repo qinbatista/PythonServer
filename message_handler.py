@@ -29,11 +29,11 @@ class MessageHandler:
 					message['data']['unique_id'] = await self.validate_token(message['data']['token'], session)
 				except KeyError:
 					return '{"status" : 10, "message" : "missing required token"}'
-			return await fn(self, message['data'])
+			return await fn(self, message)
 		except InvalidTokenError:
 			return '{"status" : 11, "message" : "unauthorized. invalid token."}'
-		except KeyError:
-			return '{"status" : 10, "message" : "invalid message format"}'
+
+
 
 	async def validate_token(self, token, session):
 		async with session.post(TOKEN_BASE_URL + '/validate', data = {'token' : token}) as r:
@@ -41,7 +41,7 @@ class MessageHandler:
 			if validated['status'] != 0:
 				raise InvalidTokenError
 			return validated['data']['unique_id']
-			
+
 	async def _login(self, data: dict) -> str:
 		return json.dumps(await self.am.login(data['identifier'], data['value'], data['password']))
 
@@ -325,10 +325,10 @@ class MessageHandler:
 	# async def _try_all_material(self, data: dict) -> str:
 	# 	return json.dumps(await self.gm.try_all_material(data['world'], data['unique_id'], data['data']['stage']))
 
-	async def _get_stage_info(self) -> str:
+	async def _get_stage_info(self,data:dict) -> str:
 		return json.dumps(await self.gm.get_stage_info())
 
-	async def _get_monster_info(self) -> str:
+	async def _get_monster_info(self,data:dict) -> str:
 		return json.dumps(await self.gm.get_monster_info())
 
 	async def _get_all_roles(self, data: dict) -> str:
@@ -504,7 +504,6 @@ FUNCTION_LIST = {
 	'get_hang_up_info' : MessageHandler._get_hang_up_info,
 
 
-	'get_all_friend_info': MessageHandler._get_all_friend_info,
 	'delete_friend': MessageHandler._delete_friend,
 	'request_friend': MessageHandler._request_friend,
 	'response_friend': MessageHandler._response_friend,
