@@ -154,6 +154,8 @@ class Gate:
 		self.cwriters[cid] = writer
 		await self.redis.set(cid, self.gid, expire = 10)
 		await self.nats.publish('jobs', (cid + '~' + job).encode())
+		print(f'gate: submitted new job with id {cid} and args {job}')
+		print(f'gate: waiting for job {cid} to complete')
 
 	async def _receive(self, reader):
 		raw = await reader.readuntil(b'\r\n')
