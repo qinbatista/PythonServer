@@ -3608,11 +3608,10 @@ class GameManager:
 		return int(data[0][0])
 
 	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> list:
-		try:
-			return list((await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'))[0])
-		except:
-			await self._execute_statement(world, f'INSERT INTO weapon (unique_id, weapon_name) VALUES ("{unique_id}", "{weapon}")')
-			return list((await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'))[0])
+		data = await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"')
+		if data: return list(data[0])
+		await self._execute_statement(world, f'INSERT INTO weapon (unique_id, weapon_name) VALUES ("{unique_id}", "{weapon}")')
+		return list((await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'))[0])
 
 	async def _get_role_row_by_id(self, world: int, role: str, unique_id: str) -> list:
 		try:
