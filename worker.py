@@ -39,6 +39,7 @@ class Worker:
 			subbed = True
 			while self.running:
 				await asyncio.sleep(1)
+				await self.nats.flush()
 		finally:
 			await self.session.close()
 
@@ -59,7 +60,7 @@ class Worker:
 			response = '{"status" : -2, "message" : "request timed out"}'
 		except:
 			print(f'worker: message handler call with args: {work} had an error...')
-			respose = '{"status" : -1, "message" : "programming error, this should not happen"}'
+			response = '{"status" : -1, "message" : "programming error, this should not happen"}'
 		print(f'worker: returning response {cid} back to correct gate...')
 		await self._return_response(cid, response, await self._get_gid(cid))
 		print(f'worker: returned {cid} back to correct gate!')
