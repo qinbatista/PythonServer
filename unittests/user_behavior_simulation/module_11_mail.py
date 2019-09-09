@@ -26,6 +26,16 @@ def friend_request(nonce):
 	new_response = send_tcp_message({'world' : world, 'function' : 'response_friend', 'data' : {'token' : token,"nonce":nonce}})
 	return new_response
 
+def gift_request(nonce):
+	print_method("friend_request")
+	new_response = send_tcp_message({'world' : world, 'function' : 'response_friend', 'data' : {'token' : token,"nonce":nonce}})
+	return new_response
+
+def accpet_all_request(nonce):
+	pass
+def get_all_new_mail():
+	pass
+
 def mail_dialog(_token,_world,_all_info):
 	global world,token,all_info
 	token = _token
