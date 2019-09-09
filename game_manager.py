@@ -1979,7 +1979,8 @@ class GameManager:
 	async def get_account_world_info(self, unique_id: str):
 		# 0 - Get all world information
 		remaining = []
-		for w in range(len(self._pools)):
+		# for w in range(len(self._pools)):
+		for w in range(self.get_world_list):
 			data = await self._execute_statement(w, f"select game_name,level from player where unique_id='{unique_id}'")
 			if data:
 				if w == 0:
@@ -2001,7 +2002,7 @@ class GameManager:
 		# 99 - No such world
 		# world=0
 		remaining = {}
-		if target_world < 0 or target_world >= len(self._pools):
+		if target_world < 0 or target_world >= self.get_world_list:
 			return self._message_typesetting(99, "No such world")
 		# if world == target_world:
 		# 	return self._message_typesetting(98, "You have been in this world")
@@ -3751,7 +3752,8 @@ class GameManager:
 		self._monster_config_json = result.json()
 		result = requests.get('http://localhost:8000/get_level_enemy_layouts_config')
 		self._level_enemy_layouts_config_json = result.json()
-	
+		self.get_world_list = 1 #it means how many world we have
+
 	def _initialize_pools(self, worlds):
 		self._pools = {}
 		if len(worlds) == 0:
@@ -4564,7 +4566,7 @@ def run():
 	app.add_routes(ROUTES)
 	config = get_config()
 	app['MANAGER'] = GameManager(config['worlds'])
-	print(f'starting game manager for worlds {config["worlds"]} on port {config["port"]}...')
+	# print(f'starting game manager for worlds {config["worlds"]} on port {config["port"]}...')
 	web.run_app(app, port=config['port'])
 
 
