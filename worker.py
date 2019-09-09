@@ -50,9 +50,12 @@ class Worker:
 		self.ujobs += 1
 		cid, work = job.data.decode().split('~', maxsplit = 1)
 		try:
-			response  = await self.mh.resolve(work, self.session)
+			#response = await self.mh.resolve(work, self.session)
+			response = await asyncio.wait_for(self.mh.resolve(work, self.session), 3)
+		except asyncio.TimeoutError:
+			response = '{"status" : -2, "message" : "request timed out"}'
 		except:
-			respose = '{"status" : -1, "message" : "programming error"}'
+			respose = '{"status" : -1, "message" : "programming error, this should not happen"}'
 		await self._return_response(cid, response, await self._get_gid(cid))
 		self.ujobs -= 1
 
