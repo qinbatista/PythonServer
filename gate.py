@@ -26,15 +26,15 @@ import contextlib
 import nats.aio.client
 
 class Gate:
-	def __init__(self, gid, cport = 8880, wport = 8201):
+	def __init__(self, cport = 8880, wport = 8201):
 		self.ip       = self._read_ip()
-		self.gid      = gid
 		self.cport    = cport
 		self.wport    = wport
 		self.cwriters = {}
 
 		self.cs       = None
 		self.ws       = None
+		self.gid      = None
 		self.nats     = None
 		self.redis    = None
 		self.running  = False
@@ -97,6 +97,7 @@ class Gate:
 		self.nats = nats.aio.client.Client()
 		self.redis = await aioredis.create_redis('redis://192.168.1.102/')
 		await self.nats.connect('nats://192.168.1.102/', max_reconnect_attempts = 1)
+		await self._next_avail_gid()
 		await self.redis.set('gates.id.' + self.gid, self.ip + ':' + str(self.wport))
 		self.ws = await asyncio.start_server(self.worker_protocol, port = self.wport)
 		self.cs = await asyncio.start_server(self.client_protocol, port = self.cport)
@@ -161,6 +162,12 @@ class Gate:
 		raw = await reader.readuntil(b'\r\n')
 		return raw.decode().strip()
 
+	async def _next_avail_gid(self):
+		gid = 1
+		while await self.redis.exists('gates.id.' + str(gid)):
+			gid += 1
+		self.gid = str(gid)
+
 	# reads the ip address of the machine
 	# TODO possibly move to another module
 	def _read_ip(self):
@@ -173,4 +180,4 @@ class Gate:
 			s.close()
 
 if __name__ == '__main__':
-	asyncio.run(Gate('1').start())
+	asyncio.run(Gate().start())
