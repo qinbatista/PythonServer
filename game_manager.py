@@ -572,7 +572,7 @@ class GameManager:
 		}
 		return self._message_typesetting(status=0, message="Successful weapon decomposition", data=data)
 
-	def get_weapon_config(self) -> dict:
+	async def get_weapon_config(self) -> dict:
 		# 0 - Successfully get all weapon configuration information
 		return self._message_typesetting(status=0, message="Successfully get all weapon configuration information", data={"remaining": {"weapon_config": self._weapon_config}})
 
@@ -678,7 +678,7 @@ class GameManager:
 			remaining.append(role_info)
 		return self._message_typesetting(0, "Get all the role information", {"remaining": remaining})
 
-	def get_role_config(self) -> dict:
+	async def get_role_config(self) -> dict:
 		# - 0 - Get role configuration information
 		return self._message_typesetting(0, "Get role configuration information", {"remaining": {"role_config": self._role_config}})
 

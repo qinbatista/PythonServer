@@ -43,287 +43,287 @@ class MessageHandler:
 			return validated['data']['unique_id']
 
 	async def _login(self, data: dict) -> str:
-		return json.dumps(await self.am.login(data['identifier'], data['value'], data['password']))
+		return json.dumps(await self.am.login(data['data']['identifier'], data['data']['value'], data['data']['password']))
 
 	async def _login_unique(self, data: dict) -> str:
-		return json.dumps(await self.am.login_unique(data['unique_id']))
+		return json.dumps(await self.am.login_unique(data['data']['unique_id']))
 
 	async def _bind_account(self, data: dict) -> str:
-		return json.dumps(await self.am.bind_account(data['unique_id'], data['password'], data['account'], data['email'], data['phone_number']))
+		return json.dumps(await self.am.bind_account(data['data']['unique_id'], data['data']['password'], data['data']['account'], data['data']['email'], data['data']['phone_number']))
 
 	async def _level_up_skill(self, data: dict) -> str:
-		return json.dumps(await self.gm.level_up_skill(data['world'], data['unique_id'], data['skill_id'], data['scroll_id']))
+		return json.dumps(await self.gm.level_up_skill(data['world'], data['data']['unique_id'], data['data']['skill_id'], data['data']['scroll_id']))
 
 	async def _get_all_skill_level(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_all_skill_level(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_all_skill_level(data['world'], data['data']['unique_id']))
 
 	async def _get_all_supplies(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_all_supplies(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_all_supplies(data['world'], data['data']['unique_id']))
 
 	async def _get_skill(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_skill(data['world'], data['unique_id'], data['skill_id']))
+		return json.dumps(await self.gm.get_skill(data['world'], data['data']['unique_id'], data['data']['skill_id']))
 
 	async def _level_up_scroll(self, data: dict) -> str:
-		return json.dumps(await self.gm.level_up_scroll(data['world'], data['unique_id'], data['scroll_id']))
+		return json.dumps(await self.gm.level_up_scroll(data['world'], data['data']['unique_id'], data['data']['scroll_id']))
 	# region _01_Manager_Weapon.py
 	async def _level_up_weapon(self, data: dict) -> str:
-		return json.dumps(await self.gm.level_up_weapon(data['world'], data['unique_id'], data['weapon'], data['iron']))
+		return json.dumps(await self.gm.level_up_weapon(data['world'], data['data']['unique_id'], data['data']['weapon'], data['data']['iron']))
 
 	async def _level_up_passive(self, data: dict) -> str:
-		return json.dumps(await self.gm.level_up_passive(data['world'], data['unique_id'], data['weapon'], data['passive']))
+		return json.dumps(await self.gm.level_up_passive(data['world'], data['data']['unique_id'], data['data']['weapon'], data['data']['passive']))
 
 	async def _reset_weapon_skill_point(self, data: dict) -> str:
-		return json.dumps(await self.gm.reset_weapon_skill_point(data['world'], data['unique_id'], data['weapon']))
+		return json.dumps(await self.gm.reset_weapon_skill_point(data['world'], data['data']['unique_id'], data['data']['weapon']))
 
 	async def _level_up_weapon_star(self, data: dict) -> str:
-		return json.dumps(await self.gm.level_up_weapon_star(data['world'], data['unique_id'], data['weapon']))
+		return json.dumps(await self.gm.level_up_weapon_star(data['world'], data['data']['unique_id'], data['data']['weapon']))
 
 	async def _get_all_weapon(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_all_weapon(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_all_weapon(data['world'], data['data']['unique_id']))
 
 	async def _disintegrate_weapon(self, data: dict) -> str:
-		return json.dumps(await self.gm.disintegrate_weapon(data['world'], data['unique_id'], data['weapon']))
+		return json.dumps(await self.gm.disintegrate_weapon(data['world'], data['data']['unique_id'], data['data']['weapon']))
 	# endregion
 
 	async def _enter_tower(self, data: dict) -> str:
-		return json.dumps(await self.gm.enter_tower(data['world'], data['unique_id'], data['stage']))
+		return json.dumps(await self.gm.enter_tower(data['world'], data['data']['unique_id'], data['data']['stage']))
 
 	async def _pass_tower(self, data: dict) -> str:
-		return json.dumps(await self.gm.pass_tower(data['world'], data['unique_id'], data['stage'], data['clear_time']))
+		return json.dumps(await self.gm.pass_tower(data['world'], data['data']['unique_id'], data['data']['stage'], data['data']['clear_time']))
 
 	async def _get_all_stage_info(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_all_stage_info())
 
 	async def _get_all_armor_info(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_all_armor_info(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_all_armor_info(data['world'], data['data']['unique_id']))
 
 	async def _pass_stage(self, data: dict) -> str:
-		return json.dumps(await self.gm.pass_stage(data['world'], data['unique_id'], data['stage'], data['clear_time']))
+		return json.dumps(await self.gm.pass_stage(data['world'], data['data']['unique_id'], data['data']['stage'], data['data']['clear_time']))
 
 	# 以后会删除这个方法
 	async def _add_supplies(self, data: dict) -> str:
-		return json.dumps(await self.gm.add_supplies(data['world'], data['unique_id'], data['supply'], data['value']))
+		return json.dumps(await self.gm.add_supplies(data['world'], data['data']['unique_id'], data['data']['supply'], data['data']['value']))
 
 	async def _get_all_head(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_all_head(data['world'], data['table']))
+		return json.dumps(await self.gm.get_all_head(data['world'], data['data']['table']))
 
 	async def _get_all_material(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_all_material(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_all_material(data['world'], data['data']['unique_id']))
 
 	async def _try_coin(self, data: dict) -> str:
-		return json.dumps(await self.gm.try_coin(data['world'], data['unique_id'], data['value']))
+		return json.dumps(await self.gm.try_coin(data['world'], data['data']['unique_id'], data['data']['value']))
 
 	async def _try_unlock_skill(self, data: dict) -> str:
-		return json.dumps(await self.gm.try_unlock_skill(data['world'], data['unique_id'], data['skill_id']))
+		return json.dumps(await self.gm.try_unlock_skill(data['world'], data['data']['unique_id'], data['data']['skill_id']))
 
 	async def _try_unlock_weapon(self, data: dict) -> str:
-		return json.dumps(await self.gm.try_unlock_weapon(data['world'], data['unique_id'], data['weapon']))
+		return json.dumps(await self.gm.try_unlock_weapon(data['world'], data['data']['unique_id'], data['data']['weapon']))
 
 	async def _basic_summon(self, data: dict) -> str:
-		return json.dumps(await self.gm.basic_summon(data['world'], data['unique_id'], data['cost_item'], 'weapons'))
+		return json.dumps(await self.gm.basic_summon(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'weapons'))
 
 	async def _pro_summon(self, data: dict) -> str:
-		return json.dumps(await self.gm.pro_summon(data['world'], data['unique_id'], data['cost_item'], 'weapons'))
+		return json.dumps(await self.gm.pro_summon(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'weapons'))
 
 	async def _friend_summon(self, data: dict) -> str:
-		return json.dumps(await self.gm.friend_summon(data['world'], data['unique_id'], data['cost_item'], 'weapons'))
+		return json.dumps(await self.gm.friend_summon(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'weapons'))
 
 	async def _basic_summon_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.basic_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'weapons'))
+		return json.dumps(await self.gm.basic_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'weapons'))
 
 	async def _pro_summon_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.pro_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'weapons'))
+		return json.dumps(await self.gm.pro_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'weapons'))
 
 	async def _friend_summon_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.friend_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'weapons'))
+		return json.dumps(await self.gm.friend_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'weapons'))
 
 	async def _basic_summon_roles(self, data: dict) -> str:
-		return json.dumps(await self.gm.basic_summon(data['world'], data['unique_id'], data['cost_item'], 'roles'))
+		return json.dumps(await self.gm.basic_summon(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'roles'))
 
 	async def _pro_summon_roles(self, data: dict) -> str:
-		return json.dumps(await self.gm.pro_summon(data['world'], data['unique_id'], data['cost_item'], 'roles'))
+		return json.dumps(await self.gm.pro_summon(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'roles'))
 
 	async def _friend_summon_roles(self, data: dict) -> str:
-		return json.dumps(await self.gm.friend_summon(data['world'], data['unique_id'], data['cost_item'], 'roles'))
+		return json.dumps(await self.gm.friend_summon(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'roles'))
 
 	async def _basic_summon_roles_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.basic_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'roles'))
+		return json.dumps(await self.gm.basic_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'roles'))
 
 	async def _pro_summon_roles_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.pro_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'roles'))
+		return json.dumps(await self.gm.pro_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'roles'))
 
 	async def _friend_summon_roles_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.friend_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'roles'))
+		return json.dumps(await self.gm.friend_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'roles'))
 
 	async def _basic_summon_skill(self, data: dict) -> str:
-		return json.dumps(await self.gm.basic_summon(data['world'], data['unique_id'], data['cost_item'], 'skills'))
+		return json.dumps(await self.gm.basic_summon(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'skills'))
 
 	async def _pro_summon_skill(self, data: dict) -> str:
-		return json.dumps(await self.gm.pro_summon(data['world'], data['unique_id'], data['cost_item'], 'skills'))
+		return json.dumps(await self.gm.pro_summon(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'skills'))
 
 	async def _friend_summon_skill(self, data: dict) -> str:
-		return json.dumps(await self.gm.friend_summon(data['world'], data['unique_id'], data['cost_item'], 'skills'))
+		return json.dumps(await self.gm.friend_summon(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'skills'))
 
 	async def _basic_summon_skill_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.basic_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'skills'))
+		return json.dumps(await self.gm.basic_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'skills'))
 
 	async def _pro_summon_skill_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.pro_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'skills'))
+		return json.dumps(await self.gm.pro_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'skills'))
 
 	async def _friend_summon_skill_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.friend_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'skills'))
+		return json.dumps(await self.gm.friend_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'skills'))
 
 	async def _prophet_summon_10_times(self, data: dict) -> str:
-		return json.dumps(await self.gm.prophet_summon_10_times(data['world'], data['unique_id'], data['cost_item'], 'weapons'))
+		return json.dumps(await self.gm.prophet_summon_10_times(data['world'], data['data']['unique_id'], data['data']['cost_item'], 'weapons'))
 
 	async def _start_hang_up(self, data: dict) -> str:
-		return json.dumps(await self.gm.start_hang_up(data['world'], data['unique_id'], data['stage']))
+		return json.dumps(await self.gm.start_hang_up(data['world'], data['data']['unique_id'], data['data']['stage']))
 
 	async def _get_hang_up_info(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_hang_up_info(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_hang_up_info(data['world'], data['data']['unique_id']))
 
 	async def _enter_stage(self, data: dict) -> str:
-		return json.dumps(await self.gm.enter_stage(data['world'], data['unique_id'], data['stage']))
+		return json.dumps(await self.gm.enter_stage(data['world'], data['data']['unique_id'], data['data']['stage']))
 
 	async def _fortune_wheel_basic(self, data: dict) -> str:
-		return json.dumps(await self.gm.fortune_wheel_basic(data['world'], data['unique_id'], data['cost_item']))
+		return json.dumps(await self.gm.fortune_wheel_basic(data['world'], data['data']['unique_id'], data['data']['cost_item']))
 
 	async def _fortune_wheel_pro(self, data: dict) -> str:
-		return json.dumps(await self.gm.fortune_wheel_pro(data['world'], data['unique_id'], data['cost_item']))
+		return json.dumps(await self.gm.fortune_wheel_pro(data['world'], data['data']['unique_id'], data['data']['cost_item']))
 
 	async def _automatically_refresh_store(self, data: dict) -> str:
-		return json.dumps(await self.gm.automatically_refresh_store(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.automatically_refresh_store(data['world'], data['data']['unique_id']))
 
 	async def _manually_refresh_store(self, data: dict) -> str:
-		return json.dumps(await self.gm.manually_refresh_store(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.manually_refresh_store(data['world'], data['data']['unique_id']))
 
 	async def _diamond_refresh_store(self, data: dict) -> str:
-		return json.dumps(await self.gm.diamond_refresh_store(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.diamond_refresh_store(data['world'], data['data']['unique_id']))
 
 	async def _black_market_transaction(self, data: dict) -> str:
-		return json.dumps(await self.gm.black_market_transaction(data['world'], data['unique_id'], data['code']))
+		return json.dumps(await self.gm.black_market_transaction(data['world'], data['data']['unique_id'], data['data']['code']))
 
 	async def _show_energy(self, data: dict) -> str:
-		return json.dumps(await self.gm.show_energy(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.show_energy(data['world'], data['data']['unique_id']))
 
 	async def _upgrade_armor(self, data: dict) -> str:
-		return json.dumps(await self.gm.upgrade_armor(data['world'], data['unique_id'], data['armor_id'], data['level']))
+		return json.dumps(await self.gm.upgrade_armor(data['world'], data['data']['unique_id'], data['data']['armor_id'], data['data']['level']))
 
 	async def _send_friend_gift(self, data: dict) -> str:
-		return json.dumps(await self.gm.send_friend_gift(data['world'], data['unique_id'], data['friend_name']))
+		return json.dumps(await self.gm.send_friend_gift(data['world'], data['data']['unique_id'], data['data']['friend_name']))
 
 	async def _redeem_nonce(self, data: dict) -> str:
-		return json.dumps(await self.gm.redeem_nonce(data['world'], data['unique_id'], data['nonce']))
+		return json.dumps(await self.gm.redeem_nonce(data['world'], data['data']['unique_id'], data['data']['nonce']))
 
 	async def _level_enemy_layouts_config(self, data: dict) -> str:
-		return json.dumps(await self.gm.level_enemy_layouts_config(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.level_enemy_layouts_config(data['world'], data['data']['unique_id']))
 
 	async def _monster_config(self, data: dict) -> str:
-		return json.dumps(await self.gm.monster_config(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.monster_config(data['world'], data['data']['unique_id']))
 
 	async def _get_stage_reward_config(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_stage_reward_config())
 
 	async def _get_hang_up_info(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_hang_up_info(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_hang_up_info(data['world'], data['data']['unique_id']))
 
 	async def _get_hang_up_reward(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_hang_up_reward(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_hang_up_reward(data['world'], data['data']['unique_id']))
 
 	async def _get_all_friend_info(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_all_friend_info(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_all_friend_info(data['world'], data['data']['unique_id']))
 
 	async def _request_friend(self, data: dict) -> str:
-		return json.dumps(await self.gm.request_friend(data['world'], data['unique_id'], data['friend_name']))
+		return json.dumps(await self.gm.request_friend(data['world'], data['data']['unique_id'], data['data']['friend_name']))
 
 	async def _response_friend(self, data: dict) -> str:
-		return json.dumps(await self.gm.response_friend(data['world'], data['unique_id'], data['nonce']))
+		return json.dumps(await self.gm.response_friend(data['world'], data['data']['unique_id'], data['data']['nonce']))
 
 	async def _delete_friend(self, data: dict) -> str:
-		return json.dumps(await self.gm.delete_friend(data['world'], data['unique_id'], data['friend_name']))
+		return json.dumps(await self.gm.delete_friend(data['world'], data['data']['unique_id'], data['data']['friend_name']))
 	async def _send_all_friend_gift(self, data: dict) -> str:
-		return json.dumps(await self.gm.send_all_friend_gift(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.send_all_friend_gift(data['world'], data['data']['unique_id']))
 
 	async def _check_boss_status(self, data: dict) -> str:
-		return json.dumps(await self.gm._check_boss_status(data['world'], data['unique_id']))
+		return json.dumps(await self.gm._check_boss_status(data['world'], data['data']['unique_id']))
 
 	async def _enter_world_boss_stage(self, data: dict) -> str:
-		return json.dumps(await self.gm._enter_world_boss_stage(data['world'], data['unique_id']))
+		return json.dumps(await self.gm._enter_world_boss_stage(data['world'], data['data']['unique_id']))
 
 	async def _leave_world_boss_stage(self, data: dict) -> str:
-		return json.dumps(await self.gm._leave_world_boss_stage(data['world'], data['unique_id'], data['total_damage']))
+		return json.dumps(await self.gm._leave_world_boss_stage(data['world'], data['data']['unique_id'], data['data']['total_damage']))
 
 	async def _get_top_damage(self, data: dict) -> str:
-		return json.dumps(await self.gm._get_top_damage(data['world'], data['unique_id'], data['range_number']))
+		return json.dumps(await self.gm._get_top_damage(data['world'], data['data']['unique_id'], data['data']['range_number']))
 
 	async def _leave_family(self, data: dict) -> str:
-		return json.dumps(await self.gm.leave_family(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.leave_family(data['world'], data['data']['unique_id']))
 
 	async def _create_family(self, data: dict) -> str:
-		return json.dumps(await self.gm.create_family(data['world'], data['unique_id'], data['fname']))
+		return json.dumps(await self.gm.create_family(data['world'], data['data']['unique_id'], data['data']['fname']))
 
 	async def _invite_user_family(self, data: dict) -> str:
-		return json.dumps(await self.gm.invite_user_family(data['world'], data['unique_id'], data['target']))
+		return json.dumps(await self.gm.invite_user_family(data['world'], data['data']['unique_id'], data['data']['target']))
 
 	async def _remove_user_family(self, data: dict) -> str:
-		return json.dumps(await self.gm.remove_user_family(data['world'], data['unique_id'], data['user']))
+		return json.dumps(await self.gm.remove_user_family(data['world'], data['data']['unique_id'], data['data']['user']))
 
 	async def _request_join_family(self, data: dict) -> str:
-		return json.dumps(await self.gm.request_join_family(data['world'], data['unique_id'], data['fname']))
+		return json.dumps(await self.gm.request_join_family(data['world'], data['data']['unique_id'], data['data']['fname']))
 
 	async def _respond_family(self, data: dict) -> str:
-		return json.dumps(await self.gm.respond_family(data['world'], data['unique_id'], data['nonce']))
+		return json.dumps(await self.gm.respond_family(data['world'], data['data']['unique_id'], data['data']['nonce']))
 
 
 	async def _buy_workers(self, data: dict) -> str:
-		return json.dumps(await self.gm.buy_workers(data['world'], data['unique_id'], data['workers_quantity']))
+		return json.dumps(await self.gm.buy_workers(data['world'], data['data']['unique_id'], data['data']['workers_quantity']))
 
 	async def _refresh_all_storage(self, data: dict) -> str:
-		return json.dumps(await self.gm.refresh_all_storage(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.refresh_all_storage(data['world'], data['data']['unique_id']))
 
 	async def _upgrade_food_factory(self, data: dict) -> str:
-		return json.dumps(await self.gm.upgrade_food_factory(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.upgrade_food_factory(data['world'], data['data']['unique_id']))
 
 	async def _upgrade_crystal_factory(self, data: dict) -> str:
-		return json.dumps(await self.gm.upgrade_crystal_factory(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.upgrade_crystal_factory(data['world'], data['data']['unique_id']))
 
 	async def _upgrade_mine_factory(self, data: dict) -> str:
-		return json.dumps(await self.gm.upgrade_mine_factory(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.upgrade_mine_factory(data['world'], data['data']['unique_id']))
 
 	async def _upgrade_wishing_pool(self, data: dict) -> str:
-		return json.dumps(await self.gm.upgrade_wishing_pool(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.upgrade_wishing_pool(data['world'], data['data']['unique_id']))
 
 	async def _equipment_manufacturing_armor(self, data: dict) -> str:
-		return json.dumps(await self.gm.equipment_manufacturing_armor(data['world'], data['unique_id'], data['armor_kind']))
+		return json.dumps(await self.gm.equipment_manufacturing_armor(data['world'], data['data']['unique_id'], data['data']['armor_kind']))
 
 	async def _active_wishing_pool(self, data: dict) -> str:
-		return json.dumps(await self.gm._active_wishing_pool(data['world'], data['unique_id'], data['weapon_id']))
+		return json.dumps(await self.gm._active_wishing_pool(data['world'], data['data']['unique_id'], data['data']['weapon_id']))
 
 	async def _distribution_workers(self, data: dict) -> str:
-		return json.dumps(await self.gm.distribution_workers(data['world'], data['unique_id'], data['workers_quantity'], data['factory_kind']))
+		return json.dumps(await self.gm.distribution_workers(data['world'], data['data']['unique_id'], data['data']['workers_quantity'], data['data']['factory_kind']))
 
 
 	async def _get_account_world_info(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_account_world_info(data['unique_id']))
+		return json.dumps(await self.gm.get_account_world_info(data['data']['unique_id']))
 
 	# not designed yet
 	# async def _get_chat_server(self, data: dict):
 	# 	return self._map[data['world']]['chatserver']
 
 	async def _choice_world(self, data: dict) -> str:
-		return json.dumps(await self.gm.choice_world(data['unique_id'], data['data']['target_world']))
+		return json.dumps(await self.gm.choice_world(data['data']['unique_id'], data['data']['target_world']))
 
 	async def _create_player(self, data: dict) -> str:
-		return json.dumps(await self.gm.create_player(data['world'], data['unique_id'], data['data']['game_name']))
+		return json.dumps(await self.gm.create_player(data['world'], data['data']['unique_id'], data['data']['game_name']))
 	#not sure where to use them
 	# async def _join_world(self, data: dict) -> str:
-	# 	return json.dumps(await self.gm.join_world(data['world'], data['unique_id'], data['data']['game_name']))
+	# 	return json.dumps(await self.gm.join_world(data['world'], data['data']['unique_id'], data['data']['game_name']))
 
 	# async def _bind_gamename(self, data: dict) -> str:
-	# 	return json.dumps(await self.gm.bind_gamename(data['world'], data['unique_id'], data['data']['game_name']))
+	# 	return json.dumps(await self.gm.bind_gamename(data['world'], data['data']['unique_id'], data['data']['game_name']))
 
 	# async def _try_all_material(self, data: dict) -> str:
-	# 	return json.dumps(await self.gm.try_all_material(data['world'], data['unique_id'], data['data']['stage']))
+	# 	return json.dumps(await self.gm.try_all_material(data['world'], data['data']['unique_id'], data['data']['stage']))
 
 	async def _get_stage_info(self,data:dict) -> str:
 		return json.dumps(await self.gm.get_stage_info())
@@ -332,17 +332,17 @@ class MessageHandler:
 		return json.dumps(await self.gm.get_monster_info())
 
 	async def _get_all_roles(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_all_roles(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_all_roles(data['world'], data['data']['unique_id']))
 
 	async def _get_factory_info(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_factory_info(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.get_factory_info(data['world'], data['data']['unique_id']))
 	#未完成
 	# async def _get_all_family_info(self, data: dict) -> str:
-	# 	return json.dumps(await self.gm.get_all_family_info(data['world'], data['unique_id']))
+	# 	return json.dumps(await self.gm.get_all_family_info(data['world'], data['data']['unique_id']))
 
 	#未完成
-	# async def _get_all_mail(self, data: dict) -> str:
-	# 	return json.dumps(await self.gm.get_all_mail(data['world'], data['unique_id']))
+	async def _get_all_mail(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_all_mail(data['world'], data['data']['unique_id']))
 
 	async def _get_lottery_config_info(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_lottery_config_info())
@@ -350,10 +350,10 @@ class MessageHandler:
 	# async def _player_config(self, data: dict) -> str:
 	# 	return json.dumps(await self.gm.player_config())
 
-	async def _get_weapon_config(self) -> str:
+	async def _get_weapon_config(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_weapon_config())
 
-	async def _get_skill_level_up_config(self) -> str:
+	async def _get_skill_level_up_config(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_skill_level_up_config())
 
 	#未完成
@@ -364,36 +364,36 @@ class MessageHandler:
 		return json.dumps(await self.gm.get_role_config())
 
 	async def _redeem_all_nonce(self, data: dict) -> str:
-		return json.dumps(await self.gm.redeem_all_nonce(data['world'], data['unique_id'],data['data']['type_list'],data['data']['nonce_list']))
+		return json.dumps(await self.gm.redeem_all_nonce(data['world'], data['data']['unique_id'],data['data']['type_list'],data['data']['nonce_list']))
 
 	#未完成 邮件为不同系统
 	# async def _get_new_mail(self, data: dict) -> str:
-	# 	return json.dumps(await self.gm.get_new_mail(data['world'], data['unique_id']))
+	# 	return json.dumps(await self.gm.get_new_mail(data['world'], data['data']['unique_id']))
 	# async def _delete_mail(self, data: dict) -> str:
-	# 	return json.dumps(await self.gm.delete_mail(data['world'], data['unique_id'],data['data']['nonce']))
+	# 	return json.dumps(await self.gm.delete_mail(data['world'], data['data']['unique_id'],data['data']['nonce']))
 	# async def _delete_all_mail(self, data: dict) -> str:
-	# 	return json.dumps(await self.gm.delete_all_mail(data['world'], data['unique_id']))
+	# 	return json.dumps(await self.gm.delete_all_mail(data['world'], data['data']['unique_id']))
 
 	async def _acceleration_technology(self, data: dict) -> str:
-		return json.dumps(await self.gm.acceleration_technology(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.acceleration_technology(data['world'], data['data']['unique_id']))
 
 	async def _refresh_food_storage(self, data: dict) -> str:
-		return json.dumps(await self.gm.refresh_food_storage(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.refresh_food_storage(data['world'], data['data']['unique_id']))
 
 	async def _refresh_mine_storage(self, data: dict) -> str:
-		return json.dumps(await self.gm.refresh_mine_storage(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.refresh_mine_storage(data['world'], data['data']['unique_id']))
 
 	async def _refresh_crystal_storage(self, data: dict) -> str:
-		return json.dumps(await self.gm.refresh_crystal_storage(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.refresh_crystal_storage(data['world'], data['data']['unique_id']))
 
 	async def _refresh_equipment_storage(self, data: dict) -> str:
-		return json.dumps(await self.gm.refresh_equipment_storage(data['world'], data['unique_id']))
+		return json.dumps(await self.gm.refresh_equipment_storage(data['world'], data['data']['unique_id']))
 
 	async def _upgrade_role_level(self, data: dict) -> str:
-		return json.dumps(await self.gm.upgrade_role_level(data['world'], data['unique_id'],data['data']['role'],data['data']['experience_potion']))
+		return json.dumps(await self.gm.upgrade_role_level(data['world'], data['data']['unique_id'],data['data']['role'],data['data']['experience_potion']))
 
 	async def _upgrade_role_star(self, data: dict) -> str:
-		return json.dumps(await self.gm.upgrade_role_star(data['world'], data['unique_id'],data['data']['role']))
+		return json.dumps(await self.gm.upgrade_role_star(data['world'], data['data']['unique_id'],data['data']['role']))
 
 
 		# async with session.post(self._game_manager_base_url("0") + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
@@ -486,7 +486,7 @@ FUNCTION_LIST = {
 	'get_all_roles' : MessageHandler._get_all_roles,
 	'get_factory_info' : MessageHandler._get_factory_info,
 	# 'get_all_family_info' : MessageHandler._get_all_family_info,
-	# 'get_all_mail' : MessageHandler._get_all_mail,
+	'get_all_mail' : MessageHandler._get_all_mail,
 	# 'player_config' : MessageHandler._player_config,
 	'get_weapon_config' : MessageHandler._get_weapon_config,
 	'get_skill_level_up_config' : MessageHandler._get_skill_level_up_config,

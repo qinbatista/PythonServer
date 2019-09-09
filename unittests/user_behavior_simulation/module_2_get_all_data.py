@@ -93,9 +93,9 @@ def get_weapon_config():#获取武器配置
 	print_method("[get_weapon_config]"+str(response))
 	return response
 
-def skill_level_up_config():#获取技能配置
-	response = send_tcp_message({'world' : world, 'function' : 'skill_level_up_config', 'data' : {'token' : token}})#升级请求
-	print_method("[skill_level_up_config]"+str(response))
+def get_skill_level_up_config():#获取技能配置
+	response = send_tcp_message({'world' : world, 'function' : 'get_skill_level_up_config', 'data' : {'token' : token}})#升级请求
+	print_method("[get_skill_level_up_config]"+str(response))
 	return response
 
 def get_family_config():#获取家族配置
@@ -134,14 +134,14 @@ def get_all_info(_token,_world):
 	get_lottery_config_info_str = get_lottery_config_info()
 	player_config_str = ""#player_config()#未完成
 	get_weapon_config_str = get_weapon_config()
-	skill_level_up_config_str = skill_level_up_config()
+	get_skill_level_up_config_str = get_skill_level_up_config()
 	get_family_config_str = ""#get_family_config()#家族还未开始制作
 	get_role_config_str = get_role_config()
 	get_hang_up_info_str = get_hang_up_info()
 	return [get_level_info_str,get_stage_info_str,get_monster_info_str,get_all_friend_info_str,
 	get_all_skill_level_str,get_all_weapon_str,refresh_all_storage_str,get_all_roles_str,
 	get_factory_info_str,get_all_family_info_str,get_all_mail_str,get_all_armor_info_str,
-	get_lottery_config_info_str,player_config_str,get_weapon_config_str,skill_level_up_config_str,get_family_config_str,get_role_config_str,get_hang_up_info_str]
+	get_lottery_config_info_str,player_config_str,get_weapon_config_str,get_skill_level_up_config_str,get_family_config_str,get_role_config_str,get_hang_up_info_str]
 
 if __name__ == "__main__":
 	pass
