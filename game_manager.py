@@ -2190,6 +2190,42 @@ class GameManager:
 		await self._execute_statement(world, f'INSERT INTO families (familyid, familyname, president) VALUES("{game_name}", "{fname}", "{game_name}");')
 		return self._message_typesetting(0, 'success, family created')
 
+	async def get_all_family_info(self, world: int, uid: str) -> dict:
+		# 0 - Successfully obtained family information
+		# 94 - No such union, your family has been dissolved
+		# 98 - Your family has been dissolved by the patriarch
+		# 99 - You have not joined any family
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if not fid: return self._message_typesetting(99, 'You have not joined any family')
+		members = [gname[0] for gname in await self._execute_statement(world, f'select game_name from player where familyid="{fid}"')]
+
+		family_info = await self._get_family_information(world, fid)
+		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(94, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+		remove_times = family_info[17]
+		remove_start_time = family_info[16]
+		announcement = family_info[5]
+		news = family_info[6]
+		president = family_info[7]
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(98, 'Your family has been dissolved by the patriarch')
+		members.remove(president)
+		admins = []
+		for admin in family_info[8: 11]:
+			if admin:
+				admins.append(admin)
+				members.remove(admin)  # 这里可能会报错，当管理员不存在于成员列表中时会报==>值错误：ValueError
+		elites = []
+		for elite in family_info[11: 16]:
+			if elite:
+				elites.append(elite)
+				members.remove(elite)  # 这里可能会报值错误：ValueError
+		ramining = {'remove_start_time': remove_start_time, 'remove_times': remove_times, 'announcement': announcement, 'news': news, 'president': president, 'admins': admins, 'elites': elites, 'members': members}
+		return self._message_typesetting(0, 'Successfully obtained family information', data={'ramining': ramining})
+
 	@C.collect_async
 	async def request_join_family(self, world: int, uid: str, fname: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox
