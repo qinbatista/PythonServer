@@ -2064,11 +2064,12 @@ class GameManager:
 		# 93 - You have reached the upper limit of the number of union removals today.
 		# 94 - No such union, your family has been dissolved
 		# 95 - you can not remove yourself using this function
+		# 96 - you do not belong to a family
 		# 97 - you must be family owner to remove a user
-		# 98 - you do not belong to a family
+		# 98 - Your family has been dissolved by the patriarch
 		# 99 - He is not your family member
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if not fid: return self._message_typesetting(98, 'you are not in a family.')
+		if not fid: return self._message_typesetting(96, 'you are not in a family.')
 		members = [gname[0] for gname in await self._execute_statement(world, f'select game_name from player where familyid="{fid}"')]
 		if gamename_target not in members: return self._message_typesetting(99, 'He is not your family member')
 		if game_name == gamename_target: return self._message_typesetting(95, 'you can not remove yourself using this function')
@@ -2081,6 +2082,10 @@ class GameManager:
 		remove_start_time = family_info[16]
 		news = family_info[6]
 		president = family_info[7]
+		disbanded_family_time = family_info[18]
+
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(98, 'Your family has been dissolved by the patriarch')
 		members.remove(president)
 		admins = []
 		for admin in family_info[8: 11]:
@@ -2129,7 +2134,7 @@ class GameManager:
 				news.update({str(i + 1): value})
 		await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{str(news)}" WHERE familyid = "{fid}";')
 		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="", cumulative_contribution=0 WHERE game_name = "{gamename_target}";')
-		remaining = {"announcement": announcement, "news": news, "remove_start_time": remove_start_time, "remove_times": remove_times}
+		remaining = {"announcement": announcement, "news": news, "remove_start_time": remove_start_time, "remove_times": remove_times, 'disbanded_family_time': disbanded_family_time}
 		return self._message_typesetting(0, 'success, user removed', data={"remaining": remaining})
 
 	# TODO refactor code to run both sql statements with asyncio.gather
@@ -2137,18 +2142,37 @@ class GameManager:
 	@C.collect_async
 	async def leave_family(self, world: int, uid: str) -> dict:
 		# 0 - success, you have left your family
-		# 98 - you do not belong to a family
-		game_name, fid = await self._get_familyid(world, unique_id = uid)
-		if fid is None or fid == '': return self._message_typesetting(98, 'you are not in a family.')
-		owner, fname, members = await self._get_family_information(world, fid)
-		if game_name == owner: # the owner is leaving, disband the entire family
-			for member in members:
-				if member != '':
-					await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE game_name = "{member}";')
-			await self._execute_statement(world, f'DELETE FROM families WHERE familyid = "{fid}";')
-		else:
-			await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE unique_id = "{uid}";')
-			await self._execute_statement_update(world, f'UPDATE families SET member{members.index(game_name)} = "" WHERE familyid = "{fid}";')
+		# 94 - No such union, your family has been dissolved
+		# 98 - Your family has been dissolved by the patriarch
+		# 99 - you do not belong to a family
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if not fid: return self._message_typesetting(99, 'you are not in a family.')
+		family_info = await self._get_family_information(world, fid)
+		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(94, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+		news = family_info[6]
+		president = family_info[7]
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(98, 'Your family has been dissolved by the patriarch')
+
+		if game_name in family_info[8: 11]:
+			for i, key in enumerate(family_info[8: 11]):
+				if game_name == key:
+					await self._execute_statement_update(world, f'UPDATE families SET admin{i+1} = "" WHERE familyid = "{fid}";')
+
+		elif game_name in family_info[11: 16]:
+			for i, key in enumerate(family_info[11: 16]):
+				if game_name == key:
+					await self._execute_statement_update(world, f'UPDATE families SET elite{i+1} = "" WHERE familyid = "{fid}";')
+
+		elif game_name == president: # the owner is leaving, disband the entire family
+			disbanded_family_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}" WHERE familyid = "{fid}";')
+
+		await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE unique_id = "{uid}";')
 		return self._message_typesetting(0, 'success, you have left your family.')
 
 	@C.collect_async
@@ -2222,6 +2246,14 @@ class GameManager:
 		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{r[nonce]["fid"]}" WHERE unique_id = "{r[nonce]["uid"]}";')
 		return self._message_typesetting(0, 'success')
 
+	async def check_disbanded_family_time(self, world: int, fid: str, disbanded_family_time: str) -> bool:
+		if disbanded_family_time:
+			current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+			if (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds() >= self._family_config['union_restrictions']['disbanded_cooling_time']:
+				await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+				await self._execute_statement(world, f'DELETE FROM families WHERE familyid = "{fid}";')
+				return True
+		return False
 #############################################################################
 #							End Family Functions							#
 #############################################################################
@@ -3685,6 +3717,7 @@ class GameManager:
 		d = r.json()
 		self._mall_config = d['mall']
 		self._factory_config = d['factory']
+		self._family_config = d['family']
 		self._stage_reward = d['reward']
 		self._skill_scroll_functions = d['skill']['skill_scroll_functions']
 		self._upgrade_chance = d['skill']['upgrade_chance']
