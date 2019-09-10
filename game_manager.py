@@ -308,6 +308,7 @@ class GameManager:
 	@C.collect_async
 	async def level_up_weapon(self, world: int, unique_id: str, weapon: str, iron: int) -> dict:
 		# - 0 - Success
+		# - 93 - User does not have that weapon in database
 		# - 94 - Invalid weapon name
 		# - 95 - User does not have that weapon
 		# - 96 - Incoming materials are not upgraded enough
@@ -317,8 +318,10 @@ class GameManager:
 		if weapon not in self._weapon_config["weapons"]:
 			return self._message_typesetting(status=94, message="Invalid weapon name")
 		row = await self._get_row_by_id(world, weapon, unique_id)
+		if row == False:
+			return self._message_typesetting(93, 'User does not have that weapon in database')
 		if row[2] == 0:
-			return self._message_typesetting(95, 'User does not have that weapon')
+			return self._message_typesetting(95, 'weapon level is 0')
 		if row[3] == 100:
 			return self._message_typesetting(status=99, message='Weapon already max level')
 
@@ -362,6 +365,8 @@ class GameManager:
 		if weapon not in self._weapon_config["weapons"]:
 			return self._message_typesetting(status=94, message="Invalid weapon name")
 		row = await self._get_row_by_id(world, weapon, unique_id)
+		if row == False:
+			return self._message_typesetting(93, 'User does not have that weapon in database')
 		if row[2] == 0:
 			return self._message_typesetting(status=96, message="User does not have that weapon")
 		valid_passive_skills = self._weapon_config["valid_passive_skills"]
@@ -370,6 +375,8 @@ class GameManager:
 		data_tuple = (await self.get_all_head(world, 'weapon'))["remaining"]
 		head = [x[0] for x in data_tuple]
 		row = await self._get_row_by_id(world, weapon, unique_id)
+		if row == False:
+			return self._message_typesetting(93, 'User does not have that weapon in database')
 		point_count = head.index("skill_point")
 		passive_count = head.index(passive)
 		if row[point_count] == 0:
@@ -397,6 +404,8 @@ class GameManager:
 		data_tuple = (await self.get_all_head(world, 'weapon'))["remaining"]
 		head = [x[0] for x in data_tuple]
 		row = await self._get_row_by_id(world, weapon, unique_id)
+		if row == False:
+			return self._message_typesetting(93, 'User does not have that weapon in database')
 
 		star_count = head.index('weapon_star')
 		segment_count = self._weapon_config["standard_segment_count"] * (1 + row[star_count])
@@ -430,6 +439,8 @@ class GameManager:
 		if weapon not in self._weapon_config["weapons"]:
 			return self._message_typesetting(status=94, message="Invalid weapon name")
 		row = await self._get_row_by_id(world, weapon, unique_id)
+		if row == False:
+			return self._message_typesetting(93, 'User does not have that weapon in database')
 		if row[2] == 0:
 			return self._message_typesetting(97, 'no weapon')
 		data = await self.try_coin(world, unique_id, -1 * self._weapon_config["standard_reset_weapon_skill_coin_count"])
@@ -480,7 +491,9 @@ class GameManager:
 		# - 99 - Invalid weapon name
 		if weapon not in self._weapon_config["weapons"]:
 			return self._message_typesetting(status=99, message="Invalid weapon name")
-		row = await self._get_row_by_id(world=world, weapon=weapon, unique_id=unique_id)
+		row = await self._get_row_by_id(world, weapon, unique_id)
+		if row == False:
+			return self._message_typesetting(93, 'User does not have that weapon in database')
 		if row[2] != 0:  # weapon_star
 			row[9] += self._weapon_config["standard_segment_count"]  # segment
 			sql_str = f"update weapon set weapon_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and weapon_name='{weapon}'"
@@ -499,6 +512,8 @@ class GameManager:
 		if role not in self._role_config["roles"]:
 			return self._message_typesetting(status=99, message="Invalid role name")
 		row = await self._get_role_row_by_id(world=world, role=role, unique_id=unique_id)
+		if row == False:
+			return self._message_typesetting(status=98, message="don't have this role in database")
 		if row[2] != 0:  # role_star
 			row[9] += self._role_config["standard_segment_count"]  # segment
 			sql_str = f"update role set role_star={row[2]}, segment={row[9]} where unique_id='{unique_id}' and role_name='{role}'"
@@ -597,7 +612,10 @@ class GameManager:
 		# - 99 - role already max level
 		if role not in self._role_config["roles"]:
 			return self._message_typesetting(status=94, message="Invalid role name")
-		row = await self._get_role_row_by_id(world, role, unique_id)
+		row = await self._get_role_row_by_id(world=world, role=role, unique_id=unique_id)
+		if row == False:
+			return self._message_typesetting(status=98, message="don't have this role in database")
+
 		if row[2] == 0:
 			return self._message_typesetting(95, 'User does not have that role')
 		if row[3] == 100:
@@ -642,7 +660,10 @@ class GameManager:
 			return self._message_typesetting(status=94, message="Invalid role name")
 		data_tuple = (await self.get_all_head(world, 'role'))["remaining"]
 		head = [x[0] for x in data_tuple]
-		row = await self._get_role_row_by_id(world, role, unique_id)
+
+		row = await self._get_role_row_by_id(world=world, role=role, unique_id=unique_id)
+		if row == False:
+			return self._message_typesetting(status=98, message="don't have this role in database")
 
 		star_count = head.index('role_star')
 		segment_count = self._role_config["standard_segment_count"] * (1 + row[star_count])
@@ -3620,16 +3641,23 @@ class GameManager:
 
 	async def _get_row_by_id(self, world: int, weapon: str, unique_id: str) -> list:
 		data = await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"')
-		if data: return list(data[0])
-		await self._execute_statement(world, f'INSERT INTO weapon (unique_id, weapon_name) VALUES ("{unique_id}", "{weapon}")')
+		if len(data)==0:
+			await self._execute_statement(world, f'INSERT INTO weapon (unique_id, weapon_name) VALUES ("{unique_id}", "{weapon}")')
+			return False
 		return list((await self._execute_statement(world, f'SELECT * FROM weapon WHERE unique_id = "{unique_id}" AND weapon_name = "{weapon}"'))[0])
 
 	async def _get_role_row_by_id(self, world: int, role: str, unique_id: str) -> list:
-		try:
-			return list((await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"'))[0])
-		except:
+		data = await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"')
+		if len(data)==0:
 			await self._execute_statement(world, f'INSERT INTO role (unique_id, role_name) VALUES ("{unique_id}", "{role}")')
-			return list((await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"'))[0])
+			return False
+		return list((await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"'))[0])
+
+		# try:
+		# 	return list((await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"'))[0])
+		# except:
+		# 	await self._execute_statement(world, f'INSERT INTO role (unique_id, role_name) VALUES ("{unique_id}", "{role}")')
+		# 	return list((await self._execute_statement(world, f'SELECT * FROM role WHERE unique_id = "{unique_id}" AND role_name = "{role}"'))[0])
 
 	async def _set_passive_skill_level_up_data(self, world: int, unique_id: str, weapon: str, passive: str, skill_level: int, skill_point: int) -> dict:
 		return await self._execute_statement_update(world, 'UPDATE `' + weapon + '` SET ' + passive + ' = "' + str(skill_level) + '", skill_point = "' + str(skill_point) + '" WHERE unique_id = "' + unique_id + '";')

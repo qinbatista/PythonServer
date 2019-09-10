@@ -46,6 +46,6 @@ def mail_dialog(_token,_world,_all_info):
 		return print_method("your email is empty")
 	for i in range(len(_all_info["data"]["mail"]["new"])):
 		request_type = _all_info["data"]["mail"]["new"][i]["type"]
-		print("request_type:"+request_type)
+		print_method("request_type:"+request_type)
 		if request_type == "friend_request":
-			print(friend_request(_all_info["data"]["mail"]["new"][i]["data"]["nonce"]))
+			print_method(friend_request(_all_info["data"]["mail"]["new"][i]["data"]["nonce"]))

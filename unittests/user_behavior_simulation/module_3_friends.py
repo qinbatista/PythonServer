@@ -35,7 +35,7 @@ def send_friend_gift():
 
 def send_all_friend_gift():
 	if all_info["status"]=="99":
-		print_method(f'[freind_dialog] you have no friend')
+		print_method(f'[send_all_friend_gift] you have no friend')
 		request_friend()
 		return
 	new_response = send_tcp_message({'world' : world, 'function' : 'send_all_friend_gift', 'data' : {'token' : token}})#发送好友信息
@@ -44,7 +44,7 @@ def send_all_friend_gift():
 def request_friend():
 	print_method("[request_friend]")
 	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"friend_name":"name_unique_id"+str(random.randint(0,user_behavior_simulation.get_number()))}})#发送好友信息
-	print_method("[freind_dialog] requst_friend:"+str(new_response))
+	print_method("[request_friend] requst_friend:"+str(new_response))
 
 def delete_friend():
 	print_method("[delete_friend]")
