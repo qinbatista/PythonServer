@@ -265,8 +265,8 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	# result = requests.post('http://localhost:8100/get_weapon_config')
-	# print(str(result.text))
+	result = requests.post('http://localhost:8100/get_all_family_info', data={"world": 0, "unique_id": "4"})
+	print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_stage_info', data={"world": 0, "unique_id": "8"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_monster_info', data={"world": 0, "unique_id": "5"})
@@ -295,8 +295,8 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/request_friend', data={"world": 0, "unique_id": unique_id, "friend_name": "a"})
 	# print(str(result.text))
-	result = requests.post('http://localhost:8100/leave_family', data={"world": 0, "unique_id": "1"})
-	print(str(result.text))
+	# result = requests.post('http://localhost:8100/leave_family', data={"world": 0, "unique_id": "1"})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/create_family', data={"world": 0, "unique_id": "5", "fname": "dad"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/invite_user_family', data={"world": 0, "unique_id": unique_id, "target": "b"})
@@ -399,8 +399,8 @@ print(str(result.text))
 """
 
 if __name__ == "__main__":
-	result = requests.post('http://localhost:8100/get_stage_info', data={})
-	print(str(result.text))
+	# result = requests.post('http://localhost:8100/get_stage_info', data={})
+	# print(str(result.text))
 	# try_coin()
 	# try_iron()
 	# try_diamond()
@@ -464,7 +464,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	# all_function(unique_id="4")
+	all_function(unique_id="4")
 
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")

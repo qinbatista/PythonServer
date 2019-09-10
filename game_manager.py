@@ -2203,6 +2203,10 @@ class GameManager:
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
 		remove_times = family_info[17]
 		remove_start_time = family_info[16]
+		familyname = family_info[1]
+		level = family_info[2]
+		icon = family_info[3]
+		experience = family_info[4]
 		announcement = family_info[5]
 		news = family_info[6]
 		president = family_info[7]
@@ -2220,7 +2224,12 @@ class GameManager:
 			if elite:
 				elites.append(elite)
 				members.remove(elite)  # 这里可能会报值错误：ValueError
-		ramining = {'remove_start_time': remove_start_time, 'remove_times': remove_times, 'announcement': announcement, 'news': news, 'president': president, 'admins': admins, 'elites': elites, 'members': members}
+		ramining = {
+			'remove_start_time': remove_start_time, 'remove_times': remove_times,
+			'familyname': familyname, 'level': level, 'icon': str(icon, 'utf-8'),
+			'experience': experience, 'announcement': announcement, 'news': news,
+			'president': president, 'admins': admins, 'elites': elites, 'members': members
+		}
 		return self._message_typesetting(0, 'Successfully obtained family information', data={'ramining': ramining})
 
 	@C.collect_async
@@ -4373,6 +4382,11 @@ async def _leave_family(request: web.Request) -> web.Response:
 async def _create_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).create_family(int(post['world']), post['unique_id'], post['fname']))
+
+@ROUTES.post('/get_all_family_info')
+async def _get_all_family_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).get_all_family_info(int(post['world']), post['unique_id']))
 
 @ROUTES.post('/request_join_family')
 async def _request_join_family(request: web.Request) -> web.Response:
