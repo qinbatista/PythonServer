@@ -2699,9 +2699,11 @@ class GameManager:
 		0  - Successful employee assignment, get factory work rewards
 		1  - Successful employee assignment
 		2  - Allocation is full
+		3  - Successfully recalled workers, get factory work rewards
+		4  - Successfully recalled workers
 		97 - Insufficient distribution workers
 		98 - Factory type error
-		99 - The number of workers assigned is not a positive integer
+		99 - The number of staff assigned cannot be 0
 		思路： 判断分配的工人数量workers_quantity是否为为正整数 The number of workers assigned is not a positive integer ==> 代号99，
 		工厂类型factory_kind是否在数据库表中 Factory type error ==> 代号98，查询数据库表中是否存在unique_id的数据，
 		不存在则创建，获取数据库中的所有工人的数量totally_workers和正在此工厂工作的工人数量factory_workers，
@@ -2720,16 +2722,21 @@ class GameManager:
 		问题：如果指定工厂之前存在工人在工作则结算后的工作时间是否统一成当前时间
 		"""
 		all_factory = self._factory_config["factory_kind"]
-		if workers_quantity <= 0:
-			return self._message_typesetting(status=99, message="The number of workers assigned is not a positive integer")
-
 		if factory_kind not in all_factory:
 			return self._message_typesetting(status=98, message="Factory type error")
-
 		factory_mark = all_factory.index(factory_kind)
 		remaining = {}
 		reward = {}
 		result = await self.refresh_all_storage(world, unique_id)
+		# if factory_kind == "food":
+		# 	result = await self.refresh_food_storage(world, unique_id)
+		# elif factory_kind == "mine":
+		# 	result = await self.refresh_mine_storage(world, unique_id)
+		# elif factory_kind == "crystal":
+		# 	result = await self.refresh_crystal_storage(world, unique_id)
+		# else:
+		# 	result = await self.refresh_equipment_storage(world, unique_id)
+		# result = await eval(f"self.refresh_{factory_kind}_storage({world},{unique_id})")
 		if result["data"]:
 			remaining = result["data"]["remaining"]
 			reward = result["data"]["reward"]
@@ -2739,24 +2746,40 @@ class GameManager:
 		factory_workers = factory_data[9 + factory_mark]
 		totally_workers = factory_data[13]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		if factory_kind != "equipment":
-			# 配置文件下的工作人员上限限制
-			workers_number_limit = factory_config["workers_number_limit"][str(factory_level)]
-			if factory_workers + workers_quantity > workers_number_limit:
-				workers_quantity = workers_number_limit - factory_workers
-		# 数据库可分配人员数量的限制
-		if workers_quantity > totally_workers:
-			workers_quantity = totally_workers
-		totally_workers -= workers_quantity
-		factory_workers += workers_quantity
-		sql_str = f"update factory set totally_workers={totally_workers}, {factory_kind}_factory_workers={factory_workers}, {factory_kind}_factory_timer='{current_time}' where unique_id='{unique_id}'"
-		await self._execute_statement_update(world=world, statement=sql_str)
-		remaining.update({"totally_workers": totally_workers, f"{factory_kind}_factory_workers": factory_workers, f"{factory_kind}_start_time": current_time})
+
 		if workers_quantity == 0:
-			return self._message_typesetting(status=2, message="Allocation is full", data={"remaining": remaining, "reward": reward})
-		if reward:
-			return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
-		return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
+			return self._message_typesetting(status=99, message="The number of staff assigned cannot be 0")
+		elif workers_quantity < 0:
+			workers_quantity = abs(workers_quantity)
+			if factory_workers - workers_quantity < 0:
+				workers_quantity = factory_workers
+			totally_workers += workers_quantity
+			factory_workers -= workers_quantity
+			sql_str = f"update factory set totally_workers={totally_workers}, {factory_kind}_factory_workers={factory_workers}, {factory_kind}_factory_timer='{current_time}' where unique_id='{unique_id}'"
+			await self._execute_statement_update(world=world, statement=sql_str)
+			remaining.update({"totally_workers": totally_workers, f"{factory_kind}_factory_workers": factory_workers, f"{factory_kind}_start_time": current_time})
+			if reward:
+				return self._message_typesetting(status=3, message="Successfully recalled workers, get factory work rewards", data={"remaining": remaining, "reward": reward})
+			return self._message_typesetting(status=4, message="Successfully recalled workers", data={"remaining": remaining})
+		else:
+			if factory_kind != "equipment":
+				# 配置文件下的工作人员上限限制
+				workers_number_limit = factory_config["workers_number_limit"][str(factory_level)]
+				if factory_workers + workers_quantity > workers_number_limit:
+					workers_quantity = workers_number_limit - factory_workers
+			# 数据库可分配人员数量的限制
+			if workers_quantity > totally_workers:
+				workers_quantity = totally_workers
+			totally_workers -= workers_quantity
+			factory_workers += workers_quantity
+			sql_str = f"update factory set totally_workers={totally_workers}, {factory_kind}_factory_workers={factory_workers}, {factory_kind}_factory_timer='{current_time}' where unique_id='{unique_id}'"
+			await self._execute_statement_update(world=world, statement=sql_str)
+			remaining.update({"totally_workers": totally_workers, f"{factory_kind}_factory_workers": factory_workers, f"{factory_kind}_start_time": current_time})
+			if workers_quantity == 0:
+				return self._message_typesetting(status=2, message="Allocation is full", data={"remaining": remaining, "reward": reward})
+			if reward:
+				return self._message_typesetting(status=0, message="Successful employee assignment, get factory work rewards", data={"remaining": remaining, "reward": reward})
+			return self._message_typesetting(status=1, message="Successful employee assignment", data={"remaining": remaining})
 
 	@C.collect_async
 	async def equipment_manufacturing_armor(self, world: int, unique_id: str, armor_id: str) -> dict:
@@ -3048,7 +3071,7 @@ class GameManager:
 	async def _select_factory(self, world: int, unique_id) -> list:
 		sql_str = f"select * from factory where unique_id='{unique_id}'"
 		data = await self._execute_statement(world, sql_str)
-		if data: return data[0]
+		if data != (): return data[0]
 		await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
 		return list((await self._execute_statement(world, sql_str))[0])
 

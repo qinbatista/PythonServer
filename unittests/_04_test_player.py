@@ -265,8 +265,10 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8100/get_all_family_info', data={"world": 0, "unique_id": "4"})
-	print(str(result.text))
+	# result = requests.post('http://localhost:8100/family_sign_in', data={"world": 0, "unique_id": "4"})
+	# print(str(result.text))
+	# result = requests.post('http://localhost:8100/get_all_family_info', data={"world": 0, "unique_id": "4"})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_stage_info', data={"world": 0, "unique_id": "8"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_monster_info', data={"world": 0, "unique_id": "5"})
@@ -320,8 +322,8 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/buy_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 10})
 	# print(str(result.text))
-	# result = requests.post('http://localhost:8100/distribution_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 1, 'factory_kind': "food"})
-	# print(str(result.text))
+	result = requests.post('http://localhost:8100/distribution_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': -2, 'factory_kind': "food"})
+	print(str(result.text))
 	# result = requests.post('http://localhost:8100/distribution_workers', data={"world": 0, 'unique_id': "4", 'workers_quantity': 1, 'factory_kind': "mine"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/distribution_workers', data={"world": 0, 'unique_id': unique_id, 'workers_quantity': 1, 'factory_kind': "crystal"})
