@@ -58,6 +58,7 @@ def mail_dialog(get_all_mail):
 def run_task(name):
 	call_login(str(name))
 	info_list = call_get_all_info()#加载所有参数信息
+	mail_dialog(info_list[10])#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
 	# skill_dialog(info_list[4])#技能界面
 	# weapon_dialog(info_list[5])#武器界面
@@ -66,7 +67,7 @@ def run_task(name):
 	# role_dialog()#角色界面
 	# family_dialog(get_all_family_info)#家族界面*暂时不需要
 	# stage_dialog(info_list[19])#关卡界面* 需要
-	mail_dialog(info_list[10])#邮箱界面
+
 def run_all_task():
 	starttime = datetime.now()
 	print("cpu:"+str(multiprocessing.cpu_count()))
