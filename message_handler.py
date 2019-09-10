@@ -13,6 +13,11 @@ class MessageHandler:
 		self.am = account_manager.AccountManager()
 		self.gm = game_manager.GameManager()
 
+	async def shutdown(self):
+		if self.am._pool:
+			self.am._pool.close()
+			await self.am._pool.wait_closed()
+
 	# json.decoder.JSONDecodeError
 	async def resolve(self, message: str, session) -> str:
 		'''
