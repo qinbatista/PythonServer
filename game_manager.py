@@ -3739,6 +3739,7 @@ class GameManager:
 		:param data:json数据
 		:return:返回客户端需要的json数据
 		"""
+		#return f'{{"status":{status}, "message":"{message}", "data":{json.dumps(data)}}}'
 		return {"status": status, "message": message, "random": random.randint(-1000, 1000), "data": data}
 
 	def firstDayOfMonth(self, dt):
