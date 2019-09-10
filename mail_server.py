@@ -111,6 +111,9 @@ class MailServer:
 				if mid == key:
 					folder.discard(mid)
 					return self._message_typesetting(status=0, message='successfully deleted message')
+				elif mid['type'] != 'simple' and mid['nonce'] == key:
+					folder.discard(mid)
+					return self._message_typesetting(status=0, message='successfully deleted message')
 		except mailbox.NoSuchMailboxError:
 			pass
 		return self._message_typesetting(status=0, message='mailbox does not exist')
