@@ -1877,12 +1877,16 @@ class GameManager:
 		# 99 - You already have this friend
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
 		data = response.json()
+		print(data)
+		if data[nonce]["status"]==1:
+			re = requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "key": nonce})
+			return self._message_typesetting(status=97, message="this email had been used："+str(re.json()))
 		try:
 			friend_name = data[nonce]["sender"]
 			friend_id = data[nonce]["uid_sender"]
 			requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
-		except:
-			return self._message_typesetting(status=97, message="nonce error")
+		except Exception as e:
+			return self._message_typesetting(status=97, message="nonce error:"+str(e))
 
 		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{friend_id}' and friend_id='{unique_id}'")
 		if data[0][5] != "":
@@ -2129,8 +2133,9 @@ class GameManager:
 			news = {}
 			for i, value in enumerate(content):
 				news.update({str(i + 1): value})
+		leave_family_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{str(news)}" WHERE familyid = "{fid}";')
-		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="", cumulative_contribution=0 WHERE game_name = "{gamename_target}";')
+		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="", cumulative_contribution=0, leave_family_time="{leave_family_time}" WHERE game_name = "{gamename_target}";')
 		remaining = {"announcement": announcement, "news": news, "remove_start_time": remove_start_time, "remove_times": remove_times, 'disbanded_family_time': disbanded_family_time}
 		return self._message_typesetting(0, 'success, user removed', data={"remaining": remaining})
 
@@ -2169,8 +2174,9 @@ class GameManager:
 			disbanded_family_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}" WHERE familyid = "{fid}";')
 
-		await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE unique_id = "{uid}";')
-		return self._message_typesetting(0, 'success, you have left your family.')
+		leave_family_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="",cumulative_contribution=0, leave_family_time="{leave_family_time}"WHERE unique_id = "{uid}";')
+		return self._message_typesetting(0, 'success, you have left your family.', data={"remaining": {"leave_family_time": leave_family_time}})
 
 	@C.collect_async
 	async def create_family(self, world: int, uid: str, fname: str) -> dict:

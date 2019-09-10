@@ -42,6 +42,8 @@ def mail_dialog(_token,_world,_all_info):
 	world = _world
 	all_info = _all_info
 	print_module("mail_dialog")
+	if _all_info["status"]==62:
+		return print_method("your email is empty")
 	for i in range(len(_all_info["data"]["mail"]["new"])):
 		request_type = _all_info["data"]["mail"]["new"][i]["type"]
 		print("request_type:"+request_type)
