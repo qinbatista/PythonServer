@@ -2286,7 +2286,8 @@ class GameManager:
 		remaining.update({'union_contribution': union_contribution, 'cumulative_contribution': cumulative_contribution})
 		return self._message_typesetting(0, 'Sign-in success', data={'ramining': remaining, 'reward': reward})
 
-
+	async def disbanded_family(self, world: int, uid: str):
+		pass
 #  #################################################################################
 	#@C.collect_async
 	async def request_join_family(self, world: int, uid: str, fname: str) -> dict:
