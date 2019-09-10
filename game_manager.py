@@ -9,7 +9,6 @@ import json
 import random
 import aiomysql
 import requests
-import threading
 import configparser
 from aiohttp import web
 from datetime import datetime, timedelta
