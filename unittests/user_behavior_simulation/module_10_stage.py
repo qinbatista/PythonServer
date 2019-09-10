@@ -32,9 +32,9 @@ def enter_stage(token,world,response):
 			yourstage = response["data"]["remaining"]["stage"]
 			print_method("[enter_level] play normal level")
 			stage = random.randint(1,yourstage+1)
-			response_enter = send_tcp_message({'world' : world, 'function' : 'enter_stage', 'data' : {'token' : token, 'stage' : str(stage)}})#进入关卡
+			response_enter = send_tcp_message({'world' : world, 'function' : 'enter_stage', 'data' : {'token' : token, 'stage' : stage}})#进入关卡
 			if response_enter["status"]==0:
-				response_enter = send_tcp_message({'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : token, 'stage' : str(stage), 'clear_time' : 'we dont care what this string is'}})#挑战成功
+				response_enter = send_tcp_message({'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : token, 'stage' : stage, 'clear_time' : 'we dont care what this string is'}})#挑战成功
 				print_method("[enter_level] normal level passed")
 			else:
 				my_choice = random.choice([0,1])

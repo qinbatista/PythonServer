@@ -49,7 +49,7 @@ def factory_dialog(token,world,get_all_weapon):
 				else:
 					continue
 		elif int_number==2:#改变工人
-			new_response = send_tcp_message({'world' : world, 'function' : 'distribution_workers', 'data' : {'token' : token,"workers_quantity":str(random.randint(-3,3)),"factory_kind":random.choice(["food", "mine", "crystal", "equipment"])}})
+			new_response = send_tcp_message({'world' : world, 'function' : 'distribution_workers', 'data' : {'token' : token,"workers_quantity":random.randint(-3,3),"factory_kind":random.choice(["food", "mine", "crystal", "equipment"])}})
 			print_method("[factory_dialog]distribute workers:"+str(new_response))
 		elif int_number==3:#选择盔甲
 			new_response = send_tcp_message({'world' : world, 'function' : 'equipment_manufacturing_armor', 'data' : {'token' : token,"armor_kind":random.choice(["armor1", "armor2", "armor3", "armor4", "armor5", "armor6", "armor7", "armor8", "armor9", "armor10"])}})
