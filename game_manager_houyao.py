@@ -2243,14 +2243,49 @@ class GameManager:
 		return self._message_typesetting(0, 'Successfully obtained family information', data={'ramining': ramining})
 
 	async def family_sign_in(self, world: int, uid: str) -> dict:
-		# 98 - You have already signed in today
+		# 0 - Sign-in success
+		# 94 - No such union, your family has been dissolved
+		# 97 - You have already signed in today
+		# 98 - Your family has been dissolved by the patriarch
 		# 99 - You have not joined any family yet
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
 		current_time = datetime.now().strftime("%Y-%m-%d")
 		if fid == '':
 			return self._message_typesetting(99, 'You have not joined any family yet')
 		if current_time == sign_in_time:
-			return self._message_typesetting(98, 'You have already signed in today')
+			return self._message_typesetting(97, 'You have already signed in today')
+
+		family_info = await self._get_family_information(world, fid)
+		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(94, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(98, 'Your family has been dissolved by the patriarch')
+
+		level = family_info[2]
+		experience = family_info[4]
+		if level < self._family_config['union_restrictions']['experience']['max_level']:
+			experience += 1
+			need_experience = self._family_config['union_restrictions']['experience']['experience_standard'][str(level + 1)]
+			if experience >= need_experience:  # 工会升级成功
+				experience -= need_experience
+				level += 1
+		await self._execute_statement_update(world, f'update families set experience="{experience}", level={level} where familyid="{fid}"')
+		remaining = {'sign_in_time': current_time, 'level': level, 'experience': experience}
+		reward = {'union_contribution': 1, 'cumulative_contribution': 1}
+		for key, value in self._family_config['union_restrictions']['sign_in_reward'].items():
+			data = await self._try_material(world, uid, key, value)
+			if data['status'] == 0:
+				remaining.update({key: data['remaining']})
+				reward.update({key: value})
+		await self._execute_statement_update(world, f'update player set sign_in_time="{current_time}", union_contribution=union_contribution+1, cumulative_contribution=cumulative_contribution+1 where unique_id="{uid}"')
+		contribution_data = await self._execute_statement(world, f'select union_contribution,cumulative_contribution from player where unique_id="{uid}"')
+		union_contribution, cumulative_contribution = contribution_data[0]
+		remaining.update({'union_contribution': union_contribution, 'cumulative_contribution': cumulative_contribution})
+		return self._message_typesetting(0, 'Sign-in success', data={'ramining': remaining, 'reward': reward})
+
 
 #  #################################################################################
 	#@C.collect_async
@@ -2696,6 +2731,8 @@ class GameManager:
 		0  - Successful employee assignment, get factory work rewards
 		1  - Successful employee assignment
 		2  - Allocation is full
+		3  - Successfully recalled workers, get factory work rewards
+		4  - Successfully recalled workers
 		97 - Insufficient distribution workers
 		98 - Factory type error
 		99 - The number of staff assigned cannot be 0
@@ -2742,12 +2779,20 @@ class GameManager:
 		totally_workers = factory_data[13]
 		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 
-		if not workers_quantity:
+		if workers_quantity == 0:
 			return self._message_typesetting(status=99, message="The number of staff assigned cannot be 0")
 		elif workers_quantity < 0:
-			factory_workers += workers_quantity
-			if factory_workers < 0:
-				factory_workers = 0
+			workers_quantity = abs(workers_quantity)
+			if factory_workers - workers_quantity < 0:
+				workers_quantity = factory_workers
+			totally_workers += workers_quantity
+			factory_workers -= workers_quantity
+			sql_str = f"update factory set totally_workers={totally_workers}, {factory_kind}_factory_workers={factory_workers}, {factory_kind}_factory_timer='{current_time}' where unique_id='{unique_id}'"
+			await self._execute_statement_update(world=world, statement=sql_str)
+			remaining.update({"totally_workers": totally_workers, f"{factory_kind}_factory_workers": factory_workers, f"{factory_kind}_start_time": current_time})
+			if reward:
+				return self._message_typesetting(status=3, message="Successfully recalled workers, get factory work rewards", data={"remaining": remaining, "reward": reward})
+			return self._message_typesetting(status=4, message="Successfully recalled workers", data={"remaining": remaining})
 		else:
 			if factory_kind != "equipment":
 				# 配置文件下的工作人员上限限制
@@ -3061,7 +3106,7 @@ class GameManager:
 	async def _select_factory(self, world: int, unique_id) -> list:
 		sql_str = f"select * from factory where unique_id='{unique_id}'"
 		data = await self._execute_statement(world, sql_str)
-		if data: return data[0]
+		if data != (): return data[0]
 		await self._execute_statement(world, f"INSERT INTO factory (unique_id) VALUES ('{unique_id}')")
 		return list((await self._execute_statement(world, sql_str))[0])
 
@@ -4414,6 +4459,11 @@ async def _create_family(request: web.Request) -> web.Response:
 async def _get_all_family_info(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).get_all_family_info(int(post['world']), post['unique_id']))
+
+@ROUTES.post('/family_sign_in')
+async def _family_sign_in(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).family_sign_in(int(post['world']), post['unique_id']))
 
 @ROUTES.post('/request_join_family')
 async def _request_join_family(request: web.Request) -> web.Response:

@@ -18,6 +18,9 @@
 				"10": 15870
 			}
 		},
+		"sign_in_reward": {
+			"coin": 100
+		},
 		"people_number": {
 			"basis_people": 30,
 			"increment": 2,
