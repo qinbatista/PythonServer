@@ -96,6 +96,8 @@ class Worker:
 		for r,w in self.gates.values():
 			w.close()
 			await w.wait_closed()
+		print('worker: mh shutting down') 
+		await self.mh.shutdown()
 		self.running = False
 		print('worker: shutdown complete')
 

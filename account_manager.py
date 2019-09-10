@@ -11,7 +11,7 @@ import random
 import asyncio
 import hashlib
 import secrets
-import tormysql
+import aiomysql
 import requests
 import configparser
 from aiohttp import web
@@ -23,9 +23,7 @@ TOKEN_SERVER_BASE_URL = 'http://127.0.0.1:8001'
 # Part (1 / 2)
 class AccountManager:
 	def __init__(self):
-		# This is the connection pool to the SQL server. These connections stay open
-		# for as long as this class is alive.
-		self._pool = tormysql.ConnectionPool(max_connections=10, host='192.168.1.102', user='root', passwd='lukseun', db='user', charset='utf8')
+		self._pool = None
 		self._password_re = re.compile(r'\A[\w!@#$%^&*()_+|`~=\-\\\[\]:;\'\"{}/?,.<>]{6,30}\Z')
 		self._account_re = re.compile(r'^[A-Za-z]\w{5,24}$')
 		self._email_re = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
@@ -217,15 +215,24 @@ class AccountManager:
 			return ""
 		return data[0][0]
 
+	async def _connect_sql(self):
+		self._pool = await aiomysql.create_pool(
+				maxsize = 5,
+				host = '192.168.1.102',
+				user = 'root',
+				password = 'lukseun',
+				charset = 'utf8',
+				db = 'user')
+
 	async def _execute_statement(self, statement: str) -> tuple:
 		'''
 		Executes the given statement and returns the result.
 		'''
-		async with await self._pool.Connection() as conn:
+		if self._pool is None: await self._connect_sql()
+		async with self._pool.acquire() as conn:
 			async with conn.cursor() as cursor:
 				await cursor.execute(statement)
-				data = cursor.fetchall()
-				return data
+				return await cursor.fetchall()
 
 	def message_typesetting(self, status: int, message: str, data: dict={}) -> dict:
 		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
