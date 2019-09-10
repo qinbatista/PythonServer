@@ -1897,7 +1897,6 @@ class GameManager:
 		# 99 - You already have this friend
 		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
 		data = response.json()
-		print(data)
 		if data[nonce]["status"]==1:
 			re = requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "key": nonce})
 			return self._message_typesetting(status=97, message="this email had been used："+str(re.json()))
@@ -3700,7 +3699,9 @@ class GameManager:
 		:param material:材料名
 		:return:返回材料名对应的值
 		"""
+		# print('SELECT ' + material + ' FROM player WHERE unique_id="' + str(unique_id) + '";')
 		data = await self._execute_statement(world, 'SELECT ' + material + ' FROM player WHERE unique_id="' + str(unique_id) + '";')
+		# print(data)
 		return data[0][0]
 
 	async def _update_material(self, world: int, unique_id: str, material: str, value: int) -> int:
@@ -3746,7 +3747,8 @@ class GameManager:
 		"""
 		if self._pool is None: await self._connect_sql()
 		async with self._pool.acquire() as conn:
-			await conn.select_db(str(world) if world != 0 else 'aliya')
+			str(world) if str(world) != '0' else 'aliya'
+			await conn.select_db(str(world) if str(world) != '0' else 'aliya')
 			async with conn.cursor() as cursor:
 				await cursor.execute(statement)
 				return await cursor.fetchall()
@@ -3760,7 +3762,7 @@ class GameManager:
 		"""
 		if self._pool is None: await self._connect_sql()
 		async with self._pool.acquire() as conn:
-			await conn.select_db(str(world) if world != 0 else 'aliya')
+			await conn.select_db(str(world) if str(world) != '0' else 'aliya')
 			async with conn.cursor() as cursor:
 				return await cursor.execute(statement)
 
@@ -3803,13 +3805,13 @@ class GameManager:
 		self._hang_reward = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
-			print("firstDayOfMonth")
+			# print("firstDayOfMonth")
 			self._is_first_start = True
 			self.is_first_month=True
 		if self.firstDayOfMonth(datetime.today()).day != datetime.today().day and self.is_first_month==True:
 			self.is_first_month=False
 		if self._is_first_start:
-			print("refresh")
+			# print("refresh")
 			self._boss_life=[]
 			self._boss_life_remaining=[]
 			self._is_first_start = False
@@ -4614,7 +4616,7 @@ async def _get_account_world_info(request: web.Request) -> web.Response:
 @ROUTES.post('/choice_world')
 async def _choice_world(request: web.Request) -> web.Response:
 	post = await request.post()
-	print(str(post))
+	# print(str(post))
 	result = await (request.app['MANAGER']).choice_world(post['unique_id'], int(post['target_world']))
 	return _json_response(result)
 
@@ -4636,7 +4638,7 @@ def get_config() -> configparser.ConfigParser:
 			r = requests.get('http://localhost:8000/register_game_manager')
 			return r.json()
 		except requests.exceptions.ConnectionError:
-			print('Could not find configuration server, retrying in 5 seconds...')
+			# print('Could not find configuration server, retrying in 5 seconds...')
 			time.sleep(5)
 
 

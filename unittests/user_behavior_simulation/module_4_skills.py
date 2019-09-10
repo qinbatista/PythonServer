@@ -33,6 +33,7 @@ def skill_dialog(_token,_world,get_all_skill_info):
 			print_method("[skill_dialog] level up skill success"+str(response))
 			if response["status"]==98:
 				module_12_store.purchase_skill_scroll()
+				break
 		if random.randint(0,1)==0:
 			print_method("[skill_dialog] quit skill dialog")
 			break
@@ -62,6 +63,8 @@ def get_random_skill():
 			print_method("[get_random_skill] basic summon:"+str(new_response))
 			if new_response["status"]!=0:
 				purchase_skill_stuff()#购买流程
+		else:
+			break
 def print_method(my_string):
 	print("\033[0;37;44m\t"+my_string+"\033[0m")
 def print_module(my_string):

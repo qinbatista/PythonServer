@@ -15,7 +15,7 @@ import time
 from datetime import datetime, timedelta
 world = "0"
 token = ""
-testing_people_number = 100
+testing_people_number = 100000
 def call_login(unique_id):
 	global world,token
 	while True:
@@ -58,15 +58,15 @@ def mail_dialog(get_all_mail):
 def run_task(name):
 	call_login(str(name))
 	info_list = call_get_all_info()#加载所有参数信息
-	# mail_dialog(info_list[10])#邮箱界面
-	# call_friend_dialog(info_list[3])#朋友界面
-	# skill_dialog(info_list[4])#技能界面
-	# weapon_dialog(info_list[5])#武器界面
-	# factory_dialog(info_list[6])#工厂界面
-	# get_random_item()#抽奖界面
+	mail_dialog(info_list[10])#邮箱界面
+	call_friend_dialog(info_list[3])#朋友界面
+	skill_dialog(info_list[4])#技能界面
+	weapon_dialog(info_list[5])#武器界面
+	factory_dialog(info_list[6])#工厂界面
+	get_random_item()#抽奖界面
 	role_dialog()#角色界面
 	# family_dialog(get_all_family_info)#家族界面*暂时不需要
-	# stage_dialog(info_list[19])#关卡界面* 需要
+	stage_dialog(info_list[19])#关卡界面
 
 def run_all_task():
 	starttime = datetime.now()
@@ -79,5 +79,5 @@ def run_all_task():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("10")
-	# run_all_task()
+	# run_task("10")
+	run_all_task()
