@@ -2137,8 +2137,9 @@ class GameManager:
 			news = {}
 			for i, value in enumerate(content):
 				news.update({str(i + 1): value})
+		leave_family_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{str(news)}" WHERE familyid = "{fid}";')
-		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="", cumulative_contribution=0 WHERE game_name = "{gamename_target}";')
+		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="", cumulative_contribution=0, leave_family_time="{leave_family_time}" WHERE game_name = "{gamename_target}";')
 		remaining = {"announcement": announcement, "news": news, "remove_start_time": remove_start_time, "remove_times": remove_times, 'disbanded_family_time': disbanded_family_time}
 		return self._message_typesetting(0, 'success, user removed', data={"remaining": remaining})
 
@@ -2177,8 +2178,9 @@ class GameManager:
 			disbanded_family_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}" WHERE familyid = "{fid}";')
 
-		await self._execute_statement_update(world, f'UPDATE player SET familyid = "" WHERE unique_id = "{uid}";')
-		return self._message_typesetting(0, 'success, you have left your family.')
+		leave_family_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="",cumulative_contribution=0, leave_family_time="{leave_family_time}"WHERE unique_id = "{uid}";')
+		return self._message_typesetting(0, 'success, you have left your family.', data={"remaining": {"leave_family_time": leave_family_time}})
 
 	#@C.collect_async
 	async def create_family(self, world: int, uid: str, fname: str) -> dict:
@@ -2239,6 +2241,16 @@ class GameManager:
 			'president': president, 'admins': admins, 'elites': elites, 'members': members
 		}
 		return self._message_typesetting(0, 'Successfully obtained family information', data={'ramining': ramining})
+
+	async def family_sign_in(self, world: int, uid: str) -> dict:
+		# 98 - You have already signed in today
+		# 99 - You have not joined any family yet
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		current_time = datetime.now().strftime("%Y-%m-%d")
+		if fid == '':
+			return self._message_typesetting(99, 'You have not joined any family yet')
+		if current_time == sign_in_time:
+			return self._message_typesetting(98, 'You have already signed in today')
 
 #  #################################################################################
 	#@C.collect_async
