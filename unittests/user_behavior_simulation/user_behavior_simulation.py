@@ -55,6 +55,9 @@ def stage_dialog(get_level_info):
 def mail_dialog(get_all_mail):
 	module_11_mail.mail_dialog(token,world,get_all_mail)
 
+def announcement():
+	pass
+
 def run_task(name):
 	call_login(str(name))
 	info_list = call_get_all_info()#加载所有参数信息
@@ -67,6 +70,8 @@ def run_task(name):
 	role_dialog()#角色界面
 	# family_dialog(get_all_family_info)#家族界面*暂时不需要
 	stage_dialog(info_list[19])#关卡界面
+	announcement()#公告界面
+
 
 def run_all_task():
 	starttime = datetime.now()
