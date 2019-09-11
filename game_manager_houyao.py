@@ -2375,7 +2375,7 @@ class GameManager:
 		if disbanded_family_time:
 			current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			if (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds() >= self._family_config['union_restrictions']['disbanded_cooling_time']:
-				await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+				await self._execute_statement(world, f'update player set familyid="", sign_in_time="",cumulative_contribution=0, leave_family_time="{current_time}" where familyid="{fid}"')
 				await self._execute_statement(world, f'DELETE FROM families WHERE familyid = "{fid}";')
 				return True
 		return False
