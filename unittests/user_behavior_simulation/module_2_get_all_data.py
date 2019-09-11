@@ -108,20 +108,26 @@ def get_role_config():#获取角色配置
 	print_method("[get_role_config]"+str(response))
 	return response
 
-def get_hang_up_info():
+def get_hang_up_info():#获取挂机信息了
 	response = send_tcp_message({'world' : world, 'function' : 'get_hang_up_info', 'data' : {'token' : token}})#升级请求
 	print_method("[get_hang_up_info]"+str(response))
 	return response
 
-def get_player_info():
+def get_player_info():#加载玩家体力和黑市信息
 	response = send_tcp_message({'world' : world, 'function' : 'get_player_info', 'data' : {'token' : token}})#升级请求
 	print_method("[get_hang_up_info]"+str(response))
 	return response
 
-def get_all_supplies():
+def get_all_supplies():#获取玩家所有到物资信息
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_supplies', 'data' : {'token' : token}})#升级请求
 	print_method("[get_all_supplies]"+str(response))
 	return response
+
+def mail_gift():#获取公告奖励
+	return ""
+
+def get_picture_link():#获取图片下载到链接
+	return ""
 
 def get_all_info(_token,_world):
 	print_module("[module_2_get_all_data] get_all_info")
@@ -148,6 +154,8 @@ def get_all_info(_token,_world):
 	get_family_config_str = ""#get_family_config()#家族还未开始制作
 	get_role_config_str = get_role_config()
 	get_hang_up_info_str = get_hang_up_info()
+	mail_gift_str = mail_gift()
+	get_picture_link_str = get_picture_link()
 	return [get_level_info_str,get_stage_info_str,get_monster_info_str,get_all_friend_info_str,
 	get_all_skill_level_str,get_all_weapon_str,refresh_all_storage_str,get_all_roles_str,
 	get_factory_info_str,get_all_family_info_str,get_all_mail_str,get_all_armor_info_str,

@@ -2008,9 +2008,9 @@ class GameManager:
 					remaining.append({"server_status": 0, "world": w, "world_name": f"world{w}", "game_name": data[0][0], "level": data[0][1]})
 			else:
 				if w == 0:
-					remaining.append({"server_status": 0, "world": w, "world_name": "aliya"})
+					remaining.append({"server_status": 0, "world": w, "world_name": "aliya","game_name": "", "level": ""})
 				else:
-					remaining.append({"server_status": 0, "world": w, "world_name": f"world{w}"})
+					remaining.append({"server_status": 0, "world": w, "world_name": f"world{w}","game_name": "", "level": ""})
 		return self._message_typesetting(0, 'Get all world information', data={"remaining": remaining})
 
 	async def choice_world(self, unique_id: str, target_world: int):
