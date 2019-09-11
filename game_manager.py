@@ -2301,6 +2301,34 @@ class GameManager:
 		remaining.update({'union_contribution': union_contribution, 'cumulative_contribution': cumulative_contribution})
 		return self._message_typesetting(0, 'Sign-in success', data={'ramining': remaining, 'reward': reward})
 
+	async def disbanded_family(self, world: int, uid: str) -> dict:
+		# 0 - Your family is being dissolved
+		# 94 - No such union, your family has been dissolved
+		# 97 - You are not the patriarch of the family
+		# 98 - Your family has been dissolved by the patriarch
+		# 99 - you are not in a family
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if not fid: return self._message_typesetting(99, 'you are not in a family')
+		family_info = await self._get_family_information(world, fid)
+		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(94, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+		president = family_info[7]
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(98, 'Your family has been dissolved by the patriarch')
+		if game_name != president:
+			return self._message_typesetting(97, 'You are not the patriarch of the family')
+		disbanded_cooling_time = self._family_config['union_restrictions']['disbanded_cooling_time']
+		current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+		if disbanded_family_time == "":
+			disbanded_family_time = current_time
+			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}" WHERE familyid = "{fid}";')
+		else:
+			disbanded_cooling_time = int(disbanded_cooling_time - (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds())
+		return self._message_typesetting(0, 'Your family is being dissolved', data={"remaining": {"disbanded_family_time": disbanded_family_time, 'disbanded_cooling_time': disbanded_cooling_time}})
+
 	@C.collect_async
 	async def request_join_family(self, world: int, uid: str, fname: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox
@@ -4494,6 +4522,11 @@ async def _get_all_family_info(request: web.Request) -> web.Response:
 async def _family_sign_in(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).family_sign_in(int(post['world']), post['unique_id']))
+
+@ROUTES.post('/disbanded_family')
+async def _disbanded_family(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).disbanded_family(int(post['world']), post['unique_id']))
 
 @ROUTES.post('/request_join_family')
 async def _request_join_family(request: web.Request) -> web.Response:
