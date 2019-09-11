@@ -2306,12 +2306,13 @@ class GameManager:
 		if game_name != president:
 			return self._message_typesetting(97, 'You are not the patriarch of the family')
 		disbanded_cooling_time = self._family_config['union_restrictions']['disbanded_cooling_time']
+		current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 		if disbanded_family_time == "":
-			disbanded_family_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+			disbanded_family_time = current_time
 			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}" WHERE familyid = "{fid}";')
-			return self._message_typesetting(0, 'Your family is being dissolved', data={"remaining": {"disbanded_family_time": disbanded_family_time, 'disbanded_cooling_time': disbanded_cooling_time}})
 		else:
-			return self._message_typesetting(1, 'Your family is being dissolved')
+			disbanded_cooling_time = int(disbanded_cooling_time - (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds())
+		return self._message_typesetting(0, 'Your family is being dissolved', data={"remaining": {"disbanded_family_time": disbanded_family_time, 'disbanded_cooling_time': disbanded_cooling_time}})
 
 #  #################################################################################
 	#@C.collect_async
@@ -2374,7 +2375,7 @@ class GameManager:
 		if disbanded_family_time:
 			current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			if (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds() >= self._family_config['union_restrictions']['disbanded_cooling_time']:
-				await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+				await self._execute_statement(world, f'update player set familyid="", sign_in_time="",cumulative_contribution=0, leave_family_time="{current_time}" where familyid="{fid}"')
 				await self._execute_statement(world, f'DELETE FROM families WHERE familyid = "{fid}";')
 				return True
 		return False
@@ -4490,6 +4491,11 @@ async def _get_all_family_info(request: web.Request) -> web.Response:
 async def _family_sign_in(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).family_sign_in(int(post['world']), post['unique_id']))
+
+@ROUTES.post('/disbanded_family')
+async def _disbanded_family(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).disbanded_family(int(post['world']), post['unique_id']))
 
 @ROUTES.post('/request_join_family')
 async def _request_join_family(request: web.Request) -> web.Response:
