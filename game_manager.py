@@ -2164,6 +2164,7 @@ class GameManager:
 	async def leave_family(self, world: int, uid: str) -> dict:
 		# 0 - success, you have left your family
 		# 94 - No such union, your family has been dissolved
+		# 97 - You are a patriarch, you can't leave the family
 		# 98 - Your family has been dissolved by the patriarch
 		# 99 - you do not belong to a family
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
@@ -2189,9 +2190,8 @@ class GameManager:
 				if game_name == key:
 					await self._execute_statement_update(world, f'UPDATE families SET elite{i+1} = "" WHERE familyid = "{fid}";')
 
-		elif game_name == president: # the owner is leaving, disband the entire family
-			disbanded_family_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}" WHERE familyid = "{fid}";')
+		elif game_name == president:
+			return self._message_typesetting(97, "You are a patriarch, you can't leave the family")
 
 		leave_family_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="",cumulative_contribution=0, leave_family_time="{leave_family_time}"WHERE unique_id = "{uid}";')
