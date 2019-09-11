@@ -61,7 +61,7 @@ class ConfigurationManager:
 		self._read_game_manager_config()
 
 	async def get_server_config_location(self):
-		return {'file' : loc() + '/configuration/server/' + self._sv + '/server.conf'}
+		return {'file' : loc() + '/configuration/' + self._sv + '/server/server.conf'}
 
 	async def get_server_version(self):
 		return {'version' : self._sv}
