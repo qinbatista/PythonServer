@@ -6,7 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
-lukseun = tool_lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
 
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))

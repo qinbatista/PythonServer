@@ -8,7 +8,7 @@ import tool_lukseun_client
 import random
 import module_12_store
 import module_10_stage
-lukseun = tool_lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya',  port = 8880)
 world = "0"
 token = ""
 weapon_list = ["weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10", "weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20", "weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30", "weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"]

@@ -8,7 +8,7 @@ import tool_lukseun_client
 import random
 import user_behavior_simulation
 
-lukseun = tool_lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
 world = ""
 token = ""
 all_info =""

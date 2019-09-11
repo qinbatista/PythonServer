@@ -8,7 +8,7 @@ import tool_lukseun_client
 import random
 
 
-lukseun = tool_lukseun_client.LukseunClient('aliya', '127.0.0.1', port = 8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
 world = "0"
 token = ""
 role_list=["role1", "role2", "role3", "role4", "role5", "role6", "role7", "role8", "role9", "role10", "role11", "role12", "role13", "role14", "role15", "role16", "role17", "role18", "role19", "role20", "role21", "role22", "role23", "role24", "role25", "role26", "role27", "role28", "role29", "role30", "role31", "role32", "role33", "role34", "role35", "role36", "role37", "role38", "role39", "role40"]
