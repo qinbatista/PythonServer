@@ -1919,6 +1919,29 @@ class GameManager:
 		await self._execute_statement_update(world=world, statement=insert_str)
 		return self._message_typesetting(status=0, message="Add friends to success", data={"remaining": {"nonce": nonce}})
 
+	#@C.collect_async
+	async def send_merchandise(self, world: int, unique_id: str, merchandise: str, quantities: int) -> dict:
+		# success -> 0
+		# 0 - send merchandise successfully
+		# 99 - Mailbox error
+
+		json_data = {
+			'world': world,
+			'uid_to': unique_id,
+			'kwargs': {
+				'from': 'server',
+				'body': 'Your gift is waiting.',
+				'subject': 'You have a gift!',
+				'type': 'gift',
+				'items': merchandise,
+				'quantities': quantities
+			}
+		}
+		result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+		if result["status"] != 0:
+			return self._message_typesetting(status=99, message='Mailbox error')
+		return self._message_typesetting(status=0, message="send merchandise successfully")
+
 #############################################################################
 #						End Friend Module Functions							#
 #############################################################################
@@ -4433,6 +4456,14 @@ async def _request_friend(request: web.Request) -> web.Response:
 async def _response_friend(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).response_friend(int(post['world']), post['unique_id'], post['nonce'])
+	return _json_response(result)
+
+
+# 系统调用方法
+@ROUTES.post('/send_merchandise')
+async def _send_merchandise(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).send_merchandise(int(post['world']), post['unique_id'], post['merchandise'], post['quantities'])
 	return _json_response(result)
 
 

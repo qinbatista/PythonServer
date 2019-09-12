@@ -3,6 +3,9 @@ import time
 import os
 import requests
 import configparser
+import asyncio
+from unittests.user_behavior_simulation import tool_lukseun_client
+import random
 """
 print(str(time.time()))
 print(str(time.time() % 1 * 1e6))
@@ -265,8 +268,13 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8100/get_all_friend_info', data={"world": 0, "unique_id": "4"})
-	print(str(result.text))
+	# result = requests.post('http://localhost:8100/send_merchandise', data={"world": 0, "unique_id": "1", "merchandise": "coin", "quantities": 20})
+	# print(str(result.text))
+	nonce = get_new_mail(unique_id="1")
+	# redeem_nonce(unique_id="1", nonce=nonce)
+
+	# result = requests.post('http://localhost:8100/get_all_friend_info', data={"world": 0, "unique_id": "4"})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_player_info')
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/cancel_disbanded_family', data={"world": 0, "unique_id": "5"})
@@ -408,6 +416,24 @@ result = requests.post('http://localhost:8020/send_mail', json=json_data)
 print(str(result.text))
 """
 
+
+lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
+
+def send_tcp_message(msg):
+	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
+
+def new_server_test(world):
+	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '1'}})
+	print(response)
+	token = response['data']['token']
+	# response = send_tcp_message({'world' : 0, 'function' : 'send_merchandise', 'data' : {'token': token, 'merchandise': 'coin', 'quantities': '20'}})
+	# print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_mail', 'data' : {'token': token}})
+	print(response)
+	nonce = ''
+	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': nonce}})
+	# print(response)
+
 if __name__ == "__main__":
 	# result = requests.post('http://localhost:8100/get_stage_info', data={})
 	# print(str(result.text))
@@ -448,7 +474,7 @@ if __name__ == "__main__":
 	# get_all_mail(unique_id="1")
 	# send_friend_gift(unique_id="4", friend_name="a")
 	# nonce = get_new_mail(unique_id="1")
-	# redeem_nonce(unique_id="1", nonce="5238947786014068689996630933856144383091275996565077486443260087176438651269")
+	# redeem_nonce(unique_id="1", nonce=nonce)
 	# get_all_mail(unique_id="1")
 
 	# request_friend(unique_id="4", friend_name="a")
@@ -474,7 +500,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	all_function(unique_id="4")
+	# all_function(unique_id="4")
 
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
@@ -484,3 +510,5 @@ if __name__ == "__main__":
 	# leave_world_boss_stage('4','10000')
 	# get_top_damage(4,4)
 	# active_wishing_pool(4,"weapon1")
+
+	new_server_test(0)
