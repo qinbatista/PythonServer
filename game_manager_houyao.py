@@ -2051,6 +2051,9 @@ class GameManager:
 			remaining.update({head[i]: data[0][i]})
 		return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
 
+	def get_player_info(self):
+		# 0 - get player configuration success
+		return self._message_typesetting(0, 'get player configuration success', data={'remaining': {'player': self._player}})
 #############################################################################
 #                       End Temp Function Position                          #
 #############################################################################
@@ -4749,6 +4752,13 @@ async def _choice_world(request: web.Request) -> web.Response:
 async def _create_player(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).create_player(int(post['world']), post['unique_id'], post['game_name'])
+	return _json_response(result)
+
+
+@ROUTES.post('/get_player_info')
+async def _get_player_info(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = (request.app['MANAGER']).get_player_info()
 	return _json_response(result)
 
 
