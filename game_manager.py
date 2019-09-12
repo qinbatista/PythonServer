@@ -4261,7 +4261,8 @@ class GameManager:
 		if diamond_data['status'] != 0:
 			return self._message_typesetting(99, 'Insufficient diamond')
 
-		remaining = {'diamond': diamond_data['remaining'], 'missing_date': []}
+		# remaining = {'diamond': diamond_data['remaining'], 'missing_date': []}
+		remaining = {'missing_date': []}
 		for d in range(1, today.day + 1):
 			if d not in day_list:
 				check_date = f'{month_pre}{d}'
