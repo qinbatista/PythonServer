@@ -265,8 +265,10 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8100/disbanded_family', data={"world": 0, "unique_id": "5"})
+	result = requests.post('http://localhost:8100/cancel_disbanded_family', data={"world": 0, "unique_id": "5"})
 	print(str(result.text))
+	# result = requests.post('http://localhost:8100/disbanded_family', data={"world": 0, "unique_id": "5"})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/family_sign_in', data={"world": 0, "unique_id": "4"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_all_family_info', data={"world": 0, "unique_id": "4"})

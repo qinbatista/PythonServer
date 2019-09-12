@@ -2182,6 +2182,7 @@ class GameManager:
 		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="",cumulative_contribution=0, leave_family_time="{leave_family_time}"WHERE unique_id = "{uid}";')
 		return self._message_typesetting(0, 'success, you have left your family.', data={"remaining": {"leave_family_time": leave_family_time}})
 
+
 	#@C.collect_async
 	async def create_family(self, world: int, uid: str, fname: str) -> dict:
 		# 0 - success, family created
@@ -2314,16 +2315,41 @@ class GameManager:
 			disbanded_cooling_time = int(disbanded_cooling_time - (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds())
 		return self._message_typesetting(0, 'Your family is being dissolved', data={"remaining": {"disbanded_family_time": disbanded_family_time, 'disbanded_cooling_time': disbanded_cooling_time}})
 
-#  #################################################################################
+	async def cancel_disbanded_family(self, world: int, uid: str) -> dict:
+		# 0 - You have canceled the disbanded family
+		# 94 - No such union, your family has been dissolved
+		# 96 - Your family does not need to cancel the dissolution
+		# 97 - You are not a patriarch
+		# 98 - Your family has been dissolved by the patriarch
+		# 99 - you are not in a family
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if not fid: return self._message_typesetting(99, 'you are not in a family')
+		family_info = await self._get_family_information(world, fid)
+		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(94, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+		president = family_info[7]
+		disbanded_family_time = family_info[18]
+		if disbanded_family_time == '':
+			return self._message_typesetting(96, 'Your family does not need to cancel the dissolution')
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(98, 'Your family has been dissolved by the patriarch')
+		if game_name != president:
+			return self._message_typesetting(97, 'You are not a patriarch')
+		await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "" WHERE familyid = "{fid}";')
+		return self._message_typesetting(0, 'You have canceled the disbanded family')
+
+	#  #################################################################################
 	#@C.collect_async
 	async def request_join_family(self, world: int, uid: str, fname: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox
 		# 98 - you already belong to a family
 		# 99 - family does not exist
-		game_name, fid = await self._get_familyid(world, unique_id = uid)
-		if fid is not None and fid != '': return self._message_typesetting(98, 'already in a family')
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if fid != '': return self._message_typesetting(98, 'already in a family')
 		if not await self._family_exists(world, fname): return self._message_typesetting(99, 'family does not exist')
-		data = await self._execute_statement(world, f'SELECT familyid FROM families WHERE familyname = "{fname}";')
+		data = await self._execute_statement(world, f'SELECT president FROM families WHERE familyname = "{fname}";')
 		owner_uid = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{data[0][0]}";')
 		j = {'world' : 0, 'uid_to' : owner_uid[0][0], 'kwargs' : {'from' : 'server', 'subject' : 'New join family request', 'body' : f'new request to join family from {game_name}', 'type' : 'family_request', 'fid' : data[0][0], 'fname' : fname, 'target' : game_name, 'uid' : uid}}
 		r = requests.post('http://localhost:8020/send_mail', json = j)
@@ -2352,22 +2378,42 @@ class GameManager:
 	#@C.collect_async
 	async def respond_family(self, world: int, uid: str, nonce: str) -> dict:
 		# 0 - success
-		# 96 - family does not exist
+		# 90 - You are not a member of this family
+		# 91 - You are not the patriarch or administrator of this family
+		# 94 - No such union, your family has been dissolved
+		# 95 - Your family has been dissolved by the patriarch
 		# 97 - target is already in a family
 		# 98 - family is full
 		# 99 - invalid nonce
+		admin_data = await self._execute_statement(world, f'select game_name from player where unique_id="{uid}"')
+		if admin_data == ():
+			return self._message_typesetting(90, 'You are not a member of this family')
+
 		r = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['family_request'], 'nonce' : [nonce]}).json()
 		if r[nonce]['status'] != 0 or r[nonce]['type'] != 'family_request':
 			return self._message_typesetting(99, 'invalid nonce')
-		game_name, fid = await self._get_familyid(world, unique_id = r[nonce]['uid'])
-		if fid is not None and fid != '': return self._message_typesetting(97, 'target already in a family')
-		owner, fname, members = await self._get_family_information(world, r[nonce]['fid'])
-		if owner is None: return self._message_typesetting(96, 'family does not exist')
-		try:
-			next_open = members.index('')
-		except ValueError:
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = r[nonce]['uid'])
+		if fid != '': return self._message_typesetting(97, 'target already in a family')
+
+		family_info = await self._get_family_information(world, fid)
+		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(94, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+		level = family_info[2]
+		president = family_info[7]
+		admins = [admin for admin in family_info[8: 11] if admin != '']
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(95, 'Your family has been dissolved by the patriarch')
+
+		if admin_data[0][0] != president and admin_data[0][0] not in admins:
+			return self._message_typesetting(91, 'You are not the patriarch or administrator of this family')
+
+		members = [gname[0] for gname in await self._execute_statement(world, f'select game_name from player where familyid="{fid}"')]
+		max_member = self._family_config['union_restrictions']['people_number']['basis_people'] + level * self._family_config['union_restrictions']['people_number']['increment']
+		if len(members) >= max_member:
 			return self._message_typesetting(98, 'family is full')
-		await self._execute_statement_update(world, f'UPDATE families SET member{next_open} = "{r[nonce]["target"]}" WHERE familyid = "{r[nonce]["fid"]}";')
 		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{r[nonce]["fid"]}" WHERE unique_id = "{r[nonce]["uid"]}";')
 		return self._message_typesetting(0, 'success')
 
@@ -4496,6 +4542,11 @@ async def _family_sign_in(request: web.Request) -> web.Response:
 async def _disbanded_family(request: web.Request) -> web.Response:
 	post = await request.post()
 	return _json_response(await (request.app['MANAGER']).disbanded_family(int(post['world']), post['unique_id']))
+
+@ROUTES.post('/cancel_disbanded_family')
+async def _cancel_disbanded_family(request: web.Request) -> web.Response:
+	post = await request.post()
+	return _json_response(await (request.app['MANAGER']).cancel_disbanded_family(int(post['world']), post['unique_id']))
 
 @ROUTES.post('/request_join_family')
 async def _request_join_family(request: web.Request) -> web.Response:
