@@ -15,7 +15,7 @@ def main():
 		processes.append(subprocess.Popen(['python', loc() + '/configuration_manager.py']))
 		time.sleep(1)
 		processes.append(subprocess.Popen(['python', loc() + '/mail_server.py']))
-		processes.append(subprocess.Popen(['python', loc() + '/token_server.py']))
+		#processes.append(subprocess.Popen(['python', loc() + '/token_server.py']))
 #		processes.append(subprocess.Popen(['python', loc() + '/account_manager.py']))
 		#processes.append(subprocess.Popen(['python', loc() + '/game_manager_qin.py']))
 		# processes.append(subprocess.Popen(['python3', loc() + '/game_manager_houyao.py']))

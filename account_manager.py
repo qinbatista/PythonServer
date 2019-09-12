@@ -18,7 +18,7 @@ from aiohttp import web
 from aiohttp import ClientSession
 
 
-TOKEN_SERVER_BASE_URL = 'http://127.0.0.1:8001'
+TOKEN_SERVER_BASE_URL = 'http://192.168.1.165:8001'
 
 # Part (1 / 2)
 class AccountManager:
