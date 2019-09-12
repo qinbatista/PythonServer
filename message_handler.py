@@ -185,9 +185,6 @@ class MessageHandler:
 	async def _start_hang_up(self, data: dict) -> str:
 		return json.dumps(await self.gm.start_hang_up(data['world'], data['data']['unique_id'], data['data']['stage']))
 
-	async def _get_hang_up_info(self, data: dict) -> str:
-		return json.dumps(await self.gm.get_hang_up_info(data['world'], data['data']['unique_id']))
-
 	async def _enter_stage(self, data: dict) -> str:
 		return json.dumps(await self.gm.enter_stage(data['world'], data['data']['unique_id'], data['data']['stage']))
 
@@ -220,6 +217,9 @@ class MessageHandler:
 
 	async def _redeem_nonce(self, data: dict) -> str:
 		return json.dumps(await self.gm.redeem_nonce(data['world'], data['data']['unique_id'], data['data']['nonce']))
+
+	async def _send_merchandise(self, data: dict) -> str:
+		return json.dumps(await self.gm.send_merchandise(data['world'], data['data']['unique_id'], data['data']['merchandise'], data['data']['quantities']))
 
 	async def _level_enemy_layouts_config(self, data: dict) -> str:
 		return json.dumps(await self.gm.level_enemy_layouts_config(data['world'], data['data']['unique_id']))
@@ -526,6 +526,7 @@ FUNCTION_LIST = {
 	'delete_mail': MessageHandler._delete_mail,
 	# 'delete_all_mail': MessageHandler._delete_all_mail,
 
+	'send_merchandise': MessageHandler._send_merchandise,
 
 	'check_boss_status' : MessageHandler._check_boss_status,
 	'enter_world_boss_stage' : MessageHandler._enter_world_boss_stage,
