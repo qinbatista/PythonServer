@@ -498,6 +498,24 @@ class MessageHandler:
 
 	async def _get_all_check_in_table(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_all_check_in_table(data['world'], data['data']['unique_id']))
+
+
+	async def _increase_vip_exp(self, data: dict) -> str:
+		return json.dumps(await self.gm.increase_vip_exp(data['world'], data['data']['unique_id'],data['data']['quanitiy']))
+
+	async def _purchase_vip_gift(self, data: dict) -> str:
+		return json.dumps(await self.gm.purchase_vip_gift(data['world'], data['data']['unique_id'],data['data']['kind']))
+
+	async def _check_vip_daily_reward(self, data: dict) -> str:
+		return json.dumps(await self.gm.check_vip_daily_reward(data['world'], data['data']['unique_id']))
+
+	async def _get_all_vip_info(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_all_vip_info(data['world'], data['data']['unique_id']))
+
+	async def _purchase_vip_card(self, data: dict) -> str:
+		return json.dumps(await self.gm.purchase_vip_card(data['world'], data['data']['unique_id'],data['data']['type']))
+
+
 ###############################################################################
 
 
@@ -678,5 +696,11 @@ FUNCTION_LIST = {
 	'check_in': MessageHandler._check_in,
 	'supplement_check_in': MessageHandler._supplement_check_in,
 	'get_all_check_in_table': MessageHandler._get_all_check_in_table,
+
+	'increase_vip_exp': MessageHandler._increase_vip_exp,# internal
+	'purchase_vip_gift': MessageHandler._purchase_vip_gift,
+	'check_vip_daily_reward':MessageHandler._check_vip_daily_reward,
+	'get_all_vip_info':MessageHandler._get_all_vip_info,
+	'purchase_vip_card':MessageHandler._purchase_vip_card
 }
 

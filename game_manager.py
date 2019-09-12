@@ -5118,6 +5118,34 @@ class GameManager:
 			return self._internal_format(1, num)
 		return self._internal_format(status=0, remaining=num)
 
+	async def increase_vip_exp(self, world: int, unique_id: str, quanitiy: int):
+		await self._execute_statement_update(world, 'UPDATE player SET vip_experience = vip_experience +' + str(quanitiy) + ' WHERE unique_id = "' + unique_id + '";')
+		data={
+				"remaining":
+				{
+					"vip_experience": quanitiy,
+					"vip_level": basic_segment
+				},
+				"reward":
+				{
+					"vip_experience": weapon_id,
+					"vip_level": basic_segment
+				}
+		}
+		return self._message_typesetting(status=0, message="increase_vip_exp success:"+str(quanitiy))
+
+	async def purchase_vip_gift(self, world: int, unique_id: str, kind: str):
+		return self._message_typesetting(status=0, message="purchase_vip_gift",data= "")
+
+	async def check_vip_daily_reward(self, world: int, unique_id: str):
+		return self._message_typesetting(status=0, message="check_vip_daily_reward",data= "")
+
+	async def get_all_vip_info(self, world: int, unique_id: str):
+		return self._message_typesetting(status=0, message="get_all_vip_info",data= "")
+
+	async def purchase_vip_card(self, world: int, unique_id: str, type: str):
+		return self._message_typesetting(status=0, message="purchase_vip_card",data= "")
+
 	async def _get_material(self, world: int, unique_id: str, material: str) -> int or str:
 		"""
 		Used to get numeric or string information
@@ -5239,6 +5267,7 @@ class GameManager:
 		self._acheviement = d['acheviement']
 		self._task = d['task']
 		self._check_in = d['check_in']
+		self._vip_config = d['vip_config']
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			# print("firstDayOfMonth")
 			self._is_first_start = True
