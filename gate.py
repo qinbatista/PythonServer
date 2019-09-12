@@ -46,7 +46,12 @@ class Gate:
 	async def start(self):
 		try:
 			await self.init()
-			await asyncio.gather(self.cs.serve_forever(), self.ws.serve_forever())
+			asyncio.create_task(self.cs.serve_forever())
+			asyncio.create_task(self.ws.serve_forever())
+			while self.running:
+				await asyncio.sleep(300)
+				await self.redis.expire('gates.id.' + self.gid, 600)
+				print(f'gate {self.gid}: updating expiration time for redis registry')
 		except:
 			await self.shutdown()
 	
@@ -98,7 +103,7 @@ class Gate:
 		self.redis = await aioredis.create_redis('redis://192.168.1.102/')
 		await self.nats.connect('nats://192.168.1.102/', max_reconnect_attempts = 1)
 		await self._next_avail_gid()
-		await self.redis.set('gates.id.' + self.gid, self.ip + ':' + str(self.wport))
+		await self.redis.set('gates.id.' + self.gid, self.ip + ':' + str(self.wport), expire = 600)
 		self.ws = await asyncio.start_server(self.worker_protocol, port = self.wport)
 		self.cs = await asyncio.start_server(self.client_protocol, port = self.cport)
 		print(f'gate {self.gid}: find me at {self.ip} on ports client: {self.cport}  worker: {self.wport}')
