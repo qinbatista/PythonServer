@@ -1652,12 +1652,14 @@ class GameManager:
 		friends = await self._execute_statement(world, f'SELECT * FROM friend WHERE unique_id = "{unique_id}";')
 		if len(friends) == 0:
 			return self._message_typesetting(99, 'You do not have any friends. FeelsBadMan.')
-		remaining = {'remaining' : {'f_name' : [], 'f_level' : [], 'f_recovery_time' : [], 'become_friend_time' : []}}
+		remaining = {'remaining' : {'f_name' : [], 'f_level' : [], 'f_recovery_time' : [], 'become_friend_time' : [], 'login_in_time': []}}
 		for friend in friends:
+			login_in_data = await self._execute_statement(world, f'select login_in_time from player where unique_id="{friend[1]}"')
 			remaining['remaining']['f_name'].append(friend[2])
 			remaining['remaining']['f_level'].append(friend[3])
 			remaining['remaining']['f_recovery_time'].append(friend[4])
 			remaining['remaining']['become_friend_time'].append(friend[5])
+			remaining['remaining']['login_in_time'].append(login_in_data[0][0])
 		return self._message_typesetting(0, 'Got all friends info', remaining)
 
 	# TODO optimize the subroutine
