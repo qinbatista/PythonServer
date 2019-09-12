@@ -194,6 +194,7 @@ def create_table_player(cursor):
 	  `union_contribution` int(11) unsigned DEFAULT 0 COMMENT '工会贡献值',
 	  `cumulative_contribution` int(11) unsigned DEFAULT 0 COMMENT '工会累积贡献值',
 	  `leave_family_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '离开工会的开始时间',
+	  `registration_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '用户注册的时间',
 	  `login_in_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '用户登录的时间',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -359,7 +360,7 @@ def operating_test():
 	c.select_db("aliya")
 	cursor = c.cursor()
 	create_table_player(cursor)
-	create_table_families(cursor)
+	# create_table_families(cursor)
 
 
 if __name__ == '__main__':
