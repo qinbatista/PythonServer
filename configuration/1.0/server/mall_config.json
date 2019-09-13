@@ -88,7 +88,7 @@
 		}
 	},
 	"other": {
-		"type": ["energy", "diamond", "coin"],
+		"type": ["energy", "coin"],
 		"energy": {
 			"package_type": ["1", "2"],
 			"1": {
@@ -100,34 +100,6 @@
 				"consume": "diamond",
 				"c_quantity": 87,
 				"m_quantity": 100
-			}
-		},
-		"diamond": {
-			"package_type": ["1", "2", "3", "4", "5"],
-			"1": {
-				"consume": "RMB",
-				"c_quantity": 1,
-				"m_quantity": 80
-			},
-			"2": {
-				"consume": "RMB",
-				"c_quantity": 5,
-				"m_quantity": 500
-			},
-			"3": {
-				"consume": "RMB",
-				"c_quantity": 10,
-				"m_quantity": 1200
-			},
-			"4": {
-				"consume": "RMB",
-				"c_quantity": 20,
-				"m_quantity": 2500
-			},
-			"5": {
-				"consume": "RMB",
-				"c_quantity": 100,
-				"m_quantity": 14000
 			}
 		},
 		"coin": {
@@ -146,6 +118,32 @@
 				"consume": "diamond",
 				"c_quantity": 270,
 				"m_quantity": 43200
+			}
+		}
+	},
+	"RMB": {
+		"type": ["diamond"],
+		"diamond": {
+			"package_type": ["1", "2", "3", "4", "5"],
+			"1": {
+				"c_quantity": 1,
+				"m_quantity": 80
+			},
+			"2": {
+				"c_quantity": 5,
+				"m_quantity": 500
+			},
+			"3": {
+				"c_quantity": 10,
+				"m_quantity": 1200
+			},
+			"4": {
+				"c_quantity": 20,
+				"m_quantity": 2500
+			},
+			"5": {
+				"c_quantity": 100,
+				"m_quantity": 14000
 			}
 		}
 	}

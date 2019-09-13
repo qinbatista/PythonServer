@@ -1979,6 +1979,62 @@ class GameManager:
 		await self._execute_statement_update(world=world, statement=f"update player set {scroll_type}={scroll_type}+{mall_scroll_quantity} where unique_id='{unique_id}'")
 		scroll_quantity = await self._get_material(world=world, unique_id=unique_id, material=scroll_type)
 		return self._message_typesetting(status=0, message="Purchase success", data={"remaining": {mall_consume: consume_data["remaining"], scroll_type: scroll_quantity}, "reward": {scroll_type: mall_scroll_quantity}})
+
+	@C.collect_async
+	async def purchase_other_mall(self, world: int, unique_id: str, m_type: str, package_id: str, p_quantity: int):
+		"""
+		0 - Purchase success
+		96 - Insufficient {mall_consume}
+		97 - No such purchase type
+		98 - This scroll cannot be purchased
+		99 - The quantity purchased must be a positive integer
+		"""
+		o_config = self._mall_config["other"]
+		if p_quantity <= 0:
+			return self._message_typesetting(status=99, message="The quantity purchased must be a positive integer")
+		m_other_type = o_config["type"]
+		if m_type not in m_other_type:
+			return self._message_typesetting(status=98, message="This scroll cannot be purchased")
+		m_package_type = o_config[m_type]["package_type"]
+		if package_id not in m_package_type:
+			return self._message_typesetting(status=97, message="No such purchase type")
+		consume = o_config[m_type][package_id]["consume"]
+		c_quantity = -1 * o_config[m_type][package_id]["c_quantity"] * p_quantity
+		m_quantity = o_config[m_type][package_id]["m_quantity"] * p_quantity
+		# self.try_diamond(world,unique_id,value)
+		consume_data = await eval(f"self.try_{consume}({world}, {unique_id}, {c_quantity})")
+		if consume_data["status"] == 1:
+			return self._message_typesetting(status=96, message=f"Insufficient {consume}")
+		await self._execute_statement_update(world=world, statement=f"update player set {m_type}={m_type}+{m_quantity} where unique_id='{unique_id}'")
+		r_m_quantity = await self._get_material(world=world, unique_id=unique_id, material=m_type)
+		return self._message_typesetting(status=0, message="Purchase success", data={"remaining": {consume: consume_data["remaining"], m_type: r_m_quantity}, "reward": {m_type: m_quantity}})
+
+	@C.collect_async
+	async def purchase_rmb_mall(self, world: int, unique_id: str, m_type: str, package_id: str, p_quantity: int, rmb_quantity: int):
+		"""
+		0 - Purchase success
+		96 - Insufficient {mall_consume}
+		97 - No such purchase type
+		98 - This scroll cannot be purchased
+		99 - The quantity purchased must be a positive integer
+		"""
+		rmb_config = self._mall_config["RMB"]
+		if p_quantity <= 0:
+			return self._message_typesetting(status=99, message="The quantity purchased must be a positive integer")
+		m_rmb_type = rmb_config["type"]
+		if m_type not in m_rmb_type:
+			return self._message_typesetting(status=98, message="This scroll cannot be purchased")
+		m_package_type = rmb_config[m_type]["package_type"]
+		if package_id not in m_package_type:
+			return self._message_typesetting(status=97, message="No such purchase type")
+		c_quantity = rmb_config[m_type][package_id]["c_quantity"] * p_quantity
+		m_quantity = rmb_config[m_type][package_id]["m_quantity"] * p_quantity
+		# self.try_diamond(world,unique_id,value)
+		if c_quantity > rmb_quantity:
+			return self._message_typesetting(status=96, message=f"Insufficient RMB")
+		await self._execute_statement_update(world=world, statement=f"update player set {m_type}={m_type}+{m_quantity} where unique_id='{unique_id}'")
+		r_m_quantity = await self._get_material(world=world, unique_id=unique_id, material=m_type)
+		return self._message_typesetting(status=0, message="Purchase success", data={"remaining": {m_type: r_m_quantity}, "reward": {m_type: m_quantity}})
 #############################################################################
 #                     Start Mall Function Position                          #
 #############################################################################
