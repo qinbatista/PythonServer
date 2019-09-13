@@ -1,103 +1,13 @@
 {
-	"scroll": {
-		"scroll_type": ["basic_summon_scroll", "pro_summon_scroll", "skill_scroll_10", "skill_scroll_30", "skill_scroll_100"],
-		"basic_summon_scroll": {
-			"package_type": ["1", "2", "3"],
-			"1": {
-				"consume": "diamond",
-				"quantity": 10,
-				"scroll_quantity": 1
-			},
-			"2": {
-				"consume": "diamond",
-				"quantity": 90,
-				"scroll_quantity": 10
-			},
-			"3": {
-				"consume": "diamond",
-				"quantity": 800,
-				"scroll_quantity": 100
-			}
-		},
-		"pro_summon_scroll": {
-			"package_type": ["1", "2"],
-			"1": {
-				"consume": "diamond",
-				"quantity": 30,
-				"scroll_quantity": 1
-			},
-			"2": {
-				"consume": "diamond",
-				"quantity": 270,
-				"scroll_quantity": 10
-			}
-		},
-		"skill_scroll_10": {
-			"package_type": ["1", "2", "3"],
-			"1": {
-				"consume": "diamond",
-				"quantity": 30,
-				"scroll_quantity": 10
-			},
-			"2": {
-				"consume": "diamond",
-				"quantity": 87,
-				"scroll_quantity": 30
-			},
-			"3": {
-				"consume": "diamond",
-				"quantity": 270,
-				"scroll_quantity": 100
-			}
-		},
-		"skill_scroll_30": {
-			"package_type": ["1", "2", "3"],
-			"1": {
-				"consume": "diamond",
-				"quantity": 30,
-				"scroll_quantity": 10
-			},
-			"2": {
-				"consume": "diamond",
-				"quantity": 87,
-				"scroll_quantity": 30
-			},
-			"3": {
-				"consume": "diamond",
-				"quantity": 270,
-				"scroll_quantity": 100
-			}
-		},
-		"skill_scroll_100": {
-			"package_type": ["1", "2", "3"],
-			"1": {
-				"consume": "diamond",
-				"quantity": 30,
-				"scroll_quantity": 10
-			},
-			"2": {
-				"consume": "diamond",
-				"quantity": 87,
-				"scroll_quantity": 30
-			},
-			"3": {
-				"consume": "diamond",
-				"quantity": 270,
-				"scroll_quantity": 100
-			}
-		}
-	},
-	"other": {
-		"type": ["energy", "coin"],
+	"diamond": {
+		"merchandise_type": ["energy", "coin", "basic_summon_scroll", "pro_summon_scroll", "skill_scroll_10", "skill_scroll_30", "skill_scroll_100"],
 		"energy": {
 			"package_type": ["1", "2"],
 			"1": {
-				"consume": "diamond",
 				"c_quantity": 30,
 				"m_quantity": 10
 			},
 			"2": {
-				"consume": "diamond",
 				"c_quantity": 87,
 				"m_quantity": 100
 			}
@@ -105,24 +15,192 @@
 		"coin": {
 			"package_type": ["1", "2", "3"],
 			"1": {
-				"consume": "diamond",
 				"c_quantity": 30,
 				"m_quantity": 4800
 			},
 			"2": {
-				"consume": "diamond",
 				"c_quantity": 87,
 				"m_quantity": 14400
 			},
 			"3": {
-				"consume": "diamond",
 				"c_quantity": 270,
 				"m_quantity": 43200
 			}
+		},
+		"basic_summon_scroll": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"c_quantity": 10,
+				"m_quantity": 1
+			},
+			"2": {
+				"c_quantity": 90,
+				"m_quantity": 10
+			},
+			"3": {
+				"c_quantity": 800,
+				"m_quantity": 100
+			}
+		},
+		"pro_summon_scroll": {
+			"package_type": ["1", "2"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 1
+			},
+			"2": {
+				"c_quantity": 270,
+				"m_quantity": 10
+			}
+		},
+		"skill_scroll_10": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 10
+			},
+			"2": {
+				"c_quantity": 87,
+				"m_quantity": 30
+			},
+			"3": {
+				"c_quantity": 270,
+				"m_quantity": 100
+			}
+		},
+		"skill_scroll_30": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 10
+			},
+			"2": {
+				"c_quantity": 87,
+				"m_quantity": 30
+			},
+			"3": {
+				"c_quantity": 270,
+				"m_quantity": 100
+			}
+		},
+		"skill_scroll_100": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 10
+			},
+			"2": {
+				"c_quantity": 87,
+				"m_quantity": 30
+			},
+			"3": {
+				"c_quantity": 270,
+				"m_quantity": 100
+			}
 		}
 	},
-	"RMB": {
-		"type": ["diamond"],
+	"coin": {
+		"merchandise_type": ["energy", "coin", "basic_summon_scroll", "pro_summon_scroll", "skill_scroll_10", "skill_scroll_30", "skill_scroll_100"],
+		"energy": {
+			"package_type": ["1", "2"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 10
+			},
+			"2": {
+				"c_quantity": 87,
+				"m_quantity": 100
+			}
+		},
+		"coin": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 4800
+			},
+			"2": {
+				"c_quantity": 87,
+				"m_quantity": 14400
+			},
+			"3": {
+				"c_quantity": 270,
+				"m_quantity": 43200
+			}
+		},
+		"basic_summon_scroll": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"c_quantity": 10,
+				"m_quantity": 1
+			},
+			"2": {
+				"c_quantity": 90,
+				"m_quantity": 10
+			},
+			"3": {
+				"c_quantity": 800,
+				"m_quantity": 100
+			}
+		},
+		"pro_summon_scroll": {
+			"package_type": ["1", "2"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 1
+			},
+			"2": {
+				"c_quantity": 270,
+				"m_quantity": 10
+			}
+		},
+		"skill_scroll_10": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 10
+			},
+			"2": {
+				"c_quantity": 87,
+				"m_quantity": 30
+			},
+			"3": {
+				"c_quantity": 270,
+				"m_quantity": 100
+			}
+		},
+		"skill_scroll_30": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 10
+			},
+			"2": {
+				"c_quantity": 87,
+				"m_quantity": 30
+			},
+			"3": {
+				"c_quantity": 270,
+				"m_quantity": 100
+			}
+		},
+		"skill_scroll_100": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"c_quantity": 30,
+				"m_quantity": 10
+			},
+			"2": {
+				"c_quantity": 87,
+				"m_quantity": 30
+			},
+			"3": {
+				"c_quantity": 270,
+				"m_quantity": 100
+			}
+		}
+	},
+	"rmb": {
+		"merchandise_type": ["diamond"],
 		"diamond": {
 			"package_type": ["1", "2", "3", "4", "5"],
 			"1": {
