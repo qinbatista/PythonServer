@@ -1,8 +1,8 @@
 {
 	"scroll": {
-		"scroll_type": ["basic_summon_scroll", "pro_summon_scroll"],
+		"scroll_type": ["basic_summon_scroll", "pro_summon_scroll", "skill_scroll_10", "skill_scroll_30", "skill_scroll_100"],
 		"basic_summon_scroll": {
-			"purchase_type": ["1", "2", "3"],
+			"package_type": ["1", "2", "3"],
 			"1": {
 				"consume": "diamond",
 				"quantity": 10,
@@ -20,7 +20,7 @@
 			}
 		},
 		"pro_summon_scroll": {
-			"purchase_type": ["1", "2"],
+			"package_type": ["1", "2"],
 			"1": {
 				"consume": "diamond",
 				"quantity": 30,
@@ -30,6 +30,122 @@
 				"consume": "diamond",
 				"quantity": 270,
 				"scroll_quantity": 10
+			}
+		},
+		"skill_scroll_10": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"consume": "diamond",
+				"quantity": 30,
+				"scroll_quantity": 10
+			},
+			"2": {
+				"consume": "diamond",
+				"quantity": 87,
+				"scroll_quantity": 30
+			},
+			"3": {
+				"consume": "diamond",
+				"quantity": 270,
+				"scroll_quantity": 100
+			}
+		},
+		"skill_scroll_30": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"consume": "diamond",
+				"quantity": 30,
+				"scroll_quantity": 10
+			},
+			"2": {
+				"consume": "diamond",
+				"quantity": 87,
+				"scroll_quantity": 30
+			},
+			"3": {
+				"consume": "diamond",
+				"quantity": 270,
+				"scroll_quantity": 100
+			}
+		},
+		"skill_scroll_100": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"consume": "diamond",
+				"quantity": 30,
+				"scroll_quantity": 10
+			},
+			"2": {
+				"consume": "diamond",
+				"quantity": 87,
+				"scroll_quantity": 30
+			},
+			"3": {
+				"consume": "diamond",
+				"quantity": 270,
+				"scroll_quantity": 100
+			}
+		}
+	},
+	"other": {
+		"type": ["energy", "diamond", "coin"],
+		"energy": {
+			"package_type": ["1", "2"],
+			"1": {
+				"consume": "diamond",
+				"c_quantity": 30,
+				"m_quantity": 10
+			},
+			"2": {
+				"consume": "diamond",
+				"c_quantity": 87,
+				"m_quantity": 100
+			}
+		},
+		"diamond": {
+			"package_type": ["1", "2", "3", "4", "5"],
+			"1": {
+				"consume": "RMB",
+				"c_quantity": 1,
+				"m_quantity": 80
+			},
+			"2": {
+				"consume": "RMB",
+				"c_quantity": 5,
+				"m_quantity": 500
+			},
+			"3": {
+				"consume": "RMB",
+				"c_quantity": 10,
+				"m_quantity": 1200
+			},
+			"4": {
+				"consume": "RMB",
+				"c_quantity": 20,
+				"m_quantity": 2500
+			},
+			"5": {
+				"consume": "RMB",
+				"c_quantity": 100,
+				"m_quantity": 14000
+			}
+		},
+		"coin": {
+			"package_type": ["1", "2", "3"],
+			"1": {
+				"consume": "diamond",
+				"c_quantity": 30,
+				"m_quantity": 4800
+			},
+			"2": {
+				"consume": "diamond",
+				"c_quantity": 87,
+				"m_quantity": 14400
+			},
+			"3": {
+				"consume": "diamond",
+				"c_quantity": 270,
+				"m_quantity": 43200
 			}
 		}
 	}

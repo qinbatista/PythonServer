@@ -1953,7 +1953,7 @@ class GameManager:
 #                     Start Mall Function Position                          #
 #############################################################################
 	@C.collect_async
-	async def purchase_scroll_mall(self, world: int, unique_id: str, scroll_type: str, purchase_type: str, quantity: int):
+	async def purchase_scroll_mall(self, world: int, unique_id: str, scroll_type: str, package_id: str, quantity: int):
 		"""
 		0 - Purchase success
 		96 - Insufficient {mall_consume}
@@ -1967,12 +1967,12 @@ class GameManager:
 		mall_scroll_type = scroll_config["scroll_type"]
 		if scroll_type not in mall_scroll_type:
 			return self._message_typesetting(status=98, message="This scroll cannot be purchased")
-		mall_purchase_type = scroll_config[scroll_type]["purchase_type"]
-		if purchase_type not in mall_purchase_type:
+		mall_package_type = scroll_config[scroll_type]["package_type"]
+		if package_id not in mall_package_type:
 			return self._message_typesetting(status=97, message="No such purchase type")
-		mall_consume = scroll_config[scroll_type][purchase_type]["consume"]
-		mall_quantity = -1 * scroll_config[scroll_type][purchase_type]["quantity"] * quantity
-		mall_scroll_quantity = scroll_config[scroll_type][purchase_type]["scroll_quantity"] * quantity
+		mall_consume = scroll_config[scroll_type][package_id]["consume"]
+		mall_quantity = -1 * scroll_config[scroll_type][package_id]["quantity"] * quantity
+		mall_scroll_quantity = scroll_config[scroll_type][package_id]["scroll_quantity"] * quantity
 		consume_data = await eval(f"self.try_{mall_consume}({world}, {unique_id}, {mall_quantity})")
 		if consume_data["status"] == 1:
 			return self._message_typesetting(status=96, message=f"Insufficient {mall_consume}")
@@ -4621,7 +4621,7 @@ async def _respond_family(request: web.Request) -> web.Response:
 @ROUTES.post('/purchase_scroll_mall')
 async def _purchase_scroll_mall(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], post["purchase_type"], int(post['quantity'])))
+	return _json_response(await (request.app['MANAGER']).purchase_scroll_mall(int(post['world']), post['unique_id'], post['scroll_type'], post["package_id"], int(post['quantity'])))
 
 #  ################################################################################
 #  ##########################   end mall  #########################################
