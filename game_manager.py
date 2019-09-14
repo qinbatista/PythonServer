@@ -2064,9 +2064,6 @@ class GameManager:
 		else:
 			return await self.purchase_coin_mall(world, unique_id, 'basic_summon_scroll', package_id, p_quantity)
 
-	async def get_picture_link(self, world: int, unique_id: str) -> dict:
-		pass
-
 	async def mail_gift(self, world: int, unique_id: str) -> dict:
 		# 0 - Successfully reissue gift
 		# 97 - You have already received all the activities
@@ -2108,6 +2105,58 @@ class GameManager:
 		for key in data:
 			remaining.update({key: config[key]})
 		return self._message_typesetting(0, 'Successfully reissue gift', data={'remaining': remaining})
+
+	def get_login_screen(self) -> dict:
+		# 0 - Successfully get a link
+		# 99 - All activities are completed
+		current_time = datetime.now().strftime("%Y-%m-%d")
+		current_value = int(current_time.replace('-', ''))
+		config_list = self._announcement['login_screen']
+		config = {}  # 将列表转化成字典
+		for d in config_list: config.update(d)
+		data = list(config.keys())
+		data_value = [int(d.replace('-', '')) for d in data]
+		min_value = min(data_value)
+		min_index = data_value.index(min_value)
+		while current_value > min_value:
+			if not data: return self._message_typesetting(99, 'All activities are completed')
+			data.pop(min_index)
+			data_value.pop(min_index)
+			min_value = min(data_value)
+			min_index = data_value.index(min_value)
+		remaining = {data[min_index]: config[data[min_index]]}
+		return self._message_typesetting(0, 'Successfully get a link', data={'remaining': remaining})
+
+	def get_announcement_pic(self) -> dict:
+		# 0 - Successfully get a link
+		# 99 - All activities are completed
+		current_time = datetime.now().strftime("%Y-%m-%d")
+		current_value = int(current_time.replace('-', ''))
+		config_list = self._announcement['announcement']
+		config = {}  # 将列表转化成字典
+		for d in config_list: config.update(d)
+		data = list(config.keys())
+		data_value = [int(d.replace('-', '')) for d in data]
+		min_value = min(data_value)
+		min_index = data_value.index(min_value)
+		while current_value > min_value:
+			if not data: return self._message_typesetting(99, 'All activities are completed')
+			data.pop(min_index)
+			data_value.pop(min_index)
+			min_value = min(data_value)
+			min_index = data_value.index(min_value)
+		remaining = {data[min_index]: config[data[min_index]]}
+		return self._message_typesetting(0, 'Successfully get a link', data={'remaining': remaining})
+
+	def get_picture_link(self) -> dict:
+		login_pic = self.get_login_screen()
+		announcement_pic = self.get_announcement_pic()
+		remaining = {'login_screen': {'status': login_pic['status']}, 'announcement': {'status': announcement_pic['status']}}
+		if login_pic['status'] == 0:
+			remaining['login_screen'].update(login_pic['data']['remaining'])
+		if announcement_pic['status'] == 0:
+			remaining['announcement'].update(announcement_pic['data']['remaining'])
+		return self._message_typesetting(0, 'Successfully get link', data={'remaining': remaining})
 
 #############################################################################
 #                     Start Mall Function Position                          #
