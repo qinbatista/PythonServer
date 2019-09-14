@@ -2064,6 +2064,51 @@ class GameManager:
 		else:
 			return await self.purchase_coin_mall(world, unique_id, 'basic_summon_scroll', package_id, p_quantity)
 
+	async def get_picture_link(self, world: int, unique_id: str) -> dict:
+		pass
+
+	async def mail_gift(self, world: int, unique_id: str) -> dict:
+		# 0 - Successfully reissue gift
+		# 97 - You have already received all the activities
+		# 98 - Did not arrive at the event time
+		# 99 - no player info
+		m_data = await self._execute_statement(world, f'select mail_gift_time from player where unique_id="{unique_id}"')
+		if m_data == ():
+			return self._message_typesetting(99, 'no player info')
+		mail_gift_time = m_data[0][0]
+		current_time = datetime.now().strftime("%Y-%m-%d")
+		current_value = int(current_time.replace('-', ''))
+		config_list = self._announcement['mail_gift']
+		config = {}  # 将列表转化成字典
+		for d in config_list: config.update(d)
+		data = list(config.keys())
+		data_value = [int(d.replace('-', '')) for d in data]
+		data_list = [[int(key.replace('-', '')), int(config[key]['end_time'].replace('-', ''))] for key in config.keys()]
+
+		# 筛选出所有符合时间范围的活动
+		for b, r in data_list:
+			if current_value < b or current_value > r:
+				i = data_value.index(b)
+				data.pop(i)
+				data_value.pop(i)
+		if not data: return self._message_typesetting(98, 'Did not arrive at the event time')
+
+		remaining = {}
+		if mail_gift_time != "":
+			mail_value = int(mail_gift_time.replace('-', ''))
+			min_value = min(data_value)
+			min_index = data_value.index(min_value)
+			while mail_value > min_value:
+				data.pop(min_index)
+				data_value.pop(min_index)
+				if not data: return self._message_typesetting(97, 'You have already received all the activities')
+				min_value = min(data_value)
+				min_index = data_value.index(min_value)
+		for key in data:
+			remaining.update({key: config[key]})
+		await self._execute_statement_update(world, f'update player set mail_gift_time="{current_time}" where unique_id="{unique_id}"')
+		return self._message_typesetting(0, 'Successfully reissue gift', data={'remaining': remaining})
+
 #############################################################################
 #                     Start Mall Function Position                          #
 #############################################################################
@@ -3858,7 +3903,7 @@ class GameManager:
 		return int(data[0][0]), data[0][1]
 
 	async def _set_weapon_star(self, world: int, unique_id: str, weapon: str, star: int):
-		return await self._execute_statement_update(world, 'UPDATE weapon SET weapon_star = "' + str(star) + '" WHERE unique_id = "' + unique_id + '" AND weapon_name = "' + weapon + '";') 
+		return await self._execute_statement_update(world, 'UPDATE weapon SET weapon_star = "' + str(star) + '" WHERE unique_id = "' + unique_id + '" AND weapon_name = "' + weapon + '";')
 
 	async def _get_segment(self, world: int, unique_id: str, weapon: str) -> int:
 		data = await self._execute_statement(world, 'SELECT segment FROM weapon WHERE unique_id = "' + unique_id + '" AND weapon_name = "' + weapon + '";')
@@ -4038,6 +4083,7 @@ class GameManager:
 		self._player = d['player']
 		self._hang_reward = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
+		self._announcement = d['announcement']
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			# print("firstDayOfMonth")
 			self._is_first_start = True
