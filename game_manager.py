@@ -2078,6 +2078,7 @@ class GameManager:
 		mail_gift_time = m_data[0][0]
 		current_time = datetime.now().strftime("%Y-%m-%d")
 		current_value = int(current_time.replace('-', ''))
+		await self._execute_statement_update(world, f'update player set mail_gift_time="{current_time}" where unique_id="{unique_id}"')
 		config_list = self._announcement['mail_gift']
 		config = {}  # 将列表转化成字典
 		for d in config_list: config.update(d)
@@ -2106,7 +2107,6 @@ class GameManager:
 				min_index = data_value.index(min_value)
 		for key in data:
 			remaining.update({key: config[key]})
-		await self._execute_statement_update(world, f'update player set mail_gift_time="{current_time}" where unique_id="{unique_id}"')
 		return self._message_typesetting(0, 'Successfully reissue gift', data={'remaining': remaining})
 
 #############################################################################
