@@ -196,6 +196,7 @@ def create_table_player(cursor):
 	  `leave_family_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '离开工会的开始时间',
 	  `registration_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '用户注册的时间',
 	  `login_in_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '用户登录的时间',
+	  `mail_gift_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '参与活动的时间',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
