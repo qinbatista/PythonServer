@@ -34,7 +34,7 @@ HANG_REWARD = loc() + '/configuration/{}/server/hang_reward_config.json'
 ENEMY_LAYOUT = loc() + '/configuration/{}/client/level_enemy_layouts_config.json'
 SERVER_CONFIG = loc() + '/configuration/{}/server/server_config.json'
 ENTRY_CONSUMABLES = loc() + '/configuration/{}/server/entry_consumables_config.json'
-ANNOUNCEMENT = loc() + '/configuration/{}/server/announcement_info.json'
+ANNOUNCEMENT = loc() + '/configuration/{}/announcement_info.json'
 
 
 class ConfigurationManager:
@@ -57,6 +57,7 @@ class ConfigurationManager:
 		self._read_factory_config()
 		self._read_family_config()
 		self._read_mall_config()
+		self._read_announcement_info()
 
 		# read this one last
 		self._read_game_manager_config()

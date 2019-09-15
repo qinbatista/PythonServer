@@ -749,6 +749,11 @@ class GameManager:
 			await self._execute_statement_update(world, update_str)
 		for i in range(len(keys)):
 			remaining.update({keys[i]: values[i]})
+		enemyLayouts = self._level_enemy_layouts_config_json['enemyLayouts']
+		if stage > len(enemyLayouts):
+			remaining.update({'enemyLayout': enemyLayouts[-1]})
+		else:
+			remaining.update({'enemyLayout': enemyLayouts[stage - 1]})
 		return self._message_typesetting(0, "success", {"remaining": remaining})
 
 	@C.collect_async
