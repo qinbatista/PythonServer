@@ -1043,7 +1043,7 @@ class GameManager:
 		"""
 		return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config_json}})
 
-	async def get_stage_info(self) -> dict:
+	def get_stage_info(self) -> dict:
 		"""
 		# 0 - Successfully obtained level information
 		# 1 - No information found for this user, successfully obtained general level configuration information
@@ -4703,7 +4703,7 @@ async def _get_monster_info(request: web.Request) -> web.Response:
 
 @ROUTES.post('/get_stage_info')
 async def _get_stage_info(request: web.Request) -> web.Response:
-	result = (request.app['MANAGER']).get_stage_info(int(post['world']))
+	result = (request.app['MANAGER']).get_stage_info()
 	return _json_response(result)
 
 @ROUTES.post('/enter_stage')
