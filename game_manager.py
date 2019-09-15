@@ -1037,11 +1037,13 @@ class GameManager:
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		return self._message_typesetting(status=0, message="get hang up info", data={"remaining": {"tower_stage":tower_stage,"stage":stage,"hang_up_time": hang_up_time, "hang_stage": hang_stage, "hang_up_time_seconds": int(delta_time.total_seconds())}})
 
-	async def get_monster_info(self) -> dict:
+	def get_monster_info(self) -> dict:
 		"""
 		# 0 - Get all monster information to get success
 		"""
-		return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config_json}})
+		monster_name = list(self._monster_config_json.keys())
+		# return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config_json}})
+		return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_name": monster_name}})
 
 	def get_stage_info(self) -> dict:
 		"""

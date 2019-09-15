@@ -332,10 +332,10 @@ class MessageHandler:
 	# 	return json.dumps(await self.gm.try_all_material(data['world'], data['data']['unique_id'], data['data']['stage']))
 
 	async def _get_stage_info(self,data:dict) -> str:
-		return json.dumps(await self.gm.get_stage_info())
+		return json.dumps(self.gm.get_stage_info())
 
 	async def _get_monster_info(self,data:dict) -> str:
-		return json.dumps(await self.gm.get_monster_info())
+		return json.dumps(self.gm.get_monster_info())
 
 	async def _get_all_roles(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_all_roles(data['world'], data['data']['unique_id']))
