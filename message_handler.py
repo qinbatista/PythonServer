@@ -414,6 +414,12 @@ class MessageHandler:
 	async def _get_player_info(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_player_info())
 
+	async def _mail_gift(self, data: dict) -> str:
+		return json.dumps(await self.gm.mail_gift(data['world'], data['data']['unique_id']))
+
+	async def _get_picture_link(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_picture_link())
+
 
 		# async with session.post(self._game_manager_base_url("0") + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
 		# 	return await resp.text()
@@ -565,6 +571,8 @@ FUNCTION_LIST = {
 
 	'upgrade_role_level':MessageHandler._upgrade_role_level,
 	'upgrade_role_star':MessageHandler._upgrade_role_star,
-	'get_player_info':MessageHandler._get_player_info
+	'get_player_info':MessageHandler._get_player_info,
+	'mail_gift':MessageHandler._mail_gift,
+	'get_picture_link': MessageHandler._get_picture_link
 }
 

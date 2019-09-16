@@ -124,10 +124,14 @@ def get_all_supplies():#获取玩家所有到物资信息
 	return response
 
 def mail_gift():#获取公告奖励
-	return ""
+	response = send_tcp_message({'world' : world, 'function' : 'mail_gift', 'data' : {'token' : token}})#升级请求
+	print_method("[get_all_supplies]"+str(response))
+	return response
 
 def get_picture_link():#获取图片下载到链接
-	return ""
+	response = send_tcp_message({'world' : world, 'function' : 'get_picture_link', 'data' : {'token' : token}})#升级请求
+	print_method("[get_all_supplies]"+str(response))
+	return response
 
 def get_all_info(_token,_world):
 	print_module("[module_2_get_all_data] get_all_info")
@@ -161,7 +165,7 @@ def get_all_info(_token,_world):
 	get_all_skill_level_str,get_all_weapon_str,refresh_all_storage_str,get_all_roles_str,
 	get_factory_info_str,get_all_family_info_str,get_all_mail_str,get_all_armor_info_str,
 	get_lottery_config_info_str,player_config_str,get_weapon_config_str,get_skill_level_up_config_str,
-	get_family_config_str,get_role_config_str,get_hang_up_info_str,get_all_supplies_str,get_player_info_str]
+	get_family_config_str,get_role_config_str,get_hang_up_info_str,get_all_supplies_str,get_player_info_str,get_picture_link_str,mail_gift_str]
 
 if __name__ == "__main__":
 	pass

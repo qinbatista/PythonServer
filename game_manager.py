@@ -2116,7 +2116,7 @@ class GameManager:
 			remaining.update({key: config[key]})
 		return self._message_typesetting(0, 'Successfully reissue gift', data={'remaining': remaining})
 
-	def get_login_screen(self) -> dict:
+	async def get_login_screen(self) -> dict:
 		# 0 - Successfully get a link
 		# 99 - All activities are completed
 		current_time = datetime.now().strftime("%Y-%m-%d")
@@ -2137,7 +2137,7 @@ class GameManager:
 		remaining = {data[min_index]: config[data[min_index]]}
 		return self._message_typesetting(0, 'Successfully get a link', data={'remaining': remaining})
 
-	def get_announcement_pic(self) -> dict:
+	async def get_announcement_pic(self) -> dict:
 		# 0 - Successfully get a link
 		# 99 - All activities are completed
 		current_time = datetime.now().strftime("%Y-%m-%d")
@@ -2158,7 +2158,7 @@ class GameManager:
 		remaining = {data[min_index]: config[data[min_index]]}
 		return self._message_typesetting(0, 'Successfully get a link', data={'remaining': remaining})
 
-	def get_picture_link(self) -> dict:
+	async def get_picture_link(self) -> dict:
 		login_pic = self.get_login_screen()
 		announcement_pic = self.get_announcement_pic()
 		remaining = {'login_screen': {'status': login_pic['status']}, 'announcement': {'status': announcement_pic['status']}}
