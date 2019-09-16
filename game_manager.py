@@ -1,5 +1,3 @@
-#
-#
 ###############################################################################
 
 import os
@@ -4076,7 +4074,8 @@ class GameManager:
 				host = '192.168.1.102',
 				user = 'root',
 				password = 'lukseun',
-				charset = 'utf8')
+				charset = 'utf8',
+				autocommit = True)
 
 	async def _execute_statement(self, world: int, statement: str) -> tuple:
 		"""
