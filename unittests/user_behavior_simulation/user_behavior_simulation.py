@@ -58,19 +58,22 @@ def mail_dialog(get_all_mail):
 def announcement():
 	pass
 
+def dark_market():
+	pass
 def run_task(name):
 	call_login(str(name))
 	info_list = call_get_all_info()#加载所有参数信息
-	mail_dialog(info_list[10])#邮箱界面
-	call_friend_dialog(info_list[3])#朋友界面
-	skill_dialog(info_list[4])#技能界面
-	weapon_dialog(info_list[5])#武器界面
-	factory_dialog(info_list[6])#工厂界面
-	get_random_item()#抽奖界面
-	role_dialog()#角色界面
+	# dark_market()#*加载黑市信息
+	# mail_dialog(info_list[10])#邮箱界面
+	# call_friend_dialog(info_list[3])#朋友界面
+	# skill_dialog(info_list[4])#技能界面
+	# weapon_dialog(info_list[5])#武器界面
+	# factory_dialog(info_list[6])#工厂界面
+	# get_random_item()#抽奖界面
+	# role_dialog()#角色界面
 	# family_dialog(get_all_family_info)#家族界面*暂时不需要
-	stage_dialog(info_list[19])#关卡界面
-	announcement()#公告界面
+	# stage_dialog(info_list[19])#关卡界面
+	# announcement()#公告界面
 
 
 def run_all_task():

@@ -411,6 +411,9 @@ class MessageHandler:
 	async def _upgrade_role_star(self, data: dict) -> str:
 		return json.dumps(await self.gm.upgrade_role_star(data['world'], data['data']['unique_id'],data['data']['role']))
 
+	async def _get_player_info(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_player_info())
+
 
 		# async with session.post(self._game_manager_base_url("0") + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
 		# 	return await resp.text()
@@ -561,6 +564,7 @@ FUNCTION_LIST = {
 
 
 	'upgrade_role_level':MessageHandler._upgrade_role_level,
-	'upgrade_role_star':MessageHandler._upgrade_role_star
+	'upgrade_role_star':MessageHandler._upgrade_role_star,
+	'get_player_info':MessageHandler._get_player_info
 }
 

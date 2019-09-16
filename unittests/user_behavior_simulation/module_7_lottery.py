@@ -159,6 +159,15 @@ def get_random_skill():
 			else:
 				break
 
+def fortune_wheel_basic():
+	print_module("[fortune_wheel_basic]")
+	int_n = random.randint(0,1)
+	if int_n == 0:
+		new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_basic', 'data' : {'token' : token,"cost_item":"diamond"}})#发送好友信息
+		print_method("[fortune_wheel_basic][diamond]"+str(new_response))
+	elif int_n == 1:
+		new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_basic', 'data' : {'token' : token,"cost_item":"fortune_wheel_ticket_basic"}})#发送好友信息
+		print_method("[fortune_wheel_basic][fortune_wheel_ticket_basic]"+str(new_response))
 def get_random_item(_token,_world):
 	global token,world
 	token = _token
@@ -169,4 +178,5 @@ def get_random_item(_token,_world):
 		if int_number==0: get_random_role()
 		if int_number==1: get_random_skill()
 		if int_number==2: get_random_weapon()
-		if int_number==3: break
+		if int_number==3: fortune_wheel_basic()
+		if int_number==4: break

@@ -2279,7 +2279,7 @@ class GameManager:
 			remaining.update({head[i]: data[0][i]})
 		return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
 
-	def get_player_info(self):
+	async def get_player_info(self):
 		# 0 - get player configuration success
 		return self._message_typesetting(0, 'get player configuration success', data={'remaining': {'player': self._player}})
 
