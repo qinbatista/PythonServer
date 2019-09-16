@@ -9,11 +9,16 @@ import json
 import random
 import aiomysql
 import requests
-import configparser
 from aiohttp import web
 from datetime import datetime, timedelta
 from utility import repeating_timer
 from utility import metrics
+from utility import config_reader
+
+CFG = config_reader.wait_config()
+MAIL_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
+TOKEN_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
+
 
 
 C = metrics.Collector()
@@ -1729,7 +1734,7 @@ class GameManager:
 						'quantities' : '1'
 						}
 					}
-			result = requests.post('http://localhost:8020/send_mail', json = json_data).json()
+			result = requests.post(MAIL_URL + '/send_mail', json = json_data).json()
 			if result['status'] != 0:
 				return self._message_typesetting(97, 'mailbox error')
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
@@ -1758,7 +1763,7 @@ class GameManager:
 							'quantities' : '1'
 							}
 						}
-				result = requests.post('http://localhost:8020/send_mail', json = json_data).json()
+				result = requests.post(MAIL_URL + '/send_mail', json = json_data).json()
 				if result['status'] != 0:
 					return self._message_typesetting(97, 'Mailbox error')
 				await self._execute_statement_update(world, f'UPDATE friend SET recovery_time = "{current_time}" WHERE unique_id = "{unique_id}" AND friend_id = "{friend_id}";')
@@ -1802,8 +1807,8 @@ class GameManager:
 	async def redeem_nonce(self, world: int, unique_id: str, nonce: str) -> dict:
 		# 0 - successfully redeemed
 		# 99 - database operation error
-		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['gift'], 'nonce' : [nonce]})
-		requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
+		response = requests.post(TOKEN_URL + '/redeem_nonce', json = {'type' : ['gift'], 'nonce' : [nonce]})
+		requests.post(MAIL_URL + '/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
 		data = response.json()
 		if data[nonce]['status'] != 0:
 			return self._message_typesetting(98, 'nonce already redeemed')
@@ -1822,7 +1827,7 @@ class GameManager:
 		# 0 - Add friends to success
 		# 98 - database operating error
 		# 99 - You already have this friend
-		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : type_list, 'nonce' : nonce_list})
+		response = requests.post(TOKEN_URL + '/redeem_nonce', json = {'type' : type_list, 'nonce' : nonce_list})
 		data = response.json()
 		remaining = {"nonce_list": nonce_list, "expired_nonce": []}
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
@@ -1889,7 +1894,7 @@ class GameManager:
 				"uid_sender": unique_id
 			}
 		}
-		result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+		result = requests.post(MAIL_URL + '/send_mail', json=json_data).json()
 		if result["status"] != 0:
 			return self._message_typesetting(status=96, message='Mailbox error')
 
@@ -1904,15 +1909,15 @@ class GameManager:
 		# 97 - nonce error
 		# 98 - The other has deleted the friend request
 		# 99 - You already have this friend
-		response = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
+		response = requests.post(TOKEN_URL + '/redeem_nonce', json = {'type' : ['friend_request'], 'nonce' : [nonce]})
 		data = response.json()
 		if data[nonce]["status"]==1:
-			re = requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "key": nonce})
+			re = requests.post(MAIL_URL + '/delete_mail', data={"world": world, "unique_id": unique_id, "key": nonce})
 			return self._message_typesetting(status=97, message="this email had been used："+str(re.json()))
 		try:
 			friend_name = data[nonce]["sender"]
 			friend_id = data[nonce]["uid_sender"]
-			requests.post('http://localhost:8020/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
+			requests.post(MAIL_URL + '/delete_mail', data={"world": world, "unique_id": unique_id, "nonce": nonce})
 		except Exception as e:
 			return self._message_typesetting(status=97, message="nonce error:"+str(e))
 
@@ -1947,7 +1952,7 @@ class GameManager:
 				'quantities': quantities
 			}
 		}
-		result = requests.post('http://localhost:8020/send_mail', json=json_data).json()
+		result = requests.post(MAIL_URL + '/send_mail', json=json_data).json()
 		if result["status"] != 0:
 			return self._message_typesetting(status=99, message='Mailbox error')
 		return self._message_typesetting(status=0, message="send merchandise successfully")
@@ -2579,7 +2584,7 @@ class GameManager:
 		data = await self._execute_statement(world, f'SELECT familyid FROM families WHERE familyname = "{fname}";')
 		owner_uid = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{data[0][0]}";')
 		j = {'world' : 0, 'uid_to' : owner_uid[0][0], 'kwargs' : {'from' : 'server', 'subject' : 'New join family request', 'body' : f'new request to join family from {game_name}', 'type' : 'family_request', 'fid' : data[0][0], 'fname' : fname, 'target' : game_name, 'uid' : uid}}
-		r = requests.post('http://localhost:8020/send_mail', json = j)
+		r = requests.post(MAIL_URL + '/send_mail', json = j)
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
 	@C.collect_async
@@ -2599,7 +2604,7 @@ class GameManager:
 		if tfid is not None and tfid != '': return self._message_typesetting(96, 'target already in a family')
 		targetuid = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{target}";')
 		j = {'world' : 0, 'uid_to' : targetuid[0][0], 'kwargs' : {'from' : game_name, 'subject' : 'New join family request', 'body' : f'{game_name} invites you to join their family!', 'type' : 'family_request', 'fid' : fid, 'fname' : fname, 'target' : tgame_name, 'uid' : targetuid[0][0]}}
-		r = requests.post('http://localhost:8020/send_mail', json = j)
+		r = requests.post(MAIL_URL + '/send_mail', json = j)
 		return self._message_typesetting(0, 'success, request sent')
 
 	@C.collect_async
@@ -2609,7 +2614,7 @@ class GameManager:
 		# 97 - target is already in a family
 		# 98 - family is full
 		# 99 - invalid nonce
-		r = requests.post('http://localhost:8001/redeem_nonce', json = {'type' : ['family_request'], 'nonce' : [nonce]}).json()
+		r = requests.post(TOKEN_URL + '/redeem_nonce', json = {'type' : ['family_request'], 'nonce' : [nonce]}).json()
 		if r[nonce]['status'] != 0 or r[nonce]['type'] != 'family_request':
 			return self._message_typesetting(99, 'invalid nonce')
 		game_name, fid = await self._get_familyid(world, unique_id = r[nonce]['uid'])
@@ -4667,22 +4672,22 @@ async def _send_merchandise(request: web.Request) -> web.Response:
 
 @ROUTES.post('/get_new_mail')
 async def _get_new_mail(request: web.Request) -> web.Response:
-	return _json_response(json.loads(requests.post('http://localhost:8020/get_new_mail', data=await request.post()).text))
+	return _json_response(json.loads(requests.post(MAIL_URL + '/get_new_mail', data=await request.post()).text))
 
 
 @ROUTES.post('/get_all_mail')
 async def _get_all_mail(request: web.Request) -> web.Response:
-	return _json_response(json.loads(requests.post('http://localhost:8020/get_all_mail', data=await request.post()).text))
+	return _json_response(json.loads(requests.post(MAIL_URL + '/get_all_mail', data=await request.post()).text))
 
 
 @ROUTES.post('/delete_mail')
 async def _delete_mail(request: web.Request) -> web.Response:
-	return _json_response(json.loads(requests.post('http://localhost:8020/delete_mail', data=await request.post()).text))
+	return _json_response(json.loads(requests.post(MAIL_URL + '/delete_mail', data=await request.post()).text))
 
 
 @ROUTES.post('/delete_all_mail')
 async def _delete_all_mail(request: web.Request) -> web.Response:
-	return _json_response(json.loads(requests.post('http://localhost:8020/delete_all_mail', data=await request.post()).text))
+	return _json_response(json.loads(requests.post(MAIL_URL + '/delete_all_mail', data=await request.post()).text))
 
 
 @ROUTES.post('/start_hang_up')
@@ -4994,27 +4999,13 @@ async def _get_player_info(request: web.Request) -> web.Response:
 	return _json_response(result)
 
 
-def get_config() -> configparser.ConfigParser:
-	'''
-	Fetches the server's configuration file from the config server.
-	Waits until the configuration server is online.
-	'''
-	while True:
-		try:
-			r = requests.get('http://localhost:8000/register_game_manager')
-			return r.json()
-		except requests.exceptions.ConnectionError:
-			# print('Could not find configuration server, retrying in 5 seconds...')
-			time.sleep(5)
-
 
 def run():
 	app = web.Application()
 	app.add_routes(ROUTES)
-	config = get_config()
-	app['MANAGER'] = GameManager(config['worlds'])
+	app['MANAGER'] = GameManager()
 	# print(f'starting game manager for worlds {config["worlds"]} on port {config["port"]}...')
-	web.run_app(app, port=config['port'])
+	web.run_app(app, port = CFG.getint('game_manager', 'port'))
 
 
 if __name__ == '__main__':

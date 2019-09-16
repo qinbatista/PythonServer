@@ -2,7 +2,12 @@ import json
 import account_manager
 import game_manager
 
-TOKEN_BASE_URL = 'http://192.168.1.165:8001'
+from utility import config_reader
+
+CFG = config_reader.wait_config()
+
+TOKEN_BASE_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
+MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
 
 class InvalidTokenError(Exception):
 	pass
@@ -348,7 +353,7 @@ class MessageHandler:
 
 	#未完成
 	async def _get_all_mail(self, data: dict) -> str:
-		async with data['session'].post('http://localhost:8020/get_all_mail', data = {'world' : data['world'], 'unique_id' : data['data']['unique_id']}) as r:
+		async with data['session'].post(MAIL_BASE_URL + '/get_all_mail', data = {'world' : data['world'], 'unique_id' : data['data']['unique_id']}) as r:
 			return await r.text()
 
 	async def _get_lottery_config_info(self, data: dict) -> str:
@@ -375,11 +380,11 @@ class MessageHandler:
 
 	#未完成 邮件为不同系统
 	async def _get_new_mail(self, data: dict) -> str:
-		async with data['session'].post('http://localhost:8020/get_new_mail', data = {'world' : data['world'], 'unique_id' : data['data']['unique_id']}) as r:
+		async with data['session'].post(MAIL_BASE_URL + '/get_new_mail', data = {'world' : data['world'], 'unique_id' : data['data']['unique_id']}) as r:
 			return await r.text()
 	# 	return json.dumps(await self.gm.get_new_mail(data['world'], data['data']['unique_id']))
 	async def _delete_mail(self, data: dict) -> str:
-		async with data['session'].post('http://localhost:8020/delete_mail', data = {'world' : data['world'], 'unique_id' : data['data']['unique_id'], 'key' : data['data']['key']}) as r:
+		async with data['session'].post(MAIL_BASE_URL + '/delete_mail', data = {'world' : data['world'], 'unique_id' : data['data']['unique_id'], 'key' : data['data']['key']}) as r:
 			return await r.text()
 	# 	return json.dumps(await self.gm.delete_mail(data['world'], data['data']['unique_id'],data['data']['nonce']))
 	# async def _delete_all_mail(self, data: dict) -> str:

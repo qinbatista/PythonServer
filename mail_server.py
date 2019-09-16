@@ -9,14 +9,17 @@ import time
 import random
 import mailbox
 import requests
-import configparser
 
 
 from aiohttp import web
 from datetime import datetime
 from collections import defaultdict
+from utility import config_reader
 
 DIRNAME = os.path.dirname(os.path.realpath(__file__)) + '/box'
+
+CFG = config_reader.wait_config()
+TOKEN_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
 
 class MailServer:
 	def __init__(self):
@@ -168,13 +171,13 @@ class MailServer:
 
 	def _request_nonce(self, msg: mailbox.MaildirMessage):
 		if msg['type'] == 'gift':
-			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'gift', 'items' : msg['items'], 'quantities' : msg['quantities']})
+			r = requests.post(TOKEN_URL + '/generate_nonce', json = {'type' : 'gift', 'items' : msg['items'], 'quantities' : msg['quantities']})
 			return r.json()['data']['nonce']
 		elif msg['type'] == 'friend_request':
-			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'friend_request', 'uid_sender' : msg['uid_sender'], 'sender' : msg['sender']})
+			r = requests.post(TOKEN_URL + '/generate_nonce', json = {'type' : 'friend_request', 'uid_sender' : msg['uid_sender'], 'sender' : msg['sender']})
 			return r.json()['data']['nonce']
 		elif msg['type'] == 'family_request':
-			r = requests.post('http://localhost:8001/generate_nonce', json = {'type' : 'family_request', 'fid' : msg['fid'], 'target' : msg['target'], 'uid' : msg['uid']})
+			r = requests.post(TOKEN_URL + '/generate_nonce', json = {'type' : 'family_request', 'fid' : msg['fid'], 'target' : msg['target'], 'uid' : msg['uid']})
 			return r.json()['data']['nonce']
 
 
@@ -223,16 +226,6 @@ class MailServer:
 	def _message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
 		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
 
-def get_config():
-	while True:
-		try:
-			r = requests.get('http://localhost:8000/get_server_config_location')
-			parser = configparser.ConfigParser()
-			parser.read(r.json()['file'])
-			return parser
-		except requests.exceptions.ConnectionError:
-			print('Could not find configuration server, retrying in 5 seconds...')
-			time.sleep(5)
 
 def _json_response(body: dict = '', **kwargs) -> web.Response:
 	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
@@ -286,9 +279,8 @@ def run():
 	app = web.Application(client_max_size = 10000000) # accept client requests up to 10 MB
 	app.add_routes(ROUTES)
 	app['MANAGER'] = MailServer()
-	config = get_config()
-	print(f'starting mail server on port {config.getint("mail_server", "port")}...')
-	web.run_app(app, port = config.getint('mail_server', 'port'))
+	print(f'starting mail server on port {CFG.getint("mail_server", "port")}...')
+	web.run_app(app, port = CFG.getint('mail_server', 'port'))
 
 
 

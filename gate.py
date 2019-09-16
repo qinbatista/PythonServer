@@ -25,6 +25,10 @@ import aioredis
 import contextlib
 import nats.aio.client
 
+from utility import config_reader
+
+CFG = config_reader.wait_config()
+
 class Gate:
 	def __init__(self, cport = 8880, wport = 8201):
 		self.ip       = self._read_ip()
@@ -100,8 +104,8 @@ class Gate:
 	async def init(self):
 		asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 		self.nats = nats.aio.client.Client()
-		self.redis = await aioredis.create_redis('redis://192.168.1.102/')
-		await self.nats.connect('nats://192.168.1.102/', max_reconnect_attempts = 1)
+		self.redis = await aioredis.create_redis(CFG['redis']['addr'])
+		await self.nats.connect(CFG['nats']['addr'], max_reconnect_attempts = 1)
 		await self._next_avail_gid()
 		await self.redis.set('gates.id.' + self.gid, self.ip + ':' + str(self.wport), expire = 600)
 		self.ws = await asyncio.start_server(self.worker_protocol, port = self.wport)

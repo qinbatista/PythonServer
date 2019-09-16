@@ -11,10 +11,10 @@ def wait_config():
 	'''
 	Fetches the server configuration file from the location specified by the configuration manager.
 	'''
-	print(f'Attempting to read configuration file from config_manager at {CM}...')
+	print(f'Reading configuration file from config_manager at {CM}...')
 	while True:
 		try:
-			r = requests.get()
+			r = requests.get(CM)
 			parser = configparser.ConfigParser()
 			parser.read(r.json()['file'])
 			print('done.')

@@ -12,13 +12,14 @@ import asyncio
 import hashlib
 import secrets
 import aiomysql
-import requests
-import configparser
+
 from aiohttp import web
 from aiohttp import ClientSession
+from utility import config_reader
 
+CFG = config_reader.wait_config()
 
-TOKEN_SERVER_BASE_URL = 'http://192.168.1.165:8001'
+TOKEN_SERVER_BASE_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
 
 # Part (1 / 2)
 class AccountManager:

@@ -17,6 +17,10 @@ import aioredis
 import message_handler
 import nats.aio.client
 
+from utility import config_reader
+
+CFG = config_reader.wait_config()
+
 class Worker:
 	def __init__(self):
 		self.mh      = message_handler.MessageHandler()
@@ -74,8 +78,8 @@ class Worker:
 		self.running = True
 		self.nats = nats.aio.client.Client()
 		self.session = aiohttp.ClientSession()
-		self.redis = await aioredis.create_redis('redis://192.168.1.102')
-		await self.nats.connect('nats://192.168.1.102/', max_reconnect_attempts = 1)
+		self.redis = await aioredis.create_redis(CFG['redis']['addr'])
+		await self.nats.connect(CFG['nats']['addr'], max_reconnect_attempts = 1)
 		asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 
 	'''
