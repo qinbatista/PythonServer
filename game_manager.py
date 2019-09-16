@@ -754,9 +754,22 @@ class GameManager:
 			remaining.update({keys[i]: values[i]})
 		enemyLayouts = self._level_enemy_layouts_config_json['enemyLayouts']
 		if stage > len(enemyLayouts):
-			remaining.update({'enemyLayout': enemyLayouts[-1]})
+			enemyLayoutList = enemyLayouts[-1]['enemyLayout']
 		else:
-			remaining.update({'enemyLayout': enemyLayouts[stage - 1]})
+			enemyLayoutList = enemyLayouts[stage - 1]['enemyLayout']
+		remaining.update({'enemyLayoutList': enemyLayoutList})
+		enemyList = []
+		for layout in enemyLayoutList:
+			for enemy in layout['enemyList']:
+				enemyList.append(enemy['enemysPrefString'])
+		enemyList = list(set(enemyList))
+		remaining.update({'enemy_kind': {}})
+		for enemy in enemyList:
+			if enemy not in list(self._monster_config_json.keys()):
+				remaining['enemy_kind'].update({enemy: {}})
+			else:
+				remaining['enemy_kind'].update({enemy: self._monster_config_json[enemy]})
+
 		return self._message_typesetting(0, "success", {"remaining": remaining})
 
 	@C.collect_async
