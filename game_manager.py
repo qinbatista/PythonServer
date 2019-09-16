@@ -2168,7 +2168,7 @@ class GameManager:
 				for k, v in resource.items():
 					items += f'{k},'
 					quantities += f'{v},'
-			if ',' in items:
+			if items != '':
 				items = items[:-1]
 				quantities = quantities[:-1]
 				json_data['kwargs']['items'] = items
