@@ -25,6 +25,8 @@ import aioredis
 import contextlib
 import nats.aio.client
 
+import platform
+
 from utility import config_reader
 
 CFG = config_reader.wait_config()
@@ -102,7 +104,8 @@ class Gate:
 	Starts both socket servers.
 	'''
 	async def init(self):
-		asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
+		if platform.system() != 'Windows':
+			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 		self.nats = nats.aio.client.Client()
 		self.redis = await aioredis.create_redis(CFG['redis']['addr'])
 		await self.nats.connect(CFG['nats']['addr'], max_reconnect_attempts = 1)

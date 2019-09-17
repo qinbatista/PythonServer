@@ -24,7 +24,7 @@ class MessageHandler:
 			await self.am._pool.wait_closed()
 
 	# json.decoder.JSONDecodeError
-	async def resolve(self, message: str, session) -> str:
+	async def resolve(self, message: str, session, redis) -> str:
 		'''
 		Resolves the message included in the request. If required, ensures that a valid token is present.
 		'''
@@ -40,6 +40,7 @@ class MessageHandler:
 				except KeyError:
 					return '{"status" : 10, "message" : "missing required token"}'
 			message['session'] = session
+			message['redis'] = redis
 			return await fn(self, message)
 		except InvalidTokenError:
 			return '{"status" : 11, "message" : "unauthorized. invalid token."}'
@@ -420,6 +421,12 @@ class MessageHandler:
 	async def _get_picture_link(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_picture_link())
 
+	async def _bind_email(self, data: dict) -> str:
+		return json.dumps(await self.am.bind_email(data['data']['unique_id'], data['data']['email'], data['redis'], data['session']))
+
+	async def _verify_email_code(self, data: dict) -> str:
+		return json.dumps(await self.am.verify_email_code(data['data']['unique_id'], data['data']['code'], data['redis'], data['session']))
+
 
 		# async with session.post(self._game_manager_base_url("0") + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
 		# 	return await resp.text()
@@ -439,6 +446,8 @@ FUNCTION_LIST = {
 	'choice_world': MessageHandler._choice_world,
 	'get_account_world_info': MessageHandler._get_account_world_info,
 	'create_player': MessageHandler._create_player,
+	'bind_email' : MessageHandler._bind_email,
+	'verify_email_code' : MessageHandler._verify_email_code,
 
 	# game_manager
 	# 'join_world' : MessageHandler._join_world,

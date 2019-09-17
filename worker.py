@@ -17,6 +17,8 @@ import aioredis
 import message_handler
 import nats.aio.client
 
+import platform
+
 from utility import config_reader
 
 CFG = config_reader.wait_config()
@@ -80,7 +82,8 @@ class Worker:
 		self.session = aiohttp.ClientSession()
 		self.redis = await aioredis.create_redis(CFG['redis']['addr'])
 		await self.nats.connect(CFG['nats']['addr'], max_reconnect_attempts = 1)
-		asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
+		if platform.system() != 'Windows':
+			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 
 	'''
 	Gracefully shuts down the worker. Drains outstanding messages from the message queue,

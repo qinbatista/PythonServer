@@ -17,6 +17,7 @@ import requests
 from aiohttp import web
 from aiohttp import ClientSession
 from utility import config_reader
+from utility import direct_mail
 
 CFG = config_reader.wait_config()
 
@@ -62,6 +63,36 @@ class AccountManager:
 		await self._register_token(unique_id, resp['token'])
 		requests.post(GAME_MANAGER + '/update_login_in_time', data={'world': world, 'unique_id': unique_id})
 		return self.message_typesetting(status, message, resp)
+
+	async def bind_email(self, unique_id: str, email: str, redis, session):
+		if not await self._account_is_bound(unique_id):
+			return self.message_typesetting(99, 'account must be bound to bind email')
+		retvals = await asyncio.gather(self._email_is_bound(unique_id), self._check_exists('email', email))
+		if retvals[0]: return self.message_typesetting(98, 'email has already been bound')
+		if retvals[1]: return self.message_typesetting(97, 'email already exists')
+		code = str(secrets.randbits(6))
+		while await redis.setnx('nonce.verify.email.' + code, email) == 0:
+			code = str(secrets.randbits(6))
+		print(f'account manager: created nonce code {code}')
+		await redis.expire('nonce.verify.email.' + code, 300)
+		r = await direct_mail.send_verification(email, code, session)
+		if r != 'OK':
+			print(f'account_manager: email could not be sent: {r}')
+			return self.message_typesetting(96, 'email could not be sent', {'message' : r})
+		print('account manager: message was sent')
+		return self.message_typesetting(0, 'success, email sent. code valid for 5 minutes.')
+
+
+	async def verify_email_code(self, unique_id: str, code, redis, session):
+		email = await redis.get('nonce.verify.email.' + code)
+		if not email: return self.message_typesetting(99, 'code invalid')
+		await redis.delete('nonce.verify.email.' + code)
+		retvals = await asyncio.gather(self._email_is_bound(unique_id), self._check_exists('email', email))
+		if retvals[0]: return self.message_typesetting(98, 'account already bound email')
+		if retvals[1]: return self.message_typesetting(97, 'email already exists')
+		await self._execute_statement(f'UPDATE info SET email = "{email}" WHERE unique_id = "{unique_id}";')
+		return self.message_typesetting(0, 'success, email verified')
+
 
 	# TODO run check_exists as a task
 	# TODO refactor code for speed improvements
@@ -227,7 +258,8 @@ class AccountManager:
 				user = 'root',
 				password = 'lukseun',
 				charset = 'utf8',
-				db = 'user')
+				db = 'user',
+				autocommit = True)
 
 	async def _execute_statement(self, statement: str) -> tuple:
 		'''
