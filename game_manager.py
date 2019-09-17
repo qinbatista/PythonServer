@@ -2072,8 +2072,7 @@ class GameManager:
 			return self._message_typesetting(status=97, message="No such purchase type")
 		c_quantity = rmb_config[m_type][package_id]["c_quantity"] * p_quantity
 		m_quantity = rmb_config[m_type][package_id]["m_quantity"] * p_quantity
-		# self.try_diamond(world,unique_id,value)
-		if c_quantity > rmb_quantity:
+		if rmb_quantity != -1 and c_quantity > rmb_quantity:
 			return self._message_typesetting(status=96, message=f"Insufficient rmb")
 		await self._execute_statement_update(world=world, statement=f"update player set {m_type}={m_type}+{m_quantity} where unique_id='{unique_id}'")
 		r_m_quantity = await self._get_material(world=world, unique_id=unique_id, material=m_type)
@@ -2093,6 +2092,14 @@ class GameManager:
 			return await self.purchase_diamond_mall(world, unique_id, 'energy', package_id, p_quantity)
 		else:
 			return await self.purchase_coin_mall(world, unique_id, 'energy', package_id, p_quantity)
+
+	async def purchase_item(self, world: int, unique_id: str, item_id: str) -> dict:
+		"""
+		# 95 - Consumable type error
+		:param item_id: energy_pack_10
+		"""
+		p_list = item_id.split('_pack_')
+		return await self.purchase_rmb_mall(world, unique_id, p_list[0], p_list[1], 1, rmb_quantity=-1)
 
 	async def purchase_basic_summon_scroll(self, world: int, unique_id: str, package_id: str, p_quantity: int, c_type: str) -> dict:
 		"""
@@ -4879,10 +4886,10 @@ async def _respond_family(request: web.Request) -> web.Response:
 #  ########################## start mall  #########################################
 #  ################################################################################
 
-@ROUTES.post('/purchase_diamond_mall')
-async def _purchase_scroll_mall(request: web.Request) -> web.Response:
+@ROUTES.post('/purchase_item')
+async def _purchase_item(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).purchase_diamond_mall(int(post['world']), post['unique_id'], post['m_type'], post["package_id"], int(post['p_quantity'])))
+	return _json_response(await (request.app['MANAGER']).purchase_item(int(post['world']), post['unique_id'], post['item_id']))
 
 #  ################################################################################
 #  ##########################   end mall  #########################################
