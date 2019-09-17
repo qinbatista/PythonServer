@@ -268,9 +268,11 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
+	result = requests.post('http://localhost:8004/update_login_in_time', data={"world": 0, "unique_id": "1"})
+	print(str(result.text))
 	# result = requests.post('http://localhost:8100/send_merchandise', data={"world": 0, "unique_id": "1", "merchandise": "coin", "quantities": 20})
 	# print(str(result.text))
-	nonce = get_new_mail(unique_id="1")
+	# nonce = get_new_mail(unique_id="1")
 	# redeem_nonce(unique_id="1", nonce=nonce)
 
 	# result = requests.post('http://localhost:8100/get_all_friend_info', data={"world": 0, "unique_id": "4"})
@@ -457,7 +459,7 @@ if __name__ == "__main__":
 	# try_energy()
 	# start_hang_up()
 	# get_hang_up_reward()
-	enter_stage(stage=1)
+	# enter_stage(stage=1)
 	# enter_tower(stage=3)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
@@ -500,7 +502,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	# all_function(unique_id="4")
+	all_function(unique_id="4")
 
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
