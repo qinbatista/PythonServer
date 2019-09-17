@@ -1823,14 +1823,26 @@ class GameManager:
 		data = response.json()
 		if data[nonce]['status'] != 0:
 			return self._message_typesetting(98, 'nonce already redeemed')
-		items = data[nonce]['items']
-		quantities = data[nonce]['quantities']
-		sql_str = f'UPDATE player SET {items}={items}+{quantities} WHERE unique_id = "{unique_id}";'
-		if await self._execute_statement_update(world, sql_str) == 0:
-			return self._message_typesetting(99, 'database operating error')
-		sql_str = f'SELECT {items} FROM player WHERE unique_id = "{unique_id}";'
-		quantities = (await self._execute_statement(world, sql_str))[0][0]
-		return self._message_typesetting(0, 'successfully redeemed', {'remaining' : {"nonce": nonce, items : quantities}})
+		items = data[nonce]['items'].split(',')
+		quantities = data[nonce]['quantities'].split(',')
+
+		update_sql_str = 'UPDATE player SET '
+		select_sql_str = 'SELECT '
+		for j in range(len(items)):
+			update_sql_str += f'{items[j]}={items[j]}+{quantities[j]}'
+			select_sql_str += items[j]
+			if j != len(items) - 1:
+				update_sql_str += ', '
+				select_sql_str += ', '
+		update_sql_str += f' WHERE unique_id = "{unique_id}";'
+		select_sql_str += f' FROM player WHERE unique_id = "{unique_id}";'
+
+		await self._execute_statement_update(world, update_sql_str)
+		quantities = (await self._execute_statement(world, select_sql_str))[0]
+		remaining = {'nonce': nonce}
+		for j in range(len(items)):
+			remaining.update({items[j]: quantities[j]})
+		return self._message_typesetting(0, 'successfully redeemed', {'remaining' : remaining})
 
 	@C.collect_async
 	async def redeem_all_nonce(self, world: int, unique_id: str, type_list: [str], nonce_list: [str]) -> dict:
@@ -1845,14 +1857,24 @@ class GameManager:
 		for i in range(len(type_list)):
 			if data[nonce_list[i]]["status"] == 0:
 				if type_list[i] == "gift":
-					items = data[nonce_list[i]]["items"]
-					quantities = data[nonce_list[i]]["quantities"]
-					sql_str = f"update player set {items}={items}+{quantities} where unique_id='{unique_id}'"
-					if await self._execute_statement_update(world=world, statement=sql_str) == 0:
-						return self._message_typesetting(status=98, message="database operating error")
-					sql_str = f"select {items} from player where unique_id='{unique_id}'"
-					quantities = (await self._execute_statement(world=world, statement=sql_str))[0][0]
-					remaining.update({items: quantities})
+					items = data[nonce_list[i]]["items"].split(',')
+					quantities = data[nonce_list[i]]["quantities"].split(',')
+
+					update_sql_str = 'UPDATE player SET '
+					select_sql_str = 'SELECT '
+					for j in range(len(items)):
+						update_sql_str += f'{items[j]}={items[j]}+{quantities[j]}'
+						select_sql_str += items[j]
+						if j != len(items) - 1:
+							update_sql_str += ', '
+							select_sql_str += ', '
+					update_sql_str += f' WHERE unique_id = "{unique_id}";'
+					select_sql_str += f' FROM player WHERE unique_id = "{unique_id}";'
+
+					await self._execute_statement_update(world=world, statement=update_sql_str)
+					quantities = (await self._execute_statement(world=world, statement=select_sql_str))[0]
+					for j in range(len(items)):
+						remaining.update({items[j]: quantities[j]})
 				elif type_list[i] == "simple":
 					pass
 				elif type_list[i] == "friend_request":
@@ -2050,8 +2072,7 @@ class GameManager:
 			return self._message_typesetting(status=97, message="No such purchase type")
 		c_quantity = rmb_config[m_type][package_id]["c_quantity"] * p_quantity
 		m_quantity = rmb_config[m_type][package_id]["m_quantity"] * p_quantity
-		# self.try_diamond(world,unique_id,value)
-		if c_quantity > rmb_quantity:
+		if rmb_quantity != -1 and c_quantity > rmb_quantity:
 			return self._message_typesetting(status=96, message=f"Insufficient rmb")
 		await self._execute_statement_update(world=world, statement=f"update player set {m_type}={m_type}+{m_quantity} where unique_id='{unique_id}'")
 		r_m_quantity = await self._get_material(world=world, unique_id=unique_id, material=m_type)
@@ -2072,6 +2093,14 @@ class GameManager:
 		else:
 			return await self.purchase_coin_mall(world, unique_id, 'energy', package_id, p_quantity)
 
+	async def purchase_item(self, world: int, unique_id: str, item_id: str) -> dict:
+		"""
+		# 95 - Consumable type error
+		:param item_id: energy_pack_10
+		"""
+		p_list = item_id.split('_pack_')
+		return await self.purchase_rmb_mall(world, unique_id, p_list[0], p_list[1], 1, rmb_quantity=-1)
+
 	async def purchase_basic_summon_scroll(self, world: int, unique_id: str, package_id: str, p_quantity: int, c_type: str) -> dict:
 		"""
 		# 95 - Consumable type error
@@ -2089,6 +2118,7 @@ class GameManager:
 
 	async def mail_gift(self, world: int, unique_id: str) -> dict:
 		# 0 - Successfully reissue gift
+		# 96 - Mailbox error
 		# 97 - You have already received all the activities
 		# 98 - Did not arrive at the event time
 		# 99 - no player info
@@ -2098,7 +2128,6 @@ class GameManager:
 		mail_gift_time = m_data[0][0]
 		current_time = datetime.now().strftime("%Y-%m-%d")
 		current_value = int(current_time.replace('-', ''))
-		await self._execute_statement_update(world, f'update player set mail_gift_time="{current_time}" where unique_id="{unique_id}"')
 		config_list = self._announcement['mail_gift']
 		config = {}  # 将列表转化成字典
 		for d in config_list: config.update(d)
@@ -2125,8 +2154,38 @@ class GameManager:
 				if not data: return self._message_typesetting(97, 'You have already received all the activities')
 				min_value = min(data_value)
 				min_index = data_value.index(min_value)
+
+		json_data = {
+			'world': world,
+			'uid_to': unique_id,
+			'kwargs': {
+				'from': 'server',
+				'body': 'Your gift is waiting.',
+				'subject': 'You have a gift!',
+				'type': 'gift',
+				'items': 'friend_gift',
+				'quantities': '1'
+			}
+		}
+
 		for key in data:
+			items = ''
+			quantities = ''
+			for resource in config[key]['resource_list']:
+				for k, v in resource.items():
+					items += f'{k},'
+					quantities += f'{v},'
+			if items != '':
+				items = items[:-1]
+				quantities = quantities[:-1]
+				json_data['kwargs']['items'] = items
+				json_data['kwargs']['quantities'] = quantities
+				json_data['kwargs']['body'] = config[key]['content_cn']
+				result = requests.post(MAIL_URL + '/send_mail', json=json_data).json()
+				if result['status'] != 0:
+					return self._message_typesetting(96, 'Mailbox error')
 			remaining.update({key: config[key]})
+		await self._execute_statement_update(world, f'update player set mail_gift_time="{current_time}" where unique_id="{unique_id}"')
 		return self._message_typesetting(0, 'Successfully reissue gift', data={'remaining': remaining})
 
 	async def get_login_screen(self) -> dict:
@@ -2172,8 +2231,8 @@ class GameManager:
 		return self._message_typesetting(0, 'Successfully get a link', data={'remaining': remaining})
 
 	async def get_picture_link(self) -> dict:
-		login_pic = self.get_login_screen()
-		announcement_pic = self.get_announcement_pic()
+		login_pic = await self.get_login_screen()
+		announcement_pic = await self.get_announcement_pic()
 		remaining = {'login_screen': {'status': login_pic['status']}, 'announcement': {'status': announcement_pic['status']}}
 		if login_pic['status'] == 0:
 			remaining['login_screen'].update(login_pic['data']['remaining'])
@@ -2181,6 +2240,11 @@ class GameManager:
 			remaining['announcement'].update(announcement_pic['data']['remaining'])
 		return self._message_typesetting(0, 'Successfully get link', data={'remaining': remaining})
 
+	async def update_login_in_time(self, world: int, unique_id: str) -> dict:
+		# 0 - Login time has been updated
+		current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		await self._execute_statement_update(world, f'update player set login_in_time="{current_time}" where unique_id="{unique_id}"')
+		return self._message_typesetting(0, 'Login time has been updated')
 #############################################################################
 #                     Start Mall Function Position                          #
 #############################################################################
@@ -4822,10 +4886,10 @@ async def _respond_family(request: web.Request) -> web.Response:
 #  ########################## start mall  #########################################
 #  ################################################################################
 
-@ROUTES.post('/purchase_diamond_mall')
-async def _purchase_scroll_mall(request: web.Request) -> web.Response:
+@ROUTES.post('/purchase_item')
+async def _purchase_item(request: web.Request) -> web.Response:
 	post = await request.post()
-	return _json_response(await (request.app['MANAGER']).purchase_diamond_mall(int(post['world']), post['unique_id'], post['m_type'], post["package_id"], int(post['p_quantity'])))
+	return _json_response(await (request.app['MANAGER']).purchase_item(int(post['world']), post['unique_id'], post['item_id']))
 
 #  ################################################################################
 #  ##########################   end mall  #########################################
@@ -5008,6 +5072,12 @@ async def _create_player(request: web.Request) -> web.Response:
 async def _get_player_info(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = (request.app['MANAGER']).get_player_info()
+	return _json_response(result)
+
+@ROUTES.post('/update_login_in_time')
+async def _update_login_in_time(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).update_login_in_time(world=int(post['world']), unique_id=post['unique_id'])
 	return _json_response(result)
 
 

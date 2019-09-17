@@ -122,7 +122,7 @@ def get_hang_up_reward():
 
 
 def enter_stage(stage: int):
-	result = requests.post('http://localhost:8004/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': stage})
+	result = requests.post('http://localhost:8004/enter_stage', data={"world": 0, 'unique_id': "4", 'stage': 1})
 	print(str(result.text))
 
 
@@ -268,9 +268,13 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
+	result = requests.post('http://localhost:8004/purchase_item', data={"world": 0, "unique_id": "1", "item_id": "diamond_pack_5"})
+	print(str(result.text))
+	# result = requests.post('http://localhost:8004/update_login_in_time', data={"world": 0, "unique_id": "1"})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/send_merchandise', data={"world": 0, "unique_id": "1", "merchandise": "coin", "quantities": 20})
 	# print(str(result.text))
-	nonce = get_new_mail(unique_id="1")
+	# nonce = get_new_mail(unique_id="1")
 	# redeem_nonce(unique_id="1", nonce=nonce)
 
 	# result = requests.post('http://localhost:8100/get_all_friend_info', data={"world": 0, "unique_id": "4"})
