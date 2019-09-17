@@ -223,7 +223,8 @@ class AccountManager:
 				user = 'root',
 				password = 'lukseun',
 				charset = 'utf8',
-				db = 'user')
+				db = 'user',
+				autocommit = True)
 
 	async def _execute_statement(self, statement: str) -> tuple:
 		'''
