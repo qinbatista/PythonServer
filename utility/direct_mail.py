@@ -7,6 +7,7 @@ Allows the sending of verification emails to the specified clients.
 Requires the caller to supply an aiohttp.ClientSession instance.
 '''
 
+import os
 import hmac
 import base64
 import secrets
@@ -34,7 +35,7 @@ BASE_REQUEST = \
 	'Version' : '2015-11-23'
 }
 
-with open('verify_email_template.html', 'r') as html:
+with open(os.path.dirname(os.path.realpath(__file__)) + '/verify_email_template.html', 'r') as html:
 	VERIFY_TEMPLATE = html.read()
 
 def percent_encode(item):
