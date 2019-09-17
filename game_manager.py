@@ -2233,6 +2233,11 @@ class GameManager:
 			remaining['announcement'].update(announcement_pic['data']['remaining'])
 		return self._message_typesetting(0, 'Successfully get link', data={'remaining': remaining})
 
+	async def update_login_in_time(self, world: int, unique_id: str) -> dict:
+		# 0 - Login time has been updated
+		current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		await self._execute_statement_update(world, f'update player set login_in_time="{current_time}" where unique_id="{unique_id}"')
+		return self._message_typesetting(0, 'Login time has been updated')
 #############################################################################
 #                     Start Mall Function Position                          #
 #############################################################################
@@ -5060,6 +5065,12 @@ async def _create_player(request: web.Request) -> web.Response:
 async def _get_player_info(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = (request.app['MANAGER']).get_player_info()
+	return _json_response(result)
+
+@ROUTES.post('/update_login_in_time')
+async def _update_login_in_time(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).update_login_in_time(world=int(post['world']), unique_id=post['unique_id'])
 	return _json_response(result)
 
 
