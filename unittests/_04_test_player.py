@@ -208,9 +208,7 @@ def redeem_nonce(unique_id: str, nonce: str):
 
 
 def request_friend(unique_id: str, friend_name: str):
-	# result = requests.post('http://localhost:8006/request_friend', data={"world": 0, 'unique_id': 4, "friend_name": "曲永杰"})
-	# result = requests.post('http://localhost:8006/request_friend', data={"world": 0, 'unique_id': 4, "friend_name": "quyongjie"})
-	result = requests.post('http://localhost:8100/request_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": friend_name})
+	result = requests.post('http://localhost:8004/request_friend', data={"world": 0, 'unique_id': unique_id, "friend_name": friend_name})
 	print(str(result.text))
 
 
@@ -461,7 +459,7 @@ if __name__ == "__main__":
 	# try_energy()
 	# start_hang_up()
 	# get_hang_up_reward()
-	enter_stage(stage=1)
+	# enter_stage(stage=1)
 	# enter_tower(stage=3)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
@@ -481,7 +479,7 @@ if __name__ == "__main__":
 	# redeem_nonce(unique_id="1", nonce=nonce)
 	# get_all_mail(unique_id="1")
 
-	# request_friend(unique_id="4", friend_name="a")
+	request_friend(unique_id="5", friend_name="a")
 	# nonce = get_new_mail(unique_id="1")
 	# response_friend(unique_id="1", nonce=nonce)
 	# response_friend(unique_id="1", nonce="32963693688928993319733151846953915999978396660497710378095972836181446004813")

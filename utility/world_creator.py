@@ -197,6 +197,8 @@ def create_table_player(cursor):
 	  `registration_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '用户注册的时间',
 	  `login_in_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '用户登录的时间',
 	  `mail_gift_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '参与活动的时间',
+	  `add_friends_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '添加好友的时间',
+	  `add_friends_times` int(11) unsigned DEFAULT 50 COMMENT '添加好友的次数',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
