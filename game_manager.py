@@ -1,4 +1,27 @@
 ###############################################################################
+'''
+Code Audit Remarks
+- Should not use requests package (migrate to aiohttp ClientSession)
+- Speed of f-strings (should be consistant)
+- Move 'config' function to configuration manager?
+- Possibility of merging role, weapon similar functions like 'get_all_X' functions
+
+add_supplies() how is this different from try_material?
+try_pass_stage() rename and move to private
+try_energy() a try function public????
+try_unlock_skill() should be private?
+pass_stage() how to verify correct information / valid client
+pass_tower() function is too long, should refactor
+start_hang_up() too long, refactor
+automatically_refresh_store() REALLY TOO LONG
+refresh store functions need to be refactored
+black market transaction too long
+create_player query needs to be redone
+
+summon functions can be simplified to a default summon?
+
+
+'''
 
 import os
 import sys
@@ -2239,11 +2262,14 @@ class GameManager:
 			remaining['announcement'].update(announcement_pic['data']['remaining'])
 		return self._message_typesetting(0, 'Successfully get link', data={'remaining': remaining})
 
+	
 	async def update_login_in_time(self, world: int, unique_id: str) -> dict:
 		# 0 - Login time has been updated
 		current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		await self._execute_statement_update(world, f'update player set login_in_time="{current_time}" where unique_id="{unique_id}"')
 		return self._message_typesetting(0, 'Login time has been updated')
+
+
 #############################################################################
 #                     Start Mall Function Position                          #
 #############################################################################
@@ -2318,6 +2344,7 @@ class GameManager:
 		if server_status == -1:
 			return self._message_typesetting(97, 'enter world failed, the world is full')
 		data = await self._execute_statement(target_world, f"select game_name, level, role from player where unique_id='{unique_id}'")
+		await self.update_login_in_time(target_world, unique_id)
 		if data:
 			# weapons = (await self.get_all_weapon(target_world, unique_id))["data"]
 			# supplies = (await self.get_all_supplies(target_world, unique_id))["data"]
@@ -2342,6 +2369,7 @@ class GameManager:
 				remaining.update({head[i]: data[0][i]})
 			return self._message_typesetting(1, 'Create failed, you have a player in this world', data={"remaining": remaining})
 
+		# TODO this query is very very slow
 		data_name = await self._execute_statement(world, f"select game_name from player")
 		game_names = [x[0] for x in data_name]
 		if game_name == "":
@@ -2354,6 +2382,21 @@ class GameManager:
 		for i in range(len(head)):
 			remaining.update({head[i]: data[0][i]})
 		return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
+	
+	'''
+	Changes the player's game name. Costs 200 diamonds.
+	New name must be valid and unique.
+	'''
+	async def change_game_name(self, world: int, unique_id: str, newname: str):
+		if newname == '': return self._message_typesetting(99, 'player name can not be null')
+		isunique = await self._execute_statement(world, f'SELECT EXISTS (SELECT 1 FROM player WHERE game_name = "{newname}");')
+		if isunique[0][0] != 0: return self._message_typesetting(98, 'game name already exists')
+		try_res = await self.try_diamond(world, unique_id, -200)
+		if try_res['status'] != 0: return self._message_typesetting(97, 'not enough diamonds')
+		await self._execute_statement_update(world, f'UPDATE player SET game_name = "{newname}" WHERE unique_id = "{unique_id}"')
+		return self._message_typesetting(0, 'success')
+
+
 
 	async def get_player_info(self):
 		# 0 - get player configuration success
@@ -3458,6 +3501,7 @@ class GameManager:
 #############################################################################
 #							Private Functions								#
 #############################################################################
+	
 
 	async def _select_factory(self, world: int, unique_id) -> list:
 		sql_str = f"select * from factory where unique_id='{unique_id}'"

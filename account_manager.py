@@ -12,7 +12,6 @@ import asyncio
 import hashlib
 import secrets
 import aiomysql
-import requests
 
 from aiohttp import web
 from aiohttp import ClientSession
@@ -153,7 +152,6 @@ class AccountManager:
 				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
 			if phone != '':
 				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
-		requests.post(GAME_MANAGER + '/update_login_in_time', data={'world': world, 'unique_id': unique_id})
 		return self.message_typesetting(0, 'success')
 
 

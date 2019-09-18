@@ -427,6 +427,8 @@ class MessageHandler:
 	async def _verify_email_code(self, data: dict) -> str:
 		return json.dumps(await self.am.verify_email_code(data['data']['unique_id'], data['data']['code'], data['redis'], data['session']))
 
+	async def _change_game_name(self, data: dict) -> str:
+		return json.dumps(await self.gm.change_game_name(data['world'], data['data']['unique_id'], data['data']['newname']))
 
 		# async with session.post(self._game_manager_base_url("0") + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
 		# 	return await resp.text()
@@ -538,6 +540,7 @@ FUNCTION_LIST = {
 	'get_hang_up_info' : MessageHandler._get_hang_up_info,
 
 
+	'change_game_name' : MessageHandler._change_game_name,
 	'delete_friend': MessageHandler._delete_friend,
 	'request_friend': MessageHandler._request_friend,
 	'response_friend': MessageHandler._response_friend,
