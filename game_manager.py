@@ -1,4 +1,26 @@
 ###############################################################################
+'''
+Code Audit Remarks
+- Should not use requests package (migrate to aiohttp ClientSession)
+- Speed of f-strings (should be consistant)
+- Move 'config' function to configuration manager?
+- Possibility of merging role, weapon similar functions like 'get_all_X' functions
+
+add_supplies() how is this different from try_material?
+try_pass_stage() rename and move to private
+try_energy() a try function public????
+try_unlock_skill() should be private?
+pass_stage() how to verify correct information / valid client
+pass_tower() function is too long, should refactor
+start_hang_up() too long, refactor
+automatically_refresh_store() REALLY TOO LONG
+refresh store functions need to be refactored
+black market transaction too long
+
+summon functions can be simplified to a default summon?
+
+
+'''
 
 import os
 import sys
