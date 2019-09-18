@@ -1897,6 +1897,8 @@ class GameManager:
 	async def request_friend(self, world: int, unique_id: str, friend_name: str) -> dict:
 		# success -> 0
 		# 0 - request friend successfully
+		# 90 - Your information is empty and the data is wrong
+		# 94 - The number of friends added today has reached the limit
 		# 95 - database operating error
 		# 96 - Mailbox error
 		# 97 - You already have this friend
@@ -1906,6 +1908,19 @@ class GameManager:
 		if len(friend_data) == 0:
 			return self._message_typesetting(status=99, message="No such person")
 		friend_id = friend_data[0][0]
+
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		uid_data = await self._execute_statement(world=world, statement=f"SELECT add_friends_time, add_friends_times FROM player WHERE unique_id = '{unique_id}'")
+		if uid_data == ():  # 你的信息为空，数据存在错误
+			return self._message_typesetting(90, 'Your information is empty and the data is wrong')
+		add_friends_time, add_friends_times = uid_data[0]
+		if current_time == add_friends_time:
+			if add_friends_times == 0:  # 今天添加好友次数已经达到上限
+				return self._message_typesetting(94, 'The number of friends added today has reached the limit')
+			add_friends_times -= 1
+		else:
+			add_friends_time = current_time
+			add_friends_times = 49  # 每天限制添加好友次数为50次
 
 		data = await self._execute_statement(world=world, statement=f"SELECT * FROM friend WHERE unique_id='{unique_id}' and friend_id='{friend_id}'")
 		if len(data) != 0:
@@ -1932,7 +1947,9 @@ class GameManager:
 
 		if await self._execute_statement_update(world=world, statement=f"insert into friend (unique_id, friend_id, friend_name) values ('{unique_id}', '{friend_id}', '{friend_name}')") == 0:
 			return self._message_typesetting(status=95, message="database operating error")
-		return self._message_typesetting(status=0, message="request friend successfully")
+
+		await self._execute_statement_update(world=world, statement=f'update player set add_friends_time="{add_friends_time}", add_friends_times={add_friends_times} WHERE unique_id = "{unique_id}"')
+		return self._message_typesetting(status=0, message="request friend successfully", data={'remaining': {'add_friends_time': add_friends_time, 'add_friends_times': add_friends_times}})
 
 	@C.collect_async
 	async def response_friend(self, world: int, unique_id: str, nonce: str) -> dict:
