@@ -60,7 +60,7 @@ class Worker:
 		try:
 			#response = await self.mh.resolve(work, self.session)
 			print(f'worker: calling messagehandler with args: {work}')
-			response = await asyncio.wait_for(self.mh.resolve(work, self.session), 3)
+			response = await asyncio.wait_for(self.mh.resolve(work, self.session, self.redis), 3)
 		except asyncio.TimeoutError:
 			print(f'worker: message handler call with args: {work} timed out...')
 			response = '{"status" : -2, "message" : "request timed out"}'

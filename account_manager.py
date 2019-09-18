@@ -22,7 +22,7 @@ from utility import direct_mail
 CFG = config_reader.wait_config()
 
 TOKEN_SERVER_BASE_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
-GAME_MANAGER = 'http://localhost:' + CFG.getint('game_manager', 'port')
+GAME_MANAGER = 'http://localhost:' + CFG['game_manager']['port']
 # Part (1 / 2)
 class AccountManager:
 	def __init__(self):
@@ -36,7 +36,7 @@ class AccountManager:
 		self._p = 1
 
 
-	async def login(self, world: int, identifier: str, value: str, password: str) -> dict:
+	async def login(self, identifier: str, value: str, password: str) -> dict:
 		valid = await self._valid_credentials(identifier, value, password)
 		if not valid:
 			return self.message_typesetting(1, 'Invalid credentials')
@@ -47,10 +47,9 @@ class AccountManager:
 		resp['account'] = account_email_phone[0]
 		resp['email'] = account_email_phone[1]
 		resp['phone_number'] = account_email_phone[2]
-		requests.post(GAME_MANAGER + '/update_login_in_time', data={'world': world, 'unique_id': unique_id})
 		return self.message_typesetting(0, 'success', resp)
 
-	async def login_unique(self, world: int, unique_id: str) -> dict:
+	async def login_unique(self, unique_id: str) -> dict:
 		retvals = await asyncio.gather(self._check_exists('unique_id', unique_id), self._account_is_bound(unique_id))
 		if not retvals[0]:
 			await self._create_new_user(unique_id)
@@ -61,7 +60,6 @@ class AccountManager:
 			status, message, prev_token = 0, 'success', await self._get_prev_token('unique_id', unique_id)
 		resp = await self._request_new_token(unique_id, prev_token)
 		await self._register_token(unique_id, resp['token'])
-		requests.post(GAME_MANAGER + '/update_login_in_time', data={'world': world, 'unique_id': unique_id})
 		return self.message_typesetting(status, message, resp)
 
 	async def bind_email(self, unique_id: str, email: str, redis, session):
