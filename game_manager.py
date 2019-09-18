@@ -23,7 +23,6 @@ C = metrics.Collector()
 
 class GameManager:
 	def __init__(self, worlds = []):
-		#self._initialize_pools(worlds)
 		self._pool = None
 		self._is_first_start = True
 		self.is_first_month = False
@@ -4247,16 +4246,6 @@ class GameManager:
 		self._level_enemy_layouts_config_json = result.json()
 		self.get_world_list = 1 #it means how many world we have
 
-	def _initialize_pools(self, worlds):
-		self._pools = {}
-		if len(worlds) == 0:
-			self._pools[0] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
-		else:
-			for world in worlds:
-				if world == 0:
-					self._pools[0] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = 'aliya', charset = 'utf8')
-				else:
-					self._pools[world] = tormysql.ConnectionPool(max_connections = 10, host = '192.168.1.102', user = 'root', passwd = 'lukseun', db = f'world{world}', charset = 'utf8')
 
 #############################################################################
 #
