@@ -2239,11 +2239,14 @@ class GameManager:
 			remaining['announcement'].update(announcement_pic['data']['remaining'])
 		return self._message_typesetting(0, 'Successfully get link', data={'remaining': remaining})
 
+	
 	async def update_login_in_time(self, world: int, unique_id: str) -> dict:
 		# 0 - Login time has been updated
 		current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 		await self._execute_statement_update(world, f'update player set login_in_time="{current_time}" where unique_id="{unique_id}"')
 		return self._message_typesetting(0, 'Login time has been updated')
+
+
 #############################################################################
 #                     Start Mall Function Position                          #
 #############################################################################
@@ -2318,6 +2321,7 @@ class GameManager:
 		if server_status == -1:
 			return self._message_typesetting(97, 'enter world failed, the world is full')
 		data = await self._execute_statement(target_world, f"select game_name, level, role from player where unique_id='{unique_id}'")
+		await self.update_login_in_time(target_world, unique_id)
 		if data:
 			# weapons = (await self.get_all_weapon(target_world, unique_id))["data"]
 			# supplies = (await self.get_all_supplies(target_world, unique_id))["data"]
@@ -3458,6 +3462,7 @@ class GameManager:
 #############################################################################
 #							Private Functions								#
 #############################################################################
+	
 
 	async def _select_factory(self, world: int, unique_id) -> list:
 		sql_str = f"select * from factory where unique_id='{unique_id}'"
