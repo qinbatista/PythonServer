@@ -774,7 +774,7 @@ class GameManager:
 			await self._execute_statement_update(world, update_str)
 		for i in range(len(keys)):
 			remaining.update({keys[i]: values[i]})
-		enemyLayouts = self._level_enemy_layouts_config_json['enemyLayouts']
+		enemyLayouts = self._level_enemy_layouts['enemyLayouts']
 		if stage > len(enemyLayouts):
 			enemyLayoutList = enemyLayouts[-1]['enemyLayout']
 		else:
@@ -787,10 +787,10 @@ class GameManager:
 		enemyList = list(set(enemyList))
 		remaining.update({'enemy_kind': {}})
 		for enemy in enemyList:
-			if enemy not in list(self._monster_config_json.keys()):
+			if enemy not in list(self._monster_config.keys()):
 				remaining['enemy_kind'].update({enemy: {}})
 			else:
-				remaining['enemy_kind'].update({enemy: self._monster_config_json[enemy]})
+				remaining['enemy_kind'].update({enemy: self._monster_config[enemy]})
 
 		return self._message_typesetting(0, "success", {"remaining": remaining})
 
@@ -1084,8 +1084,8 @@ class GameManager:
 		"""
 		# 0 - Get all monster information to get success
 		"""
-		monster_name = list(self._monster_config_json.keys())
-		# return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config_json}})
+		monster_name = list(self._monster_config.keys())
+		# return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_config": self._monster_config}})
 		return self._message_typesetting(status=0, message="Get all monster information to get success", data={"remaining": {"monster_name": monster_name}})
 
 	def get_stage_info(self) -> dict:
@@ -1097,7 +1097,7 @@ class GameManager:
 			"entry_consumables": self._entry_consumables
 			# "hang_reward": self._hang_reward
 			# "stage_reward": self._stage_reward,
-			# "level_enemy_layouts": self._level_enemy_layouts_config_json,
+			# "level_enemy_layouts": self._level_enemy_layouts,
 		}
 		return self._message_typesetting(status=0, message="get all stage info", data={"remaining": server_config})
 
@@ -2279,7 +2279,7 @@ class GameManager:
 			remaining['announcement'].update(announcement_pic['data']['remaining'])
 		return self._message_typesetting(0, 'Successfully get link', data={'remaining': remaining})
 
-	
+
 	async def update_login_in_time(self, world: int, unique_id: str) -> dict:
 		# 0 - Login time has been updated
 		current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -2310,21 +2310,21 @@ class GameManager:
 		return self._message_typesetting(0, 'got all lottery config info', data)
 
 	async def get_stage_reward_config(self):
-		if self._get_stage_reward_config_json == "":
+		if self._stage_reward == "":
 			return self._message_typesetting(1, 'configration is empty')
-		data = {"remaining": {"stage_reward_config": self._get_stage_reward_config_json}}
+		data = {"remaining": {"stage_reward_config": self._stage_reward}}
 		return self._message_typesetting(0, 'got all stage reward config info', data)
 
 	async def monster_config(self, world: int, unique_id: str):
-		if self._monster_config_json == "":
+		if self._monster_config == "":
 			return self._message_typesetting(1, 'configration is empty')
-		data = {"remaining": {"monster_config": self._monster_config_json}}
+		data = {"remaining": {"monster_config": self._monster_config}}
 		return self._message_typesetting(0, 'got all monster config info', data)
 
 	async def level_enemy_layouts_config(self, world: int, unique_id: str):
-		if self._level_enemy_layouts_config_json == "":
+		if self._level_enemy_layouts == "":
 			return self._message_typesetting(1, 'configration is empty')
-		data = {"remaining": {"level_enemy_layouts_config": self._level_enemy_layouts_config_json}}
+		data = {"remaining": {"level_enemy_layouts_config": self._level_enemy_layouts}}
 		return self._message_typesetting(0, 'got all level enemy layouts config info', data)
 
 	async def get_account_world_info(self, unique_id: str):
@@ -2399,7 +2399,7 @@ class GameManager:
 		for i in range(len(head)):
 			remaining.update({head[i]: data[0][i]})
 		return self._message_typesetting(0, 'You have successfully created a player in this world', data={"remaining": remaining})
-	
+
 	'''
 	Changes the player's game name. Costs 200 diamonds.
 	New name must be valid and unique.
@@ -4281,6 +4281,10 @@ class GameManager:
 		self._hang_reward = d['hang_reward']
 		self._entry_consumables = d['entry_consumables']
 		self._announcement = d['announcement']
+		self._player_experience = d['player_experience']
+		self._monster_config = d['monster_config']
+		self._level_enemy_layouts = d['level_enemy_layouts']
+
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			# print("firstDayOfMonth")
 			self._is_first_start = True
@@ -4299,14 +4303,7 @@ class GameManager:
 				self._boss_life_remaining.append(self._world_boss["boss"+str(i+1)]["life_value"])
 				self._boss_life.append(self._world_boss["boss"+str(i+1)]["life_value"])
 
-		result = requests.get('http://localhost:8000/get_stage_reward_config')
-		self._get_stage_reward_config_json = result.json()
-		result = requests.get('http://localhost:8000/get_monster_config')
-		self._monster_config_json = result.json()
-		result = requests.get('http://localhost:8000/get_level_enemy_layouts_config')
-		self._level_enemy_layouts_config_json = result.json()
 		self.get_world_list = 1 #it means how many world we have
-
 
 #############################################################################
 #

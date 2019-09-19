@@ -35,7 +35,7 @@ ENEMY_LAYOUT = loc() + '/configuration/{}/client/level_enemy_layouts_config.json
 SERVER_CONFIG = loc() + '/configuration/{}/server/server_config.json'
 ENTRY_CONSUMABLES = loc() + '/configuration/{}/server/entry_consumables_config.json'
 ANNOUNCEMENT = loc() + '/configuration/{}/announcement_info.json'
-PLAYER_EXPERIENCE = loc() + '/configuration/{}/player_experience.json'
+PLAYER_EXPERIENCE = loc() + '/configuration/{}/server/player_experience.json'
 
 
 class ConfigurationManager:
@@ -73,23 +73,8 @@ class ConfigurationManager:
 	async def get_client_version(self):
 		return {'version' : self._cv}
 
-	async def get_entry_consumables_config(self):
-		return self._entry_consumables_config
-
 	async def get_game_manager_config(self):
 		return self._game_manager_config
-
-	async def get_level_enemy_layouts_config(self):
-		return self._level_enemy_layouts_config
-
-	async def get_monster_config(self):
-		return self._monster_config
-
-	async def get_stage_reward_config(self):
-		return self._stage_reward_config
-
-	async def get_hang_reward_config(self):
-		return self._hang_reward_config
 
 	async def get_mysql_data_config(self):
 		return self._mysql_data_config
@@ -137,7 +122,6 @@ class ConfigurationManager:
 
 	def _read_game_manager_config(self):
 		# reward_list = [v for v in (json.load(open(REWARD_LIST.format(self._cv), encoding = 'utf-8'))).values()]
-		reward = json.load(open(REWARD.format(self._cv), encoding = 'utf-8'))
 		lottery = json.load(open(LOTTERY.format(self._sv), encoding = 'utf-8'))
 		weapon = json.load(open(WEAPON.format(self._sv), encoding = 'utf-8'))
 		role = json.load(open(ROLE.format(self._sv), encoding = 'utf-8'))
@@ -145,12 +129,13 @@ class ConfigurationManager:
 		player = json.load(open(PLAYER.format(self._sv), encoding = 'utf-8'))
 		world_boss = json.load(open(WORLD_BOSS.format(self._sv), encoding = 'utf-8'))
 		self._game_manager_config = {
-			'reward' : reward, 'lottery' : lottery, 'weapon' : weapon, 'role' : role,
+			'reward' : self._stage_reward, 'lottery' : lottery, 'weapon' : weapon, 'role' : role,
 			'skill' : skill, 'hang_reward' : self._hang_reward_config, 'player' : player,
 			'entry_consumables' : self._entry_consumables_config, "world_boss" : world_boss,
 			"factory": self._factory_config, 'family': self._family_config,
 			"mall": self._mall_config, "announcement": self._announcement_info,
-			'player_experience': self._player_experience
+			'player_experience': self._player_experience, 'monster_config': self._monster_config,
+			'level_enemy_layouts': self._level_enemy_layouts_config
 		}
 
 	def _read_level_enemy_layouts_config(self):
@@ -182,7 +167,7 @@ class ConfigurationManager:
 		self._world_distribution_config = d
 
 	def _read_stage_reward_config(self):
-		self._stage_reward_config = json.load(open(REWARD.format(self._cv), encoding = 'utf-8'))
+		self._stage_reward = json.load(open(REWARD.format(self._cv), encoding = 'utf-8'))
 
 	def _read_hang_reward_config(self):
 		self._hang_reward_config = json.load(open(HANG_REWARD.format(self._cv), encoding = 'utf-8'))
@@ -241,7 +226,7 @@ ROUTES = web.RouteTableDef()
 
 # Call this method whenever you return from any of the following functions.
 # This makes it very easy to construct a json response back to the caller.
-def _json_response(body: str = '', **kwargs) -> web.Response:
+def _json_response(body: dict = {}, **kwargs) -> web.Response:
 	'''
 	A simple wrapper for aiohttp.web.Response return value.
 	'''
@@ -254,22 +239,6 @@ def _json_response(body: str = '', **kwargs) -> web.Response:
 @ROUTES.get('/get_game_manager_config')
 async def __get_game_manager_config(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_game_manager_config())
-
-@ROUTES.get('/get_level_enemy_layouts_config')
-async def __get_level_enemy_layouts_config(request: web.Request) -> web.Response:
-	return _json_response(await MANAGER.get_level_enemy_layouts_config())
-
-@ROUTES.get('/get_monster_config')
-async def __get_monster_config(request: web.Request) -> web.Response:
-	return _json_response(await MANAGER.get_monster_config())
-
-@ROUTES.get('/get_stage_reward_config')
-async def __get_stage_reward_config(request: web.Request) -> web.Response:
-	return _json_response(await MANAGER.get_stage_reward_config())
-
-@ROUTES.get('/get_hang_reward_config')
-async def __get_hang_reward_config(request: web.Request) -> web.Response:
-	return _json_response(await MANAGER.get_hang_reward_config())
 
 @ROUTES.get('/get_mysql_data_config')
 async def __get_mysql_data_config(request: web.Request) -> web.Response:
@@ -286,10 +255,6 @@ async def __get_client_version(request: web.Request) -> web.Response:
 @ROUTES.get('/get_server_config_location')
 async def __get_server_config_location(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_server_config_location())
-
-@ROUTES.get('/get_entry_consumables_config')
-async def __get_entry_consumables_config(request: web.Request) -> web.Response:
-	return _json_response(await MANAGER.get_entry_consumables_config())
 
 @ROUTES.get('/get_world_map')
 async def __get_world_map(request: web.Request) -> web.Response:
