@@ -13,7 +13,9 @@ class Role(enum.Enum):
 	BASIC = 3
 
 async def create(pid, **kwargs):
-	return mt(0, 'success')
+	if not await game.try_coin(pid, -200, **kwargs):
+		return mt(99, 'not enough coins!!!!')
+	return mt(0, 'success!!')
 
 async def leave():
 	pass
