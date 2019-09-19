@@ -42,7 +42,6 @@ class Worker:
 		try:
 			await self.init()
 			self.sid = await self.nats.subscribe('jobs', 'workers', self.process_job)
-			subbed = True
 			while self.running:
 				await asyncio.sleep(1)
 				await self.nats.flush()
