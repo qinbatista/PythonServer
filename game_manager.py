@@ -742,6 +742,7 @@ class GameManager:
 		# 97 - Insufficient energy
 		# 98 - key insufficient
 		# 99 - parameter error
+		await self.try_energy(world=world, unique_id=unique_id, amount=0)
 		enter_stage_data = self._entry_consumables["stage"]
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")) + 1:
 			return self._message_typesetting(99, "Parameter error")
@@ -750,6 +751,7 @@ class GameManager:
 		keys = list(enter_stage_data[str(stage)].keys())
 		values = [-1*int(v) for v in list(enter_stage_data[str(stage)].values())]
 		remaining = {}
+		reward = {'experience': 0, 'level': 0}
 		material_dict = {}
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
@@ -763,6 +765,18 @@ class GameManager:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=material_dict["energy"])
 			if energy_data["status"] >= 97:
 				return self._message_typesetting(status=97, message="Insufficient energy")
+
+			level, experience = (await self._execute_statement(world=world, statement=f'select level, experience from player where unique_id="{unique_id}"'))[0]  # try成功了，一定存在这个列表
+			player_experience = self._player_experience['player_level']['experience'][level]
+			reward['experience'] = 10 * abs(material_dict["energy"])
+			experience += 10 * abs(material_dict["energy"])
+			if experience >= player_experience:
+				experience -= player_experience
+				level += 1
+				reward['level'] = 1
+			await self._execute_statement_update(world, f'update player set level={level}, experience={experience} where unique_id="{unique_id}"')
+			remaining.update({'experience': experience, 'level': level})
+
 			values.pop(keys.index("energy"))
 			keys.remove("energy")
 			material_dict.pop("energy")
@@ -792,7 +806,7 @@ class GameManager:
 			else:
 				remaining['enemy_kind'].update({enemy: self._monster_config[enemy]})
 
-		return self._message_typesetting(0, "success", {"remaining": remaining})
+		return self._message_typesetting(0, "success", {"remaining": remaining, 'reward': reward})
 
 	@C.collect_async
 	async def pass_stage(self, world: int, unique_id: str, stage: int, clear_time: str) -> dict:
@@ -822,6 +836,7 @@ class GameManager:
 		# 97 - Insufficient energy
 		# 98 - key insufficient
 		# 99 - parameter error
+		await self.try_energy(world=world, unique_id=unique_id, amount=0)
 		enter_tower_data = self._entry_consumables["tower"]
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "tower_stage")) + 1:
 			return self._message_typesetting(99, "Parameter error")
@@ -830,6 +845,7 @@ class GameManager:
 		keys = list(enter_tower_data[str(stage)].keys())
 		values = [-1*int(v) for v in list(enter_tower_data[str(stage)].values())]
 		remaining = {}
+		reward = {'experience': 0, 'level': 0}
 		material_dict = {}
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
@@ -843,6 +859,18 @@ class GameManager:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=material_dict["energy"])
 			if energy_data["status"] >= 97:
 				return self._message_typesetting(status=97, message="Insufficient energy")
+
+			level, experience = (await self._execute_statement(world=world, statement=f'select level, experience from player where unique_id="{unique_id}"'))[0]  # try成功了，一定存在这个列表
+			player_experience = self._player_experience['player_level']['experience'][level - 1]
+			reward['experience'] = 10 * abs(material_dict["energy"])
+			experience += 10 * abs(material_dict["energy"])
+			if experience >= player_experience:
+				experience -= player_experience
+				level += 1
+				reward['level'] = 1
+			await self._execute_statement_update(world, f'update player set level={level}, experience={experience} where unique_id="{unique_id}"')
+			remaining.update({'experience': experience, 'level': level})
+
 			values.pop(keys.index("energy"))
 			keys.remove("energy")
 			material_dict.pop("energy")
