@@ -1,6 +1,7 @@
 {
 	"player_level":
 	{
+		"max_level": 100,
 		"experience":
 		[
 			60,

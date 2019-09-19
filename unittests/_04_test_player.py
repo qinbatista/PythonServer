@@ -15,7 +15,7 @@ print(str(os.getpid()))
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-GAME_MANAGER_BASE_URL = 'http://localhost:8100'
+GAME_MANAGER_BASE_URL = 'http://localhost:8004'
 # GAME_MANAGER_BASE_URL = 'http://localhost:8007'
 # GAME_MANAGER_BASE_URL = 'http://localhost:8006'
 
@@ -443,8 +443,8 @@ if __name__ == "__main__":
 	# try_iron()
 	# try_diamond()
 	# level_up_weapon()
-	# pass_stage(stage=11)
-	# pass_tower(stage=33)
+	# pass_stage(stage=2)
+	# pass_tower(stage=1)
 	# get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
@@ -460,7 +460,7 @@ if __name__ == "__main__":
 	# start_hang_up()
 	# get_hang_up_reward()
 	enter_stage(stage=1)
-	# enter_tower(stage=3)
+	enter_tower(stage=1)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
 	# manually_refresh_store()

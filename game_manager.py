@@ -136,6 +136,8 @@ class GameManager:
 		if stage not in stages: stage_reward = stage_data[str(max(stages))]
 		else: stage_reward = stage_data[str(stage)]
 		for key, value in stage_reward.items():
+			if key == 'experience':
+				material_dict.update({'level': 0})
 			material_dict.update({key: value})
 		if sql_stage + 1 == stage:  # 通过新关卡
 			material_dict.update({"stage": 1})
@@ -768,14 +770,17 @@ class GameManager:
 
 			level, experience = (await self._execute_statement(world=world, statement=f'select level, experience from player where unique_id="{unique_id}"'))[0]  # try成功了，一定存在这个列表
 			player_experience = self._player_experience['player_level']['experience'][level]
+			max_level = self._player_experience['player_level']['max_level']
 			reward['experience'] = 10 * abs(material_dict["energy"])
 			experience += 10 * abs(material_dict["energy"])
-			if experience >= player_experience:
-				experience -= player_experience
+			while experience >= player_experience:
+				if level >= max_level: break
+				reward['level'] += 1
 				level += 1
-				reward['level'] = 1
+				experience -= player_experience
+				player_experience = self._player_experience['player_level']['experience'][level]
 			await self._execute_statement_update(world, f'update player set level={level}, experience={experience} where unique_id="{unique_id}"')
-			remaining.update({'experience': experience, 'level': level})
+			remaining.update({'experience': experience, 'level': level, 'max_level': max_level})
 
 			values.pop(keys.index("energy"))
 			keys.remove("energy")
@@ -828,6 +833,19 @@ class GameManager:
 			for i in range(len(keys)):
 				remaining.update({keys[i]: values[i]})
 			reward.pop("stage")
+			if 'level' in keys:
+				player_experience = self._player_experience['player_level']['experience'][remaining['level']]
+				max_level = self._player_experience['player_level']['max_level']
+				remaining.update({'max_level': max_level})
+				while remaining['experience'] >= player_experience:
+					if remaining['level'] >= max_level: break
+					reward['level'] += 1
+					remaining['level'] += 1
+					remaining['experience'] -= player_experience
+					player_experience = self._player_experience['player_level']['experience'][remaining['level']]
+
+				await self._execute_statement_update(world, f'update player set experience={remaining["experience"]}, level={remaining["level"]} where unique_id="{unique_id}"')
+
 			return self._message_typesetting(status=0, message="passed customs!", data={"remaining": remaining, "reward": reward})
 
 	@C.collect_async
@@ -861,15 +879,19 @@ class GameManager:
 				return self._message_typesetting(status=97, message="Insufficient energy")
 
 			level, experience = (await self._execute_statement(world=world, statement=f'select level, experience from player where unique_id="{unique_id}"'))[0]  # try成功了，一定存在这个列表
-			player_experience = self._player_experience['player_level']['experience'][level - 1]
+			player_experience = self._player_experience['player_level']['experience'][level]
+			max_level = self._player_experience['player_level']['max_level']
 			reward['experience'] = 10 * abs(material_dict["energy"])
 			experience += 10 * abs(material_dict["energy"])
-			if experience >= player_experience:
-				experience -= player_experience
+			while experience >= player_experience:
+				if level >= max_level: break
 				level += 1
-				reward['level'] = 1
+				reward['level'] += 1
+				experience -= player_experience
+				player_experience = self._player_experience['player_level']['experience'][level]
+
 			await self._execute_statement_update(world, f'update player set level={level}, experience={experience} where unique_id="{unique_id}"')
-			remaining.update({'experience': experience, 'level': level})
+			remaining.update({'experience': experience, 'level': level, 'max_level': max_level})
 
 			values.pop(keys.index("energy"))
 			keys.remove("energy")
@@ -929,6 +951,20 @@ class GameManager:
 			keys = list(material_dict.keys())
 			values = list((await self._execute_statement(world=world, statement=select_str))[0])
 			for i in range(len(keys)):
+				if keys[i] == 'experience':
+					level = await self._get_material(world, unique_id, 'level')
+					player_experience = self._player_experience['player_level']['experience'][level]
+					max_level = self._player_experience['player_level']['max_level']
+					material_dict.update({'level': 0})
+					remaining.update({'level': level, 'max_level': max_level})
+					while values[i] >= player_experience:
+						if level >= max_level: break
+						level += 1
+						values[i] -= player_experience
+						player_experience = self._player_experience['player_level']['experience'][level]
+					material_dict['level'] = level - remaining['level']
+					remaining['level'] = level
+					await self._execute_statement_update(world, f'update player set experience={values[i]}, level={level} where unique_id="{unique_id}"')
 				remaining.update({keys[i]: values[i]})
 			material_dict.pop("tower_stage")
 			return self._message_typesetting(status=0, message="Earn rewards success", data={"remaining": remaining, "reward": material_dict})

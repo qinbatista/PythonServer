@@ -2,7 +2,8 @@
 	"tower": {
 		"1":{
 			"iron": 210,
-			"coin": 220
+			"coin": 220,
+			"experience": 220
 		},
 		"2":{
 			"iron": 250,
