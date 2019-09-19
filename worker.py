@@ -13,6 +13,7 @@ Completed jobs are sent to the gate server which contains the requesting client.
 import signal
 import asyncio
 import aiohttp
+import aiomysql
 import aioredis
 import message_handler
 import nats.aio.client
@@ -30,6 +31,7 @@ class Worker:
 		self.ujobs   = 0
 		self.running = False
 
+		self.db      = None
 		self.sid     = None
 		self.nats    = None
 		self.redis   = None
@@ -41,7 +43,7 @@ class Worker:
 	async def start(self):
 		try:
 			await self.init()
-			self.sid = await self.nats.subscribe('jobs', 'workers', self.process_job)
+			self.sid = await self.nats.subscribe('experimental', 'workers', self.process_job)
 			while self.running:
 				await asyncio.sleep(1)
 				await self.nats.flush()
@@ -59,7 +61,7 @@ class Worker:
 		try:
 			#response = await self.mh.resolve(work, self.session)
 			print(f'worker: calling messagehandler with args: {work}')
-			response = await asyncio.wait_for(self.mh.resolve(work, self.session, self.redis), 3)
+			response = await asyncio.wait_for(self.mh.resolve(work, self.session, self.redis, self.db), 3)
 		except asyncio.TimeoutError:
 			print(f'worker: message handler call with args: {work} timed out...')
 			response = '{"status" : -2, "message" : "request timed out"}'
@@ -81,6 +83,7 @@ class Worker:
 		self.session = aiohttp.ClientSession()
 		self.redis = await aioredis.create_redis(CFG['redis']['addr'])
 		await self.nats.connect(CFG['nats']['addr'], max_reconnect_attempts = 1)
+		self.db = await aiomysql.create_pool(maxsize = 10, host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'experimental')
 		if platform.system() != 'Windows':
 			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 
@@ -104,6 +107,8 @@ class Worker:
 			await w.wait_closed()
 		print('worker: mh shutting down') 
 		await self.mh.shutdown()
+		self.db.close()
+		await self.db.wait_closed()
 		self.running = False
 		print('worker: shutdown complete')
 

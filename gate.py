@@ -166,7 +166,7 @@ class Gate:
 		cid = uuid.uuid4().hex
 		self.cwriters[cid] = writer
 		await self.redis.set(cid, self.gid, expire = 10)
-		await self.nats.publish('jobs', (cid + '~' + job).encode())
+		await self.nats.publish('experimental', (cid + '~' + job).encode())
 		print(f'gate: submitted new job with id {cid} and args {job}')
 		print(f'gate: waiting for job {cid} to complete')
 

@@ -3,6 +3,7 @@ family.py
 '''
 
 import enum
+from module import game
 
 
 class Role(enum.Enum):
@@ -11,15 +12,14 @@ class Role(enum.Enum):
 	ELITE = 2,
 	BASIC = 3
 
-class Family:
-	def __init__(self):
-		pass
-	
-	async def create(self, **kwargs):
-		pass
+async def create(pid, **kwargs):
+	return mt(0, 'success')
 
-	async def leave(self):
-		pass
+async def leave():
+	pass
 
-	async def kick_member(self):
-		pass
+async def kick_member():
+	pass
+
+def mt(status, message):
+	return {'status' : status, 'message' : message}

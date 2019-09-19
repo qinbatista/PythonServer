@@ -30,6 +30,7 @@ class LukseunClient:
 		await writer.wait_closed()
 		if resp != '':
 			data = json.loads(resp, encoding = 'utf-8')
+			print(f'received: {data}')
 			if 'data' in data and 'token' in data['data']:
 				self.token = data['data']['token']
 			return data
