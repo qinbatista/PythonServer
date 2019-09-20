@@ -2369,7 +2369,6 @@ class GameManager:
 		await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "" WHERE familyid = "{fid}";')
 		return self._message_typesetting(0, 'You have canceled the disbanded family')
 
-	#  #################################################################################
 	#@C.collect_async
 	async def request_join_family(self, world: int, uid: str, fname: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox
@@ -2389,6 +2388,7 @@ class GameManager:
 			r = requests.post('http://localhost:8020/send_mail', json = j)
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
+	#  #################################################################################
 	#@C.collect_async
 	async def invite_user_family(self, world: int, uid: str, target: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox
