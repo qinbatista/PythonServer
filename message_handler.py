@@ -61,7 +61,7 @@ class MessageHandler:
 		return json.dumps(await self.am.login_unique(data['data']['unique_id']))
 
 	async def _bind_account(self, data: dict) -> str:
-		return json.dumps(await self.am.bind_account(data['world'], data['data']['unique_id'], data['data']['password'], data['data']['account'], data['data']['email'], data['data']['phone_number']))
+		return json.dumps(await self.am.bind_account(data['data']['unique_id'], data['data']['account'], data['data']['password']))
 
 	async def _level_up_skill(self, data: dict) -> str:
 		return json.dumps(await self.gm.level_up_skill(data['world'], data['data']['unique_id'], data['data']['skill_id'], data['data']['scroll_id']))
