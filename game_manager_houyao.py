@@ -2378,10 +2378,15 @@ class GameManager:
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
 		if fid != '': return self._message_typesetting(98, 'already in a family')
 		if not await self._family_exists(world, fname): return self._message_typesetting(99, 'family does not exist')
-		data = await self._execute_statement(world, f'SELECT president FROM families WHERE familyname = "{fname}";')
-		owner_uid = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{data[0][0]}";')
-		j = {'world' : 0, 'uid_to' : owner_uid[0][0], 'kwargs' : {'from' : 'server', 'subject' : 'New join family request', 'body' : f'new request to join family from {game_name}', 'type' : 'family_request', 'fid' : data[0][0], 'fname' : fname, 'target' : game_name, 'uid' : uid}}
-		r = requests.post('http://localhost:8020/send_mail', json = j)
+		data = await self._execute_statement(world, f'SELECT familyid, president, admin1, admin2, admin3 FROM families WHERE familyname = "{fname}";')
+		gn_list = [gn for gn in data[0] if gn != '']
+		fid = gn_list[0]
+		gn_list.remove(fid)
+		data = tuple(gn_list)
+		admin_uid = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name in {data};')
+		for admin in admin_uid:
+			j = {'world' : 0, 'uid_to' : admin[0], 'kwargs' : {'from' : 'server', 'subject' : 'New join family request', 'body' : f'new request to join family from {game_name}', 'type' : 'family_request', 'fid' : fid, 'fname' : fname, 'target' : game_name, 'uid' : uid}}
+			r = requests.post('http://localhost:8020/send_mail', json = j)
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
 	#@C.collect_async
