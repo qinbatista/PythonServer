@@ -36,7 +36,7 @@ class MessageHandler:
 
 
 	async def _create_family(self, data: dict) -> str:
-		return json.dumps(await family.create(data['data']['unique_id'], **data))
+		return json.dumps(await family.create(data['data']['unique_id'], data['data']['name'],**data))
 
 
 FUNCTION_LIST = {

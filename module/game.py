@@ -7,7 +7,7 @@ import enum
 from module import common
 
 
-class Item(enum.Enum):
+class Item(enum.IntEnum):
 	COIN = 0
 
 async def try_coin(pid, value, **kwargs):
@@ -16,6 +16,5 @@ async def try_coin(pid, value, **kwargs):
 
 async def _get_material(pid, mid, **kwargs):
 	data = await common.execute(f'SELECT value FROM item WHERE pid = "{pid}" AND iid = "{mid.value}";', kwargs['db'])
-	print(f'this is data from db: {data}')
 	return int(data[0][0])
 
