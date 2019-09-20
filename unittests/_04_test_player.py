@@ -4,7 +4,11 @@ import os
 import requests
 import configparser
 import asyncio
-from unittests.user_behavior_simulation import tool_lukseun_client
+try:
+	from unittests.user_behavior_simulation import tool_lukseun_client
+except:
+	from user_behavior_simulation import tool_lukseun_client
+
 import random
 """
 print(str(time.time()))
