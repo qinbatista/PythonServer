@@ -21,7 +21,7 @@ from utility import direct_mail
 CFG = config_reader.wait_config()
 
 TOKEN_SERVER_BASE_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
-GAME_MANAGER = 'http://localhost:' + CFG['game_manager']['port']
+
 # Part (1 / 2)
 class AccountManager:
 	def __init__(self):
@@ -34,6 +34,18 @@ class AccountManager:
 		self._r = 8
 		self._p = 1
 
+	async def login_unique(self, unique_id: str) -> dict:
+		retvals = await asyncio.gather(self._check_exists('unique_id', unique_id), self._account_is_bound(unique_id))
+		if not retvals[0]:
+			await self._create_new_user(unique_id)
+			status, message, prev_token = 1, 'new account created', ''
+		elif retvals[1]:
+			return self.message_typesetting(2, 'account already bound')
+		else:
+			status, message, prev_token = 0, 'success', await self._get_prev_token('unique_id', unique_id)
+		resp = await self._request_new_token(unique_id, prev_token)
+		await self._register_token(unique_id, resp['token'])
+		return self.message_typesetting(status, message, resp)
 
 	async def login(self, identifier: str, value: str, password: str) -> dict:
 		valid = await self._valid_credentials(identifier, value, password)
@@ -48,18 +60,20 @@ class AccountManager:
 		resp['phone_number'] = account_email_phone[2]
 		return self.message_typesetting(0, 'success', resp)
 
-	async def login_unique(self, unique_id: str) -> dict:
-		retvals = await asyncio.gather(self._check_exists('unique_id', unique_id), self._account_is_bound(unique_id))
-		if not retvals[0]:
-			await self._create_new_user(unique_id)
-			status, message, prev_token = 1, 'new account created', ''
-		elif retvals[1]:
-			return self.message_typesetting(2, 'account already bound')
-		else:
-			status, message, prev_token = 0, 'success', await self._get_prev_token('unique_id', unique_id)
-		resp = await self._request_new_token(unique_id, prev_token)
-		await self._register_token(unique_id, resp['token'])
-		return self.message_typesetting(status, message, resp)
+	async def bind_account(self, unique_id: str, account: str, password: str) -> dict:
+		if not self._is_valid_account(account):
+			return self.message_typesetting(99, 'invalid account name')
+		if not self._is_valid_password(password):
+			return self.message_typesetting(98, 'invalid password')
+		if await self._check_exists('account', account):
+			return self.message_typesetting(97, 'invalid account name')
+
+		random_salt = str(secrets.randbits(256))
+		if len(random_salt) % 2 != 0:
+			random_salt = '0' + random_salt
+		hashed_password = hashlib.scrypt(password.encode(), salt=random_salt.encode(), n = self._n, r = self._r, p = self._p).hex()
+		await self._execute_statement('UPDATE info SET account = "' + account + '", password = "' + hashed_password + '", salt = "' + random_salt + '" WHERE unique_id = "' + unique_id + '";')
+		return self.message_typesetting(0, 'success', {'account' : account})
 
 	async def bind_email(self, unique_id: str, email: str, redis, session):
 		if not await self._account_is_bound(unique_id):
@@ -79,83 +93,16 @@ class AccountManager:
 		print('account manager: message was sent')
 		return self.message_typesetting(0, 'success, email sent. code valid for 5 minutes.')
 
-
 	async def verify_email_code(self, unique_id: str, code, redis, session):
 		email = await redis.get('nonce.verify.email.' + code)
 		if not email: return self.message_typesetting(99, 'code invalid')
+		email = email.decode()
 		await redis.delete('nonce.verify.email.' + code)
 		retvals = await asyncio.gather(self._email_is_bound(unique_id), self._check_exists('email', email))
 		if retvals[0]: return self.message_typesetting(98, 'account already bound email')
 		if retvals[1]: return self.message_typesetting(97, 'email already exists')
 		await self._execute_statement(f'UPDATE info SET email = "{email}" WHERE unique_id = "{unique_id}";')
-		return self.message_typesetting(0, 'success, email verified')
-
-
-	# TODO run check_exists as a task
-	# TODO refactor code for speed improvements
-	async def bind_account(self, world: int, unique_id: str, password: str, account: str, email: str, phone: str) -> dict:
-		if await self._account_is_bound(unique_id): # trying to bind additional items
-			if email == '' and phone == '':
-				return self.message_typesetting(9, 'could not bind additional items')
-			if email != '':
-				retvals = await asyncio.gather(self._email_is_bound(unique_id), self._check_exists('email', email))
-				if retvals[0]:
-					return self.message_typesetting(8, 'email already bound')
-				if retvals[1]:
-					return self.message_typesetting(6, 'email already exists')
-				if not self._is_valid_email(email):
-					return self.message_typesetting(2, 'invalid email')
-
-			if phone != '':
-				retvals = await asyncio.gather(self._phone_is_bound(unique_id), self._check_exists('phone_number', phone))
-				if retvals[0]:
-					return self.message_typesetting(9, 'phone already bound')
-				if retvals[1]:
-					return self.message_typesetting(4, 'phone already exists')
-				if not self._is_valid_phone(phone):
-					return self.message_typesetting(3, 'invalid phone')
-
-			if email != '':
-				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
-			if phone != '':
-				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
-
-		else: # trying to bind for the first time
-			retvals = await asyncio.gather(self._check_exists('account', account), self._check_exists('email', email), self._check_exists('phone_number', phone))
-			if not self._is_valid_account(account):
-				return self.message_typesetting(1, 'invalid account name')
-			if retvals[0]:
-				return self.message_typesetting(5, 'account already exists')
-			if not self._is_valid_password(password):
-				return self.message_typesetting(4, 'invalid password')
-			
-			if email != '':
-				if retvals[1]:
-					return self.message_typesetting(6, 'email already exists')
-				if not self._is_valid_email(email):
-					return self.message_typesetting(2, 'invalid email')
-
-			if phone != '':
-				if retvals[2]:
-					return self.message_typesetting(7, 'phone already exists')
-				if not self._is_valid_phone(phone):
-					return self.message_typesetting(3, 'invalid phone')
-
-
-			random_salt = str(secrets.randbits(256))
-			if len(random_salt) % 2 != 0:
-				random_salt = '0' + random_salt
-			hashed_password = hashlib.scrypt(password.encode(), salt=random_salt.encode(), n = self._n, r = self._r, p = self._p).hex()
-			await self._execute_statement('UPDATE info SET account = "' + account + '", password = "' + hashed_password + '", salt = "' + random_salt + '" WHERE unique_id = "' + unique_id + '";')
-
-			if email != '':
-				await self._execute_statement('UPDATE info SET email = "' + email + '" WHERE unique_id = "' + unique_id + '";')
-			if phone != '':
-				await self._execute_statement('UPDATE info SET phone_number = "' + phone + '" WHERE unique_id = "' + unique_id + '";')
-		return self.message_typesetting(0, 'success')
-
-
-
+		return self.message_typesetting(0, 'success, email verified', {'email' : email})
 
 
 
