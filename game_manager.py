@@ -2936,7 +2936,6 @@ class GameManager:
 
 		return self._message_typesetting(0, 'success', data={'remaining': {'news': news}})
 
-	# TODO
 	async def family_officer(self, world: int, uid: str, target: str, position: int) -> dict:
 		# position: 0:管理员, 1:精英
 		# 0 - You successfully appointed the target as an official
@@ -3004,7 +3003,6 @@ class GameManager:
 			return self._message_typesetting(91, 'No such position')
 
 		return self._message_typesetting(0, '', data={'remaining': {'news': news}})
-
 
 	# TODO
 	async def dismissal_family_officer(self, world: int, uid: str, target: str) -> dict:
