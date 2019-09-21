@@ -2490,10 +2490,11 @@ class GameManager:
 #############################################################################
 #						Start Family Functions								#
 #############################################################################
-
+	# 新闻格式如下：
+	# latest_news = "执行人:执行目标:执行方式:执行人的身份:执行目标的身份"
+	# 执行方式的代号==> 1:删除， 2:添加， 3:...
 	@C.collect_async
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
-		# announcement = "执行人:执行目标:执行方式:执行人的身份:执行目标的身份"
 		# 需要清空被移除者的工会贡献值和签到时间
 		# 0 - success, user removed
 		# 91 - You don't have permission to delete the administrator
@@ -2511,7 +2512,7 @@ class GameManager:
 		if gamename_target not in members: return self._message_typesetting(99, 'He is not your family member')
 		if game_name == gamename_target: return self._message_typesetting(95, 'you can not remove yourself using this function')
 		family_info = await self._get_family_information(world, fid)
-		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
 			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
 			return self._message_typesetting(94, 'No such union, your family has been dissolved')
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
@@ -2539,40 +2540,40 @@ class GameManager:
 		else: remove_times -= 1
 		if game_name != president and game_name not in admins: return self._message_typesetting(97, 'you are not family admin')
 
-		announcement = ""
+		latest_news = ''
 		if game_name == president:  # 会长权限
 			for i in range(len(family_info[8: 11])):  # 管理员admin
 				if gamename_target == family_info[i + 8]:
-					announcement = f"{game_name}:{gamename_target}:1:president:admin"
+					latest_news = f"{game_name}:{gamename_target}:1:president:admin"
 					await self._execute_statement_update(world, f'UPDATE families SET admin{i + 1} = "" WHERE familyid = "{fid}";')
-			if not announcement:
+			if latest_news == '':
 				for i in range(len(family_info[11: 16])):  # 精英elite
 					if gamename_target == family_info[i + 11]:
-						announcement = f"{game_name}:{gamename_target}:1:president:elite"
+						latest_news = f"{game_name}:{gamename_target}:1:president:elite"
 						await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
-			if not announcement:
-				announcement = f"{game_name}:{gamename_target}:1:president:member"
+			if latest_news == '':
+				latest_news = f"{game_name}:{gamename_target}:1:president:member"
 		else:
 			if gamename_target in admins: return self._message_typesetting(91, "You don't have permission to delete the administrator")
 			for i in range(len(family_info[11: 16])):  # 精英elite
 				if gamename_target == family_info[i + 11]:
-					announcement = f"{game_name}:{gamename_target}:1:admin:elite"
+					latest_news = f"{game_name}:{gamename_target}:1:admin:elite"
 					await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
-			if not announcement:
-				announcement = f"{game_name}:{gamename_target}:1:admin:member"
+			if latest_news == '':
+				latest_news = f"{game_name}:{gamename_target}:1:admin:member"
 		if news == "":
-			news = {"1": announcement}
+			news = {"1": latest_news}
 		else:
 			content = list(json.loads(news.replace("'", "\""), encoding='utf-8').values())
 			if len(content) >= 30: content.pop(0)
-			content.append(announcement)
-			news = {}
+			content.append(latest_news)
+			news = {}  # 1, 2, 3, ..., latest_news
 			for i, value in enumerate(content):
 				news.update({str(i + 1): value})
 		leave_family_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-		await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{str(news)}" WHERE familyid = "{fid}";')
+		await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, news="{str(news)}" WHERE familyid = "{fid}";')
 		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="", cumulative_contribution=0, leave_family_time="{leave_family_time}" WHERE game_name = "{gamename_target}";')
-		remaining = {"announcement": announcement, "news": news, "remove_start_time": remove_start_time, "remove_times": remove_times, 'disbanded_family_time': disbanded_family_time}
+		remaining = {"news": news, "remove_start_time": remove_start_time, "remove_times": remove_times, 'disbanded_family_time': disbanded_family_time}
 		return self._message_typesetting(0, 'success, user removed', data={"remaining": remaining})
 
 	# TODO refactor code to run both sql statements with asyncio.gather
