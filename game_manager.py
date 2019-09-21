@@ -2775,7 +2775,7 @@ class GameManager:
 	async def request_join_family(self, world: int, uid: str, fname: str) -> dict:
 		# 用户发出请求加入对应的家族
 		# 0 - success, join request message sent to family owner's mailbox
-		# 96 - The player family you invited has not cooled yet.
+		# 96 - You have to leave the family for less than a day
 		# 97 - This family has been dissolved and the family does not exist.
 		# 98 - you already belong to a family
 		# 99 - family does not exist
@@ -2783,7 +2783,7 @@ class GameManager:
 		if fid != '': return self._message_typesetting(98, 'already in a family')
 		leave_family_time = (await self._execute_statement(world, f'select leave_family_time from player where unique_id="{uid}"'))[0][0]
 		if leave_family_time != '' and (datetime.now() - datetime.strptime(leave_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds() >= 86400:
-			return self._message_typesetting(96, 'The player family you invited has not cooled yet.')
+			return self._message_typesetting(96, 'You have to leave the family for less than a day')
 		if not await self._family_exists(world, fname): return self._message_typesetting(99, 'family does not exist')
 		data = await self._execute_statement(world, f'SELECT familyid, president, admin1, admin2, admin3 FROM families WHERE familyname = "{fname}";')
 		gn_list = [gn for gn in data[0] if gn != '']
@@ -2823,33 +2823,33 @@ class GameManager:
 		r = requests.post(MAIL_URL + '/send_mail', json = j)
 		return self._message_typesetting(0, 'success, request sent')
 
-	# TODO
+	# TODO Done · No test
 	@C.collect_async
 	async def respond_family(self, world: int, uid: str, nonce: str) -> dict:
 		# 处理申请家族的邀请函
 		# 0 - success
-		# 91 - You are not the patriarch or administrator of this family
-		# 93 - You didn't join the family
-		# 94 - No such union, your family has been dissolved
+		# 90 - You are not a user
+		# 94 - You are not the patriarch or administrator of this family
 		# 95 - Your family has been dissolved by the patriarch
+		# 96 - No such union, your family has been dissolved
 		# 97 - target is already in a family
 		# 98 - family is full
 		# 99 - invalid nonce
-		gn = await self._execute_statement(world, f'select game_name, familyid from player where unique_id="{uid}"')
-		if gn[0][1] == '':
-			return self._message_typesetting(93, "You didn't join the family")
+		user_data = await self._execute_statement(world, f'select game_name from player where unique_id="{uid}"')
+		if user_data == ():
+			return self._message_typesetting(90, 'You are not a user')
 
 		r = requests.post(TOKEN_URL + '/redeem_nonce', json = {'type' : ['family_request'], 'nonce' : [nonce]}).json()
 		if r[nonce]['status'] != 0 or r[nonce]['type'] != 'family_request':
 			return self._message_typesetting(99, 'invalid nonce')
 
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = r[nonce]['uid'])
-		if fid != '': return self._message_typesetting(97, 'target already in a family')
+		if fid != '': return self._message_typesetting(97, 'target already in a family')  # 申请的用户已在其他家庭中
 
 		family_info = await self._get_family_information(world, fid)
-		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
 			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
-			return self._message_typesetting(94, 'No such union, your family has been dissolved')
+			return self._message_typesetting(96, 'No such union, your family has been dissolved')
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
 		level = family_info[2]
 		president = family_info[7]
@@ -2858,8 +2858,8 @@ class GameManager:
 		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
 			return self._message_typesetting(95, 'Your family has been dissolved by the patriarch')
 
-		if admin_data[0][0] != president and admin_data[0][0] not in admins:
-			return self._message_typesetting(91, 'You are not the patriarch or administrator of this family')
+		if user_data[0][0] != president and user_data[0][0] not in admins:
+			return self._message_typesetting(94, 'You are not the patriarch or administrator of this family')
 
 		members = [gname[0] for gname in await self._execute_statement(world, f'select game_name from player where familyid="{fid}"')]
 		max_member = self._family_config['union_restrictions']['people_number']['basis_people'] + level * self._family_config['union_restrictions']['people_number']['increment']
