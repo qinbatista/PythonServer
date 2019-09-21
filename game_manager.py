@@ -3061,6 +3061,60 @@ class GameManager:
 			await self._execute_statement_update(world, f'update families set elite{elites.index(target) + 1} = "", news="{str(news)}" where familyid="{fid}"')
 		return self._message_typesetting(0, 'You successfully dismissed the target', data={'remaining': {'news': news}})
 
+	async def family_change_name(self, world: int, uid: str, family_name: str) -> dict:
+		# 0 - Modify family name successfully
+		# 92 - Insufficient diamond
+		# 93 - family name already taken
+		# 94 - family name is illegal
+		# 95 - Can't be the same as the old name
+		# 96 - You are not a patriarch and you have no right to modify the family name
+		# 97 - Your family has been dissolved by the patriarch
+		# 98 - No such union, your family has been dissolved
+		# 99 - you are not in a family
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if fid == '': return self._message_typesetting(99, 'you are not in a family')
+
+		family_info = await self._get_family_information(world, fid)
+		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(98, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+
+		news = family_info[6]
+		content = []
+		if news != '':
+			news = json.loads(news.replace("'", "\""), encoding='utf-8')
+			content = list(news.values())
+			if len(content) >= 30: content.pop(0)
+
+		fname = family_info[1]
+		president = family_info[7]
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(97, 'Your family has been dissolved by the patriarch')
+		if president != game_name:
+			return self._message_typesetting(96, 'You are not a patriarch and you have no right to modify the family name')
+		if fname == family_name:
+			return self._message_typesetting(95, "Can't be the same as the old name")
+		if family_name == '':
+			return self._message_typesetting(94, 'family name is illegal')
+		if await self._family_exists(world, family_name):
+			return self._message_typesetting(93, 'family name already taken')
+
+		need_diamond = self._family_config['union_restrictions']['modify_name_diamond']
+		data = await self.try_diamond(world, uid, -1 * abs(need_diamond))
+		if data['status'] != 0:
+			return self._message_typesetting(92, 'Insufficient diamond')
+		diamond = data['remaining']
+
+		latest_news = f"{president}:family:7:president:family"
+		news = {}  # 1, 2, 3, ..., latest_news
+		content.append(latest_news)
+		for i, value in enumerate(content):
+			news.update({str(i + 1): value})
+		await self._execute_statement_update(world, f'UPDATE families SET news="{str(news)}", familyname="{family_name}" WHERE familyid = "{fid}";')
+		return self._message_typesetting(0, 'Modify family name successfully', data={'remaining': {'news': news, 'diamond': diamond, 'family_name': family_name}})
+
 	async def check_disbanded_family_time(self, world: int, fid: str, disbanded_family_time: str) -> bool:
 		if disbanded_family_time:
 			current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -5435,6 +5489,12 @@ async def _family_officer(request: web.Request) -> web.Response:
 async def _dismissal_family_officer(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).dismissal_family_officer(int(post['world']), post['unique_id'], post['target'])
+	return _json_response(result)
+
+@ROUTES.post('/family_change_name')
+async def _family_change_name(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).family_change_name(int(post['world']), post['unique_id'], post['family_name'])
 	return _json_response(result)
 
 
