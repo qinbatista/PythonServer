@@ -2900,6 +2900,14 @@ class GameManager:
 			return self._message_typesetting(96, 'No such union, your family has been dissolved')
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
 		level = family_info[2]
+
+		news = family_info[6]
+		content = []
+		if news != '':
+			news = json.loads(news.replace("'", "\""), encoding='utf-8')
+			content = list(news.values())
+			if len(content) >= 30: content.pop(0)
+
 		president = family_info[7]
 		admins = [admin for admin in family_info[8: 11] if admin != '']
 		disbanded_family_time = family_info[18]
@@ -2914,7 +2922,19 @@ class GameManager:
 		if len(members) >= max_member:
 			return self._message_typesetting(98, 'family is full')
 		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{r[nonce]["fid"]}" WHERE unique_id = "{r[nonce]["uid"]}";')
-		return self._message_typesetting(0, 'success')
+
+		if user_data[0][0] == president:
+			latest_news = f"{user_data[0][0]}:{game_name}:2:president:member"
+		else:
+			latest_news = f"{user_data[0][0]}:{game_name}:2:admin:member"
+
+		news = {}  # 1, 2, 3, ..., latest_news
+		content.append(latest_news)
+		for i, value in enumerate(content):
+			news.update({str(i + 1): value})
+		await self._execute_statement_update(world, f'UPDATE families SET news="{str(news)}" WHERE familyid = "{fid}";')
+
+		return self._message_typesetting(0, 'success', data={'remaining': {'news': news}})
 
 	async def check_disbanded_family_time(self, world: int, fid: str, disbanded_family_time: str) -> bool:
 		if disbanded_family_time:
