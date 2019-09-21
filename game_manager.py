@@ -2492,7 +2492,7 @@ class GameManager:
 #############################################################################
 	# 新闻格式如下：
 	# latest_news = "执行人:执行目标:执行方式:执行人的身份:执行目标的身份"
-	# 执行方式的代号==> 1:删除， 2:添加， 3:解散家族， 4:取消解散家族， 5:任命官员， 6:解聘官员
+	# 执行方式的代号==> 1:删除， 2:添加， 3:解散家族， 4:取消解散家族， 5:任命官员， 6:解聘官员， 7:修改家族名字
 	@C.collect_async
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
 		# 需要清空被移除者的工会贡献值和签到时间
@@ -3002,11 +3002,64 @@ class GameManager:
 		else:
 			return self._message_typesetting(91, 'No such position')
 
-		return self._message_typesetting(0, '', data={'remaining': {'news': news}})
+		return self._message_typesetting(0, 'You successfully appointed the target as an official', data={'remaining': {'news': news}})
 
-	# TODO
 	async def dismissal_family_officer(self, world: int, uid: str, target: str) -> dict:
-		pass
+		# 0 - You successfully dismissed the target
+		# 93 - target have no position
+		# 94 - You can't dismiss the patriarch's position
+		# 95 - target is not your member
+		# 96 - You are not a patriarch, you have no authority to appoint an official
+		# 97 - Your family has been dissolved by the patriarch
+		# 98 - No such union, your family has been dissolved
+		# 99 - you are not in a family
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if fid == '': return self._message_typesetting(99, 'you are not in a family')
+
+		family_info = await self._get_family_information(world, fid)
+		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(98, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+
+		news = family_info[6]
+		content = []
+		if news != '':
+			news = json.loads(news.replace("'", "\""), encoding='utf-8')
+			content = list(news.values())
+			if len(content) >= 30: content.pop(0)
+
+		president = family_info[7]
+		admins = family_info[8: 11]
+		elites = family_info[11: 16]
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(97, 'Your family has been dissolved by the patriarch')
+		if president != game_name:
+			return self._message_typesetting(96, 'You are not a patriarch, you have no authority to appoint an official')
+		members = [gname[0] for gname in await self._execute_statement(world, f'select game_name from player where familyid="{fid}"')]
+		if target == '' or target not in members:
+			return self._message_typesetting(95, 'target is not your member')
+		if target == president:
+			return self._message_typesetting(94, "You can't dismiss the patriarch's position")
+		if target not in admins and target not in elites:
+			return self._message_typesetting(93, 'target have no position')
+
+		if target in admins:
+			latest_news = f'{president}:{target}:6:president:admin'
+			news = {}  # 1, 2, 3, ..., latest_news
+			content.append(latest_news)
+			for i, value in enumerate(content):
+				news.update({str(i + 1): value})
+			await self._execute_statement_update(world, f'update families set admin{admins.index(target) + 1} = "", news="{str(news)}" where familyid="{fid}"')
+		else:
+			latest_news = f'{president}:{target}:6:president:elite'
+			news = {}  # 1, 2, 3, ..., latest_news
+			content.append(latest_news)
+			for i, value in enumerate(content):
+				news.update({str(i + 1): value})
+			await self._execute_statement_update(world, f'update families set elite{elites.index(target) + 1} = "", news="{str(news)}" where familyid="{fid}"')
+		return self._message_typesetting(0, 'You successfully dismissed the target', data={'remaining': {'news': news}})
 
 	async def check_disbanded_family_time(self, world: int, fid: str, disbanded_family_time: str) -> bool:
 		if disbanded_family_time:
@@ -5376,6 +5429,12 @@ async def _update_login_in_time(request: web.Request) -> web.Response:
 async def _family_officer(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).family_officer(int(post['world']), post['unique_id'], post['target'], int(post['position']))
+	return _json_response(result)
+
+@ROUTES.post('/dismissal_family_officer')
+async def _dismissal_family_officer(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).dismissal_family_officer(int(post['world']), post['unique_id'], post['target'])
 	return _json_response(result)
 
 
