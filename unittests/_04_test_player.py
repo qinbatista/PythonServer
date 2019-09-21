@@ -270,6 +270,8 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
+	result = requests.post('http://localhost:8004/family_officer', data={"world": 0, "unique_id": "3", "target": "f", "position": 0})
+	print(str(result.text))
 	# result = requests.post('http://localhost:8004/purchase_item', data={"world": 0, "unique_id": "1", "item_id": "diamond_pack_5"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/update_login_in_time', data={"world": 0, "unique_id": "1"})
@@ -283,8 +285,8 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_player_info')
 	# print(str(result.text))
-	result = requests.post('http://localhost:8004/cancel_disbanded_family', data={"world": 0, "unique_id": "3"})
-	print(str(result.text))
+	# result = requests.post('http://localhost:8004/cancel_disbanded_family', data={"world": 0, "unique_id": "3"})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/disbanded_family', data={"world": 0, "unique_id": "3"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/family_sign_in', data={"world": 0, "unique_id": "4"})
