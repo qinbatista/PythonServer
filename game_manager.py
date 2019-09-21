@@ -2492,7 +2492,7 @@ class GameManager:
 #############################################################################
 	# 新闻格式如下：
 	# latest_news = "执行人:执行目标:执行方式:执行人的身份:执行目标的身份"
-	# 执行方式的代号==> 1:删除， 2:添加， 3:...
+	# 执行方式的代号==> 1:删除， 2:添加， 3:解散家族， 4:取消解散家族
 	@C.collect_async
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
 		# 需要清空被移除者的工会贡献值和签到时间
@@ -2732,6 +2732,12 @@ class GameManager:
 			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
 			return self._message_typesetting(94, 'No such union, your family has been dissolved')
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+		news = family_info[6]
+		content = []
+		if news != '':
+			news = json.loads(news.replace("'", "\""), encoding='utf-8')
+			content = list(news.values())
+			if len(content) >= 30: content.pop(0)
 		president = family_info[7]
 		disbanded_family_time = family_info[18]
 		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
@@ -2742,10 +2748,15 @@ class GameManager:
 		current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 		if disbanded_family_time == "":
 			disbanded_family_time = current_time
-			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}" WHERE familyid = "{fid}";')
+			latest_news = f'{president}:family:3:president:family'
+			news = {}  # 1, 2, 3, ..., latest_news
+			content.append(latest_news)
+			for i, value in enumerate(content):
+				news.update({str(i + 1): value})
+			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}", news="{str(news)}" WHERE familyid = "{fid}";')
 		else:
 			disbanded_cooling_time = int(disbanded_cooling_time - (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds())
-		return self._message_typesetting(0, 'Your family is being dissolved', data={"remaining": {"disbanded_family_time": disbanded_family_time, 'disbanded_cooling_time': disbanded_cooling_time}})
+		return self._message_typesetting(0, 'Your family is being dissolved', data={'remaining': {'disbanded_family_time': disbanded_family_time, 'disbanded_cooling_time': disbanded_cooling_time, 'news': news}})
 
 	async def cancel_disbanded_family(self, world: int, uid: str) -> dict:
 		# 0 - You have canceled the disbanded family
@@ -2755,12 +2766,20 @@ class GameManager:
 		# 98 - Your family has been dissolved by the patriarch
 		# 99 - you are not in a family
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if not fid: return self._message_typesetting(99, 'you are not in a family')
+		if fid == '': return self._message_typesetting(99, 'you are not in a family')
 		family_info = await self._get_family_information(world, fid)
 		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
 			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
 			return self._message_typesetting(94, 'No such union, your family has been dissolved')
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+
+		news = family_info[6]
+		content = []
+		if news != '':
+			news = json.loads(news.replace("'", "\""), encoding='utf-8')
+			content = list(news.values())
+			if len(content) >= 30: content.pop(0)
+
 		president = family_info[7]
 		disbanded_family_time = family_info[18]
 		if disbanded_family_time == '':
@@ -2769,8 +2788,14 @@ class GameManager:
 			return self._message_typesetting(98, 'Your family has been dissolved by the patriarch')
 		if game_name != president:
 			return self._message_typesetting(97, 'You are not a patriarch')
-		await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "" WHERE familyid = "{fid}";')
-		return self._message_typesetting(0, 'You have canceled the disbanded family')
+
+		latest_news = f'{president}:family:4:president:family'
+		news = {}  # 1, 2, 3, ..., latest_news
+		content.append(latest_news)
+		for i, value in enumerate(content):
+			news.update({str(i + 1): value})
+		await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "", news="{str(news)}" WHERE familyid = "{fid}";')
+		return self._message_typesetting(0, 'You have canceled the disbanded family', data={'remaining': {'news': news}})
 
 	@C.collect_async
 	async def request_join_family(self, world: int, uid: str, fname: str) -> dict:
