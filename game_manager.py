@@ -2802,24 +2802,46 @@ class GameManager:
 			r = requests.post(MAIL_URL + '/send_mail', json=j)
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
-	# TODO
+	# TODO Done · No test
 	@C.collect_async
 	async def invite_user_family(self, world: int, uid: str, target: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox
-		# 95 - target does not exist
-		# 96 - target is already in a family
-		# 97 - you must be family owner
+		# 92 - You are not the patriarch or administrator of this family
+		# 93 - Your family has been dissolved by the patriarch
+		# 94 - No such union, your family has been dissolved
+		# 95 - The user you invited is already in a family
+		# 96 - The user you invited leaves the family less than a day
+		# 97 - The user you invited does not exist
 		# 98 - you do not belong to a family
 		# 99 - invalid target
-		game_name, fid = await self._get_familyid(world, unique_id = uid)
-		if fid is None or fid == '': return self._message_typesetting(98, 'not in a family')
-		owner, fname, members = await self._get_family_information(world, fid)
-		if owner != game_name: return self._message_typesetting(97, 'you must be family owner')
-		tgame_name, tfid = await self._get_familyid(world, game_name = target)
-		if not tgame_name: return self._message_typesetting(95, 'target does not exist')
-		if tfid is not None and tfid != '': return self._message_typesetting(96, 'target already in a family')
-		targetuid = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{target}";')
-		j = {'world' : 0, 'uid_to' : targetuid[0][0], 'kwargs' : {'from' : game_name, 'subject' : 'New join family request', 'body' : f'{game_name} invites you to join their family!', 'type' : 'family_request', 'fid' : fid, 'fname' : fname, 'target' : tgame_name, 'uid' : targetuid[0][0]}}
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if fid == '': return self._message_typesetting(98, 'not in a family')
+		target_info = await self._execute_statement(world, f'select leave_family_time, familyid, unique_id from player where game_name="{target}"')
+		if target_info == (): return self._message_typesetting(97, 'The user you invited does not exist')
+		leave_family_time = target_info[0][0]
+		target_fid = target_info[0][1]
+		target_uid = target_info[0][2]
+		if leave_family_time != '' and (datetime.now() - datetime.strptime(leave_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds() >= 86400:
+			return self._message_typesetting(96, 'The user you invited leaves the family less than a day')
+		if target_fid != '':
+			return self._message_typesetting(95, 'The user you invited is already in a family')
+
+		family_info = await self._get_family_information(world, fid)
+		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(94, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+		fname = family_info[1]
+		president = family_info[7]
+		admins = [admin for admin in family_info[8: 11] if admin != '']
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(93, 'Your family has been dissolved by the patriarch')
+
+		if game_name != president and game_name not in admins:
+			return self._message_typesetting(92, 'You are not the patriarch or administrator of this family')
+
+		j = {'world' : 0, 'uid_to' : target_uid, 'kwargs' : {'from' : game_name, 'subject' : 'New join family request', 'body' : f'{game_name} invites you to join their family!', 'type' : 'family_request', 'fid' : fid, 'fname' : fname, 'target' : target, 'uid' : target_uid}}
 		r = requests.post(MAIL_URL + '/send_mail', json = j)
 		return self._message_typesetting(0, 'success, request sent')
 
