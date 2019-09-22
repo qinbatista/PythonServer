@@ -3139,7 +3139,6 @@ class GameManager:
 
 		return self._message_typesetting(0, 'Successfully obtained news information', data={'remaining': {'news': news}})
 
-	# TODO
 	async def family_announcement(self, world: int, uid: str) -> dict:
 		# 家族公告
 		# 0 - Successfully obtained announcement information
@@ -3164,13 +3163,13 @@ class GameManager:
 		return self._message_typesetting(0, 'Successfully obtained announcement information', data={'remaining': {'announcement': announcement}})
 
 	# TODO
-	async def family_gift_package(self, world: int, uid: str) -> dict:
-		# 工会礼包，一人购买，全员获得
+	async def family_market_purchase(self, world: int, uid: str) -> dict:
+		# 工会兑换，商品内容根据配置表固定
 		pass
 
 	# TODO
-	async def family_market_purchase(self, world: int, uid: str) -> dict:
-		# 工会兑换，商品内容根据配置表固定
+	async def family_gift_package(self, world: int, uid: str) -> dict:
+		# 工会礼包，一人购买，全员获得
 		pass
 
 	# TODO
