@@ -453,7 +453,7 @@ def new_server_test(world):
 	token = response['data']['token']
 	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
 	# print(response)
-	response = send_tcp_message({'world' : world, 'function' : 'response_family', 'data' : {'token': token, 'nonce': '11257147272669051659734663676109313401164526091592898430363300842490370050965'}})
+	response = send_tcp_message({'world' : world, 'function' : 'response_family', 'data' : {'token': token, 'nonce': '78337956676184997857706980485225384889478708200314904499946514947315907719455'}})
 	print(response)
 
 

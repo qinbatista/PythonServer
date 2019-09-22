@@ -2123,6 +2123,7 @@ class GameManager:
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
 
 		fname = family_info[1]
+		level = family_info[2]
 		disbanded_family_time = family_info[18]
 		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
 			return self._message_typesetting(94, 'This family has been dissolved')
@@ -2138,6 +2139,12 @@ class GameManager:
 		content.append(latest_news)
 		for i, value in enumerate(content):
 			news.update({str(i + 1): value})
+
+		count = (await self._execute_statement(world, f'select count(1) from player where familyid="{fid}"'))[0][0]
+		basis_people = self._family_config['union_restrictions']['people_number']['basis_people']
+		increment =  self._family_config['union_restrictions']['people_number']['increment']
+		if count >= basis_people + level * increment:
+			return self._message_typesetting(93, 'This family is already full')
 
 		await self._execute_statement_update(world=world, statement=f'update player set familyid="{fid}" WHERE unique_id="{uid}"')
 		await self._execute_statement_update(world=world, statement=f'update families set news="{str(news)}" WHERE familyid="{fid}"')
