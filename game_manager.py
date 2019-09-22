@@ -2093,6 +2093,56 @@ class GameManager:
 			return self._message_typesetting(status=99, message='Mailbox error')
 		return self._message_typesetting(status=0, message="send merchandise successfully")
 
+	async def response_family(self, world: int, unique_id: str, nonce: str) -> dict:
+		# success -> 0
+		# 0 - You successfully joined the family
+		# 94 - This family has been dissolved
+		# 95 - No such union, your family has been dissolved
+		# 96 - You already have a family
+		# 97 - This nonce does not belong to you
+		# 98 - nonce error
+		# 99 - this email had been used
+		response = requests.post(TOKEN_URL + '/redeem_nonce', json = {'type' : ['family_request'], 'nonce' : [nonce]})
+		data = response.json()
+		if data[nonce]["status"] != 0:
+			re = requests.post(MAIL_URL + '/delete_mail', data={"world": world, "unique_id": unique_id, "key": nonce})
+			return self._message_typesetting(status=99, message=f"this email had been used：{re.json()}")
+		if data[nonce]["type"] != 'family_request': return self._message_typesetting(98, 'nonce error')
+
+		fid = data[nonce]["fid"]
+		uid = data[nonce]["uid"]
+		if uid != unique_id: return self._message_typesetting(97, 'This nonce does not belong to you')
+
+		game_name, family_id, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if family_id != '': return self._message_typesetting(96, 'You already have a family')
+
+		family_info = await self._get_family_information(world, fid)
+		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(95, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+
+		fname = family_info[1]
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(94, 'This family has been dissolved')
+
+		news = family_info[6]
+		content = []
+		if news != '':
+			news = json.loads(news.replace("'", "\""), encoding='utf-8')
+			content = list(news.values())
+			if len(content) >= 30: content.pop(0)
+		latest_news = f'family:{data[nonce]["target"]}:2:family:member'
+		news = {}  # 1, 2, 3, ..., latest_news
+		content.append(latest_news)
+		for i, value in enumerate(content):
+			news.update({str(i + 1): value})
+
+		await self._execute_statement_update(world=world, statement=f'update player set familyid="{fid}" WHERE unique_id="{uid}"')
+		await self._execute_statement_update(world=world, statement=f'update families set news="{str(news)}" WHERE familyid="{fid}"')
+		return self._message_typesetting(status=0, message="You successfully joined the family", data={"remaining": {"nonce": nonce, 'fname': fname, 'news': news}})
+
 #############################################################################
 #						End Friend Module Functions							#
 #############################################################################
@@ -2828,10 +2878,9 @@ class GameManager:
 			r = requests.post(MAIL_URL + '/send_mail', json=j)
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
-	# TODO Done · Need joint testing · function -> response_family
 	@C.collect_async
 	async def invite_user_family(self, world: int, uid: str, target: str) -> dict:
-		# 0 - success, join request message sent to family owner's mailbox
+		# 0 - Has successfully invited the target
 		# 92 - You are not the patriarch or administrator of this family
 		# 93 - Your family has been dissolved by the patriarch
 		# 94 - No such union, your family has been dissolved
@@ -2840,8 +2889,9 @@ class GameManager:
 		# 97 - The user you invited does not exist
 		# 98 - you do not belong to a family
 		# 99 - invalid target
+		if target == '': return self._message_typesetting(99, 'invalid target')
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(98, 'not in a family')
+		if fid == '': return self._message_typesetting(98, 'you do not belong to a family')
 		target_info = await self._execute_statement(world, f'select leave_family_time, familyid, unique_id from player where game_name="{target}"')
 		if target_info == (): return self._message_typesetting(97, 'The user you invited does not exist')
 		leave_family_time = target_info[0][0]
@@ -2869,7 +2919,7 @@ class GameManager:
 
 		j = {'world' : 0, 'uid_to' : target_uid, 'kwargs' : {'from' : game_name, 'subject' : 'New join family request', 'body' : f'{game_name} invites you to join their family!', 'type' : 'family_request', 'fid' : fid, 'fname' : fname, 'target' : target, 'uid' : target_uid}}
 		r = requests.post(MAIL_URL + '/send_mail', json = j)
-		return self._message_typesetting(0, 'success, request sent')
+		return self._message_typesetting(0, 'Has successfully invited the target')
 
 	@C.collect_async
 	async def respond_family(self, world: int, uid: str, nonce: str) -> dict:
@@ -3225,7 +3275,7 @@ class GameManager:
 		return self._message_typesetting(0, 'success', data={'remaining': self._family_config})
 
 	async def check_disbanded_family_time(self, world: int, fid: str, disbanded_family_time: str) -> bool:
-		if disbanded_family_time:
+		if disbanded_family_time != '':
 			current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			if (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds() >= self._family_config['union_restrictions']['disbanded_cooling_time']:
 				await self._execute_statement(world, f'update player set familyid="", sign_in_time="",cumulative_contribution=0, leave_family_time="{current_time}" where familyid="{fid}"')

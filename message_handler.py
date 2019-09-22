@@ -251,6 +251,9 @@ class MessageHandler:
 	async def _response_friend(self, data: dict) -> str:
 		return json.dumps(await self.gm.response_friend(data['world'], data['data']['unique_id'], data['data']['nonce']))
 
+	async def _response_family(self, data: dict) -> str:
+		return json.dumps(await self.gm.response_family(data['world'], data['data']['unique_id'], data['data']['nonce']))
+
 	async def _delete_friend(self, data: dict) -> str:
 		return json.dumps(await self.gm.delete_friend(data['world'], data['data']['unique_id'], data['data']['friend_name']))
 	async def _send_all_friend_gift(self, data: dict) -> str:
@@ -583,6 +586,7 @@ FUNCTION_LIST = {
 	'delete_friend': MessageHandler._delete_friend,
 	'request_friend': MessageHandler._request_friend,
 	'response_friend': MessageHandler._response_friend,
+	'response_family': MessageHandler._response_family,
 	'send_friend_gift': MessageHandler._send_friend_gift,
 	'send_all_friend_gift': MessageHandler._send_all_friend_gift,
 	'redeem_nonce': MessageHandler._redeem_nonce,
