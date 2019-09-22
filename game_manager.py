@@ -3162,10 +3162,45 @@ class GameManager:
 
 		return self._message_typesetting(0, 'Successfully obtained announcement information', data={'remaining': {'announcement': announcement}})
 
-	# TODO
-	async def family_market_purchase(self, world: int, uid: str) -> dict:
+	# TODO Done · Unused
+	async def refresh_family_store(self, world: int) -> dict:
+		# 刷新工会商店
+		current_time = datetime.now().strftime('%Y-%m-%d')
+		family_store = self._family_config['union_store']['merchandise']
+		remaining = {}
+		for code, item in enumerate(family_store.items()):
+			if code > 7: break
+			remaining.update({code: {item[0]: item[1]['m_quantity'], 'union_contribution': item[1]['c_quantity']}})
+			await self._set_family_store_material(world, code + 1, item[0], item[1]['m_quantity'], 'union_contribution', item[1]['c_quantity'], current_time)
+		return self._message_typesetting(0, 'The union store refreshed successfully', data={'remaining': remaining})
+
+	# TODO Done · Unused
+	async def _set_family_store_material(self, world: int, code: int, merchandise: str, merchandise_quantity: int, currency_type: str, currency_type_price: int, refresh_time: str) -> int:
+		sql_str = f'UPDATE union_store SET merchandise{code}="{merchandise}", merchandise{code}_quantity="{merchandise_quantity}", currency_type{code}="{currency_type}", currency_type{code}_price="{currency_type_price}", refresh_time="{refresh_time}" WHERE unique_id="world family";'
+		return await self._execute_statement_update(world, sql_str)
+
+	# TODO Done
+	async def get_family_store(self, world: int, uid: str) -> dict:
+		# 获取工会商店的物品
+		# 0 - success
+		return self._message_typesetting(0, 'success', data={'remaining': self._family_config['union_store']['merchandise']})
+
+	# TODO Done
+	async def family_market_purchase(self, world: int, uid: str, merchandise: str) -> dict:
 		# 工会兑换，商品内容根据配置表固定
-		pass
+		# 0 - success
+		# 98 - Insufficient union coin
+		# 99 - The item you purchased has expired
+		store = self._family_config['union_store']['merchandise']
+		if merchandise not in list(store.keys()):
+			return self._message_typesetting(99, 'The item you purchased has expired')
+		c_quantity = store[merchandise]['c_quantity']
+		m_quantity = store[merchandise]['m_quantity']
+		c_data = await self._try_material(world, uid, 'union_contribution', -1 * abs(c_quantity))
+		if c_data['status'] != 0:
+			return self._message_typesetting(98, 'Insufficient union coin')
+		m_data = await self._try_material(world, uid, merchandise, m_quantity)
+		return self._message_typesetting(0, 'success', data={'remaining': {'union_contribution': c_data['remaining'], merchandise: m_data['remaining']}, 'reward': {merchandise: m_quantity}})
 
 	# TODO
 	async def family_gift_package(self, world: int, uid: str) -> dict:
