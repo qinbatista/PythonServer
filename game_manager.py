@@ -2706,7 +2706,7 @@ class GameManager:
 				experience -= need_experience
 				level += 1
 		await self._execute_statement_update(world, f'update families set experience="{experience}", level={level} where familyid="{fid}"')
-		remaining = {'sign_in_time': current_time, 'level': level, 'experience': experience}
+		remaining = {'sign_in_time': current_time, 'family_level': level, 'family_experience': experience}
 		reward = {'union_contribution': 1, 'cumulative_contribution': 1}
 		for key, value in self._family_config['union_restrictions']['sign_in_reward'].items():
 			data = await self._try_material(world, uid, key, value)
