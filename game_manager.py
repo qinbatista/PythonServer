@@ -2871,7 +2871,6 @@ class GameManager:
 		r = requests.post(MAIL_URL + '/send_mail', json = j)
 		return self._message_typesetting(0, 'success, request sent')
 
-	# TODO Done · No test
 	@C.collect_async
 	async def respond_family(self, world: int, uid: str, nonce: str) -> dict:
 		# 处理申请家族的邀请函
@@ -2894,6 +2893,7 @@ class GameManager:
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = r[nonce]['uid'])
 		if fid != '': return self._message_typesetting(97, 'target already in a family')  # 申请的用户已在其他家庭中
 
+		fid = r[nonce]["fid"]  # 要加入的家族的id
 		family_info = await self._get_family_information(world, fid)
 		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
 			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
@@ -2921,7 +2921,7 @@ class GameManager:
 		max_member = self._family_config['union_restrictions']['people_number']['basis_people'] + level * self._family_config['union_restrictions']['people_number']['increment']
 		if len(members) >= max_member:
 			return self._message_typesetting(98, 'family is full')
-		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{r[nonce]["fid"]}" WHERE unique_id = "{r[nonce]["uid"]}";')
+		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{fid}" WHERE unique_id = "{r[nonce]["uid"]}";')
 
 		if user_data[0][0] == president:
 			latest_news = f"{user_data[0][0]}:{game_name}:2:president:member"
@@ -3114,6 +3114,10 @@ class GameManager:
 			news.update({str(i + 1): value})
 		await self._execute_statement_update(world, f'UPDATE families SET news="{str(news)}", familyname="{family_name}" WHERE familyid = "{fid}";')
 		return self._message_typesetting(0, 'Modify family name successfully', data={'remaining': {'news': news, 'diamond': diamond, 'family_name': family_name}})
+
+	# TODO
+	async def family_config(self, world: int, uid: str):
+		pass
 
 	async def check_disbanded_family_time(self, world: int, fid: str, disbanded_family_time: str) -> bool:
 		if disbanded_family_time:

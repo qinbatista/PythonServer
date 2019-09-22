@@ -435,20 +435,25 @@ def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
 def new_server_test(world):
-	# response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : 'aass'}})
-	# print(response)
-	# token = response['data']['token']
-	# response = send_tcp_message({'world' : 0, 'function' : 'request_join_family', 'data' : {'token': token, 'fname': 'Tomcat'}})
-	# print(response)
+	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : 'aass'}})
+	print(response)
+	token = response['data']['token']
+	response = send_tcp_message({'world' : 0, 'function' : 'request_join_family', 'data' : {'token': token, 'fname': 'Tomcat'}})
+	print(response)
 
 	# response = send_tcp_message({'world' : 0, 'function' : 'send_merchandise', 'data' : {'token': token, 'merchandise': 'coin', 'quantities': '20'}})
 	# print(response)
 
 	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
 	token = response['data']['token']
-	response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
+	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
+	# print(response)
+
+
+	nonce = '109859617373153377003944302714374895868816002944800435692483366741142151128392'
+	response = send_tcp_message({'world' : 0, 'function' : 'respond_family', 'data' : {'token': token, 'nonce': nonce}})
 	print(response)
-	nonce = ''
+
 	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': nonce}})
 	# print(response)
 
@@ -518,7 +523,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	all_function(unique_id="4")
+	# all_function(unique_id="4")
 
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
@@ -529,4 +534,4 @@ if __name__ == "__main__":
 	# get_top_damage(4,4)
 	# active_wishing_pool(4,"weapon1")
 
-	# new_server_test(0)
+	new_server_test(0)
