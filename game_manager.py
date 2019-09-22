@@ -3187,28 +3187,42 @@ class GameManager:
 	async def family_market_purchase(self, world: int, uid: str, merchandise: str) -> dict:
 		# 工会兑换，商品内容根据配置表固定
 		# 0 - success
-		# 98 - Insufficient union coin
-		# 99 - The item you purchased has expired
+		# 97 - Insufficient union coin
+		# 98 - The item you purchased has expired
+		# 99 - you are not in a family
+
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if fid == '': return self._message_typesetting(99, 'you are not in a family')
+
 		store = self._family_config['union_store']['merchandise']
 		if merchandise not in list(store.keys()):
-			return self._message_typesetting(99, 'The item you purchased has expired')
+			return self._message_typesetting(98, 'The item you purchased has expired')
 		c_quantity = store[merchandise]['c_quantity']
 		m_quantity = store[merchandise]['m_quantity']
 		c_data = await self._try_material(world, uid, 'union_contribution', -1 * abs(c_quantity))
 		if c_data['status'] != 0:
-			return self._message_typesetting(98, 'Insufficient union coin')
+			return self._message_typesetting(97, 'Insufficient union coin')
 		m_data = await self._try_material(world, uid, merchandise, m_quantity)
 		return self._message_typesetting(0, 'success', data={'remaining': {'union_contribution': c_data['remaining'], merchandise: m_data['remaining']}, 'reward': {merchandise: m_quantity}})
 
-	# TODO
 	async def family_gift_package(self, world: int, uid: str) -> dict:
 		# 工会礼包，一人购买，全员获得
-		pass
+		# 0 - success
+		# 99 - you are not in a family
 
-	# TODO
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if fid == '': return self._message_typesetting(99, 'you are not in a family')
+
+		store = self._family_config['union_store']['gift_package']
+		for k, v in store.items():
+			await self._execute_statement_update(world, f'UPDATE player set {k}={k}+{v} where familyid="{fid}"')
+
+		return self._message_typesetting(0, 'success')
+
 	async def get_family_config(self, world: int, uid: str) -> dict:
 		# 返回家族配置表
-		pass
+		# 0 - success
+		return self._message_typesetting(0, 'success', data={'remaining': self._family_config})
 
 	async def check_disbanded_family_time(self, world: int, fid: str, disbanded_family_time: str) -> bool:
 		if disbanded_family_time:

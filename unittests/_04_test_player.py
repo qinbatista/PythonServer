@@ -438,8 +438,10 @@ def new_server_test(world):
 	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
 	print(response)
 	token = response['data']['token']
-	response = send_tcp_message({'world' : 0, 'function' : 'family_market_purchase', 'data' : {'token': token, 'merchandise': 'skill_scroll_10'}})
+	response = send_tcp_message({'world' : 0, 'function' : 'family_gift_package', 'data' : {'token': token}})
 	print(response)
+	# response = send_tcp_message({'world' : 0, 'function' : 'family_market_purchase', 'data' : {'token': token, 'merchandise': 'skill_scroll_10'}})
+	# print(response)
 
 	# response = send_tcp_message({'world' : 0, 'function' : 'send_merchandise', 'data' : {'token': token, 'merchandise': 'coin', 'quantities': '20'}})
 	# print(response)

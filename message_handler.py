@@ -307,6 +307,12 @@ class MessageHandler:
 	async def _family_market_purchase(self, data: dict) -> str:
 		return json.dumps(await self.gm.family_market_purchase(data['world'], data['data']['unique_id'], data['data']['merchandise']))
 
+	async def _get_family_config(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_family_config(data['world'], data['data']['unique_id']))
+
+	async def _family_gift_package(self, data: dict) -> str:
+		return json.dumps(await self.gm.family_gift_package(data['world'], data['data']['unique_id']))
+
 
 	async def _buy_workers(self, data: dict) -> str:
 		return json.dumps(await self.gm.buy_workers(data['world'], data['data']['unique_id'], data['data']['workers_quantity']))
@@ -593,6 +599,8 @@ FUNCTION_LIST = {
 	'family_announcement' : MessageHandler._family_announcement,
 	'get_family_store' : MessageHandler._get_family_store,
 	'family_market_purchase' : MessageHandler._family_market_purchase,
+	'get_family_config' : MessageHandler._get_family_config,
+	'family_gift_package' : MessageHandler._family_gift_package,
 
 	'buy_workers' : MessageHandler._buy_workers,
 	'upgrade_food_factory' : MessageHandler._upgrade_food_factory,

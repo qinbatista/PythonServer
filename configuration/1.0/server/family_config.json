@@ -62,6 +62,9 @@
 			"c_quantity": 1,
 			"m_quantity": 80
 		}
+		},
+		"gift_package":{
+			"diamond": 100
 		}
 	}
 }
