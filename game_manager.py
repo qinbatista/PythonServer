@@ -3115,8 +3115,48 @@ class GameManager:
 		await self._execute_statement_update(world, f'UPDATE families SET news="{str(news)}", familyname="{family_name}" WHERE familyid = "{fid}";')
 		return self._message_typesetting(0, 'Modify family name successfully', data={'remaining': {'news': news, 'diamond': diamond, 'family_name': family_name}})
 
+	async def family_blackboard(self, world: int, uid: str) -> dict:
+		# 家族黑板 显示工会信息
+		# 0 - Successfully obtained news information
+		# 97 - Your family has been dissolved by the patriarch
+		# 98 - No such union, your family has been dissolved
+		# 99 - you are not in a family
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if fid == '': return self._message_typesetting(99, 'you are not in a family')
+
+		family_info = await self._get_family_information(world, fid)
+		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(98, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+
+		news = family_info[6]
+		if news != '': news = json.loads(news.replace("'", "\""), encoding='utf-8')
+
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(97, 'Your family has been dissolved by the patriarch')
+
+		return self._message_typesetting(0, 'Successfully obtained news information', data={'remaining': {'news': news}})
+
 	# TODO
-	async def family_config(self, world: int, uid: str):
+	async def family_announcement(self, world: int, uid: str) -> dict:
+		# 家族公告
+		pass
+
+	# TODO
+	async def family_gift_package(self, world: int, uid: str) -> dict:
+		# 工会礼包，一人购买，全员获得
+		pass
+
+	# TODO
+	async def family_market_purchase(self, world: int, uid: str) -> dict:
+		# 工会兑换，商品内容根据配置表固定
+		pass
+
+	# TODO
+	async def get_family_config(self, world: int, uid: str) -> dict:
+		# 返回家族配置表
 		pass
 
 	async def check_disbanded_family_time(self, world: int, fid: str, disbanded_family_time: str) -> bool:
