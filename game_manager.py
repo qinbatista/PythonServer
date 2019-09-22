@@ -3179,13 +3179,11 @@ class GameManager:
 		sql_str = f'UPDATE union_store SET merchandise{code}="{merchandise}", merchandise{code}_quantity="{merchandise_quantity}", currency_type{code}="{currency_type}", currency_type{code}_price="{currency_type_price}", refresh_time="{refresh_time}" WHERE unique_id="world family";'
 		return await self._execute_statement_update(world, sql_str)
 
-	# TODO Done
 	async def get_family_store(self, world: int, uid: str) -> dict:
 		# 获取工会商店的物品
 		# 0 - success
 		return self._message_typesetting(0, 'success', data={'remaining': self._family_config['union_store']['merchandise']})
 
-	# TODO Done
 	async def family_market_purchase(self, world: int, uid: str, merchandise: str) -> dict:
 		# 工会兑换，商品内容根据配置表固定
 		# 0 - success

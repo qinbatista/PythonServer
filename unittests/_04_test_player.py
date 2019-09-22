@@ -435,11 +435,10 @@ def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
 def new_server_test(world):
-	# response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
-	# print(response)
-	# token = response['data']['token']
-	token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzE3MjEyNjksInVuaXF1ZV9pZCI6IjQifQ.pf2pI9REKSQoYvHQA30n_UsZOazrzPikiEbApZU64O4'
-	response = send_tcp_message({'world' : 0, 'function' : 'get_family_store', 'data' : {'token': token}})
+	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
+	print(response)
+	token = response['data']['token']
+	response = send_tcp_message({'world' : 0, 'function' : 'family_market_purchase', 'data' : {'token': token, 'merchandise': 'skill_scroll_10'}})
 	print(response)
 
 	# response = send_tcp_message({'world' : 0, 'function' : 'send_merchandise', 'data' : {'token': token, 'merchandise': 'coin', 'quantities': '20'}})

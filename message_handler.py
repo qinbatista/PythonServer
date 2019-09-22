@@ -302,7 +302,6 @@ class MessageHandler:
 		return json.dumps(await self.gm.family_announcement(data['world'], data['data']['unique_id']))
 
 	async def _get_family_store(self, data: dict) -> str:
-		print('进入方法')
 		return json.dumps(await self.gm.get_family_store(data['world'], data['data']['unique_id']))
 
 	async def _family_market_purchase(self, data: dict) -> str:
