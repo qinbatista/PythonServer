@@ -69,6 +69,50 @@ def create_table_dark_market(cursor):
 	"""
 	cursor.execute(statement)
 
+def create_table_union_store(cursor):
+	statement = \
+	"""
+	CREATE TABLE `union_store` (
+	  `unique_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一标识',
+	  `merchandise1` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料1',
+	  `merchandise1_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料1的数量',
+	  `currency_type1` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料1的价值(金币或者钻石)',
+	  `currency_type1_price` int(6) DEFAULT 0 COMMENT '材料1的价格',
+	  `merchandise2` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料2',
+	  `merchandise2_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料2的数量',
+	  `currency_type2` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料2的价值(金币或者钻石)',
+	  `currency_type2_price` int(6) DEFAULT 0 COMMENT '材料2的价格',
+	  `merchandise3` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料3',
+	  `merchandise3_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料3的数量',
+	  `currency_type3` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料3的价值(金币或者钻石)',
+	  `currency_type3_price` int(6) DEFAULT 0 COMMENT '材料3的价格',
+	  `merchandise4` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料4',
+	  `merchandise4_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料4的数量',
+	  `currency_type4` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料4的价值(金币或者钻石)',
+	  `currency_type4_price` int(6) DEFAULT 0 COMMENT '材料4的价格',
+	  `merchandise5` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料5',
+	  `merchandise5_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料5的数量',
+	  `currency_type5` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料5的价值(金币或者钻石)',
+	  `currency_type5_price` int(6) DEFAULT 0 COMMENT '材料5的价格',
+	  `merchandise6` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料6',
+	  `merchandise6_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料6的数量',
+	  `currency_type6` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料6的价值(金币或者钻石)',
+	  `currency_type6_price` int(6) DEFAULT 0 COMMENT '材料6的价格',
+	  `merchandise7` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料7',
+	  `merchandise7_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料7的数量',
+	  `currency_type7` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料7的价值(金币或者钻石)',
+	  `currency_type7_price` int(6) DEFAULT 0 COMMENT '材料7的价格',
+	  `merchandise8` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料8',
+	  `merchandise8_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料8的数量',
+	  `currency_type8` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料8的价值(金币或者钻石)',
+	  `currency_type8_price` int(6) DEFAULT 0 COMMENT '材料8的价格',
+	  `refresh_time` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '刷新所有材料的刷新时间',
+	  `refreshable_quantity` int(6) DEFAULT 0 COMMENT '可以刷新所有材料的次数',
+	  PRIMARY KEY (`unique_id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+	cursor.execute(statement)
+
 def create_table_factory(cursor):
 	statement = \
 	"""
@@ -422,6 +466,7 @@ def create_world(world):
 	cursor = c.cursor()
 	create_table_armor(cursor)
 	create_table_dark_market(cursor)
+	create_table_union_store(cursor)
 	create_table_factory(cursor)
 	create_table_families(cursor)
 	create_table_friend(cursor)
@@ -457,7 +502,8 @@ def operating_test():
 	c.select_db("aliya")
 	cursor = c.cursor()
 	# creat_table_task(cursor)
-	create_achievement(cursor)
+	# create_achievement(cursor)
+	create_table_union_store(cursor)
 	# create_table_player(cursor)
 	# create_table_families(cursor)
 
