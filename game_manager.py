@@ -2828,7 +2828,7 @@ class GameManager:
 			r = requests.post(MAIL_URL + '/send_mail', json=j)
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
-	# TODO Done · No test
+	# TODO Done · Need joint testing · function -> response_family
 	@C.collect_async
 	async def invite_user_family(self, world: int, uid: str, target: str) -> dict:
 		# 0 - success, join request message sent to family owner's mailbox

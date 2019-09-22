@@ -435,24 +435,24 @@ def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
 def new_server_test(world):
-	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : 'aass'}})
+	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
 	print(response)
 	token = response['data']['token']
-	response = send_tcp_message({'world' : 0, 'function' : 'request_join_family', 'data' : {'token': token, 'fname': 'Tomcat'}})
+	response = send_tcp_message({'world' : 0, 'function' : 'invite_user_family', 'data' : {'token': token, 'target': 'nklnl'}})
 	print(response)
 
 	# response = send_tcp_message({'world' : 0, 'function' : 'send_merchandise', 'data' : {'token': token, 'merchandise': 'coin', 'quantities': '20'}})
 	# print(response)
 
-	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
+	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '9768cf79b8a3f49c96e6cc1508f6aa57af4877ee'}})
 	token = response['data']['token']
-	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
-	# print(response)
-
-
-	nonce = '109859617373153377003944302714374895868816002944800435692483366741142151128392'
-	response = send_tcp_message({'world' : 0, 'function' : 'respond_family', 'data' : {'token': token, 'nonce': nonce}})
+	response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
 	print(response)
+
+
+	# nonce = '109859617373153377003944302714374895868816002944800435692483366741142151128392'
+	# response = send_tcp_message({'world' : 0, 'function' : 'respond_family', 'data' : {'token': token, 'nonce': nonce}})
+	# print(response)
 
 	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': nonce}})
 	# print(response)
