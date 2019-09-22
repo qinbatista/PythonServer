@@ -298,6 +298,9 @@ class MessageHandler:
 	async def _family_blackboard(self, data: dict) -> str:
 		return json.dumps(await self.gm.family_blackboard(data['world'], data['data']['unique_id']))
 
+	async def _family_announcement(self, data: dict) -> str:
+		return json.dumps(await self.gm.family_announcement(data['world'], data['data']['unique_id']))
+
 
 	async def _buy_workers(self, data: dict) -> str:
 		return json.dumps(await self.gm.buy_workers(data['world'], data['data']['unique_id'], data['data']['workers_quantity']))
@@ -581,6 +584,7 @@ FUNCTION_LIST = {
 	'dismissal_family_officer' : MessageHandler._dismissal_family_officer,
 	'family_change_name' : MessageHandler._family_change_name,
 	'family_blackboard' : MessageHandler._family_blackboard,
+	'family_announcement' : MessageHandler._family_announcement,
 
 	'buy_workers' : MessageHandler._buy_workers,
 	'upgrade_food_factory' : MessageHandler._upgrade_food_factory,

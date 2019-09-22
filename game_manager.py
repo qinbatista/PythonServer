@@ -3142,7 +3142,26 @@ class GameManager:
 	# TODO
 	async def family_announcement(self, world: int, uid: str) -> dict:
 		# 家族公告
-		pass
+		# 0 - Successfully obtained announcement information
+		# 97 - Your family has been dissolved by the patriarch
+		# 98 - No such union, your family has been dissolved
+		# 99 - you are not in a family
+		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
+		if fid == '': return self._message_typesetting(99, 'you are not in a family')
+
+		family_info = await self._get_family_information(world, fid)
+		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
+			return self._message_typesetting(98, 'No such union, your family has been dissolved')
+		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
+
+		announcement = family_info[5]
+
+		disbanded_family_time = family_info[18]
+		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
+			return self._message_typesetting(97, 'Your family has been dissolved by the patriarch')
+
+		return self._message_typesetting(0, 'Successfully obtained announcement information', data={'remaining': {'announcement': announcement}})
 
 	# TODO
 	async def family_gift_package(self, world: int, uid: str) -> dict:

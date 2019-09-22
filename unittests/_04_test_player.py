@@ -438,7 +438,7 @@ def new_server_test(world):
 	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : 'aass'}})
 	print(response)
 	token = response['data']['token']
-	response = send_tcp_message({'world' : 0, 'function' : 'family_blackboard', 'data' : {'token': token}})
+	response = send_tcp_message({'world' : 0, 'function' : 'family_announcement', 'data' : {'token': token}})
 	print(response)
 
 	# response = send_tcp_message({'world' : 0, 'function' : 'send_merchandise', 'data' : {'token': token, 'merchandise': 'coin', 'quantities': '20'}})
