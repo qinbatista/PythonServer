@@ -161,6 +161,7 @@ def get_all_info(_token,_world):
 	mail_gift_str = mail_gift()
 	get_picture_link_str = get_picture_link()
 	get_player_info_str = get_player_info()
+	get_family_config_str = get_family_config()
 	return [get_level_info_str,get_stage_info_str,get_monster_info_str,get_all_friend_info_str,
 	get_all_skill_level_str,get_all_weapon_str,refresh_all_storage_str,get_all_roles_str,
 	get_factory_info_str,get_all_family_info_str,get_all_mail_str,get_all_armor_info_str,

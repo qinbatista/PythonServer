@@ -274,6 +274,18 @@ class MessageHandler:
 	async def _create_family(self, data: dict) -> str:
 		return json.dumps(await self.gm.create_family(data['world'], data['data']['unique_id'], data['data']['fname']))
 
+	async def _get_all_family_info(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_all_family_info(data['world'], data['data']['unique_id']))
+
+	async def _family_sign_in(self, data: dict) -> str:
+		return json.dumps(await self.gm.family_sign_in(data['world'], data['data']['unique_id']))
+
+	async def _disbanded_family(self, data: dict) -> str:
+		return json.dumps(await self.gm.disbanded_family(data['world'], data['data']['unique_id']))
+
+	async def _cancel_disbanded_family(self, data: dict) -> str:
+		return json.dumps(await self.gm.cancel_disbanded_family(data['world'], data['data']['unique_id']))
+
 	async def _invite_user_family(self, data: dict) -> str:
 		return json.dumps(await self.gm.invite_user_family(data['world'], data['data']['unique_id'], data['data']['target']))
 
@@ -588,6 +600,10 @@ FUNCTION_LIST = {
 
 	'leave_family' : MessageHandler._leave_family,
 	'create_family' : MessageHandler._create_family,
+	'get_all_family_info' : MessageHandler._get_all_family_info,
+	'family_sign_in' : MessageHandler._family_sign_in,
+	'disbanded_family' : MessageHandler._disbanded_family,
+	'cancel_disbanded_family' : MessageHandler._cancel_disbanded_family,
 	'invite_user_family' : MessageHandler._invite_user_family,
 	'remove_user_family' : MessageHandler._remove_user_family,
 	'request_join_family' : MessageHandler._request_join_family,
