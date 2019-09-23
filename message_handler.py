@@ -44,9 +44,17 @@ class MessageHandler:
 	async def _login_unique(self, data: dict) -> str:
 		return json.dumps(await account.login_unique(data['data']['unique_id'], **data))
 
+	async def _login(self, data: dict) -> str:
+		return json.dumps(await account.login(data['data']['identifier'], data['data']['value'], data['data']['password'], **data))
+
+	async def _bind_account(self, data: dict) -> str:
+		return json.dumps(await account.bind_account(data['data']['unique_id'], data['data']['account'], data['data']['password'], **data))
+
 
 FUNCTION_LIST = {
 	'login_unique' : MessageHandler._login_unique,
+	'login' : MessageHandler._login,
+	'bind_account' : MessageHandler._bind_account,
 	'create_family': MessageHandler._create_family
 }
 

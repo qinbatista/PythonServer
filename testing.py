@@ -18,15 +18,13 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-				 {'function': 'login_unique', 'data':{'unique_id':'4'}}
+		{'function': 'login', 'data':{'identifier' : 'account', 'value':'niggers123lal', 'password' : 'feelsblackman'}}
 				]
 
 
 def send_single_message(message_id: int):
 	client = LukseunClient(client_type)
 	start = time.time()
-	MESSAGE_LIST[message_id]["data"]['token']=token
-	MESSAGE_LIST[message_id]["data"]['world']=0
 	newstring  =  str(MESSAGE_LIST[message_id]).replace("'","\"")
 	print('sending message...')
 	asyncio.run(client.send_message(newstring))
