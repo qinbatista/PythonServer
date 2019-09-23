@@ -4,6 +4,7 @@ account.py
 Contains functions related to administrative account activies such as logging in, and
 binding email addresses.
 '''
+
 import re
 import string
 import random
@@ -55,7 +56,7 @@ async def bind_account(uid, account, password, **kwargs):
 	if len(salt) % 2 != 0:
 		salt = '0' + salt
 	hashed_pw = hashlib.scrypt(password.encode(), salt = salt.encode(), n = N, r = R, p = P).hex()
-	await common.execute(f'UPDATE info SET account = "{account}", password = "{hashed_pw}", salt = "{salt}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	await _set_credentials(uid, account, hashed_pw, salt, **kwargs)
 	return common.mt(0, 'success', {'account' : account})
 
 async def bind_email(uid, email, **kwargs):
@@ -77,20 +78,10 @@ async def verify_email_code(uid, code, **kwargs):
 	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', 'email', email, db = 'accountdb', **kwargs))
 	if bound: return common.mt(98, 'account already bound email')
 	if exists: return common.mt(97, 'email already exists')
-	await common.execute(f'UPDATE info SET email = "{email}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	await _set_email(uid, email, **kwargs)
 	return common.mt(0, 'success, email verified', {'email' : email})
 
 #######################################################################
-async def _gen_email_code(email, **kwargs):
-	code = ''.join(random.choice(string.digits) for i in range(6))
-	while await kwargs['redis'].setnx('nonce.verify.email.' + code, email) == 0:
-		code = ''.join(random.choice(string.digits) for i in range(6))
-	await kwargs['redis'].expire('nonce.verify.email.' + code, 300)
-	return code
-
-async def _email_bound(uid, **kwargs):
-	data = await common.execute(f'SELECT email FROM info WHERE unique_id = "{uid}";', kwargs['accountdb'])
-	return not (data == () or (None,) in data or ('',) in data)
 
 async def _account_bound(uid, **kwargs):
 	data = await common.execute(f'SELECT account FROM info WHERE unique_id = "{uid}";', kwargs['accountdb'])
@@ -99,13 +90,28 @@ async def _account_bound(uid, **kwargs):
 async def _create_new_user(uid, **kwargs):
 	await common.execute(f'INSERT INTO info (unique_id) VALUES("{uid}");', kwargs['accountdb'])
 
-async def _get_prev_token(identifier, value, **kwargs):
-	data = await common.execute(f'SELECT token FROM info WHERE {identifier} = "{value}";', kwargs['accountdb'])
-	return data[0][0]
+async def _email_bound(uid, **kwargs):
+	data = await common.execute(f'SELECT email FROM info WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	return not (data == () or (None,) in data or ('',) in data)
+
+async def _gen_email_code(email, **kwargs):
+	code = ''.join(random.choice(string.digits) for i in range(6))
+	while await kwargs['redis'].setnx('nonce.verify.email.' + code, email) == 0:
+		code = ''.join(random.choice(string.digits) for i in range(6))
+	await kwargs['redis'].expire('nonce.verify.email.' + code, 300)
+	return code
 
 async def _get_account_email_phone(uid, **kwargs):
 	data = await common.execute(f'SELECT account, email, phone_number FROM info WHERE unique_id = "{uid}";', kwargs['accountdb'])
 	return data[0]
+
+async def _get_hash_and_salt(identifier, value, **kwargs):
+	data = await common.execute(f'SELECT password, salt FROM info WHERE `{identifier}` = "{value}";', kwargs['accountdb'])
+	return (None, None) if data == () else data[0]
+
+async def _get_prev_token(identifier, value, **kwargs):
+	data = await common.execute(f'SELECT token FROM info WHERE {identifier} = "{value}";', kwargs['accountdb'])
+	return data[0][0]
 
 async def _get_unique_id(identifier, value, **kwargs):
 	data = await common.execute(f'SELECT unique_id FROM info WHERE `{identifier}` = "{value}";', kwargs['accountdb'])
@@ -113,16 +119,18 @@ async def _get_unique_id(identifier, value, **kwargs):
 		return ''
 	return data[0][0]
 
+async def _record_token(uid, token, **kwargs):
+	await common.execute(f'UPDATE info SET token = "{token}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
+
 async def _request_new_token(uid, prev_token = '', **kwargs):
 	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/issue_token', data = {'unique_id' : uid, 'prev_token' : prev_token}) as resp:
 		return await resp.json(content_type = 'text/json')
 
-async def _record_token(uid, token, **kwargs):
-	await common.execute(f'UPDATE info SET token = "{token}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
+async def _set_credentials(uid, account, hashed_pw, salt, **kwargs):
+	await common.execute(f'UPDATE info SET account = "{account}", password = "{hashed_pw}", salt = "{salt}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
 
-async def _get_hash_and_salt(identifier, value, **kwargs):
-	data = await common.execute(f'SELECT password, salt FROM info WHERE `{identifier}` = "{value}";', kwargs['accountdb'])
-	return (None, None) if data == () else data[0]
+async def _set_email(uid, email, **kwargs):
+	await common.execute(f'UPDATE info SET email = "{email}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
 
 async def _valid_credentials(identifier, value, password, **kwargs):
 	if not _valid_password(password): return False
@@ -136,12 +144,14 @@ async def _valid_credentials(identifier, value, password, **kwargs):
 	input_hash = hashlib.scrypt(password.encode(), salt = salt.encode(), n = N, r = R, p = P).hex()
 	return input_hash == hashed_pw
 
-def _valid_password(password):
-	return bool(PW_RE.match(password))
-
 def _valid_account(account):
 	return bool(AC_RE.match(account))
 
 def _valid_email(email):
 	return bool(EM_RE.match(email))
+
+def _valid_password(password):
+	return bool(PW_RE.match(password))
+
+
 
