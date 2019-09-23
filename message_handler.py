@@ -21,7 +21,7 @@ class MessageHandler:
 		pass
 
 	# json.decoder.JSONDecodeError
-	async def resolve(self, message: str, session, redis, db, adb) -> str:
+	async def resolve(self, message: str, resource) -> str:
 		'''
 		Resolves the message included in the request. If required, ensures that a valid token is present.
 		'''
@@ -30,10 +30,10 @@ class MessageHandler:
 			fn = self._functions[message['function']]
 		except KeyError:
 			return '{"status" : 10, "message" : "function is not in function list"}'
-		message['session'] = session
-		message['redis'] = redis
-		message['worlddb'] = db
-		message['accountdb'] = adb
+		message['session'] = resource['session']
+		message['redis'] = resource['redis']
+		message['worlddb'] = resource['db']
+		message['accountdb'] = resource['accountdb']
 		message['tokenserverbaseurl'] = TOKEN_BASE_URL
 		return await fn(self, message)
 
