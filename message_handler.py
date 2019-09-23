@@ -50,11 +50,18 @@ class MessageHandler:
 	async def _bind_account(self, data: dict) -> str:
 		return json.dumps(await account.bind_account(data['data']['unique_id'], data['data']['account'], data['data']['password'], **data))
 
+	async def _bind_email(self, data: dict) -> str:
+		return json.dumps(await account.bind_email(data['data']['unique_id'], data['data']['email'], **data))
+	async def _verify_email_code(self, data: dict) -> str:
+		return json.dumps(await account.verify_email_code(data['data']['unique_id'], data['data']['code'], **data))
+
 
 FUNCTION_LIST = {
 	'login_unique' : MessageHandler._login_unique,
 	'login' : MessageHandler._login,
 	'bind_account' : MessageHandler._bind_account,
+	'bind_email' : MessageHandler._bind_email,
+	'verify_email_code' : MessageHandler._verify_email_code,
 	'create_family': MessageHandler._create_family
 }
 

@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'login', 'data':{'identifier' : 'account', 'value':'niggers123lal', 'password' : 'feelsblackman'}}
+		{'function': 'verify_email_code', 'data':{'unique_id' : 'testtest', 'code':'729973'}}
 				]
 
 

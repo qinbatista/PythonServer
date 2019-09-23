@@ -5,11 +5,14 @@ Contains functions related to administrative account activies such as logging in
 binding email addresses.
 '''
 import re
+import string
+import random
 import asyncio
 import hashlib
 import secrets
 
 from module import common
+from utility import direct_mail
 
 N = 2**10
 R = 8
@@ -56,12 +59,38 @@ async def bind_account(uid, account, password, **kwargs):
 	return common.mt(0, 'success', {'account' : account})
 
 async def bind_email(uid, email, **kwargs):
-	pass
+	if not await _account_bound(uid, **kwargs): return common.mt(99, 'account is not bound')
+	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', 'email', email, db = 'accountdb', **kwargs))
+	if bound: return common.mt(98, 'email has already been bound')
+	if exists: return common.mt(97, 'email already exists')
+	code = await _gen_email_code(email, **kwargs)
+	r = await direct_mail.send_verification(email, code, kwargs['session'])
+	if r != 'OK': return common.mt(96, 'email could not be sent', {'message' : r})
+	return common.mt(0, 'success')
 
-async def verify_email_code():
-	pass
+
+async def verify_email_code(uid, code, **kwargs):
+	email = await kwargs['redis'].get('nonce.verify.email.' + code)
+	if not email: return common.mt(99, 'invalid code')
+	email = email.decode()
+	await kwargs['redis'].delete('nonce.verify.email.' + code)
+	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', 'email', email, db = 'accountdb', **kwargs))
+	if bound: return common.mt(98, 'account already bound email')
+	if exists: return common.mt(97, 'email already exists')
+	await common.execute(f'UPDATE info SET email = "{email}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	return common.mt(0, 'success, email verified', {'email' : email})
 
 #######################################################################
+async def _gen_email_code(email, **kwargs):
+	code = ''.join(random.choice(string.digits) for i in range(6))
+	while await kwargs['redis'].setnx('nonce.verify.email.' + code, email) == 0:
+		code = ''.join(random.choice(string.digits) for i in range(6))
+	await kwargs['redis'].expire('nonce.verify.email.' + code, 300)
+	return code
+
+async def _email_bound(uid, **kwargs):
+	data = await common.execute(f'SELECT email FROM info WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	return not (data == () or (None,) in data or ('',) in data)
 
 async def _account_bound(uid, **kwargs):
 	data = await common.execute(f'SELECT account FROM info WHERE unique_id = "{uid}";', kwargs['accountdb'])
