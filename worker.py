@@ -32,6 +32,7 @@ class Worker:
 		self.running = False
 
 		self.db      = None
+		self.adb     = None
 		self.sid     = None
 		self.nats    = None
 		self.redis   = None
@@ -61,7 +62,7 @@ class Worker:
 		try:
 			#response = await self.mh.resolve(work, self.session)
 			print(f'worker: calling messagehandler with args: {work}')
-			response = await asyncio.wait_for(self.mh.resolve(work, self.session, self.redis, self.db), 3)
+			response = await asyncio.wait_for(self.mh.resolve(work, self.session, self.redis, self.db, self.adb), 3)
 		except asyncio.TimeoutError:
 			print(f'worker: message handler call with args: {work} timed out...')
 			response = '{"status" : -2, "message" : "request timed out"}'
@@ -84,6 +85,7 @@ class Worker:
 		self.redis = await aioredis.create_redis(CFG['redis']['addr'])
 		await self.nats.connect(CFG['nats']['addr'], max_reconnect_attempts = 1)
 		self.db = await aiomysql.create_pool(maxsize = 10, host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'experimental')
+		self.adb = await aiomysql.create_pool(maxsize = 4, host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'user')
 		if platform.system() != 'Windows':
 			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 
@@ -109,6 +111,8 @@ class Worker:
 		await self.mh.shutdown()
 		self.db.close()
 		await self.db.wait_closed()
+		self.adb.close()
+		await self.adb.wait_closed()
 		self.running = False
 		print('worker: shutdown complete')
 

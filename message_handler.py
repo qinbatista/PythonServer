@@ -3,6 +3,7 @@ import json
 from utility import config_reader
 
 from module import family
+from module import account
 
 CFG = config_reader.wait_config()
 
@@ -20,7 +21,7 @@ class MessageHandler:
 		pass
 
 	# json.decoder.JSONDecodeError
-	async def resolve(self, message: str, session, redis, db) -> str:
+	async def resolve(self, message: str, session, redis, db, adb) -> str:
 		'''
 		Resolves the message included in the request. If required, ensures that a valid token is present.
 		'''
@@ -31,15 +32,21 @@ class MessageHandler:
 			return '{"status" : 10, "message" : "function is not in function list"}'
 		message['session'] = session
 		message['redis'] = redis
-		message['db'] = db
+		message['worlddb'] = db
+		message['accountdb'] = adb
+		message['tokenserverbaseurl'] = TOKEN_BASE_URL
 		return await fn(self, message)
 
 
 	async def _create_family(self, data: dict) -> str:
 		return json.dumps(await family.create(data['data']['unique_id'], data['data']['name'],**data))
 
+	async def _login_unique(self, data: dict) -> str:
+		return json.dumps(await account.login_unique(data['data']['unique_id'], **data))
+
 
 FUNCTION_LIST = {
+	'login_unique' : MessageHandler._login_unique,
 	'create_family': MessageHandler._create_family
 }
 

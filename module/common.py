@@ -2,8 +2,11 @@
 common.py
 '''
 
-async def exists(table, identifier, value, **kwargs):
-	data = await execute(f'SELECT EXISTS (SELECT 1 FROM {table} WHERE {identifier} = "{value}");', kwargs['db'])
+def mt(status, message, data = {}):
+	return {'status' : status, 'message' : message, 'data' : data}
+
+async def exists(table, identifier, value, *, db = 'worlddb', **kwargs):
+	data = await execute(f'SELECT EXISTS (SELECT 1 FROM {table} WHERE {identifier} = "{value}");', kwargs[db])
 	if data == () or () in data: return False
 	return data[0][0] != 0
 
