@@ -18,11 +18,11 @@ import message_handler
 import nats.aio.client
 
 import platform
-
+import sys
 from utility import config_reader
 
 CFG = config_reader.wait_config()
-
+jobs_name = "jobs"
 class Worker:
 	def __init__(self):
 		self.mh      = message_handler.MessageHandler()
@@ -41,7 +41,8 @@ class Worker:
 	async def start(self):
 		try:
 			await self.init()
-			self.sid = await self.nats.subscribe('jobs', 'workers', self.process_job)
+			print("this worker will go channel:"+jobs_name)
+			self.sid = await self.nats.subscribe(jobs_name, 'workers', self.process_job)
 			while self.running:
 				await asyncio.sleep(1)
 				await self.nats.flush()
@@ -130,5 +131,7 @@ class Worker:
 
 
 if __name__ == '__main__':
+	if len(sys.argv)>=2:
+		jobs_name  = sys.argv[1]
 	worker = Worker()
 	asyncio.run(worker.start())

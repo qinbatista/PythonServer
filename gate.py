@@ -25,13 +25,13 @@ import asyncio
 import aioredis
 import contextlib
 import nats.aio.client
-
+import sys
 import platform
 
 from utility import config_reader
 
 CFG = config_reader.wait_config()
-
+jobs_name = "jobs"
 class Gate:
 	def __init__(self, cport = 8880, wport = 8201):
 		self.ip       = self._read_ip()
@@ -167,7 +167,8 @@ class Gate:
 		cid = uuid.uuid4().hex
 		self.cwriters[cid] = writer
 		await self.redis.set(cid, self.gid, expire = 10)
-		await self.nats.publish('jobs', (cid + '~' + job).encode())
+		print("this gate will go channel:"+jobs_name)
+		await self.nats.publish(jobs_name, (cid + '~' + job).encode())
 		print(f'gate: submitted new job with id {cid} and args {job}')
 		print(f'gate: waiting for job {cid} to complete')
 
@@ -193,4 +194,6 @@ class Gate:
 			s.close()
 
 if __name__ == '__main__':
+	if len(sys.argv)>=2:
+		jobs_name  = sys.argv[1]
 	asyncio.run(Gate().start())
