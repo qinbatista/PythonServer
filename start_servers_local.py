@@ -17,29 +17,29 @@ def GetPythonCommand():
 		version1 = os.popen("python3.7 --version")
 		if version1.read()!="":
 			PythonVersion="python3.7"
-	except:
-		pass
+	except Exception as e:
+		print(str(e))
 
 	try:
 		version2 = os.popen("python.exe --version")
 		if version2.read()!="":
 			PythonVersion="python.exe"
-	except:
-		pass
+	except Exception as e:
+		print(str(e))
 
 	try:
 		version3 = os.popen("python3 --version")
 		if version3.read()!="":
 			PythonVersion="python3"
-	except:
-		pass
+	except Exception as e:
+		print(str(e))
 
 	try:
 		version4 = os.popen("python --version")
 		if version4.read()!="":
 			PythonVersion="python"
-	except:
-		pass
+	except Exception as e:
+		print(str(e))
 	# print("Version:"+version1.read())
 	# print("show:"+version2.read())
 	# print("show:"+version3.read())
