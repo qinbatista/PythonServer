@@ -451,10 +451,10 @@ def new_server_test(world):
 
 	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : 'aass'}})
 	token = response['data']['token']
-	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
-	# print(response)
-	response = send_tcp_message({'world' : world, 'function' : 'response_family', 'data' : {'token': token, 'nonce': '78337956676184997857706980485225384889478708200314904499946514947315907719455'}})
+	response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
 	print(response)
+	# response = send_tcp_message({'world' : world, 'function' : 'response_family', 'data' : {'token': token, 'nonce': '78337956676184997857706980485225384889478708200314904499946514947315907719455'}})
+	# print(response)
 
 
 	# nonce = '109859617373153377003944302714374895868816002944800435692483366741142151128392'
@@ -463,6 +463,7 @@ def new_server_test(world):
 
 	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': nonce}})
 	# print(response)
+	input('继续... ...')
 
 if __name__ == "__main__":
 	# result = requests.post('http://localhost:8100/get_stage_info', data={})
