@@ -18,7 +18,8 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'get_new_mail', 'data':{'unique_id' : '4'}}
+		{'function': 'get_new_mail', 'data':{'unique_id' : '4'}},
+		{'function': 'get_new_mail', 'data':{'unique_id' : '1'}}
 				]
 
 
@@ -33,7 +34,8 @@ def send_single_message(message_id: int):
 
 
 def main() -> None:
-	send_single_message(0)
+	for i in range(len(MESSAGE_LIST)):
+		send_single_message(i)
 
 
 if __name__ == '__main__':

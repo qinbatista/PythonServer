@@ -18,9 +18,11 @@ Required Kwargs By MailType:
 	FRIEND_REQUEST: from_, sender, uid_sender
 	FAMILY_REQUEST: name, target
 '''
-async def send_mail(mailtype, uid_to, **kwargs):
+async def send_mail(mailtype, *args, **kwargs):
 	try:
-		return await (SWITCH[mailtype])(uid_to, **kwargs)
+		for uid_to in args:
+			await (SWITCH[mailtype])(uid_to, **kwargs)
+		return True
 	except KeyError: return False
 
 async def get_new_mail(uid, **kwargs):

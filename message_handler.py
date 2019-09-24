@@ -39,55 +39,72 @@ class MessageHandler:
 		message['tokenserverbaseurl'] = TOKEN_BASE_URL
 		message['mailserverbaseurl'] = MAIL_BASE_URL
 		message['world'] = '0'
-		return await fn(self, message)
+		return json.dumps(await fn(self, message))
 
 
 
-	# account.py
+	###################### account.py ######################
 	async def _login_unique(self, data: dict) -> str:
-		return json.dumps(await account.login_unique(data['data']['unique_id'], **data))
+		return await account.login_unique(data['data']['unique_id'], **data)
 
 	async def _login(self, data: dict) -> str:
-		return json.dumps(await account.login(data['data']['identifier'], data['data']['value'], data['data']['password'], **data))
+		return await account.login(data['data']['identifier'], data['data']['value'], data['data']['password'], **data)
 
 	async def _bind_account(self, data: dict) -> str:
-		return json.dumps(await account.bind_account(data['data']['unique_id'], data['data']['account'], data['data']['password'], **data))
+		return await account.bind_account(data['data']['unique_id'], data['data']['account'], data['data']['password'], **data)
 
 	async def _bind_email(self, data: dict) -> str:
-		return json.dumps(await account.bind_email(data['data']['unique_id'], data['data']['email'], **data))
-	async def _verify_email_code(self, data: dict) -> str:
-		return json.dumps(await account.verify_email_code(data['data']['unique_id'], data['data']['code'], **data))
+		return await account.bind_email(data['data']['unique_id'], data['data']['email'], **data)
 
-	# family.py
+	async def _verify_email_code(self, data: dict) -> str:
+		return await account.verify_email_code(data['data']['unique_id'], data['data']['code'], **data)
+
+	###################### family.py ######################
 	async def _create_family(self, data: dict) -> str:
-		return json.dumps(await family.create(data['data']['unique_id'], data['data']['name'], **data))
+		return await family.create(data['data']['unique_id'], data['data']['name'], **data)
 
 	async def _leave_family(self, data: dict) -> str:
-		return json.dumps(await family.leave(data['data']['unique_id'], **data))
+		return await family.leave(data['data']['unique_id'], **data)
 
 	async def _remove_user_family(self, data: dict) -> str:
-		return json.dumps(await family.remove_user(data['data']['unique_id'], data['data']['gn_target'], **data))
+		return await family.remove_user(data['data']['unique_id'], data['data']['gn_target'], **data)
 
-	# mail.py
+	async def _invite_user_family(self, data: dict) -> str:
+		return await family.invite_user(data['data']['unique_id'], data['data']['gn_target'], **data)
+
+	async def _request_join_family(self, data: dict) -> str:
+		return await family.request_join(data['data']['unique_id'], data['data']['name'], **data)
+
+	async def _respond_family(self, data: dict) -> str:
+		return await family.respond(data['data']['unique_id'], data['data']['nonce'], **data)
+
+	###################### mail.py ######################
+	async def _send_mail(self, data: dict) -> str:
+		return await mail.send_mail(common.MailType.SIMPLE, '4', '1', **data)
+
 	async def _get_new_mail(self, data: dict) -> str:
-		return json.dumps(await mail.get_new_mail(data['data']['unique_id'], **data))
+		return await mail.get_new_mail(data['data']['unique_id'], **data)
 
 
 
 FUNCTION_LIST = {
-	# account.py
+	###################### account.py ######################
 	'login_unique' : MessageHandler._login_unique,
 	'login' : MessageHandler._login,
 	'bind_account' : MessageHandler._bind_account,
 	'bind_email' : MessageHandler._bind_email,
 	'verify_email_code' : MessageHandler._verify_email_code,
 
-	# family.py
+	###################### family.py ######################
 	'create_family': MessageHandler._create_family,
 	'leave_family' : MessageHandler._leave_family,
 	'remove_user_family' : MessageHandler._remove_user_family,
+	'invite_user_family' : MessageHandler._invite_user_family,
+	'request_join_family' : MessageHandler._request_join_family,
+	'respond_family' : MessageHandler._request_join_family,
 
-	# mail.py
+	###################### mail.py ######################
+	'send_mail' : MessageHandler._send_mail,
 	'get_new_mail' : MessageHandler._get_new_mail
 }
 
