@@ -427,6 +427,79 @@ def create_achievement(cursor):
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 	cursor.execute(statement)
+def create_check_in(cursor):
+	statement = \
+	"""
+	CREATE TABLE `check_in` (
+	  `unique_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new_id',
+
+	  `check_in_day1` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day1` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day2` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day2` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day3` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day3` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day4` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day4` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day5` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day5` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day6` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day6` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day7` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day7` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day8` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day8` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day9` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day9` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day10` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day10` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day11` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day11` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day12` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day12` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day13` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day13` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day14` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day14` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day15` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day15` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day16` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day16` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day17` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day17` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day18` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day18` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day19` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day19` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day20` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day20` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day21` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day21` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day22` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day22` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day23` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day23` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day24` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day24` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day25` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day25` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day26` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day26` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day27` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day27` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day28` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day28` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day29` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day29` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day30` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day30` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+	  `check_in_day31` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
+	  `reward_day31` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
+
+	  PRIMARY KEY (`unique_id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+	cursor.execute(statement)
 def create_triggers_player(cursor):
 	trigger1 = \
 	"""
@@ -503,7 +576,8 @@ def operating_test():
 	cursor = c.cursor()
 	# creat_table_task(cursor)
 	# create_achievement(cursor)
-	create_table_union_store(cursor)
+	# create_table_union_store(cursor)
+	create_check_in(cursor)
 	# create_table_player(cursor)
 	# create_table_families(cursor)
 
