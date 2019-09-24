@@ -3,20 +3,40 @@ import time
 import subprocess
 import signal
 import requests
-
+PythonVersion=""
 def loc():
 	return os.path.dirname(os.path.realpath(__file__))
 
-
+def GetPythonCommand():
+	global PythonVersion
+	if PythonVersion!="":
+		return PythonVersion
+	version1 = os.popen("python3.7 --version")
+	version3 = os.popen("python3 --version")
+	version2 = os.popen("python.exe --version")
+	version4 = os.popen("python --version")
+	# print("Version:"+version1.read())
+	# print("show:"+version2.read())
+	# print("show:"+version3.read())
+	if version1.read()!="":
+		PythonVersion="python3.7"
+	if version2.read()!="":
+		PythonVersion="python"
+	if version3.read()!="":
+		PythonVersion="python.exe"
+	if version4.read()!="":
+		PythonVersion="python"
+	print("Your are using python command:"+PythonVersion)
+	return PythonVersion
 
 def main():
 	processes = []
 	try:
-		processes.append(subprocess.Popen(['python3', loc() + '/configuration_manager.py']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/configuration_manager.py']))
 		time.sleep(1)
-		processes.append(subprocess.Popen(['python3', loc() + '/mail_server.py']))
-		processes.append(subprocess.Popen(['python3', loc() + '/token_server.py']))
-		processes.append(subprocess.Popen(['python3', loc() + '/chat_server.py']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/mail_server.py']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/token_server.py']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/chat_server.py']))
 		# processes.append(subprocess.Popen(['python', loc() + '/account_manager.py']))
 		# processes.append(subprocess.Popen(['python', loc() + '/game_manager_qin.py']))
 		# processes.append(subprocess.Popen(['python3', loc() + '/game_manager_houyao.py']))
