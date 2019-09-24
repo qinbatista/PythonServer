@@ -31,6 +31,13 @@ class FamilyRole(enum.IntEnum):
 	ELITE = 3
 	BASIC = 4
 
+class MailType(enum.IntEnum):
+	SIMPLE = 0
+	GIFT = 1
+	FRIEND_REQUEST = 2
+	FAMILY_INVITE = 3
+
+
 ##############################################################################
 
 async def try_item(uid, item, value, **kwargs):

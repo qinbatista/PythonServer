@@ -59,6 +59,9 @@ class MessageHandler:
 	async def _create_family(self, data: dict) -> str:
 		return json.dumps(await family.create(data['data']['unique_id'], data['data']['name'], **data))
 
+	async def _leave_family(self, data: dict) -> str:
+		return json.dumps(await family.leave(data['data']['unique_id'], **data))
+
 
 FUNCTION_LIST = {
 	# account.py
@@ -70,5 +73,6 @@ FUNCTION_LIST = {
 
 	# family.py
 	'create_family': MessageHandler._create_family,
+	'leave_family' : MessageHandler._leave_family
 }
 

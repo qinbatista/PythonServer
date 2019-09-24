@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'create_family', 'data':{'unique_id' : '1', 'name':'my fam bam'}}
+		{'function': 'leave_family', 'data':{'unique_id' : '1'}}
 				]
 
 
