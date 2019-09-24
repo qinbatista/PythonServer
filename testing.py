@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'send_mail', 'data':{'unique_id' : '1', 'gn_target' : 'cuck'}}
+		{'function': 'get_new_mail', 'data':{'unique_id' : '4'}}
 				]
 
 

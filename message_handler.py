@@ -69,8 +69,8 @@ class MessageHandler:
 		return json.dumps(await family.remove_user(data['data']['unique_id'], data['data']['gn_target'], **data))
 
 	# mail.py
-	async def _send_mail(self, data: dict) -> str:
-		return json.dumps(await mail.send_mail(common.MailType.SIMPLE, '4', **data))
+	async def _get_new_mail(self, data: dict) -> str:
+		return json.dumps(await mail.get_new_mail(data['data']['unique_id'], **data))
 
 
 
@@ -88,6 +88,6 @@ FUNCTION_LIST = {
 	'remove_user_family' : MessageHandler._remove_user_family,
 
 	# mail.py
-	'send_mail' : MessageHandler._send_mail
+	'get_new_mail' : MessageHandler._get_new_mail
 }
 

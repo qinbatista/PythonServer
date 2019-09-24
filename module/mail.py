@@ -23,6 +23,9 @@ async def send_mail(mailtype, uid_to, **kwargs):
 		return await (SWITCH[mailtype])(uid_to, **kwargs)
 	except KeyError: return False
 
+async def get_new_mail(uid, **kwargs):
+	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/get_new_mail', data = {'world' : kwargs['world'], 'unique_id' : uid}) as resp:
+		return await resp.json(content_type = 'text/json')
 
 #################################################################################################
 
