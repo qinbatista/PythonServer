@@ -5,6 +5,7 @@ from utility import config_reader
 from module import family
 from module import account
 from module import common
+from module import mail
 
 CFG = config_reader.wait_config()
 
@@ -36,6 +37,8 @@ class MessageHandler:
 		message['worlddb'] = resource['db']
 		message['accountdb'] = resource['accountdb']
 		message['tokenserverbaseurl'] = TOKEN_BASE_URL
+		message['mailserverbaseurl'] = MAIL_BASE_URL
+		message['world'] = '0'
 		return await fn(self, message)
 
 
@@ -65,6 +68,11 @@ class MessageHandler:
 	async def _remove_user_family(self, data: dict) -> str:
 		return json.dumps(await family.remove_user(data['data']['unique_id'], data['data']['gn_target'], **data))
 
+	# mail.py
+	async def _send_mail(self, data: dict) -> str:
+		return json.dumps(await mail.send_mail(common.MailType.SIMPLE, '4', **data))
+
+
 
 FUNCTION_LIST = {
 	# account.py
@@ -77,6 +85,9 @@ FUNCTION_LIST = {
 	# family.py
 	'create_family': MessageHandler._create_family,
 	'leave_family' : MessageHandler._leave_family,
-	'remove_user_family' : MessageHandler._remove_user_family
+	'remove_user_family' : MessageHandler._remove_user_family,
+
+	# mail.py
+	'send_mail' : MessageHandler._send_mail
 }
 
