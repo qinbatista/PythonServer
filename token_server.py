@@ -71,6 +71,15 @@ class TokenServer:
 				results[n] = {'status' : 0, **self._nonce_table.pop(n)}
 		return results
 
+	async def redeem_nonce_new(self, nonces: [str]) -> dict:
+		results = {}
+		for n in nonces:
+			if n not in self._nonce_table:
+				results[n] = {'status' : 1}
+			else:
+				results[n] = {'status' : 0, **self._nonce_table.pop(n)}
+		return results
+
 
 
 	def _message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
@@ -127,6 +136,11 @@ async def __generate_nonce(request: web.Request) -> web.Response:
 async def __redeem_nonce(request: web.Request) -> web.Response:
 	post = await request.json()
 	return _json_response(await (request.app['MANAGER']).redeem_nonce(post['type'], post['nonce']))
+
+@ROUTES.post('/redeem_nonce_new')
+async def __redeem_nonce_new(request: web.Request) -> web.Response:
+	post = await request.json()
+	return _json_response(await (request.app['MANAGER']).redeem_nonce_new(post['nonce']))
 
 def run():
 	app = web.Application()
