@@ -59,9 +59,10 @@ async def request_join(uid, name, **kwargs):
 
 async def respond(uid, nonce, **kwargs):
 	name, gn_target = await _lookup_nonce(nonce, **kwargs)
+	if not name: return common.mt(99, 'invalid nonce')
 	uid_target = await _get_uid(gn_target, **kwargs)
 	in_family, _ = await _in_family(uid_target, **kwargs)
-	if in_family: return common.mt(99, 'already in a family')
+	if in_family: return common.mt(98, 'already in a family')
 	await _add_to_family(uid_target, name)
 	return common.mt(0, 'success')
 
@@ -104,9 +105,9 @@ async def _get_uid_officials(name, **kwargs):
 	return None if data == () else [u[0] for u in data]
 
 async def _lookup_nonce(nonce, **kwargs):
-	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce', data = {'nonce' : nonce}) as resp:
-		pass
-	return (None, None)
+	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce_new', json = {'nonce' : [nonce]}) as resp:
+		data = await resp.json(content_type = 'text/json')
+		return (None, None) if data['status'] != 0 else (data['nonce']['name'], data['nonce']['target'])
 
 async def _remove_from_family(uid, name, **kwargs):
 	await asyncio.gather(common.execute(f'UPDATE player SET fid = "" WHERE uid = "{uid}";', **kwargs),
