@@ -25,7 +25,7 @@ EM_RE = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
 
 
 async def login_unique(uid, **kwargs):
-	exists, bound = await asyncio.gather(common.exists('info', 'unique_id', uid, db = 'accountdb', **kwargs), _account_bound(uid, **kwargs))
+	exists, bound = await asyncio.gather(common.exists('info', 'unique_id', uid, account = True, **kwargs), _account_bound(uid, **kwargs))
 	if not exists:
 		await _create_new_user(uid, **kwargs)
 		status, message, prev_token = 1, 'new account created', ''
@@ -50,7 +50,7 @@ async def login(identifier, value, password, **kwargs):
 async def bind_account(uid, account, password, **kwargs):
 	if not _valid_account(account): return common.mt(99, 'invalid account name')
 	if not _valid_password(password): return common.mt(98, 'invalid password')
-	if await common.exists('info', 'account', account, db = 'accountdb', **kwargs):
+	if await common.exists('info', 'account', account, account = True, **kwargs):
 		return common.mt(97, 'invalid account name')
 	salt = str(secrets.randbits(256))
 	if len(salt) % 2 != 0:
@@ -84,14 +84,14 @@ async def verify_email_code(uid, code, **kwargs):
 #######################################################################
 
 async def _account_bound(uid, **kwargs):
-	data = await common.execute(f'SELECT account FROM info WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	data = await common.execute(f'SELECT account FROM info WHERE unique_id = "{uid}";', account = True, **kwargs)
 	return not (data == () or (None,) in data or ('',) in data)
 
 async def _create_new_user(uid, **kwargs):
-	await common.execute(f'INSERT INTO info (unique_id) VALUES("{uid}");', kwargs['accountdb'])
+	await common.execute(f'INSERT INTO info (unique_id) VALUES("{uid}");', account = True, **kwargs)
 
 async def _email_bound(uid, **kwargs):
-	data = await common.execute(f'SELECT email FROM info WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	data = await common.execute(f'SELECT email FROM info WHERE unique_id = "{uid}";', account = True, **kwargs)
 	return not (data == () or (None,) in data or ('',) in data)
 
 async def _gen_email_code(email, **kwargs):
@@ -102,35 +102,35 @@ async def _gen_email_code(email, **kwargs):
 	return code
 
 async def _get_account_email_phone(uid, **kwargs):
-	data = await common.execute(f'SELECT account, email, phone_number FROM info WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	data = await common.execute(f'SELECT account, email, phone_number FROM info WHERE unique_id = "{uid}";', account = True, **kwargs)
 	return data[0]
 
 async def _get_hash_and_salt(identifier, value, **kwargs):
-	data = await common.execute(f'SELECT password, salt FROM info WHERE `{identifier}` = "{value}";', kwargs['accountdb'])
+	data = await common.execute(f'SELECT password, salt FROM info WHERE `{identifier}` = "{value}";', account = True, **kwargs)
 	return (None, None) if data == () else data[0]
 
 async def _get_prev_token(identifier, value, **kwargs):
-	data = await common.execute(f'SELECT token FROM info WHERE {identifier} = "{value}";', kwargs['accountdb'])
+	data = await common.execute(f'SELECT token FROM info WHERE {identifier} = "{value}";', account = True, **kwargs)
 	return data[0][0]
 
 async def _get_unique_id(identifier, value, **kwargs):
-	data = await common.execute(f'SELECT unique_id FROM info WHERE `{identifier}` = "{value}";', kwargs['accountdb'])
+	data = await common.execute(f'SELECT unique_id FROM info WHERE `{identifier}` = "{value}";', account = True, **kwargs)
 	if data == () or (None,) in data or ('',) in data:
 		return ''
 	return data[0][0]
 
 async def _record_token(uid, token, **kwargs):
-	await common.execute(f'UPDATE info SET token = "{token}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	await common.execute(f'UPDATE info SET token = "{token}" WHERE unique_id = "{uid}";', account = True, **kwargs)
 
 async def _request_new_token(uid, prev_token = '', **kwargs):
 	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/issue_token', data = {'unique_id' : uid, 'prev_token' : prev_token}) as resp:
 		return await resp.json(content_type = 'text/json')
 
 async def _set_credentials(uid, account, hashed_pw, salt, **kwargs):
-	await common.execute(f'UPDATE info SET account = "{account}", password = "{hashed_pw}", salt = "{salt}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	await common.execute(f'UPDATE info SET account = "{account}", password = "{hashed_pw}", salt = "{salt}" WHERE unique_id = "{uid}";', account = True, **kwargs)
 
 async def _set_email(uid, email, **kwargs):
-	await common.execute(f'UPDATE info SET email = "{email}" WHERE unique_id = "{uid}";', kwargs['accountdb'])
+	await common.execute(f'UPDATE info SET email = "{email}" WHERE unique_id = "{uid}";', account = True, **kwargs)
 
 async def _valid_credentials(identifier, value, password, **kwargs):
 	if not _valid_password(password): return False

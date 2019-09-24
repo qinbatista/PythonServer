@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'leave_family', 'data':{'unique_id' : '1'}}
+		{'function': 'remove_user_family', 'data':{'unique_id' : '1', 'gn_target' : 'cuck'}}
 				]
 
 

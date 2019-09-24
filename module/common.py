@@ -26,10 +26,10 @@ class Item(enum.IntEnum):
 
 
 class FamilyRole(enum.IntEnum):
-	OWNER = 1
-	ADMIN = 2
-	ELITE = 3
-	BASIC = 4
+	BASIC = 0
+	ELITE = 4
+	ADMIN = 8
+	OWNER = 10
 
 class MailType(enum.IntEnum):
 	SIMPLE = 0
@@ -41,7 +41,8 @@ class MailType(enum.IntEnum):
 ##############################################################################
 
 async def try_item(uid, item, value, **kwargs):
-	async with kwargs['worlddb'].acquire() as conn:
+	async with (await get_db(**kwargs)).acquire() as conn:
+		# await conn.select_db()
 		async with conn.cursor() as cursor:
 			await cursor.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{item.value}" FOR UPDATE;')
 			quantity = await cursor.fetchall()
@@ -51,16 +52,20 @@ async def try_item(uid, item, value, **kwargs):
 			return (False, quantity[0][0] + value)
 
 
-async def exists(table, identifier, value, *, db = 'worlddb', **kwargs):
-	data = await execute(f'SELECT EXISTS (SELECT 1 FROM {table} WHERE {identifier} = "{value}");', kwargs[db])
+async def exists(table, identifier, value, *, account = False, **kwargs):
+	data = await execute(f'SELECT EXISTS (SELECT 1 FROM {table} WHERE {identifier} = "{value}");', account, **kwargs)
 	if data == () or () in data: return False
 	return data[0][0] != 0
 
-async def execute(statement, pool):
-	async with pool.acquire() as conn:
+async def execute(statement, account = False, **kwargs):
+	async with ((await get_db(**kwargs)).acquire() if not account else kwargs['accountdb'].acquire()) as conn:
+		# await conn.select_db()
 		async with conn.cursor() as cursor:
 			await cursor.execute(statement)
 			return await cursor.fetchall()
+
+async def get_db(**kwargs):
+	return kwargs['worlddb']
 
 def mt(status, message, data = {}):
 	return {'status' : status, 'message' : message, 'data' : data}
