@@ -35,7 +35,7 @@ class MailType(enum.IntEnum):
 	SIMPLE = 0
 	GIFT = 1
 	FRIEND_REQUEST = 2
-	FAMILY_INVITE = 3
+	FAMILY_REQUEST = 3
 
 
 ##############################################################################
