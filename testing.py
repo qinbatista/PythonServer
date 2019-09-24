@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'verify_email_code', 'data':{'unique_id' : 'testtest', 'code':'729973'}}
+		{'function': 'create_family', 'data':{'unique_id' : '1', 'name':'my fam bam'}}
 				]
 
 

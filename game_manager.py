@@ -190,42 +190,6 @@ class GameManager:
 		else:
 			return await self._decrease_energy(world, unique_id, abs(amount))
 
-	async def try_coin(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'coin', value)
-
-	async def try_iron(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'iron', value)
-
-	async def try_diamond(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'diamond', value)
-
-	async def try_experience(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'experience', value)
-
-	async def try_level(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'level', value)
-
-	async def try_role(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'role', value)
-
-	async def try_stage(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'stage', value)
-
-	async def try_skill_scroll_10(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'skill_scroll_10', value)
-
-	async def try_skill_scroll_30(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'skill_scroll_30', value)
-
-	async def try_skill_scroll_100(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'skill_scroll_100', value)
-
-	async def try_experience_potion(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'experience_potion', value)
-
-	async def try_small_energy_potion(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'small_energy_potion', value)
-
 	async def try_armor(self, world: int, unique_id: str, armor_id: str, armor_level: str, value: int) -> dict:
 		select_str = f"select {armor_level} from armor where unique_id='{unique_id}' and armor_id='{armor_id}'"
 		insert_str = f"insert into armor(unique_id, armor_id, {armor_level}) values('{unique_id}', '{armor_id}', {value})"

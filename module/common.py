@@ -24,21 +24,25 @@ class Item(enum.IntEnum):
 	FORTUNE_WHEEL_BASIC = 14
 	FORTUNE_WHEEL_PRO = 15
 
+
+class FamilyRole(enum.IntEnum):
+	OWNER = 1
+	ADMIN = 2
+	ELITE = 3
+	BASIC = 4
+
 ##############################################################################
 
-'''
-try_item provides a single interface to query, and modify any player item.
-it has three modes: check, add, remove
-check:	access this mode by setting value parameter to 0
-		returns a tuple containing True and the current value of that item
-
-add:	access this mode by setting value parameter to a positive number
-		returns a tuple containing True and the resulting value after adding value to it
-
-remove:	access this mode by setting value parameter to a negative number
-'''
 async def try_item(uid, item, value, **kwargs):
-	pass
+	async with kwargs['worlddb'].acquire() as conn:
+		async with conn.cursor() as cursor:
+			await cursor.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{item.value}" FOR UPDATE;')
+			quantity = await cursor.fetchall()
+			if value >= 0 or quantity[0][0] + value >= 0:
+				await cursor.execute(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{item.value}";')
+				return (True, quantity[0][0] + value)
+			return (False, quantity[0][0] + value)
+
 
 async def exists(table, identifier, value, *, db = 'worlddb', **kwargs):
 	data = await execute(f'SELECT EXISTS (SELECT 1 FROM {table} WHERE {identifier} = "{value}");', kwargs[db])

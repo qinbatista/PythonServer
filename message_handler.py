@@ -4,6 +4,7 @@ from utility import config_reader
 
 from module import family
 from module import account
+from module import common
 
 CFG = config_reader.wait_config()
 
@@ -38,9 +39,8 @@ class MessageHandler:
 		return await fn(self, message)
 
 
-	async def _create_family(self, data: dict) -> str:
-		return json.dumps(await family.create(data['data']['unique_id'], data['data']['name'],**data))
 
+	# account.py
 	async def _login_unique(self, data: dict) -> str:
 		return json.dumps(await account.login_unique(data['data']['unique_id'], **data))
 
@@ -55,6 +55,10 @@ class MessageHandler:
 	async def _verify_email_code(self, data: dict) -> str:
 		return json.dumps(await account.verify_email_code(data['data']['unique_id'], data['data']['code'], **data))
 
+	# family.py
+	async def _create_family(self, data: dict) -> str:
+		return json.dumps(await family.create(data['data']['unique_id'], data['data']['name'], **data))
+
 
 FUNCTION_LIST = {
 	# account.py
@@ -65,6 +69,6 @@ FUNCTION_LIST = {
 	'verify_email_code' : MessageHandler._verify_email_code,
 
 	# family.py
-	'create_family': MessageHandler._create_family
+	'create_family': MessageHandler._create_family,
 }
 
