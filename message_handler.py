@@ -57,11 +57,14 @@ class MessageHandler:
 
 
 FUNCTION_LIST = {
+	# account.py
 	'login_unique' : MessageHandler._login_unique,
 	'login' : MessageHandler._login,
 	'bind_account' : MessageHandler._bind_account,
 	'bind_email' : MessageHandler._bind_email,
 	'verify_email_code' : MessageHandler._verify_email_code,
+
+	# family.py
 	'create_family': MessageHandler._create_family
 }
 

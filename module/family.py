@@ -14,15 +14,18 @@ class Role(enum.IntEnum):
 	BASIC = 3
 
 async def create(pid, name, **kwargs):
+	if not _valid_family_name(name): return common.mt(99, 'invalid family name')
+
+
 	if not await game.try_coin(pid, -200, **kwargs):
-		return mt(99, 'not enough coins!!!!')
+		return common.mt(99, 'not enough coins!!!!')
 	if await common.exists('family', 'name', name, **kwargs):
-		return mt(98, 'that family name already exists!')
+		return common.mt(98, 'that family name already exists!')
 	await common.execute(f'INSERT INTO family VALUES("{name}", 0);', kwargs['db'])
 	print(type(Role.OWNER.value))
 	await common.execute(f'INSERT INTO familyrole(name, pid, role) VALUES("{name}", "{pid}", "{Role.OWNER.value}");', kwargs['db'])
 	await common.execute(f'UPDATE player SET fid = "{name}" WHERE pid = "{pid}";', kwargs['db'])
-	return mt(0, 'success!!')
+	return common.mt(0, 'success!!')
 
 async def leave():
 	pass
@@ -30,5 +33,6 @@ async def leave():
 async def kick_member():
 	pass
 
-def mt(status, message):
-	return {'status' : status, 'message' : message}
+########################################################################
+def _valid_family_name(name):
+	return bool(name)
