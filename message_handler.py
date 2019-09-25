@@ -91,6 +91,33 @@ class MessageHandler:
 	async def _basic_summon(self, data: dict) -> str:
 		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.RewardGroup.WEAPON, **data)
 
+	async def _pro_summon(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PRO, enums.RewardGroup.WEAPON, **data)
+
+	async def _friend_summon(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.RewardGroup.WEAPON, **data)
+
+	async def _prophet_summon(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PROPHET, enums.RewardGroup.WEAPON, **data)
+
+	async def _basic_summon_skill(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.RewardGroup.SKILL, **data)
+
+	async def _pro_summon_skill(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PRO, enums.RewardGroup.SKILL, **data)
+
+	async def _friend_summon_skill(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.RewardGroup.SKILL, **data)
+
+	async def _basic_summon_role(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.RewardGroup.ROLE, **data)
+
+	async def _pro_summon_role(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PRO, enums.RewardGroup.ROLE, **data)
+
+	async def _friend_summon_role(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.RewardGroup.ROLE, **data)
+
 
 	async def test(self, data: dict) -> str:
 		return await common.exists('player', ('uid', '1'), ('gn', 'cuck'), **data)
@@ -121,5 +148,14 @@ FUNCTION_LIST = {
 
 	###################### summoning.py ######################
 	'basic_summon' : MessageHandler._basic_summon
+	'pro_summon' : MessageHandler._pro_summon,
+	'friend_summon' : MessageHandler._friend_summon,
+	'prophet_summon' : MessageHandler._friend_summon,
+	'basic_summon_skill' : MessageHandler._basic_summon_skill,
+	'pro_summon_skill' : MessageHandler._pro_summon_skill,
+	'friend_summon_skill' : MessageHandler._friend_summon_skill,
+	'basic_summon_role' : MessageHandler._basic_summon_role,
+	'pro_summon_role' : MessageHandler._pro_summon_role,
+	'friend_summon_role' : MessageHandler._friend_summon_role
 }
 
