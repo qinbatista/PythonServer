@@ -472,6 +472,13 @@ class MessageHandler:
 	async def _change_game_name(self, data: dict) -> str:
 		return json.dumps(await self.gm.change_game_name(data['world'], data['data']['unique_id'], data['data']['newname']))
 
+	async def _record_achievement(self, data: dict) -> str:
+		return json.dumps(await self.gm.record_achievement(data['world'],data['data']['unique_id'], data['data']['achievement_id'],data['data']['value']))
+
+	async def _get_achievement_reward(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_achievement_reward(data['world'],data['data']['unique_id'], data['data']['achievement_id'],data['data']['value']))
+
+
 		# async with session.post(self._game_manager_base_url("0") + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
 		# 	return await resp.text()
 ###############################################################################
@@ -641,6 +648,10 @@ FUNCTION_LIST = {
 	'upgrade_role_star':MessageHandler._upgrade_role_star,
 	'get_player_info':MessageHandler._get_player_info,
 	'mail_gift':MessageHandler._mail_gift,
-	'get_picture_link': MessageHandler._get_picture_link
+	'get_picture_link': MessageHandler._get_picture_link,
+
+	'record_achievement': MessageHandler._record_achievement,
+	'get_achievement_reward': MessageHandler._get_achievement_reward
+
 }
 
