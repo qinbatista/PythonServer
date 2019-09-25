@@ -2,18 +2,15 @@ import json
 
 from utility import config_reader
 
-from module import family
-from module import account
-from module import common
 from module import mail
+from module import family
+from module import common
+from module import account
 
 CFG = config_reader.wait_config()
 
 TOKEN_BASE_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
 MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
-
-class InvalidTokenError(Exception):
-	pass
 
 class MessageHandler:
 	def __init__(self):
@@ -40,7 +37,6 @@ class MessageHandler:
 		message['mailserverbaseurl'] = MAIL_BASE_URL
 		message['world'] = '0'
 		return json.dumps(await fn(self, message))
-
 
 
 	###################### account.py ######################
@@ -85,6 +81,9 @@ class MessageHandler:
 	async def _get_new_mail(self, data: dict) -> str:
 		return await mail.get_new_mail(data['data']['unique_id'], **data)
 
+	async def _delete_mail(self, data: dict) -> str:
+		return await mail.delete_mail(data['data']['unique_id'], data['data']['key'], **data)
+
 
 
 FUNCTION_LIST = {
@@ -105,6 +104,7 @@ FUNCTION_LIST = {
 
 	###################### mail.py ######################
 	'send_mail' : MessageHandler._send_mail,
-	'get_new_mail' : MessageHandler._get_new_mail
+	'get_new_mail' : MessageHandler._get_new_mail,
+	'delete_mail' : MessageHandler._delete_mail
 }
 
