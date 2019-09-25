@@ -4031,6 +4031,48 @@ class GameManager:
 #							End Factory Functions							#
 #############################################################################
 
+#############################################################################
+#							Start Task Functions							#
+#############################################################################
+
+	async def login_task(self, world: int, unique_id: str) -> dict:
+		# 登录就触发此方法
+		task_data = await self.get_task(world, unique_id)
+		timer = task_data[1]
+		# login = task_data[2]
+		# check_in = task_data[3]
+		# level_up_role = task_data[4]
+		# level_up_weapon = task_data[5]
+		# pass_stage = task_data[6]
+		# pass_tower = task_data[7]
+		# pass_world_boss = task_data[8]
+		# basic_summon = task_data[9]
+		# pro_summon = task_data[10]
+		# get_factory_resource = task_data[11]
+		# send_friend_gift = task_data[12]
+		# check_in_family = task_data[13]
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		if timer == '' or timer != current_time:
+			await self.reset_task(world, unique_id)
+			await self._execute_statement_update(world, f'update task set timer="{current_time}", login=1 where unique_id="{unique_id}"')
+			return self._message_typesetting(0, 'login successful')
+		else:  # 登录过的返回
+			return self._message_typesetting(1, 'Signed in')
+
+	async def get_task(self, world: int, unique_id: str) -> tuple:
+		data = await self._execute_statement(world, f'select * from task where unique_id="{unique_id}"')
+		if data == ():
+			await self._execute_statement_update(world, f'insert into task(unique_id) values ("{unique_id}")')
+			data = await self._execute_statement(world, f'select * from task where unique_id="{unique_id}"')
+		return data[0]
+
+	async def reset_task(self, world: int, unique_id: str) -> None:
+		await self._execute_statement_update(world, f'update task set login=0,check_in=0,level_up_role=0,level_up_weapon=0,pass_stage=0,pass_tower=0,pass_world_boss=0,basic_summon=0,pro_summon=0,get_factory_resource=0,send_friend_gift=0,check_in_family=0 where unique_id="{unique_id}"')
+
+#############################################################################
+#							End Task Functions							#
+#############################################################################
+
 
 
 #############################################################################
@@ -5661,6 +5703,12 @@ async def _dismissal_family_officer(request: web.Request) -> web.Response:
 async def _family_change_name(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).family_change_name(int(post['world']), post['unique_id'], post['family_name'])
+	return _json_response(result)
+
+@ROUTES.post('/login_task')
+async def _login_task(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).login_task(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 
