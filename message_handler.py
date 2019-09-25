@@ -91,10 +91,6 @@ class MessageHandler:
 	async def _basic_summon(self, data: dict) -> str:
 		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.RewardGroup.WEAPON, **data)
 
-	###################### lottery.py ######################
-	async def _random_gift(self, data: dict) -> str:
-		return await lottery.random_gift(data['data']['unique_id'], enums.RewardGroup.ROLE, enums.Tier.BASIC, **data)
-
 
 	async def test(self, data: dict) -> str:
 		return await common.exists('player', ('uid', '1'), ('gn', 'cuck'), **data)
@@ -124,9 +120,6 @@ FUNCTION_LIST = {
 	'delete_mail' : MessageHandler._delete_mail,
 
 	###################### summoning.py ######################
-	'basic_summon' : MessageHandler._basic_summon,
-
-	###################### lottery.py ######################
-	'random_gift' : MessageHandler._random_gift
+	'basic_summon' : MessageHandler._basic_summon
 }
 

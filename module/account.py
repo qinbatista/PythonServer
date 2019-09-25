@@ -69,7 +69,6 @@ async def bind_email(uid, email, **kwargs):
 	if r != 'OK': return common.mt(96, 'email could not be sent', {'message' : r})
 	return common.mt(0, 'success')
 
-
 async def verify_email_code(uid, code, **kwargs):
 	email = await kwargs['redis'].get('nonce.verify.email.' + code)
 	if not email: return common.mt(99, 'invalid code')
