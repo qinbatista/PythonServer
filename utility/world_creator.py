@@ -361,69 +361,10 @@ def create_achievement(cursor):
 	"""
 	CREATE TABLE `achievement` (
 	  `unique_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new_id',
-
-	  `reward_vip_level` smallint(6) DEFAULT 0 COMMENT '领取vip的等级数',
-	  `reward_level` smallint(6) DEFAULT 0 COMMENT '领取奖励的关卡数',
-
-	  `total_login` smallint(6) DEFAULT 0 COMMENT '累计总登录天数',
-	  `reward_total_login` smallint(6) DEFAULT 0 COMMENT '领取奖励的天数',
-
-	  `keeping_login` smallint(6) DEFAULT 0 COMMENT '连续登录天数',
-	  `reward_keeping_login` smallint(6) DEFAULT 0 COMMENT '领取奖励的连续天数',
-
-	  `get_4_star_hero` smallint(6) DEFAULT 0 COMMENT '获得4星英雄的次数',
-	  `get_5_star_hero` smallint(6) DEFAULT 0 COMMENT '获得5星英雄的次数',
-	  `get_6_star_hero` smallint(6) DEFAULT 0 COMMENT '获得6星英雄的次数',
-	  `upgrade_roles_times` smallint(6) DEFAULT 0 COMMENT '英雄的升级次数',
-	  `reward_get_4_star_hero` smallint(6) DEFAULT 0 COMMENT '领取获得4星英雄的次数',
-	  `reward_get_5_star_hero` smallint(6) DEFAULT 0 COMMENT '领取获得5星英雄的次数',
-	  `reward_get_6_star_hero` smallint(6) DEFAULT 0 COMMENT '领取获得6星英雄的次数',
-	  `reward_upgrade_roles_times` smallint(6) DEFAULT 0 COMMENT '领取获得英雄的升级次数',
-
-	  `get_4_star_weapon` smallint(6) DEFAULT 0 COMMENT '获得4星武器的次数',
-	  `get_5_star_weapon` smallint(6) DEFAULT 0 COMMENT '获得5星武器的次数',
-	  `get_6_star_weapon` smallint(6) DEFAULT 0 COMMENT '获得6星武器的次数',
-	  `upgrade_weapon_times` smallint(6) DEFAULT 0 COMMENT '武器的升级次数',
-	  `reward_get_4_star_weapon` smallint(6) DEFAULT 0 COMMENT '领取获得4星武器的次数',
-	  `reward_get_5_star_weapon` smallint(6) DEFAULT 0 COMMENT '领取获得5星武器的次数',
-	  `reward_get_6_star_weapon` smallint(6) DEFAULT 0 COMMENT '领取获得6星武器的次数',
-	  `reward_upgrade_weapon_times` smallint(6) DEFAULT 0 COMMENT '领取获得武器的升级次数',
-
-	  `collect_food` smallint(6) DEFAULT 0 COMMENT '收集食物数量',
-	  `reward_food` smallint(6) DEFAULT 0 COMMENT '奖励食物数量',
-	  `collect_mine` smallint(6) DEFAULT 0 COMMENT '收集食物数量',
-	  `reward_mine` smallint(6) DEFAULT 0 COMMENT '奖励食物数量',
-	  `collect_crystal` smallint(6) DEFAULT 0 COMMENT '收集食物数量',
-	  `reward_crystal` smallint(6) DEFAULT 0 COMMENT '奖励食物数量',
-
-	  `reward_food_upgrade` smallint(6) DEFAULT 0 COMMENT '获取升级次数奖励等级',
-	  `reward_mine_upgrade` smallint(6) DEFAULT 0 COMMENT '获取升级次数奖励等级',
-	  `reward_crystal_upgrade` smallint(6) DEFAULT 0 COMMENT '获取升级次数奖励等级',
-
-	  `summon_3_star_weapon_times` smallint(6) DEFAULT 0 COMMENT '召唤3星武器个数',
-	  `summon_4_star_weapon_times` smallint(6) DEFAULT 0 COMMENT '召唤4星武器个数',
-	  `summon_5_star_weapon_times` smallint(6) DEFAULT 0 COMMENT '召唤5星武器个数',
-	  `summon_3_star_role_times` smallint(6) DEFAULT 0 COMMENT '召唤3星角色个数',
-	  `summon_4_star_role_times` smallint(6) DEFAULT 0 COMMENT '召唤4星角色个数',
-	  `summon_5_star_role_times` smallint(6) DEFAULT 0 COMMENT '召唤5星角色个数',
-	  `total_pro_summon_times` smallint(6) DEFAULT 0 COMMENT '累计召唤次数',
-	  `reward_summon_3_star_weapon_times` smallint(6) DEFAULT 0 COMMENT '召唤3星武器个数',
-	  `reward_summon_4_star_weapon_times` smallint(6) DEFAULT 0 COMMENT '召唤4星武器个数',
-	  `reward_summon_5_star_weapon_times` smallint(6) DEFAULT 0 COMMENT '召唤5星武器个数',
-	  `reward_summon_3_star_role_times` smallint(6) DEFAULT 0 COMMENT '召唤3星角色个数',
-	  `reward_summon_4_star_role_times` smallint(6) DEFAULT 0 COMMENT '召唤4星角色个数',
-	  `reward_summon_5_star_role_times` smallint(6) DEFAULT 0 COMMENT '召唤5星角色个数',
-	  `reward_total_pro_summon_times` smallint(6) DEFAULT 0 COMMENT '累计召唤次数',
-
-	  `add_friend_times` smallint(6) DEFAULT 0 COMMENT '添加朋友次数',
-	  `send_friend_gift` smallint(6) DEFAULT 0 COMMENT '发送礼物次数',
-	  `reward_add_friend_times` smallint(6) DEFAULT 0 COMMENT '奖励添加朋友次数',
-	  `reward_send_friend_gift` smallint(6) DEFAULT 0 COMMENT '奖励发送礼物次数',
-
-	  `check_in_family_times` smallint(6) DEFAULT 0 COMMENT '工会签到次数',
-	  `reward_check_in_family_times` smallint(6) DEFAULT 0 COMMENT '奖励工会签到次数',
-
-	  PRIMARY KEY (`unique_id`)
+	  `achievement_id` smallint(6) DEFAULT 0 COMMENT '表示成就的数字编号',
+	  `achievement_value` smallint(6) DEFAULT 0 COMMENT '表示成就的次数',
+	  `achievement_value_reward` smallint(6) DEFAULT 0 COMMENT '表示成就领取奖励的次数',
+	  PRIMARY KEY (`unique_id`,`achievement_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 	cursor.execute(statement)
@@ -574,8 +515,8 @@ def operating_test():
 	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
 	c.select_db("aliya")
 	cursor = c.cursor()
-	creat_table_task(cursor)
-	# create_achievement(cursor)
+	# creat_table_task(cursor)
+	create_achievement(cursor)
 	# create_table_union_store(cursor)
 	# create_check_in(cursor)
 	# create_table_player(cursor)
