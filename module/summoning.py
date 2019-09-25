@@ -3,6 +3,7 @@ summoning.py
 '''
 
 from module import common
+from module import enums
 
 # Tier
 # basic, friend, pro, prophet

@@ -3,6 +3,7 @@ import json
 from utility import config_reader
 
 from module import mail
+from module import enums
 from module import family
 from module import common
 from module import account
@@ -78,7 +79,7 @@ class MessageHandler:
 
 	###################### mail.py ######################
 	async def _send_mail(self, data: dict) -> str:
-		return await mail.send_mail(common.MailType.SIMPLE, '4', '1', **data)
+		return await mail.send_mail(enums.MailType.SIMPLE, '4', '1', **data)
 
 	async def _get_new_mail(self, data: dict) -> str:
 		return await mail.get_new_mail(data['data']['unique_id'], **data)
@@ -88,11 +89,11 @@ class MessageHandler:
 
 	###################### summoning.py ######################
 	async def _basic_summon(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], common.Item(int(data['data']['item'])), common.Tier.BASIC, common.RewardGroup.WEAPON, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.RewardGroup.WEAPON, **data)
 
 	###################### lottery.py ######################
 	async def _random_gift(self, data: dict) -> str:
-		return await lottery.random_gift(data['data']['unique_id'], common.RewardGroup.WEAPON, common.Tier.BASIC, **data)
+		return await lottery.random_gift(data['data']['unique_id'], enums.RewardGroup.WEAPON, enums.Tier.BASIC, **data)
 
 
 	async def test(self, data: dict) -> str:
