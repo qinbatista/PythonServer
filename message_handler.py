@@ -93,7 +93,7 @@ class MessageHandler:
 
 	###################### lottery.py ######################
 	async def _random_gift(self, data: dict) -> str:
-		return await lottery.random_gift(data['data']['unique_id'], enums.RewardGroup.WEAPON, enums.Tier.BASIC, **data)
+		return await lottery.random_gift(data['data']['unique_id'], enums.RewardGroup.ROLE, enums.Tier.BASIC, **data)
 
 
 	async def test(self, data: dict) -> str:
