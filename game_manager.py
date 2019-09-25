@@ -4059,6 +4059,71 @@ class GameManager:
 		else:  # 登录过的返回
 			return self._message_typesetting(1, 'Signed in')
 
+	# TODO
+	async def check_in(self, world: int, unique_id: str) -> dict:
+		"""每日签到"""
+		pass
+
+	# TODO
+	async def level_up_role_task(self, world: int, unique_id: str) -> dict:
+		"""升级角色"""
+		pass
+
+	# TODO
+	async def level_up_weapon_task(self, world: int, unique_id: str) -> dict:
+		"""升级武器"""
+		pass
+
+	# TODO
+	async def pass_stage_task(self, world: int, unique_id: str) -> dict:
+		"""通过关卡"""
+		pass
+
+	# TODO
+	async def pass_tower_task(self, world: int, unique_id: str) -> dict:
+		"""通过塔"""
+		pass
+
+	# TODO
+	async def leave_world_boss_stage_task(self, world: int, unique_id: str) -> dict:
+		"""通过世界boss"""
+		pass
+
+	# TODO
+	async def basic_summon_task(self, world: int, unique_id: str) -> dict:
+		"""普通召唤"""
+		pass
+
+	# TODO
+	async def pro_summon_task(self, world: int, unique_id: str) -> dict:
+		"""高级召唤"""
+		pass
+
+	# TODO
+	async def refresh_all_storage_task(self, world: int, unique_id: str) -> dict:
+		"""领取资源"""
+		pass
+
+	# TODO
+	async def send_friend_gift_task(self, world: int, unique_id: str) -> dict:
+		"""发送一次爱心"""
+		pass
+
+	# TODO
+	async def check_in_family_task(self, world: int, unique_id: str) -> dict:
+		"""每日签到"""
+		pass
+
+	# TODO
+	async def get_all_taks(self, world: int, unique_id: str) -> dict:
+		"""获取所有每日任务信息"""
+		pass
+
+	# TODO
+	async def get_daily_task_reward(self, world: int, unique_id: str, task_id: str) -> dict:
+		"""领取钻石"""
+		pass
+
 	async def get_task(self, world: int, unique_id: str) -> tuple:
 		data = await self._execute_statement(world, f'select * from task where unique_id="{unique_id}"')
 		if data == ():
@@ -4078,7 +4143,7 @@ class GameManager:
 #############################################################################
 #							Private Functions								#
 #############################################################################
-	
+
 
 	async def _select_factory(self, world: int, unique_id) -> list:
 		sql_str = f"select * from factory where unique_id='{unique_id}'"
