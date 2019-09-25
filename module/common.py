@@ -37,16 +37,28 @@ class MailType(enum.IntEnum):
 	FRIEND_REQUEST = 2
 	FAMILY_REQUEST = 3
 
-class SummoningTier(enum.IntEnum):
+class Tier(enum.IntEnum):
 	BASIC = 0
 	FRIEND = 1
 	PRO = 2
 	PROPHET = 3
 
-class SummoningReward(enum.IntEnum):
+class RewardGroup(enum.IntEnum):
 	WEAPON = 0
 	SKILL = 1
 	ROLE = 2
+
+class Weapon(enum.IntEnum):
+	W1 = 1
+	W2 = 2
+	W3 = 3
+	W4 = 4
+	W5 = 5
+	W6 = 6
+	W7 = 7
+	W8 = 8
+	W9 = 9
+
 
 
 ##############################################################################

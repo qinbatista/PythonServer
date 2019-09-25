@@ -18,8 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'get_new_mail', 'data':{'unique_id' : '4'}},
-		{'function': 'get_new_mail', 'data':{'unique_id' : '1'}}
+		{'function': 'random_gift', 'data':{'unique_id' : '1'}}
 				]
 
 

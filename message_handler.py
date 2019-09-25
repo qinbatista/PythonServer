@@ -6,6 +6,8 @@ from module import mail
 from module import family
 from module import common
 from module import account
+from module import lottery
+from module import summoning
 
 CFG = config_reader.wait_config()
 
@@ -84,7 +86,16 @@ class MessageHandler:
 	async def _delete_mail(self, data: dict) -> str:
 		return await mail.delete_mail(data['data']['unique_id'], data['data']['key'], **data)
 
+	###################### summoning.py ######################
+	async def _basic_summon(self, data: dict) -> str:
+		return await summoning.summon(data['data']['unique_id'], common.Item(int(data['data']['item'])), common.Tier.BASIC, common.RewardGroup.WEAPON, **data)
 
+	###################### lottery.py ######################
+	async def _random_gift(self, data: dict) -> str:
+		return await lottery.random_gift(data['data']['unique_id'], common.RewardGroup.WEAPON, common.Tier.BASIC, **data)
+
+##########################################################################################################
+##########################################################################################################
 
 FUNCTION_LIST = {
 	###################### account.py ######################
@@ -105,6 +116,12 @@ FUNCTION_LIST = {
 	###################### mail.py ######################
 	'send_mail' : MessageHandler._send_mail,
 	'get_new_mail' : MessageHandler._get_new_mail,
-	'delete_mail' : MessageHandler._delete_mail
+	'delete_mail' : MessageHandler._delete_mail,
+
+	###################### summoning.py ######################
+	'basic_summon' : MessageHandler._basic_summon,
+
+	###################### lottery.py ######################
+	'random_gift' : MessageHandler._random_gift
 }
 
