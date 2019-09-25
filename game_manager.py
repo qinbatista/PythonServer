@@ -378,6 +378,7 @@ class GameManager:
 		for i in range(len(head)):
 			remaining.update({head[i] : row[i]})
 		remaining.pop('unique_id')
+		await self.level_up_weapon_task(world, unique_id)
 		return self._message_typesetting(status=0, message='success', data={'remaining': remaining})
 
 	@C.collect_async
@@ -846,7 +847,7 @@ class GameManager:
 					player_experience = self._player_experience['player_level']['experience'][remaining['level']]
 
 				await self._execute_statement_update(world, f'update player set experience={remaining["experience"]}, level={remaining["level"]} where unique_id="{unique_id}"')
-
+			await self.pass_stage_task(world, unique_id)
 			return self._message_typesetting(status=0, message="passed customs!", data={"remaining": remaining, "reward": reward})
 
 	@C.collect_async
@@ -922,6 +923,7 @@ class GameManager:
 		if stage <= 0 or stage > sql_stage + 1:
 			return self._message_typesetting(99, "Parameter error")
 
+		await self.pass_tower_task(world, unique_id)
 		stages = [int(x) if str.isdigit(x) else 1 for x in pass_tower_data.keys()]
 		if stage not in stages:
 			if stage % 10 != 0:
@@ -4060,10 +4062,13 @@ class GameManager:
 		else:  # 登录过的返回
 			return self._message_typesetting(1, 'Signed in')
 
-	# TODO
+
 	async def check_in(self, world: int, unique_id: str) -> dict:
 		"""每日签到"""
-		pass
+		# 0 - Not the first time
+		# 1 - the first time
+		return await self._execute_statement_update(world, f'update task set check_in=1 where unique_id="{unique_id}"')
+
 
 	async def level_up_role_task(self, world: int, unique_id: str) -> int:
 		"""升级角色"""
@@ -4071,20 +4076,27 @@ class GameManager:
 		# 1 - the first time
 		return await self._execute_statement_update(world, f'update task set level_up_role=1 where unique_id="{unique_id}"')
 
-	# TODO
+
 	async def level_up_weapon_task(self, world: int, unique_id: str) -> int:
 		"""升级武器"""
-		pass
+		# 0 - Not the first time
+		# 1 - the first time
+		return await self._execute_statement_update(world, f'update task set level_up_weapon=1 where unique_id="{unique_id}"')
 
-	# TODO
+
 	async def pass_stage_task(self, world: int, unique_id: str) -> int:
 		"""通过关卡"""
-		pass
+		# 0 - Not the first time
+		# 1 - the first time
+		return await self._execute_statement_update(world, f'update task set pass_stage=1 where unique_id="{unique_id}"')
 
-	# TODO
+
 	async def pass_tower_task(self, world: int, unique_id: str) -> int:
 		"""通过塔"""
-		pass
+		# 0 - Not the first time
+		# 1 - the first time
+		return await self._execute_statement_update(world, f'update task set pass_tower=1 where unique_id="{unique_id}"')
+
 
 	# TODO
 	async def leave_world_boss_stage_task(self, world: int, unique_id: str) -> int:
