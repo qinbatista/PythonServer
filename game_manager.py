@@ -674,6 +674,7 @@ class GameManager:
 		for i in range(len(head)):
 			remaining.update({head[i] : row[i]})
 		remaining.pop('unique_id')
+		await self.level_up_role_task(world, unique_id)
 		return self._message_typesetting(status=0, message='success', data={'remaining': remaining})
 
 	@C.collect_async
@@ -4064,63 +4065,64 @@ class GameManager:
 		"""每日签到"""
 		pass
 
-	# TODO
-	async def level_up_role_task(self, world: int, unique_id: str) -> dict:
+	async def level_up_role_task(self, world: int, unique_id: str) -> int:
 		"""升级角色"""
-		pass
+		# 0 - Not the first time
+		# 1 - the first time
+		return await self._execute_statement_update(world, f'update task set level_up_role=1 where unique_id="{unique_id}"')
 
 	# TODO
-	async def level_up_weapon_task(self, world: int, unique_id: str) -> dict:
+	async def level_up_weapon_task(self, world: int, unique_id: str) -> int:
 		"""升级武器"""
 		pass
 
 	# TODO
-	async def pass_stage_task(self, world: int, unique_id: str) -> dict:
+	async def pass_stage_task(self, world: int, unique_id: str) -> int:
 		"""通过关卡"""
 		pass
 
 	# TODO
-	async def pass_tower_task(self, world: int, unique_id: str) -> dict:
+	async def pass_tower_task(self, world: int, unique_id: str) -> int:
 		"""通过塔"""
 		pass
 
 	# TODO
-	async def leave_world_boss_stage_task(self, world: int, unique_id: str) -> dict:
+	async def leave_world_boss_stage_task(self, world: int, unique_id: str) -> int:
 		"""通过世界boss"""
 		pass
 
 	# TODO
-	async def basic_summon_task(self, world: int, unique_id: str) -> dict:
+	async def basic_summon_task(self, world: int, unique_id: str) -> int:
 		"""普通召唤"""
 		pass
 
 	# TODO
-	async def pro_summon_task(self, world: int, unique_id: str) -> dict:
+	async def pro_summon_task(self, world: int, unique_id: str) -> int:
 		"""高级召唤"""
 		pass
 
 	# TODO
-	async def refresh_all_storage_task(self, world: int, unique_id: str) -> dict:
+	async def refresh_all_storage_task(self, world: int, unique_id: str) -> int:
 		"""领取资源"""
 		pass
 
 	# TODO
-	async def send_friend_gift_task(self, world: int, unique_id: str) -> dict:
+	async def send_friend_gift_task(self, world: int, unique_id: str) -> int:
 		"""发送一次爱心"""
 		pass
 
 	# TODO
-	async def check_in_family_task(self, world: int, unique_id: str) -> dict:
+	async def check_in_family_task(self, world: int, unique_id: str) -> int:
 		"""每日签到"""
 		pass
 
 	# TODO
-	async def get_all_taks(self, world: int, unique_id: str) -> dict:
+	async def get_all_taks(self, world: int, unique_id: str) -> int:
 		"""获取所有每日任务信息"""
 		pass
 
 	# TODO
-	async def get_daily_task_reward(self, world: int, unique_id: str, task_id: str) -> dict:
+	async def get_daily_task_reward(self, world: int, unique_id: str, task_id: str) -> int:
 		"""领取钻石"""
 		pass
 
