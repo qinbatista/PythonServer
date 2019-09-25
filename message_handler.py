@@ -94,10 +94,14 @@ class MessageHandler:
 	async def _random_gift(self, data: dict) -> str:
 		return await lottery.random_gift(data['data']['unique_id'], common.RewardGroup.WEAPON, common.Tier.BASIC, **data)
 
+
+	async def test(self, data: dict) -> str:
+		return await common.exists('player', ('uid', '1'), ('gn', 'cuck'), **data)
 ##########################################################################################################
 ##########################################################################################################
 
 FUNCTION_LIST = {
+	'test' : MessageHandler.test,
 	###################### account.py ######################
 	'login_unique' : MessageHandler._login_unique,
 	'login' : MessageHandler._login,

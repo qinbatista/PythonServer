@@ -25,7 +25,7 @@ EM_RE = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
 
 
 async def login_unique(uid, **kwargs):
-	exists, bound = await asyncio.gather(common.exists('info', 'unique_id', uid, account = True, **kwargs), _account_bound(uid, **kwargs))
+	exists, bound = await asyncio.gather(common.exists('info', ('unique_id', uid), account = True, **kwargs), _account_bound(uid, **kwargs))
 	if not exists:
 		await _create_new_user(uid, **kwargs)
 		status, message, prev_token = 1, 'new account created', ''
@@ -50,7 +50,7 @@ async def login(identifier, value, password, **kwargs):
 async def bind_account(uid, account, password, **kwargs):
 	if not _valid_account(account): return common.mt(99, 'invalid account name')
 	if not _valid_password(password): return common.mt(98, 'invalid password')
-	if await common.exists('info', 'account', account, account = True, **kwargs):
+	if await common.exists('info', ('account', account), account = True, **kwargs):
 		return common.mt(97, 'invalid account name')
 	salt = str(secrets.randbits(256))
 	if len(salt) % 2 != 0:
@@ -61,7 +61,7 @@ async def bind_account(uid, account, password, **kwargs):
 
 async def bind_email(uid, email, **kwargs):
 	if not await _account_bound(uid, **kwargs): return common.mt(99, 'account is not bound')
-	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', 'email', email, db = 'accountdb', **kwargs))
+	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), db = 'accountdb', **kwargs))
 	if bound: return common.mt(98, 'email has already been bound')
 	if exists: return common.mt(97, 'email already exists')
 	code = await _gen_email_code(email, **kwargs)
@@ -75,7 +75,7 @@ async def verify_email_code(uid, code, **kwargs):
 	if not email: return common.mt(99, 'invalid code')
 	email = email.decode()
 	await kwargs['redis'].delete('nonce.verify.email.' + code)
-	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', 'email', email, db = 'accountdb', **kwargs))
+	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), db = 'accountdb', **kwargs))
 	if bound: return common.mt(98, 'account already bound email')
 	if exists: return common.mt(97, 'email already exists')
 	await _set_email(uid, email, **kwargs)

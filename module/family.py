@@ -13,7 +13,7 @@ async def create(uid, name, **kwargs):
 	if in_family: return common.mt(97, 'already in a family')
 	enough, _ = await common.try_item(uid, common.Item.COIN, -200, **kwargs)
 	if not enough: return common.mt(99, 'need coins')
-	if await common.exists('family', 'name', name, **kwargs): return common.mt(98, 'name already exists!')
+	if await common.exists('family', ('name', name), **kwargs): return common.mt(98, 'name already exists!')
 	await asyncio.gather(common.execute(f'INSERT INTO family(name) VALUES("{name}");', **kwargs),
 						common.execute(f'INSERT INTO familyrole(uid, name, role) VALUES("{uid}", "{name}", "{common.FamilyRole.OWNER.value}");', **kwargs),
 						common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs))

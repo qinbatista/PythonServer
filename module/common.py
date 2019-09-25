@@ -75,8 +75,9 @@ async def try_item(uid, item, value, **kwargs):
 			return (False, quantity[0][0] + value)
 
 
-async def exists(table, identifier, value, *, account = False, **kwargs):
-	data = await execute(f'SELECT EXISTS (SELECT 1 FROM {table} WHERE {identifier} = "{value}");', account, **kwargs)
+async def exists(table, *conditions, account = False, **kwargs):
+	condition = ' AND '.join([f'`{cond[0]}` = "{cond[1]}"' for cond in conditions])
+	data = await execute(f'SELECT EXISTS (SELECT 1 FROM {table} WHERE {condition});', account, **kwargs)
 	if data == () or () in data: return False
 	return data[0][0] != 0
 

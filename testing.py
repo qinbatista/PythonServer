@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'random_gift', 'data':{'unique_id' : '1'}}
+		{'function': 'login_unique', 'data':{'unique_id' : 'testtest', 'identifier' : 'account', 'value' : 'keepokappa', 'password' : 'testtest'}}
 				]
 
 
