@@ -13,8 +13,11 @@ from module import lottery
 
 SWITCH = {}
 
-async def summon(uid, item, tier, rewardgroup, *, num_times = 1, **kwargs):
+async def summon(uid, item, tier, rewardgroup, **kwargs):
 	return await _base_summon(uid, item, tier, rewardgroup, **kwargs)
+
+async def summon_multi(uid, item, tier, rewardgroup, num_times = 10, **kwargs):
+	return await _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs)
 
 ##############################################################
 
@@ -23,6 +26,18 @@ async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
 	if not can_pay: return common.mt(99, 'insufficient materials')
 	new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
 	return await _response_factory(uid, rewardgroup, new, reward, item, remaining, **kwargs)
+
+async def _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs):
+	can_pay, remaining = await common.try_item(uid, item, -100 * num_times, **kwargs)
+	if not can_pay: return common.mt(99, 'insufficient materials')
+	response = {'remaining' : {}, 'reward' : {}}
+	for time in range(num_times):
+		new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
+		result = await _response_factory(uid, rewardgroup, new, reward, item, remaining, **kwargs)
+		response['remaining'][time] = result['data']['remaining']
+		response['reward'][time] = result['data']['reward']
+	return common.mt(0, 'success', response)
+
 
 async def _response_factory(uid, rewardgroup, new, reward, item, remaining, **kwargs):
 	return await SWITCH[rewardgroup](uid, rewardgroup, new, reward, item, remaining, **kwargs)

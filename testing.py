@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'fortune_wheel_basic', 'data':{'unique_id' : '1', 'item' : '1'}}
+		{'function': 'basic_summon_10_times', 'data':{'unique_id' : '1', 'item' : '1'}}
 				]
 
 
