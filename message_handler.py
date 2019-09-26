@@ -480,6 +480,12 @@ class MessageHandler:
 
 	async def _get_all_achievement(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_all_achievement(data['world'],data['data']['unique_id']))
+
+	async def _get_all_task(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_all_task(data['world'], data['data']['unique_id']))
+
+	async def _get_daily_task_reward(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_daily_task_reward(data['world'], data['data']['unique_id'], data['data']['task_id']))
 ###############################################################################
 
 
@@ -651,7 +657,9 @@ FUNCTION_LIST = {
 
 	'record_achievement': MessageHandler._record_achievement,
 	'get_achievement_reward': MessageHandler._get_achievement_reward,
-	'get_all_achievement': MessageHandler._get_all_achievement
+	'get_all_achievement': MessageHandler._get_all_achievement,
 
+	'get_all_task': MessageHandler._get_all_task,
+	'get_daily_task_reward': MessageHandler._get_daily_task_reward,
 }
 
