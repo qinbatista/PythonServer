@@ -100,7 +100,7 @@ def choice_world(token,target_world):
 
 def create_player(token,target_world,game_name):
 	print_module("[create_player] create user name="+game_name)
-	response = send_tcp_message({'function' : 'create_player', 'data' : {"token":token,"world":target_world,"game_name":game_name}})
+	response = send_tcp_message({"world":target_world,'function' : 'create_player',  'data' : {"token":token,"game_name":game_name}})
 	if response["status"]==0:#角色创建成功,返回世界
 		return target_world
 	elif response["status"]==98 or response["status"]==99:#角色名字重复

@@ -153,7 +153,7 @@ def get_all_info(_token,_world):
 	refresh_all_storage_str = refresh_all_storage()
 	get_all_roles_str = get_all_roles()
 	get_factory_info_str = get_factory_info()
-	get_all_family_info_str = ""#get_all_family_info()#家族还未开始制作
+	get_all_family_info_str = get_all_family_info()#家族还未开始制作
 	get_all_mail_str = get_all_mail()
 	get_all_armor_info_str = get_all_armor_info()
 	get_lottery_config_info_str = get_lottery_config_info()

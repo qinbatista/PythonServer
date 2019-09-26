@@ -31,6 +31,11 @@ def gift_request(nonce):
 	new_response = send_tcp_message({'world' : world, 'function' : 'redeem_nonce', 'data' : {'token' : token,"nonce":nonce}})
 	return new_response
 
+def family_request(nonce):
+	print_method("response_family")
+	new_response = send_tcp_message({'world' : world, 'function' : 'response_family', 'data' : {'token' : token,"nonce":nonce}})
+	return new_response
+
 def accpet_all_request(nonce):
 	pass
 def get_all_new_mail():
@@ -51,6 +56,10 @@ def send_friend():
 	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : module_1_login.get_token("unique_id15"),"friend_name":"name_unique_id"+str(10)}})#发送好友信息
 	print_method("[request_friend] requst_friend:"+str(new_response))
 
+def send_family():
+	new_response = send_tcp_message({'world' : world, 'function' : 'request_join_family', 'data' : {'token' : module_1_login.get_token("unique_id19"),"friend_name":"name_unique_id"+str(10)}})#发送好友信息
+	print_method("[request_friend] requst_friend:"+str(new_response))
+
 def send_gift():
 	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : module_1_login.get_token("unique_id19"),"friend_name":"name_unique_id"+str(10)}})#发送好友信息
 	print_method("[request_friend] requst_friend:"+str(new_response))
@@ -62,6 +71,7 @@ def mail_dialog(_token,_world,_all_info,_name):
 	world = _world
 	all_info = _all_info
 	send_friend()
+	send_family()
 	print_module("mail_dialog")
 	if _all_info["status"]==62:
 		return print_method("your email is empty")

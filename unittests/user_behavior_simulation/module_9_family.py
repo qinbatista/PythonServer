@@ -6,7 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
-
+import user_behavior_simulation
 
 lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
 world = "0"
@@ -20,24 +20,28 @@ def print_method(my_string):
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
-def family_dialog(token,world,get_all_family_info):
+def family_dialog(token,world,get_all_family_info,player_info):
+
+	print("player_info="+str(player_info))
+	print("get_all_family_info="+str(get_all_family_info))
+	myLevel = player_info["data"]["remaining"]["level"]
+
+	if myLevel<18:
+		response = send_tcp_message({'world' : 0, 'function' : 'request_join_family', 'data' : {'token': token, 'fname': 'family_name_'+str(random.randint(0,user_behavior_simulation.testing_people_number))}})
+		print(response)
+		return
+	else:
+		response = send_tcp_message({'world' : 0, 'function' : 'create_family', 'data' : {'token': token, 'fname': 'family_name_'+user_behavior_simulation.unique_id}})
+		print(response)
+
 	response = send_tcp_message({'world' : 0, 'function' : 'remove_user_family', 'data' : {'token': token, 'user': 'game name'}})
 	print(response)
-	response = send_tcp_message({'world' : 0, 'function' : 'leave_family', 'data' : {'token': token}})
-	print(response)
-	response = send_tcp_message({'world' : 0, 'function' : 'create_family', 'data' : {'token': token, 'fname': 'family name'}})
-	print(response)
-	response = send_tcp_message({'world' : 0, 'function' : 'get_all_family_info', 'data' : {'token': token}})
-	print(response)
+
 	response = send_tcp_message({'world' : 0, 'function' : 'family_sign_in', 'data' : {'token': token}})
 	print(response)
-	response = send_tcp_message({'world' : 0, 'function' : 'disbanded_family', 'data' : {'token': token}})
-	print(response)
-	response = send_tcp_message({'world' : 0, 'function' : 'cancel_disbanded_family', 'data' : {'token': token}})
-	print(response)
-	response = send_tcp_message({'world' : 0, 'function' : 'request_join_family', 'data' : {'token': token, 'fname': 'family name'}})
-	print(response)
-	response = send_tcp_message({'world' : 0, 'function' : 'invite_user_family', 'data' : {'token': token, 'target': 'game name'}})
+
+
+	response = send_tcp_message({'world' : 0, 'function' : 'invite_user_family', 'data' : {'token': token, 'target': 'name_unique_id'+user_behavior_simulation.unique_id}})
 	print(response)
 	response = send_tcp_message({'world' : 0, 'function' : 'respond_family', 'data' : {'token': token, 'nonce': '234567899'}})
 	print(response)
@@ -60,6 +64,14 @@ def family_dialog(token,world,get_all_family_info):
 	response = send_tcp_message({'world' : 0, 'function' : 'get_family_config', 'data' : {'token': token}})
 	print(response)
 
+	response = send_tcp_message({'world' : 0, 'function' : 'disbanded_family', 'data' : {'token': token}})
+	print(response)
+
+	response = send_tcp_message({'world' : 0, 'function' : 'cancel_disbanded_family', 'data' : {'token': token}})
+	print(response)
+
+	response = send_tcp_message({'world' : 0, 'function' : 'leave_family', 'data' : {'token': token}})
+	print(response)
 if __name__ == '__main__':
 	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
 	print(response)
