@@ -6,6 +6,7 @@ from module import mail
 from module import enums
 from module import skill
 from module import family
+from module import friend
 from module import common
 from module import account
 from module import lottery
@@ -160,6 +161,23 @@ class MessageHandler:
 	async def _level_up_skill(self, data: dict) -> str:
 		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']),  **data)
 
+	###################### friend.py ######################
+	async def _get_all_friend(self, data: dict) -> str:
+		return await friend.get_all(data['data']['unique_id'], **data)
+
+	async def _remove_friend(self, data: dict) -> str:
+		return await friend.remove(data['data']['unique_id'], data['data']['gn_target'], **data)
+
+	async def _request_friend(self, data: dict) -> str:
+		return await friend.request(data['data']['unique_id'], data['data']['gn_target'], **data)
+
+	async def _respond_friend(self, data: dict) -> str:
+		return await friend.respond(data['data']['unique_id'], data['data']['nonce'], **data)
+
+
+
+
+
 
 	async def test(self, data: dict) -> str:
 		return await common.exists('player', ('uid', '1'), ('gn', 'cuck'), **data)
@@ -215,7 +233,12 @@ FUNCTION_LIST = {
 	###################### skill.py ######################
 	'get_skill' : MessageHandler._get_skill,
 	'get_all_levels_skill' : MessageHandler._get_all_levels_skill,
-	'level_up_skill' : MessageHandler._level_up_skill
+	'level_up_skill' : MessageHandler._level_up_skill,
 
+	###################### friend.py ######################
+	'get_all_friend' : MessageHandler._get_all_friend,
+	'remove_friend' : MessageHandler._remove_friend,
+	'request_friend' : MessageHandler._request_friend,
+	'respond_friend' : MessageHandler._respond_friend
 }
 

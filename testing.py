@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'level_up_skill', 'data':{'unique_id' : '1', 'skill' : '1', 'item' : '6'}}
+		{'function': 'remove_friend', 'data':{'unique_id' : '1', 'gn_target' : 'cuck'}}
 				]
 
 
