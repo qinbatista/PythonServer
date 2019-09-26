@@ -4129,7 +4129,7 @@ class GameManager:
 		pass
 
 	# TODO
-	async def get_all_taks(self, world: int, unique_id: str) -> int:
+	async def get_all_task(self, world: int, unique_id: str) -> int:
 		"""获取所有每日任务信息"""
 		pass
 
