@@ -4037,71 +4037,68 @@ class GameManager:
 #############################################################################
 #							Start Task Functions							#
 #############################################################################
+	# login:0,            check_in:1,     level_up_role:2,    level_up_weapon:3,      pass_stage:4,           pass_tower:5
+	# pass_world_boss:6,  basic_summon:7, pro_summon:8,       get_factory_resource:9, send_friend_gift:10,    check_in_family:11
 
 	async def login_task(self, world: int, unique_id: str) -> dict:
 		# 登录就触发此方法
-		task_data = await self.get_task(world, unique_id)
-		timer = task_data[1]
-		# login = task_data[2]
-		# check_in = task_data[3]
-		# level_up_role = task_data[4]
-		# level_up_weapon = task_data[5]
-		# pass_stage = task_data[6]
-		# pass_tower = task_data[7]
-		# pass_world_boss = task_data[8]
-		# basic_summon = task_data[9]
-		# pro_summon = task_data[10]
-		# get_factory_resource = task_data[11]
-		# send_friend_gift = task_data[12]
-		# check_in_family = task_data[13]
+		tid = self._task['task_id']['login']
+		task_data = await self.get_task(world, unique_id, tid)
+		timer = task_data[3]
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
 		if timer == '' or timer != current_time:
-			await self.reset_task(world, unique_id)
-			await self._execute_statement_update(world, f'update task set timer="{current_time}", login=1 where unique_id="{unique_id}"')
+			await self.reset_task(world, unique_id, tid)
+			await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={tid}')
 			return self._message_typesetting(0, 'login successful')
 		else:  # 登录过的返回
 			return self._message_typesetting(1, 'Signed in')
 
 
-	async def check_in(self, world: int, unique_id: str) -> dict:
+	async def check_in(self, world: int, unique_id: str) -> int:
 		"""每日签到"""
 		# 0 - Not the first time
 		# 1 - the first time
-		return await self._execute_statement_update(world, f'update task set check_in=1 where unique_id="{unique_id}"')
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
+
 
 
 	async def level_up_role_task(self, world: int, unique_id: str) -> int:
 		"""升级角色"""
 		# 0 - Not the first time
 		# 1 - the first time
-		return await self._execute_statement_update(world, f'update task set level_up_role=1 where unique_id="{unique_id}"')
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["level_up_role"]}')
 
 
 	async def level_up_weapon_task(self, world: int, unique_id: str) -> int:
 		"""升级武器"""
 		# 0 - Not the first time
 		# 1 - the first time
-		return await self._execute_statement_update(world, f'update task set level_up_weapon=1 where unique_id="{unique_id}"')
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["level_up_weapon"]}')
 
 
 	async def pass_stage_task(self, world: int, unique_id: str) -> int:
 		"""通过关卡"""
 		# 0 - Not the first time
 		# 1 - the first time
-		return await self._execute_statement_update(world, f'update task set pass_stage=1 where unique_id="{unique_id}"')
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_stage"]}')
 
 
 	async def pass_tower_task(self, world: int, unique_id: str) -> int:
 		"""通过塔"""
 		# 0 - Not the first time
 		# 1 - the first time
-		return await self._execute_statement_update(world, f'update task set pass_tower=1 where unique_id="{unique_id}"')
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_tower"]}')
 
 
-	# TODO
 	async def leave_world_boss_stage_task(self, world: int, unique_id: str) -> int:
 		"""通过世界boss"""
-		pass
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_world_boss"]}')
 
 	# TODO
 	async def basic_summon_task(self, world: int, unique_id: str) -> int:
@@ -4138,15 +4135,15 @@ class GameManager:
 		"""领取钻石"""
 		pass
 
-	async def get_task(self, world: int, unique_id: str) -> tuple:
-		data = await self._execute_statement(world, f'select * from task where unique_id="{unique_id}"')
-		if data == ():
-			await self._execute_statement_update(world, f'insert into task(unique_id) values ("{unique_id}")')
-			data = await self._execute_statement(world, f'select * from task where unique_id="{unique_id}"')
+	async def get_task(self, world: int, uid: str, tid: int) -> tuple:
+		data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
+		if data == ():  # 这里一次性创建所有需要的记录
+			await self._execute_statement_update(world, f'insert into task(unique_id, task_id) values ("{uid}", 0),("{uid}", 1),("{uid}", 2),("{uid}", 3),("{uid}", 4),("{uid}", 5),("{uid}", 6),("{uid}", 7),("{uid}", 8),("{uid}", 9),("{uid}", 10),("{uid}", 11)')
+			data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
 		return data[0]
 
-	async def reset_task(self, world: int, unique_id: str) -> None:
-		await self._execute_statement_update(world, f'update task set login=0,check_in=0,level_up_role=0,level_up_weapon=0,pass_stage=0,pass_tower=0,pass_world_boss=0,basic_summon=0,pro_summon=0,get_factory_resource=0,send_friend_gift=0,check_in_family=0 where unique_id="{unique_id}"')
+	async def reset_task(self, world: int, uid: str, tid: int) -> None:
+		await self._execute_statement_update(world, f'update task set task_value=0 where unique_id="{uid}" and task_id={tid}')
 
 #############################################################################
 #							End Task Functions							#
@@ -4708,6 +4705,7 @@ class GameManager:
 			"boss10": "%.2f" %(self._boss_life_remaining[9]/self._boss_life[9])
 			}
 		}
+		await self.leave_world_boss_stage_task(world, unique_id)
 		return self._message_typesetting(status=0, message="challenge success",data=message_dic)
 
 	async def _check_boss_status(self,world: int,unique_id: str):
@@ -5018,6 +5016,7 @@ class GameManager:
 		self._monster_config = d['monster_config']
 		self._level_enemy_layouts = d['level_enemy_layouts']
 		self._acheviement = d['acheviement']
+		self._task = d['task']
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			# print("firstDayOfMonth")
 			self._is_first_start = True

@@ -448,7 +448,7 @@ def operating_test():
 	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
 	c.select_db("aliya")
 	cursor = c.cursor()
-	# creat_table_task(cursor)
+	creat_table_task(cursor)
 	# create_achievement(cursor)
 	# create_table_union_store(cursor)
 	create_check_in(cursor)
