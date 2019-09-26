@@ -12,5 +12,10 @@
 		"get_factory_resource": 9,
 		"send_friend_gift": 10,
 		"check_in_family": 11
+	},
+	"task_reward":{
+		"all_task": {
+			"diamond": 5
+		}
 	}
 }

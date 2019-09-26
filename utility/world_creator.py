@@ -345,6 +345,7 @@ def creat_table_task(cursor):
 	  `unique_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一标识',
 	  `task_id` smallint(6) NOT NULL COMMENT '表示任务的数字编号',
 	  `task_value` smallint(6) DEFAULT 0 COMMENT '表示任务是否完成0:false,1:true',
+	  `task_reward` smallint(6) DEFAULT 0 COMMENT '表示奖励是否已经领取',
 	  `timer` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '完成时间',
 	  PRIMARY KEY (`unique_id`,`task_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -451,7 +452,7 @@ def operating_test():
 	creat_table_task(cursor)
 	# create_achievement(cursor)
 	# create_table_union_store(cursor)
-	create_check_in(cursor)
+	# create_check_in(cursor)
 	# create_table_player(cursor)
 	# create_table_families(cursor)
 

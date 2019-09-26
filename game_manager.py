@@ -4136,14 +4136,34 @@ class GameManager:
 			if data[3] == '' or data[3] != current_time:
 				await self.reset_task(world, unique_id, tid)
 				data = await self.get_task(world, unique_id, tid)
-			remaining.update({key: {'task_value': data[2], 'timer': data[3]}})
+			remaining.update({key: {'task_value': data[2], 'task_reward': data[3], 'timer': data[4]}})
 		return self._message_typesetting(0, 'get task success', data={'remaining': remaining})
 
 
-	# TODO
-	async def get_daily_task_reward(self, world: int, unique_id: str, task_id: str) -> int:
-		"""领取钻石"""
-		pass
+	async def get_daily_task_reward(self, world: int, unique_id: str, task_id: str) -> dict:
+		"""领取钻石，每天领取一次并将领取的字段置为1，今天之内不再领取"""
+		# 0 - Successfully receive rewards
+		# 96 - Reward acquisition failed
+		# 97 - You have already received a reward
+		# 98 - You have not completed this task yet
+		# 99 - No such task id
+		if task_id not in list(self._task['task_id'].keys()):
+			return self._message_typesetting(99, 'No such task id')
+		tid = self._task['task_id'][task_id]
+		data = await self.get_task(world, unique_id, tid)
+		if data[2] == 0:  # 判断任务是否完成
+			return self._message_typesetting(98, 'You have not completed this task yet')
+		if data[3] == 1:  # 判断奖励是否已经领取过
+			return self._message_typesetting(97, 'You have already received a reward')
+		await self._execute_statement_update(world, f'update task set task_reward=1 where unique_id="{unique_id}" and task_id={tid}')
+		diamond = self._task['task_reward']['all_task']['diamond']
+		data = await self.try_diamond(world, unique_id, diamond)
+		if data['status'] != 0:
+			return self._message_typesetting(96, 'Reward acquisition failed')
+		remaining = {'diamond': data['remaining'], 'task_reward': 1}
+		reward = {'diamond': diamond}
+		return self._message_typesetting(0, 'Successfully receive rewards', data={'remaining': remaining, 'reward': reward})
+
 
 	async def get_task(self, world: int, uid: str, tid: int) -> tuple:
 		data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
@@ -4153,7 +4173,7 @@ class GameManager:
 		return data[0]
 
 	async def reset_task(self, world: int, uid: str, tid: int) -> None:
-		await self._execute_statement_update(world, f'update task set task_value=0, timer="" where unique_id="{uid}" and task_id={tid}')
+		await self._execute_statement_update(world, f'update task set task_value=0, task_reward=0, timer="" where unique_id="{uid}" and task_id={tid}')
 
 #############################################################################
 #							End Task Functions							#
