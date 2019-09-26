@@ -17,7 +17,7 @@ import time
 from datetime import datetime, timedelta
 world = "0"
 token = ""
-testing_people_number = 100000
+testing_people_number = 20
 def call_login(unique_id):
 	global world,token
 	while True:
@@ -54,8 +54,8 @@ def family_dialog(get_all_family_info):
 def stage_dialog(get_level_info):
 	module_10_stage.enter_stage(token,world,get_level_info)
 
-def mail_dialog(get_all_mail):
-	module_11_mail.mail_dialog(token,world,get_all_mail)
+def mail_dialog(get_all_mail,name):
+	module_11_mail.mail_dialog(token,world,get_all_mail,name)
 
 def announcement():
 	pass
@@ -68,9 +68,9 @@ def achievement(get_all_achievement):
 
 def run_task(name):
 	call_login(str(name))
-	# info_list = call_get_all_info()#加载所有参数信息
+	info_list = call_get_all_info()#加载所有参数信息
 	# dark_market()#*加载黑市信息
-	# mail_dialog(info_list[10])#邮箱界面
+	mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
 	# skill_dialog(info_list[4])#技能界面
 	# weapon_dialog(info_list[5])#武器界面
@@ -80,7 +80,7 @@ def run_task(name):
 	# family_dialog(info_list[9])#家族界面*暂时不需要
 	# stage_dialog(info_list[19])#关卡界面
 	# announcement()#公告界面
-	achievement("")
+	# achievement(info_list[20])
 
 
 def run_all_task():

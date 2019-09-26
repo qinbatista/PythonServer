@@ -18,6 +18,17 @@ def print_method(my_string):
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
+def get_token(my_unique_id):#模拟登录
+	print_module("[get_token] unique_id="+my_unique_id)
+	num = random.choice(["account","account","account"])
+	if num =="account": account = my_unique_id+"account"
+	if num =="email": account = my_unique_id+"@email.com"
+	if num =="phone_number": account = "86"+my_unique_id[9:]
+	response = send_tcp_message({'function' : 'login', 'data' : {'identifier':num, "value":account, "password":"123456"}})
+	if response["status"]==0:
+		return response["data"]["token"]
+	else:
+		return False
 def login_unique():#游客登陆
 	global world
 	my_unique_id = unique_id
