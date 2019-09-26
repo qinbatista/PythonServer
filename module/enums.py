@@ -42,7 +42,7 @@ class Tier(enum.IntEnum):
 	PRO = 2
 	PROPHET = 3
 
-class RewardGroup(enum.IntEnum):
+class Group(enum.IntEnum):
 	WEAPON = 0
 	SKILL = 1
 	ROLE = 2

@@ -89,34 +89,34 @@ class MessageHandler:
 
 	###################### summoning.py ######################
 	async def _basic_summon(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.RewardGroup.WEAPON, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.Group.WEAPON, **data)
 
 	async def _pro_summon(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PRO, enums.RewardGroup.WEAPON, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PRO, enums.Group.WEAPON, **data)
 
 	async def _friend_summon(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.RewardGroup.WEAPON, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.Group.WEAPON, **data)
 
 	async def _prophet_summon(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PROPHET, enums.RewardGroup.WEAPON, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PROPHET, enums.Group.WEAPON, **data)
 
 	async def _basic_summon_skill(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.RewardGroup.SKILL, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.Group.SKILL, **data)
 
 	async def _pro_summon_skill(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PRO, enums.RewardGroup.SKILL, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PRO, enums.Group.SKILL, **data)
 
 	async def _friend_summon_skill(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.RewardGroup.SKILL, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.Group.SKILL, **data)
 
 	async def _basic_summon_role(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.RewardGroup.ROLE, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.BASIC, enums.Group.ROLE, **data)
 
 	async def _pro_summon_role(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PRO, enums.RewardGroup.ROLE, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.PRO, enums.Group.ROLE, **data)
 
 	async def _friend_summon_role(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.RewardGroup.ROLE, **data)
+		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.Group.ROLE, **data)
 
 
 	async def test(self, data: dict) -> str:

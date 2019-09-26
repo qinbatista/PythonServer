@@ -71,6 +71,6 @@ async def _try_unlock_role(uid, gift, **kwargs):
 	await common.execute(f'UPDATE role SET segment = segment + {STANDARD_SEG_COUNT} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
 	return (False, role)
 
-SWITCH[enums.RewardGroup.WEAPON] = _try_unlock_weapon
-SWITCH[enums.RewardGroup.SKILL] = _try_unlock_skill
-SWITCH[enums.RewardGroup.ROLE] = _try_unlock_role
+SWITCH[enums.Group.WEAPON] = _try_unlock_weapon
+SWITCH[enums.Group.SKILL] = _try_unlock_skill
+SWITCH[enums.Group.ROLE] = _try_unlock_role

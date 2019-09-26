@@ -50,6 +50,6 @@ async def _response_factory_role(uid, rewardgroup, new, reward, item, remaining,
 
 
 
-SWITCH[enums.RewardGroup.WEAPON] = _response_factory_weapon
-SWITCH[enums.RewardGroup.SKILL] = _response_factory_skill
-SWITCH[enums.RewardGroup.ROLE] = _response_factory_role
+SWITCH[enums.Group.WEAPON] = _response_factory_weapon
+SWITCH[enums.Group.SKILL] = _response_factory_skill
+SWITCH[enums.Group.ROLE] = _response_factory_role
