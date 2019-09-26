@@ -270,8 +270,10 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8004/login_task', data={"world": 0, "unique_id": "3"})
+	result = requests.post('http://localhost:8004/get_all_task', data={"world": 0, "unique_id": "3"})
 	print(str(result.text))
+	# result = requests.post('http://localhost:8004/login_task', data={"world": 0, "unique_id": "3"})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/family_change_name', data={"world": 0, "unique_id": "3", "family_name": "bs"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/dismissal_family_officer', data={"world": 0, "unique_id": "3", "target": "e"})

@@ -4062,7 +4062,6 @@ class GameManager:
 		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
 
 
-
 	async def level_up_role_task(self, world: int, unique_id: str) -> int:
 		"""升级角色"""
 		# 0 - Not the first time
@@ -4100,6 +4099,7 @@ class GameManager:
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
 		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_world_boss"]}')
 
+
 	# TODO
 	async def basic_summon_task(self, world: int, unique_id: str) -> int:
 		"""普通召唤"""
@@ -4125,10 +4125,20 @@ class GameManager:
 		"""每日签到"""
 		pass
 
-	# TODO
-	async def get_all_task(self, world: int, unique_id: str) -> int:
+
+	async def get_all_task(self, world: int, unique_id: str) -> dict:
 		"""获取所有每日任务信息"""
-		pass
+		# 0 - get task success
+		remaining = {}
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		for key, tid in self._task['task_id'].items():
+			data = await self.get_task(world, unique_id, tid)
+			if data[3] == '' or data[3] != current_time:
+				await self.reset_task(world, unique_id, tid)
+				data = await self.get_task(world, unique_id, tid)
+			remaining.update({key: {'task_value': data[2], 'timer': data[3]}})
+		return self._message_typesetting(0, 'get task success', data={'remaining': remaining})
+
 
 	# TODO
 	async def get_daily_task_reward(self, world: int, unique_id: str, task_id: str) -> int:
@@ -4137,13 +4147,13 @@ class GameManager:
 
 	async def get_task(self, world: int, uid: str, tid: int) -> tuple:
 		data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
-		if data == ():  # 这里一次性创建所有需要的记录
+		if data == ():  # 这里一次性创建所有需要的记录，这里没有使用task配置信息，到时候要作为单独修改
 			await self._execute_statement_update(world, f'insert into task(unique_id, task_id) values ("{uid}", 0),("{uid}", 1),("{uid}", 2),("{uid}", 3),("{uid}", 4),("{uid}", 5),("{uid}", 6),("{uid}", 7),("{uid}", 8),("{uid}", 9),("{uid}", 10),("{uid}", 11)')
 			data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
 		return data[0]
 
 	async def reset_task(self, world: int, uid: str, tid: int) -> None:
-		await self._execute_statement_update(world, f'update task set task_value=0 where unique_id="{uid}" and task_id={tid}')
+		await self._execute_statement_update(world, f'update task set task_value=0, timer="" where unique_id="{uid}" and task_id={tid}')
 
 #############################################################################
 #							End Task Functions							#
@@ -5880,6 +5890,12 @@ async def _family_change_name(request: web.Request) -> web.Response:
 async def _login_task(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).login_task(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/get_all_task')
+async def _get_all_task(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).get_all_task(int(post['world']), post['unique_id'])
 	return _json_response(result)
 
 
