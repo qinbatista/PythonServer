@@ -4,6 +4,7 @@ from utility import config_reader
 
 from module import mail
 from module import enums
+from module import skill
 from module import family
 from module import common
 from module import account
@@ -149,7 +150,15 @@ class MessageHandler:
 	async def _fortune_wheel_basic(self, data: dict) -> str:
 		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.BASIC, enums.Item(int(data['data']['item'])), **data)
 
+	###################### skill.py ######################
+	async def _get_skill(self, data: dict) -> str:
+		return await skill.get_skill(data['data']['unique_id'], int(data['data']['skill']), **data)
 
+	async def _get_all_levels_skill(self, data: dict) -> str:
+		return await skill.get_all_levels(data['data']['unique_id'], **data)
+
+	async def _level_up_skill(self, data: dict) -> str:
+		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']),  **data)
 
 
 	async def test(self, data: dict) -> str:
@@ -201,6 +210,12 @@ FUNCTION_LIST = {
 	'friend_summon_role_10_times' : MessageHandler._friend_summon_role_10_times,
 
 	###################### lottery.py ######################
-	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic
+	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
+
+	###################### skill.py ######################
+	'get_skill' : MessageHandler._get_skill,
+	'get_all_levels_skill' : MessageHandler._get_all_levels_skill,
+	'level_up_skill' : MessageHandler._level_up_skill
+
 }
 

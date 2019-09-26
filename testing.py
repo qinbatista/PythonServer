@@ -18,7 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'basic_summon_10_times', 'data':{'unique_id' : '1', 'item' : '1'}}
+		{'function': 'level_up_skill', 'data':{'unique_id' : '1', 'skill' : '1', 'item' : '6'}}
 				]
 
 
