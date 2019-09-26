@@ -478,9 +478,8 @@ class MessageHandler:
 	async def _get_achievement_reward(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_achievement_reward(data['world'],data['data']['unique_id'], data['data']['achievement_id'],data['data']['value']))
 
-
-		# async with session.post(self._game_manager_base_url("0") + '/get_account_world_info', data={'unique_id': message['data']['unique_id']}) as resp:
-		# 	return await resp.text()
+	async def _get_all_achievement(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_all_achievement(data['world'],data['data']['unique_id']))
 ###############################################################################
 
 
@@ -651,7 +650,8 @@ FUNCTION_LIST = {
 	'get_picture_link': MessageHandler._get_picture_link,
 
 	'record_achievement': MessageHandler._record_achievement,
-	'get_achievement_reward': MessageHandler._get_achievement_reward
+	'get_achievement_reward': MessageHandler._get_achievement_reward,
+	'get_all_achievement': MessageHandler._get_all_achievement
 
 }
 

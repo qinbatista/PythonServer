@@ -42,8 +42,12 @@ def print_module(my_string):
 
 def achievement_dialog(token,world,respons):
 	while True:
-		response = send_tcp_message({'world' : world, 'function' : 'record_achievement', 'data' : {'token' : token,"achievement_id":random.randint(30,40), "value":2}})#能量包，1是1张， 2是3张，3是10张
+		# response = send_tcp_message({'world' : world, 'function' : 'record_achievement', 'data' : {'token' : token,"achievement_id":random.randint(3,3), "value":2}})#能量包，1是1张， 2是3张，3是10张
+		# print_method("[achievement_dialog]"+str(response))
+		# response = send_tcp_message({'world' : world, 'function' : 'get_achievement_reward', 'data' : {'token' : token,"achievement_id":random.randint(3,3), "value":1}})#能量包，1是1张， 2是3张，3是10张
+		# print_method("[achievement_dialog]"+str(response))
+		response = send_tcp_message({'world' : world, 'function' : 'get_all_achievement', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
 		print_method("[achievement_dialog]"+str(response))
-		response = send_tcp_message({'world' : world, 'function' : 'get_achievement_reward', 'data' : {'token' : token,"achievement_id":random.randint(30,40), "value":1}})#能量包，1是1张， 2是3张，3是10张
-		print_method("[achievement_dialog]"+str(response))
+
+
 
