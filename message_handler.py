@@ -368,7 +368,7 @@ class MessageHandler:
 		return json.dumps(await self.gm.choice_world(data['data']['unique_id'], data['data']['target_world']))
 
 	async def _create_player(self, data: dict) -> str:
-		return json.dumps(await self.gm.create_player(data['world'], data['data']['unique_id'], data['data']['game_name']))
+		return json.dumps(await self.gm.create_player(data['data']['world'], data['data']['unique_id'], data['data']['game_name']))
 	#not sure where to use them
 	# async def _join_world(self, data: dict) -> str:
 	# 	return json.dumps(await self.gm.join_world(data['world'], data['data']['unique_id'], data['data']['game_name']))
