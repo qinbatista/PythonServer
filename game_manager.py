@@ -3524,6 +3524,11 @@ class GameManager:
 		# 97 - database skill operation error
 		# 98 - insufficient material
 		# 99 - cost_item error
+
+
+
+		
+		# paying cost
 		if cost_item == 'diamond':
 			result = await self.try_diamond(world, uid, -int(self._lottery['fortune_wheel']['cost'][cost_item]))
 		elif cost_item == 'coin':
@@ -3540,10 +3545,26 @@ class GameManager:
 			return self._message_typesetting(99, 'cost_item error')
 		if result['status'] != 0:
 			return self._message_typesetting(98, 'insufficient materials')
+
+
+
+
+
+
+
+
+
+
+		# choosing random tier and resulting item
 		tier_choice = (random.choices(self._lottery['fortune_wheel']['names'], self._lottery['fortune_wheel']['weights'][tier]))[0]
 		random_item = (random.choices(self._lottery['fortune_wheel']['items'][tier_choice]))[0]
 
+
+
+
+
 		# TODO THIS SHIT NEEDS TO BE REFACTORED
+		# updating database with new item
 		if random_item == 'coin':
 			try_result = await self.try_coin(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
 		elif random_item == 'energy':
@@ -3640,6 +3661,8 @@ class GameManager:
 				return self._message_typesetting(97, 'database skill operation error')
 		else:
 			return self._message_typesetting(96, 'item name error')
+
+		# never executes????
 		return self._message_typesetting(5, 'get item success', {'remaining' : {"cost_item": cost_item, "cost_quantity": result["remaining"], "item_id": random_item, "item_quantity": try_result['remaining']}, 'reward' : {"item_id": random_item, "item_quantity": self._lottery['fortune_wheel']['reward'][tier][random_item]}})
 
 	async def _decrease_energy(self, world:int, unique_id: str, amount: int) -> dict:

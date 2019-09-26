@@ -15,6 +15,7 @@ class LukseunClient:
 		self._host = host
 		self._port = port
 		self.token = ""
+		self.response = None
 	
 	async def send_message(self, message: str) -> dict:
 		'''
@@ -31,8 +32,7 @@ class LukseunClient:
 		if resp != '':
 			data = json.loads(resp, encoding = 'utf-8')
 			print(f'received: {data}')
-			if 'data' in data and 'token' in data['data']:
-				self.token = data['data']['token']
+			self.response = data
 			return data
 		return {}
 

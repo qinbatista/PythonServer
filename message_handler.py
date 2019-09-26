@@ -118,6 +118,12 @@ class MessageHandler:
 	async def _friend_summon_role(self, data: dict) -> str:
 		return await summoning.summon(data['data']['unique_id'], enums.Item(int(data['data']['item'])), enums.Tier.FRIEND, enums.Group.ROLE, **data)
 
+	###################### lottery.py ######################
+	async def _fortune_wheel_basic(self, data: dict) -> str:
+		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.BASIC, enums.Item(int(data['data']['item'])), **data)
+
+
+
 
 	async def test(self, data: dict) -> str:
 		return await common.exists('player', ('uid', '1'), ('gn', 'cuck'), **data)
@@ -147,7 +153,7 @@ FUNCTION_LIST = {
 	'delete_mail' : MessageHandler._delete_mail,
 
 	###################### summoning.py ######################
-	'basic_summon' : MessageHandler._basic_summon
+	'basic_summon' : MessageHandler._basic_summon,
 	'pro_summon' : MessageHandler._pro_summon,
 	'friend_summon' : MessageHandler._friend_summon,
 	'prophet_summon' : MessageHandler._friend_summon,
@@ -156,6 +162,9 @@ FUNCTION_LIST = {
 	'friend_summon_skill' : MessageHandler._friend_summon_skill,
 	'basic_summon_role' : MessageHandler._basic_summon_role,
 	'pro_summon_role' : MessageHandler._pro_summon_role,
-	'friend_summon_role' : MessageHandler._friend_summon_role
+	'friend_summon_role' : MessageHandler._friend_summon_role,
+
+	###################### lottery.py ######################
+	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic
 }
 

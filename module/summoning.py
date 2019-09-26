@@ -13,7 +13,7 @@ from module import lottery
 
 SWITCH = {}
 
-async def summon(uid, item, tier, rewardgroup, **kwargs):
+async def summon(uid, item, tier, rewardgroup, *, num_times = 1, **kwargs):
 	return await _base_summon(uid, item, tier, rewardgroup, **kwargs)
 
 ##############################################################
@@ -36,10 +36,10 @@ async def _response_factory_weapon(uid, rewardgroup, new, reward, item, remainin
 
 async def _response_factory_skill(uid, rewardgroup, new, reward, item, remaining, **kwargs):
 	if new:
-		return common.mt(0, 'new skill unlocked', {'remaining' : {'weapon' : reward.value, 'star' : 1, 'segment' : 0, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'weapon' : reward.value, 'star' : 1}})
+		return common.mt(0, 'new skill unlocked', {'remaining' : {'skill' : reward.value, 'star' : 1, 'segment' : 0, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'skill' : reward.value, 'level' : 1}})
 	else:
-		star, segment = (await common.execute(f'SELECT star, segment FROM weapon WHERE uid = "{uid}" AND wid = "{reward.value}";', **kwargs))[0]
-		return common.mt(3, 'get segment',{'remaining' : {'weapon' : reward.value, 'star' : star, 'segment' : segment, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'weapon' : reward.value, 'star' : star}})
+		scroll_quantity = (await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = {reward.value};', **kwargs))[0][0]
+		return common.mt(1, 'get scroll', {'remaining' : {'scroll_id' : reward.value, 'scroll_quantity' : scroll_quantity, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'scroll_id' : reward.value, 'scroll_quantity' : 1}})
 
 async def _response_factory_role(uid, rewardgroup, new, reward, item, remaining, **kwargs):
 	if new:

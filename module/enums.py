@@ -46,6 +46,7 @@ class Group(enum.IntEnum):
 	WEAPON = 0
 	SKILL = 1
 	ROLE = 2
+	ITEM = 3
 
 class Weapon(enum.IntEnum):
 	W1 = 1
