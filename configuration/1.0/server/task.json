@@ -1,0 +1,16 @@
+{
+	"task_id": {
+		"login": 0,
+		"check_in": 1,
+		"level_up_role": 2,
+		"level_up_weapon": 3,
+		"pass_stage": 4,
+		"pass_tower": 5,
+		"pass_world_boss": 6,
+		"basic_summon": 7,
+		"pro_summon": 8,
+		"get_factory_resource": 9,
+		"send_friend_gift": 10,
+		"check_in_family": 11
+	}
+}
