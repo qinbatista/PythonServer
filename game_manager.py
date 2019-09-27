@@ -1550,6 +1550,7 @@ class GameManager:
 		# 97 - skill operation error
 		# 98 - insufficient materials
 		# 99 - wrong item name
+		await self.basic_summon_task(world, unique_id)
 		return await self._default_summon(world, unique_id, cost_item, 'basic', summon_kind)
 
 	@C.collect_async
@@ -1566,6 +1567,7 @@ class GameManager:
 		# 97 - skill operation error
 		# 98 - insufficient materials
 		# 99 - wrong item name
+		await self.pro_summon_task(world, unique_id)
 		return await self._default_summon(world, unique_id, cost_item, 'pro', summon_kind)
 
 	@C.collect_async
@@ -4017,6 +4019,7 @@ class GameManager:
 		acceleration_end_time = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
 		await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='{acceleration_end_time}' where unique_id='{unique_id}'")
 		remaining.update({"acceleration_end_time": acceleration_end_time})
+		await self.refresh_all_storage_task(world, unique_id)
 		return self._message_typesetting(status=0, message="Accelerate success", data={"remaining": remaining, "reward": reward})
 
 	@C.collect_async
@@ -4100,20 +4103,23 @@ class GameManager:
 		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_world_boss"]}')
 
 
-	# TODO
 	async def basic_summon_task(self, world: int, unique_id: str) -> int:
 		"""普通召唤"""
-		pass
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["basic_summon"]}')
 
-	# TODO
+
 	async def pro_summon_task(self, world: int, unique_id: str) -> int:
 		"""高级召唤"""
-		pass
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pro_summon"]}')
 
-	# TODO
+
 	async def refresh_all_storage_task(self, world: int, unique_id: str) -> int:
 		"""领取资源"""
-		pass
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["factory_resource"]}')
+
 
 	# TODO
 	async def send_friend_gift_task(self, world: int, unique_id: str) -> int:
