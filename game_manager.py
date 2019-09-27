@@ -1848,6 +1848,7 @@ class GameManager:
 							'current_time' : current_time
 						}
 					}
+			await self.send_friend_gift_task(world, unique_id)
 			return self._message_typesetting(0, 'send friend gift success because of f_recovering time is empty', data)
 		else:
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
@@ -1876,6 +1877,7 @@ class GameManager:
 								'current_time' : current_time
 							}
 						}
+				await self.send_friend_gift_task(world, unique_id)
 				return self._message_typesetting(1, 'send friend gift success because of f_recovering time is over 1 day', data)
 			else:
 				data = {
@@ -2779,6 +2781,7 @@ class GameManager:
 		contribution_data = await self._execute_statement(world, f'select union_contribution,cumulative_contribution from player where unique_id="{uid}"')
 		union_contribution, cumulative_contribution = contribution_data[0]
 		remaining.update({'union_contribution': union_contribution, 'cumulative_contribution': cumulative_contribution})
+		await self.check_in_family_task(world, uid)
 		return self._message_typesetting(0, 'Sign-in success', data={'ramining': remaining, 'reward': reward})
 
 	async def disbanded_family(self, world: int, uid: str) -> dict:
@@ -4121,15 +4124,16 @@ class GameManager:
 		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["factory_resource"]}')
 
 
-	# TODO
 	async def send_friend_gift_task(self, world: int, unique_id: str) -> int:
 		"""发送一次爱心"""
-		pass
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["send_friend_gift"]}')
 
-	# TODO
+
 	async def check_in_family_task(self, world: int, unique_id: str) -> int:
 		"""每日签到"""
-		pass
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in_family"]}')
 
 
 	async def get_all_task(self, world: int, unique_id: str) -> dict:
