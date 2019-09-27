@@ -15,7 +15,7 @@ async def get_all(uid, **kwargs):
 
 async def remove(uid, gn_target, **kwargs):
 	uid_target = await family._get_uid(gn_target, **kwargs)
-	if uid == uid_target: return common.mt(99, 'do not be an idiot')
+	if uid == uid_target: return common.mt(99, 'don\'t be an idiot')
 	await common.execute(f'DELETE FROM friend WHERE (uid = "{uid}" AND fid = "{uid_target}") OR (uid = "{uid_target}" AND fid = "{uid}");', **kwargs)
 	return common.mt(0, 'removed target')
 
