@@ -22,9 +22,7 @@ class MailServer:
 	
 	async def send_mail(self, world, uid, **kwargs):
 		try:
-			print(f'MAIL: kwargs {kwargs}')
 			mailtype = enums.MailType(int(kwargs['type']))
-			print(f'MAIL: mailtype {mailtype}')
 			message = self._construct_message(mailtype, **kwargs)
 			folder = self._open_mail_folder(world, uid)
 			self._deliver_message(folder, message)
@@ -114,14 +112,14 @@ class MailServer:
 		return messages
 
 	def _register_nonce(self, msg):
-		if 'F' not in msg.get_flags() and enums.MailType(int(msg['type'])) != enums.MailType.SIMPLE:
+		if enums.MailType(int(msg['type'])) != enums.MailType.SIMPLE and 'F' not in msg.get_flags():
 			if enums.MailType(int(msg['type'])) == enums.MailType.GIFT:
 				r = requests.post(TOKEN + '/register_nonce', json = {'nonce' : msg['key'], 'type' : msg['type'], 'items' : msg['items']})
 			elif enums.MailType(int(msg['type'])) == enums.MailType.FRIEND_REQUEST:
 				r = requests.post(TOKEN + '/register_nonce', json = {'nonce' : msg['key'], 'type' : msg['type'], 'uid_sender' : msg['uid_sender']})
 			elif enums.MailType(int(msg['type'])) == enums.MailType.FAMILY_REQUEST:
 				r = requests.post(TOKEN + '/register_nonce', json = {'nonce' : msg['key'], 'type' : msg['type'], 'uid_target' : msg['uid_target'], 'name' : msg['name']})
-			if r['status'] == 0: msg.add_flag('F')
+			if r.json()['status'] == 0: msg.add_flag('F')
 		return msg
 
 

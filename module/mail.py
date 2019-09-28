@@ -11,11 +11,11 @@ SWITCH = {}
 
 '''
 Possible valid kwargs:
-	from_, body, subject, items, quantities, sender, uid_sender, name, target
+	from_, body, subject, items, sender, uid_sender, name, target
 
 Required Kwargs By MailType:
 	SIMPLE: No kwargs required
-	GIFT: quantities, items
+	GIFT: items
 	FRIEND_REQUEST: from_, sender, uid_sender
 	FAMILY_REQUEST: name, target
 '''
@@ -50,7 +50,7 @@ async def delete_read(uid, key, **kwargs):
 #################################################################################################
 
 async def _send_mail(mail, **kwargs):
-	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/send_mail', json = mail) as resp:
+	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/send', json = mail) as resp:
 		result = await resp.json(content_type = 'text/json')
 		return result['status'] == 0
 
@@ -59,8 +59,6 @@ async def _send_mail_simple(uid, **kwargs):
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_gift(uid, **kwargs):
-	print(f'mail: this is send mail gift')
-	print(f'kwargs: {kwargs}')
 	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), 'body' : kwargs.get('body', 'Your gift is waiting!'), 'subj' : kwargs.get('subject', 'You have a gift!'), 'type' : enums.MailType.GIFT.value, 'items' : kwargs['data']['items']}}
 	return await _send_mail(mail, **kwargs)
 
