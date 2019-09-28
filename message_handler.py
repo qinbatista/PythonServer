@@ -15,7 +15,8 @@ from module import summoning
 CFG = config_reader.wait_config()
 
 TOKEN_BASE_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
-MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
+#MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
+MAIL_BASE_URL = 'http://127.0.0.1:8020'
 
 class MessageHandler:
 	def __init__(self):
@@ -81,13 +82,22 @@ class MessageHandler:
 
 	###################### mail.py ######################
 	async def _send_mail(self, data: dict) -> str:
-		return await mail.send_mail(enums.MailType.SIMPLE, '4', '1', **data)
+		return await mail.send_mail(enums.MailType.GIFT, '1', **data)
 
 	async def _get_new_mail(self, data: dict) -> str:
 		return await mail.get_new_mail(data['data']['unique_id'], **data)
 
+	async def _get_all_mail(self, data: dict) -> str:
+		return await mail.get_all_mail(data['data']['unique_id'], **data)
+
 	async def _delete_mail(self, data: dict) -> str:
 		return await mail.delete_mail(data['data']['unique_id'], data['data']['key'], **data)
+
+	async def _delete_read_mail(self, data: dict) -> str:
+		return await mail.delete_read_mail(data['data']['unique_id'], **data)
+
+	async def _mark_read_mail(self, data: dict) -> str:
+		return await mail.mark_read(data['data']['unique_id'], data['data']['key'], **data)
 
 	###################### summoning.py ######################
 	async def _basic_summon(self, data: dict) -> str:
@@ -204,7 +214,10 @@ FUNCTION_LIST = {
 	###################### mail.py ######################
 	'send_mail' : MessageHandler._send_mail,
 	'get_new_mail' : MessageHandler._get_new_mail,
+	'get_all_mail' : MessageHandler._get_all_mail,
 	'delete_mail' : MessageHandler._delete_mail,
+	'mark_read_mail' : MessageHandler._mark_read_mail,
+	'delete_read_mail' : MessageHandler._delete_read_mail,
 
 	###################### summoning.py ######################
 	'basic_summon' : MessageHandler._basic_summon,
