@@ -243,6 +243,8 @@ def create_table_player(cursor):
 	  `mail_gift_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '参与活动的时间',
 	  `add_friends_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '添加好友的时间',
 	  `add_friends_times` int(11) unsigned DEFAULT 50 COMMENT '添加好友的次数',
+	  `vip_level` int(11) unsigned DEFAULT 0 COMMENT 'VIP等级',
+	  `vip_experience` int(11) unsigned DEFAULT 0 COMMENT 'VIP经验',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
@@ -449,11 +451,11 @@ def operating_test():
 	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
 	c.select_db("aliya")
 	cursor = c.cursor()
-	creat_table_task(cursor)
+	# creat_table_task(cursor)
 	# create_achievement(cursor)
 	# create_table_union_store(cursor)
-	create_check_in(cursor)
-	# create_table_player(cursor)
+	# create_check_in(cursor)
+	create_table_player(cursor)
 	# create_table_families(cursor)
 
 
