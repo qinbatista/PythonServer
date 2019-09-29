@@ -11,11 +11,15 @@
 		"pro_summon": 8,
 		"factory_resource": 9,
 		"send_friend_gift": 10,
-		"check_in_family": 11
+		"check_in_family": 11,
+		"complete_10_tasks": 12
 	},
 	"task_reward":{
 		"all_task": {
 			"diamond": 5
+		},
+		"complete_10_tasks": {
+			"diamond": 100
 		}
 	}
 }

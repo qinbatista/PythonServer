@@ -4143,7 +4143,7 @@ class GameManager:
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
 		for key, tid in self._task['task_id'].items():
 			data = await self.get_task(world, unique_id, tid)
-			if data[4] == '' or data[4] != current_time:
+			if data[4] != '' and data[4] != current_time:
 				await self.reset_task(world, unique_id, tid)
 				data = await self.get_task(world, unique_id, tid)
 			remaining.update({key: {'task_value': data[2], 'task_reward': data[3], 'timer': data[4]}})
@@ -4175,10 +4175,41 @@ class GameManager:
 		return self._message_typesetting(0, 'Successfully receive rewards', data={'remaining': remaining, 'reward': reward})
 
 
+	async def get_task_pack_diamond(self, world: int, unique_id: str) -> dict:
+		"""任务完成10以上获取的100的钻石奖励"""
+		# 0 - Successfully get complete 10 tasks rewards
+		# 96 - Reward acquisition failed
+		# 97 - You have already received a reward
+		# 98 - You have not completed this task yet
+		await self.refresh_10_task_completions(world, unique_id)
+
+		tid = self._task['task_id']['complete_10_tasks']
+		data = await self.get_task(world, unique_id, tid)
+		if data[2] == 0:  # 判断任务是否完成
+			return self._message_typesetting(98, 'You have not completed this task yet')
+		if data[3] == 1:  # 判断奖励是否已经领取过
+			return self._message_typesetting(97, 'You have already received a reward')
+		await self._execute_statement_update(world, f'update task set task_reward=1 where unique_id="{unique_id}" and task_id={tid}')
+		diamond = self._task['task_reward']['complete_10_tasks']['diamond']
+		data = await self.try_diamond(world, unique_id, diamond)
+		if data['status'] != 0:
+			return self._message_typesetting(96, 'Reward acquisition failed')
+		remaining = {'diamond': data['remaining'], 'task_reward': 1}
+		reward = {'diamond': diamond}
+		return self._message_typesetting(0, 'Successfully get complete 10 tasks rewards', data={'remaining': remaining, 'reward': reward})
+
+
+	async def refresh_10_task_completions(self, world: int, unique_id: str) -> None:
+		"""刷新完成10个任务的情况"""
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		task_data = await self._execute_statement(world, f'select count(1) from task where unique_id="{unique_id}" and timer="{current_time}"')
+		if task_data != () and task_data[0][0] >= 10:
+			await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["complete_10_tasks"]}')
+
 	async def get_task(self, world: int, uid: str, tid: int) -> tuple:
 		data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
 		if data == ():  # 这里一次性创建所有需要的记录，这里没有使用task配置信息，到时候要作为单独修改
-			await self._execute_statement_update(world, f'insert into task(unique_id, task_id) values ("{uid}", 0),("{uid}", 1),("{uid}", 2),("{uid}", 3),("{uid}", 4),("{uid}", 5),("{uid}", 6),("{uid}", 7),("{uid}", 8),("{uid}", 9),("{uid}", 10),("{uid}", 11)')
+			await self._execute_statement_update(world, f'insert into task(unique_id, task_id) values ("{uid}", 0),("{uid}", 1),("{uid}", 2),("{uid}", 3),("{uid}", 4),("{uid}", 5),("{uid}", 6),("{uid}", 7),("{uid}", 8),("{uid}", 9),("{uid}", 10),("{uid}", 11),("{uid}", 12)')
 			data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
 		return data[0]
 
