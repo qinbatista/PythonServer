@@ -245,6 +245,8 @@ def create_table_player(cursor):
 	  `add_friends_times` int(11) unsigned DEFAULT 50 COMMENT '添加好友的次数',
 	  `vip_level` int(11) unsigned DEFAULT 0 COMMENT 'VIP等级',
 	  `vip_experience` int(11) unsigned DEFAULT 0 COMMENT 'VIP经验',
+	  `coin_card` int(11) unsigned DEFAULT 0 COMMENT '金币卡',
+	  `universal_segment` int(11) unsigned DEFAULT 0 COMMENT '万能碎片',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""

@@ -4060,7 +4060,7 @@ class GameManager:
 			return self._message_typesetting(1, 'Signed in')
 
 
-	async def check_in(self, world: int, unique_id: str) -> int:
+	async def check_in_task(self, world: int, unique_id: str) -> int:
 		"""每日签到"""
 		# 0 - Not the first time
 		# 1 - the first time
@@ -4218,6 +4218,51 @@ class GameManager:
 
 #############################################################################
 #							End Task Functions								#
+#############################################################################
+
+
+#############################################################################
+#							Start Check_in Functions						#
+#############################################################################
+
+	# TODO
+	async def check_in(self, world: int, unique_id: str) -> dict:
+		"""每日签到"""
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		day = int(current_time.split('-')[2])
+		vip_level = await self._get_material(world, unique_id, 'vip_level')
+		item_index = day % 7
+		check_reward = {}
+		if item_index < vip_level:
+			for key, value in self._check_in[str(item_index + 1)].items():
+				if key in ['role', 'weapon']:
+					for k, v in value.items():
+						check_reward.update({key: {k: v*2}})
+				else:
+					check_reward.update({key: value*2})
+		else:
+			for key, value in self._check_in[str(item_index + 1)].items():
+				if key in ['role', 'weapon']:
+					for k, v in value.items():
+						check_reward.update({key: {k: v}})
+				else:
+					check_reward.update({key: value})
+
+
+	# TODO
+	async def supplement_check_in(self, world: int, unique_id: str) -> dict:
+		"""补签"""
+		pass
+
+
+	# TODO
+	async def get_all_check_in_table(self, world: int, unique_id: str) -> dict:
+		"""获取所有签到情况"""
+		pass
+
+
+#############################################################################
+#							End Check_in Functions							#
 #############################################################################
 
 
@@ -5088,6 +5133,7 @@ class GameManager:
 		self._level_enemy_layouts = d['level_enemy_layouts']
 		self._acheviement = d['acheviement']
 		self._task = d['task']
+		self._check_in = d['check_in']
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			# print("firstDayOfMonth")
 			self._is_first_start = True
