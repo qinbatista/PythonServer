@@ -187,7 +187,19 @@ class MessageHandler:
 
 	###################### weapon.py ######################
 	async def _level_up_weapon(self, data: dict) -> str:
-		return await weapon.level_up(data['data']['unique_id'], enums.Weapon(int(data['data']['weapon'])), int(data['data']['amount']), **data)
+		return await weapon.level_up(data['data']['unique_id'], int(data['data']['weapon']), int(data['data']['amount']), **data)
+
+	async def _level_up_passive_weapon(self, data: dict) -> str:
+		return await weapon.level_up_passive(data['data']['unique_id'], int(data['data']['weapon']), int(data['data']['passive']), **data)
+
+	async def _level_up_star_weapon(self, data: dict) -> str:
+		return await weapon.level_up_star(data['data']['unique_id'], int(data['data']['weapon']), **data)
+
+	async def _reset_skill_point_weapon(self, data: dict) -> str:
+		return await weapon.reset_skill_point(data['data']['unique_id'], int(data['data']['weapon']), **data)
+	
+	async def _get_all_weapon(self, data: dict) -> str:
+		return await weapon.get_all(data['data']['unique_id'], **data)
 
 
 
@@ -260,6 +272,10 @@ FUNCTION_LIST = {
 	'respond_friend' : MessageHandler._respond_friend,
 
 	###################### weapon.py ######################
-	'level_up_weapon' : MessageHandler._level_up_weapon
+	'level_up_weapon' : MessageHandler._level_up_weapon,
+	'level_up_passive_weapon' : MessageHandler._level_up_passive_weapon,
+	'level_up_star_weapon' : MessageHandler._level_up_star_weapon,
+	'reset_skill_point_weapon' : MessageHandler._reset_skill_point_weapon,
+	'get_all_weapon' : MessageHandler._get_all_weapon
 }
 

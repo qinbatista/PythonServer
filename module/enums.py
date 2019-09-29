@@ -90,6 +90,12 @@ class Weapon(enum.IntEnum):
 	W39 = 39
 	W40 = 40
 
+class WeaponPassive(enum.IntEnum):
+	P1 = 1
+	P2 = 2
+	P3 = 3
+	P4 = 4
+
 class Skill(enum.IntEnum):
 	M1 = 0
 	M11 = 1
