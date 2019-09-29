@@ -17,6 +17,7 @@ S = \
 async def get_skill(uid, sid, **kwargs):
 	skill = enums.Skill(sid)
 	level = await common.execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND sid = {skill.value};', **kwargs)
+	# sid, level
 	return common.mt(0, 'success', {'remaining' : { skill.value : level[0][0] }}) if level != () else common.mt(1, 'invalid skill name')
 
 async def level_up(uid, sid, iid, **kwargs):
@@ -28,10 +29,12 @@ async def level_up(uid, sid, iid, **kwargs):
 	if not can_pay: return common.mt(98, 'insufficient materials')
 	if not _roll_for_upgrade(enums.Item(iid)): return common.mt(1, 'unlucky', {'remaining' : { sid : level['data']['remaining'][sid], iid : remaining}})
 	await common.execute(f'UPDATE skill SET level = level + 1 WHERE uid = "{uid}" AND sid = {sid};', **kwargs)
+	# skill : [sid, level], item : [iid, qty]
 	return common.mt(0, 'upgrade success', {'remaining' : { sid : level['data']['remaining'][sid] + 1, iid : remaining}})
 
 async def get_all_levels(uid, **kwargs):
 	skills = await common.execute(f'SELECT sid, level FROM skill WHERE uid = "{uid}";', **kwargs)
+	# skills : [ {sid : #, level : #}, ...
 	return common.mt(0, 'success', {'remaining' : {s[0] : s[1] for s in skills}})
 
 ######################################################################################################
