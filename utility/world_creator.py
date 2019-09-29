@@ -452,7 +452,7 @@ def operating_test():
 	creat_table_task(cursor)
 	# create_achievement(cursor)
 	# create_table_union_store(cursor)
-	# create_check_in(cursor)
+	create_check_in(cursor)
 	# create_table_player(cursor)
 	# create_table_families(cursor)
 

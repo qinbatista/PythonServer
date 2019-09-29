@@ -9,6 +9,7 @@ def loc():
 	return os.path.dirname(os.path.realpath(__file__))
 PythonVersion=""
 def GetPythonCommand():
+	return 'python'
 	global PythonVersion
 	if PythonVersion!="":
 		return PythonVersion
