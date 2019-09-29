@@ -6,6 +6,7 @@ import os
 import json
 import mailbox
 import datetime
+import urllib.parse
 
 from module import enums
 from module import common
@@ -77,7 +78,7 @@ class MailServer:
 		msg = mailbox.MaildirMessage()
 		msg['time'] = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
 		msg['type'] = str(mailtype.value)
-		msg['from'] = kwargs['from']
+		msg['from'] = urllib.parse.quote(kwargs['from'], safe = '')
 		msg['subj'] = kwargs['subj']
 		msg.set_payload(kwargs['body'])
 		msg = self._attach_extra_information(msg, mailtype, **kwargs)
@@ -91,6 +92,7 @@ class MailServer:
 	
 	def _dump_message(self, msg):
 		dump = {k : v for k, v in msg.items() if k not in {'uid_sender', 'name', 'uid_target'}}
+		dump['body'] = msg.get_payload()
 		dump['read'] = 0 if 'S' not in msg.get_flags() else 1
 		return dump
 

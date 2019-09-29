@@ -82,7 +82,7 @@ class MessageHandler:
 
 	###################### mail.py ######################
 	async def _send_mail(self, data: dict) -> str:
-		return await mail.send_mail(enums.MailType(int(data['data']['type'])), '1', **data)
+		return await mail.send_mail(enums.MailType.SIMPLE, data['data']['unique_id'], **data)
 
 	async def _get_new_mail(self, data: dict) -> str:
 		return await mail.get_new_mail(data['data']['unique_id'], **data)

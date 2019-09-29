@@ -3,6 +3,7 @@ mail.py
 '''
 
 from module import common
+from module import family
 from module import enums
 
 
@@ -16,15 +17,18 @@ Possible valid kwargs:
 Required Kwargs By MailType:
 	SIMPLE: No kwargs required
 	GIFT: items
-	FRIEND_REQUEST: from_, sender, uid_sender
+	FRIEND_REQUEST: sender, uid_sender
 	FAMILY_REQUEST: name, target
 '''
 async def send_mail(mailtype, *args, **kwargs):
+	print(f'kwargs: {kwargs}')
 	try:
 		for uid in args:
 			await (SWITCH[mailtype])(uid, **kwargs)
 		return True
-	except KeyError: return False
+	except KeyError as e:
+		print(e)
+		return False
 
 async def get_new_mail(uid, **kwargs):
 	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/new', data = {'world' : kwargs['world'], 'uid' : uid}) as resp:
@@ -55,19 +59,20 @@ async def _send_mail(mail, **kwargs):
 		return result['status'] == 0
 
 async def _send_mail_simple(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), 'body' : kwargs.get('body', 'This is a test message'), 'subj' : kwargs.get('subject', 'Test Message'), 'type' : enums.MailType.SIMPLE.value}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['data'].get('from_', await family._get_gn(uid, **kwargs)), 'body' : kwargs['data'].get('body', 'This is a test message'), 'subj' : kwargs['data'].get('subj', 'Test Message'), 'type' : enums.MailType.SIMPLE.value}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_gift(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), 'body' : kwargs.get('body', 'Your gift is waiting!'), 'subj' : kwargs.get('subject', 'You have a gift!'), 'type' : enums.MailType.GIFT.value, 'items' : kwargs['data']['items']}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), 'body' : kwargs.get('body', 'Your gift is waiting!'), 'subj' : kwargs.get('subj', 'You have a gift!'), 'type' : enums.MailType.GIFT.value, 'items' : kwargs['data']['items']}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_friend_request(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['from_'], 'body' : kwargs.get('body', 'Friend request'), 'subject' : kwargs.get('subj', 'You Have A Friend Request!'), 'type' : enums.MailType.FRIEND_REQUEST.value, 'sender' : kwargs['sender'], 'uid_sender' : kwargs['uid_sender']}}
+	print(f'MAIL: this is kwargs: {kwargs}')
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['data']['sender'], 'body' : kwargs.get('body', 'Friend request'), 'subj' : kwargs.get('subj', 'You Have A Friend Request!'), 'type' : enums.MailType.FRIEND_REQUEST.value, 'uid_sender' : kwargs['data']['uid_sender']}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_family_request(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), 'body' : kwargs.get('body', 'Family request'), 'subj' : kwargs.get('subject', 'Family Request'), 'type' : enums.MailType.FAMILY_REQUEST.value, 'name' : kwargs['name'], 'target' : kwargs['target']}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), 'body' : kwargs.get('body', 'Family request'), 'subj' : kwargs.get('subj', 'Family Request'), 'type' : enums.MailType.FAMILY_REQUEST.value, 'name' : kwargs['data']['name'], 'target' : kwargs['data']['target']}}
 	return await _send_mail(mail, **kwargs)
 
 SWITCH[enums.MailType.SIMPLE] = _send_mail_simple
