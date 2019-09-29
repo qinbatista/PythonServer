@@ -10,6 +10,7 @@ from module import friend
 from module import common
 from module import account
 from module import lottery
+from module import weapon
 from module import summoning
 
 CFG = config_reader.wait_config()
@@ -184,6 +185,10 @@ class MessageHandler:
 	async def _respond_friend(self, data: dict) -> str:
 		return await friend.respond(data['data']['unique_id'], data['data']['nonce'], **data)
 
+	###################### weapon.py ######################
+	async def _level_up_weapon(self, data: dict) -> str:
+		return await weapon.level_up(data['data']['unique_id'], enums.Weapon(int(data['data']['weapon'])), int(data['data']['amount']), **data)
+
 
 
 
@@ -252,6 +257,9 @@ FUNCTION_LIST = {
 	'get_all_friend' : MessageHandler._get_all_friend,
 	'remove_friend' : MessageHandler._remove_friend,
 	'request_friend' : MessageHandler._request_friend,
-	'respond_friend' : MessageHandler._respond_friend
+	'respond_friend' : MessageHandler._respond_friend,
+
+	###################### weapon.py ######################
+	'level_up_weapon' : MessageHandler._level_up_weapon
 }
 

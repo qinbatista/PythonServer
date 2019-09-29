@@ -18,8 +18,7 @@ client_type="aliya"
 host="127.0.0.1"
 token =""
 MESSAGE_LIST = [
-		{'function': 'send_mail', 'data':{'unique_id' : '1', 'subj' : '我要"凉面', 'body' : 'nothing'}},
-		{'function': 'get_new_mail', 'data':{'unique_id' : '1'}}
+		{'function': 'level_up_weapon', 'data':{'unique_id' : '1', 'weapon' : '1', 'amount' : 40}},
 		#{'function': 'send_mail', 'data':{'unique_id' : '1', 'type' : '1', 'items' : '0:1:300,0:2:10'}},
 		#{'function': 'get_all_friend', 'data':{'unique_id' : '1'}}
 				]
