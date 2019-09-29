@@ -455,8 +455,73 @@ def new_server_test(world):
 
 	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : 'aass'}})
 	token = response['data']['token']
-	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'login'}})
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
+	# print(response)
+
+	# # 测试level_up_role_task
+	# response = send_tcp_message({'world' : world, 'function' : 'upgrade_role_level', 'data' : {'token': token, 'role': 'role1', 'experience_potion': 100}})
+	# print(response)
+	#
+	# # 测试level_up_weapon_task
+	# response = send_tcp_message({'world' : world, 'function' : 'level_up_weapon', 'data' : {'token': token, 'weapon': 'weapon1', 'iron': 100}})
+	# print(response)
+	#
+	# # 测试pass_stage_task
+	# response = send_tcp_message({'world' : world, 'function' : 'pass_stage', 'data' : {'token': token, 'stage': 1, 'clear_time': ''}})
+	# print(response)
+	#
+	# # 测试pass_tower_task
+	# response = send_tcp_message({'world' : world, 'function' : 'pass_tower', 'data' : {'token': token, 'stage': 1, 'clear_time': ''}})
+	# print(response)
+	#
+	# # 测试leave_world_boss_stage_task
+	# response = send_tcp_message({'world' : world, 'function' : 'leave_world_boss_stage', 'data' : {'token': token, 'total_damage': 1}})
+	# print(response)
+	#
+	# # 测试basic_summon_task
+	# response = send_tcp_message({'world' : world, 'function' : 'basic_summon', 'data' : {'token': token, 'cost_item': 'diamond', 'summon_kind': 'weapon'}})
+	# print(response)
+	#
+	# # 测试pro_summon_task
+	# response = send_tcp_message({'world' : world, 'function' : 'pro_summon', 'data' : {'token': token, 'cost_item': 'diamond', 'summon_kind': 'weapon'}})
+	# print(response)
+	#
+	# # 测试refresh_all_storage_task
+	# # response = send_tcp_message({'world' : world, 'function' : 'refresh_all_storage', 'data' : {'token': token}})
+	# # print(response)
+	#
+	# # 测试send_friend_gift_task
+	# response = send_tcp_message({'world' : world, 'function' : 'send_friend_gift', 'data' : {'token': token, 'friend_name': '0000005'}})
+	# print(response)
+	#
+	# # 测试check_in_family_task
+	# response = send_tcp_message({'world' : world, 'function' : 'family_sign_in', 'data' : {'token': token}})
+	# print(response)
+	#
+	# # 测试get_all_task
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
+	# print(response)
+
+	# 测试get_daily_task_reward
+	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'level_up_role'}})
 	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'level_up_weapon'}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'pass_stage'}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'pass_tower'}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'pass_world_boss'}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'basic_summon'}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'pro_summon'}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'send_friend_gift'}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'check_in_family'}})
+	print(response)
+
 	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
 	# print(response)
 	# response = send_tcp_message({'world' : world, 'function' : 'response_family', 'data' : {'token': token, 'nonce': '78337956676184997857706980485225384889478708200314904499946514947315907719455'}})
@@ -469,7 +534,7 @@ def new_server_test(world):
 
 	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': nonce}})
 	# print(response)
-	input('继续... ...')
+	# input('继续... ...')
 
 if __name__ == "__main__":
 	# result = requests.post('http://localhost:8100/get_stage_info', data={})

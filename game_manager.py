@@ -3667,6 +3667,7 @@ class GameManager:
 			sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{food_start_time}', mine_factory_timer='{mine_start_time}', crystal_factory_timer='{crystal_start_time}', equipment_factory_timer='{equipment_start_time}', equipment_product_type='{equipment_product_type}' where unique_id='{unique_id}'"
 			await self._execute_statement_update(world=world, statement=sql_str)
 		if len(reward) > 4:
+			await self.refresh_all_storage_task(world, unique_id)
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
 
@@ -4022,7 +4023,6 @@ class GameManager:
 		acceleration_end_time = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
 		await self._execute_statement_update(world=world, statement=f"update factory set acceleration_end_time='{acceleration_end_time}' where unique_id='{unique_id}'")
 		remaining.update({"acceleration_end_time": acceleration_end_time})
-		await self.refresh_all_storage_task(world, unique_id)
 		return self._message_typesetting(status=0, message="Accelerate success", data={"remaining": remaining, "reward": reward})
 
 	@C.collect_async
@@ -4143,7 +4143,7 @@ class GameManager:
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
 		for key, tid in self._task['task_id'].items():
 			data = await self.get_task(world, unique_id, tid)
-			if data[3] == '' or data[3] != current_time:
+			if data[4] == '' or data[4] != current_time:
 				await self.reset_task(world, unique_id, tid)
 				data = await self.get_task(world, unique_id, tid)
 			remaining.update({key: {'task_value': data[2], 'task_reward': data[3], 'timer': data[4]}})
