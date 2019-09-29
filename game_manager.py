@@ -4217,7 +4217,7 @@ class GameManager:
 		await self._execute_statement_update(world, f'update task set task_value=0, task_reward=0, timer="" where unique_id="{uid}" and task_id={tid}')
 
 #############################################################################
-#							End Task Functions							#
+#							End Task Functions								#
 #############################################################################
 
 
