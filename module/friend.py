@@ -49,6 +49,10 @@ async def send_gift(uid, gn_target, **kwargs):
 	await common.execute(f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
 	return common.mt(0, 'success')
 
+async def send_gift_all(uid, **kwargs):
+	pass
+
+
 
 ##########################################################################################################
 

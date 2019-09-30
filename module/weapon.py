@@ -1,7 +1,7 @@
 '''
 weapon.py
 
-return types checked with liang
+CHECKED WITH LIANG
 '''
 
 import asyncio
@@ -25,7 +25,7 @@ async def level_up(uid, wid, amount, **kwargs):
 	can_pay, remaining = await common.try_item(uid, enums.Item.IRON, -upgrade_cnt * STANDARD_IRON, **kwargs)
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
 	await common.execute(f'UPDATE weapon SET level = {level + upgrade_cnt}, skillpoint = {sp + upgrade_cnt} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
-	return common.mt(0, 'success', {'wid' : wid.value, 'level' : level + upgrade_cnt, 'sp' : sp + upgrade_cnt, 'remaining' : remaining})
+	return common.mt(0, 'success', {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : level + upgrade_cnt, 'sp' : sp + upgrade_cnt}, enums.Group.ITEM.value : { 'iid' : enums.Item.IRON.value, 'value' : remaining}})
 
 async def level_up_passive(uid, wid, pid, **kwargs):
 	wid, pid = enums.Weapon(wid), enums.WeaponPassive(pid)
@@ -51,7 +51,7 @@ async def reset_skill_point(uid, wid, **kwargs):
 	can_pay, remaining = await common.try_item(uid, enums.Item.COIN, -STANDARD_RESET, **kwargs)
 	if not can_pay: return common.mt(98, 'insufficient coins')
 	reclaimed = await _reset_skill_point(uid, wid, **kwargs)
-	return common.mt(0, 'success', {'wid' : wid.value, 'sp' : payload[0] + reclaimed, 'remaining' : remaining})
+	return common.mt(0, 'success', {enums.Group.WEAPON.value : {'wid' : wid.value, 'sp' : payload[0] + reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, 'value' : remaining}})
 
 async def get_all(uid, **kwargs):
 	weps = await _get_all_weapon_info(uid, **kwargs)
