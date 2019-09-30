@@ -4375,22 +4375,11 @@ class GameManager:
 #							Start VIP Functions								#
 #############################################################################
 
-	# TODO
-	async def increase_vip_exp(self, world: int, unique_id: str, quanitiy: int):
-		await self._execute_statement_update(world, 'UPDATE player SET vip_experience = vip_experience +' + str(quanitiy) + ' WHERE unique_id = "' + unique_id + '";')
-		data={
-				"remaining":
-				{
-					"vip_experience": quanitiy,
-					"vip_level": basic_segment
-				},
-				"reward":
-				{
-					"vip_experience": weapon_id,
-					"vip_level": basic_segment
-				}
-		}
-		return self._message_typesetting(status=0, message="increase_vip_exp success:"+str(quanitiy))
+	async def increase_vip_exp(self, world: int, unique_id: str, quantity: int) -> dict:
+		data = await self._try_material(world, unique_id, 'vip_experience', quantity)
+		experience_list = self._vip_config['vip_level']['experience']
+		g_list = [exp for exp in experience_list if exp > data['remaining']]
+		return {} if data['status'] != 0 else {'vip_experience': data['remaining'], 'vip_level': experience_list.index(g_list[0]) if g_list != [] else len(experience_list)}
 
 	# TODO
 	async def purchase_vip_gift(self, world: int, unique_id: str, kind: str):

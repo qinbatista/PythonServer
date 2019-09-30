@@ -513,7 +513,11 @@ def new_server_test(world):
 	# print(response)
 	#
 	# # 测试 get_all_check_in_table
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
+	# print(response)
+	#
+	# # 测试 get_all_check_in_table
+	response = send_tcp_message({'world' : world, 'function' : 'increase_vip_exp', 'data' : {'token': token, 'quantity': 200}})
 	print(response)
 
 	# 测试get_daily_task_reward

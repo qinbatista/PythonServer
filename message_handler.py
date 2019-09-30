@@ -501,10 +501,10 @@ class MessageHandler:
 
 
 	async def _increase_vip_exp(self, data: dict) -> str:
-		return json.dumps(await self.gm.increase_vip_exp(data['world'], data['data']['unique_id'],data['data']['quanitiy']))
+		return json.dumps(await self.gm.increase_vip_exp(data['world'], data['data']['unique_id'], data['data']['quantity']))
 
 	async def _purchase_vip_gift(self, data: dict) -> str:
-		return json.dumps(await self.gm.purchase_vip_gift(data['world'], data['data']['unique_id'],data['data']['kind']))
+		return json.dumps(await self.gm.purchase_vip_gift(data['world'], data['data']['unique_id'], data['data']['kind']))
 
 	async def _check_vip_daily_reward(self, data: dict) -> str:
 		return json.dumps(await self.gm.check_vip_daily_reward(data['world'], data['data']['unique_id']))
@@ -513,7 +513,7 @@ class MessageHandler:
 		return json.dumps(await self.gm.get_all_vip_info(data['world'], data['data']['unique_id']))
 
 	async def _purchase_vip_card(self, data: dict) -> str:
-		return json.dumps(await self.gm.purchase_vip_card(data['world'], data['data']['unique_id'],data['data']['type']))
+		return json.dumps(await self.gm.purchase_vip_card(data['world'], data['data']['unique_id'], data['data']['type']))
 
 
 ###############################################################################
