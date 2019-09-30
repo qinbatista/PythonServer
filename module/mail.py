@@ -21,7 +21,6 @@ Required Kwargs By MailType:
 	FAMILY_REQUEST: name, target
 '''
 async def send_mail(mailtype, *args, **kwargs):
-	print(f'kwargs: {kwargs}')
 	try:
 		for uid in args:
 			await (SWITCH[mailtype])(uid, **kwargs)

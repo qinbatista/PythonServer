@@ -46,7 +46,7 @@ async def invite_user(uid, gn_target, **kwargs):
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_invite_permissions(role): return common.mt(98, 'insufficient permissions')
 	uid_target = await _get_uid(gn_target, **kwargs)
-	sent = await mail.send_mail(common.MailType.FAMILY_REQUEST, uid_target, from_ = name, subject = 'Family Invitation', body = f'You have been invited to join:\n{name}', name = name, target = gn_target)
+	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, uid_target, from_ = name, subject = 'Family Invitation', body = f'You have been invited to join:\n{name}', name = name, target = gn_target)
 	return common.mt(0, 'success') if sent else common.mt(97, 'mail could not be sent')
 
 async def request_join(uid, name, **kwargs):
@@ -55,7 +55,7 @@ async def request_join(uid, name, **kwargs):
 	gn = await _get_gn(uid, **kwargs)
 	officials = await _get_uid_officials(name, **kwargs)
 	if not officials: return common.mt(98, 'invalid family')
-	sent = await mail.send_mail(common.MailType.FAMILY_REQUEST, *officials, from_ = name, subject = 'Family Request', body = f'{gn} requests to join your family.', name = name, target = gn)
+	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, *officials, from_ = name, subject = 'Family Request', body = f'{gn} requests to join your family.', name = name, target = gn)
 	return common.mt(0, 'success') if sent else common.mt(97, 'mail could not be sent')
 
 async def respond(uid, nonce, **kwargs):
