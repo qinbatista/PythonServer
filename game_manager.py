@@ -4060,7 +4060,7 @@ class GameManager:
 			return self._message_typesetting(1, 'Signed in')
 
 
-	async def check_in(self, world: int, unique_id: str) -> int:
+	async def check_in_task(self, world: int, unique_id: str) -> int:
 		"""每日签到"""
 		# 0 - Not the first time
 		# 1 - the first time
@@ -4143,7 +4143,7 @@ class GameManager:
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
 		for key, tid in self._task['task_id'].items():
 			data = await self.get_task(world, unique_id, tid)
-			if data[4] == '' or data[4] != current_time:
+			if data[4] != '' and data[4] != current_time:
 				await self.reset_task(world, unique_id, tid)
 				data = await self.get_task(world, unique_id, tid)
 			remaining.update({key: {'task_value': data[2], 'task_reward': data[3], 'timer': data[4]}})
@@ -4175,10 +4175,41 @@ class GameManager:
 		return self._message_typesetting(0, 'Successfully receive rewards', data={'remaining': remaining, 'reward': reward})
 
 
+	async def get_task_pack_diamond(self, world: int, unique_id: str) -> dict:
+		"""任务完成10以上获取的100的钻石奖励"""
+		# 0 - Successfully get complete 10 tasks rewards
+		# 96 - Reward acquisition failed
+		# 97 - You have already received a reward
+		# 98 - You have not completed this task yet
+		await self.refresh_10_task_completions(world, unique_id)
+
+		tid = self._task['task_id']['complete_10_tasks']
+		data = await self.get_task(world, unique_id, tid)
+		if data[2] == 0:  # 判断任务是否完成
+			return self._message_typesetting(98, 'You have not completed this task yet')
+		if data[3] == 1:  # 判断奖励是否已经领取过
+			return self._message_typesetting(97, 'You have already received a reward')
+		await self._execute_statement_update(world, f'update task set task_reward=1 where unique_id="{unique_id}" and task_id={tid}')
+		diamond = self._task['task_reward']['complete_10_tasks']['diamond']
+		data = await self.try_diamond(world, unique_id, diamond)
+		if data['status'] != 0:
+			return self._message_typesetting(96, 'Reward acquisition failed')
+		remaining = {'diamond': data['remaining'], 'task_reward': 1}
+		reward = {'diamond': diamond}
+		return self._message_typesetting(0, 'Successfully get complete 10 tasks rewards', data={'remaining': remaining, 'reward': reward})
+
+
+	async def refresh_10_task_completions(self, world: int, unique_id: str) -> None:
+		"""刷新完成10个任务的情况"""
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		task_data = await self._execute_statement(world, f'select count(1) from task where unique_id="{unique_id}" and timer="{current_time}"')
+		if task_data != () and task_data[0][0] >= 10:
+			await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["complete_10_tasks"]}')
+
 	async def get_task(self, world: int, uid: str, tid: int) -> tuple:
 		data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
 		if data == ():  # 这里一次性创建所有需要的记录，这里没有使用task配置信息，到时候要作为单独修改
-			await self._execute_statement_update(world, f'insert into task(unique_id, task_id) values ("{uid}", 0),("{uid}", 1),("{uid}", 2),("{uid}", 3),("{uid}", 4),("{uid}", 5),("{uid}", 6),("{uid}", 7),("{uid}", 8),("{uid}", 9),("{uid}", 10),("{uid}", 11)')
+			await self._execute_statement_update(world, f'insert into task(unique_id, task_id) values ("{uid}", 0),("{uid}", 1),("{uid}", 2),("{uid}", 3),("{uid}", 4),("{uid}", 5),("{uid}", 6),("{uid}", 7),("{uid}", 8),("{uid}", 9),("{uid}", 10),("{uid}", 11),("{uid}", 12)')
 			data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
 		return data[0]
 
@@ -4186,7 +4217,52 @@ class GameManager:
 		await self._execute_statement_update(world, f'update task set task_value=0, task_reward=0, timer="" where unique_id="{uid}" and task_id={tid}')
 
 #############################################################################
-#							End Task Functions							#
+#							End Task Functions								#
+#############################################################################
+
+
+#############################################################################
+#							Start Check_in Functions						#
+#############################################################################
+
+	# TODO
+	async def check_in(self, world: int, unique_id: str) -> dict:
+		"""每日签到"""
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		day = int(current_time.split('-')[2])
+		vip_level = await self._get_material(world, unique_id, 'vip_level')
+		item_index = day % 7
+		check_reward = {}
+		if item_index < vip_level:
+			for key, value in self._check_in[str(item_index + 1)].items():
+				if key in ['role', 'weapon']:
+					for k, v in value.items():
+						check_reward.update({key: {k: v*2}})
+				else:
+					check_reward.update({key: value*2})
+		else:
+			for key, value in self._check_in[str(item_index + 1)].items():
+				if key in ['role', 'weapon']:
+					for k, v in value.items():
+						check_reward.update({key: {k: v}})
+				else:
+					check_reward.update({key: value})
+
+
+	# TODO
+	async def supplement_check_in(self, world: int, unique_id: str) -> dict:
+		"""补签"""
+		pass
+
+
+	# TODO
+	async def get_all_check_in_table(self, world: int, unique_id: str) -> dict:
+		"""获取所有签到情况"""
+		pass
+
+
+#############################################################################
+#							End Check_in Functions							#
 #############################################################################
 
 
@@ -5057,6 +5133,7 @@ class GameManager:
 		self._level_enemy_layouts = d['level_enemy_layouts']
 		self._acheviement = d['acheviement']
 		self._task = d['task']
+		self._check_in = d['check_in']
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			# print("firstDayOfMonth")
 			self._is_first_start = True
