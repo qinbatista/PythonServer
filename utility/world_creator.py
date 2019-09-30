@@ -245,8 +245,15 @@ def create_table_player(cursor):
 	  `add_friends_times` int(11) unsigned DEFAULT 50 COMMENT '添加好友的次数',
 	  `vip_level` int(11) unsigned DEFAULT 0 COMMENT 'VIP等级',
 	  `vip_experience` int(11) unsigned DEFAULT 0 COMMENT 'VIP经验',
-	  `coin_card` int(11) unsigned DEFAULT 0 COMMENT '金币卡',
 	  `universal_segment` int(11) unsigned DEFAULT 0 COMMENT '万能碎片',
+	  `vip_card_type` int(11) unsigned DEFAULT 0 COMMENT '月卡类型',
+	  `vip_card_deadline` int(11) unsigned DEFAULT 0 COMMENT '月卡截止时间',
+	  `coin_card` int(11) unsigned DEFAULT 0 COMMENT '金币卡',
+	  `exp_card` int(11) unsigned DEFAULT 0 COMMENT '经验卡',
+	  `food_card` int(11) unsigned DEFAULT 0 COMMENT '食物卡',
+	  `mine_card` int(11) unsigned DEFAULT 0 COMMENT '合金卡',
+	  `crystal_card` int(11) unsigned DEFAULT 0 COMMENT '水晶卡',
+	  `diamond_card` int(11) unsigned DEFAULT 0 COMMENT '钻石卡',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
@@ -372,10 +379,9 @@ def create_check_in(cursor):
 	"""
 	CREATE TABLE `check_in` (
 	  `unique_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一标识',
-	  `day` smallint(6) NOT NULL COMMENT '表示日期',
-	  `check_in` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到时间',
-	  `reward` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '奖励的物品',
-	  PRIMARY KEY (`unique_id`, `day`)
+	  `date` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到日期',
+	  `reward` smallint(6) DEFAULT 0 COMMENT '0：未领奖，1：已领奖',
+	  PRIMARY KEY (`unique_id`, `date`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 	cursor.execute(statement)
@@ -456,8 +462,8 @@ def operating_test():
 	# creat_table_task(cursor)
 	# create_achievement(cursor)
 	# create_table_union_store(cursor)
-	# create_check_in(cursor)
-	create_table_player(cursor)
+	create_check_in(cursor)
+	# create_table_player(cursor)
 	# create_table_families(cursor)
 
 

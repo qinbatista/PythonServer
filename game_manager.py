@@ -4228,25 +4228,69 @@ class GameManager:
 	# TODO
 	async def check_in(self, world: int, unique_id: str) -> dict:
 		"""每日签到"""
+		# 0 - Sign-in success
+		# 99 - You have already signed in today
 		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		day = int(current_time.split('-')[2])
-		vip_level = await self._get_material(world, unique_id, 'vip_level')
-		item_index = day % 7
-		check_reward = {}
-		if item_index < vip_level:
-			for key, value in self._check_in[str(item_index + 1)].items():
-				if key in ['role', 'weapon']:
-					for k, v in value.items():
-						check_reward.update({key: {k: v*2}})
-				else:
-					check_reward.update({key: value*2})
-		else:
-			for key, value in self._check_in[str(item_index + 1)].items():
-				if key in ['role', 'weapon']:
-					for k, v in value.items():
-						check_reward.update({key: {k: v}})
-				else:
-					check_reward.update({key: value})
+		check_select_str = f'select * from check_in where unique_id="{unique_id}" and date="{current_time}"'
+		s_data = await self._execute_statement(world, check_select_str)
+		if s_data != ():
+			return self._message_typesetting(99, 'You have already signed in today')
+		# 领奖的操作
+		# key_words = ['role', 'weapon']
+		# day = int(current_time.split('-')[2])
+		# vip_level = await self._get_material(world, unique_id, 'vip_level')
+		# item_index = day % 7
+		# check_remaining = {}
+		# check_reward = {}
+		# if item_index < vip_level:
+		# 	for key, value in self._check_in[str(item_index + 1)].items():
+		# 		if key in key_words:
+		# 			for k, v in value.items():
+		# 				quantity = 2 * v
+		# 				select_str = f'select segment from {key} where unique_id="{unique_id}" and {key}_name="{k}"'
+		# 				update_str = f'update {key} set segment=segment+{quantity} where unique_id="{unique_id}" and {key}_name="{k}"'
+		# 				insert_str = f'insert into {key}(unique_id, {key}_name, segment) values("{unique_id}", "{k}", {quantity})'
+		# 				k_data = await self._execute_statement(world, select_str)
+		# 				if k_data == ():
+		# 					await self._execute_statement_update(world, insert_str)
+		# 					check_reward.update({key: {k: quantity}})
+		# 					check_remaining.update({key: {k: quantity}})
+		# 				else:
+		# 					await self._execute_statement_update(world, update_str)
+		# 					check_reward.update({key: {k: quantity}})
+		# 					check_remaining.update({key: {k: k_data[0][0] + quantity}})
+		# 		else:
+		# 			quantity = 2 * value
+		# 			key_data = await self._try_material(world, unique_id, key, quantity)
+		# 			check_reward.update({key: quantity})
+		# 			check_remaining.update({key: key_data['remaining']})
+		# else:
+		# 	for key, value in self._check_in[str(item_index + 1)].items():
+		# 		if key in key_words:
+		# 			for k, v in value.items():
+		# 				quantity = v
+		# 				select_str = f'select segment from {key} where unique_id="{unique_id}" and {key}_name="{k}"'
+		# 				update_str = f'update {key} set segment=segment+{quantity} where unique_id="{unique_id}" and {key}_name="{k}"'
+		# 				insert_str = f'insert into {key}(unique_id, {key}_name, segment) values("{unique_id}", "{k}", {quantity})'
+		# 				k_data = await self._execute_statement(world, select_str)
+		# 				if k_data == ():
+		# 					await self._execute_statement_update(world, insert_str)
+		# 					check_reward.update({key: {k: quantity}})
+		# 					check_remaining.update({key: {k: quantity}})
+		# 				else:
+		# 					await self._execute_statement_update(world, update_str)
+		# 					check_reward.update({key: {k: quantity}})
+		# 					check_remaining.update({key: {k: k_data[0][0] + quantity}})
+		# 		else:
+		# 			quantity = value
+		# 			key_data = await self._try_material(world, unique_id, key, quantity)
+		# 			check_reward.update({key: quantity})
+		# 			check_remaining.update({key: key_data['remaining']})
+		# 更新签到表
+		check_insert_str = f'insert into check_in(unique_id, date) values("{unique_id}", "{current_time}")'
+		await self._execute_statement_update(world, check_insert_str)
+		return self._message_typesetting(0, 'Sign-in success')
+
 
 
 	# TODO
@@ -4343,6 +4387,7 @@ class GameManager:
 				}
 				return self._message_typesetting(0, f'get reward success',data)
 		return self._message_typesetting(98, f'can not get reward')
+
 	async def get_all_achievement(self, world, unique_id):
 		# - 0 - gain success
 		data_tuple = (await self.get_all_head(world, "achievement"))["remaining"]
