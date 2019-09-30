@@ -23,8 +23,8 @@ MESSAGE_LIST = [
 		#{'function': 'level_up_star_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}}
 		#{'function': 'reset_skill_point_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}},
 		#{'function': 'send_gift_friend', 'data':{'unique_id' : '1', 'gn_target' : 'バカ'}},
-		{'function' : 'send_mail', 'data' : {'gn_target' : 'placeholder', 'subj' : 'delete me liang', 'body' : 'please delete me!!!'}}
-		#{'function': 'get_account_world_info', 'data':{}}
+		#{'function' : 'send_mail', 'data' : {'gn_target' : 'placeholder', 'subj' : 'delete me liang', 'body' : 'please delete me!!!'}}
+		{'function': 'delete_read_mail', 'data':{}}
 				]
 
 

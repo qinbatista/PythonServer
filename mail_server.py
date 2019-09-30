@@ -39,11 +39,13 @@ class MailServer:
 		return common.mt(-1, 'no match')
 
 	async def delete_read(self, world, uid):
+		deleted = []
 		folder = self._open_mail_folder(world, uid)
 		for mid, msg in folder.iteritems():
 			if 'S' in msg.get_flags():
 				folder.discard(mid)
-		return common.mt(0, 'success')
+				deleted.append(mid)
+		return common.mt(0, 'success', {'keys' : deleted})
 
 	async def mark_read(self, world, uid, key):
 		folder = self._open_mail_folder(world, uid)

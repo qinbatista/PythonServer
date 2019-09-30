@@ -107,7 +107,7 @@ class MessageHandler:
 		return await mail.delete_mail(data['data']['unique_id'], data['data']['key'], **data)
 
 	async def _delete_read_mail(self, data: dict) -> str:
-		return await mail.delete_read_mail(data['data']['unique_id'], **data)
+		return await mail.delete_read(data['data']['unique_id'], **data)
 
 	async def _mark_read_mail(self, data: dict) -> str:
 		return await mail.mark_read(data['data']['unique_id'], data['data']['key'], **data)
