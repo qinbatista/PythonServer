@@ -505,7 +505,19 @@ def new_server_test(world):
 	# print(response)
 	#
 	# # 测试 check_in
-	response = send_tcp_message({'world' : world, 'function' : 'check_in', 'data' : {'token': token}})
+	# response = send_tcp_message({'world' : world, 'function' : 'check_in', 'data' : {'token': token}})
+	# print(response)
+
+	# 测试 supplement_check_in
+	# response = send_tcp_message({'world' : world, 'function' : 'supplement_check_in', 'data' : {'token': token}})
+	# print(response)
+	#
+	# # 测试 get_all_check_in_table
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
+	# print(response)
+	#
+	# # 测试 get_all_check_in_table
+	response = send_tcp_message({'world' : world, 'function' : 'increase_vip_exp', 'data' : {'token': token, 'quantity': 0}})
 	print(response)
 
 	# 测试get_daily_task_reward

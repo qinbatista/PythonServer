@@ -174,7 +174,7 @@ class ConfigurationManager:
 		self._check_in_config = json.load(open(CHECK_IN.format(self._sv), encoding = 'utf-8'))
 
 	def _read_vip_config_config(self):
-		self._vip_config = json.load(open(CHECK_IN.format(self._sv), encoding = 'utf-8'))
+		self._vip_config = json.load(open(VIP_CONFIG.format(self._sv), encoding = 'utf-8'))
 
 	def _read_world_distribution_config(self):
 		d = json.load(open(SERVER_CONFIG.format(self._cv), encoding = 'utf-8'))
