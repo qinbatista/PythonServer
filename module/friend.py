@@ -11,8 +11,8 @@ from module import family
 
 
 async def get_all(uid, **kwargs):
-	friends, exp = await _get_friend_info(uid, **kwargs)
-	return common.mt(0, 'got all friends', {'friends' : friends, 'exp' : exp})
+	info = await _get_friend_info(uid, **kwargs)
+	return common.mt(0, 'got all friends', {'friends' : [{'gn' : i[0], 'exp' : i[1]} for i in info]})
 
 async def remove(uid, gn_target, **kwargs):
 	uid_target = await family._get_uid(gn_target, **kwargs)
@@ -32,13 +32,12 @@ async def request(uid, gn_target, **kwargs):
 async def respond(uid, nonce, **kwargs):
 	return common.mt(0, 'success')
 
+async def send_friend_gift():
+	pass
+
 
 ##########################################################################################################
 
 async def _get_friend_info(uid, **kwargs):
 	info = await common.execute(f'SELECT player.gn, progress.exp FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
-	friends, exp = [], []
-	for f, e in info:
-		friends.append(f)
-		exp.append(e)
-	return (friends, exp)
+	return info

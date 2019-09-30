@@ -22,9 +22,9 @@ MESSAGE_LIST = [
 		#{'function': 'level_up_passive_weapon', 'data':{'unique_id' : '1', 'weapon' : '1', 'passive' : '2'}}
 		#{'function': 'level_up_star_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}}
 		#{'function': 'reset_skill_point_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}},
-		{'function': 'get_all_weapon', 'data':{'unique_id' : '1'}}
+		#{'function': 'get_all_weapon', 'data':{'unique_id' : '1'}}
 		#{'function': 'send_mail', 'data':{'unique_id' : '1', 'type' : '1', 'items' : '0:1:300,0:2:10'}},
-		#{'function': 'get_all_friend', 'data':{'unique_id' : '1'}}
+		{'function': 'get_all_friend', 'data':{'unique_id' : '1'}}
 				]
 
 
