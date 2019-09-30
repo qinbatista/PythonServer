@@ -4365,6 +4365,7 @@ class GameManager:
 			await self._execute_statement_update(world, f'update check_in set reward=1 where unique_id="{unique_id}" and date="{d[1]}"')
 
 		return self._message_typesetting(0, 'Successfully received the reward', data={'remaining': remaining, 'reward': reward})
+
 #############################################################################
 #							End Check_in Functions							#
 #############################################################################
