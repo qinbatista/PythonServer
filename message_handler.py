@@ -495,6 +495,9 @@ class MessageHandler:
 
 	async def _supplement_check_in(self, data: dict) -> str:
 		return json.dumps(await self.gm.supplement_check_in(data['world'], data['data']['unique_id']))
+
+	async def _get_all_check_in_table(self, data: dict) -> str:
+		return json.dumps(await self.gm.get_all_check_in_table(data['world'], data['data']['unique_id']))
 ###############################################################################
 
 
@@ -674,5 +677,6 @@ FUNCTION_LIST = {
 
 	'check_in': MessageHandler._check_in,
 	'supplement_check_in': MessageHandler._supplement_check_in,
+	'get_all_check_in_table': MessageHandler._get_all_check_in_table,
 }
 

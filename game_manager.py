@@ -4295,6 +4295,7 @@ class GameManager:
 	async def supplement_check_in(self, world: int, unique_id: str) -> dict:
 		"""补签"""
 		# 0 - Successful signing
+		# 98 - You have completed all current check-ins
 		# 99 - Insufficient diamond
 		month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取每月需要补签的日期前缀
 		data = await self._execute_statement(world, f'select date from check_in where unique_id="{unique_id}" and date like "{month_pre}%"')
@@ -4303,6 +4304,8 @@ class GameManager:
 		# max_day = calendar.monthrange(today.year, today.month)[1]  # 获取本月的总天数
 
 		missing_num = today.day - len(day_list)
+		if missing_num == 0:
+			return self._message_typesetting(98, 'You have completed all current check-ins')
 		need_diamond = -1 * missing_num * self._check_in['patch_diamond']
 		diamond_data = await self.try_diamond(world, unique_id, need_diamond)
 		if diamond_data['status'] != 0:
@@ -4319,10 +4322,17 @@ class GameManager:
 		return self._message_typesetting(0, 'Successful signing', data={'remaining': remaining})
 
 
-	# TODO
 	async def get_all_check_in_table(self, world: int, unique_id: str) -> dict:
 		"""获取所有签到情况"""
-		pass
+		# 0 - Successfully obtained all check-in status
+		# 0 - Successfully obtained all check-in status this month
+		# data = await self._execute_statement(world, f'select * from check_in where unique_id="{unique_id}"')
+		month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取本月的日期前缀
+		data = await self._execute_statement(world, f'select * from check_in where unique_id="{unique_id}" and date like "{month_pre}%"')
+		remaining = {}
+		for i, d in enumerate(data):
+			remaining.update({i: {'date': d[1], 'reward': d[2]}})
+		return self._message_typesetting(0, 'Successfully obtained all check-in status this month', data={'remaining': remaining})
 
 
 #############################################################################
