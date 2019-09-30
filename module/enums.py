@@ -22,6 +22,7 @@ class Item(enum.IntEnum):
 	SUMMON_SCROLL_PROPHET = 13
 	FORTUNE_WHEEL_BASIC = 14
 	FORTUNE_WHEEL_PRO = 15
+	FRIEND_GIFT = 16
 
 
 class FamilyRole(enum.IntEnum):

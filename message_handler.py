@@ -185,6 +185,9 @@ class MessageHandler:
 	async def _respond_friend(self, data: dict) -> str:
 		return await friend.respond(data['data']['unique_id'], data['data']['nonce'], **data)
 
+	async def _send_gift_friend(self, data: dict) -> str:
+		return await friend.send_gift(data['data']['unique_id'], data['data']['gn_target'], **data)
+
 	###################### weapon.py ######################
 	async def _level_up_weapon(self, data: dict) -> str:
 		return await weapon.level_up(data['data']['unique_id'], int(data['data']['weapon']), int(data['data']['amount']), **data)
@@ -270,6 +273,7 @@ FUNCTION_LIST = {
 	'remove_friend' : MessageHandler._remove_friend,
 	'request_friend' : MessageHandler._request_friend,
 	'respond_friend' : MessageHandler._respond_friend,
+	'send_gift_friend' : MessageHandler._send_gift_friend,
 
 	###################### weapon.py ######################
 	'level_up_weapon' : MessageHandler._level_up_weapon,

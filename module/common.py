@@ -33,5 +33,8 @@ async def try_item(uid, item, value, **kwargs):
 				return (True, quantity[0][0] + value)
 			return (False, quantity[0][0] + value)
 
+def encode_item(gid, iid, value):
+	return f'{gid.value}:{iid.value}:{value}'
+
 def mt(status, message, data = {}):
 	return {'status' : status, 'message' : message, 'data' : data}
