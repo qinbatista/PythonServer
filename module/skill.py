@@ -1,5 +1,7 @@
 '''
 skill.py
+
+CHECKED WITH LIANG
 '''
 
 import random
@@ -28,7 +30,7 @@ async def level_up(uid, sid, iid, **kwargs):
 	if not can_pay: return common.mt(98, 'insufficient materials')
 	if not _roll_for_upgrade(enums.Item(iid)): return common.mt(1, 'unlucky', {'remaining' : { sid : level['data']['remaining'][sid], iid : remaining}})
 	await common.execute(f'UPDATE skill SET level = level + 1 WHERE uid = "{uid}" AND sid = {sid};', **kwargs)
-	return common.mt(0, 'success', {'sid' : sid, 'level' : level['data']['level'] + 1, 'iid' : iid, 'qty' : remaining})
+	return common.mt(0, 'success', {enums.Group.SKILL.value : {'sid' : sid, 'level' : level['data']['level'] + 1}, enums.Group.ITEM.value : {'iid' : iid, 'value' : remaining}})
 
 async def get_all_levels(uid, **kwargs):
 	skills = await common.execute(f'SELECT sid, level FROM skill WHERE uid = "{uid}";', **kwargs)
