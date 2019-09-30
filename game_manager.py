@@ -4372,6 +4372,48 @@ class GameManager:
 
 
 #############################################################################
+#							Start VIP Functions								#
+#############################################################################
+
+	# TODO
+	async def increase_vip_exp(self, world: int, unique_id: str, quanitiy: int):
+		await self._execute_statement_update(world, 'UPDATE player SET vip_experience = vip_experience +' + str(quanitiy) + ' WHERE unique_id = "' + unique_id + '";')
+		data={
+				"remaining":
+				{
+					"vip_experience": quanitiy,
+					"vip_level": basic_segment
+				},
+				"reward":
+				{
+					"vip_experience": weapon_id,
+					"vip_level": basic_segment
+				}
+		}
+		return self._message_typesetting(status=0, message="increase_vip_exp success:"+str(quanitiy))
+
+	# TODO
+	async def purchase_vip_gift(self, world: int, unique_id: str, kind: str):
+		return self._message_typesetting(status=0, message="purchase_vip_gift",data= "")
+
+	# TODO
+	async def check_vip_daily_reward(self, world: int, unique_id: str):
+		return self._message_typesetting(status=0, message="check_vip_daily_reward",data= "")
+
+	# TODO
+	async def get_all_vip_info(self, world: int, unique_id: str):
+		return self._message_typesetting(status=0, message="get_all_vip_info",data= "")
+
+	# TODO
+	async def purchase_vip_card(self, world: int, unique_id: str, type: str):
+		return self._message_typesetting(status=0, message="purchase_vip_card",data= "")
+
+#############################################################################
+#							End VID Functions								#
+#############################################################################
+
+
+#############################################################################
 #							Start Achievement Functions						#
 #############################################################################
 
@@ -4462,6 +4504,7 @@ class GameManager:
 				achievement.update({col_name_list[j] : row[i][j]})
 			remaining.update({row[i][1] : achievement})
 		return self._message_typesetting(0, "gain success", {"remaining": remaining})
+
 #############################################################################
 #							End Achievement Functions						#
 #############################################################################
@@ -5118,34 +5161,6 @@ class GameManager:
 		if await self._update_material(world, unique_id, material, num) == 0:
 			return self._internal_format(1, num)
 		return self._internal_format(status=0, remaining=num)
-
-	async def increase_vip_exp(self, world: int, unique_id: str, quanitiy: int):
-		await self._execute_statement_update(world, 'UPDATE player SET vip_experience = vip_experience +' + str(quanitiy) + ' WHERE unique_id = "' + unique_id + '";')
-		data={
-				"remaining":
-				{
-					"vip_experience": quanitiy,
-					"vip_level": basic_segment
-				},
-				"reward":
-				{
-					"vip_experience": weapon_id,
-					"vip_level": basic_segment
-				}
-		}
-		return self._message_typesetting(status=0, message="increase_vip_exp success:"+str(quanitiy))
-
-	async def purchase_vip_gift(self, world: int, unique_id: str, kind: str):
-		return self._message_typesetting(status=0, message="purchase_vip_gift",data= "")
-
-	async def check_vip_daily_reward(self, world: int, unique_id: str):
-		return self._message_typesetting(status=0, message="check_vip_daily_reward",data= "")
-
-	async def get_all_vip_info(self, world: int, unique_id: str):
-		return self._message_typesetting(status=0, message="get_all_vip_info",data= "")
-
-	async def purchase_vip_card(self, world: int, unique_id: str, type: str):
-		return self._message_typesetting(status=0, message="purchase_vip_card",data= "")
 
 	async def _get_material(self, world: int, unique_id: str, material: str) -> int or str:
 		"""
