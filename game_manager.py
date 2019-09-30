@@ -4294,7 +4294,9 @@ class GameManager:
 		month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取本月的日期前缀
 		data = await self._execute_statement(world, f'select * from check_in where unique_id="{unique_id}" and date like "{month_pre}%" and reward=0')
 		key_words = ['role', 'weapon']
-		vip_level = await self._get_material(world, unique_id, 'vip_level')
+		vip_dict = await self.increase_vip_exp(world, unique_id, 0)
+		if vip_dict == {}: return self._message_typesetting(99, 'function increase_vip_exp error')
+		vip_level = vip_dict['vip_level']
 		remaining = {}
 		reward = {}
 		for d in data:
