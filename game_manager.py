@@ -4385,7 +4385,27 @@ class GameManager:
 
 	# TODO
 	async def purchase_vip_gift(self, world: int, unique_id: str, kind: str):
-		return self._message_typesetting(status=0, message="purchase_vip_gift",data= "")
+		"""购买VIP礼包"""
+		# 0 -
+		# 98 - you not vip identity
+		# 99 - function increase_vip_exp error
+		vip_dict = await self.increase_vip_exp(world, unique_id, 0)
+		if vip_dict == {}:
+			return self._message_typesetting(99, 'function increase_vip_exp error')
+
+		vip_level = vip_dict['vip_level']
+		if vip_level == 0:
+			return self._message_typesetting(98, 'you not vip identity')
+		vip_package = self._vip_config['vip_speical_package'][str(vip_level)]
+		reward = vip_package['reward']
+		need_diamond = -1 * vip_package['diamond']
+
+		# TODO
+		diamond_data = await self.try_diamond(world, unique_id, need_diamond)
+		if diamond_data['status'] != 0:
+			return self._message_typesetting(97, 'Insufficient diamond')
+
+		return self._message_typesetting(status=0, message="purchase_vip_gift", data= {})
 
 	# TODO
 	async def check_vip_daily_reward(self, world: int, unique_id: str):

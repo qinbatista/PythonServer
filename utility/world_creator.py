@@ -246,6 +246,7 @@ def create_table_player(cursor):
 	  `vip_experience` int(11) unsigned DEFAULT 0 COMMENT 'VIP经验',
 	  `daily_reward_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT 'VIP每日奖励的刷新时间',
 	  `universal_segment` int(11) unsigned DEFAULT 0 COMMENT '万能碎片',
+	  `universal_segment_6` int(11) unsigned DEFAULT 0 COMMENT '6星万能碎片',
 	  `vip_card_type` int(11) unsigned DEFAULT 0 COMMENT '月卡类型',
 	  `vip_card_deadline` int(11) unsigned DEFAULT 0 COMMENT '月卡截止时间',
 	  `coin_card` int(11) unsigned DEFAULT 0 COMMENT '金币卡',
