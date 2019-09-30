@@ -15,7 +15,8 @@ from datetime import datetime, timezone
 
 async def get_all(uid, **kwargs):
 	info = await _get_friend_info(uid, **kwargs)
-	return common.mt(0, 'got all friends', {'friends' : [{'gn' : i[0], 'exp' : i[1]} for i in info]})
+	# one friend {'gn' : gn, 'exp' : exp, 'recover' : recover, 'since' : since, 'icon' : 0}
+	return common.mt(0, 'got all friends', {'friends' : [{'gn' : i[0], 'exp' : i[1], 'recover' : i[2], 'since' : i[3], 'icon' : 0} for i in info]})
 
 async def remove(uid, gn_target, **kwargs):
 	uid_target = await family._get_uid(gn_target, **kwargs)
@@ -75,7 +76,7 @@ async def _are_friends(uid, fid, **kwargs):
 	return (True, data[0][0], data[0][1]) if data != () else (False, None, None)
 
 async def _get_friend_info(uid, **kwargs):
-	info = await common.execute(f'SELECT player.gn, progress.exp FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
+	info = await common.execute(f'SELECT player.gn, progress.exp, friend.recover, friend.since FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
 	return info
 
 async def _lookup_nonce(nonce, **kwargs):

@@ -23,8 +23,8 @@ MESSAGE_LIST = [
 		#{'function': 'level_up_star_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}}
 		#{'function': 'reset_skill_point_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}},
 		#{'function': 'send_gift_friend', 'data':{'unique_id' : '1', 'gn_target' : 'バカ'}},
-		{'function' : 'request_friend', 'data' : {'gn_target' : 'placeholder'}}
-		#{'function': 'delete_read_mail', 'data':{}}
+		#{'function' : 'request_friend', 'data' : {'gn_target' : 'placeholder'}}
+		{'function': 'get_all_info_friend', 'data':{}}
 				]
 
 
