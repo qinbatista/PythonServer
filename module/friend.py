@@ -35,6 +35,7 @@ async def respond(uid, nonce, **kwargs):
 	if not uid_sender: return common.mt(99, 'invalid nonce')
 	await _add_friend(uid, uid_sender, **kwargs)
 	info = await _get_friend_info(uid_sender, **kwargs)
+	await mail.delete_mail(uid, nonce, **kwargs)
 	return common.mt(0, 'success', {'gn' : info[0], 'exp' : info[1]})
 
 async def send_gift(uid, gn_target, **kwargs):

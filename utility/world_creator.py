@@ -69,6 +69,50 @@ def create_table_dark_market(cursor):
 	"""
 	cursor.execute(statement)
 
+def create_table_union_store(cursor):
+	statement = \
+	"""
+	CREATE TABLE `union_store` (
+	  `unique_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一标识',
+	  `merchandise1` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料1',
+	  `merchandise1_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料1的数量',
+	  `currency_type1` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料1的价值(金币或者钻石)',
+	  `currency_type1_price` int(6) DEFAULT 0 COMMENT '材料1的价格',
+	  `merchandise2` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料2',
+	  `merchandise2_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料2的数量',
+	  `currency_type2` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料2的价值(金币或者钻石)',
+	  `currency_type2_price` int(6) DEFAULT 0 COMMENT '材料2的价格',
+	  `merchandise3` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料3',
+	  `merchandise3_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料3的数量',
+	  `currency_type3` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料3的价值(金币或者钻石)',
+	  `currency_type3_price` int(6) DEFAULT 0 COMMENT '材料3的价格',
+	  `merchandise4` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料4',
+	  `merchandise4_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料4的数量',
+	  `currency_type4` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料4的价值(金币或者钻石)',
+	  `currency_type4_price` int(6) DEFAULT 0 COMMENT '材料4的价格',
+	  `merchandise5` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料5',
+	  `merchandise5_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料5的数量',
+	  `currency_type5` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料5的价值(金币或者钻石)',
+	  `currency_type5_price` int(6) DEFAULT 0 COMMENT '材料5的价格',
+	  `merchandise6` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料6',
+	  `merchandise6_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料6的数量',
+	  `currency_type6` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料6的价值(金币或者钻石)',
+	  `currency_type6_price` int(6) DEFAULT 0 COMMENT '材料6的价格',
+	  `merchandise7` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料7',
+	  `merchandise7_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料7的数量',
+	  `currency_type7` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料7的价值(金币或者钻石)',
+	  `currency_type7_price` int(6) DEFAULT 0 COMMENT '材料7的价格',
+	  `merchandise8` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '工会商店中展示可以买的材料8',
+	  `merchandise8_quantity` int(6) DEFAULT 0 COMMENT '工会商店中展示可以买的材料8的数量',
+	  `currency_type8` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '材料8的价值(金币或者钻石)',
+	  `currency_type8_price` int(6) DEFAULT 0 COMMENT '材料8的价格',
+	  `refresh_time` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '刷新所有材料的刷新时间',
+	  `refreshable_quantity` int(6) DEFAULT 0 COMMENT '可以刷新所有材料的次数',
+	  PRIMARY KEY (`unique_id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+	cursor.execute(statement)
+
 def create_table_factory(cursor):
 	statement = \
 	"""
@@ -199,6 +243,17 @@ def create_table_player(cursor):
 	  `mail_gift_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '参与活动的时间',
 	  `add_friends_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '添加好友的时间',
 	  `add_friends_times` int(11) unsigned DEFAULT 50 COMMENT '添加好友的次数',
+	  `vip_level` int(11) unsigned DEFAULT 0 COMMENT 'VIP等级',
+	  `vip_experience` int(11) unsigned DEFAULT 0 COMMENT 'VIP经验',
+	  `universal_segment` int(11) unsigned DEFAULT 0 COMMENT '万能碎片',
+	  `vip_card_type` int(11) unsigned DEFAULT 0 COMMENT '月卡类型',
+	  `vip_card_deadline` int(11) unsigned DEFAULT 0 COMMENT '月卡截止时间',
+	  `coin_card` int(11) unsigned DEFAULT 0 COMMENT '金币卡',
+	  `exp_card` int(11) unsigned DEFAULT 0 COMMENT '经验卡',
+	  `food_card` int(11) unsigned DEFAULT 0 COMMENT '食物卡',
+	  `mine_card` int(11) unsigned DEFAULT 0 COMMENT '合金卡',
+	  `crystal_card` int(11) unsigned DEFAULT 0 COMMENT '水晶卡',
+	  `diamond_card` int(11) unsigned DEFAULT 0 COMMENT '钻石卡',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
@@ -290,7 +345,46 @@ def create_table_weapon(cursor):
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 	cursor.execute(statement)
-
+def creat_table_task(cursor):
+	"""
+		login:0,            check_in:1,     level_up_role:2,    level_up_weapon:3,      pass_stage:4,           pass_tower:5
+		pass_world_boss:6,  basic_summon:7, pro_summon:8,       get_factory_resource:9, send_friend_gift:10,    check_in_family:11
+	"""
+	statement = \
+	"""
+	CREATE TABLE `task` (
+	  `unique_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一标识',
+	  `task_id` smallint(6) NOT NULL COMMENT '表示任务的数字编号',
+	  `task_value` smallint(6) DEFAULT 0 COMMENT '表示任务是否完成0:false,1:true',
+	  `task_reward` smallint(6) DEFAULT 0 COMMENT '表示奖励是否已经领取',
+	  `timer` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '完成时间',
+	  PRIMARY KEY (`unique_id`,`task_id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+	cursor.execute(statement)
+def create_achievement(cursor):
+	statement = \
+	"""
+	CREATE TABLE `achievement` (
+	  `unique_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new_id',
+	  `achievement_id` smallint(6) DEFAULT 0 COMMENT '表示成就的数字编号',
+	  `achievement_value` smallint(6) DEFAULT 0 COMMENT '表示成就的次数',
+	  `achievement_value_reward` smallint(6) DEFAULT 0 COMMENT '表示成就领取奖励的次数',
+	  PRIMARY KEY (`unique_id`,`achievement_id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+	cursor.execute(statement)
+def create_check_in(cursor):
+	statement = \
+	"""
+	CREATE TABLE `check_in` (
+	  `unique_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一标识',
+	  `date` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到日期',
+	  `reward` smallint(6) DEFAULT 0 COMMENT '0：未领奖，1：已领奖',
+	  PRIMARY KEY (`unique_id`, `date`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+	cursor.execute(statement)
 def create_triggers_player(cursor):
 	trigger1 = \
 	"""
@@ -330,6 +424,7 @@ def create_world(world):
 	cursor = c.cursor()
 	create_table_armor(cursor)
 	create_table_dark_market(cursor)
+	create_table_union_store(cursor)
 	create_table_factory(cursor)
 	create_table_families(cursor)
 	create_table_friend(cursor)
@@ -338,6 +433,8 @@ def create_world(world):
 	create_table_role(cursor)
 	create_table_skill(cursor)
 	create_table_weapon(cursor)
+	creat_table_task(cursor)
+	create_achievement(cursor)
 	create_triggers_player(cursor)
 
 def create_mailbox(world):
@@ -359,10 +456,14 @@ def already_exists(world):
 	return True
 
 def operating_test():
-	c = pymysql.connect(host='127.0.0.1', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
+	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
 	c.select_db("aliya")
 	cursor = c.cursor()
-	create_table_player(cursor)
+	# creat_table_task(cursor)
+	# create_achievement(cursor)
+	# create_table_union_store(cursor)
+	create_check_in(cursor)
+	# create_table_player(cursor)
 	# create_table_families(cursor)
 
 

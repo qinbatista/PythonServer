@@ -66,8 +66,7 @@ async def _send_mail_gift(uid, **kwargs):
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_friend_request(uid, **kwargs):
-	print(f'MAIL: this is kwargs: {kwargs}')
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['data']['sender'], 'body' : kwargs.get('body', 'Friend request'), 'subj' : kwargs.get('subj', 'You Have A Friend Request!'), 'type' : enums.MailType.FRIEND_REQUEST.value, 'uid_sender' : kwargs['data']['uid_sender']}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), 'body' : kwargs.get('body', 'Friend request'), 'subj' : kwargs.get('subj', 'You Have A Friend Request!'), 'type' : enums.MailType.FRIEND_REQUEST.value, 'uid_sender' : kwargs['uid_sender']}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_family_request(uid, **kwargs):

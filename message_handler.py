@@ -195,7 +195,7 @@ class MessageHandler:
 		return await friend.request(data['data']['unique_id'], data['data']['gn_target'], **data)
 
 	async def _respond_friend(self, data: dict) -> str:
-		return await friend.respond(data['data']['unique_id'], data['data']['nonce'], **data)
+		return await friend.respond(data['data']['unique_id'], data['data']['key'], **data)
 
 	async def _send_gift_friend(self, data: dict) -> str:
 		return await friend.send_gift(data['data']['unique_id'], data['data']['gn_target'], **data)
