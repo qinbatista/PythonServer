@@ -30,6 +30,7 @@ import json
 import random
 import aiomysql
 import requests
+import calendar
 from aiohttp import web
 from datetime import datetime, timedelta
 from utility import repeating_timer
@@ -4225,7 +4226,6 @@ class GameManager:
 #							Start Check_in Functions						#
 #############################################################################
 
-	# TODO
 	async def check_in(self, world: int, unique_id: str) -> dict:
 		"""每日签到"""
 		# 0 - Sign-in success
@@ -4292,11 +4292,31 @@ class GameManager:
 		return self._message_typesetting(0, 'Sign-in success')
 
 
-
-	# TODO
 	async def supplement_check_in(self, world: int, unique_id: str) -> dict:
 		"""补签"""
-		pass
+		# 0 - Successful signing
+		# 99 - Insufficient diamond
+		month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取每月需要补签的日期前缀
+		data = await self._execute_statement(world, f'select date from check_in where unique_id="{unique_id}" and date like "{month_pre}%"')
+		day_list = [int(d[0][-2:]) for d in data]
+		today = datetime.today()
+		# max_day = calendar.monthrange(today.year, today.month)[1]  # 获取本月的总天数
+
+		missing_num = today.day - len(day_list)
+		need_diamond = -1 * missing_num * self._check_in['patch_diamond']
+		diamond_data = await self.try_diamond(world, unique_id, need_diamond)
+		if diamond_data['status'] != 0:
+			return self._message_typesetting(99, 'Insufficient diamond')
+
+		remaining = {'diamond': diamond_data['remaining'], 'missing_date': []}
+		for d in range(1, today.day + 1):
+			if d not in day_list:
+				check_date = f'{month_pre}{d}'
+				if d < 10: check_date = f'{month_pre}0{d}'
+				remaining['missing_date'].append(check_date)
+				await self._execute_statement_update(world, f'insert into check_in(unique_id, date) values("{unique_id}", "{check_date}")')
+
+		return self._message_typesetting(0, 'Successful signing', data={'remaining': remaining})
 
 
 	# TODO
