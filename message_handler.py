@@ -489,6 +489,9 @@ class MessageHandler:
 
 	async def _get_task_pack_diamond(self, data: dict) -> str:
 		return json.dumps(await self.gm.get_task_pack_diamond(data['world'], data['data']['unique_id']))
+
+	async def _check_in(self, data: dict) -> str:
+		return json.dumps(await self.gm.check_in(data['world'], data['data']['unique_id']))
 ###############################################################################
 
 
@@ -664,6 +667,9 @@ FUNCTION_LIST = {
 
 	'get_all_task': MessageHandler._get_all_task,
 	'get_daily_task_reward': MessageHandler._get_daily_task_reward,
+	'get_task_pack_diamond': MessageHandler._get_task_pack_diamond,
+
+	'check_in': MessageHandler._check_in,
 	'get_task_pack_diamond': MessageHandler._get_task_pack_diamond,
 }
 

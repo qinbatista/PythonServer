@@ -457,8 +457,8 @@ def new_server_test(world):
 	token = response['data']['token']
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
 	# print(response)
-	response = send_tcp_message({'world' : world, 'function' : 'get_task_pack_diamond', 'data' : {'token': token}})
-	print(response)
+	# response = send_tcp_message({'world' : world, 'function' : 'get_task_pack_diamond', 'data' : {'token': token}})
+	# print(response)
 
 	# # 测试level_up_role_task
 	# response = send_tcp_message({'world' : world, 'function' : 'upgrade_role_level', 'data' : {'token': token, 'role': 'role1', 'experience_potion': 100}})
@@ -503,6 +503,10 @@ def new_server_test(world):
 	# # 测试get_all_task
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
 	# print(response)
+	#
+	# # 测试 check_in
+	response = send_tcp_message({'world' : world, 'function' : 'check_in', 'data' : {'token': token}})
+	print(response)
 
 	# 测试get_daily_task_reward
 	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'level_up_role'}})
