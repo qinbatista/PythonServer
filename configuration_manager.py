@@ -39,6 +39,7 @@ PLAYER_EXPERIENCE = loc() + '/configuration/{}/server/player_experience.json'
 ACHIEVEMENT= loc() + '/configuration/{}/server/achievement_config.json'
 TASK = loc() + '/configuration/{}/server/task.json'
 CHECK_IN = loc() + '/configuration/{}/server/check_in.json'
+VIP_CONFIG = loc() + '/configuration/{}/server/vip_config.json'
 
 
 class ConfigurationManager:
@@ -66,6 +67,7 @@ class ConfigurationManager:
 		self._read_acheviement_config()
 		self._read_task_config()
 		self._read_check_in_config()
+		self._read_vip_config_config()
 
 		# read this one last
 		self._read_game_manager_config()
@@ -143,7 +145,8 @@ class ConfigurationManager:
 			'player_experience': self._player_experience, 'monster_config': self._monster_config,
 			'level_enemy_layouts': self._level_enemy_layouts_config,
 			'acheviement': self._acheviement_config, 'task': self._task_config,
-			'check_in': self._check_in_config
+			'check_in': self._check_in_config,
+			'vip_config': self._vip_config
 		}
 
 	def _read_level_enemy_layouts_config(self):
@@ -169,6 +172,9 @@ class ConfigurationManager:
 
 	def _read_check_in_config(self):
 		self._check_in_config = json.load(open(CHECK_IN.format(self._sv), encoding = 'utf-8'))
+
+	def _read_vip_config_config(self):
+		self._vip_config = json.load(open(CHECK_IN.format(self._sv), encoding = 'utf-8'))
 
 	def _read_world_distribution_config(self):
 		d = json.load(open(SERVER_CONFIG.format(self._cv), encoding = 'utf-8'))
