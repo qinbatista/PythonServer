@@ -22,7 +22,7 @@ MESSAGE_LIST = [
 		#{'function': 'level_up_passive_weapon', 'data':{'unique_id' : '1', 'weapon' : '1', 'passive' : '2'}}
 		#{'function': 'level_up_star_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}}
 		#{'function': 'reset_skill_point_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}},
-		{'function': 'get_all_weapon', 'data':{'unique_id' : '1'}}
+		{'function': 'get_all_weapon', 'data':{}}
 		#{'function': 'send_gift_friend', 'data':{'unique_id' : '1', 'gn_target' : 'バカ'}},
 		#{'function': 'get_new_mail', 'data':{'unique_id' : '4'}}
 				]
@@ -31,12 +31,21 @@ MESSAGE_LIST = [
 def send_single_message(message_id: int):
 	client = LukseunClient(client_type)
 	start = time.time()
-	newstring  =  str(MESSAGE_LIST[message_id]).replace("'","\"")
+	m = MESSAGE_LIST[message_id]
+	m['data']['token'] = token
+	newstring  =  str(m).replace("'","\"")
 	print('sending message...')
 	asyncio.run(client.send_message(newstring))
 	print(f"Message #{message_id} took {COLORS['pass']} {time.time() - start} {COLORS['end']} seconds to complete.")
 	return client.response
 
+def get_token():
+	m = {'function': 'login_unique', 'data':{'unique_id' : '1'}}
+	client = LukseunClient(client_type)
+	newstring  =  str(m).replace("'","\"")
+	asyncio.run(client.send_message(newstring))
+	global token
+	token = client.response['data']['token']
 
 def test_error():
 	while True:
@@ -46,6 +55,7 @@ def test_error():
 
 
 def main() -> None:
+	get_token()
 
 	for i in range(len(MESSAGE_LIST)):
 		send_single_message(i)

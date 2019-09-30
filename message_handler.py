@@ -36,6 +36,13 @@ class MessageHandler:
 			fn = self._functions[message['function']]
 		except KeyError:
 			return '{"status" : 10, "message" : "function is not in function list"}'
+		if message['function'] not in DOES_NOT_NEED_TOKEN:
+			try:
+				validated, uid = await self.validate_token(message, resource['session'])
+				if not validated: return '{"status" : 11, "message" : "invalid token"}'
+				message['data']['unique_id'] = uid
+			except KeyError:
+				return '{"status" : 12, "message" : "token not present"}'
 		message['session'] = resource['session']
 		message['redis'] = resource['redis']
 		message['worlddb'] = resource['db']
@@ -44,6 +51,11 @@ class MessageHandler:
 		message['mailserverbaseurl'] = MAIL_BASE_URL
 		message['world'] = '0'
 		return json.dumps(await fn(self, message))
+
+	async def validate_token(self, msg, session):
+		async with session.post(TOKEN_BASE_URL + '/validate', data = {'token' : msg['data']['token']}) as r:
+			validated = await r.json(content_type = 'text/json')
+			return (False, None) if validated['status'] != 0 else (True, validated['data']['unique_id'])
 
 
 	###################### account.py ######################
@@ -213,6 +225,8 @@ class MessageHandler:
 		return await common.exists('player', ('uid', '1'), ('gn', 'cuck'), **data)
 ##########################################################################################################
 ##########################################################################################################
+
+DOES_NOT_NEED_TOKEN = {'login_unique', 'login'}
 
 FUNCTION_LIST = {
 	'test' : MessageHandler.test,
