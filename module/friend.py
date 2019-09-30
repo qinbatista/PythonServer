@@ -1,5 +1,7 @@
 '''
 friend.py
+
+CHECKED RETURN TYPES WITH LIANG
 '''
 
 import asyncio
@@ -36,6 +38,7 @@ async def respond(uid, nonce, **kwargs):
 	await _add_friend(uid, uid_sender, **kwargs)
 	info = await _get_friend_info(uid_sender, **kwargs)
 	await mail.delete_mail(uid, nonce, **kwargs)
+	# {'gn' : new friend, 'exp' : new friend, 'icon' : 0 new friend, 'recover' : NF, 'since' : since new friend}
 	return common.mt(0, 'success', {'gn' : info[0], 'exp' : info[1]})
 
 async def send_gift(uid, gn_target, **kwargs):
@@ -48,6 +51,7 @@ async def send_gift(uid, gn_target, **kwargs):
 	sent = await mail.send_mail(enums.MailType.GIFT, fid, **kwargs)
 	if not sent: return common.mt(97, 'mailbox error')
 	await common.execute(f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
+	# {'gn' : gn, 'recover' : rt}
 	return common.mt(0, 'success')
 
 async def send_gift_all(uid, **kwargs):
@@ -64,7 +68,7 @@ def _can_send_gift(now, recover):
 
 async def _add_friend(uid, fid, **kwargs):
 	now = datetime.now(timezone.utc).strftime('%Y-%m-%d')
-	await asyncio.gather(common.execute(f'INSERT INTO friend(uid, fid, since) VALUES ("{uid}", "{fid}", "{today}") ON DUPLICATE KEY UPDATE since = "{today}";'), common.execute(f'INSERT INTO friend(uid, fid, since) VALUES ("{fid}", "{uid}", "{today}") ON DUPLICATE KEY UPDATE since = "{today}";'))
+	await asyncio.gather(common.execute(f'INSERT INTO friend(uid, fid, since) VALUES ("{uid}", "{fid}", "{now}") ON DUPLICATE KEY UPDATE since = "{now}";', **kwargs), common.execute(f'INSERT INTO friend(uid, fid, since) VALUES ("{fid}", "{uid}", "{now}") ON DUPLICATE KEY UPDATE since = "{now}";', **kwargs))
 
 async def _are_friends(uid, fid, **kwargs):
 	data = await common.execute(f'SELECT recover, since FROM friend WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
@@ -77,7 +81,7 @@ async def _get_friend_info(uid, **kwargs):
 async def _lookup_nonce(nonce, **kwargs):
 	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce_new', json = {'nonce' : [nonce]}) as resp:
 		data = await resp.json(content_type = 'text/json')
-		return None if data['status'] != 0 else data['nonce']['uid_sender']
+		return None if data[nonce]['status'] != 0 else data[nonce]['uid_sender']
 
 
 
