@@ -509,12 +509,12 @@ def new_server_test(world):
 	# print(response)
 	#
 	# # 测试 supplement_check_in
-	# response = send_tcp_message({'world' : world, 'function' : 'supplement_check_in', 'data' : {'token': token}})
-	# print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'supplement_check_in', 'data' : {'token': token}})
+	print(response)
 	#
 	# # 测试 get_all_check_in_table
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
-	print(response)
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
+	# print(response)
 
 	# 测试get_daily_task_reward
 	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'level_up_role'}})

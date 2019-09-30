@@ -4235,61 +4235,11 @@ class GameManager:
 		s_data = await self._execute_statement(world, check_select_str)
 		if s_data != ():
 			return self._message_typesetting(99, 'You have already signed in today')
-		# 领奖的操作
-		# key_words = ['role', 'weapon']
-		# day = int(current_time.split('-')[2])
-		# vip_level = await self._get_material(world, unique_id, 'vip_level')
-		# item_index = day % 7
-		# check_remaining = {}
-		# check_reward = {}
-		# if item_index < vip_level:
-		# 	for key, value in self._check_in[str(item_index + 1)].items():
-		# 		if key in key_words:
-		# 			for k, v in value.items():
-		# 				quantity = 2 * v
-		# 				select_str = f'select segment from {key} where unique_id="{unique_id}" and {key}_name="{k}"'
-		# 				update_str = f'update {key} set segment=segment+{quantity} where unique_id="{unique_id}" and {key}_name="{k}"'
-		# 				insert_str = f'insert into {key}(unique_id, {key}_name, segment) values("{unique_id}", "{k}", {quantity})'
-		# 				k_data = await self._execute_statement(world, select_str)
-		# 				if k_data == ():
-		# 					await self._execute_statement_update(world, insert_str)
-		# 					check_reward.update({key: {k: quantity}})
-		# 					check_remaining.update({key: {k: quantity}})
-		# 				else:
-		# 					await self._execute_statement_update(world, update_str)
-		# 					check_reward.update({key: {k: quantity}})
-		# 					check_remaining.update({key: {k: k_data[0][0] + quantity}})
-		# 		else:
-		# 			quantity = 2 * value
-		# 			key_data = await self._try_material(world, unique_id, key, quantity)
-		# 			check_reward.update({key: quantity})
-		# 			check_remaining.update({key: key_data['remaining']})
-		# else:
-		# 	for key, value in self._check_in[str(item_index + 1)].items():
-		# 		if key in key_words:
-		# 			for k, v in value.items():
-		# 				quantity = v
-		# 				select_str = f'select segment from {key} where unique_id="{unique_id}" and {key}_name="{k}"'
-		# 				update_str = f'update {key} set segment=segment+{quantity} where unique_id="{unique_id}" and {key}_name="{k}"'
-		# 				insert_str = f'insert into {key}(unique_id, {key}_name, segment) values("{unique_id}", "{k}", {quantity})'
-		# 				k_data = await self._execute_statement(world, select_str)
-		# 				if k_data == ():
-		# 					await self._execute_statement_update(world, insert_str)
-		# 					check_reward.update({key: {k: quantity}})
-		# 					check_remaining.update({key: {k: quantity}})
-		# 				else:
-		# 					await self._execute_statement_update(world, update_str)
-		# 					check_reward.update({key: {k: quantity}})
-		# 					check_remaining.update({key: {k: k_data[0][0] + quantity}})
-		# 		else:
-		# 			quantity = value
-		# 			key_data = await self._try_material(world, unique_id, key, quantity)
-		# 			check_reward.update({key: quantity})
-		# 			check_remaining.update({key: key_data['remaining']})
 		# 更新签到表
 		check_insert_str = f'insert into check_in(unique_id, date) values("{unique_id}", "{current_time}")'
 		await self._execute_statement_update(world, check_insert_str)
-		return self._message_typesetting(0, 'Sign-in success')
+		data = await self.receive_all_check_reward(world, unique_id)
+		return self._message_typesetting(0, 'Sign-in success', data=data['data'])
 
 
 	async def supplement_check_in(self, world: int, unique_id: str) -> dict:
@@ -4319,6 +4269,8 @@ class GameManager:
 				remaining['missing_date'].append(check_date)
 				await self._execute_statement_update(world, f'insert into check_in(unique_id, date) values("{unique_id}", "{check_date}")')
 
+		data = await self.receive_all_check_reward(world, unique_id)
+		remaining.update({'check_in_data': data['data']})
 		return self._message_typesetting(0, 'Successful signing', data={'remaining': remaining})
 
 
@@ -4335,6 +4287,83 @@ class GameManager:
 		return self._message_typesetting(0, 'Successfully obtained all check-in status this month', data={'remaining': remaining})
 
 
+	async def receive_all_check_reward(self, world: int, unique_id: str) -> dict:
+		"""领取本月所有签到奖励"""
+		# 0 - Successfully received the reward
+		month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取本月的日期前缀
+		data = await self._execute_statement(world, f'select * from check_in where unique_id="{unique_id}" and date like "{month_pre}%" and reward=0')
+		key_words = ['role', 'weapon']
+		vip_level = await self._get_material(world, unique_id, 'vip_level')
+		remaining = {}
+		reward = {}
+		for d in data:
+			# 领奖的操作
+			day = int(d[1][-2:])
+			item_index = day % 7
+			if item_index < vip_level:
+				for key, value in self._check_in[str(item_index + 1)].items():
+					if key in key_words:
+						k = value['type']
+						quantity = 2 * value['quantity']
+						select_str = f'select segment from {key} where unique_id="{unique_id}" and {key}_name="{k}"'
+						update_str = f'update {key} set segment=segment+{quantity} where unique_id="{unique_id}" and {key}_name="{k}"'
+						insert_str = f'insert into {key}(unique_id, {key}_name, segment) values("{unique_id}", "{k}", {quantity})'
+						k_data = await self._execute_statement(world, select_str)
+						if k_data == ():
+							await self._execute_statement_update(world, insert_str)
+							remaining.update({key: {k: quantity}})
+						else:
+							await self._execute_statement_update(world, update_str)
+							remaining.update({key: {k: k_data[0][0] + quantity}})
+						if key in reward.keys():
+							if k in reward[key].keys():
+								reward[key][k] += quantity
+							else:
+								reward[key].update({k: quantity})
+						else:
+							reward.update({key: {k: quantity}})
+					else:
+						quantity = 2 * value
+						key_data = await self._try_material(world, unique_id, key, quantity)
+						remaining.update({key: key_data['remaining']})
+						if key in reward.keys():
+							reward[key] += quantity
+						else:
+							reward.update({key: quantity})
+			else:
+				for key, value in self._check_in[str(item_index + 1)].items():
+					if key in key_words:
+						k = value['type']
+						quantity = value['quantity']
+						select_str = f'select segment from {key} where unique_id="{unique_id}" and {key}_name="{k}"'
+						update_str = f'update {key} set segment=segment+{quantity} where unique_id="{unique_id}" and {key}_name="{k}"'
+						insert_str = f'insert into {key}(unique_id, {key}_name, segment) values("{unique_id}", "{k}", {quantity})'
+						k_data = await self._execute_statement(world, select_str)
+						if k_data == ():
+							await self._execute_statement_update(world, insert_str)
+							remaining.update({key: {k: quantity}})
+						else:
+							await self._execute_statement_update(world, update_str)
+							remaining.update({key: {k: k_data[0][0] + quantity}})
+						if key in reward.keys():
+							if k in reward[key].keys():
+								reward[key][k] += quantity
+							else:
+								reward[key].update({k: quantity})
+						else:
+							reward.update({key: {k: quantity}})
+					else:
+						quantity = value
+						key_data = await self._try_material(world, unique_id, key, quantity)
+						remaining.update({key: key_data['remaining']})
+						if key in reward.keys():
+							reward[key] += quantity
+						else:
+							reward.update({key: quantity})
+			# 领完奖励后，将签到表中的reward置为1
+			await self._execute_statement_update(world, f'update check_in set reward=1 where unique_id="{unique_id}" and date="{d[1]}"')
+
+		return self._message_typesetting(0, 'Successfully received the reward', data={'remaining': remaining, 'reward': reward})
 #############################################################################
 #							End Check_in Functions							#
 #############################################################################
