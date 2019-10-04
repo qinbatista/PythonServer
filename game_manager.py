@@ -4383,10 +4383,12 @@ class GameManager:
 		g_list = [exp for exp in experience_list if exp > data['remaining']]
 		return {} if data['status'] != 0 else {'vip_experience': data['remaining'], 'vip_level': experience_list.index(g_list[0]) if g_list != [] else len(experience_list)}
 
-	# TODO
-	async def purchase_vip_gift(self, world: int, unique_id: str, kind: str):
+
+	async def purchase_vip_gift(self, world: int, unique_id: str, kind: int):
 		"""购买VIP礼包"""
-		# 0 -
+		# 0 - purchase vip gift success
+		# 96 - Insufficient diamond
+		# 97 - Your VIP level is not enough to buy
 		# 98 - you not vip identity
 		# 99 - function increase_vip_exp error
 		vip_dict = await self.increase_vip_exp(world, unique_id, 0)
@@ -4396,16 +4398,24 @@ class GameManager:
 		vip_level = vip_dict['vip_level']
 		if vip_level == 0:
 			return self._message_typesetting(98, 'you not vip identity')
-		vip_package = self._vip_config['vip_speical_package'][str(vip_level)]
+
+		if kind <= 0 or kind > vip_level:
+			return self._message_typesetting(97, 'Your VIP level is not enough to buy')
+
+		vip_package = self._vip_config['vip_speical_package'][str(kind)]
 		reward = vip_package['reward']
 		need_diamond = -1 * vip_package['diamond']
 
-		# TODO
 		diamond_data = await self.try_diamond(world, unique_id, need_diamond)
 		if diamond_data['status'] != 0:
-			return self._message_typesetting(97, 'Insufficient diamond')
+			return self._message_typesetting(96, 'Insufficient diamond')
 
-		return self._message_typesetting(status=0, message="purchase_vip_gift", data= {})
+		remaining = {'diamond': diamond_data['remaining']}
+		for key, value in reward.items():
+			r_data = await self._try_material(world, unique_id, key, value)
+			if r_data['status'] == 0:
+				remaining.update({key: r_data['remaining']})
+		return self._message_typesetting(status=0, message="purchase vip gift success", data={'remaining': remaining, 'reward': reward})
 
 	# TODO
 	async def check_vip_daily_reward(self, world: int, unique_id: str):
