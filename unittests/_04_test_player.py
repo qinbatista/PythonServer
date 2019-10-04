@@ -521,7 +521,13 @@ def new_server_test(world):
 	# print(response)
 	#
 	# 测试 purchase_vip_gift
-	response = send_tcp_message({'world' : world, 'function' : 'purchase_vip_gift', 'data' : {'token': token, 'kind': 2}})
+	# response = send_tcp_message({'world' : world, 'function' : 'purchase_vip_gift', 'data' : {'token': token, 'kind': 2}})
+	# print(response)
+	#
+	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
+	# print(response)
+	# 测试 check_vip_daily_reward
+	response = send_tcp_message({'world' : world, 'function' : 'check_vip_daily_reward', 'data' : {'token': token}})
 	print(response)
 
 	# 测试get_daily_task_reward
@@ -554,7 +560,7 @@ def new_server_test(world):
 	# response = send_tcp_message({'world' : 0, 'function' : 'respond_family', 'data' : {'token': token, 'nonce': nonce}})
 	# print(response)
 
-	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': nonce}})
+	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': '23406974281973059804531233519244142730168423188319936271156207351662179009634'}})
 	# print(response)
 	# input('继续... ...')
 

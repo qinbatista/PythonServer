@@ -4383,7 +4383,6 @@ class GameManager:
 		g_list = [exp for exp in experience_list if exp > data['remaining']]
 		return {} if data['status'] != 0 else {'vip_experience': data['remaining'], 'vip_level': experience_list.index(g_list[0]) if g_list != [] else len(experience_list)}
 
-
 	async def purchase_vip_gift(self, world: int, unique_id: str, kind: int):
 		"""购买VIP礼包"""
 		# 0 - purchase vip gift success
@@ -4417,9 +4416,61 @@ class GameManager:
 				remaining.update({key: r_data['remaining']})
 		return self._message_typesetting(status=0, message="purchase vip gift success", data={'remaining': remaining, 'reward': reward})
 
-	# TODO
 	async def check_vip_daily_reward(self, world: int, unique_id: str):
-		return self._message_typesetting(status=0, message="check_vip_daily_reward",data= "")
+		"""发送vip每日礼包: check_vip_daily_reward() 时间差发送，已邮件形式"""
+		# 0 - Successfully received, please check the system mail
+		# 95 - Today's vip package has been received
+		# 96 - vip_dialy_reward does not exist gift
+		# 97 - Mailbox error
+		# 98 - you not vip identity
+		# 99 - function increase_vip_exp error
+		vip_dict = await self.increase_vip_exp(world, unique_id, 0)
+		if vip_dict == {}:
+			return self._message_typesetting(99, 'function increase_vip_exp error')
+
+		vip_level = vip_dict['vip_level']
+		if vip_level == 0:
+			return self._message_typesetting(98, 'you not vip identity')
+
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		daily_reward_time = await self._get_material(world, unique_id, 'daily_reward_time')
+		cooling_time = self._vip_config['vip_dialy_reward']['cooling_time']
+		if daily_reward_time != '' and (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(daily_reward_time, '%Y-%m-%d %H:%M:%S')).total_seconds() < cooling_time:
+			return self._message_typesetting(95, "Today's vip package has been received")  # 你今天的礼物已经领取过
+
+		reward = self._vip_config['vip_dialy_reward'][str(vip_level)]
+		json_data = {
+			'world': world,
+			'uid_to': unique_id,
+			'kwargs': {
+				'from': 'server',
+				'body': 'Your gift is waiting.',
+				'subject': 'You have a gift!',
+				'type': 'gift',
+				'items': '',
+				'quantities': ''
+			}
+		}
+
+		items = ''
+		quantities = ''
+		for key, value in reward.items():
+			items += f'{key},'
+			quantities += f'{value},'
+		if items != '':
+			items = items[:-1]
+			quantities = quantities[:-1]
+			json_data['kwargs']['items'] = items
+			json_data['kwargs']['quantities'] = quantities
+
+			result = requests.post(MAIL_URL + '/send_mail', json=json_data).json()
+			if result["status"] != 0:
+				return self._message_typesetting(status=97, message='Mailbox error')
+		else:
+			return self._message_typesetting(status=96, message='vip_dialy_reward does not exist gift')  # 不存在VIP礼包数据
+
+		await self._execute_statement_update(world, f'update player set daily_reward_time="{current_time}" where unique_id="{unique_id}"')
+		return self._message_typesetting(status=0, message="Successfully received, please check the system mail")
 
 	# TODO
 	async def get_all_vip_info(self, world: int, unique_id: str):

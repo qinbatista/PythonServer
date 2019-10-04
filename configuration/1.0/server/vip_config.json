@@ -21,6 +21,7 @@
 	},
 	"vip_dialy_reward":
 	{
+		"cooling_time": 86400,
 		"1":
 		{
 			"diamond_card":10,
