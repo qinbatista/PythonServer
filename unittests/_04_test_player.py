@@ -517,7 +517,7 @@ def new_server_test(world):
 	# print(response)
 	#
 	# 测试 get_all_check_in_table
-	# response = send_tcp_message({'world' : world, 'function' : 'increase_vip_exp', 'data' : {'token': token, 'quantity': 0}})
+	# response = send_tcp_message({'world' : world, 'function' : 'increase_vip_exp', 'data' : {'token': token, 'quantity': 60}})
 	# print(response)
 	#
 	# 测试 purchase_vip_gift
@@ -527,7 +527,10 @@ def new_server_test(world):
 	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
 	# print(response)
 	# 测试 check_vip_daily_reward
-	response = send_tcp_message({'world' : world, 'function' : 'check_vip_daily_reward', 'data' : {'token': token}})
+	# response = send_tcp_message({'world' : world, 'function' : 'check_vip_daily_reward', 'data' : {'token': token}})
+	# print(response)
+	# 测试 get_all_vip_info
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_vip_info', 'data' : {'token': token}})
 	print(response)
 
 	# 测试get_daily_task_reward

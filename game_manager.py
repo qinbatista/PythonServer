@@ -4381,7 +4381,7 @@ class GameManager:
 		data = await self._try_material(world, unique_id, 'vip_experience', quantity)
 		experience_list = self._vip_config['vip_level']['experience']
 		g_list = [exp for exp in experience_list if exp > data['remaining']]
-		return {} if data['status'] != 0 else {'vip_experience': data['remaining'], 'vip_level': experience_list.index(g_list[0]) if g_list != [] else len(experience_list)}
+		return {} if data['status'] != 0 else {'vip_experience': data['remaining'], 'vip_level': experience_list.index(g_list[0]) if g_list != [] else len(experience_list), 'upgrade_experience': g_list[0] - data['remaining'] if g_list != [] else 0}
 
 	async def purchase_vip_gift(self, world: int, unique_id: str, kind: int):
 		"""购买VIP礼包"""
@@ -4472,9 +4472,20 @@ class GameManager:
 		await self._execute_statement_update(world, f'update player set daily_reward_time="{current_time}" where unique_id="{unique_id}"')
 		return self._message_typesetting(status=0, message="Successfully received, please check the system mail")
 
-	# TODO
 	async def get_all_vip_info(self, world: int, unique_id: str):
-		return self._message_typesetting(status=0, message="get_all_vip_info",data= "")
+		"""获取vip所有信息： get_all_vip_info()， 返回vip等级，当前经验，升级经验，所有可以领取礼包的信息，所有可以购买礼包的信息"""
+		# 0 - Successfully obtained all information about VIP
+		# 99 - function increase_vip_exp error
+		remaining = await self.increase_vip_exp(world, unique_id, 0)
+		if remaining == {}:
+			return self._message_typesetting(99, 'function increase_vip_exp error')
+
+		vip_level = remaining['vip_level']
+		remaining.update({'gifts': {}})
+		for key, value in self._vip_config['vip_speical_package'].items():
+			if key.isdigit() and int(key) <= vip_level:
+				remaining['gifts'].update({key: value})
+		return self._message_typesetting(status=0, message="Successfully obtained all information about VIP", data={'remaining': remaining})
 
 	# TODO
 	async def purchase_vip_card(self, world: int, unique_id: str, type: str):
