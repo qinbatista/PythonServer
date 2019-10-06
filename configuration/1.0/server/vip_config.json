@@ -310,6 +310,11 @@
 	"diamond_card_base_amount":10,
 	"base_month_vip_car_exp":10,
 	"pro_month_vip_car_exp":15,
-	"permanent_month_vip_car_exp":20
+	"permanent_month_vip_car_exp":20,
+	"card_type": {
+		"base": 0,
+		"pro": 1,
+		"permanent": 2
+	}
 }
 

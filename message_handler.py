@@ -513,7 +513,7 @@ class MessageHandler:
 		return json.dumps(await self.gm.get_all_vip_info(data['world'], data['data']['unique_id']))
 
 	async def _purchase_vip_card(self, data: dict) -> str:
-		return json.dumps(await self.gm.purchase_vip_card(data['world'], data['data']['unique_id'], data['data']['type']))
+		return json.dumps(await self.gm.purchase_vip_card(data['world'], data['data']['unique_id'], data['data']['card_type']))
 
 
 ###############################################################################

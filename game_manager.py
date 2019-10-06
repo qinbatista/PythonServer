@@ -4488,7 +4488,7 @@ class GameManager:
 		return self._message_typesetting(status=0, message="Successfully obtained all information about VIP", data={'remaining': remaining})
 
 	# TODO
-	async def purchase_vip_card(self, world: int, unique_id: str, type: str):
+	async def purchase_vip_card(self, world: int, unique_id: str, card_type: str):
 		return self._message_typesetting(status=0, message="purchase_vip_card",data= "")
 
 #############################################################################
