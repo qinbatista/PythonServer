@@ -4487,11 +4487,34 @@ class GameManager:
 				remaining['gifts'].update({key: value})
 		return self._message_typesetting(status=0, message="Successfully obtained all information about VIP", data={'remaining': remaining})
 
-	# TODO
 	async def purchase_vip_card(self, world: int, unique_id: str, card_type: str):
-		return self._message_typesetting(status=0, message="purchase_vip_card",data= "")
+		"""购买月卡方法"""
+		# 0 - Successful purchase of monthly card
+		# 98 - Your monthly card has not expired
+		# 99 - The monthly card information you purchased is incorrect
+		card_cooling_time = self._vip_config['card_cooling_time']
+		if card_type not in card_cooling_time.keys():
+			return self._message_typesetting(99, 'The monthly card information you purchased is incorrect')
+		await self.check_vip_card_deadline(world, unique_id)
+		card_info = await self._execute_statement(world, f'select vip_card_type from player where unique_id="{unique_id}"')
+		if card_info[0][0] != '':
+			return self._message_typesetting(98, 'Your monthly card has not expired')
 
-#############################################################################
+		cooling_time = card_cooling_time[card_type]
+		vip_card_deadline = (datetime.today() + timedelta(seconds=cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
+		await self._execute_statement_update(world, f'update player set vip_card_type="{card_type}", vip_card_deadline="{vip_card_deadline}" where unique_id="{unique_id}"')
+
+		return self._message_typesetting(status=0, message="Successful purchase of monthly card", data={'remaining': {'card_type': card_type, 'vip_card_deadline': vip_card_deadline}})
+
+	async def check_vip_card_deadline(self, world: int, unique_id: str) -> None:
+		card_info = await self._execute_statement(world, f'select vip_card_type, vip_card_deadline from player where unique_id="{unique_id}"')
+		vip_card_type = card_info[0][0]
+		vip_card_deadline = card_info[0][1]
+		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		if vip_card_type != 'permanent' and vip_card_deadline != '' and int(vip_card_deadline.replace('-', '').replace(':', '').replace(' ', '')) <= int(current_time.replace('-', '').replace(':', '').replace(' ', '')):
+			await self._execute_statement_update(world, f'update player set vip_card_type="", vip_card_deadline="" where unique_id="{unique_id}"')
+
+	#############################################################################
 #							End VID Functions								#
 #############################################################################
 
@@ -6236,6 +6259,12 @@ async def _login_task(request: web.Request) -> web.Response:
 async def _get_all_task(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).get_all_task(int(post['world']), post['unique_id'])
+	return _json_response(result)
+
+@ROUTES.post('/purchase_vip_card')
+async def _get_all_task(request: web.Request) -> web.Response:
+	post = await request.post()
+	result = await (request.app['MANAGER']).purchase_vip_card(int(post['world']), post['unique_id'], post['card_type'])
 	return _json_response(result)
 
 

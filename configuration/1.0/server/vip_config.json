@@ -311,10 +311,10 @@
 	"base_month_vip_car_exp":10,
 	"pro_month_vip_car_exp":15,
 	"permanent_month_vip_car_exp":20,
-	"card_type": {
-		"base": 0,
-		"pro": 1,
-		"permanent": 2
+	"card_cooling_time": {
+		"base": 2592000,
+		"pro": 7776000,
+		"permanent": 3153600000
 	}
 }
 

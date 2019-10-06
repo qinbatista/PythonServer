@@ -270,8 +270,10 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8004/get_all_task', data={"world": 0, "unique_id": "3"})
+	result = requests.post('http://localhost:8004/purchase_vip_card', data={"world": 0, "unique_id": "3", "card_type": "base"})
 	print(str(result.text))
+	# result = requests.post('http://localhost:8004/get_all_task', data={"world": 0, "unique_id": "3"})
+	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/login_task', data={"world": 0, "unique_id": "3"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/family_change_name', data={"world": 0, "unique_id": "3", "family_name": "bs"})
@@ -633,7 +635,7 @@ if __name__ == "__main__":
 	# end   ########################################################
 	# enter_stage(stage=1)
 	# enter_tower(stage=1)
-	# all_function(unique_id="4")
+	all_function(unique_id="4")
 
 	# check_boss_status(unique_id="4")
 	# check_boss_status(unique_id="4")
@@ -644,4 +646,4 @@ if __name__ == "__main__":
 	# get_top_damage(4,4)
 	# active_wishing_pool(4,"weapon1")
 
-	new_server_test(0)
+	# new_server_test(0)
