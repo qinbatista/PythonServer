@@ -4065,8 +4065,31 @@ class GameManager:
 		"""每日签到"""
 		# 0 - Not the first time
 		# 1 - the first time
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
+		check_in_info = await self._execute_statement(world, f'select task_value from task where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
+		if check_in_info[0][0] == 0:
+			vip_experience = self._vip_config['card_increase_experience']
+			await self.check_vip_card_deadline(world, unique_id)
+			card_info = await self._execute_statement(world, f'select vip_card_type from player where unique_id="{unique_id}"')
+			vip_card_type = card_info[0][0]
+			if vip_card_type != '':
+				json_data = {
+					'world' : world,
+					'uid_to': unique_id,
+					'kwargs': {
+						'from' : 'server',
+						'body' : 'Your gift is waiting.',
+						'subject' : 'You have a gift!',
+						'type' : 'gift',
+						'items' : 'vip_experience',
+						'quantities' : str(vip_experience[vip_card_type])
+					}
+				}
+				result = requests.post(MAIL_URL + '/send_mail', json = json_data).json()
+				# await self._execute_statement_update(world, f'update player set vip_experience=vip_experience+{vip_experience[vip_card_type]} where unique_id="{unique_id}"')
+			current_time = time.strftime('%Y-%m-%d', time.localtime())
+			return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
+		else:
+			return 0
 
 
 	async def level_up_role_task(self, world: int, unique_id: str) -> int:
