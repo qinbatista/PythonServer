@@ -319,6 +319,50 @@ class MessageHandler:
 	async def _weapon_config(self, data: dict) -> str:
 		return ''
 
+	###################### role.py ######################
+	# TODO
+	async def _upgrade_role_star(self, data: dict) -> str:
+		return ''
+
+	async def _upgrade_role_level(self, data: dict) -> str:
+		return ''
+
+	async def _get_all_roles(self, data: dict) -> str:
+		return ''
+
+	async def _role_config(self, data: dict) -> str:
+		return ''
+
+	###################### 签到系统 ######################
+	# TODO
+	async def _check_in(self, data: dict) -> str:
+		return ''
+
+	async def _supplement_check_in(self, data: dict) -> str:
+		return ''
+
+	async def _get_all_check_in_table(self, data: dict) -> str:
+		return ''
+
+	###################### VIP ######################
+	# TODO
+	async def _purchase_vip_gift(self, data: dict) -> str:
+		return ''
+
+	async def _check_vip_daily_reward(self, data: dict) -> str:
+		return ''
+
+	async def _purchase_vip_card(self, data: dict) -> str:
+		return ''
+
+	async def _get_all_vip_info(self, data: dict) -> str:
+		return ''
+
+	###################### player ######################
+	# TODO
+	async def _exchange_card(self, data: dict) -> str:
+		return ''
+
 
 
 
@@ -448,5 +492,29 @@ FUNCTION_LIST = {
 	'reset_skill_point_weapon' : MessageHandler._reset_skill_point_weapon,
 	'get_all_weapon' : MessageHandler._get_all_weapon,
 	'weapon_config' : MessageHandler._weapon_config,
+
+	# TODO
+	###################### role.py ######################
+	'upgrade_role_star' : MessageHandler._upgrade_role_star,
+	'upgrade_role_level' : MessageHandler._upgrade_role_level,
+	'get_all_roles' : MessageHandler._get_all_roles,
+	'role_config' : MessageHandler._role_config,
+
+	# TODO
+	###################### 签到系统 ######################
+	'check_in' : MessageHandler._check_in,
+	'supplement_check_in' : MessageHandler._supplement_check_in,
+	'get_all_check_in_table' : MessageHandler._get_all_check_in_table,
+
+	# TODO
+	###################### VIP ######################
+	'purchase_vip_gift' : MessageHandler._purchase_vip_gift,
+	'check_vip_daily_reward' : MessageHandler._check_vip_daily_reward,
+	'purchase_vip_card' : MessageHandler._purchase_vip_card,
+	'get_all_vip_info': MessageHandler._get_all_vip_info,
+
+	# TODO
+	###################### player ######################
+	'exchange_card': MessageHandler._exchange_card,
 }
 
