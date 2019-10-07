@@ -16,8 +16,8 @@ from module import summoning
 CFG = config_reader.wait_config()
 
 TOKEN_BASE_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
-#MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
-MAIL_BASE_URL = 'http://127.0.0.1:8020'
+MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
+#MAIL_BASE_URL = 'http://127.0.0.1:8020'
 
 class MessageHandler:
 	def __init__(self):
