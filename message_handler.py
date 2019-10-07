@@ -95,7 +95,7 @@ class MessageHandler:
 
 	###################### mail.py ######################
 	async def _send_mail(self, data: dict) -> str:
-		return await mail.send_mail(enums.MailType.SIMPLE, data['data']['unique_id'], **data)
+		return await mail.send_mail(enums.MailType.SIMPLE, await family._get_uid(data['data']['gn_target'], **data), **data)
 
 	async def _get_new_mail(self, data: dict) -> str:
 		return await mail.get_new_mail(data['data']['unique_id'], **data)
@@ -107,7 +107,7 @@ class MessageHandler:
 		return await mail.delete_mail(data['data']['unique_id'], data['data']['key'], **data)
 
 	async def _delete_read_mail(self, data: dict) -> str:
-		return await mail.delete_read_mail(data['data']['unique_id'], **data)
+		return await mail.delete_read(data['data']['unique_id'], **data)
 
 	async def _mark_read_mail(self, data: dict) -> str:
 		return await mail.mark_read(data['data']['unique_id'], data['data']['key'], **data)
@@ -185,7 +185,7 @@ class MessageHandler:
 		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']),  **data)
 
 	###################### friend.py ######################
-	async def _get_all_friend(self, data: dict) -> str:
+	async def _get_all_info_friend(self, data: dict) -> str:
 		return await friend.get_all(data['data']['unique_id'], **data)
 
 	async def _remove_friend(self, data: dict) -> str:
@@ -195,7 +195,7 @@ class MessageHandler:
 		return await friend.request(data['data']['unique_id'], data['data']['gn_target'], **data)
 
 	async def _respond_friend(self, data: dict) -> str:
-		return await friend.respond(data['data']['unique_id'], data['data']['nonce'], **data)
+		return await friend.respond(data['data']['unique_id'], data['data']['key'], **data)
 
 	async def _send_gift_friend(self, data: dict) -> str:
 		return await friend.send_gift(data['data']['unique_id'], data['data']['gn_target'], **data)
@@ -220,6 +220,13 @@ class MessageHandler:
 
 
 
+	###################### TODO.py ######################
+	async def _get_account_world_info(self, data: dict) -> str:
+		return {'status' : 0, 'message' : 'temp function success', 'data' : {'worlds' : [{'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : 'placeholder', 'exp' : 1000}]}}
+
+	async def _get_all_supplies(self, data: dict) -> str:
+		return {'status' : 0, 'message' : 'temp function success', 'data' : {'remaining' : {}}}
+
 
 	async def test(self, data: dict) -> str:
 		return await common.exists('player', ('uid', '1'), ('gn', 'cuck'), **data)
@@ -229,6 +236,11 @@ class MessageHandler:
 DOES_NOT_NEED_TOKEN = {'login_unique', 'login'}
 
 FUNCTION_LIST = {
+	###################### TODO.py ######################
+	'get_account_world_info' : MessageHandler._get_account_world_info,
+	'get_all_supplies' : MessageHandler._get_all_supplies,
+
+
 	'test' : MessageHandler.test,
 	###################### account.py ######################
 	'login_unique' : MessageHandler._login_unique,
@@ -283,7 +295,7 @@ FUNCTION_LIST = {
 	'level_up_skill' : MessageHandler._level_up_skill,
 
 	###################### friend.py ######################
-	'get_all_friend' : MessageHandler._get_all_friend,
+	'get_all_info_friend' : MessageHandler._get_all_info_friend,
 	'remove_friend' : MessageHandler._remove_friend,
 	'request_friend' : MessageHandler._request_friend,
 	'respond_friend' : MessageHandler._respond_friend,

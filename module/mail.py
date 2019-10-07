@@ -21,7 +21,6 @@ Required Kwargs By MailType:
 	FAMILY_REQUEST: name, target
 '''
 async def send_mail(mailtype, *args, **kwargs):
-	print(f'kwargs: {kwargs}')
 	try:
 		for uid in args:
 			await (SWITCH[mailtype])(uid, **kwargs)
@@ -46,7 +45,7 @@ async def mark_read(uid, key, **kwargs):
 	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/mark_read', data = {'world' : kwargs['world'], 'uid' : uid, 'key' : key}) as resp:
 		return await resp.json(content_type = 'text/json')
 
-async def delete_read(uid, key, **kwargs):
+async def delete_read(uid, **kwargs):
 	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/delete_read', data = {'world' : kwargs['world'], 'uid' : uid}) as resp:
 		return await resp.json(content_type = 'text/json')
 
@@ -67,8 +66,7 @@ async def _send_mail_gift(uid, **kwargs):
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_friend_request(uid, **kwargs):
-	print(f'MAIL: this is kwargs: {kwargs}')
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['data']['sender'], 'body' : kwargs.get('body', 'Friend request'), 'subj' : kwargs.get('subj', 'You Have A Friend Request!'), 'type' : enums.MailType.FRIEND_REQUEST.value, 'uid_sender' : kwargs['data']['uid_sender']}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), 'body' : kwargs.get('body', 'Friend request'), 'subj' : kwargs.get('subj', 'You Have A Friend Request!'), 'type' : enums.MailType.FRIEND_REQUEST.value, 'uid_sender' : kwargs['uid_sender']}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_family_request(uid, **kwargs):

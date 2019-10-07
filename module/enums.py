@@ -23,6 +23,16 @@ class Item(enum.IntEnum):
 	FORTUNE_WHEEL_BASIC = 14
 	FORTUNE_WHEEL_PRO = 15
 	FRIEND_GIFT = 16
+	# qin start
+	UNIVERSAL_SEGMENT = 17
+	COIN_CARD = 18
+	EXP_CARD = 19
+	FOOD_CARD = 20
+	MINE_CARD = 21
+	CRYSTAL_CARD = 22
+	DIAMOND_CARD = 23
+	MINE = 24
+	# qin end
 
 
 class FamilyRole(enum.IntEnum):
@@ -48,6 +58,8 @@ class Group(enum.IntEnum):
 	SKILL = 1
 	ROLE = 2
 	ITEM = 3
+	ARMOR = 4
+
 
 class Weapon(enum.IntEnum):
 	W1 = 1
@@ -181,3 +193,52 @@ class Role(enum.IntEnum):
 	R40 = 40
 
 
+class Armor(enum.IntEnum):
+	A1 = 1
+	A2 = 2
+	A3 = 3
+	A4 = 4
+
+class ArmorTier(enum.IntEnum):
+	T1 = 1
+	T2 = 2
+	T3 = 3
+	T4 = 4
+	T5 = 5
+	T6 = 6
+	T7 = 7
+	T8 = 8
+	T9 = 9
+	T10 = 10
+
+
+class Achievement(enum.IntEnum):
+	TOTAL_LOGIN = 1
+	KEEPING_LOGIN = 2
+	VIP_LEVEL = 3
+	GET_4_STAR_ROLE = 4
+	GET_5_STAR_ROLE = 5
+	GET_6_STAR_ROLE = 6
+	LEVEL_UP_ROLE = 7
+	GET_4_star_weapon = 8
+	GET_5_star_weapon = 9
+	GET_6_star_weapon = 10
+	LEVEL_UP_WEAPON = 11
+	PASS_STAGE = 12
+	COLLECT_FOOD = 13
+	COLLECT_MINE = 14
+	COLLECT_CRYSTAL = 15
+	UPGRADE_FOOD_FACTORY = 16
+	UPGRADE_MINE_FACTORY = 17
+	UPGRADE_MINE_CRYSTAL = 18
+	SUMMON_TIMES = 19
+	SUMMON_3_STAR_WEAPON_TIMES = 20
+	SUMMON_4_STAR_WEAPON_TIMES = 21
+	SUMMON_5_STAR_WEAPON_TIMES = 22
+	SUMMON_3_STAR_ROLE_TIMES = 23
+	SUMMON_4_STAR_ROLE_TIMES = 24
+	SUMMON_5_STAR_ROLE_TIMES = 25
+	PRO_SUMMON_TIMES = 28
+	FRIEND_REQUEST = 29
+	FRIEND_GIFT = 30
+	CHECK_IN_FAMILY = 31
