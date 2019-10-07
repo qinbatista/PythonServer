@@ -45,7 +45,8 @@ MESSAGE_LIST = [ {'function': 'login', 'random': '-906', 'data':{'unique_id':'ma
 				 {'function': 'automatically_refresh_store','random':'-906', 'data':{"world": "0"}},
 				 {'function': 'manually_refresh_store','random':'-906', 'data':{"world": "0"}},
 				 {'function': 'diamond_refresh_store','random':'-906', 'data':{"world": "0"}},
-				 {'function': 'black_market_transaction','random':'-906', 'data':{"world": "0", "code": 1}}
+				 {'function': 'diamond_refresh_store','random':'-906', 'data':{"world": "0"}},
+				 {'function': 'create_family','random':'-906', 'data':{"unique_id": "1"}}
 				]
 LOGIN = 0
 LOGIN_UNIQUE = 1  # ----------------------------------------------
@@ -252,8 +253,8 @@ def main() -> None:
 	# new_test_multiple_message(int(input('How many messages to send (it will be n * 10 so be careful): ')))
 
 	# send_single_message(LOGIN_AS_ACCOUNT)
-	token = send_single_message(LOGIN_UNIQUE)
-	print(f'this is token = {token}')
+#	token = send_single_message(LOGIN_UNIQUE)
+	#print(f'this is token = {token}')
 	# send_single_message(UPDATE_ENERGY)
 	# send_single_message(GET_SKILL)
 	# send_single_message(GET_ALL_SUPPLIES)
@@ -276,6 +277,7 @@ def main() -> None:
 	# send_single_message(MANUALLY_REFRESH_STORE)
 	# send_single_message(DIAMOND_REFRESH_STORE)
 	# send_single_message(BLACK_MARKET_TRANSACTION)
+	send_single_message(24)
 
 	# test_token_server()
 

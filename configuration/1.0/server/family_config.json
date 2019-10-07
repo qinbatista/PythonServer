@@ -28,43 +28,6 @@
 		}
 	},
 	"union_store": {
-		"cooling_time": 3600,
-		"merchandise": {
-			"skill_scroll_10": {
-				"c_quantity": 1,
-				"m_quantity": 80
-			},
-			"skill_scroll_30": {
-				"c_quantity": 1,
-				"m_quantity": 80
-			},
-			"skill_scroll_100": {
-				"c_quantity": 1,
-				"m_quantity": 80
-			},
-			"experience_potion": {
-				"c_quantity": 1,
-				"m_quantity": 80
-			},
-			"small_energy_potion": {
-				"c_quantity": 1,
-				"m_quantity": 80
-			},
-			"basic_summon_scroll": {
-				"c_quantity": 1,
-				"m_quantity": 80
-			},
-			"pro_summon_scroll": {
-				"c_quantity": 1,
-				"m_quantity": 80
-			},
-			"prophet_summon_scroll": {
-			"c_quantity": 1,
-			"m_quantity": 80
-		}
-		},
-		"gift_package":{
-			"diamond": 100
-		}
+
 	}
 }

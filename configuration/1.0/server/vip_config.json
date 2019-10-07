@@ -21,7 +21,6 @@
 	},
 	"vip_dialy_reward":
 	{
-		"cooling_time": 86400,
 		"1":
 		{
 			"diamond_card":10,
@@ -310,16 +309,6 @@
 	"diamond_card_base_amount":10,
 	"base_month_vip_car_exp":10,
 	"pro_month_vip_car_exp":15,
-	"permanent_month_vip_car_exp":20,
-	"card_cooling_time": {
-		"base": 30,
-		"pro": 90,
-		"permanent": 36500
-	},
-	"card_increase_experience": {
-		"base": 10,
-		"pro": 15,
-		"permanent": 20
-	}
+	"permanent_month_vip_car_exp":20
 }
 

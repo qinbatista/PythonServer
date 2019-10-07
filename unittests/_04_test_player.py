@@ -4,11 +4,7 @@ import os
 import requests
 import configparser
 import asyncio
-try:
-	from unittests.user_behavior_simulation import tool_lukseun_client
-except:
-	from user_behavior_simulation import tool_lukseun_client
-
+from unittests.user_behavior_simulation import tool_lukseun_client
 import random
 """
 print(str(time.time()))
@@ -19,7 +15,7 @@ print(str(os.getpid()))
 CONFIG = configparser.ConfigParser()
 CONFIG.read('../Application/GameAliya/Configuration/server/1.0/server.conf', encoding="utf-8")
 # GAME_MANAGER_BASE_URL = 'http://localhost:' + CONFIG['game_manager']['port']
-GAME_MANAGER_BASE_URL = 'http://localhost:8004'
+GAME_MANAGER_BASE_URL = 'http://localhost:8100'
 # GAME_MANAGER_BASE_URL = 'http://localhost:8007'
 # GAME_MANAGER_BASE_URL = 'http://localhost:8006'
 
@@ -270,22 +266,8 @@ def test():
 		print(f'"{11+i}": {250+30*i},')
 
 def all_function(unique_id: str):
-	result = requests.post('http://localhost:8004/check_in_task', data={"world": 0, "unique_id": "3"})
+	result = requests.post('http://localhost:8004/purchase_item', data={"world": 0, "unique_id": "1", "item_id": "diamond_pack_5"})
 	print(str(result.text))
-	# result = requests.post('http://localhost:8004/purchase_vip_card', data={"world": 0, "unique_id": "3", "card_type": "base"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/get_all_task', data={"world": 0, "unique_id": "3"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/login_task', data={"world": 0, "unique_id": "3"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/family_change_name', data={"world": 0, "unique_id": "3", "family_name": "bs"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/dismissal_family_officer', data={"world": 0, "unique_id": "3", "target": "e"})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/family_officer', data={"world": 0, "unique_id": "3", "target": "f", "position": 0})
-	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/purchase_item', data={"world": 0, "unique_id": "1", "item_id": "diamond_pack_5"})
-	# print(str(result.text))
 	# result = requests.post('http://localhost:8004/update_login_in_time', data={"world": 0, "unique_id": "1"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/send_merchandise', data={"world": 0, "unique_id": "1", "merchandise": "coin", "quantities": 20})
@@ -297,9 +279,9 @@ def all_function(unique_id: str):
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/get_player_info')
 	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/cancel_disbanded_family', data={"world": 0, "unique_id": "3"})
+	# result = requests.post('http://localhost:8100/cancel_disbanded_family', data={"world": 0, "unique_id": "5"})
 	# print(str(result.text))
-	# result = requests.post('http://localhost:8004/disbanded_family', data={"world": 0, "unique_id": "3"})
+	# result = requests.post('http://localhost:8100/disbanded_family', data={"world": 0, "unique_id": "5"})
 	# print(str(result.text))
 	# result = requests.post('http://localhost:8100/family_sign_in', data={"world": 0, "unique_id": "4"})
 	# print(str(result.text))
@@ -443,139 +425,16 @@ def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
 def new_server_test(world):
-	# response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
-	# print(response)
-	# token = response['data']['token']
-	# response = send_tcp_message({'world' : 0, 'function' : 'invite_user_family', 'data' : {'token': token, 'target': 'aasskkk'}})
-	# print(response)
-
-	# response = send_tcp_message({'world' : 0, 'function' : 'family_gift_package', 'data' : {'token': token}})
-	# print(response)
-	# response = send_tcp_message({'world' : 0, 'function' : 'family_market_purchase', 'data' : {'token': token, 'merchandise': 'skill_scroll_10'}})
-	# print(response)
-
+	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '1'}})
+	print(response)
+	token = response['data']['token']
 	# response = send_tcp_message({'world' : 0, 'function' : 'send_merchandise', 'data' : {'token': token, 'merchandise': 'coin', 'quantities': '20'}})
 	# print(response)
-
-	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : 'aass'}})
-	token = response['data']['token']
-	# response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
-	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'get_task_pack_diamond', 'data' : {'token': token}})
-	# print(response)
-
-	# # 测试level_up_role_task
-	# response = send_tcp_message({'world' : world, 'function' : 'upgrade_role_level', 'data' : {'token': token, 'role': 'role1', 'experience_potion': 100}})
-	# print(response)
-	#
-	# # 测试level_up_weapon_task
-	# response = send_tcp_message({'world' : world, 'function' : 'level_up_weapon', 'data' : {'token': token, 'weapon': 'weapon1', 'iron': 100}})
-	# print(response)
-	#
-	# # 测试pass_stage_task
-	# response = send_tcp_message({'world' : world, 'function' : 'pass_stage', 'data' : {'token': token, 'stage': 1, 'clear_time': ''}})
-	# print(response)
-	#
-	# # 测试pass_tower_task
-	# response = send_tcp_message({'world' : world, 'function' : 'pass_tower', 'data' : {'token': token, 'stage': 1, 'clear_time': ''}})
-	# print(response)
-	#
-	# # 测试leave_world_boss_stage_task
-	# response = send_tcp_message({'world' : world, 'function' : 'leave_world_boss_stage', 'data' : {'token': token, 'total_damage': 1}})
-	# print(response)
-	#
-	# # 测试basic_summon_task
-	# response = send_tcp_message({'world' : world, 'function' : 'basic_summon', 'data' : {'token': token, 'cost_item': 'diamond', 'summon_kind': 'weapon'}})
-	# print(response)
-	#
-	# # 测试pro_summon_task
-	# response = send_tcp_message({'world' : world, 'function' : 'pro_summon', 'data' : {'token': token, 'cost_item': 'diamond', 'summon_kind': 'weapon'}})
-	# print(response)
-	#
-	# # 测试refresh_all_storage_task
-	# # response = send_tcp_message({'world' : world, 'function' : 'refresh_all_storage', 'data' : {'token': token}})
-	# # print(response)
-	#
-	# # 测试send_friend_gift_task
-	# response = send_tcp_message({'world' : world, 'function' : 'send_friend_gift', 'data' : {'token': token, 'friend_name': '0000005'}})
-	# print(response)
-	#
-	# # 测试check_in_family_task
-	# response = send_tcp_message({'world' : world, 'function' : 'family_sign_in', 'data' : {'token': token}})
-	# print(response)
-	#
-	# # 测试get_all_task
-	# response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
-	# print(response)
-	#
-	# # 测试 check_in
-	# response = send_tcp_message({'world' : world, 'function' : 'check_in', 'data' : {'token': token}})
-	# print(response)
-
-	# 测试 supplement_check_in
-	# response = send_tcp_message({'world' : world, 'function' : 'supplement_check_in', 'data' : {'token': token}})
-	# print(response)
-	#
-	# # 测试 get_all_check_in_table
-	# response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
-	# print(response)
-	#
-	# 测试 get_all_check_in_table
-	# response = send_tcp_message({'world' : world, 'function' : 'increase_vip_exp', 'data' : {'token': token, 'quantity': 60}})
-	# print(response)
-	#
-	# 测试 purchase_vip_gift
-	# response = send_tcp_message({'world' : world, 'function' : 'purchase_vip_gift', 'data' : {'token': token, 'kind': 2}})
-	# print(response)
-	#
-	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
-	# print(response)
-	# 测试 check_vip_daily_reward
-	# response = send_tcp_message({'world' : world, 'function' : 'check_vip_daily_reward', 'data' : {'token': token}})
-	# print(response)
-	# 测试 get_all_vip_info
-	# response = send_tcp_message({'world' : world, 'function' : 'get_all_vip_info', 'data' : {'token': token}})
-	# print(response)
-	# 测试 purchase_vip_card
-	# response = send_tcp_message({'world' : world, 'function' : 'purchase_vip_card', 'data' : {'token': token, 'card_type': 'permanent'}})
-	# print(response)
-	# 测试 exchange_card
-	response = send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token': token, 'card_type': 'diamond_card'}})
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_mail', 'data' : {'token': token}})
 	print(response)
-
-	# 测试get_daily_task_reward
-	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'level_up_role'}})
+	nonce = ''
+	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': nonce}})
 	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'level_up_weapon'}})
-	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'pass_stage'}})
-	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'pass_tower'}})
-	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'pass_world_boss'}})
-	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'basic_summon'}})
-	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'pro_summon'}})
-	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'send_friend_gift'}})
-	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'check_in_family'}})
-	# print(response)
-
-	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
-	# print(response)
-	# response = send_tcp_message({'world' : world, 'function' : 'response_family', 'data' : {'token': token, 'nonce': '78337956676184997857706980485225384889478708200314904499946514947315907719455'}})
-	# print(response)
-
-
-	# nonce = '109859617373153377003944302714374895868816002944800435692483366741142151128392'
-	# response = send_tcp_message({'world' : 0, 'function' : 'respond_family', 'data' : {'token': token, 'nonce': nonce}})
-	# print(response)
-
-	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': '23406974281973059804531233519244142730168423188319936271156207351662179009634'}})
-	# print(response)
-	# input('继续... ...')
 
 if __name__ == "__main__":
 	# result = requests.post('http://localhost:8100/get_stage_info', data={})
@@ -584,8 +443,8 @@ if __name__ == "__main__":
 	# try_iron()
 	# try_diamond()
 	# level_up_weapon()
-	# pass_stage(stage=2)
-	# pass_tower(stage=1)
+	# pass_stage(stage=11)
+	# pass_tower(stage=33)
 	# get_skill()
 	# get_all_skill_level()
 	# level_up_skill()
@@ -601,7 +460,7 @@ if __name__ == "__main__":
 	# start_hang_up()
 	# get_hang_up_reward()
 	# enter_stage(stage=1)
-	# enter_tower(stage=1)
+	# enter_tower(stage=3)
 	# disintegrate_weapon()
 	# automatically_refresh_store()
 	# manually_refresh_store()
@@ -620,7 +479,7 @@ if __name__ == "__main__":
 	# redeem_nonce(unique_id="1", nonce=nonce)
 	# get_all_mail(unique_id="1")
 
-	# request_friend(unique_id="5", friend_name="a")
+	request_friend(unique_id="5", friend_name="a")
 	# nonce = get_new_mail(unique_id="1")
 	# response_friend(unique_id="1", nonce=nonce)
 	# response_friend(unique_id="1", nonce="32963693688928993319733151846953915999978396660497710378095972836181446004813")
@@ -654,4 +513,4 @@ if __name__ == "__main__":
 	# get_top_damage(4,4)
 	# active_wishing_pool(4,"weapon1")
 
-	new_server_test(0)
+	# new_server_test(0)

@@ -13,16 +13,18 @@ Completed jobs are sent to the gate server which contains the requesting client.
 import signal
 import asyncio
 import aiohttp
+import aiomysql
 import aioredis
 import message_handler
 import nats.aio.client
 
 import platform
-import sys
+
 from utility import config_reader
+from utility import worker_resources
 
 CFG = config_reader.wait_config()
-jobs_name = "jobs"
+
 class Worker:
 	def __init__(self):
 		self.mh      = message_handler.MessageHandler()
@@ -30,24 +32,19 @@ class Worker:
 		self.ujobs   = 0
 		self.running = False
 
+		self.resource= worker_resources.WorkerResources(CFG)
 		self.sid     = None
 		self.nats    = None
-		self.redis   = None
-		self.session = None
 
 	'''
 	Starts the worker. Should only be called once.
 	'''
 	async def start(self):
-		try:
-			await self.init()
-			print("this worker will go channel:"+jobs_name)
-			self.sid = await self.nats.subscribe(jobs_name, 'workers', self.process_job)
-			while self.running:
-				await asyncio.sleep(1)
-				await self.nats.flush()
-		finally:
-			await self.session.close()
+		await self.init()
+		self.sid = await self.nats.subscribe('experimental', 'workers', self.process_job)
+		while self.running:
+			await asyncio.sleep(1)
+			await self.nats.flush()
 
 	'''
 	Processes the job request. Splits the message into cid, work parts.
@@ -60,7 +57,7 @@ class Worker:
 		try:
 			#response = await self.mh.resolve(work, self.session)
 			print(f'worker: calling messagehandler with args: {work}')
-			response = await asyncio.wait_for(self.mh.resolve(work, self.session, self.redis), 3)
+			response = await asyncio.wait_for(self.mh.resolve(work, self.resource), 3)
 		except asyncio.TimeoutError:
 			print(f'worker: message handler call with args: {work} timed out...')
 			response = '{"status" : -2, "message" : "request timed out"}'
@@ -79,8 +76,7 @@ class Worker:
 	async def init(self):
 		self.running = True
 		self.nats = nats.aio.client.Client()
-		self.session = aiohttp.ClientSession()
-		self.redis = await aioredis.create_redis(CFG['redis']['addr'])
+		await self.resource.init()
 		await self.nats.connect(CFG['nats']['addr'], max_reconnect_attempts = 1)
 		if platform.system() != 'Windows':
 			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
@@ -100,6 +96,7 @@ class Worker:
 			await asyncio.sleep(1)
 			timeout -= 1
 		print('worker: closing gate connections')
+		await self.resource.shutdown()
 		for r,w in self.gates.values():
 			w.close()
 			await w.wait_closed()
@@ -115,10 +112,10 @@ class Worker:
 	Opens a connection to the gate if it doesn't already exist.
 	'''
 	async def _get_gid(self, cid):
-		gid = (await self.redis.get(cid)).decode()
+		gid = (await self.resource['redis'].get(cid)).decode()
 		if gid not in self.gates or self.gates[gid][1].is_closing() or self.gates[gid][0].at_eof():
 			print(f'adding a new gate connection for gate: {gid}')
-			ip, port = (await self.redis.get('gates.id.' + gid)).decode().split(':')
+			ip, port = (await self.resource['redis'].get('gates.id.' + gid)).decode().split(':')
 			self.gates[gid] = await asyncio.open_connection(ip, int(port))
 		return gid
 	
@@ -131,7 +128,5 @@ class Worker:
 
 
 if __name__ == '__main__':
-	if len(sys.argv)>=2:
-		jobs_name  = sys.argv[1]
 	worker = Worker()
 	asyncio.run(worker.start())

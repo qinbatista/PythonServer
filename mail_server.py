@@ -1,288 +1,180 @@
-#
-# A simple mail server
-#
-######################################################################
+'''
+mail_server.py
+'''
 
 import os
 import json
-import time
-import random
 import mailbox
+import datetime
+import urllib.parse
+
+from module import enums
+from module import common
+from aiohttp import web
+
 import requests
 
-
-from aiohttp import web
-from datetime import datetime
-from collections import defaultdict
-from utility import config_reader
-
 DIRNAME = os.path.dirname(os.path.realpath(__file__)) + '/box'
-
-CFG = config_reader.wait_config()
-TOKEN_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
+TOKEN = 'http://192.168.1.165:8001'
 
 class MailServer:
 	def __init__(self):
-		self._box = mailbox.Maildir(DIRNAME)
+		self.box = mailbox.Maildir(DIRNAME)
 	
-	# TODO refactor code
-	''''''
-	def send_mail(self, world: int, uid_to: str, **kwargs):
-		# 0 - successfully sent mail
-		# 60 - invalid request format
-		# 61 - invalid message type
-		if kwargs['type'] not in {'simple', 'gift', 'friend_request', 'family_request'}:
-			return self._message_typesetting(61, 'invalid message type')
+	async def send_mail(self, world, uid, **kwargs):
 		try:
-			msg = self._construct_message(**kwargs)
-			recipient_folder = self._box.get_folder(str(world)).get_folder(uid_to)
-		except KeyError:
-			return self._message_typesetting(60, 'invalid request format')
-		except mailbox.NoSuchMailboxError:
-			recipient_folder = self._box.get_folder(str(world)).add_folder(uid_to)
-		key = recipient_folder.add(msg)
-		m = recipient_folder[key]
-		m['key'] = key
-		recipient_folder[key] = m
-		return self._message_typesetting(0, 'success')
+			mailtype = enums.MailType(int(kwargs['type']))
+			message = self._construct_message(mailtype, **kwargs)
+			folder = self._open_mail_folder(world, uid)
+			self._deliver_message(folder, message)
+		except (ValueError, KeyError): return common.mt(99, 'invalid parameters')
+		return common.mt(0, 'success')
 
-
-
-	'''
-	Returns all the previously un-fetched mail in the 'new' folder.
-	'simple' typed messages will be moved to the 'cur' folder.
-	Messages requiring a nonce will request a nonce from the token server
-	if they have not done that already.
-	Non-'simple' typed messages are kept in the 'new' folder.
-	'''
-	def get_new_mail(self, world: int, uid: str):
-		# 0 - successfully got new mail
-		# 62 - mailbox empty
-		try:
-			folder = self._box.get_folder(str(world)).get_folder(uid)
-		except mailbox.NoSuchMailboxError:
-			return self._message_typesetting(62, 'mailbox empty')
-		messages = []
+	async def delete(self, world, uid, key):
+		folder = self._open_mail_folder(world, uid)
 		for mid, msg in folder.iteritems():
-			if msg.get_subdir() == 'new' and 'S' not in msg.get_flags():
-				if msg['type'] == 'simple':
-					msg.set_subdir('cur')
-				elif 'nonce' not in msg:
-					msg['nonce'] = self._request_nonce(msg)
-				msg.set_flags('S')
-				folder[mid] = msg
-				messages.append(self._message_to_dict(msg))
-		if not messages:
-			return self._message_typesetting(62, 'mailbox empty')
-		return self._message_typesetting(0, 'got new mail', {'mail' : messages})
-
-
-	'''
-	Returns all messages located in the 'new' and 'cur' folders.
-	Previously un-fetched messages in the 'new' folder follow the same
-	procedure as documented in the get_new_mail function.
-	'''
-	def get_all_mail(self, world:int, uid: str):
-		# 0 - successfully got all mail
-		# 62 - mailbox empty
-		try:
-			folder = self._box.get_folder(str(world)).get_folder(uid)
-		except mailbox.NoSuchMailboxError:
-			return self._message_typesetting(62, 'mailbox empty')
-		messages = defaultdict(list)
-		for mid, msg in folder.iteritems():
-			if msg.get_subdir() == 'new':
-				if msg['type'] == 'simple':
-					msg.set_subdir('cur')
-				elif 'nonce' not in msg:
-					msg['nonce'] = self._request_nonce(msg)
-				msg.set_flags('S')
-				folder[mid] = msg
-				messages['new'].append(self._message_to_dict(msg))
-			else:
-				messages['cur'].append(self._message_to_dict(msg))
-		if not messages:
-			return self._message_typesetting(62, 'mailbox empty')
-		return self._message_typesetting(0, 'got all mail', {'mail' : messages})
-
-	''''''
-	def delete_mail(self, world: int, unique_id: str, key: str) -> dict:
-		# 0 - successfully deleted mail
-		try:
-			folder = self._box.get_folder(str(world)).get_folder(unique_id)
-			for mid, message in folder.iteritems():
-				if mid == key:
-					folder.discard(mid)
-					return self._message_typesetting(status=0, message='successfully deleted message')
-				elif message['type'] != 'simple' and message['nonce'] == key:
-					folder.discard(mid)
-					return self._message_typesetting(status=0, message='successfully deleted message')
-		except mailbox.NoSuchMailboxError:
-			pass
-		return self._message_typesetting(status=0, message='mailbox does not exist')
-
-
-	''''''
-	def delete_cur_mail(self, world: int, uid: str):
-		# 0 - successfully deleted cur mail
-		try:
-			folder = self._box.get_folder(str(world)).get_folder(uid)
-		except mailbox.NoSuchMailboxError:
-			return self._message_typesetting(0, 'deleted cur mail')
-		for mid, msg in folder.iteritems():
-			if msg.get_subdir() == 'cur':
+			if mid == key:
 				folder.discard(mid)
-		return self._message_typesetting(0, 'deleted cur mail')
+				return common.mt(0, 'deleted')
+		return common.mt(-1, 'no match')
 
-	''''''
-	def move_nonce_mail(self, world: int, uid: str, nonce: str):
-		# 0 - success
-		try:
-			folder = self._box.get_folder(str(world)).get_folder(uid)
-			for mid, msg in folder.iteritems():
-				if msg.get_subdir() == 'new' and msg['nonce'] == nonce:
-					msg.set_subdir('cur')
-					folder[mid] = msg
-		except mailbox.NoSuchMailboxError:
-			pass
-		return self._message_typesetting(0, 'success')
+	async def delete_read(self, world, uid):
+		deleted = []
+		folder = self._open_mail_folder(world, uid)
+		for mid, msg in folder.iteritems():
+			if 'S' in msg.get_flags():
+				folder.discard(mid)
+				deleted.append(mid)
+		return common.mt(0, 'success', {'keys' : deleted})
 
+	async def mark_read(self, world, uid, key):
+		folder = self._open_mail_folder(world, uid)
+		for mid, msg in folder.iteritems():
+			if mid == key:
+				msg.add_flag('S')
+				folder[mid] = msg
+				return common.mt(0, 'marked')
+		return common.mt(-1, 'no match')
 
+	async def all_mail(self, world, uid):
+		folder = self._open_mail_folder(world, uid)
+		return common.mt(0, 'got all mail', {'mail' : self._read_subfolders(folder, {'new', 'cur'})})
 
-	# TODO map for loop to run concurrently
-	''''''
-	def broadcast_mail(self, world: int, users: [str], **kwargs) -> dict:
-		# 0 - successfully sent mail
-		# 60 - invalid request format
-		# 61 - invalid message type
-		if kwargs['type'] not in {'simple', 'gift', 'friend_request'}:
-			return self._message_typesetting(61, 'invalid message type')
-		try:
-			msg = self._construct_message(**kwargs)
-		except KeyError:
-			return self._message_typesetting(60, 'invalid request format')
-		for user in users:
-			try:
-				folder = self._box.get_folder(str(world)).get_folder(user)
-			except mailbox.NoSuchMailboxError:
-				folder = self._box.get_folder(str(world)).add_folder(user)
-			folder.add(msg)
-		return self._message_typesetting(0, 'success')
+	async def new_mail(self, world, uid):
+		folder = self._open_mail_folder(world, uid)
+		return common.mt(0, 'got new mail', {'mail' : self._read_subfolders(folder, {'new'})})
 
-	def _request_nonce(self, msg: mailbox.MaildirMessage):
-		if msg['type'] == 'gift':
-			r = requests.post(TOKEN_URL + '/generate_nonce', json = {'type' : 'gift', 'items' : msg['items'], 'quantities' : msg['quantities']})
-			return r.json()['data']['nonce']
-		elif msg['type'] == 'friend_request':
-			r = requests.post(TOKEN_URL + '/generate_nonce', json = {'type' : 'friend_request', 'uid_sender' : msg['uid_sender'], 'sender' : msg['sender']})
-			return r.json()['data']['nonce']
-		elif msg['type'] == 'family_request':
-			r = requests.post(TOKEN_URL + '/generate_nonce', json = {'type' : 'family_request', 'fid' : msg['fid'], 'target' : msg['target'], 'uid' : msg['uid']})
-			return r.json()['data']['nonce']
+	############################################################
 
-
-	def _construct_message(self, **kwargs):
-		msg = mailbox.MaildirMessage()
-		msg['time']    = datetime.now().strftime('%Y/%m/%d, %H:%M:%S')
-		msg['from']    = kwargs['from']
-		msg['type']    = kwargs['type']
-		msg['subject'] = kwargs['subject']
-		msg.set_payload(kwargs['body'])
-		if msg['type'] == 'gift':
+	def _attach_extra_information(self, msg, mailtype, **kwargs):
+		if mailtype == enums.MailType.GIFT:
 			msg['items'] = kwargs['items']
-			msg['quantities'] = kwargs['quantities']
-		elif msg['type'] == 'friend_request':
-			msg['sender'] = kwargs['sender']
+		elif mailtype == enums.MailType.FRIEND_REQUEST:
 			msg['uid_sender'] = kwargs['uid_sender']
-		elif msg['type'] == 'family_request':
-			msg['fid'] = kwargs['fid']
-			msg['fname'] = kwargs['fname']
-			msg['target'] = kwargs['target']
-			msg['uid'] = kwargs['uid']
+		elif mailtype == enums.MailType.FAMILY_REQUEST:
+			msg['name'] = kwargs['name']
+			msg['uid_target'] = kwargs['uid_target']
 		return msg
 
-	def _message_to_dict(self, msg: mailbox.MaildirMessage, **kwargs) -> dict:
-		d = {}
-		d['key'] = msg['key']
-		d['subject'] = msg['subject']
-		d['time'] = msg['time']
-		d['from'] = msg['from']
-		d['body'] = msg.get_payload()
-		d['type'] = msg['type']
-		d['data'] = {}
-		if msg['type'] == 'gift':
-			d['data']['nonce'] = msg['nonce']
-		elif msg['type'] == 'friend_request':
-			d['data']['nonce'] = msg['nonce']
-			d['data']['sender'] = msg['sender']
-		elif msg['type'] == 'family_request':
-			d['data']['nonce'] = msg['nonce']
-			d['data']['fname'] = msg['fname']
-			d['data']['target'] = msg['target']
+	def _construct_message(self, mailtype, **kwargs):
+		msg = mailbox.MaildirMessage()
+		msg['time'] = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+		msg['type'] = str(mailtype.value)
+		msg['from'] = urllib.parse.quote(kwargs['from'], safe = '')
+		msg['subj'] = kwargs['subj']
+		msg.set_payload(kwargs['body'])
+		msg = self._attach_extra_information(msg, mailtype, **kwargs)
+		return msg
 
-		return d
+	def _deliver_message(self, folder, message):
+		key = folder.add(message)
+		msg = folder[key]
+		msg['key']  = key
+		folder[key] = msg
+	
+	def _dump_message(self, msg):
+		dump = {k : v for k, v in msg.items() if k not in {'uid_sender', 'name', 'uid_target'}}
+		dump['body'] = msg.get_payload()
+		dump['read'] = 0 if 'S' not in msg.get_flags() else 1
+		return dump
+
+	def _open_mail_folder(self, world, uid):
+		try:
+			folder = self.box.get_folder(str(world)).get_folder(uid)
+		except mailbox.NoSuchMailboxError:
+			folder = self.box.get_folder(str(world)).add_folder(uid)
+		return folder
+
+	def _read_subfolders(self, folder, subfolders):
+		messages = []
+		for mid, msg in folder.iteritems():
+			if msg.get_subdir() in subfolders:
+				msg = self._register_nonce(msg)
+				msg.set_subdir('cur')
+				folder[mid] = msg
+				messages.append(self._dump_message(msg))
+		return messages
+
+	def _register_nonce(self, msg):
+		if enums.MailType(int(msg['type'])) != enums.MailType.SIMPLE and 'F' not in msg.get_flags():
+			if enums.MailType(int(msg['type'])) == enums.MailType.GIFT:
+				r = requests.post(TOKEN + '/register_nonce', json = {'nonce' : msg['key'], 'type' : msg['type'], 'items' : msg['items']})
+			elif enums.MailType(int(msg['type'])) == enums.MailType.FRIEND_REQUEST:
+				r = requests.post(TOKEN + '/register_nonce', json = {'nonce' : msg['key'], 'type' : msg['type'], 'uid_sender' : msg['uid_sender']})
+			elif enums.MailType(int(msg['type'])) == enums.MailType.FAMILY_REQUEST:
+				r = requests.post(TOKEN + '/register_nonce', json = {'nonce' : msg['key'], 'type' : msg['type'], 'uid_target' : msg['uid_target'], 'name' : msg['name']})
+			if r.json()['status'] == 0: msg.add_flag('F')
+		return msg
 
 
-	def _message_typesetting(self, status: int, message: str, data: dict = {}) -> dict:
-		return {'status' : status, 'message' : message, 'random' : random.randint(-1000, 1000), 'data' : data}
-
-
-def _json_response(body: dict = '', **kwargs) -> web.Response:
-	kwargs['body'] = json.dumps(body or kwargs['kwargs']).encode('utf-8')
+def _json_response(b = '', **kwargs):
+	kwargs['body'] = json.dumps(b or kwargs['kwargs']).encode('utf-8')
 	kwargs['content_type'] = 'text/json'
 	return web.Response(**kwargs)
 
 ROUTES = web.RouteTableDef()
-@ROUTES.post('/send_mail')
+
+@ROUTES.post('/send')
 async def __send_mail(request: web.Request) -> web.Response:
 	post = await request.json() # notice we are awaiting a json type due to nested dictionary
-	data = (request.app['MANAGER']).send_mail(post['world'], post['uid_to'], **post['kwargs'])
+	data = await (request.app['MANAGER']).send_mail(post['world'], post['uid'], **post['kwargs'])
 	return _json_response(data)
 
-@ROUTES.post('/get_new_mail')
+@ROUTES.post('/new')
 async def __get_new_mail(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = (request.app['MANAGER']).get_new_mail(post['world'], post['unique_id'])
+	data = await (request.app['MANAGER']).new_mail(post['world'], post['uid'])
 	return _json_response(data)
 
-@ROUTES.post('/get_all_mail')
+@ROUTES.post('/all')
 async def __get_all_mail(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = (request.app['MANAGER']).get_all_mail(post['world'], post['unique_id'])
+	data = await (request.app['MANAGER']).all_mail(post['world'], post['uid'])
 	return _json_response(data)
 
-@ROUTES.post('/delete_cur_mail')
-async def __delete_cur_mail(request: web.Request) -> web.Response:
+@ROUTES.post('/mark_read')
+async def __mark_read(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = (request.app['MANAGER']).delete_cur_mail(post['world'], post['unique_id'])
+	data = await (request.app['MANAGER']).mark_read(post['world'], post['uid'], post['key'])
 	return _json_response(data)
 
-@ROUTES.post('/delete_mail')
-async def __delete_mail(request: web.Request) -> web.Response:
+@ROUTES.post('/delete_read')
+async def __delete_read(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = (request.app['MANAGER']).delete_mail(post['world'], post['unique_id'], post['key'])
+	data = await (request.app['MANAGER']).delete_read(post['world'], post['uid'])
 	return _json_response(data)
 
-@ROUTES.post('/move_nonce_mail')
-async def __move_nonce_mail(request: web.Request) -> web.Response:
+@ROUTES.post('/delete')
+async def __delete(request: web.Request) -> web.Response:
 	post = await request.post()
-	data = (request.app['MANAGER']).move_nonce_mail(post['world'], post['unique_id'], post['nonce'])
-	return _json_response(data)
-
-@ROUTES.post('/broadcast_mail')
-async def __broadcast_mail(request: web.Request) -> web.Response:
-	post = await request.json() # notice we are awaiting a json type due to nested dictionary
-	data = (request.app['MANAGER']).broadcast_mail(post['world'], post['users'], **post['mail'])
+	data = await (request.app['MANAGER']).delete(post['world'], post['uid'], post['key'])
 	return _json_response(data)
 
 def run():
 	app = web.Application(client_max_size = 10000000) # accept client requests up to 10 MB
 	app.add_routes(ROUTES)
 	app['MANAGER'] = MailServer()
-	print(f'starting mail server on port {CFG.getint("mail_server", "port")}...')
-	web.run_app(app, port = CFG.getint('mail_server', 'port'))
-
-
+	web.run_app(app, port = 8020)
 
 
 if __name__ == '__main__':

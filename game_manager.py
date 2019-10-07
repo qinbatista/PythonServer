@@ -30,7 +30,6 @@ import json
 import random
 import aiomysql
 import requests
-import calendar
 from aiohttp import web
 from datetime import datetime, timedelta
 from utility import repeating_timer
@@ -137,8 +136,6 @@ class GameManager:
 		if stage not in stages: stage_reward = stage_data[str(max(stages))]
 		else: stage_reward = stage_data[str(stage)]
 		for key, value in stage_reward.items():
-			if key == 'experience':
-				material_dict.update({'level': 0})
 			material_dict.update({key: value})
 		if sql_stage + 1 == stage:  # 通过新关卡
 			material_dict.update({"stage": 1})
@@ -192,42 +189,6 @@ class GameManager:
 			return self._message_typesetting(status=97, message="Parameter error")
 		else:
 			return await self._decrease_energy(world, unique_id, abs(amount))
-
-	async def try_coin(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'coin', value)
-
-	async def try_iron(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'iron', value)
-
-	async def try_diamond(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'diamond', value)
-
-	async def try_experience(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'experience', value)
-
-	async def try_level(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'level', value)
-
-	async def try_role(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'role', value)
-
-	async def try_stage(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'stage', value)
-
-	async def try_skill_scroll_10(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'skill_scroll_10', value)
-
-	async def try_skill_scroll_30(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'skill_scroll_30', value)
-
-	async def try_skill_scroll_100(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'skill_scroll_100', value)
-
-	async def try_experience_potion(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'experience_potion', value)
-
-	async def try_small_energy_potion(self, world: int, unique_id: str, value: int) -> dict:
-		return await self._try_material(world, unique_id, 'small_energy_potion', value)
 
 	async def try_armor(self, world: int, unique_id: str, armor_id: str, armor_level: str, value: int) -> dict:
 		select_str = f"select {armor_level} from armor where unique_id='{unique_id}' and armor_id='{armor_id}'"
@@ -379,7 +340,6 @@ class GameManager:
 		for i in range(len(head)):
 			remaining.update({head[i] : row[i]})
 		remaining.pop('unique_id')
-		await self.level_up_weapon_task(world, unique_id)
 		return self._message_typesetting(status=0, message='success', data={'remaining': remaining})
 
 	@C.collect_async
@@ -676,7 +636,6 @@ class GameManager:
 		for i in range(len(head)):
 			remaining.update({head[i] : row[i]})
 		remaining.pop('unique_id')
-		await self.level_up_role_task(world, unique_id)
 		return self._message_typesetting(status=0, message='success', data={'remaining': remaining})
 
 	@C.collect_async
@@ -747,7 +706,6 @@ class GameManager:
 		# 97 - Insufficient energy
 		# 98 - key insufficient
 		# 99 - parameter error
-		await self.try_energy(world=world, unique_id=unique_id, amount=0)
 		enter_stage_data = self._entry_consumables["stage"]
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "stage")) + 1:
 			return self._message_typesetting(99, "Parameter error")
@@ -756,7 +714,6 @@ class GameManager:
 		keys = list(enter_stage_data[str(stage)].keys())
 		values = [-1*int(v) for v in list(enter_stage_data[str(stage)].values())]
 		remaining = {}
-		reward = {'experience': 0, 'level': 0}
 		material_dict = {}
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
@@ -770,21 +727,6 @@ class GameManager:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=material_dict["energy"])
 			if energy_data["status"] >= 97:
 				return self._message_typesetting(status=97, message="Insufficient energy")
-
-			level, experience = (await self._execute_statement(world=world, statement=f'select level, experience from player where unique_id="{unique_id}"'))[0]  # try成功了，一定存在这个列表
-			player_experience = self._player_experience['player_level']['experience'][level]
-			max_level = self._player_experience['player_level']['max_level']
-			reward['experience'] = 10 * abs(material_dict["energy"])
-			experience += 10 * abs(material_dict["energy"])
-			while experience >= player_experience:
-				if level >= max_level: break
-				reward['level'] += 1
-				level += 1
-				experience -= player_experience
-				player_experience = self._player_experience['player_level']['experience'][level]
-			await self._execute_statement_update(world, f'update player set level={level}, experience={experience} where unique_id="{unique_id}"')
-			remaining.update({'experience': experience, 'level': level, 'max_level': max_level})
-
 			values.pop(keys.index("energy"))
 			keys.remove("energy")
 			material_dict.pop("energy")
@@ -814,7 +756,7 @@ class GameManager:
 			else:
 				remaining['enemy_kind'].update({enemy: self._monster_config[enemy]})
 
-		return self._message_typesetting(0, "success", {"remaining": remaining, 'reward': reward})
+		return self._message_typesetting(0, "success", {"remaining": remaining})
 
 	@C.collect_async
 	async def pass_stage(self, world: int, unique_id: str, stage: int, clear_time: str) -> dict:
@@ -836,19 +778,6 @@ class GameManager:
 			for i in range(len(keys)):
 				remaining.update({keys[i]: values[i]})
 			reward.pop("stage")
-			if 'level' in keys:
-				player_experience = self._player_experience['player_level']['experience'][remaining['level']]
-				max_level = self._player_experience['player_level']['max_level']
-				remaining.update({'max_level': max_level})
-				while remaining['experience'] >= player_experience:
-					if remaining['level'] >= max_level: break
-					reward['level'] += 1
-					remaining['level'] += 1
-					remaining['experience'] -= player_experience
-					player_experience = self._player_experience['player_level']['experience'][remaining['level']]
-
-				await self._execute_statement_update(world, f'update player set experience={remaining["experience"]}, level={remaining["level"]} where unique_id="{unique_id}"')
-			await self.pass_stage_task(world, unique_id)
 			return self._message_typesetting(status=0, message="passed customs!", data={"remaining": remaining, "reward": reward})
 
 	@C.collect_async
@@ -857,7 +786,6 @@ class GameManager:
 		# 97 - Insufficient energy
 		# 98 - key insufficient
 		# 99 - parameter error
-		await self.try_energy(world=world, unique_id=unique_id, amount=0)
 		enter_tower_data = self._entry_consumables["tower"]
 		if stage <= 0 or stage > int(await self._get_material(world,  unique_id, "tower_stage")) + 1:
 			return self._message_typesetting(99, "Parameter error")
@@ -866,7 +794,6 @@ class GameManager:
 		keys = list(enter_tower_data[str(stage)].keys())
 		values = [-1*int(v) for v in list(enter_tower_data[str(stage)].values())]
 		remaining = {}
-		reward = {'experience': 0, 'level': 0}
 		material_dict = {}
 		for i in range(len(keys)):
 			material_dict.update({keys[i]: values[i]})
@@ -880,22 +807,6 @@ class GameManager:
 			energy_data = await self.try_energy(world=world, unique_id=unique_id, amount=material_dict["energy"])
 			if energy_data["status"] >= 97:
 				return self._message_typesetting(status=97, message="Insufficient energy")
-
-			level, experience = (await self._execute_statement(world=world, statement=f'select level, experience from player where unique_id="{unique_id}"'))[0]  # try成功了，一定存在这个列表
-			player_experience = self._player_experience['player_level']['experience'][level]
-			max_level = self._player_experience['player_level']['max_level']
-			reward['experience'] = 10 * abs(material_dict["energy"])
-			experience += 10 * abs(material_dict["energy"])
-			while experience >= player_experience:
-				if level >= max_level: break
-				level += 1
-				reward['level'] += 1
-				experience -= player_experience
-				player_experience = self._player_experience['player_level']['experience'][level]
-
-			await self._execute_statement_update(world, f'update player set level={level}, experience={experience} where unique_id="{unique_id}"')
-			remaining.update({'experience': experience, 'level': level, 'max_level': max_level})
-
 			values.pop(keys.index("energy"))
 			keys.remove("energy")
 			material_dict.pop("energy")
@@ -924,7 +835,6 @@ class GameManager:
 		if stage <= 0 or stage > sql_stage + 1:
 			return self._message_typesetting(99, "Parameter error")
 
-		await self.pass_tower_task(world, unique_id)
 		stages = [int(x) if str.isdigit(x) else 1 for x in pass_tower_data.keys()]
 		if stage not in stages:
 			if stage % 10 != 0:
@@ -955,20 +865,6 @@ class GameManager:
 			keys = list(material_dict.keys())
 			values = list((await self._execute_statement(world=world, statement=select_str))[0])
 			for i in range(len(keys)):
-				if keys[i] == 'experience':
-					level = await self._get_material(world, unique_id, 'level')
-					player_experience = self._player_experience['player_level']['experience'][level]
-					max_level = self._player_experience['player_level']['max_level']
-					material_dict.update({'level': 0})
-					remaining.update({'level': level, 'max_level': max_level})
-					while values[i] >= player_experience:
-						if level >= max_level: break
-						level += 1
-						values[i] -= player_experience
-						player_experience = self._player_experience['player_level']['experience'][level]
-					material_dict['level'] = level - remaining['level']
-					remaining['level'] = level
-					await self._execute_statement_update(world, f'update player set experience={values[i]}, level={level} where unique_id="{unique_id}"')
 				remaining.update({keys[i]: values[i]})
 			material_dict.pop("tower_stage")
 			return self._message_typesetting(status=0, message="Earn rewards success", data={"remaining": remaining, "reward": material_dict})
@@ -1551,7 +1447,6 @@ class GameManager:
 		# 97 - skill operation error
 		# 98 - insufficient materials
 		# 99 - wrong item name
-		await self.basic_summon_task(world, unique_id)
 		return await self._default_summon(world, unique_id, cost_item, 'basic', summon_kind)
 
 	@C.collect_async
@@ -1568,7 +1463,6 @@ class GameManager:
 		# 97 - skill operation error
 		# 98 - insufficient materials
 		# 99 - wrong item name
-		await self.pro_summon_task(world, unique_id)
 		return await self._default_summon(world, unique_id, cost_item, 'pro', summon_kind)
 
 	@C.collect_async
@@ -1849,7 +1743,6 @@ class GameManager:
 							'current_time' : current_time
 						}
 					}
-			await self.send_friend_gift_task(world, unique_id)
 			return self._message_typesetting(0, 'send friend gift success because of f_recovering time is empty', data)
 		else:
 			current_time = time.strftime('%Y-%m-%d', time.localtime())
@@ -1878,7 +1771,6 @@ class GameManager:
 								'current_time' : current_time
 							}
 						}
-				await self.send_friend_gift_task(world, unique_id)
 				return self._message_typesetting(1, 'send friend gift success because of f_recovering time is over 1 day', data)
 			else:
 				data = {
@@ -2100,63 +1992,6 @@ class GameManager:
 		if result["status"] != 0:
 			return self._message_typesetting(status=99, message='Mailbox error')
 		return self._message_typesetting(status=0, message="send merchandise successfully")
-
-	async def response_family(self, world: int, unique_id: str, nonce: str) -> dict:
-		# success -> 0
-		# 0 - You successfully joined the family
-		# 94 - This family has been dissolved
-		# 95 - No such union, your family has been dissolved
-		# 96 - You already have a family
-		# 97 - This nonce does not belong to you
-		# 98 - nonce error
-		# 99 - this email had been used
-		response = requests.post(TOKEN_URL + '/redeem_nonce', json = {'type' : ['family_request'], 'nonce' : [nonce]})
-		data = response.json()
-		if data[nonce]["status"] != 0:
-			re = requests.post(MAIL_URL + '/delete_mail', data={"world": world, "unique_id": unique_id, "key": nonce})
-			return self._message_typesetting(status=99, message=f"this email had been used：{re.json()}")
-		if data[nonce]["type"] != 'family_request': return self._message_typesetting(98, 'nonce error')
-
-		fid = data[nonce]["fid"]
-		uid = data[nonce]["uid"]
-		if uid != unique_id: return self._message_typesetting(97, 'This nonce does not belong to you')
-
-		game_name, family_id, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if family_id != '': return self._message_typesetting(96, 'You already have a family')
-
-		family_info = await self._get_family_information(world, fid)
-		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
-			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
-			return self._message_typesetting(95, 'No such union, your family has been dissolved')
-		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-
-		fname = family_info[1]
-		level = family_info[2]
-		disbanded_family_time = family_info[18]
-		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
-			return self._message_typesetting(94, 'This family has been dissolved')
-
-		news = family_info[6]
-		content = []
-		if news != '':
-			news = json.loads(news.replace("'", "\""), encoding='utf-8')
-			content = list(news.values())
-			if len(content) >= 30: content.pop(0)
-		latest_news = f'family:{data[nonce]["target"]}:2:family:member'
-		news = {}  # 1, 2, 3, ..., latest_news
-		content.append(latest_news)
-		for i, value in enumerate(content):
-			news.update({str(i + 1): value})
-
-		count = (await self._execute_statement(world, f'select count(1) from player where familyid="{fid}"'))[0][0]
-		basis_people = self._family_config['union_restrictions']['people_number']['basis_people']
-		increment =  self._family_config['union_restrictions']['people_number']['increment']
-		if count >= basis_people + level * increment:
-			return self._message_typesetting(93, 'This family is already full')
-
-		await self._execute_statement_update(world=world, statement=f'update player set familyid="{fid}" WHERE unique_id="{uid}"')
-		await self._execute_statement_update(world=world, statement=f'update families set news="{str(news)}" WHERE familyid="{fid}"')
-		return self._message_typesetting(status=0, message="You successfully joined the family", data={"remaining": {"nonce": nonce, 'fname': fname, 'news': news}})
 
 #############################################################################
 #						End Friend Module Functions							#
@@ -2416,33 +2251,6 @@ class GameManager:
 		return self._message_typesetting(0, 'Login time has been updated')
 
 
-	async def exchange_card(self, world: int, unique_id: str, card_type: str) -> dict:
-		"""兑换卡片"""
-		# 0 - Successful redemption
-		# 97 - Add material error
-		# 98 - Insufficient number of cards
-		# 99 - Card type error
-		card = self._player['card']
-		if card_type not in card.keys():
-			return self._message_typesetting(99, 'Card type error')
-
-		card_data = await self._try_material(world, unique_id, card_type, -1)
-		if card_data['status'] != 0:
-			return self._message_typesetting(98, 'Insufficient number of cards')
-
-		level = await self._get_material(world, unique_id, 'level')
-		material = card[card_type]['material']
-		quantity = card[card_type]['quantity'] * level
-		reward = {'material': material, 'quantity': quantity}
-		remaining = {'card_type': card_type, 'card_quantity': card_data['remaining'], 'material': material, 'quantity': quantity}
-		material_data = await self._try_material(world, unique_id, material, quantity)
-		if material_data['status'] != 0:
-			await self._try_material(world, unique_id, card_type, 1)
-			return self._message_typesetting(97, 'Add material error')
-		remaining['quantity'] = material_data['remaining']
-		return self._message_typesetting(0, 'Successful redemption', data={'remaining': remaining, 'reward': reward})
-
-
 #############################################################################
 #                     Start Mall Function Position                          #
 #############################################################################
@@ -2582,11 +2390,10 @@ class GameManager:
 #############################################################################
 #						Start Family Functions								#
 #############################################################################
-	# 新闻格式如下：
-	# latest_news = "执行人:执行目标:执行方式:执行人的身份:执行目标的身份"
-	# 执行方式的代号==> 1:删除， 2:添加， 3:解散家族， 4:取消解散家族， 5:任命官员， 6:解聘官员， 7:修改家族名字
+
 	@C.collect_async
 	async def remove_user_family(self, world: int, uid: str, gamename_target: str) -> dict:
+		# announcement = "执行人:执行目标:执行方式:执行人的身份:执行目标的身份"
 		# 需要清空被移除者的工会贡献值和签到时间
 		# 0 - success, user removed
 		# 91 - You don't have permission to delete the administrator
@@ -2604,7 +2411,7 @@ class GameManager:
 		if gamename_target not in members: return self._message_typesetting(99, 'He is not your family member')
 		if game_name == gamename_target: return self._message_typesetting(95, 'you can not remove yourself using this function')
 		family_info = await self._get_family_information(world, fid)
-		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
+		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
 			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
 			return self._message_typesetting(94, 'No such union, your family has been dissolved')
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
@@ -2632,40 +2439,40 @@ class GameManager:
 		else: remove_times -= 1
 		if game_name != president and game_name not in admins: return self._message_typesetting(97, 'you are not family admin')
 
-		latest_news = ''
+		announcement = ""
 		if game_name == president:  # 会长权限
 			for i in range(len(family_info[8: 11])):  # 管理员admin
 				if gamename_target == family_info[i + 8]:
-					latest_news = f"{game_name}:{gamename_target}:1:president:admin"
+					announcement = f"{game_name}:{gamename_target}:1:president:admin"
 					await self._execute_statement_update(world, f'UPDATE families SET admin{i + 1} = "" WHERE familyid = "{fid}";')
-			if latest_news == '':
+			if not announcement:
 				for i in range(len(family_info[11: 16])):  # 精英elite
 					if gamename_target == family_info[i + 11]:
-						latest_news = f"{game_name}:{gamename_target}:1:president:elite"
+						announcement = f"{game_name}:{gamename_target}:1:president:elite"
 						await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
-			if latest_news == '':
-				latest_news = f"{game_name}:{gamename_target}:1:president:member"
+			if not announcement:
+				announcement = f"{game_name}:{gamename_target}:1:president:member"
 		else:
 			if gamename_target in admins: return self._message_typesetting(91, "You don't have permission to delete the administrator")
 			for i in range(len(family_info[11: 16])):  # 精英elite
 				if gamename_target == family_info[i + 11]:
-					latest_news = f"{game_name}:{gamename_target}:1:admin:elite"
+					announcement = f"{game_name}:{gamename_target}:1:admin:elite"
 					await self._execute_statement_update(world, f'UPDATE families SET elite{i + 1} = "" WHERE familyid = "{fid}";')
-			if latest_news == '':
-				latest_news = f"{game_name}:{gamename_target}:1:admin:member"
+			if not announcement:
+				announcement = f"{game_name}:{gamename_target}:1:admin:member"
 		if news == "":
-			news = {"1": latest_news}
+			news = {"1": announcement}
 		else:
 			content = list(json.loads(news.replace("'", "\""), encoding='utf-8').values())
 			if len(content) >= 30: content.pop(0)
-			content.append(latest_news)
-			news = {}  # 1, 2, 3, ..., latest_news
+			content.append(announcement)
+			news = {}
 			for i, value in enumerate(content):
 				news.update({str(i + 1): value})
 		leave_family_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-		await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, news="{str(news)}" WHERE familyid = "{fid}";')
+		await self._execute_statement_update(world, f'UPDATE families SET remove_start_time="{remove_start_time}", remove_times={remove_times}, announcement="{announcement}", news="{str(news)}" WHERE familyid = "{fid}";')
 		await self._execute_statement_update(world, f'UPDATE player SET familyid="", sign_in_time="", cumulative_contribution=0, leave_family_time="{leave_family_time}" WHERE game_name = "{gamename_target}";')
-		remaining = {"news": news, "remove_start_time": remove_start_time, "remove_times": remove_times, 'disbanded_family_time': disbanded_family_time}
+		remaining = {"announcement": announcement, "news": news, "remove_start_time": remove_start_time, "remove_times": remove_times, 'disbanded_family_time': disbanded_family_time}
 		return self._message_typesetting(0, 'success, user removed', data={"remaining": remaining})
 
 	# TODO refactor code to run both sql statements with asyncio.gather
@@ -2678,7 +2485,7 @@ class GameManager:
 		# 98 - Your family has been dissolved by the patriarch
 		# 99 - you do not belong to a family
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(99, 'you are not in a family')
+		if not fid: return self._message_typesetting(99, 'you are not in a family.')
 		family_info = await self._get_family_information(world, fid)
 		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
 			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
@@ -2798,7 +2605,7 @@ class GameManager:
 				experience -= need_experience
 				level += 1
 		await self._execute_statement_update(world, f'update families set experience="{experience}", level={level} where familyid="{fid}"')
-		remaining = {'sign_in_time': current_time, 'family_level': level, 'family_experience': experience}
+		remaining = {'sign_in_time': current_time, 'level': level, 'experience': experience}
 		reward = {'union_contribution': 1, 'cumulative_contribution': 1}
 		for key, value in self._family_config['union_restrictions']['sign_in_reward'].items():
 			data = await self._try_material(world, uid, key, value)
@@ -2809,7 +2616,6 @@ class GameManager:
 		contribution_data = await self._execute_statement(world, f'select union_contribution,cumulative_contribution from player where unique_id="{uid}"')
 		union_contribution, cumulative_contribution = contribution_data[0]
 		remaining.update({'union_contribution': union_contribution, 'cumulative_contribution': cumulative_contribution})
-		await self.check_in_family_task(world, uid)
 		return self._message_typesetting(0, 'Sign-in success', data={'ramining': remaining, 'reward': reward})
 
 	async def disbanded_family(self, world: int, uid: str) -> dict:
@@ -2825,12 +2631,6 @@ class GameManager:
 			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
 			return self._message_typesetting(94, 'No such union, your family has been dissolved')
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-		news = family_info[6]
-		content = []
-		if news != '':
-			news = json.loads(news.replace("'", "\""), encoding='utf-8')
-			content = list(news.values())
-			if len(content) >= 30: content.pop(0)
 		president = family_info[7]
 		disbanded_family_time = family_info[18]
 		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
@@ -2841,15 +2641,10 @@ class GameManager:
 		current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 		if disbanded_family_time == "":
 			disbanded_family_time = current_time
-			latest_news = f'{president}:family:3:president:family'
-			news = {}  # 1, 2, 3, ..., latest_news
-			content.append(latest_news)
-			for i, value in enumerate(content):
-				news.update({str(i + 1): value})
-			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}", news="{str(news)}" WHERE familyid = "{fid}";')
+			await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "{disbanded_family_time}" WHERE familyid = "{fid}";')
 		else:
 			disbanded_cooling_time = int(disbanded_cooling_time - (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds())
-		return self._message_typesetting(0, 'Your family is being dissolved', data={'remaining': {'disbanded_family_time': disbanded_family_time, 'disbanded_cooling_time': disbanded_cooling_time, 'news': news}})
+		return self._message_typesetting(0, 'Your family is being dissolved', data={"remaining": {"disbanded_family_time": disbanded_family_time, 'disbanded_cooling_time': disbanded_cooling_time}})
 
 	async def cancel_disbanded_family(self, world: int, uid: str) -> dict:
 		# 0 - You have canceled the disbanded family
@@ -2859,20 +2654,12 @@ class GameManager:
 		# 98 - Your family has been dissolved by the patriarch
 		# 99 - you are not in a family
 		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(99, 'you are not in a family')
+		if not fid: return self._message_typesetting(99, 'you are not in a family')
 		family_info = await self._get_family_information(world, fid)
 		if not family_info:  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
 			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
 			return self._message_typesetting(94, 'No such union, your family has been dissolved')
 		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-
-		news = family_info[6]
-		content = []
-		if news != '':
-			news = json.loads(news.replace("'", "\""), encoding='utf-8')
-			content = list(news.values())
-			if len(content) >= 30: content.pop(0)
-
 		president = family_info[7]
 		disbanded_family_time = family_info[18]
 		if disbanded_family_time == '':
@@ -2881,444 +2668,67 @@ class GameManager:
 			return self._message_typesetting(98, 'Your family has been dissolved by the patriarch')
 		if game_name != president:
 			return self._message_typesetting(97, 'You are not a patriarch')
-
-		latest_news = f'{president}:family:4:president:family'
-		news = {}  # 1, 2, 3, ..., latest_news
-		content.append(latest_news)
-		for i, value in enumerate(content):
-			news.update({str(i + 1): value})
-		await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "", news="{str(news)}" WHERE familyid = "{fid}";')
-		return self._message_typesetting(0, 'You have canceled the disbanded family', data={'remaining': {'news': news}})
+		await self._execute_statement_update(world, f'UPDATE families SET disbanded_family_time = "" WHERE familyid = "{fid}";')
+		return self._message_typesetting(0, 'You have canceled the disbanded family')
 
 	@C.collect_async
 	async def request_join_family(self, world: int, uid: str, fname: str) -> dict:
-		# 用户发出请求加入对应的家族
 		# 0 - success, join request message sent to family owner's mailbox
-		# 96 - You have to leave the family for less than a day
-		# 97 - This family has been dissolved and the family does not exist.
 		# 98 - you already belong to a family
 		# 99 - family does not exist
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid != '': return self._message_typesetting(98, 'already in a family')
-		leave_family_time = (await self._execute_statement(world, f'select leave_family_time from player where unique_id="{uid}"'))[0][0]
-		if leave_family_time != '' and (datetime.now() - datetime.strptime(leave_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds() >= 86400:
-			return self._message_typesetting(96, 'You have to leave the family for less than a day')
+		game_name, fid = await self._get_familyid(world, unique_id = uid)
+		if fid is not None and fid != '': return self._message_typesetting(98, 'already in a family')
 		if not await self._family_exists(world, fname): return self._message_typesetting(99, 'family does not exist')
-		data = await self._execute_statement(world, f'SELECT familyid, president, admin1, admin2, admin3 FROM families WHERE familyname = "{fname}";')
-		gn_list = [gn for gn in data[0] if gn != '']
-		fid = gn_list[0]
-		gn_list.remove(fid)
-		if len(gn_list) == 0:
-			await self._execute_statement_update(world, f'DELETE FROM families WHERE familyname = "{fname}";')
-			return self._message_typesetting(97, 'This family has been dissolved and the family does not exist.')
-		elif len(gn_list) == 1:
-			sql_str = f'SELECT unique_id FROM player WHERE game_name = "{gn_list[0]}";'
-		else:
-			sql_str = f'SELECT unique_id FROM player WHERE game_name in {tuple(gn_list)};'
-		admin_uid = await self._execute_statement(world, sql_str)
-		for admin in admin_uid:
-			j = {'world' : 0, 'uid_to' : admin[0], 'kwargs' : {'from' : 'server', 'subject' : 'New join family request', 'body' : f'new request to join family from {game_name}', 'type' : 'family_request', 'fid' : fid, 'fname' : fname, 'target' : game_name, 'uid' : uid}}
-			r = requests.post(MAIL_URL + '/send_mail', json=j)
+		data = await self._execute_statement(world, f'SELECT familyid FROM families WHERE familyname = "{fname}";')
+		owner_uid = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{data[0][0]}";')
+		j = {'world' : 0, 'uid_to' : owner_uid[0][0], 'kwargs' : {'from' : 'server', 'subject' : 'New join family request', 'body' : f'new request to join family from {game_name}', 'type' : 'family_request', 'fid' : data[0][0], 'fname' : fname, 'target' : game_name, 'uid' : uid}}
+		r = requests.post(MAIL_URL + '/send_mail', json = j)
 		return self._message_typesetting(0, 'success, join request sent to family owners mailbox')
 
 	@C.collect_async
 	async def invite_user_family(self, world: int, uid: str, target: str) -> dict:
-		# 0 - Has successfully invited the target
-		# 92 - You are not the patriarch or administrator of this family
-		# 93 - Your family has been dissolved by the patriarch
-		# 94 - No such union, your family has been dissolved
-		# 95 - The user you invited is already in a family
-		# 96 - The user you invited leaves the family less than a day
-		# 97 - The user you invited does not exist
+		# 0 - success, join request message sent to family owner's mailbox
+		# 95 - target does not exist
+		# 96 - target is already in a family
+		# 97 - you must be family owner
 		# 98 - you do not belong to a family
 		# 99 - invalid target
-		if target == '': return self._message_typesetting(99, 'invalid target')
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(98, 'you do not belong to a family')
-		target_info = await self._execute_statement(world, f'select leave_family_time, familyid, unique_id from player where game_name="{target}"')
-		if target_info == (): return self._message_typesetting(97, 'The user you invited does not exist')
-		leave_family_time = target_info[0][0]
-		target_fid = target_info[0][1]
-		target_uid = target_info[0][2]
-		if leave_family_time != '' and (datetime.now() - datetime.strptime(leave_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds() >= 86400:
-			return self._message_typesetting(96, 'The user you invited leaves the family less than a day')
-		if target_fid != '':
-			return self._message_typesetting(95, 'The user you invited is already in a family')
-
-		family_info = await self._get_family_information(world, fid)
-		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
-			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
-			return self._message_typesetting(94, 'No such union, your family has been dissolved')
-		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-		fname = family_info[1]
-		president = family_info[7]
-		admins = [admin for admin in family_info[8: 11] if admin != '']
-		disbanded_family_time = family_info[18]
-		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
-			return self._message_typesetting(93, 'Your family has been dissolved by the patriarch')
-
-		if game_name != president and game_name not in admins:
-			return self._message_typesetting(92, 'You are not the patriarch or administrator of this family')
-
-		j = {'world' : 0, 'uid_to' : target_uid, 'kwargs' : {'from' : game_name, 'subject' : 'New join family request', 'body' : f'{game_name} invites you to join their family!', 'type' : 'family_request', 'fid' : fid, 'fname' : fname, 'target' : target, 'uid' : target_uid}}
+		game_name, fid = await self._get_familyid(world, unique_id = uid)
+		if fid is None or fid == '': return self._message_typesetting(98, 'not in a family')
+		owner, fname, members = await self._get_family_information(world, fid)
+		if owner != game_name: return self._message_typesetting(97, 'you must be family owner')
+		tgame_name, tfid = await self._get_familyid(world, game_name = target)
+		if not tgame_name: return self._message_typesetting(95, 'target does not exist')
+		if tfid is not None and tfid != '': return self._message_typesetting(96, 'target already in a family')
+		targetuid = await self._execute_statement(world, f'SELECT unique_id FROM player WHERE game_name = "{target}";')
+		j = {'world' : 0, 'uid_to' : targetuid[0][0], 'kwargs' : {'from' : game_name, 'subject' : 'New join family request', 'body' : f'{game_name} invites you to join their family!', 'type' : 'family_request', 'fid' : fid, 'fname' : fname, 'target' : tgame_name, 'uid' : targetuid[0][0]}}
 		r = requests.post(MAIL_URL + '/send_mail', json = j)
-		return self._message_typesetting(0, 'Has successfully invited the target')
+		return self._message_typesetting(0, 'success, request sent')
 
 	@C.collect_async
 	async def respond_family(self, world: int, uid: str, nonce: str) -> dict:
-		# 处理申请家族的邀请函
 		# 0 - success
-		# 90 - You are not a user
-		# 94 - You are not the patriarch or administrator of this family
-		# 95 - Your family has been dissolved by the patriarch
-		# 96 - No such union, your family has been dissolved
+		# 96 - family does not exist
 		# 97 - target is already in a family
 		# 98 - family is full
 		# 99 - invalid nonce
-		user_data = await self._execute_statement(world, f'select game_name from player where unique_id="{uid}"')
-		if user_data == ():
-			return self._message_typesetting(90, 'You are not a user')
-
 		r = requests.post(TOKEN_URL + '/redeem_nonce', json = {'type' : ['family_request'], 'nonce' : [nonce]}).json()
 		if r[nonce]['status'] != 0 or r[nonce]['type'] != 'family_request':
 			return self._message_typesetting(99, 'invalid nonce')
-
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = r[nonce]['uid'])
-		if fid != '': return self._message_typesetting(97, 'target already in a family')  # 申请的用户已在其他家庭中
-
-		fid = r[nonce]["fid"]  # 要加入的家族的id
-		family_info = await self._get_family_information(world, fid)
-		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
-			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
-			return self._message_typesetting(96, 'No such union, your family has been dissolved')
-		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-		level = family_info[2]
-
-		news = family_info[6]
-		content = []
-		if news != '':
-			news = json.loads(news.replace("'", "\""), encoding='utf-8')
-			content = list(news.values())
-			if len(content) >= 30: content.pop(0)
-
-		president = family_info[7]
-		admins = [admin for admin in family_info[8: 11] if admin != '']
-		disbanded_family_time = family_info[18]
-		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
-			return self._message_typesetting(95, 'Your family has been dissolved by the patriarch')
-
-		if user_data[0][0] != president and user_data[0][0] not in admins:
-			return self._message_typesetting(94, 'You are not the patriarch or administrator of this family')
-
-		members = [gname[0] for gname in await self._execute_statement(world, f'select game_name from player where familyid="{fid}"')]
-		max_member = self._family_config['union_restrictions']['people_number']['basis_people'] + level * self._family_config['union_restrictions']['people_number']['increment']
-		if len(members) >= max_member:
+		game_name, fid = await self._get_familyid(world, unique_id = r[nonce]['uid'])
+		if fid is not None and fid != '': return self._message_typesetting(97, 'target already in a family')
+		owner, fname, members = await self._get_family_information(world, r[nonce]['fid'])
+		if owner is None: return self._message_typesetting(96, 'family does not exist')
+		try:
+			next_open = members.index('')
+		except ValueError:
 			return self._message_typesetting(98, 'family is full')
-		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{fid}" WHERE unique_id = "{r[nonce]["uid"]}";')
-
-		if user_data[0][0] == president:
-			latest_news = f"{user_data[0][0]}:{game_name}:2:president:member"
-		else:
-			latest_news = f"{user_data[0][0]}:{game_name}:2:admin:member"
-
-		news = {}  # 1, 2, 3, ..., latest_news
-		content.append(latest_news)
-		for i, value in enumerate(content):
-			news.update({str(i + 1): value})
-		await self._execute_statement_update(world, f'UPDATE families SET news="{str(news)}" WHERE familyid = "{fid}";')
-
-		return self._message_typesetting(0, 'success', data={'remaining': {'news': news}})
-
-	async def family_officer(self, world: int, uid: str, target: str, position: int) -> dict:
-		# position: 0:管理员, 1:精英
-		# 0 - You successfully appointed the target as an official
-		# 91 - No such position
-		# 92 - elite position is full
-		# 93 - admin position is full
-		# 94 - target is already an official
-		# 95 - target is not your member
-		# 96 - You are not a patriarch, you have no authority to appoint an official
-		# 97 - Your family has been dissolved by the patriarch
-		# 98 - No such union, your family has been dissolved
-		# 99 - you are not in a family
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(99, 'you are not in a family')
-
-		family_info = await self._get_family_information(world, fid)
-		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
-			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
-			return self._message_typesetting(98, 'No such union, your family has been dissolved')
-		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-
-		news = family_info[6]
-		content = []
-		if news != '':
-			news = json.loads(news.replace("'", "\""), encoding='utf-8')
-			content = list(news.values())
-			if len(content) >= 30: content.pop(0)
-
-		president = family_info[7]
-		admins = family_info[8: 11]
-		elites = family_info[11: 16]
-		disbanded_family_time = family_info[18]
-		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
-			return self._message_typesetting(97, 'Your family has been dissolved by the patriarch')
-		if president != game_name:
-			return self._message_typesetting(96, 'You are not a patriarch, you have no authority to appoint an official')
-		members = [gname[0] for gname in await self._execute_statement(world, f'select game_name from player where familyid="{fid}"')]
-		if target == '' or target not in members:
-			return self._message_typesetting(95, 'target is not your member')
-		if target == president or target in admins or target in elites:
-			return self._message_typesetting(94, 'target is already an official')
-		if position == 0:  # admin
-			if '' not in admins:
-				return self._message_typesetting(93, 'admin position is full')
-
-			latest_news = f'{president}:{target}:5:president:admin'
-			news = {}  # 1, 2, 3, ..., latest_news
-			content.append(latest_news)
-			for i, value in enumerate(content):
-				news.update({str(i + 1): value})
-
-			await self._execute_statement_update(world, f'update families set admin{admins.index("") + 1} = "{target}", news="{str(news)}" where familyid="{fid}"')
-		elif position == 1:  # elite
-			if '' not in elites:
-				return self._message_typesetting(92, 'elite position is full')
-
-			latest_news = f'{president}:{target}:5:president:elite'
-			news = {}  # 1, 2, 3, ..., latest_news
-			content.append(latest_news)
-			for i, value in enumerate(content):
-				news.update({str(i + 1): value})
-
-			await self._execute_statement_update(world, f'update families set elite{elites.index("") + 1} = "{target}", news="{str(news)}" where familyid="{fid}"')
-		else:
-			return self._message_typesetting(91, 'No such position')
-
-		return self._message_typesetting(0, 'You successfully appointed the target as an official', data={'remaining': {'news': news}})
-
-	async def dismissal_family_officer(self, world: int, uid: str, target: str) -> dict:
-		# 0 - You successfully dismissed the target
-		# 93 - target have no position
-		# 94 - You can't dismiss the patriarch's position
-		# 95 - target is not your member
-		# 96 - You are not a patriarch, you have no authority to appoint an official
-		# 97 - Your family has been dissolved by the patriarch
-		# 98 - No such union, your family has been dissolved
-		# 99 - you are not in a family
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(99, 'you are not in a family')
-
-		family_info = await self._get_family_information(world, fid)
-		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
-			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
-			return self._message_typesetting(98, 'No such union, your family has been dissolved')
-		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-
-		news = family_info[6]
-		content = []
-		if news != '':
-			news = json.loads(news.replace("'", "\""), encoding='utf-8')
-			content = list(news.values())
-			if len(content) >= 30: content.pop(0)
-
-		president = family_info[7]
-		admins = family_info[8: 11]
-		elites = family_info[11: 16]
-		disbanded_family_time = family_info[18]
-		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
-			return self._message_typesetting(97, 'Your family has been dissolved by the patriarch')
-		if president != game_name:
-			return self._message_typesetting(96, 'You are not a patriarch, you have no authority to appoint an official')
-		members = [gname[0] for gname in await self._execute_statement(world, f'select game_name from player where familyid="{fid}"')]
-		if target == '' or target not in members:
-			return self._message_typesetting(95, 'target is not your member')
-		if target == president:
-			return self._message_typesetting(94, "You can't dismiss the patriarch's position")
-		if target not in admins and target not in elites:
-			return self._message_typesetting(93, 'target have no position')
-
-		if target in admins:
-			latest_news = f'{president}:{target}:6:president:admin'
-			news = {}  # 1, 2, 3, ..., latest_news
-			content.append(latest_news)
-			for i, value in enumerate(content):
-				news.update({str(i + 1): value})
-			await self._execute_statement_update(world, f'update families set admin{admins.index(target) + 1} = "", news="{str(news)}" where familyid="{fid}"')
-		else:
-			latest_news = f'{president}:{target}:6:president:elite'
-			news = {}  # 1, 2, 3, ..., latest_news
-			content.append(latest_news)
-			for i, value in enumerate(content):
-				news.update({str(i + 1): value})
-			await self._execute_statement_update(world, f'update families set elite{elites.index(target) + 1} = "", news="{str(news)}" where familyid="{fid}"')
-		return self._message_typesetting(0, 'You successfully dismissed the target', data={'remaining': {'news': news}})
-
-	async def family_change_name(self, world: int, uid: str, family_name: str) -> dict:
-		# 0 - Modify family name successfully
-		# 92 - Insufficient diamond
-		# 93 - family name already taken
-		# 94 - family name is illegal
-		# 95 - Can't be the same as the old name
-		# 96 - You are not a patriarch and you have no right to modify the family name
-		# 97 - Your family has been dissolved by the patriarch
-		# 98 - No such union, your family has been dissolved
-		# 99 - you are not in a family
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(99, 'you are not in a family')
-
-		family_info = await self._get_family_information(world, fid)
-		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
-			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
-			return self._message_typesetting(98, 'No such union, your family has been dissolved')
-		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-
-		news = family_info[6]
-		content = []
-		if news != '':
-			news = json.loads(news.replace("'", "\""), encoding='utf-8')
-			content = list(news.values())
-			if len(content) >= 30: content.pop(0)
-
-		fname = family_info[1]
-		president = family_info[7]
-		disbanded_family_time = family_info[18]
-		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
-			return self._message_typesetting(97, 'Your family has been dissolved by the patriarch')
-		if president != game_name:
-			return self._message_typesetting(96, 'You are not a patriarch and you have no right to modify the family name')
-		if fname == family_name:
-			return self._message_typesetting(95, "Can't be the same as the old name")
-		if family_name == '':
-			return self._message_typesetting(94, 'family name is illegal')
-		if await self._family_exists(world, family_name):
-			return self._message_typesetting(93, 'family name already taken')
-
-		need_diamond = self._family_config['union_restrictions']['modify_name_diamond']
-		data = await self.try_diamond(world, uid, -1 * abs(need_diamond))
-		if data['status'] != 0:
-			return self._message_typesetting(92, 'Insufficient diamond')
-		diamond = data['remaining']
-
-		latest_news = f"{president}:family:7:president:family"
-		news = {}  # 1, 2, 3, ..., latest_news
-		content.append(latest_news)
-		for i, value in enumerate(content):
-			news.update({str(i + 1): value})
-		await self._execute_statement_update(world, f'UPDATE families SET news="{str(news)}", familyname="{family_name}" WHERE familyid = "{fid}";')
-		return self._message_typesetting(0, 'Modify family name successfully', data={'remaining': {'news': news, 'diamond': diamond, 'family_name': family_name}})
-
-	async def family_blackboard(self, world: int, uid: str) -> dict:
-		# 家族黑板 显示工会信息
-		# 0 - Successfully obtained news information
-		# 97 - Your family has been dissolved by the patriarch
-		# 98 - No such union, your family has been dissolved
-		# 99 - you are not in a family
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(99, 'you are not in a family')
-
-		family_info = await self._get_family_information(world, fid)
-		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
-			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
-			return self._message_typesetting(98, 'No such union, your family has been dissolved')
-		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-
-		news = family_info[6]
-		if news != '': news = json.loads(news.replace("'", "\""), encoding='utf-8')
-
-		disbanded_family_time = family_info[18]
-		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
-			return self._message_typesetting(97, 'Your family has been dissolved by the patriarch')
-
-		return self._message_typesetting(0, 'Successfully obtained news information', data={'remaining': {'news': news}})
-
-	async def family_announcement(self, world: int, uid: str) -> dict:
-		# 家族公告
-		# 0 - Successfully obtained announcement information
-		# 97 - Your family has been dissolved by the patriarch
-		# 98 - No such union, your family has been dissolved
-		# 99 - you are not in a family
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(99, 'you are not in a family')
-
-		family_info = await self._get_family_information(world, fid)
-		if family_info == ():  # 没有这个家族的信息，出现了错误数据，将错误的信息做清空处理
-			await self._execute_statement(world, f'update player set familyid="" where familyid="{fid}"')
-			return self._message_typesetting(98, 'No such union, your family has been dissolved')
-		family_info = list(family_info[0])  # 将家族信息取出来并格式化为列表形式
-
-		announcement = family_info[5]
-
-		disbanded_family_time = family_info[18]
-		if await self.check_disbanded_family_time(world, fid, disbanded_family_time):
-			return self._message_typesetting(97, 'Your family has been dissolved by the patriarch')
-
-		return self._message_typesetting(0, 'Successfully obtained announcement information', data={'remaining': {'announcement': announcement}})
-
-	# TODO Done · Unused
-	async def refresh_family_store(self, world: int) -> dict:
-		# 刷新工会商店
-		current_time = datetime.now().strftime('%Y-%m-%d')
-		family_store = self._family_config['union_store']['merchandise']
-		remaining = {}
-		for code, item in enumerate(family_store.items()):
-			if code > 7: break
-			remaining.update({code: {item[0]: item[1]['m_quantity'], 'union_contribution': item[1]['c_quantity']}})
-			await self._set_family_store_material(world, code + 1, item[0], item[1]['m_quantity'], 'union_contribution', item[1]['c_quantity'], current_time)
-		return self._message_typesetting(0, 'The union store refreshed successfully', data={'remaining': remaining})
-
-	# TODO Done · Unused
-	async def _set_family_store_material(self, world: int, code: int, merchandise: str, merchandise_quantity: int, currency_type: str, currency_type_price: int, refresh_time: str) -> int:
-		sql_str = f'UPDATE union_store SET merchandise{code}="{merchandise}", merchandise{code}_quantity="{merchandise_quantity}", currency_type{code}="{currency_type}", currency_type{code}_price="{currency_type_price}", refresh_time="{refresh_time}" WHERE unique_id="world family";'
-		return await self._execute_statement_update(world, sql_str)
-
-	async def get_family_store(self, world: int, uid: str) -> dict:
-		# 获取工会商店的物品
-		# 0 - success
-		return self._message_typesetting(0, 'success', data={'remaining': self._family_config['union_store']['merchandise']})
-
-	async def family_market_purchase(self, world: int, uid: str, merchandise: str) -> dict:
-		# 工会兑换，商品内容根据配置表固定
-		# 0 - success
-		# 97 - Insufficient union coin
-		# 98 - The item you purchased has expired
-		# 99 - you are not in a family
-
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(99, 'you are not in a family')
-
-		store = self._family_config['union_store']['merchandise']
-		if merchandise not in list(store.keys()):
-			return self._message_typesetting(98, 'The item you purchased has expired')
-		c_quantity = store[merchandise]['c_quantity']
-		m_quantity = store[merchandise]['m_quantity']
-		c_data = await self._try_material(world, uid, 'union_contribution', -1 * abs(c_quantity))
-		if c_data['status'] != 0:
-			return self._message_typesetting(97, 'Insufficient union coin')
-		m_data = await self._try_material(world, uid, merchandise, m_quantity)
-		return self._message_typesetting(0, 'success', data={'remaining': {'union_contribution': c_data['remaining'], merchandise: m_data['remaining']}, 'reward': {merchandise: m_quantity}})
-
-	async def family_gift_package(self, world: int, uid: str) -> dict:
-		# 工会礼包，一人购买，全员获得
-		# 0 - success
-		# 99 - you are not in a family
-
-		game_name, fid, sign_in_time, union_contribution = await self._get_familyid(world, unique_id = uid)
-		if fid == '': return self._message_typesetting(99, 'you are not in a family')
-
-		store = self._family_config['union_store']['gift_package']
-		for k, v in store.items():
-			await self._execute_statement_update(world, f'UPDATE player set {k}={k}+{v} where familyid="{fid}"')
-
+		await self._execute_statement_update(world, f'UPDATE families SET member{next_open} = "{r[nonce]["target"]}" WHERE familyid = "{r[nonce]["fid"]}";')
+		await self._execute_statement_update(world, f'UPDATE player SET familyid = "{r[nonce]["fid"]}" WHERE unique_id = "{r[nonce]["uid"]}";')
 		return self._message_typesetting(0, 'success')
 
-	async def get_family_config(self, world: int, uid: str) -> dict:
-		# 返回家族配置表
-		# 0 - success
-		return self._message_typesetting(0, 'success', data={'remaining': self._family_config})
-
 	async def check_disbanded_family_time(self, world: int, fid: str, disbanded_family_time: str) -> bool:
-		if disbanded_family_time != '':
+		if disbanded_family_time:
 			current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 			if (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(disbanded_family_time, '%Y-%m-%d %H:%M:%S')).total_seconds() >= self._family_config['union_restrictions']['disbanded_cooling_time']:
 				await self._execute_statement(world, f'update player set familyid="", sign_in_time="",cumulative_contribution=0, leave_family_time="{current_time}" where familyid="{fid}"')
@@ -3695,7 +3105,6 @@ class GameManager:
 			sql_str = f"update factory set food_storage={food_storage}, iron_storage={iron_storage}, crystal_storage={crystal_storage}, equipment_storage={equipment_storage}, food_factory_timer='{food_start_time}', mine_factory_timer='{mine_start_time}', crystal_factory_timer='{crystal_start_time}', equipment_factory_timer='{equipment_start_time}', equipment_product_type='{equipment_product_type}' where unique_id='{unique_id}'"
 			await self._execute_statement_update(world=world, statement=sql_str)
 		if len(reward) > 4:
-			await self.refresh_all_storage_task(world, unique_id)
 			return self._message_typesetting(status=0, message="update factory success", data={"remaining": remaining, "reward": reward})
 		return self._message_typesetting(status=99, message="update factory failed, all factories are not initialized")
 
@@ -4068,610 +3477,12 @@ class GameManager:
 #							End Factory Functions							#
 #############################################################################
 
-#############################################################################
-#							Start Task Functions							#
-#############################################################################
-	# login:0,            check_in:1,     level_up_role:2,    level_up_weapon:3,      pass_stage:4,           pass_tower:5
-	# pass_world_boss:6,  basic_summon:7, pro_summon:8,       get_factory_resource:9, send_friend_gift:10,    check_in_family:11
-
-	async def login_task(self, world: int, unique_id: str) -> dict:
-		# 登录就触发此方法
-		tid = self._task['task_id']['login']
-		task_data = await self.get_task(world, unique_id, tid)
-		timer = task_data[3]
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		if timer == '' or timer != current_time:
-			await self.reset_task(world, unique_id, tid)
-			await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={tid}')
-			return self._message_typesetting(0, 'login successful')
-		else:  # 登录过的返回
-			return self._message_typesetting(1, 'Signed in')
-
-
-	async def check_in_task(self, world: int, unique_id: str) -> int:
-		"""每日签到"""
-		# 0 - Not the first time
-		# 1 - the first time
-		check_in_info = await self._execute_statement(world, f'select task_value, timer from task where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
-		task_value, timer = check_in_info[0]
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		if timer != current_time or task_value == 0:
-			vip_experience = self._vip_config['card_increase_experience']
-			await self.check_vip_card_deadline(world, unique_id)
-			card_info = await self._execute_statement(world, f'select vip_card_type from player where unique_id="{unique_id}"')
-			vip_card_type = card_info[0][0]
-			if vip_card_type != '':
-				json_data = {
-					'world' : world,
-					'uid_to': unique_id,
-					'kwargs': {
-						'from' : 'server',
-						'body' : 'Your gift is waiting.',
-						'subject' : 'You have a gift!',
-						'type' : 'gift',
-						'items' : 'vip_experience',
-						'quantities' : str(vip_experience[vip_card_type])
-					}
-				}
-				result = requests.post(MAIL_URL + '/send_mail', json = json_data).json()
-				# await self._execute_statement_update(world, f'update player set vip_experience=vip_experience+{vip_experience[vip_card_type]} where unique_id="{unique_id}"')
-			await self._execute_statement_update(world, f'update player set vip_experience=vip_experience+10 where unique_id="{unique_id}"')
-			return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1, task_reward=0 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
-		else:
-			return 0
-
-
-	async def level_up_role_task(self, world: int, unique_id: str) -> int:
-		"""升级角色"""
-		# 0 - Not the first time
-		# 1 - the first time
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["level_up_role"]}')
-
-
-	async def level_up_weapon_task(self, world: int, unique_id: str) -> int:
-		"""升级武器"""
-		# 0 - Not the first time
-		# 1 - the first time
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["level_up_weapon"]}')
-
-
-	async def pass_stage_task(self, world: int, unique_id: str) -> int:
-		"""通过关卡"""
-		# 0 - Not the first time
-		# 1 - the first time
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_stage"]}')
-
-
-	async def pass_tower_task(self, world: int, unique_id: str) -> int:
-		"""通过塔"""
-		# 0 - Not the first time
-		# 1 - the first time
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_tower"]}')
-
-
-	async def leave_world_boss_stage_task(self, world: int, unique_id: str) -> int:
-		"""通过世界boss"""
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_world_boss"]}')
-
-
-	async def basic_summon_task(self, world: int, unique_id: str) -> int:
-		"""普通召唤"""
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["basic_summon"]}')
-
-
-	async def pro_summon_task(self, world: int, unique_id: str) -> int:
-		"""高级召唤"""
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pro_summon"]}')
-
-
-	async def refresh_all_storage_task(self, world: int, unique_id: str) -> int:
-		"""领取资源"""
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["factory_resource"]}')
-
-
-	async def send_friend_gift_task(self, world: int, unique_id: str) -> int:
-		"""发送一次爱心"""
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["send_friend_gift"]}')
-
-
-	async def check_in_family_task(self, world: int, unique_id: str) -> int:
-		"""每日签到"""
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in_family"]}')
-
-
-	async def get_all_task(self, world: int, unique_id: str) -> dict:
-		"""获取所有每日任务信息"""
-		# 0 - get task success
-		remaining = {}
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		for key, tid in self._task['task_id'].items():
-			data = await self.get_task(world, unique_id, tid)
-			if data[4] != '' and data[4] != current_time:
-				await self.reset_task(world, unique_id, tid)
-				data = await self.get_task(world, unique_id, tid)
-			remaining.update({key: {'task_value': data[2], 'task_reward': data[3], 'timer': data[4]}})
-		return self._message_typesetting(0, 'get task success', data={'remaining': remaining})
-
-
-	async def get_daily_task_reward(self, world: int, unique_id: str, task_id: str) -> dict:
-		"""领取钻石，每天领取一次并将领取的字段置为1，今天之内不再领取"""
-		# 0 - Successfully receive rewards
-		# 96 - Reward acquisition failed
-		# 97 - You have already received a reward
-		# 98 - You have not completed this task yet
-		# 99 - No such task id
-		if task_id not in list(self._task['task_id'].keys()):
-			return self._message_typesetting(99, 'No such task id')
-		tid = self._task['task_id'][task_id]
-		data = await self.get_task(world, unique_id, tid)
-		if data[2] == 0:  # 判断任务是否完成
-			return self._message_typesetting(98, 'You have not completed this task yet')
-		if data[3] == 1:  # 判断奖励是否已经领取过
-			return self._message_typesetting(97, 'You have already received a reward')
-		await self._execute_statement_update(world, f'update task set task_reward=1 where unique_id="{unique_id}" and task_id={tid}')
-		diamond = self._task['task_reward']['all_task']['diamond']
-		data = await self.try_diamond(world, unique_id, diamond)
-		if data['status'] != 0:
-			return self._message_typesetting(96, 'Reward acquisition failed')
-		remaining = {'diamond': data['remaining'], 'task_reward': 1}
-		reward = {'diamond': diamond}
-		return self._message_typesetting(0, 'Successfully receive rewards', data={'remaining': remaining, 'reward': reward})
-
-
-	async def get_task_pack_diamond(self, world: int, unique_id: str) -> dict:
-		"""任务完成10以上获取的100的钻石奖励"""
-		# 0 - Successfully get complete 10 tasks rewards
-		# 96 - Reward acquisition failed
-		# 97 - You have already received a reward
-		# 98 - You have not completed this task yet
-		await self.refresh_10_task_completions(world, unique_id)
-
-		tid = self._task['task_id']['complete_10_tasks']
-		data = await self.get_task(world, unique_id, tid)
-		if data[2] == 0:  # 判断任务是否完成
-			return self._message_typesetting(98, 'You have not completed this task yet')
-		if data[3] == 1:  # 判断奖励是否已经领取过
-			return self._message_typesetting(97, 'You have already received a reward')
-		await self._execute_statement_update(world, f'update task set task_reward=1 where unique_id="{unique_id}" and task_id={tid}')
-		diamond = self._task['task_reward']['complete_10_tasks']['diamond']
-		data = await self.try_diamond(world, unique_id, diamond)
-		if data['status'] != 0:
-			return self._message_typesetting(96, 'Reward acquisition failed')
-		remaining = {'diamond': data['remaining'], 'task_reward': 1}
-		reward = {'diamond': diamond}
-		return self._message_typesetting(0, 'Successfully get complete 10 tasks rewards', data={'remaining': remaining, 'reward': reward})
-
-
-	async def refresh_10_task_completions(self, world: int, unique_id: str) -> None:
-		"""刷新完成10个任务的情况"""
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		task_data = await self._execute_statement(world, f'select count(1) from task where unique_id="{unique_id}" and timer="{current_time}"')
-		if task_data != () and task_data[0][0] >= 10:
-			await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["complete_10_tasks"]}')
-
-	async def get_task(self, world: int, uid: str, tid: int) -> tuple:
-		data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
-		if data == ():  # 这里一次性创建所有需要的记录，这里没有使用task配置信息，到时候要作为单独修改
-			await self._execute_statement_update(world, f'insert into task(unique_id, task_id) values ("{uid}", 0),("{uid}", 1),("{uid}", 2),("{uid}", 3),("{uid}", 4),("{uid}", 5),("{uid}", 6),("{uid}", 7),("{uid}", 8),("{uid}", 9),("{uid}", 10),("{uid}", 11),("{uid}", 12)')
-			data = await self._execute_statement(world, f'select * from task where unique_id="{uid}" and task_id={tid}')
-		return data[0]
-
-	async def reset_task(self, world: int, uid: str, tid: int) -> None:
-		await self._execute_statement_update(world, f'update task set task_value=0, task_reward=0, timer="" where unique_id="{uid}" and task_id={tid}')
-
-#############################################################################
-#							End Task Functions								#
-#############################################################################
-
-
-#############################################################################
-#							Start Check_in Functions						#
-#############################################################################
-
-	async def check_in(self, world: int, unique_id: str) -> dict:
-		"""每日签到"""
-		# 0 - Sign-in success
-		# 99 - You have already signed in today
-		current_time = time.strftime('%Y-%m-%d', time.localtime())
-		check_select_str = f'select * from check_in where unique_id="{unique_id}" and date="{current_time}"'
-		s_data = await self._execute_statement(world, check_select_str)
-		if s_data != ():
-			return self._message_typesetting(99, 'You have already signed in today')
-		# 更新签到表
-		check_insert_str = f'insert into check_in(unique_id, date) values("{unique_id}", "{current_time}")'
-		await self._execute_statement_update(world, check_insert_str)
-		data = await self.receive_all_check_reward(world, unique_id)
-		return self._message_typesetting(0, 'Sign-in success', data=data['data'])
-
-
-	async def supplement_check_in(self, world: int, unique_id: str) -> dict:
-		"""补签"""
-		# 0 - Successful signing
-		# 98 - You have completed all current check-ins
-		# 99 - Insufficient diamond
-		month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取每月需要补签的日期前缀
-		data = await self._execute_statement(world, f'select date from check_in where unique_id="{unique_id}" and date like "{month_pre}%"')
-		day_list = [int(d[0][-2:]) for d in data]
-		today = datetime.today()
-		# max_day = calendar.monthrange(today.year, today.month)[1]  # 获取本月的总天数
-
-		missing_num = today.day - len(day_list)
-		if missing_num == 0:
-			return self._message_typesetting(98, 'You have completed all current check-ins')
-		need_diamond = -1 * missing_num * self._check_in['patch_diamond']
-		diamond_data = await self.try_diamond(world, unique_id, need_diamond)
-		if diamond_data['status'] != 0:
-			return self._message_typesetting(99, 'Insufficient diamond')
-
-		# remaining = {'diamond': diamond_data['remaining'], 'missing_date': []}
-		remaining = {'missing_date': []}
-		for d in range(1, today.day + 1):
-			if d not in day_list:
-				check_date = f'{month_pre}{d}'
-				if d < 10: check_date = f'{month_pre}0{d}'
-				remaining['missing_date'].append(check_date)
-				await self._execute_statement_update(world, f'insert into check_in(unique_id, date) values("{unique_id}", "{check_date}")')
-
-		data = await self.receive_all_check_reward(world, unique_id)
-		remaining.update({'check_in_data': data['data']})
-		return self._message_typesetting(0, 'Successful signing', data={'remaining': remaining})
-
-
-	async def get_all_check_in_table(self, world: int, unique_id: str) -> dict:
-		"""获取所有签到情况"""
-		# 0 - Successfully obtained all check-in status
-		# 0 - Successfully obtained all check-in status this month
-		# data = await self._execute_statement(world, f'select * from check_in where unique_id="{unique_id}"')
-		month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取本月的日期前缀
-		data = await self._execute_statement(world, f'select * from check_in where unique_id="{unique_id}" and date like "{month_pre}%"')
-		remaining = {}
-		for i, d in enumerate(data):
-			remaining.update({i: {'date': d[1], 'reward': d[2]}})
-		return self._message_typesetting(0, 'Successfully obtained all check-in status this month', data={'remaining': remaining})
-
-
-	async def receive_all_check_reward(self, world: int, unique_id: str) -> dict:
-		"""领取本月所有签到奖励"""
-		# 0 - Successfully received the reward
-		month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取本月的日期前缀
-		data = await self._execute_statement(world, f'select * from check_in where unique_id="{unique_id}" and date like "{month_pre}%" and reward=0')
-		key_words = ['role', 'weapon']
-		vip_dict = await self.increase_vip_exp(world, unique_id, 0)
-		if vip_dict == {}: return self._message_typesetting(99, 'function increase_vip_exp error')
-		vip_level = vip_dict['vip_level']
-		remaining = {}
-		reward = {}
-		for d in data:
-			# 领奖的操作
-			day = int(d[1][-2:])
-			item_index = day % 7
-			if item_index < vip_level:
-				for key, value in self._check_in[str(item_index + 1)].items():
-					if key in key_words:
-						k = value['type']
-						quantity = 2 * value['quantity']
-						select_str = f'select segment from {key} where unique_id="{unique_id}" and {key}_name="{k}"'
-						update_str = f'update {key} set segment=segment+{quantity} where unique_id="{unique_id}" and {key}_name="{k}"'
-						insert_str = f'insert into {key}(unique_id, {key}_name, segment) values("{unique_id}", "{k}", {quantity})'
-						k_data = await self._execute_statement(world, select_str)
-						if k_data == ():
-							await self._execute_statement_update(world, insert_str)
-							remaining.update({key: {k: quantity}})
-						else:
-							await self._execute_statement_update(world, update_str)
-							remaining.update({key: {k: k_data[0][0] + quantity}})
-						if key in reward.keys():
-							if k in reward[key].keys():
-								reward[key][k] += quantity
-							else:
-								reward[key].update({k: quantity})
-						else:
-							reward.update({key: {k: quantity}})
-					else:
-						quantity = 2 * value
-						key_data = await self._try_material(world, unique_id, key, quantity)
-						remaining.update({key: key_data['remaining']})
-						if key in reward.keys():
-							reward[key] += quantity
-						else:
-							reward.update({key: quantity})
-			else:
-				for key, value in self._check_in[str(item_index + 1)].items():
-					if key in key_words:
-						k = value['type']
-						quantity = value['quantity']
-						select_str = f'select segment from {key} where unique_id="{unique_id}" and {key}_name="{k}"'
-						update_str = f'update {key} set segment=segment+{quantity} where unique_id="{unique_id}" and {key}_name="{k}"'
-						insert_str = f'insert into {key}(unique_id, {key}_name, segment) values("{unique_id}", "{k}", {quantity})'
-						k_data = await self._execute_statement(world, select_str)
-						if k_data == ():
-							await self._execute_statement_update(world, insert_str)
-							remaining.update({key: {k: quantity}})
-						else:
-							await self._execute_statement_update(world, update_str)
-							remaining.update({key: {k: k_data[0][0] + quantity}})
-						if key in reward.keys():
-							if k in reward[key].keys():
-								reward[key][k] += quantity
-							else:
-								reward[key].update({k: quantity})
-						else:
-							reward.update({key: {k: quantity}})
-					else:
-						quantity = value
-						key_data = await self._try_material(world, unique_id, key, quantity)
-						remaining.update({key: key_data['remaining']})
-						if key in reward.keys():
-							reward[key] += quantity
-						else:
-							reward.update({key: quantity})
-			# 领完奖励后，将签到表中的reward置为1
-			await self._execute_statement_update(world, f'update check_in set reward=1 where unique_id="{unique_id}" and date="{d[1]}"')
-
-		return self._message_typesetting(0, 'Successfully received the reward', data={'remaining': remaining, 'reward': reward})
-
-#############################################################################
-#							End Check_in Functions							#
-#############################################################################
-
-
-#############################################################################
-#							Start VIP Functions								#
-#############################################################################
-
-	async def increase_vip_exp(self, world: int, unique_id: str, quantity: int) -> dict:
-		data = await self._try_material(world, unique_id, 'vip_experience', quantity)
-		experience_list = self._vip_config['vip_level']['experience']
-		g_list = [exp for exp in experience_list if exp > data['remaining']]
-		return {} if data['status'] != 0 else {'vip_experience': data['remaining'], 'vip_level': experience_list.index(g_list[0]) if g_list != [] else len(experience_list), 'upgrade_experience': g_list[0] - data['remaining'] if g_list != [] else 0}
-
-	async def purchase_vip_gift(self, world: int, unique_id: str, kind: int):
-		"""购买VIP礼包"""
-		# 0 - purchase vip gift success
-		# 96 - Insufficient diamond
-		# 97 - Your VIP level is not enough to buy
-		# 98 - you not vip identity
-		# 99 - function increase_vip_exp error
-		vip_dict = await self.increase_vip_exp(world, unique_id, 0)
-		if vip_dict == {}:
-			return self._message_typesetting(99, 'function increase_vip_exp error')
-
-		vip_level = vip_dict['vip_level']
-		if vip_level == 0:
-			return self._message_typesetting(98, 'you not vip identity')
-
-		if kind <= 0 or kind > vip_level:
-			return self._message_typesetting(97, 'Your VIP level is not enough to buy')
-
-		vip_package = self._vip_config['vip_speical_package'][str(kind)]
-		reward = vip_package['reward']
-		need_diamond = -1 * vip_package['diamond']
-
-		diamond_data = await self.try_diamond(world, unique_id, need_diamond)
-		if diamond_data['status'] != 0:
-			return self._message_typesetting(96, 'Insufficient diamond')
-
-		remaining = {'diamond': diamond_data['remaining']}
-		for key, value in reward.items():
-			r_data = await self._try_material(world, unique_id, key, value)
-			if r_data['status'] == 0:
-				remaining.update({key: r_data['remaining']})
-		return self._message_typesetting(status=0, message="purchase vip gift success", data={'remaining': remaining, 'reward': reward})
-
-	async def check_vip_daily_reward(self, world: int, unique_id: str):
-		"""发送vip每日礼包: check_vip_daily_reward() 时间差发送，已邮件形式"""
-		# 0 - Successfully received, please check the system mail
-		# 95 - Today's vip package has been received
-		# 96 - vip_dialy_reward does not exist gift
-		# 97 - Mailbox error
-		# 98 - you not vip identity
-		# 99 - function increase_vip_exp error
-		vip_dict = await self.increase_vip_exp(world, unique_id, 0)
-		if vip_dict == {}:
-			return self._message_typesetting(99, 'function increase_vip_exp error')
-
-		vip_level = vip_dict['vip_level']
-		if vip_level == 0:
-			return self._message_typesetting(98, 'you not vip identity')
-
-		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		daily_reward_time = await self._get_material(world, unique_id, 'daily_reward_time')
-		cooling_time = self._vip_config['vip_dialy_reward']['cooling_time']
-		if daily_reward_time != '' and (datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(daily_reward_time, '%Y-%m-%d %H:%M:%S')).total_seconds() < cooling_time:
-			return self._message_typesetting(95, "Today's vip package has been received")  # 你今天的礼物已经领取过
-
-		reward = self._vip_config['vip_dialy_reward'][str(vip_level)]
-		json_data = {
-			'world': world,
-			'uid_to': unique_id,
-			'kwargs': {
-				'from': 'server',
-				'body': 'Your gift is waiting.',
-				'subject': 'You have a gift!',
-				'type': 'gift',
-				'items': '',
-				'quantities': ''
-			}
-		}
-
-		items = ''
-		quantities = ''
-		for key, value in reward.items():
-			items += f'{key},'
-			quantities += f'{value},'
-		if items != '':
-			items = items[:-1]
-			quantities = quantities[:-1]
-			json_data['kwargs']['items'] = items
-			json_data['kwargs']['quantities'] = quantities
-
-			result = requests.post(MAIL_URL + '/send_mail', json=json_data).json()
-			if result["status"] != 0:
-				return self._message_typesetting(status=97, message='Mailbox error')
-		else:
-			return self._message_typesetting(status=96, message='vip_dialy_reward does not exist gift')  # 不存在VIP礼包数据
-
-		await self._execute_statement_update(world, f'update player set daily_reward_time="{current_time}" where unique_id="{unique_id}"')
-		return self._message_typesetting(status=0, message="Successfully received, please check the system mail")
-
-	async def get_all_vip_info(self, world: int, unique_id: str):
-		"""获取vip所有信息： get_all_vip_info()， 返回vip等级，当前经验，升级经验，所有可以领取礼包的信息，所有可以购买礼包的信息"""
-		# 0 - Successfully obtained all information about VIP
-		# 99 - function increase_vip_exp error
-		remaining = await self.increase_vip_exp(world, unique_id, 0)
-		if remaining == {}:
-			return self._message_typesetting(99, 'function increase_vip_exp error')
-
-		vip_level = remaining['vip_level']
-		remaining.update({'gifts': {}})
-		for key, value in self._vip_config['vip_speical_package'].items():
-			if key.isdigit() and int(key) <= vip_level:
-				remaining['gifts'].update({key: value})
-		return self._message_typesetting(status=0, message="Successfully obtained all information about VIP", data={'remaining': remaining})
-
-	async def purchase_vip_card(self, world: int, unique_id: str, card_type: str):
-		"""购买月卡方法"""
-		# 0 - Successful purchase of monthly card
-		# 98 - Your monthly card has not expired
-		# 99 - The monthly card information you purchased is incorrect
-		card_cooling_time = self._vip_config['card_cooling_time']
-		if card_type not in card_cooling_time.keys():
-			return self._message_typesetting(99, 'The monthly card information you purchased is incorrect')
-		await self.check_vip_card_deadline(world, unique_id)
-		card_info = await self._execute_statement(world, f'select vip_card_type from player where unique_id="{unique_id}"')
-		if card_info[0][0] != '':
-			return self._message_typesetting(98, 'Your monthly card has not expired')
-
-		cooling_time = card_cooling_time[card_type]
-		vip_card_deadline = (datetime.today() + timedelta(days=cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
-		await self._execute_statement_update(world, f'update player set vip_card_type="{card_type}", vip_card_deadline="{vip_card_deadline}" where unique_id="{unique_id}"')
-
-		return self._message_typesetting(status=0, message="Successful purchase of monthly card", data={'remaining': {'card_type': card_type, 'vip_card_deadline': vip_card_deadline}})
-
-	async def check_vip_card_deadline(self, world: int, unique_id: str) -> None:
-		card_info = await self._execute_statement(world, f'select vip_card_type, vip_card_deadline from player where unique_id="{unique_id}"')
-		vip_card_type = card_info[0][0]
-		vip_card_deadline = card_info[0][1]
-		current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-		if vip_card_type != 'permanent' and vip_card_deadline != '' and int(vip_card_deadline.replace('-', '').replace(':', '').replace(' ', '')) <= int(current_time.replace('-', '').replace(':', '').replace(' ', '')):
-			await self._execute_statement_update(world, f'update player set vip_card_type="", vip_card_deadline="" where unique_id="{unique_id}"')
-
-#############################################################################
-#							End VIP Functions								#
-#############################################################################
-
-
-#############################################################################
-#							Start Achievement Functions						#
-#############################################################################
-
-	async def record_achievement(self, world, unique_id, achievement_id, value):
-		# class Achievement(enum.IntEnum):
-		# LOGIN = 1 #登录
-		# VIP_LEVEL = 2 #VIP等级
-		# GET_ROLE = 3  #获取角色
-		# UPGRADE_ROLE = 4 #升级角色
-		# GET_WEAPON = 5 #获得武器
-		# UPGRADE_WEAPON = 6 #升级武器
-		# FOOD_COLLECT = 7 #收集食物
-		# IRON_COLLECT = 8 #收集铁
-		# CRYSTAL_COLLECT = 9 #收集水晶
-		# UPGRADE_FOOD_FACTORY = 10 #升级食物工厂
-		# UPGRADE_MINE_FACTORY = 11 #升级矿工厂
-		# UPGRADE_CRYSTAL_FACTORY = 12 #升级水晶工厂
-		# SUMMON_WEAPON = 13 #召唤武器
-		# SUMMON_TIMES = 14 #召唤次数
-		# FRIEND_GIFT = 15 #朋友礼物
-		# CHECK_IN_FAMILY=16 #
-		achievement_id_list=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
-		if achievement_id not in achievement_id_list:#check if achievement is in list
-			return self._message_typesetting(99, f'this achivement is not in list: {str(achievement_id)}')
-		data = await self._execute_statement(world, f'SELECT * FROM achievement WHERE unique_id = "{unique_id}" AND achievement_id = "{achievement_id}"')
-		if len(data)==0:
-			await self._execute_statement(world, f'INSERT INTO achievement (unique_id, achievement_id,achievement_value) VALUES ("{unique_id}", "{achievement_id}","{value}")')
-			return self._message_typesetting(0, f'update achievement {str(achievement_id)} success')
-		await self._execute_statement(world,f'UPDATE achievement SET achievement_value = achievement_value + {value} WHERE unique_id = "{unique_id}" AND achievement_id = "{achievement_id}";')
-		return self._message_typesetting(0, f'update achievement {str(achievement_id)} success')
-
-	async def get_achievement_reward(self, world, unique_id, achievement_id, value):
-		# print("achievement_id="+str(achievement_id))
-		achievement_id_list=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
-		achievement_id_name_list=["total_login","keeping_login","vip_level","get_role_4_star","get_role_5_star","get_role_6_star","level_up_role","get_weapon_4_star","get_weapon_5_star","get_weapon_6_star","level_up_weapon","reward_level","collect_food","collect_mine","collect_crystal","upgrade_food_factory","upgrade_mine_factory","upgrade_crystal_crystal","summon_times","friend_request","friend_gift","check_in_family"]
-		if achievement_id not in achievement_id_list:#check if achievement is in list
-			return self._message_typesetting(99, f'this achivement is not in list: {str(achievement_id)}')
-		data = await self._execute_statement(world, f'SELECT achievement_value, achievement_value_reward FROM achievement WHERE unique_id = "{unique_id}" AND achievement_id = "{achievement_id}"')
-		# print("1")
-		if len(data)==0:
-			await self._execute_statement(world, f'INSERT INTO achievement (unique_id, achievement_id,achievement_value) VALUES ("{unique_id}", "{achievement_id}","{value}")')
-			return self._message_typesetting(1, f'no reward for this achievement {str(achievement_id)}')
-		achievement_id_name = achievement_id_name_list[achievement_id]
-		# print("achievement_id_name="+achievement_id_name)
-		quantity_list = self._acheviement[achievement_id_name]["quantity"]
-		index_reward = quantity_list.index(data[0][1])
-		# print("index_reward="+str(index_reward))
-		for this_quantity,index in enumerate(quantity_list):
-			# print("quantity_list="+str(quantity_list))
-			# print("data[0][0]="+str(data[0][0]))
-			# print("data[0][1]="+str(data[0][1]))
-			# print("this_quantity="+str(this_quantity))
-			# print("len(quantity_list)="+str(len(quantity_list)))
-			if len(quantity_list)==index_reward+1:
-				return self._message_typesetting(2, f'you already get all reward')
-			if  quantity_list[index_reward+1]<=data[0][0] and data[0][0]!=0:
-				# print(f'UPDATE player SET diamond = diamond+{self._acheviement[achievement_id_name]["diamond"][index+1]} WHERE unique_id = "{unique_id}";')
-				await self._execute_statement(world,f'UPDATE achievement SET achievement_value_reward = {quantity_list[index_reward+1]} WHERE unique_id = "{unique_id}" AND achievement_id = "{achievement_id}";')
-				await self._execute_statement(world,f'UPDATE player SET diamond = diamond+{self._acheviement[achievement_id_name]["diamond"][index+1]} WHERE unique_id = "{unique_id}";')
-				result_diamond = await self._execute_statement(world, f'SELECT diamond FROM player WHERE unique_id = "{unique_id}"')
-				# print("result_diamond="+str(result_diamond[0][0]))
-				data ={
-					"remaing":
-					{
-						"diamond":result_diamond[0][0]+self._acheviement[achievement_id_name]["diamond"][index+1],
-						"achievement_id":achievement_id,
-						"achievement_value":data[0][0],
-						"achievement_value_reward":quantity_list[index_reward+1]
-					},
-					"reward":
-					{
-						"diamond":self._acheviement[achievement_id_name]["diamond"][index+1],
-					}
-				}
-				return self._message_typesetting(0, f'get reward success',data)
-		return self._message_typesetting(98, f'can not get reward')
-
-	async def get_all_achievement(self, world, unique_id):
-		# - 0 - gain success
-		data_tuple = (await self.get_all_head(world, "achievement"))["remaining"]
-		col_name_list = [x[0] for x in data_tuple]
-
-		row = await self._execute_statement(world, f'SELECT * FROM achievement WHERE unique_id = "{unique_id}";')
-		remaining = {}
-		for i in range(0, len(row)):
-			achievement = {}
-			for j in range(2, len(row[i])):
-				achievement.update({col_name_list[j] : row[i][j]})
-			remaining.update({row[i][1] : achievement})
-		return self._message_typesetting(0, "gain success", {"remaining": remaining})
-
-#############################################################################
-#							End Achievement Functions						#
-#############################################################################
 
 
 #############################################################################
 #							Private Functions								#
 #############################################################################
-
+	
 
 	async def _select_factory(self, world: int, unique_id) -> list:
 		sql_str = f"select * from factory where unique_id='{unique_id}'"
@@ -4713,6 +3524,11 @@ class GameManager:
 		# 97 - database skill operation error
 		# 98 - insufficient material
 		# 99 - cost_item error
+
+
+
+		
+		# paying cost
 		if cost_item == 'diamond':
 			result = await self.try_diamond(world, uid, -int(self._lottery['fortune_wheel']['cost'][cost_item]))
 		elif cost_item == 'coin':
@@ -4729,10 +3545,26 @@ class GameManager:
 			return self._message_typesetting(99, 'cost_item error')
 		if result['status'] != 0:
 			return self._message_typesetting(98, 'insufficient materials')
+
+
+
+
+
+
+
+
+
+
+		# choosing random tier and resulting item
 		tier_choice = (random.choices(self._lottery['fortune_wheel']['names'], self._lottery['fortune_wheel']['weights'][tier]))[0]
 		random_item = (random.choices(self._lottery['fortune_wheel']['items'][tier_choice]))[0]
 
+
+
+
+
 		# TODO THIS SHIT NEEDS TO BE REFACTORED
+		# updating database with new item
 		if random_item == 'coin':
 			try_result = await self.try_coin(world, uid, int(self._lottery['fortune_wheel']['reward'][tier][random_item]))
 		elif random_item == 'energy':
@@ -4829,6 +3661,8 @@ class GameManager:
 				return self._message_typesetting(97, 'database skill operation error')
 		else:
 			return self._message_typesetting(96, 'item name error')
+
+		# never executes????
 		return self._message_typesetting(5, 'get item success', {'remaining' : {"cost_item": cost_item, "cost_quantity": result["remaining"], "item_id": random_item, "item_quantity": try_result['remaining']}, 'reward' : {"item_id": random_item, "item_quantity": self._lottery['fortune_wheel']['reward'][tier][random_item]}})
 
 	async def _decrease_energy(self, world:int, unique_id: str, amount: int) -> dict:
@@ -5128,7 +3962,6 @@ class GameManager:
 			"boss10": "%.2f" %(self._boss_life_remaining[9]/self._boss_life[9])
 			}
 		}
-		await self.leave_world_boss_stage_task(world, unique_id)
 		return self._message_typesetting(status=0, message="challenge success",data=message_dic)
 
 	async def _check_boss_status(self,world: int,unique_id: str):
@@ -5438,10 +4271,7 @@ class GameManager:
 		self._player_experience = d['player_experience']
 		self._monster_config = d['monster_config']
 		self._level_enemy_layouts = d['level_enemy_layouts']
-		self._acheviement = d['acheviement']
-		self._task = d['task']
-		self._check_in = d['check_in']
-		self._vip_config = d['vip_config']
+
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			# print("firstDayOfMonth")
 			self._is_first_start = True
@@ -5459,6 +4289,7 @@ class GameManager:
 			for i in range(0,10):
 				self._boss_life_remaining.append(self._world_boss["boss"+str(i+1)]["life_value"])
 				self._boss_life.append(self._world_boss["boss"+str(i+1)]["life_value"])
+
 		self.get_world_list = 1 #it means how many world we have
 
 #############################################################################
@@ -6281,42 +5112,6 @@ async def _get_player_info(request: web.Request) -> web.Response:
 async def _update_login_in_time(request: web.Request) -> web.Response:
 	post = await request.post()
 	result = await (request.app['MANAGER']).update_login_in_time(world=int(post['world']), unique_id=post['unique_id'])
-	return _json_response(result)
-
-@ROUTES.post('/family_officer')
-async def _family_officer(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).family_officer(int(post['world']), post['unique_id'], post['target'], int(post['position']))
-	return _json_response(result)
-
-@ROUTES.post('/dismissal_family_officer')
-async def _dismissal_family_officer(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).dismissal_family_officer(int(post['world']), post['unique_id'], post['target'])
-	return _json_response(result)
-
-@ROUTES.post('/family_change_name')
-async def _family_change_name(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).family_change_name(int(post['world']), post['unique_id'], post['family_name'])
-	return _json_response(result)
-
-@ROUTES.post('/login_task')
-async def _login_task(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).login_task(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
-@ROUTES.post('/get_all_task')
-async def _get_all_task(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).get_all_task(int(post['world']), post['unique_id'])
-	return _json_response(result)
-
-@ROUTES.post('/purchase_vip_card')
-async def _get_all_task(request: web.Request) -> web.Response:
-	post = await request.post()
-	result = await (request.app['MANAGER']).purchase_vip_card(int(post['world']), post['unique_id'], post['card_type'])
 	return _json_response(result)
 
 

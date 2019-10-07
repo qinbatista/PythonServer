@@ -243,12 +243,11 @@ def create_table_player(cursor):
 	  `mail_gift_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '参与活动的时间',
 	  `add_friends_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '添加好友的时间',
 	  `add_friends_times` int(11) unsigned DEFAULT 50 COMMENT '添加好友的次数',
+	  `vip_level` int(11) unsigned DEFAULT 0 COMMENT 'VIP等级',
 	  `vip_experience` int(11) unsigned DEFAULT 0 COMMENT 'VIP经验',
-	  `daily_reward_time` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT 'VIP每日奖励的刷新时间',
 	  `universal_segment` int(11) unsigned DEFAULT 0 COMMENT '万能碎片',
-	  `universal_segment_6` int(11) unsigned DEFAULT 0 COMMENT '6星万能碎片',
-	  `vip_card_type` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '月卡类型',
-	  `vip_card_deadline` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '月卡截止时间',
+	  `vip_card_type` int(11) unsigned DEFAULT 0 COMMENT '月卡类型',
+	  `vip_card_deadline` int(11) unsigned DEFAULT 0 COMMENT '月卡截止时间',
 	  `coin_card` int(11) unsigned DEFAULT 0 COMMENT '金币卡',
 	  `exp_card` int(11) unsigned DEFAULT 0 COMMENT '经验卡',
 	  `food_card` int(11) unsigned DEFAULT 0 COMMENT '食物卡',
@@ -463,8 +462,8 @@ def operating_test():
 	# creat_table_task(cursor)
 	# create_achievement(cursor)
 	# create_table_union_store(cursor)
-	# create_check_in(cursor)
-	create_table_player(cursor)
+	create_check_in(cursor)
+	# create_table_player(cursor)
 	# create_table_families(cursor)
 
 
