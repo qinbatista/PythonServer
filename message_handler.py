@@ -515,6 +515,9 @@ class MessageHandler:
 	async def _purchase_vip_card(self, data: dict) -> str:
 		return json.dumps(await self.gm.purchase_vip_card(data['world'], data['data']['unique_id'], data['data']['card_type']))
 
+	async def _exchange_card(self, data: dict) -> str:
+		return json.dumps(await self.gm.exchange_card(data['world'], data['data']['unique_id'], data['data']['card_type']))
+
 
 ###############################################################################
 
@@ -701,6 +704,8 @@ FUNCTION_LIST = {
 	'purchase_vip_gift': MessageHandler._purchase_vip_gift,
 	'check_vip_daily_reward':MessageHandler._check_vip_daily_reward,
 	'get_all_vip_info':MessageHandler._get_all_vip_info,
-	'purchase_vip_card':MessageHandler._purchase_vip_card
+	'purchase_vip_card':MessageHandler._purchase_vip_card,
+
+	'exchange_card':MessageHandler._exchange_card,
 }
 

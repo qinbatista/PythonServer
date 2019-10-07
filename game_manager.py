@@ -2416,6 +2416,33 @@ class GameManager:
 		return self._message_typesetting(0, 'Login time has been updated')
 
 
+	async def exchange_card(self, world: int, unique_id: str, card_type: str) -> dict:
+		"""兑换卡片"""
+		# 0 - Successful redemption
+		# 97 - Add material error
+		# 98 - Insufficient number of cards
+		# 99 - Card type error
+		card = self._player['card']
+		if card_type not in card.keys():
+			return self._message_typesetting(99, 'Card type error')
+
+		card_data = await self._try_material(world, unique_id, card_type, -1)
+		if card_data['status'] != 0:
+			return self._message_typesetting(98, 'Insufficient number of cards')
+
+		level = await self._get_material(world, unique_id, 'level')
+		material = card[card_type]['material']
+		quantity = card[card_type]['quantity'] * level
+		reward = {'material': material, 'quantity': quantity}
+		remaining = {'card_type': card_type, 'card_quantity': card_data['remaining'], 'material': material, 'quantity': quantity}
+		material_data = await self._try_material(world, unique_id, material, quantity)
+		if material_data['status'] != 0:
+			await self._try_material(world, unique_id, card_type, 1)
+			return self._message_typesetting(97, 'Add material error')
+		remaining['quantity'] = material_data['remaining']
+		return self._message_typesetting(0, 'Successful redemption', data={'remaining': remaining, 'reward': reward})
+
+
 #############################################################################
 #                     Start Mall Function Position                          #
 #############################################################################
@@ -4539,8 +4566,8 @@ class GameManager:
 		if vip_card_type != 'permanent' and vip_card_deadline != '' and int(vip_card_deadline.replace('-', '').replace(':', '').replace(' ', '')) <= int(current_time.replace('-', '').replace(':', '').replace(' ', '')):
 			await self._execute_statement_update(world, f'update player set vip_card_type="", vip_card_deadline="" where unique_id="{unique_id}"')
 
-	#############################################################################
-#							End VID Functions								#
+#############################################################################
+#							End VIP Functions								#
 #############################################################################
 
 

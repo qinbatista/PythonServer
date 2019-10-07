@@ -534,11 +534,14 @@ def new_server_test(world):
 	# response = send_tcp_message({'world' : world, 'function' : 'check_vip_daily_reward', 'data' : {'token': token}})
 	# print(response)
 	# 测试 get_all_vip_info
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_vip_info', 'data' : {'token': token}})
-	print(response)
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_vip_info', 'data' : {'token': token}})
+	# print(response)
 	# 测试 purchase_vip_card
 	# response = send_tcp_message({'world' : world, 'function' : 'purchase_vip_card', 'data' : {'token': token, 'card_type': 'permanent'}})
 	# print(response)
+	# 测试 exchange_card
+	response = send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token': token, 'card_type': 'diamond_card'}})
+	print(response)
 
 	# 测试get_daily_task_reward
 	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'level_up_role'}})
@@ -560,8 +563,8 @@ def new_server_test(world):
 	# response = send_tcp_message({'world' : world, 'function' : 'get_daily_task_reward', 'data' : {'token': token, 'task_id': 'check_in_family'}})
 	# print(response)
 
-	response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
-	print(response)
+	# response = send_tcp_message({'world' : world, 'function' : 'get_new_mail', 'data' : {'token': token}})
+	# print(response)
 	# response = send_tcp_message({'world' : world, 'function' : 'response_family', 'data' : {'token': token, 'nonce': '78337956676184997857706980485225384889478708200314904499946514947315907719455'}})
 	# print(response)
 
