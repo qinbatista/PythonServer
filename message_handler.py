@@ -147,7 +147,7 @@ class MessageHandler:
 	async def _disband_family(self, data: dict) -> str:
 		return ''
 
-	async def _cancel_disband_family(self, data: dict) -> str:
+	async def _cancel_disbanded_family(self, data: dict) -> str:
 		return ''
 
 	async def _get_config_family(self, data: dict) -> str:
@@ -360,21 +360,20 @@ FUNCTION_LIST = {
 	'request_join_family' : MessageHandler._request_join_family,
 	'respond_family' : MessageHandler._respond_family,
 	# TODO
-	'response_family' : MessageHandler._response_family,
-	'family_sign_in' : MessageHandler._family_sign_in,
-	'get_family_store' : MessageHandler._get_family_store,
-	'family_market_purchase' : MessageHandler._family_market_purchase,
-	'family_gift_package' : MessageHandler._family_gift_package,
-	'family_officer' : MessageHandler._family_officer,
-	'dismissal_family_officer' : MessageHandler._dismissal_family_officer,
-	'family_change_name' : MessageHandler._family_change_name,
-	'family_blackboard' : MessageHandler._family_blackboard,
-	'family_announcement' : MessageHandler._family_announcement,
+	'sign_in_family' : MessageHandler._sign_in_family,
+	'get_store_family' : MessageHandler._get_store_family,
+	'market_purchase_family' : MessageHandler._market_purchase_family,
+	'gift_package_family' : MessageHandler._gift_package_family,
+	'officer_family' : MessageHandler._officer_family,
+	'dismiss_officer_family' : MessageHandler._dismiss_officer_family,
+	'change_name_family' : MessageHandler._change_name_family,
+	'blackboard_family' : MessageHandler._blackboard_family,
+	'announcement_family' : MessageHandler._announcement_family,
 	'update_login_in_time' : MessageHandler._update_login_in_time,
-	'disbanded_family' : MessageHandler._disbanded_family,
+	'disband_family' : MessageHandler._disband_family,
 	'cancel_disbanded_family' : MessageHandler._cancel_disbanded_family,
-	'get_family_config' : MessageHandler._get_family_config,
-	'get_all_family_info' : MessageHandler._get_all_family_info,
+	'get_config_family' : MessageHandler._get_config_family,
+	'get_all_info_family' : MessageHandler._get_all_info_family,
 
 	###################### mail.py ######################
 	'send_mail' : MessageHandler._send_mail,
@@ -385,8 +384,6 @@ FUNCTION_LIST = {
 	'mark_read_mail' : MessageHandler._mark_read_mail,
 	# TODO
 	'redeem_nonce' : MessageHandler._redeem_nonce,
-	'delete_all_email' : MessageHandler._delete_all_email,
-	'broadcast_mail' : MessageHandler._broadcast_mail,
 	'send_merchandise' : MessageHandler._send_merchandise,
 
 	###################### summoning.py ######################
@@ -414,14 +411,14 @@ FUNCTION_LIST = {
 	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
 	# TODO
 	'fortune_wheel_pro' : MessageHandler._fortune_wheel_pro,
-	'get_lottery_config_info' : MessageHandler._get_lottery_config_info,
+	'get_config_info_lottery' : MessageHandler._get_config_info_lottery,
 
 	###################### skill.py ######################
 	'get_skill' : MessageHandler._get_skill,
 	'get_all_levels_skill' : MessageHandler._get_all_levels_skill,
 	'level_up_skill' : MessageHandler._level_up_skill,
 	# TODO
-	'get_skill_level_up_config': MessageHandler._get_skill_level_up_config,
+	'get_level_up_config_skill': MessageHandler._get_level_up_config_skill,
 
 	###################### friend.py ######################
 	'get_all_info_friend' : MessageHandler._get_all_info_friend,
