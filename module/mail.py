@@ -3,7 +3,6 @@ mail.py
 '''
 
 from module import common
-from module import family
 from module import enums
 
 
@@ -58,11 +57,11 @@ async def _send_mail(mail, **kwargs):
 		return result['status'] == 0
 
 async def _send_mail_simple(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['data'].get('from_', await family._get_gn(uid, **kwargs)), 'body' : kwargs['data'].get('body', 'This is a test message'), 'subj' : kwargs['data'].get('subj', 'Test Message'), 'type' : enums.MailType.SIMPLE.value}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['data'].get('from_', await common.get_gn(uid, **kwargs)), 'body' : kwargs['data'].get('body', 'This is a test message'), 'subj' : kwargs['data'].get('subj', 'Test Message'), 'type' : enums.MailType.SIMPLE.value}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_gift(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', await family._get_gn(uid, **kwargs)), 'body' : kwargs.get('body', 'Your gift is waiting!'), 'subj' : kwargs.get('subj', 'You have a gift!'), 'type' : enums.MailType.GIFT.value, 'items' : kwargs['data']['items']}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', await common.get_gn(uid, **kwargs)), 'body' : kwargs.get('body', 'Your gift is waiting!'), 'subj' : kwargs.get('subj', 'You have a gift!'), 'type' : enums.MailType.GIFT.value, 'items' : kwargs['data']['items']}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_friend_request(uid, **kwargs):

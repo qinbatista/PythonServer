@@ -19,8 +19,13 @@ async def execute(statement, account = False, **kwargs):
 			await cursor.execute(statement)
 			return await cursor.fetchall()
 
-async def get_db(**kwargs):
-	return kwargs['worlddb']
+async def get_gn(uid, **kwargs):
+	data = await execute(f'SELECT gn FROM player WHERE uid = "{uid}";', **kwargs)
+	return data[0][0]
+
+async def get_uid(gn, **kwargs):
+	data = await execute(f'SELECT uid FROM player WHERE gn = "{gn}";', **kwargs)
+	return data[0][0]
 
 async def try_item(uid, item, value, **kwargs):
 	async with (await get_db(**kwargs)).acquire() as conn:
@@ -32,6 +37,9 @@ async def try_item(uid, item, value, **kwargs):
 				await cursor.execute(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{item.value}";')
 				return (True, quantity[0][0] + value)
 			return (False, quantity[0][0] + value)
+
+async def get_db(**kwargs):
+	return kwargs['worlddb']
 
 def encode_item(gid, iid, value):
 	return f'{gid.value}:{iid.value}:{value}'

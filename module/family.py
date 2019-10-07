@@ -32,7 +32,7 @@ async def remove_user(uid, gn_target, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in a family')
 	role = await _get_role(uid, name, **kwargs)
-	uid_target = await _get_uid(gn_target, **kwargs)
+	uid_target = await common.get_uid(gn_target, **kwargs)
 	_, name_target = await _in_family(uid_target, **kwargs)
 	if name_target != name: return common.mt(98, 'target is not in your family')
 	role_target = await _get_role(uid_target, name, **kwargs)
@@ -45,14 +45,14 @@ async def invite_user(uid, gn_target, **kwargs):
 	if not in_family: return common.mt(99, 'not in a family')
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_invite_permissions(role): return common.mt(98, 'insufficient permissions')
-	uid_target = await _get_uid(gn_target, **kwargs)
+	uid_target = await common.get_uid(gn_target, **kwargs)
 	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, uid_target, from_ = name, subject = 'Family Invitation', body = f'You have been invited to join:\n{name}', name = name, target = gn_target)
 	return common.mt(0, 'success') if sent else common.mt(97, 'mail could not be sent')
 
 async def request_join(uid, name, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if in_family: return common.mt(99, 'already in a family')
-	gn = await _get_gn(uid, **kwargs)
+	gn = await common.get_gn(uid, **kwargs)
 	officials = await _get_uid_officials(name, **kwargs)
 	if not officials: return common.mt(98, 'invalid family')
 	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, *officials, from_ = name, subject = 'Family Request', body = f'{gn} requests to join your family.', name = name, target = gn)
@@ -61,7 +61,7 @@ async def request_join(uid, name, **kwargs):
 async def respond(uid, nonce, **kwargs):
 	name, gn_target = await _lookup_nonce(nonce, **kwargs)
 	if not name: return common.mt(99, 'invalid nonce')
-	uid_target = await _get_uid(gn_target, **kwargs)
+	uid_target = await common.get_uid(gn_target, **kwargs)
 	in_family, _ = await _in_family(uid_target, **kwargs)
 	if in_family: return common.mt(98, 'already in a family')
 	await _add_to_family(uid_target, name)
@@ -89,17 +89,10 @@ async def _in_family(uid, **kwargs):
 	if data == () or ('',) in data: return (False, '')
 	return (True, data[0][0])
 
-async def _get_gn(uid, **kwargs):
-	data = await common.execute(f'SELECT gn FROM player WHERE uid = "{uid}";', **kwargs)
-	return data[0][0]
-
 async def _get_role(uid, name, **kwargs):
 	data = await common.execute(f'SELECT role FROM familyrole WHERE uid = "{uid}" AND `name` = "{name}";', **kwargs)
 	return enums.FamilyRole(data[0][0])
 
-async def _get_uid(gn, **kwargs):
-	data = await common.execute(f'SELECT uid FROM player WHERE gn = "{gn}";', **kwargs)
-	return data[0][0]
 
 async def _get_uid_officials(name, **kwargs):
 	data = await common.execute(f'SELECT uid FROM familyrole WHERE `name` = "{name}" AND `role` >= {enums.FamilyRole.ADMIN.value};', **kwargs)
