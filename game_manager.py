@@ -4088,6 +4088,7 @@ class GameManager:
 				}
 				result = requests.post(MAIL_URL + '/send_mail', json = json_data).json()
 				# await self._execute_statement_update(world, f'update player set vip_experience=vip_experience+{vip_experience[vip_card_type]} where unique_id="{unique_id}"')
+			await self._execute_statement_update(world, f'update player set vip_experience=vip_experience+10 where unique_id="{unique_id}"')
 			return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1, task_reward=0 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
 		else:
 			return 0
