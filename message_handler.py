@@ -113,49 +113,47 @@ class MessageHandler:
 		return await family.respond(data['data']['unique_id'], data['data']['nonce'], **data)
 
 	# TODO
-	async def _response_family(self, data: dict) -> str:
+
+	async def _sign_in_family(self, data: dict) -> str:
 		return ''
 
-	async def _family_sign_in(self, data: dict) -> str:
+	async def _get_store_family(self, data: dict) -> str:
 		return ''
 
-	async def _get_family_store(self, data: dict) -> str:
+	async def _market_purchase_family(self, data: dict) -> str:
 		return ''
 
-	async def _family_market_purchase(self, data: dict) -> str:
+	async def _gift_package_family(self, data: dict) -> str:
 		return ''
 
-	async def _family_gift_package(self, data: dict) -> str:
+	async def _officer_family(self, data: dict) -> str:
 		return ''
 
-	async def _family_officer(self, data: dict) -> str:
+	async def _dismiss_officer_family(self, data: dict) -> str:
 		return ''
 
-	async def _dismissal_family_officer(self, data: dict) -> str:
+	async def _change_name_family(self, data: dict) -> str:
 		return ''
 
-	async def _family_change_name(self, data: dict) -> str:
+	async def _blackboard_family(self, data: dict) -> str:
 		return ''
 
-	async def _family_blackboard(self, data: dict) -> str:
-		return ''
-
-	async def _family_announcement(self, data: dict) -> str:
+	async def _announcement_family(self, data: dict) -> str:
 		return ''
 
 	async def _update_login_in_time(self, data: dict) -> str:
 		return ''
 
-	async def _disbanded_family(self, data: dict) -> str:
+	async def _disband_family(self, data: dict) -> str:
 		return ''
 
-	async def _cancel_disbanded_family(self, data: dict) -> str:
+	async def _cancel_disband_family(self, data: dict) -> str:
 		return ''
 
-	async def _get_family_config(self, data: dict) -> str:
+	async def _get_config_family(self, data: dict) -> str:
 		return ''
 
-	async def _get_all_family_info(self, data: dict) -> str:
+	async def _get_all_info_family(self, data: dict) -> str:
 		return ''
 
 	###################### mail.py ######################
@@ -179,12 +177,6 @@ class MessageHandler:
 
 	# TODO
 	async def _redeem_nonce(self, data: dict) -> str:
-		return ''
-
-	async def _delete_all_email(self, data: dict) -> str:
-		return ''
-
-	async def _broadcast_mail(self, data: dict) -> str:
 		return ''
 
 	async def _send_merchandise(self, data: dict) -> str:
@@ -252,11 +244,10 @@ class MessageHandler:
 	async def _fortune_wheel_basic(self, data: dict) -> str:
 		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.BASIC, enums.Item(int(data['data']['item'])), **data)
 
-	# TODO
 	async def _fortune_wheel_pro(self, data: dict) -> str:
-		return ''
+		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.PRO, enums.Item(int(data['data']['item'])), **data)
 
-	async def _get_lottery_config_info(self, data: dict) -> str:
+	async def _get_config_info_lottery(self, data: dict) -> str:
 		return ''
 
 	###################### skill.py ######################
@@ -270,7 +261,7 @@ class MessageHandler:
 		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']),  **data)
 
 	# TODO
-	async def _get_skill_level_up_config(self, data: dict) -> str:
+	async def _get_level_up_config_skill(self, data: dict) -> str:
 		return ''
 
 	###################### friend.py ######################
@@ -292,9 +283,11 @@ class MessageHandler:
 	# TODO 原 send_all_friend_gift
 	async def _send_all_gift_friend(self, data: dict) -> str:
 		return ''
+
 	# TODO 原 redeem_nonce
 	async def _accept_gift_friend(self, data: dict) -> str:
 		return ''
+
 	# TODO 原 redeem_all_nonce
 	async def _accept_all_gift_friend(self, data: dict) -> str:
 		return ''
