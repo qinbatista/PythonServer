@@ -4065,8 +4065,10 @@ class GameManager:
 		"""每日签到"""
 		# 0 - Not the first time
 		# 1 - the first time
-		check_in_info = await self._execute_statement(world, f'select task_value from task where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
-		if check_in_info[0][0] == 0:
+		check_in_info = await self._execute_statement(world, f'select task_value, timer from task where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
+		task_value, timer = check_in_info[0]
+		current_time = time.strftime('%Y-%m-%d', time.localtime())
+		if timer != current_time or task_value == 0:
 			vip_experience = self._vip_config['card_increase_experience']
 			await self.check_vip_card_deadline(world, unique_id)
 			card_info = await self._execute_statement(world, f'select vip_card_type from player where unique_id="{unique_id}"')
@@ -4086,8 +4088,7 @@ class GameManager:
 				}
 				result = requests.post(MAIL_URL + '/send_mail', json = json_data).json()
 				# await self._execute_statement_update(world, f'update player set vip_experience=vip_experience+{vip_experience[vip_card_type]} where unique_id="{unique_id}"')
-			current_time = time.strftime('%Y-%m-%d', time.localtime())
-			return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
+			return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1, task_reward=0 where unique_id="{unique_id}" and task_id={self._task["task_id"]["check_in"]}')
 		else:
 			return 0
 
@@ -4524,7 +4525,7 @@ class GameManager:
 			return self._message_typesetting(98, 'Your monthly card has not expired')
 
 		cooling_time = card_cooling_time[card_type]
-		vip_card_deadline = (datetime.today() + timedelta(seconds=cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
+		vip_card_deadline = (datetime.today() + timedelta(days=cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
 		await self._execute_statement_update(world, f'update player set vip_card_type="{card_type}", vip_card_deadline="{vip_card_deadline}" where unique_id="{unique_id}"')
 
 		return self._message_typesetting(status=0, message="Successful purchase of monthly card", data={'remaining': {'card_type': card_type, 'vip_card_deadline': vip_card_deadline}})
