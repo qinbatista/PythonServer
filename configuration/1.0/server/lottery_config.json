@@ -1,17 +1,71 @@
 {
-	"WEAPON" : {
+	"skills" : {
 		"cost":{
-			"COIN":"100"
+			"coin":"100",
+			"diamond":"100",
+			"basic_summon_scroll":"1",
+			"pro_summon_scroll":"1",
+			"friend_gift":"10",
+			"prophet_summon_scroll":"1"
 		},
-		"names" : ["tier1", "tier2"],
+		"names" : ["skilltier1", "skilltier2", "skilltier3"],
 		"weights":
 		{
-			"BASIC":[0.4, 0.5, 0.1, 0]
+				"basic":[0.60, 0.30, 0.10],
+				"pro":[0.30, 0.50, 0.20],
+				"friend_gift":[0.50, 0.40, 0.10],
+				"prophet":[0.10, 0.40, 0.50]
 		},
 		"items" : {
-			"weapontier1" : [1, 2, 3],
-			"weapontier2" : [4, 5, 6]
-		}
+			"skilltier1" : ["m1_level", "p1_level", "g1_level"],
+			"skilltier2" : ["m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level"],
+			"skilltier3" : ["m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]}
+	},
+	"weapons" : {
+		"cost":{
+			"coin":"100",
+			"diamond":"100",
+			"basic_summon_scroll":"1",
+			"pro_summon_scroll":"1",
+			"friend_gift":"10",
+			"prophet_summon_scroll":"1"
+		},
+		"names" : ["weapontier1", "weapontier2", "weapontier3", "weapontier4"],
+		"weights":
+		{
+			"basic":[0.4, 0.5, 0.1, 0],
+			"pro":[0.3, 0.4, 0.2, 0.1],
+			"friend_gift":[0.4, 0.5, 0.1, 0],
+			"prophet":[0, 0.2, 0.5, 0.3]
+		},
+		"items" : {
+			"weapontier1" : ["weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10"],
+			"weapontier2" : ["weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20"],
+			"weapontier3" : ["weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30"],
+			"weapontier4" : ["weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"]}
+	},
+	"roles" : {
+		"cost":{
+			"coin":"100",
+			"diamond":"100",
+			"basic_summon_scroll":"1",
+			"pro_summon_scroll":"1",
+			"friend_gift":"10",
+			"prophet_summon_scroll":"1"
+		},
+		"names" : ["roletier1", "roletier2", "roletier3", "roletier4"],
+		"weights":
+		{
+			"basic":[0.4, 0.5, 0.1, 0],
+			"pro":[0.3, 0.4, 0.2, 0.1],
+			"friend_gift":[0.4, 0.5, 0.1, 0],
+			"prophet":[0, 0.2, 0.5, 0.3]
+		},
+		"items" : {
+			"roletier1" : ["role1", "role2", "role3", "role4", "role5", "role6", "role7", "role8", "role9", "role10"],
+			"roletier2" : ["role11", "role12", "role13", "role14", "role15", "role16", "role17", "role18", "role19", "role20"],
+			"roletier3" : ["role21", "role22", "role23", "role24", "role25", "role26", "role27", "role28", "role29", "role30"],
+			"roletier4" : ["role31", "role32", "role33", "role34", "role35", "role36", "role37", "role38", "role39", "role40"]}
 	},
 	"fortune_wheel":
 	{

@@ -36,6 +36,10 @@ SERVER_CONFIG = loc() + '/configuration/{}/server/server_config.json'
 ENTRY_CONSUMABLES = loc() + '/configuration/{}/server/entry_consumables_config.json'
 ANNOUNCEMENT = loc() + '/configuration/{}/announcement_info.json'
 PLAYER_EXPERIENCE = loc() + '/configuration/{}/server/player_experience.json'
+ACHIEVEMENT= loc() + '/configuration/{}/server/achievement_config.json'
+TASK = loc() + '/configuration/{}/server/task.json'
+CHECK_IN = loc() + '/configuration/{}/server/check_in.json'
+VIP_CONFIG = loc() + '/configuration/{}/server/vip_config.json'
 
 
 class ConfigurationManager:
@@ -60,6 +64,10 @@ class ConfigurationManager:
 		self._read_mall_config()
 		self._read_announcement_info()
 		self._read_player_experience()
+		self._read_acheviement_config()
+		self._read_task_config()
+		self._read_check_in_config()
+		self._read_vip_config_config()
 
 		# read this one last
 		self._read_game_manager_config()
@@ -135,7 +143,10 @@ class ConfigurationManager:
 			"factory": self._factory_config, 'family': self._family_config,
 			"mall": self._mall_config, "announcement": self._announcement_info,
 			'player_experience': self._player_experience, 'monster_config': self._monster_config,
-			'level_enemy_layouts': self._level_enemy_layouts_config
+			'level_enemy_layouts': self._level_enemy_layouts_config,
+			'acheviement': self._acheviement_config, 'task': self._task_config,
+			'check_in': self._check_in_config,
+			'vip_config': self._vip_config
 		}
 
 	def _read_level_enemy_layouts_config(self):
@@ -152,6 +163,18 @@ class ConfigurationManager:
 
 	def _read_monster_config(self):
 		self._monster_config = json.load(open(MONSTER.format(self._cv), encoding = 'utf-8'))
+
+	def _read_acheviement_config(self):
+		self._acheviement_config = json.load(open(ACHIEVEMENT.format(self._cv), encoding = 'utf-8'))
+
+	def _read_task_config(self):
+		self._task_config = json.load(open(TASK.format(self._sv), encoding = 'utf-8'))
+
+	def _read_check_in_config(self):
+		self._check_in_config = json.load(open(CHECK_IN.format(self._sv), encoding = 'utf-8'))
+
+	def _read_vip_config_config(self):
+		self._vip_config = json.load(open(VIP_CONFIG.format(self._sv), encoding = 'utf-8'))
 
 	def _read_world_distribution_config(self):
 		d = json.load(open(SERVER_CONFIG.format(self._cv), encoding = 'utf-8'))
