@@ -133,6 +133,11 @@ def get_picture_link():#获取图片下载到链接
 	print_method("[get_all_supplies]"+str(response))
 	return response
 
+def get_all_achievement():#获取所有成就
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_achievement', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+	print_method("[achievement_dialog]"+str(response))
+	return response
+
 def get_all_info(_token,_world):
 	print_module("[module_2_get_all_data] get_all_info")
 	global world,token
@@ -148,7 +153,7 @@ def get_all_info(_token,_world):
 	refresh_all_storage_str = refresh_all_storage()
 	get_all_roles_str = get_all_roles()
 	get_factory_info_str = get_factory_info()
-	get_all_family_info_str = ""#get_all_family_info()#家族还未开始制作
+	get_all_family_info_str = get_all_family_info()#家族还未开始制作
 	get_all_mail_str = get_all_mail()
 	get_all_armor_info_str = get_all_armor_info()
 	get_lottery_config_info_str = get_lottery_config_info()
@@ -161,6 +166,8 @@ def get_all_info(_token,_world):
 	mail_gift_str = mail_gift()
 	get_picture_link_str = get_picture_link()
 	get_player_info_str = get_player_info()
+	get_family_config_str = get_family_config()
+	get_all_achievement_str = get_all_achievement()
 	return [get_level_info_str,get_stage_info_str,get_monster_info_str,get_all_friend_info_str,
 	get_all_skill_level_str,get_all_weapon_str,refresh_all_storage_str,get_all_roles_str,
 	get_factory_info_str,get_all_family_info_str,get_all_mail_str,get_all_armor_info_str,

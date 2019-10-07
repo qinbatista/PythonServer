@@ -10,12 +10,15 @@ import module_8_roles
 import module_9_family
 import module_10_stage
 import module_11_mail
+
+import module_13_achievement
+import module_14_vip
 import multiprocessing
 import time
 from datetime import datetime, timedelta
 world = "0"
 token = ""
-testing_people_number = 100000
+testing_people_number = 20
 def call_login(unique_id):
 	global world,token
 	while True:
@@ -46,34 +49,44 @@ def get_random_item():
 def role_dialog():
 	module_8_roles.role_dialog(token,world)
 
-def family_dialog(get_all_family_info):
-	module_9_family.family_dialog(token,world,get_all_family_info)
+def family_dialog(get_all_family_info,player_info):
+	module_9_family.family_dialog(token,world,get_all_family_info, player_info)
 
 def stage_dialog(get_level_info):
 	module_10_stage.enter_stage(token,world,get_level_info)
 
-def mail_dialog(get_all_mail):
-	module_11_mail.mail_dialog(token,world,get_all_mail)
+def mail_dialog(get_all_mail,name):
+	module_11_mail.mail_dialog(token,world,get_all_mail,name)
 
 def announcement():
 	pass
 
 def dark_market():
 	pass
+
+def vip_system():
+	module_14_vip.vip_dialog(token,world)
+def achievement(get_all_achievement):
+	module_13_achievement.achievement_dialog(token,world,get_all_achievement)
+unique_id=""
 def run_task(name):
+	global unique_id
+	unique_id = name
 	call_login(str(name))
-	info_list = call_get_all_info()#加载所有参数信息
+	# info_list = call_get_all_info()#加载所有参数信息
 	# dark_market()#*加载黑市信息
-	# mail_dialog(info_list[10])#邮箱界面
+	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
 	# skill_dialog(info_list[4])#技能界面
 	# weapon_dialog(info_list[5])#武器界面
 	# factory_dialog(info_list[6])#工厂界面
 	# get_random_item()#抽奖界面
 	# role_dialog()#角色界面
-	# family_dialog(get_all_family_info)#家族界面*暂时不需要
+	# family_dialog(info_list[9],info_list[19])#家族界面*暂时不需要
 	# stage_dialog(info_list[19])#关卡界面
 	# announcement()#公告界面
+	# achievement(info_list[20])
+	vip_system()
 
 
 def run_all_task():
