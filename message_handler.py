@@ -87,9 +87,6 @@ class MessageHandler:
 	async def _create_account(self, data: dict) -> str:
 		return ''
 
-	async def _verify_email(self, data: dict) -> str:
-		return ''
-
 	async def _change_game_name(self, data: dict) -> str:
 		return ''
 
@@ -349,7 +346,6 @@ FUNCTION_LIST = {
 	'create_player' : MessageHandler._create_player,
 	'get_player_info' : MessageHandler._get_player_info,
 	'create_account' : MessageHandler._create_account,
-	'verify_email' : MessageHandler._verify_email,
 	'change_game_name' : MessageHandler._change_game_name,
 
 	###################### family.py ######################
