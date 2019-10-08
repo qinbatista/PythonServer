@@ -442,16 +442,21 @@ def new_server_test(world):
 	# TODO get_all_achievement
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_achievement', 'data' : {'token': token}})
 	# print(response)
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_armor', 'data' : {'token': token}})
-	print(response)
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_resource', 'data' : {'token': token}})
-	print(response)
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_tower', 'data' : {'token': token}})
-	print(response)
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
-	print(response)
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
-	print(response)
+	# TODO
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_armor', 'data' : {'token': token}})
+	# print(response)
+	# TODO
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_resource', 'data' : {'token': token}})
+	# print(response)
+	# TODO
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_tower', 'data' : {'token': token}})
+	# print(response)
+	# TODO
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
+	# print(response)
+	# TODO
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
+	# print(response)
 
 
 	# nonce = ''

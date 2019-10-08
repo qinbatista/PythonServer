@@ -76,19 +76,19 @@ class MessageHandler:
 
 	# TODO
 	async def _choice_world(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _create_player(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _get_player_info(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _create_account(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _change_game_name(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### family.py ######################
 	async def _create_family(self, data: dict) -> str:
@@ -112,46 +112,46 @@ class MessageHandler:
 	# TODO
 
 	async def _sign_in_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _get_store_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _market_purchase_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _gift_package_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _officer_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _dismiss_officer_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _change_name_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _blackboard_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _announcement_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _update_login_in_time(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _disband_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _cancel_disbanded_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _get_config_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _get_all_info_family(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### mail.py ######################
 	async def _send_mail(self, data: dict) -> str:
@@ -174,10 +174,10 @@ class MessageHandler:
 
 	# TODO
 	async def _redeem_nonce(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _send_merchandise(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### summoning.py ######################
 	async def _basic_summon(self, data: dict) -> str:
@@ -245,7 +245,7 @@ class MessageHandler:
 		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.PRO, enums.Item(int(data['data']['item'])), **data)
 
 	async def _get_config_info_lottery(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### skill.py ######################
 	async def _get_skill(self, data: dict) -> str:
@@ -259,7 +259,7 @@ class MessageHandler:
 
 	# TODO
 	async def _get_level_up_config_skill(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### friend.py ######################
 	async def _get_all_friend(self, data: dict) -> str:
@@ -279,15 +279,15 @@ class MessageHandler:
 
 	# TODO 原 send_all_friend_gift
 	async def _send_all_gift_friend(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	# TODO 原 redeem_nonce
 	async def _accept_gift_friend(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	# TODO 原 redeem_all_nonce
 	async def _accept_all_gift_friend(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### weapon.py ######################
 	async def _level_up_weapon(self, data: dict) -> str:
@@ -307,77 +307,77 @@ class MessageHandler:
 
 	# TODO
 	async def _weapon_config(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### role.py ######################
 	# TODO
 	async def _upgrade_role_star(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _upgrade_role_level(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _get_all_roles(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _role_config(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### 签到系统 ######################
 	# TODO
 	async def _check_in(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _supplement_check_in(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _get_all_check_in_table(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### VIP ######################
 	# TODO
 	async def _purchase_vip_gift(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _check_vip_daily_reward(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _purchase_vip_card(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _get_all_vip_info(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### player ######################
 	# TODO
 	async def _exchange_card(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _get_all_resource(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### achievement ######################
 	# TODO
 	async def _get_all_achievement(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### armor ######################
 	# TODO
 	async def _upgrade_armor(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	async def _get_all_armor(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### stage ######################
 	# TODO
 	async def _get_all_tower(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 	###################### tasks ######################
 	# TODO
 	async def _get_all_task(self, data: dict) -> str:
-		return ''
+		return 'function'
 
 
 
