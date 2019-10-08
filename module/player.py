@@ -10,7 +10,9 @@ async def create(uid, gn, **kwargs):
 	return common.mt(0, 'success', {'gn' : gn}) if added != 0 else common.mt(99, 'gamename or uid already exists')
 
 async def enter_world(uid, **kwargs):
-	pass
+	new_player = await common.exists('player', ('uid', uid), **kwargs)
+	if new_player: return common.mt(98, 'have not been in this world before')
+	return common.mt(0, 'success')
 
 async def accept_gift(uid, key, **kwargs):
 	pass
