@@ -5,25 +5,17 @@ import pymysql
 import mailbox
 
 def create_table_armor(cursor):
-	statement = \
-	"""
-	CREATE TABLE `armor` (
-	  `unique_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一标识',
-	  `armor_id` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '盔甲唯一标识',
-	  `armor_level1` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级1',
-	  `armor_level2` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级2',
-	  `armor_level3` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级3',
-	  `armor_level4` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级4',
-	  `armor_level5` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级5',
-	  `armor_level6` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级6',
-	  `armor_level7` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级7',
-	  `armor_level8` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级8',
-	  `armor_level9` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级9',
-	  `armor_level10` int(6) NOT NULL DEFAULT 0 COMMENT '盔甲的等级10',
-	  PRIMARY KEY (`unique_id`,`armor_id`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-	"""
-	cursor.execute(statement)
+	 statement = \
+		 """
+		 CREATE TABLE `armor` (
+		   `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
+		   `aid` int(11) NOT NULL COMMENT '盔甲唯一id标识1-40种盔甲',
+		   `level` int(11) NOT NULL COMMENT '盔甲等级唯一id标识1-10级',
+		   `quantity` int(11) DEFAULT 0 COMMENT '完成成就领奖的次数',
+		   PRIMARY KEY (`uid`, `aid`, `level`)
+		 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+		 """
+	 cursor.execute(statement)
 
 def create_table_dark_market(cursor):
 	statement = \
@@ -460,7 +452,8 @@ def operating_test():
 	c.select_db("experimental")
 	cursor = c.cursor()
 	# creat_table_task(cursor)
-	create_achievement(cursor)
+	create_table_armor(cursor)
+	# create_achievement(cursor)
 	# create_table_union_store(cursor)
 	# create_check_in(cursor)
 	# create_table_player(cursor)
