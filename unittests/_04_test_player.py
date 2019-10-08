@@ -430,9 +430,31 @@ def new_server_test(world):
 	token = response['data']['token']
 	# response = send_tcp_message({'world' : 0, 'function' : 'send_merchandise', 'data' : {'token': token, 'merchandise': 'coin', 'quantities': '20'}})
 	# print(response)
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_mail', 'data' : {'token': token}})
+	# TODO get_all_mail
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_mail', 'data' : {'token': token}})
+	# print(response)
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_weapon', 'data' : {'token': token}})
+	# print(response)
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_friend', 'data' : {'token': token}})
+	# print(response)
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_skill', 'data' : {'token': token}})
+	# print(response)
+	# TODO get_all_achievement
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_achievement', 'data' : {'token': token}})
+	# print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_armor', 'data' : {'token': token}})
 	print(response)
-	nonce = ''
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_resource', 'data' : {'token': token}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_tower', 'data' : {'token': token}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
+	print(response)
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
+	print(response)
+
+
+	# nonce = ''
 	# response = send_tcp_message({'world' : 0, 'function' : 'redeem_nonce', 'data' : {'token': token, 'nonce': nonce}})
 	# print(response)
 
@@ -479,7 +501,7 @@ if __name__ == "__main__":
 	# redeem_nonce(unique_id="1", nonce=nonce)
 	# get_all_mail(unique_id="1")
 
-	request_friend(unique_id="5", friend_name="a")
+	# request_friend(unique_id="5", friend_name="a")
 	# nonce = get_new_mail(unique_id="1")
 	# response_friend(unique_id="1", nonce=nonce)
 	# response_friend(unique_id="1", nonce="32963693688928993319733151846953915999978396660497710378095972836181446004813")
@@ -513,4 +535,4 @@ if __name__ == "__main__":
 	# get_top_damage(4,4)
 	# active_wishing_pool(4,"weapon1")
 
-	# new_server_test(0)
+	new_server_test(0)

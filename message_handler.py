@@ -353,6 +353,32 @@ class MessageHandler:
 	async def _exchange_card(self, data: dict) -> str:
 		return ''
 
+	async def _get_all_resource(self, data: dict) -> str:
+		return ''
+
+	###################### achievement ######################
+	# TODO
+	async def _get_all_achievement(self, data: dict) -> str:
+		return ''
+
+	###################### armor ######################
+	# TODO
+	async def _upgrade_armor(self, data: dict) -> str:
+		return ''
+
+	async def _get_all_armor(self, data: dict) -> str:
+		return ''
+
+	###################### stage ######################
+	# TODO
+	async def _get_all_tower(self, data: dict) -> str:
+		return ''
+
+	###################### tasks ######################
+	# TODO
+	async def _get_all_task(self, data: dict) -> str:
+		return ''
+
 
 
 
@@ -502,5 +528,23 @@ FUNCTION_LIST = {
 	# TODO
 	###################### player ######################
 	'exchange_card': MessageHandler._exchange_card,
+	'get_all_resource': MessageHandler._get_all_resource,
+
+	# TODO
+	###################### achievement ######################
+	'get_all_achievement': MessageHandler._get_all_achievement,
+
+	# TODO
+	###################### armor ######################
+	'upgrade_armor': MessageHandler._upgrade_armor,
+	'get_all_armor': MessageHandler._get_all_armor,
+
+	# TODO
+	###################### stage ######################
+	'get_all_tower': MessageHandler._get_all_tower,
+
+	# TODO
+	###################### tasks ######################
+	'get_all_task': MessageHandler._get_all_task,
 }
 
