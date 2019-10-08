@@ -345,12 +345,12 @@ def creat_table_task(cursor):
 	statement = \
 	"""
 	CREATE TABLE `task` (
-	  `unique_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一标识',
-	  `task_id` smallint(6) NOT NULL COMMENT '表示任务的数字编号',
-	  `task_value` smallint(6) DEFAULT 0 COMMENT '表示任务是否完成0:false,1:true',
-	  `task_reward` smallint(6) DEFAULT 0 COMMENT '表示奖励是否已经领取',
+	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一id',
+	  `tid` smallint(6) NOT NULL COMMENT '任务唯一id',
+	  `value` smallint(6) DEFAULT 0 COMMENT '表示任务是否完成0:false,1:true',
+	  `reward` smallint(6) DEFAULT 0 COMMENT '表示奖励是否已经领取0:false,1:true',
 	  `timer` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '完成时间',
-	  PRIMARY KEY (`unique_id`,`task_id`)
+	  PRIMARY KEY (`uid`,`tid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 	cursor.execute(statement)
@@ -451,8 +451,8 @@ def operating_test():
 	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
 	c.select_db("experimental")
 	cursor = c.cursor()
-	# creat_table_task(cursor)
-	create_table_armor(cursor)
+	creat_table_task(cursor)
+	# create_table_armor(cursor)
 	# create_achievement(cursor)
 	# create_table_union_store(cursor)
 	# create_check_in(cursor)
