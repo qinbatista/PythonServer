@@ -382,6 +382,22 @@ class MessageHandler:
 
 
 
+	# TODO 新增
+	async def _automatically_refresh_store(self, data: dict) -> str:
+		return 'function'
+	# TODO
+	async def _stage_reward_config(self, data: dict) -> str:
+		return 'function'
+	# TODO
+	async def _get_lottery_config_info(self, data: dict) -> str:
+		return 'function'
+	# TODO
+	async def _get_hang_up_info(self, data: dict) -> str:
+		return 'function'
+
+
+
+
 
 	###################### TODO.py ######################
 	async def _get_account_world_info(self, data: dict) -> str:
@@ -546,5 +562,12 @@ FUNCTION_LIST = {
 	# TODO
 	###################### tasks ######################
 	'get_all_task': MessageHandler._get_all_task,
+
+
+	# TODO 新增
+	'automatically_refresh_store': MessageHandler._automatically_refresh_store,
+	'stage_reward_config': MessageHandler._stage_reward_config,
+	'get_lottery_config_info': MessageHandler._get_lottery_config_info,
+	'get_hang_up_info': MessageHandler._get_hang_up_info,
 }
 

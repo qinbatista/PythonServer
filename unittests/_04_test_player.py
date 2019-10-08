@@ -457,6 +457,21 @@ def new_server_test(world):
 	# TODO
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
 	# print(response)
+	# TODO
+	response = send_tcp_message({'world' : world, 'function' : 'get_player_info', 'data' : {'token': token}})
+	print(response)
+	# TODO
+	response = send_tcp_message({'world' : world, 'function' : 'automatically_refresh_store', 'data' : {'token': token}})
+	print(response)
+	# TODO
+	response = send_tcp_message({'world' : world, 'function' : 'stage_reward_config', 'data' : {'token': token}})
+	print(response)
+	# TODO
+	response = send_tcp_message({'world' : world, 'function' : 'get_lottery_config_info', 'data' : {'token': token}})
+	print(response)
+	# TODO
+	response = send_tcp_message({'world' : world, 'function' : 'get_hang_up_info', 'data' : {'token': token}})
+	print(response)
 
 
 	# nonce = ''
