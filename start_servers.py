@@ -52,6 +52,7 @@ def GetPythonCommand():
 	# print("Version:"+version1.read())
 	# print("show:"+version2.read())
 	# print("show:"+version3.read())
+	return PythonVersion
 
 
 def get_host_ip():
