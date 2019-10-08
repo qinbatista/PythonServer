@@ -113,7 +113,7 @@ class MessageHandler:
 
 	###################### player.py ######################
 	async def _create_player(self, data: dict) -> str:
-		return await player.create(data['data']['unique_id'], data['data']['gn'], **kwargs)
+		return await player.create(data['data']['unique_id'], data['data']['gn'], **data)
 
 	###################### family.py ######################
 	async def _create_family(self, data: dict) -> str:
