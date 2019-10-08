@@ -1,4 +1,5 @@
 import json
+import requests
 
 from utility import config_reader
 
@@ -24,6 +25,25 @@ MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
 class MessageHandler:
 	def __init__(self):
 		self._functions = FUNCTION_LIST
+
+		r = requests.get('http://localhost:8000/get_game_manager_config')
+		d = r.json()
+		self._mall_config = d['mall']
+		self._factory_config = d['factory']
+		self._family_config = d['family']
+		self._stage_reward = d['reward']
+		self._skill_scroll_functions = d['skill']['skill_scroll_functions']
+		self._upgrade_chance = d['skill']['upgrade_chance']
+		self._weapon_config = d['weapon']
+		self._role_config = d['role']
+		self._lottery = d['lottery']
+		self._player = d['player']
+		self._hang_reward = d['hang_reward']
+		self._entry_consumables = d['entry_consumables']
+		self._announcement = d['announcement']
+		self._player_experience = d['player_experience']
+		self._monster_config = d['monster_config']
+		self._level_enemy_layouts = d['level_enemy_layouts']
 
 	async def shutdown(self):
 		pass
@@ -371,9 +391,8 @@ class MessageHandler:
 		return await armor.get_all_armor(data['data']['unique_id'], **data)
 
 	###################### stage ######################
-	# TODO
 	async def _get_all_tower(self, data: dict) -> str:
-		return 'function'
+		return common.mt(0, 'success', {'tower_config': self._entry_consumables})
 
 	###################### tasks ######################
 	# TODO
