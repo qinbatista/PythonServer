@@ -430,7 +430,6 @@ def new_server_test(world):
 	token = response['data']['token']
 	# response = send_tcp_message({'world' : 0, 'function' : 'send_merchandise', 'data' : {'token': token, 'merchandise': 'coin', 'quantities': '20'}})
 	# print(response)
-	# TODO get_all_mail
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_mail', 'data' : {'token': token}})
 	# print(response)
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_weapon', 'data' : {'token': token}})
@@ -439,12 +438,11 @@ def new_server_test(world):
 	# print(response)
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_skill', 'data' : {'token': token}})
 	# print(response)
-	# TODO get_all_achievement
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_achievement', 'data' : {'token': token}})
-	print(response)
-	# TODO get_all_armor
-	# response = send_tcp_message({'world' : world, 'function' : 'get_all_armor', 'data' : {'token': token}})
+	# response = send_tcp_message({'world' : world, 'function' : 'get_all_achievement', 'data' : {'token': token}})
 	# print(response)
+	# TODO get_all_armor
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_armor', 'data' : {'token': token}})
+	print(response)
 	# TODO get_all_resource
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_resource', 'data' : {'token': token}})
 	# print(response)
