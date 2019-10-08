@@ -18,6 +18,7 @@ and then sending the completed job back to the correct client. Once a job has be
 a client, close the connection to the client.
 '''
 
+import sys
 import uuid
 import signal
 import asyncio
@@ -28,6 +29,8 @@ import nats.aio.client
 import platform
 
 from utility import config_reader
+
+channel = 'jobs'
 
 CFG = config_reader.wait_config()
 
@@ -166,7 +169,7 @@ class Gate:
 		cid = uuid.uuid4().hex
 		self.cwriters[cid] = writer
 		await self.redis.set(cid, self.gid, expire = 10)
-		await self.nats.publish('experimental', (cid + '~' + job).encode())
+		await self.nats.publish(channel, (cid + '~' + job).encode())
 		print(f'gate: submitted new job with id {cid} and args {job}')
 		print(f'gate: waiting for job {cid} to complete')
 
@@ -192,4 +195,6 @@ class Gate:
 			s.close()
 
 if __name__ == '__main__':
+	if len(sys.argv) >= 2:
+		channel = sys.argv[1]
 	asyncio.run(Gate().start())
