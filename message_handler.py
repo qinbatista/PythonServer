@@ -512,8 +512,8 @@ FUNCTION_LIST = {
 
 	###################### lottery.py ######################
 	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
-	# TODO
 	'fortune_wheel_pro' : MessageHandler._fortune_wheel_pro,
+	# TODO
 	'get_config_info_lottery' : MessageHandler._get_config_info_lottery,
 
 	###################### skill.py ######################
