@@ -251,7 +251,7 @@ class MessageHandler:
 	async def _get_skill(self, data: dict) -> str:
 		return await skill.get_skill(data['data']['unique_id'], int(data['data']['skill']), **data)
 
-	async def _get_all_levels_skill(self, data: dict) -> str:
+	async def _get_all_skill(self, data: dict) -> str:
 		return await skill.get_all_levels(data['data']['unique_id'], **data)
 
 	async def _level_up_skill(self, data: dict) -> str:
@@ -262,7 +262,7 @@ class MessageHandler:
 		return ''
 
 	###################### friend.py ######################
-	async def _get_all_info_friend(self, data: dict) -> str:
+	async def _get_all_friend(self, data: dict) -> str:
 		return await friend.get_all(data['data']['unique_id'], **data)
 
 	async def _remove_friend(self, data: dict) -> str:
@@ -411,13 +411,13 @@ FUNCTION_LIST = {
 
 	###################### skill.py ######################
 	'get_skill' : MessageHandler._get_skill,
-	'get_all_levels_skill' : MessageHandler._get_all_levels_skill,
+	'get_all_skill' : MessageHandler._get_all_skill,
 	'level_up_skill' : MessageHandler._level_up_skill,
 	# TODO
 	'get_level_up_config_skill': MessageHandler._get_level_up_config_skill,
 
 	###################### friend.py ######################
-	'get_all_info_friend' : MessageHandler._get_all_info_friend,
+	'get_all_friend' : MessageHandler._get_all_friend,
 	'remove_friend' : MessageHandler._remove_friend,
 	'request_friend' : MessageHandler._request_friend,
 	'respond_friend' : MessageHandler._respond_friend,
