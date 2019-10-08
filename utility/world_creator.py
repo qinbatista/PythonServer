@@ -367,7 +367,7 @@ def create_achievement(cursor):
 	"""
 	CREATE TABLE `achievement` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
-	  `aid` int(11) DEFAULT 0 COMMENT '成就唯一id',
+	  `aid` int(11) NOT NULL COMMENT '成就唯一id',
 	  `value` int(11) DEFAULT 0 COMMENT '成就完成的次数',
 	  `reward` int(11) DEFAULT 0 COMMENT '完成成就领奖的次数',
 	  PRIMARY KEY (`uid`,`aid`)

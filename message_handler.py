@@ -12,6 +12,7 @@ from module import account
 from module import lottery
 from module import weapon
 from module import summoning
+from module import achievement
 
 CFG = config_reader.wait_config()
 
@@ -359,7 +360,7 @@ class MessageHandler:
 	###################### achievement ######################
 	# TODO
 	async def _get_all_achievement(self, data: dict) -> str:
-		return 'function'
+		return await achievement.get_all_achievement(data['data']['unique_id'], **data)
 
 	###################### armor ######################
 	# TODO
