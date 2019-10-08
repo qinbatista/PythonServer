@@ -10,6 +10,7 @@ Each job is then processed concurrently as a task.
 Completed jobs are sent to the gate server which contains the requesting client.
 '''
 
+import sys
 import signal
 import asyncio
 import aiohttp
@@ -22,6 +23,8 @@ import platform
 
 from utility import config_reader
 from utility import worker_resources
+
+channel = 'jobs'
 
 CFG = config_reader.wait_config()
 
@@ -41,7 +44,8 @@ class Worker:
 	'''
 	async def start(self):
 		await self.init()
-		self.sid = await self.nats.subscribe('experimental', 'workers', self.process_job)
+		print(f'this worker is operating on channel: {channel}')
+		self.sid = await self.nats.subscribe(channel, 'workers', self.process_job)
 		while self.running:
 			await asyncio.sleep(1)
 			await self.nats.flush()
@@ -128,5 +132,7 @@ class Worker:
 
 
 if __name__ == '__main__':
+	if len(sys.argv) >= 2:
+		channel = sys.argv[1]
 	worker = Worker()
 	asyncio.run(worker.start())
