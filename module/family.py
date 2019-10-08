@@ -74,7 +74,7 @@ def _valid_family_name(name):
 
 def _check_remove_permissions(remover, to_remove):
 	if remover == enums.FamilyRole.OWNER: return True
-	elif remove == enums.FamilyRole.ADMIN and to_remove < enums.FamilyRole.ADMIN: return True
+	elif remover == enums.FamilyRole.ADMIN and to_remove < enums.FamilyRole.ADMIN: return True
 	return False
 
 def _check_invite_permissions(inviter):

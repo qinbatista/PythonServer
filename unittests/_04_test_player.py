@@ -440,38 +440,38 @@ def new_server_test(world):
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_skill', 'data' : {'token': token}})
 	# print(response)
 	# TODO get_all_achievement
-	# response = send_tcp_message({'world' : world, 'function' : 'get_all_achievement', 'data' : {'token': token}})
-	# print(response)
-	# TODO
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_achievement', 'data' : {'token': token}})
+	print(response)
+	# TODO get_all_armor
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_armor', 'data' : {'token': token}})
 	# print(response)
-	# TODO
+	# TODO get_all_resource
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_resource', 'data' : {'token': token}})
 	# print(response)
-	# TODO
+	# TODO get_all_tower
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_tower', 'data' : {'token': token}})
 	# print(response)
-	# TODO
+	# TODO get_all_task
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token': token}})
 	# print(response)
-	# TODO
+	# TODO get_all_check_in_table
 	# response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token': token}})
 	# print(response)
-	# TODO
-	response = send_tcp_message({'world' : world, 'function' : 'get_player_info', 'data' : {'token': token}})
-	print(response)
-	# TODO
-	response = send_tcp_message({'world' : world, 'function' : 'automatically_refresh_store', 'data' : {'token': token}})
-	print(response)
-	# TODO
-	response = send_tcp_message({'world' : world, 'function' : 'stage_reward_config', 'data' : {'token': token}})
-	print(response)
-	# TODO
-	response = send_tcp_message({'world' : world, 'function' : 'get_lottery_config_info', 'data' : {'token': token}})
-	print(response)
-	# TODO
-	response = send_tcp_message({'world' : world, 'function' : 'get_hang_up_info', 'data' : {'token': token}})
-	print(response)
+	# TODO get_player_info
+	# response = send_tcp_message({'world' : world, 'function' : 'get_player_info', 'data' : {'token': token}})
+	# print(response)
+	# TODO automatically_refresh_store
+	# response = send_tcp_message({'world' : world, 'function' : 'automatically_refresh_store', 'data' : {'token': token}})
+	# print(response)
+	# TODO stage_reward_config
+	# response = send_tcp_message({'world' : world, 'function' : 'stage_reward_config', 'data' : {'token': token}})
+	# print(response)
+	# TODO get_lottery_config_info
+	# response = send_tcp_message({'world' : world, 'function' : 'get_lottery_config_info', 'data' : {'token': token}})
+	# print(response)
+	# TODO get_hang_up_info
+	# response = send_tcp_message({'world' : world, 'function' : 'get_hang_up_info', 'data' : {'token': token}})
+	# print(response)
 
 
 	# nonce = ''
