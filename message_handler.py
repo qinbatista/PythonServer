@@ -114,7 +114,7 @@ class MessageHandler:
 		return await player.create(data['data']['unique_id'], data['data']['gn'], **data)
 
 	async def _enter_world(self, data: dict) -> str:
-		return await player.enter_world(data['data']['unique_id'], **kwargs)
+		return await player.enter_world(data['data']['unique_id'], **data)
 
 	###################### family.py ######################
 	async def _create_family(self, data: dict) -> str:
