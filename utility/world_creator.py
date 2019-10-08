@@ -366,11 +366,11 @@ def create_achievement(cursor):
 	statement = \
 	"""
 	CREATE TABLE `achievement` (
-	  `unique_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'new_id',
-	  `achievement_id` smallint(6) DEFAULT 0 COMMENT '表示成就的数字编号',
-	  `achievement_value` smallint(6) DEFAULT 0 COMMENT '表示成就的次数',
-	  `achievement_value_reward` smallint(6) DEFAULT 0 COMMENT '表示成就领取奖励的次数',
-	  PRIMARY KEY (`unique_id`,`achievement_id`)
+	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
+	  `aid` int(11) DEFAULT 0 COMMENT '成就唯一id',
+	  `value` int(11) DEFAULT 0 COMMENT '成就完成的次数',
+	  `reward` int(11) DEFAULT 0 COMMENT '完成成就领奖的次数',
+	  PRIMARY KEY (`uid`,`aid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 	cursor.execute(statement)
@@ -457,12 +457,12 @@ def already_exists(world):
 
 def operating_test():
 	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
-	c.select_db("aliya")
+	c.select_db("experimental")
 	cursor = c.cursor()
 	# creat_table_task(cursor)
-	# create_achievement(cursor)
+	create_achievement(cursor)
 	# create_table_union_store(cursor)
-	create_check_in(cursor)
+	# create_check_in(cursor)
 	# create_table_player(cursor)
 	# create_table_families(cursor)
 

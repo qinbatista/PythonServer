@@ -220,9 +220,9 @@ class Achievement(enum.IntEnum):
 	GET_5_STAR_ROLE = 5
 	GET_6_STAR_ROLE = 6
 	LEVEL_UP_ROLE = 7
-	GET_4_star_weapon = 8
-	GET_5_star_weapon = 9
-	GET_6_star_weapon = 10
+	GET_4_STAR_WEAPON = 8
+	GET_5_STAR_WEAPON = 9
+	GET_6_STAR_WEAPON = 10
 	LEVEL_UP_WEAPON = 11
 	PASS_STAGE = 12
 	COLLECT_FOOD = 13
