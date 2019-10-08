@@ -9,7 +9,6 @@ def loc():
 	return os.path.dirname(os.path.realpath(__file__))
 PythonVersion=""
 def GetPythonCommand():
-	return 'python'
 	global PythonVersion
 	if PythonVersion!="":
 		return PythonVersion
@@ -52,7 +51,6 @@ def GetPythonCommand():
 	# print("Version:"+version1.read())
 	# print("show:"+version2.read())
 	# print("show:"+version3.read())
-	return PythonVersion
 
 
 def get_host_ip():
