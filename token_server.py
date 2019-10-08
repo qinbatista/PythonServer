@@ -147,7 +147,7 @@ async def __generate_nonce(request: web.Request) -> web.Response:
 async def __register_nonce(request: web.Request) -> web.Response:
 	post = await request.json()
 	kwargs = {k : v for k, v in post.items() if k != 'type' and k != 'nonce'}
-	return _json_response(await (request.app['MANAGER']).generate_nonce(post['nonce'], post['type'], **kwargs))
+	return _json_response(await (request.app['MANAGER']).register_nonce(post['nonce'], post['type'], **kwargs))
 
 @ROUTES.post('/redeem_nonce')
 async def __redeem_nonce(request: web.Request) -> web.Response:
@@ -157,7 +157,7 @@ async def __redeem_nonce(request: web.Request) -> web.Response:
 @ROUTES.post('/redeem_nonce_new')
 async def __redeem_nonce_new(request: web.Request) -> web.Response:
 	post = await request.json()
-	return _json_response(await (request.app['MANAGER']).redeem_nonce(post['nonce']))
+	return _json_response(await (request.app['MANAGER']).redeem_nonce_new(post['nonce']))
 
 def run():
 	app = web.Application()
