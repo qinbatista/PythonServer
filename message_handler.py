@@ -15,6 +15,7 @@ from module import weapon
 from module import summoning
 from module import achievement
 from module import armor
+from module import player
 
 CFG = config_reader.wait_config()
 
@@ -376,7 +377,7 @@ class MessageHandler:
 		return 'function'
 
 	async def _get_all_resource(self, data: dict) -> str:
-		return 'function'
+		return await player.get_all_resource(data['data']['unique_id'], **data)
 
 	###################### achievement ######################
 	async def _get_all_achievement(self, data: dict) -> str:
