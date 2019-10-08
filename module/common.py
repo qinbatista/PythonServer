@@ -19,6 +19,13 @@ async def execute(statement, account = False, **kwargs):
 			await cursor.execute(statement)
 			return await cursor.fetchall()
 
+async def execute_update(statement, account = False, **kwargs):
+	async with ((await get_db(**kwargs)).acquire() if not account else kwargs['accountdb'].acquire()) as conn:
+		# await conn.select_db()
+		async with conn.cursor() as cursor:
+			affected = await cursor.execute(statement)
+			return (affected, await cursor.fetchall())
+
 async def get_gn(uid, **kwargs):
 	data = await execute(f'SELECT gn FROM player WHERE uid = "{uid}";', **kwargs)
 	return data[0][0]
