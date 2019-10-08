@@ -9,7 +9,6 @@ import asyncio
 from module import mail
 from module import enums
 from module import common
-from module import family
 from datetime import datetime, timezone
 
 
@@ -18,16 +17,16 @@ async def get_all(uid, **kwargs):
 	return common.mt(0, 'got all friends', {'friends' : [{'gn' : i[0], 'exp' : i[1], 'recover' : i[2], 'since' : i[3], 'icon' : 0} for i in info]})
 
 async def remove(uid, gn_target, **kwargs):
-	uid_target = await family._get_uid(gn_target, **kwargs)
+	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid == uid_target: return common.mt(99, 'don\'t be an idiot')
 	await common.execute(f'DELETE FROM friend WHERE (uid = "{uid}" AND fid = "{uid_target}") OR (uid = "{uid_target}" AND fid = "{uid}");', **kwargs)
 	return common.mt(0, 'removed target', {'gn' : gn_target})
 
 async def request(uid, gn_target, **kwargs):
-	uid_target = await family._get_uid(gn_target, **kwargs)
+	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid == uid_target: return common.mt(99, 'do not be an idiot')
 	await common.execute(f'INSERT INTO friend (uid, fid) VALUES ("{uid}", "{uid_target}") ON DUPLICATE KEY UPDATE uid = uid;', **kwargs)
-	sender = await family._get_gn(uid, **kwargs)
+	sender = await common.get_gn(uid, **kwargs)
 	if not await mail.send_mail(enums.MailType.FRIEND_REQUEST, uid_target, from_ = sender, sender = sender, uid_sender = uid, **kwargs):
 		return common.mt(98, 'could not send mail')
 	return common.mt(0, 'request sent', {'gn' : gn_target})
@@ -42,7 +41,7 @@ async def respond(uid, nonce, **kwargs):
 	return common.mt(0, 'success', {'gn' : info[0], 'exp' : info[1]})
 
 async def send_gift(uid, gn_target, **kwargs):
-	fid = await family._get_uid(gn_target, **kwargs)
+	fid = await common.get_uid(gn_target, **kwargs)
 	friends, recover, since = await _are_friends(uid, fid, **kwargs)
 	if not friends or since == '': return common.mt(99, 'not friends')
 	now = datetime.now(timezone.utc)
