@@ -101,8 +101,6 @@ class MessageHandler:
 	async def _choice_world(self, data: dict) -> str:
 		return 'function'
 
-	async def _create_player(self, data: dict) -> str:
-		return 'function'
 
 	async def _get_player_info(self, data: dict) -> str:
 		return 'function'
@@ -112,6 +110,10 @@ class MessageHandler:
 
 	async def _change_game_name(self, data: dict) -> str:
 		return 'function'
+
+	###################### player.py ######################
+	async def _create_player(self, data: dict) -> str:
+		return await player.create(data['data']['unique_id'], data['data']['gn'], **kwargs)
 
 	###################### family.py ######################
 	async def _create_family(self, data: dict) -> str:
@@ -450,10 +452,12 @@ FUNCTION_LIST = {
 	'verify_email_code' : MessageHandler._verify_email_code,
 	# TODO
 	'choice_world' : MessageHandler._choice_world,
-	'create_player' : MessageHandler._create_player,
 	'get_player_info' : MessageHandler._get_player_info,
 	'create_account' : MessageHandler._create_account,
 	'change_game_name' : MessageHandler._change_game_name,
+
+	###################### player.py ######################
+	'create_player' : MessageHandler._create_player,
 
 	###################### family.py ######################
 	'create_family': MessageHandler._create_family,
