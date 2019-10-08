@@ -56,10 +56,10 @@ def GetPythonCommand():
 	except Exception as e:
 		print(str(e))
 
-
-# print("Version:"+version1.read())
-# print("show:"+version2.read())
-# print("show:"+version3.read())
+	print("Version1:" + version1.read())
+	print("Version2:" + version2.read())
+	print("Version3:" + version3.read())
+	print("Version3:" + version4.read())
 
 
 def get_host_ip():
@@ -86,7 +86,7 @@ def main():
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate.py', get_host_ip()]))
 		time.sleep(0.2)
 		print('Done spawning servers...')
-		while (len(processes) > 0):
+		while len(processes) > 0:
 			time.sleep(5)
 	except KeyboardInterrupt:
 		pass
