@@ -471,14 +471,21 @@ class MessageHandler:
 	# TODO 新增
 	async def _automatically_refresh_store(self, data: dict) -> str:
 		return 'function'
-	# TODO
 	async def _stage_reward_config(self, data: dict) -> str:
-		return 'function'
+		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config': self._stage_reward}}
 	# TODO
 	async def _get_lottery_config_info(self, data: dict) -> str:
-		return 'function'
+		cost = {
+			"skills": self._lottery["skills"]["cost"],
+			"weapons": self._lottery["weapons"]["cost"],
+			"roles": self._lottery["roles"]["cost"],
+			"fortune_wheel": self._lottery["fortune_wheel"]["cost"]
+		}
+		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config': cost}}
 	# TODO
 	async def _get_hang_up_info(self, data: dict) -> str:
+		# 这个信息不知道怎么去拿，后面详细说一下，新数据库不知道这些放到哪里了
+		# sql_str = "SELECT hang_up_time, hang_stage, stage, tower_stage FROM player WHERE unique_id='%s'" % unique_id
 		return 'function'
 	# TODO
 	async def _check_boss_status(self, data: dict) -> str:
@@ -487,6 +494,7 @@ class MessageHandler:
 		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':self._family_config}}
 	async def _get_factory_info(self, data: dict) -> str:
 		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':self._factory_config}}
+	# TODO 不知道写不写，要写完变动会很大
 	async def _refresh_all_storage(self, data: dict) -> str:
 		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':""}}
 
