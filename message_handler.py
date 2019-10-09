@@ -16,6 +16,7 @@ from module import summoning
 from module import achievement
 from module import armor
 from module import player
+from module import task
 from datetime import datetime, timedelta
 
 
@@ -132,7 +133,10 @@ class MessageHandler:
 
 
 	async def _get_player_info(self, data: dict) -> str:
-		return 'function'
+		return await player.get_player_info(data['data']['unique_id'], **data)
+
+	async def _get_player_config(self, data: dict) -> str:
+		return common.mt(0, 'success', {'player_config': self._player})
 
 	async def _create_account(self, data: dict) -> str:
 		return 'function'
@@ -392,7 +396,7 @@ class MessageHandler:
 		return 'function'
 
 	async def _get_all_check_in_table(self, data: dict) -> str:
-		return 'function'
+		return common.mt(0, 'success', {'check_in': [{'date':  '2019-10-05', 'reward': 0}, {'date':  '2019-10-06', 'reward': 0}]})
 
 	###################### VIP ######################
 	# TODO
@@ -433,9 +437,9 @@ class MessageHandler:
 		return common.mt(0, 'success', {'tower_config': self._entry_consumables})
 
 	###################### tasks ######################
-	# TODO
 	async def _get_all_task(self, data: dict) -> str:
-		return 'function'
+		return await task.get_all_task(data['data']['unique_id'], **data)
+		# return common.mt(0, 'success', {'tasks': [{'tid': 1, 'value': 1, 'reward': 0, 'timer': '2019-10-05'}, {'tid': 2, 'value': 1, 'reward': 0, 'timer': '2019-10-06'}]})
 
 
 
@@ -494,6 +498,7 @@ FUNCTION_LIST = {
 	'verify_email_code' : MessageHandler._verify_email_code,
 	# TODO
 	'get_player_info' : MessageHandler._get_player_info,
+	'get_player_config' : MessageHandler._get_player_config,
 	'create_account' : MessageHandler._create_account,
 	'change_game_name' : MessageHandler._change_game_name,
 
@@ -627,7 +632,6 @@ FUNCTION_LIST = {
 	###################### stage ######################
 	'get_all_tower': MessageHandler._get_all_tower,
 
-	# TODO
 	###################### tasks ######################
 	'get_all_task': MessageHandler._get_all_task,
 
