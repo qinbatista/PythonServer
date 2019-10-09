@@ -8,8 +8,8 @@ from module import common
 from collections import defaultdict
 
 STANDARD_EXP_POT_COUNT = 5
+STANDARD_SEGMENT = 25
 
-# invalid role name, user does not have that role, max level
 async def level_up(uid, rid, amount, **kwargs):
 	rid = enums.Role(rid)
 	exists, payload = await _get_role_info(uid, rid, 'star', 'level', 'skillpoint', **kwargs)
@@ -22,9 +22,15 @@ async def level_up(uid, rid, amount, **kwargs):
 	await common.execute(f'UPDATE role SET level = {level + upgrade_cnt}, skillpoint = {sp + upgrade_cnt} WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
 	return common.mt(0, 'success', {enums.Group.ROLE.value : {'rid' : rid.value, 'level' : level + upgrade_cnt, 'sp' : sp + upgrade_cnt}, enums.Group.ITEM.value : {'iid' : enums.Item.EXPERIENCE_POTION.value, 'value' : remaining}})
 
-# invalid role name, insufficient segment, skill has been reset
-async def level_up_star():
-	pass
+async def level_up_star(uid, rid, **kwargs):
+	rid = enums.Role(rid)
+	exists, payload = await _get_role_info(uid, rid, 'star', 'segment', **kwargs)
+	if not exists: return common.mt(99, 'invalid target')
+	star, segment = payload
+	cost = STANDARD_SEGMENT * (1 + star)
+	if segment < cost: return common.mt(98, 'insufficient segments')
+	await common.execute(f'UPDATE role SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND rid = {rid.value};', **kwargs)
+	return common.mt(0, 'success', {'rid' : rid.value, 'star' : star + 1, 'seg' : segment - cost})
 
 async def get_all(uid, **kwargs):
 	roles = await _get_all_role_info(uid, **kwargs)
