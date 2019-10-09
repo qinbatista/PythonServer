@@ -73,7 +73,7 @@ def run_task(name):
 	global unique_id
 	unique_id = name
 	call_login(str(name))
-	# info_list = call_get_all_info()#加载所有参数信息
+	info_list = call_get_all_info()#加载所有参数信息
 	# dark_market()#*加载黑市信息
 	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
@@ -86,7 +86,7 @@ def run_task(name):
 	# stage_dialog(info_list[19])#关卡界面
 	# announcement()#公告界面
 	# achievement(info_list[20])
-	vip_system()
+	# vip_system()
 
 
 def run_all_task():

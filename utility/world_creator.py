@@ -408,6 +408,25 @@ def create_triggers_player(cursor):
 	cursor.execute(trigger1)
 	cursor.execute(trigger2)
 
+def creat_limits(cursor):
+	"""
+			DARK_MARKET_LIMITS = 1
+			ADD_FRIENDS_LIMITS = 2
+			WORLD_BOSS_CHALLENGE_LIMITS = 3
+			FAMILY_REMOVE_USER_LIMITS = 4
+			FACTORY_WISHING_POOL_COUNT = 5
+	"""
+	statement = \
+	"""
+	CREATE TABLE `limits` (
+	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一id',
+	  `lid` smallint(6) NOT NULL COMMENT '任务唯一id',
+	  `value` smallint(6) DEFAULT 0 COMMENT '表示限制的次数',
+	  PRIMARY KEY (`uid`,`lid`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+	cursor.execute(statement)
+
 def create_world(world):
 	c = pymysql.connect(host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8mb4', autocommit=True)
 	cursor = c.cursor()
@@ -451,13 +470,14 @@ def operating_test():
 	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
 	c.select_db("experimental")
 	cursor = c.cursor()
-	creat_table_task(cursor)
+	# creat_table_task(cursor)
 	# create_table_armor(cursor)
 	# create_achievement(cursor)
 	# create_table_union_store(cursor)
 	# create_check_in(cursor)
 	# create_table_player(cursor)
 	# create_table_families(cursor)
+	creat_limits(cursor)
 
 
 if __name__ == '__main__':

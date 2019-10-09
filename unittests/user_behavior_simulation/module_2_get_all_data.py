@@ -33,14 +33,14 @@ def get_monster_info():#获取怪物参数
 	print_method("[get_monster_info]"+str(response))
 	return response
 
-def get_all_friend_info():#获取所有朋友信息
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_friend_info', 'data' : {'token' : token}})#获取所有好友信息
-	print_method("[get_all_friend_info]"+str(response))
+def get_all_friend():#获取所有朋友信息
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_friend', 'data' : {'token' : token}})#获取所有好友信息
+	print_method("[get_all_friend]"+str(response))
 	return response
 
-def get_all_skill_level():#获取所有技能信息
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_skill_level', 'data' : {'token' : token}})#升级请求
-	print_method("[get_all_skill_level]"+str(response))
+def get_all_skill():#获取所有技能信息
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_skill', 'data' : {'token' : token}})#升级请求
+	print_method("[get_all_skill]"+str(response))
 	return response
 
 def get_all_weapon():#获取所有武器信息
@@ -73,9 +73,9 @@ def get_all_mail():#获取所有邮件
 	print_method("[get_all_mail]"+str(response))
 	return response
 
-def get_all_armor_info():#获取所有护甲信息
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_armor_info', 'data' : {'token' : token}})#升级请求
-	print_method("[get_all_armor_info]"+str(response))
+def get_all_armor():#获取所有护甲信息
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_armor', 'data' : {'token' : token}})#升级请求
+	print_method("[get_all_armor]"+str(response))
 	return response
 
 def get_lottery_config_info():#获取抽奖数值信息
@@ -138,36 +138,57 @@ def get_all_achievement():#获取所有成就
 	print_method("[achievement_dialog]"+str(response))
 	return response
 
+def get_all_resource():#获取所有成就
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_resource', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+	print_method("[get_all_resource]"+str(response))
+	return response
+
+def get_all_tower():#获取所有成就
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_tower', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+	print_method("[get_all_resource]"+str(response))
+	return response
+
+def get_all_task():#获取所有成就
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+	print_method("[get_all_resource]"+str(response))
+	return response
+
+def get_all_check_in_table():#获取所有成就
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+	print_method("[get_all_resource]"+str(response))
+	return response
+
+
+
 def get_all_info(_token,_world):
 	print_module("[module_2_get_all_data] get_all_info")
 	global world,token
 	world = _world
 	token = _token
-	get_all_supplies_str = get_all_supplies()
-	get_level_info_str = ""#get_level_info()#未完成
-	get_stage_info_str = get_stage_info()
-	get_monster_info_str = get_monster_info()
-	get_all_friend_info_str = get_all_friend_info()
-	get_all_skill_level_str = get_all_skill_level()
+	get_all_achievement_str = get_all_achievement()
+	get_all_armor_str = get_all_armor()
+	get_all_resource_str = get_all_resource()
+	get_all_tower_str = get_all_tower()
+	get_all_task_str = get_all_task()
 	get_all_weapon_str = get_all_weapon()
+	get_all_check_in_table_str = get_all_check_in_table()
+	get_all_friend_str = get_all_friend()
+	get_all_skill_str = get_all_skill()
+	get_player_info_str =get_player_info()
+	automatically_refresh_store_str =automatically_refresh_store()
+	stage_reward_config_str = stage_reward_config()
+	get_lottery_config_info_str = get_lottery_config_info()
 	refresh_all_storage_str = refresh_all_storage()
+	get_all_vip_info_str = get_all_vip_info()
 	get_all_roles_str = get_all_roles()
 	get_factory_info_str = get_factory_info()
-	get_all_family_info_str = get_all_family_info()#家族还未开始制作
-	get_all_mail_str = get_all_mail()
-	get_all_armor_info_str = get_all_armor_info()
-	get_lottery_config_info_str = get_lottery_config_info()
-	player_config_str = ""#player_config()#未完成
-	get_weapon_config_str = get_weapon_config()
-	get_skill_level_up_config_str = get_skill_level_up_config()
-	get_family_config_str = ""#get_family_config()#家族还未开始制作
-	get_role_config_str = get_role_config()
-	get_hang_up_info_str = get_hang_up_info()
-	mail_gift_str = mail_gift()
-	get_picture_link_str = get_picture_link()
-	get_player_info_str = get_player_info()
+	get_all_family_info_str = get_all_family_info()
 	get_family_config_str = get_family_config()
-	get_all_achievement_str = get_all_achievement()
+	check_boss_status_str = check_boss_status()
+
+
+
+
 	return [get_level_info_str,get_stage_info_str,get_monster_info_str,get_all_friend_info_str,
 	get_all_skill_level_str,get_all_weapon_str,refresh_all_storage_str,get_all_roles_str,
 	get_factory_info_str,get_all_family_info_str,get_all_mail_str,get_all_armor_info_str,
