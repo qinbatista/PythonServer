@@ -16,6 +16,7 @@ from module import summoning
 from module import achievement
 from module import armor
 from module import player
+from module import role
 from module import task
 from datetime import datetime, timedelta
 
@@ -382,6 +383,7 @@ class MessageHandler:
 		return 'function'
 
 	async def _get_all_roles(self, data: dict) -> str:
+		return await role.get_all(data['data']['unique_id'], **kwargs)
 		return {'status' : 0, 'message' : 'temp function success', 'data' :{'roles' :[{'rid': 1, 'star': 3, 'level': 6, 'sp': 0, 'seg': 60, 'p1': 0, 'p2': 6, 'p3': 0, 'p4': 0},{'rid': 2, 'star': 3, 'level': 6, 'sp': 0, 'seg': 60, 'p1': 0, 'p2': 6, 'p3': 0, 'p4': 0}]}}
 
 	async def _role_config(self, data: dict) -> str:
