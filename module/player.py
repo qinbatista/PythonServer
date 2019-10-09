@@ -30,9 +30,9 @@ async def accept_gift(uid, nonce, **kwargs):
 	gift = await _lookup_nonce(nonce, **kwargs)
 	if not gift: return common.mt(99, 'invalid nonce')
 	item = common.decode_items(gift)
-	_, remaining = await common.try_item(uid, item[1], item[2], **kwargs)
+	_, remaining = await common.try_item(uid, item[0][1], item[0][2], **kwargs)
 	await mail.delete_mail(uid, nonce, **kwargs)
-	return common.mt(0, 'success', item[0] : {'iid' : item[1], 'value' : remaining})
+	return common.mt(0, 'success', {item[0][0].value : {'iid' : item[0][1].value, 'value' : remaining}})
 
 async def change_name(uid, name, **kwargs):
 	pass
@@ -54,7 +54,7 @@ async def get_player_info(uid, **kwargs):
 async def _lookup_nonce(nonce, **kwargs):
 	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce_new', json = {'nonce' : [nonce]}) as resp:
 		data = await resp.json(content_type = 'text/json')
-		return None if data['status'] != 0 else data['nonce']['items']
+		return None if data[nonce]['status'] != 0 else data[nonce]['items']
 
 
 
