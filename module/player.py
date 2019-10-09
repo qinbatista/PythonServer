@@ -20,6 +20,9 @@ async def get_account_world_info(uid, **kwargs):
 	if exp != ():
 		world = {'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : await common.get_gn(uid, **kwargs), 'exp' : exp[0][0]}
 		worlds.append(world)
+	else:
+		world = {'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : '', 'exp' : ''}
+		worlds.append(world)
 	return common.mt(0, 'success', {'worlds' : worlds})
 
 async def accept_gift(uid, key, **kwargs):
