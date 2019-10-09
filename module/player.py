@@ -15,7 +15,7 @@ async def enter_world(uid, **kwargs):
 	return common.mt(0, 'success')
 
 async def get_account_world_info(uid, **kwargs):
-	worlds = [{'server_status' : 0, 'world' : '1', 'world_name' : 'experimental_wow', 'gn' : '', 'exp' : ''},{'server_status' : 0, 'world' : '2', 'world_name' : 'experimental_aliya', 'gn' : '', 'exp' : ''}]
+	worlds = [{'server_status' : 0, 'world' : '1', 'world_name' : 'experimental_test1', 'gn' : '', 'exp' : ''},{'server_status' : 0, 'world' : '2', 'world_name' : 'experimental_test2', 'gn' : '', 'exp' : ''}]
 	exp = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
 	if exp != ():
 		world = {'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : await common.get_gn(uid, **kwargs), 'exp' : exp[0][0]}
