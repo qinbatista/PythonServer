@@ -382,8 +382,8 @@ class MessageHandler:
 	async def _upgrade_role_star(self, data: dict) -> str:
 		return 'function'
 
-	async def _upgrade_role_level(self, data: dict) -> str:
-		return role.level_up(data['data']['unique_id'], data['data']['role'], data['data']['amount'], **data)
+	async def _level_up_role(self, data: dict) -> str:
+		return await role.level_up(data['data']['unique_id'], int(data['data']['role']), int(data['data']['amount']), **data)
 		return 'function'
 
 
@@ -626,7 +626,7 @@ FUNCTION_LIST = {
 	# TODO
 	###################### role.py ######################
 	'upgrade_role_star' : MessageHandler._upgrade_role_star,
-	'upgrade_role_level' : MessageHandler._upgrade_role_level,
+	'level_up_role' : MessageHandler._level_up_role,
 	'get_all_role' : MessageHandler._get_all_role,
 	'role_config' : MessageHandler._role_config,
 
