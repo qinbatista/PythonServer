@@ -2,8 +2,8 @@
 role.py
 '''
 
-from modules import enums
-from modules import common
+from module import enums
+from module import common
 
 from collections import defaultdict
 
