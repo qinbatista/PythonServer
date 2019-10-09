@@ -242,9 +242,6 @@ class MessageHandler:
 		return await mail.mark_read(data['data']['unique_id'], data['data']['key'], **data)
 
 	# TODO
-	async def _redeem_nonce(self, data: dict) -> str:
-		return 'function'
-
 	async def _send_merchandise(self, data: dict) -> str:
 		return 'function'
 
@@ -350,10 +347,6 @@ class MessageHandler:
 	async def _send_all_gift_friend(self, data: dict) -> str:
 		return 'function'
 
-	# TODO 原 redeem_nonce
-	async def _accept_gift_friend(self, data: dict) -> str:
-		return 'function'
-
 	# TODO 原 redeem_all_nonce
 	async def _accept_all_gift_friend(self, data: dict) -> str:
 		return 'function'
@@ -385,12 +378,12 @@ class MessageHandler:
 	async def _level_up_role(self, data: dict) -> str:
 		return await role.level_up(data['data']['unique_id'], int(data['data']['role']), int(data['data']['amount']), **data)
 
-	# TODO
 	async def _level_up_star_role(self, data: dict) -> str:
 		return await role.level_up_star(data['data']['unique_id'], int(data['data']['role']), **data)
 
 
 
+	# TODO
 	async def _role_config(self, data: dict) -> str:
 		return 'function'
 
@@ -503,15 +496,10 @@ class MessageHandler:
 
 
 	###################### TODO.py ######################
-	#async def _get_account_world_info(self, data: dict) -> str:
-	#	return {'status' : 0, 'message' : 'temp function success', 'data' : {'worlds' : [{'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : 'placeholder', 'exp' : 1000}]}}
-
 	async def _get_all_supplies(self, data: dict) -> str:
 		return {'status' : 0, 'message' : 'temp function success', 'data' : {'remaining' : {}}}
 
 
-	async def test(self, data: dict) -> str:
-		return await common.exists('player', ('uid', '1'), ('gn', 'cuck'), **data)
 ##########################################################################################################
 ##########################################################################################################
 
@@ -522,7 +510,6 @@ FUNCTION_LIST = {
 	'get_all_supplies' : MessageHandler._get_all_supplies,
 
 
-	'test' : MessageHandler.test,
 	###################### account.py ######################
 	'login_unique' : MessageHandler._login_unique,
 	'login' : MessageHandler._login,
@@ -572,7 +559,6 @@ FUNCTION_LIST = {
 	'delete_read_mail' : MessageHandler._delete_read_mail,
 	'mark_read_mail' : MessageHandler._mark_read_mail,
 	# TODO
-	'redeem_nonce' : MessageHandler._redeem_nonce,
 	'send_merchandise' : MessageHandler._send_merchandise,
 
 	###################### summoning.py ######################
@@ -617,7 +603,6 @@ FUNCTION_LIST = {
 	'send_gift_friend' : MessageHandler._send_gift_friend,
 	# TODO
 	'send_all_gift_friend' : MessageHandler._send_all_gift_friend,
-	'accept_gift_friend' : MessageHandler._accept_gift_friend,
 	'accept_all_gift_friend' : MessageHandler._accept_all_gift_friend,
 
 	###################### weapon.py ######################
