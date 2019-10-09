@@ -484,7 +484,7 @@ class MessageHandler:
 	async def _get_factory_info(self, data: dict) -> str:
 		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':self._factory_config}}
 	async def _refresh_all_storage(self, data: dict) -> str:
-		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':self._factory_config}}
+		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':""}}
 
 
 
