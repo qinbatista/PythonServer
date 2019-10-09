@@ -7,7 +7,7 @@ import requests
 import configparser
 
 
-from common import enums
+from module import enums
 from aiohttp import web
 from collections import defaultdict
 from datetime import datetime, timedelta
