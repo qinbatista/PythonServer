@@ -7,6 +7,24 @@ from module import common
 
 from collections import defaultdict
 
+STANDARD_EXP_POT_COUNT = 5
+
+# invalid role name, user does not have that role, max level
+async def level_up(uid, rid, amount, **kwargs):
+	rid = enums.Role(rid)
+	exists, payload = await _get_role_info(uid, rid, 'star', 'level', 'skillpoint', **kwargs)
+	if not exists: return common.mt(99, 'invalid target')
+	star, level, sp = payload
+	upgrade_cnt = min(amount // STANDARD_EXP_POT_COUNT, 100 - level)
+	if upgrade_cnt == 0: return common.mt(98, 'too few incoming materials or max level')
+	can_pay, remaining = await common.try_item(uid, enums.Item.EXPERIENCE_POTION, -upgrade_cnt * STANDARD_EXP_POT_COUNT, **kwargs)
+	if not can_pay: return common.mt(97, 'can not pay for upgrade')
+	await common.execute(f'UPDATE role SET level = {level + upgrade_cnt}, skillpoint = {sp + upgrade_cnt} WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
+	return common.mt(0, 'success', {enums.Group.ROLE.value : {'rid' : rid.value, 'level' : level + upgrade_cnt, 'sp' : sp + upgrade_cnt}, enums.Group.ITEM.value : {'iid' : enums.Item.EXPERIENCE_POTION.value, 'value' : remaining}})
+
+# invalid role name, insufficient segment, skill has been reset
+async def level_up_star():
+	pass
 
 async def get_all(uid, **kwargs):
 	roles = await _get_all_role_info(uid, **kwargs)
@@ -18,7 +36,6 @@ async def get_all(uid, **kwargs):
 			except KeyError:
 				role[f'p{str(pid.value)}'] = 0 
 	return common.mt(0, 'success', {'roles' : roles})
-
 
 #################################################################################
 

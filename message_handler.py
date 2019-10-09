@@ -383,6 +383,7 @@ class MessageHandler:
 		return 'function'
 
 	async def _upgrade_role_level(self, data: dict) -> str:
+		return role.level_up(data['data']['unique_id'], data['data']['role'], data['data']['amount'], **data)
 		return 'function'
 
 
