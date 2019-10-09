@@ -375,6 +375,9 @@ class MessageHandler:
 		return 'function'
 
 	###################### role.py ######################
+	async def _get_all_role(self, data: dict) -> str:
+		return await role.get_all(data['data']['unique_id'], **data)
+
 	# TODO
 	async def _upgrade_role_star(self, data: dict) -> str:
 		return 'function'
@@ -382,9 +385,6 @@ class MessageHandler:
 	async def _upgrade_role_level(self, data: dict) -> str:
 		return 'function'
 
-	async def _get_all_role(self, data: dict) -> str:
-		return await role.get_all(data['data']['unique_id'], **data)
-		return {'status' : 0, 'message' : 'temp function success', 'data' :{'roles' :[{'rid': 1, 'star': 3, 'level': 6, 'sp': 0, 'seg': 60, 'p1': 0, 'p2': 6, 'p3': 0, 'p4': 0},{'rid': 2, 'star': 3, 'level': 6, 'sp': 0, 'seg': 60, 'p1': 0, 'p2': 6, 'p3': 0, 'p4': 0}]}}
 
 	async def _role_config(self, data: dict) -> str:
 		return 'function'
