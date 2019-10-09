@@ -115,7 +115,7 @@ def get_hang_up_info():#获取挂机信息了
 
 def get_player_info():#加载玩家体力和黑市信息
 	response = send_tcp_message({'world' : world, 'function' : 'get_player_info', 'data' : {'token' : token}})#升级请求
-	print_method("[get_hang_up_info]"+str(response))
+	print_method("[get_player_info]"+str(response))
 	return response
 
 def get_all_supplies():#获取玩家所有到物资信息
@@ -125,17 +125,17 @@ def get_all_supplies():#获取玩家所有到物资信息
 
 def mail_gift():#获取公告奖励
 	response = send_tcp_message({'world' : world, 'function' : 'mail_gift', 'data' : {'token' : token}})#升级请求
-	print_method("[get_all_supplies]"+str(response))
+	print_method("[mail_gift]"+str(response))
 	return response
 
 def get_picture_link():#获取图片下载到链接
 	response = send_tcp_message({'world' : world, 'function' : 'get_picture_link', 'data' : {'token' : token}})#升级请求
-	print_method("[get_all_supplies]"+str(response))
+	print_method("[get_picture_link]"+str(response))
 	return response
 
 def get_all_achievement():
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_achievement', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[achievement_dialog]"+str(response))
+	print_method("[get_all_achievement]"+str(response))
 	return response
 
 def get_all_resource():
@@ -145,37 +145,37 @@ def get_all_resource():
 
 def get_all_tower():
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_tower', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[get_all_resource]"+str(response))
+	print_method("[get_all_tower]"+str(response))
 	return response
 
 def get_all_task():
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[get_all_resource]"+str(response))
+	print_method("[get_all_task]"+str(response))
 	return response
 
 def get_all_check_in_table():
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_check_in_table', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[get_all_resource]"+str(response))
+	print_method("[get_all_check_in_table]"+str(response))
 	return response
 
 def automatically_refresh_store():
 	response = send_tcp_message({'world' : world, 'function' : 'automatically_refresh_store', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[get_all_resource]"+str(response))
+	print_method("[automatically_refresh_store]"+str(response))
 	return response
 
 def stage_reward_config():
 	response = send_tcp_message({'world' : world, 'function' : 'stage_reward_config', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[get_all_resource]"+str(response))
+	print_method("[stage_reward_config]"+str(response))
 	return response
 
 def get_all_vip_info():
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_vip_info', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[get_all_resource]"+str(response))
+	print_method("[get_all_vip_info]"+str(response))
 	return response
 
 def check_boss_status():
 	response = send_tcp_message({'world' : world, 'function' : 'check_boss_status', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[get_all_resource]"+str(response))
+	print_method("[check_boss_status]"+str(response))
 	return response
 
 def get_all_info(_token,_world):

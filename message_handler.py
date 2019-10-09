@@ -406,7 +406,31 @@ class MessageHandler:
 		return 'function'
 
 	async def _get_all_vip_info(self, data: dict) -> str:
-		return 'function'
+		return {'status' : 0, 'message' : 'temp function success', 'data' :{'vip' :
+					{
+						'level':"4",
+						'exp':"2000",
+						'full_exp':"1000",
+						'vip_dialy_reward':
+							{
+							"diamond_card":10,
+							"coin":0,
+							"small_energy_potion":0,
+							"food_card":0,
+							"mine_card":0,
+							"crystal_card":0
+							},
+						'vip_speical_package':
+							{
+									"price":300,
+									"item":
+									{
+										"small_energy_potion":4,
+										"universal_segment":20,
+										"universal_segment_6":0
+									},
+							}
+					}}}
 
 	###################### player ######################
 	# TODO
@@ -458,6 +482,8 @@ class MessageHandler:
 	async def _get_family_config(self, data: dict) -> str:
 		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':self._family_config}}
 	async def _get_factory_info(self, data: dict) -> str:
+		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':self._factory_config}}
+	async def _refresh_all_storage(self, data: dict) -> str:
 		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':self._factory_config}}
 
 
@@ -639,6 +665,7 @@ FUNCTION_LIST = {
 	'get_hang_up_info': MessageHandler._get_hang_up_info,
 	'check_boss_status':MessageHandler._check_boss_status,
 	'get_family_config':MessageHandler._get_family_config,
-	'get_factory_info':MessageHandler._get_factory_info
+	'get_factory_info':MessageHandler._get_factory_info,
+	'refresh_all_storage':MessageHandler._refresh_all_storage
 }
 
