@@ -2,7 +2,7 @@ import json
 import requests
 
 from utility import config_reader
-
+from utility import repeating_timer
 from module import mail
 from module import enums
 from module import skill
@@ -16,6 +16,8 @@ from module import summoning
 from module import achievement
 from module import armor
 from module import player
+from datetime import datetime, timedelta
+
 
 CFG = config_reader.wait_config()
 
@@ -26,7 +28,16 @@ MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
 class MessageHandler:
 	def __init__(self):
 		self._functions = FUNCTION_LIST
+		self._is_first_start = True
+		self.is_first_month = False
+		self._boss_life=[]
+		self._boss_life_remaining=[]
+		self._timer = repeating_timer.RepeatingTimer(5, self._refresh_configuration)
+		self._timer.start()
 
+	def firstDayOfMonth(self, dt):
+		return (dt + timedelta(days= -dt.day + 1)).replace(hour=0, minute=0, second=0, microsecond=0)
+	def _refresh_configuration(self):
 		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
 		self._mall_config = d['mall']
@@ -45,6 +56,26 @@ class MessageHandler:
 		self._player_experience = d['player_experience']
 		self._monster_config = d['monster_config']
 		self._level_enemy_layouts = d['level_enemy_layouts']
+		self._acheviement = d['acheviement']
+		self._task = d['task']
+		self._check_in = d['check_in']
+		self._vip_config = d['vip_config']
+		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
+			self._is_first_start = True
+			self.is_first_month=True
+		if self.firstDayOfMonth(datetime.today()).day != datetime.today().day and self.is_first_month==True:
+			self.is_first_month=False
+		if self._is_first_start:
+			self._boss_life=[]
+			self._boss_life_remaining=[]
+			self._is_first_start = False
+			self._world_boss = d['world_boss']
+			self._max_enter_time = self._world_boss['max_enter_time']
+			self._max_upload_damage = self._world_boss['max_upload_damage']
+			for i in range(0,10):
+				self._boss_life_remaining.append(self._world_boss["boss"+str(i+1)]["life_value"])
+				self._boss_life.append(self._world_boss["boss"+str(i+1)]["life_value"])
+
 
 	async def shutdown(self):
 		pass
@@ -347,7 +378,7 @@ class MessageHandler:
 		return 'function'
 
 	async def _get_all_roles(self, data: dict) -> str:
-		return 'function'
+		return {'status' : 0, 'message' : 'temp function success', 'data' :{'roles' :[{'rid': 1, 'star': 3, 'level': 6, 'sp': 0, 'seg': 60, 'p1': 0, 'p2': 6, 'p3': 0, 'p4': 0},{'rid': 2, 'star': 3, 'level': 6, 'sp': 0, 'seg': 60, 'p1': 0, 'p2': 6, 'p3': 0, 'p4': 0}]}}
 
 	async def _role_config(self, data: dict) -> str:
 		return 'function'
@@ -421,6 +452,14 @@ class MessageHandler:
 	# TODO
 	async def _get_hang_up_info(self, data: dict) -> str:
 		return 'function'
+	# TODO
+	async def _check_boss_status(self, data: dict) -> str:
+		return {'status' : 0, 'message' : 'temp function success', 'data' :{'boss' :{'world_boss_enter_time':"2019/10/10 17:00:00",'world_boss_remaining_times':"20",'hp_values':["%.2f" %(int(self._boss_life_remaining[i])/int(self._boss_life[i])) for i in range(0,9)]}}}
+	async def _get_family_config(self, data: dict) -> str:
+		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':self._family_config}}
+	async def _get_factory_info(self, data: dict) -> str:
+		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':self._factory_config}}
+
 
 
 
@@ -598,5 +637,8 @@ FUNCTION_LIST = {
 	'stage_reward_config': MessageHandler._stage_reward_config,
 	'get_lottery_config_info': MessageHandler._get_lottery_config_info,
 	'get_hang_up_info': MessageHandler._get_hang_up_info,
+	'check_boss_status':MessageHandler._check_boss_status,
+	'get_family_config':MessageHandler._get_family_config,
+	'get_factory_info':MessageHandler._get_factory_info
 }
 

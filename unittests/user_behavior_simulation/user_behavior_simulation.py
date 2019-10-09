@@ -82,7 +82,7 @@ def run_task(name):
 	# factory_dialog(info_list[6])#工厂界面
 	# get_random_item()#抽奖界面
 	# role_dialog()#角色界面
-	# family_dialog(info_list[9],info_list[19])#家族界面*暂时不需要
+	# family_dialog(info_list[9],info_list[19])
 	# stage_dialog(info_list[19])#关卡界面
 	# announcement()#公告界面
 	# achievement(info_list[20])

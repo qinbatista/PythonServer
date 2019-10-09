@@ -1,7 +1,6 @@
 import json
 import time
 import os
-import requests
 import configparser
 import asyncio
 import tool_lukseun_client
