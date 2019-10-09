@@ -116,6 +116,9 @@ class MessageHandler:
 	async def _enter_world(self, data: dict) -> str:
 		return await player.enter_world(data['data']['unique_id'], **data)
 
+	async def _get_account_world_info(self, data: dict) -> str:
+		return await player.get_account_world_info(data['data']['unique_id'], **data)
+
 	###################### family.py ######################
 	async def _create_family(self, data: dict) -> str:
 		return await family.create(data['data']['unique_id'], data['data']['name'], **data)
@@ -424,8 +427,8 @@ class MessageHandler:
 
 
 	###################### TODO.py ######################
-	async def _get_account_world_info(self, data: dict) -> str:
-		return {'status' : 0, 'message' : 'temp function success', 'data' : {'worlds' : [{'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : 'placeholder', 'exp' : 1000}]}}
+	#async def _get_account_world_info(self, data: dict) -> str:
+	#	return {'status' : 0, 'message' : 'temp function success', 'data' : {'worlds' : [{'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : 'placeholder', 'exp' : 1000}]}}
 
 	async def _get_all_supplies(self, data: dict) -> str:
 		return {'status' : 0, 'message' : 'temp function success', 'data' : {'remaining' : {}}}
@@ -440,7 +443,6 @@ DOES_NOT_NEED_TOKEN = {'login_unique', 'login'}
 
 FUNCTION_LIST = {
 	###################### TODO.py ######################
-	'get_account_world_info' : MessageHandler._get_account_world_info,
 	'get_all_supplies' : MessageHandler._get_all_supplies,
 
 
@@ -459,6 +461,7 @@ FUNCTION_LIST = {
 	###################### player.py ######################
 	'create_player' : MessageHandler._create_player,
 	'enter_world' : MessageHandler._enter_world,
+	'get_account_world_info' : MessageHandler._get_account_world_info,
 
 	###################### family.py ######################
 	'create_family': MessageHandler._create_family,

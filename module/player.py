@@ -14,6 +14,14 @@ async def enter_world(uid, **kwargs):
 	if not existing_player: return common.mt(98, 'have not been in this world before')
 	return common.mt(0, 'success')
 
+async def get_account_world_info(uid, **kwargs):
+	worlds = []
+	exp = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
+	if exp != ():
+		world = {'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : await common.get_gn(uid, **kwargs), 'exp' : exp[0][0]}
+		worlds.append(world)
+	return common.mt(0, 'success', {'worlds' : worlds})
+
 async def accept_gift(uid, key, **kwargs):
 	pass
 
