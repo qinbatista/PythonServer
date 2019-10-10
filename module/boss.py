@@ -1,19 +1,10 @@
 '''
-weapon.py
-
-CHECKED WITH LIANG
+boss.py
 '''
-
-import asyncio
 
 from module import enums
 from module import common
 
-from collections import defaultdict
-
-STANDARD_IRON = 40
-STANDARD_RESET = 100
-STANDARD_SEGMENT = 25
 
 async def check_boss_status(uid, wid, amount, **kwargs):
 	data = await self._execute_statement(world,f'select world_boss_enter_time,world_boss_remaining_times from player where unique_id ="{unique_id}"')

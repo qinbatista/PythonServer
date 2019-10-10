@@ -4,6 +4,7 @@ common.py
 Contains definitions of commonly used generic functions.
 When desinging a function, try to make it as general as possible to allow the reuse of code.
 '''
+from module import enums
 
 
 async def exists(table, *conditions, account = False, **kwargs):
@@ -50,6 +51,25 @@ async def get_db(**kwargs):
 
 def encode_item(gid, iid, value):
 	return f'{gid.value}:{iid.value}:{value}'
+
+def decode_items(items):
+	decoded = []
+	for item in items.split(','):
+		gid, iid, value = item.split(':')
+		gid = enums.Group(int(gid))
+		if gid == enums.Group.ITEM:
+			decoded.append((gid, enums.Item(int(iid)), int(value)))
+		elif gid == enums.Group.WEAPON:
+			decoded.append((gid, enums.Weapon(int(iid)), int(value)))
+		elif gid == enums.Group.SKILL:
+			decoded.append((gid, enums.Skill(int(iid)), int(value)))
+		elif gid == enums.Group.ROLE:
+			decoded.append((gid, enums.Role(int(iid)), int(value)))
+		elif gid == enums.Group.ARMOR:
+			decoded.append((gid, enums.Armor(int(iid)), int(value)))
+	return decoded
+
+
 
 def mt(status, message, data = {}):
 	return {'status' : status, 'message' : message, 'data' : data}

@@ -7,6 +7,7 @@ import requests
 import configparser
 
 
+from module import enums
 from aiohttp import web
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -61,11 +62,11 @@ class TokenServer:
 
 	async def register_nonce(self, nonce, mtype: str, **kwargs) -> dict:
 		try:
-			if mtype == 'gift':
+			if enums.MailType(int(mtype)) == enums.MailType.GIFT:
 				self._nonce_table[nonce]['items'] = kwargs['items']
-			elif mtype == 'friend_request':
+			elif enums.MailType(int(mtype)) == enums.MailType.FRIEND_REQUEST:
 				self._nonce_table[nonce]['uid_sender'] = kwargs['uid_sender']
-			elif mtype == 'family_request':
+			elif enums.MailType(int(mtype)) == enums.MailType.FAMILY_REQUEST:
 				self._nonce_table[nonce]['name'] = kwargs['name']
 				self._nonce_table[nonce]['uid_target'] = kwargs['target']
 			self._nonce_table[nonce]['type'] = mtype

@@ -2,6 +2,7 @@
 player.py
 '''
 
+from module import mail
 from module import enums
 from module import common
 
@@ -25,8 +26,13 @@ async def get_account_world_info(uid, **kwargs):
 		worlds.append(world)
 	return common.mt(0, 'success', {'worlds' : worlds})
 
-async def accept_gift(uid, key, **kwargs):
-	pass
+async def accept_gift(uid, nonce, **kwargs):
+	gift = await _lookup_nonce(nonce, **kwargs)
+	if not gift: return common.mt(99, 'invalid nonce')
+	item = common.decode_items(gift)
+	_, remaining = await common.try_item(uid, item[0][1], item[0][2], **kwargs)
+	await mail.delete_mail(uid, nonce, **kwargs)
+	return common.mt(0, 'success', {item[0][0].value : {'iid' : item[0][1].value, 'value' : remaining}})
 
 async def change_name(uid, name, **kwargs):
 	pass
@@ -42,4 +48,19 @@ async def get_player_info(uid, **kwargs):
 	player = await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs)
 	# 根据朋友id查朋友的游戏名字
 	return common.mt(0, 'success', {'player_info': [{'gn': 'cc', 'fgn': 'fcc'}]})
+
+#########################################################################################
+
+async def _lookup_nonce(nonce, **kwargs):
+	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce_new', json = {'nonce' : [nonce]}) as resp:
+		data = await resp.json(content_type = 'text/json')
+		return None if data[nonce]['status'] != 0 else data[nonce]['items']
+
+
+
+
+
+
+
+
 

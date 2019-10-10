@@ -101,7 +101,7 @@ async def _get_uid_officials(name, **kwargs):
 async def _lookup_nonce(nonce, **kwargs):
 	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce_new', json = {'nonce' : [nonce]}) as resp:
 		data = await resp.json(content_type = 'text/json')
-		return (None, None) if data['status'] != 0 else (data['nonce']['name'], data['nonce']['target'])
+		return (None, None) if data[nonce]['status'] != 0 else (data[nonce]['name'], data[nonce]['target'])
 
 async def _remove_from_family(uid, name, **kwargs):
 	await asyncio.gather(common.execute(f'UPDATE player SET fid = "" WHERE uid = "{uid}";', **kwargs),
