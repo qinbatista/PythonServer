@@ -6,8 +6,9 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
-
-
+import module_1_login
+import random
+import pymysql
 lukseun = tool_lukseun_client.LukseunClient('aliya',port = 8880)
 world = "0"
 token = ""
@@ -53,9 +54,9 @@ def refresh_all_storage():#获取所有仓库信息
 	print_method("[refresh_all_storage]"+str(response))
 	return response
 
-def get_all_roles():#获取角色信息
-	response = send_tcp_message({'world' : world, 'function' : 'get_all_roles', 'data' : {'token' : token}})#升级请求
-	print_method("[get_all_roles]"+str(response))
+def get_all_role():#获取角色信息
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_role', 'data' : {'token' : token}})#升级请求
+	print_method("[get_all_role]"+str(response))
 	return response
 
 def get_factory_info():#获取工厂详细参数
@@ -178,7 +179,13 @@ def check_boss_status():
 	print_method("[check_boss_status]"+str(response))
 	return response
 
+def get_player_config():
+	response = send_tcp_message({'world' : world, 'function' : 'get_player_config', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+	print_method("[get_player_config]"+str(response))
+	return response
+
 def get_all_info(_token,_world):
+	create_random_data()
 	print_module("[module_2_get_all_data] get_all_info")
 	global world,token
 	world = _world
@@ -193,20 +200,17 @@ def get_all_info(_token,_world):
 	get_all_friend_str = get_all_friend()
 	get_all_skill_str = get_all_skill()
 	get_player_info_str =get_player_info()
+	get_all_role_str = get_all_role()
 	automatically_refresh_store_str =automatically_refresh_store()
 	stage_reward_config_str = stage_reward_config()
 	get_lottery_config_info_str = get_lottery_config_info()
 	refresh_all_storage_str = refresh_all_storage()
 	get_all_vip_info_str = get_all_vip_info()
-	get_all_roles_str = get_all_roles()
 	get_factory_info_str = get_factory_info()
 	get_all_family_info_str = get_all_family_info()
 	get_family_config_str = get_family_config()
 	check_boss_status_str = check_boss_status()
-
-
-
-
+	get_player_config_str = get_player_config()
 	return [
 			get_all_achievement_str,
 			get_all_armor_str,
@@ -223,12 +227,33 @@ def get_all_info(_token,_world):
 			get_lottery_config_info_str,
 			refresh_all_storage_str,
 			get_all_vip_info_str,
-			get_all_roles_str,
+			get_all_role_str,
 			get_factory_info_str,
 			get_all_family_info_str,
 			get_family_config_str,
 			check_boss_status_str
 			]
+
+def _execute_statement(statement: str) -> tuple:
+		db = pymysql.connect('192.168.1.102', 'root', 'lukseun', 'experimental')
+		cursor = db.cursor()
+		cursor.execute(statement)
+		db.commit()
+def create_random_data():
+	for i in range(0,5):
+		_execute_statement(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,1000)},{0}) ON DUPLICATE KEY UPDATE `reward`= values(`reward`)')
+		_execute_statement(f'INSERT INTO armor (uid, aid, level,quantity) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,10)},{random.randint(1,100)})  ON DUPLICATE KEY UPDATE `quantity`= values(`quantity`)')
+		_execute_statement(f'INSERT INTO item (uid, iid, value) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,1000)}) ON DUPLICATE KEY UPDATE `value`= values(`value`)')
+		_execute_statement(f'INSERT INTO weapon (uid, wid, star,level, skillpoint, segment) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,5)},{0},{random.randint(1,5000)},{random.randint(1,5000)}) ON DUPLICATE KEY UPDATE `segment`= values(`segment`)')
+		_execute_statement(f'INSERT INTO friend (uid, fid, recover,since) VALUES ("{module_1_login.unique_id}", "unique_id{random.randint(1,31)}", "2019-01-01","2019-01-01") ON DUPLICATE KEY UPDATE `since`= values(`since`)')
+		_execute_statement(f'INSERT INTO skill (uid, sid, level) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,31)}) ON DUPLICATE KEY UPDATE `level`= values(`level`)')
+		_execute_statement(f'INSERT INTO role (uid, rid, star, level, skillpoint, segment) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,5)},{random.randint(1,30)},{random.randint(1,5)},{random.randint(1,500)}) ON DUPLICATE KEY UPDATE `level`= values(`level`)')
+		_execute_statement(f'INSERT INTO darkmarketitems (uid, mid, gid, qty, cid, amt) VALUES ("{module_1_login.unique_id}", {random.randint(1,5)}, {random.randint(1,5)},{random.randint(1,30)},{random.randint(1,5)},{random.randint(1,500)}) ON DUPLICATE KEY UPDATE `amt`= values(`amt`)')
+		_execute_statement(f'INSERT INTO family (name, icon, exp) VALUES ("{module_1_login.unique_id}", {random.randint(1,5)}, {random.randint(1,500)}) ON DUPLICATE KEY UPDATE `exp`= values(`exp`)')
+		_execute_statement(f'INSERT INTO familyrole (uid, name, role) VALUES ("{module_1_login.unique_id}", "{"lol"+str(random.randint(1,5))}", "{random.randint(1,500)}") ON DUPLICATE KEY UPDATE `role`= values(`role`)')
+
+
+
 
 if __name__ == "__main__":
 	pass

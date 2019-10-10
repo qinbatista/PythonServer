@@ -470,7 +470,21 @@ class MessageHandler:
 
 	# TODO 新增
 	async def _automatically_refresh_store(self, data: dict) -> str:
-		return 'function'
+		darkmarket = {
+			"refresh_time": "2019-10-10 12:41:52",
+			"refreshable_quantity": 3,
+			"items": [
+				{"item":1,"quantity":100, "currency_item":5,"quantity":100},
+				{"item":2,"quantity":1200,"currency_item":5,"quantity":100},
+				{"item":3,"quantity":3100,"currency_item":5,"quantity":100},
+				{"item":4,"quantity":100, "currency_item":5,"quantity":100},
+				{"item":5,"quantity":1200,"currency_imte":5,"quantity":100},
+				{"item":6,"quantity":1200,"currency_imte":5,"quantity":100},
+				{"item":7,"quantity":1200,"currency_imte":5,"quantity":100},
+				{"item":8,"quantity":1200,"currency_imte":5,"quantity":100}
+			]
+		}
+		return common.mt(0, 'success', {'darkmarket': darkmarket})
 
 	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
 	async def _stage_reward_config(self, data: dict) -> str:
@@ -506,8 +520,42 @@ class MessageHandler:
 
 	# TODO
 	async def _refresh_all_storage(self, data: dict) -> str:
-		return {'status' : 0, 'message' : 'temp function success', 'data' :{'config':""}}
+		return {'status' : 0, 'message' : 'temp function success', 'data' :
+				{
+					'worker':200,
+					'factory':
+					[
+						{"fid":0,"worker":5,"level":5,"storage":2222,"time":"2019-01-01 22:22:22","setting":""},
+						{"fid":1,"worker":5,"level":5,"storage":2222,"time":"2019-01-01 22:22:22","setting":""},
+						{"fid":2,"worker":5,"level":15,"storage":2222,"time":"2019-01-01 22:22:22","setting":""},
+						{"fid":3,"worker":5,"level":35,"storage":2222,"time":"2019-01-01 22:22:22","setting":{"armorid":1}},
+						{"fid":4,"worker":0,"level":35,"storage":0,"time":"2019-01-01 22:22:22","setting":""},
+					]
+				}
+		}
 
+	async def _get_all_family_info(self, data: dict) -> str:
+		return {"status" : 0, "message" : "temp function success", "data" :
+    			{
+					"famliy" :{"name":"LOL","icon":"2","exp":1222,"notice":"everyone must buy red pack","announcement":"we are top family"},
+					"member":
+					[
+						{"name":"Matthew","level":"100","postion":"0","check_in":0},
+						{"name":"houyao","level":"100","postion":"1","check_in":0},
+						{"name":"覃yupeng","level":"100","postion":"2","check_in":0}
+					],
+					"blackboard":
+					[
+						["Matthew kick out children"],
+						["children join our family, welcome!"],
+						["children bought red pack for everyone"],
+						["Matthew set children as owner"],
+						["children disband family, family will disband in 24 hours"],
+						["Matthew cancel disband family"],
+						["children leave family"]
+					]
+				}
+				}
 
 
 
@@ -681,6 +729,7 @@ FUNCTION_LIST = {
 	'check_boss_status':MessageHandler._check_boss_status,
 	'get_family_config':MessageHandler._get_family_config,
 	'get_factory_info':MessageHandler._get_factory_info,
-	'refresh_all_storage':MessageHandler._refresh_all_storage
+	'refresh_all_storage':MessageHandler._refresh_all_storage,
+	'get_all_family_info': MessageHandler._get_all_family_info
 }
 
