@@ -176,7 +176,7 @@ class MessageHandler:
 		return await family.request_join(data['data']['unique_id'], data['data']['name'], **data)
 
 	async def _respond_family(self, data: dict) -> str:
-		return await family.respond(data['data']['unique_id'], data['data']['nonce'], **data)
+		return await family.respond(data['data']['unique_id'], data['data']['key'], **data)
 
 	# TODO
 
