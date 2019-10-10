@@ -367,9 +367,8 @@ class MessageHandler:
 	async def _get_all_weapon(self, data: dict) -> str:
 		return await weapon.get_all(data['data']['unique_id'], **data)
 
-	# TODO
-	async def _weapon_config(self, data: dict) -> str:
-		return 'function'
+	async def _get_config_weapon(self, data: dict) -> str:
+		return await weapon.get_config(**data)
 
 	###################### role.py ######################
 	async def _get_all_role(self, data: dict) -> str:
@@ -612,7 +611,7 @@ FUNCTION_LIST = {
 	'level_up_star_weapon' : MessageHandler._level_up_star_weapon,
 	'reset_skill_point_weapon' : MessageHandler._reset_skill_point_weapon,
 	'get_all_weapon' : MessageHandler._get_all_weapon,
-	'weapon_config' : MessageHandler._weapon_config,
+	'get_config_weapon' : MessageHandler._get_config_weapon,
 
 	# TODO
 	###################### role.py ######################
