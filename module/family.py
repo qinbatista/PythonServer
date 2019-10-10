@@ -11,10 +11,10 @@ from module import common
 async def create(uid, name, **kwargs):
 	if not _valid_family_name(name): return common.mt(99, 'invalid family name')
 	in_family, _ = await _in_family(uid, **kwargs)
-	if in_family: return common.mt(97, 'already in a family')
+	if in_family: return common.mt(98, 'already in a family')
 	enough, _ = await common.try_item(uid, enums.Item.COIN, -200, **kwargs)
-	if not enough: return common.mt(99, 'need coins')
-	if await common.exists('family', ('name', name), **kwargs): return common.mt(98, 'name already exists!')
+	if not enough: return common.mt(97, 'need coins')
+	if await common.exists('family', ('name', name), **kwargs): return common.mt(96, 'name already exists!')
 	await asyncio.gather(common.execute(f'INSERT INTO family(name) VALUES("{name}");', **kwargs),
 						common.execute(f'INSERT INTO familyrole(uid, name, role) VALUES("{uid}", "{name}", "{enums.FamilyRole.OWNER.value}");', **kwargs),
 						common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs))
