@@ -199,12 +199,6 @@ class Role(enum.IntEnum):
 	R39 = 39
 	R40 = 40
 
-class RolePassive(enum.IntEnum):
-	P1 = 1
-	P2 = 2
-	P3 = 3
-	P4 = 4
-
 class Armor(enum.IntEnum):
 	A1 = 1
 	A2 = 2
