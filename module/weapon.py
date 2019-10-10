@@ -15,6 +15,9 @@ STANDARD_IRON = 40
 STANDARD_RESET = 100
 STANDARD_SEGMENT = 25
 
+async def get_config(**kwargs):
+	return common.mt(0, 'success', {'seg' : STANDARD_SEGMENT, 'reset' : STANDARD_RESET, 'cost' : STANDARD_IRON})
+
 async def level_up(uid, wid, amount, **kwargs):
 	wid = enums.Weapon(wid)
 	exists, payload = await _get_weapon_info(uid, wid, 'star', 'level', 'skillpoint', **kwargs)
