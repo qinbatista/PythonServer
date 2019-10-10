@@ -46,7 +46,7 @@ async def invite_user(uid, gn_target, **kwargs):
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_invite_permissions(role): return common.mt(98, 'insufficient permissions')
 	uid_target = await common.get_uid(gn_target, **kwargs)
-	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, uid_target, from_ = name, subject = 'Family Invitation', body = f'You have been invited to join:\n{name}', name = name, target = gn_target)
+	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, uid_target, subj = 'Family Invitation', body = f'You have been invited to join:\n{name}', name = name, uid_target = uid_target, **kwargs)
 	return common.mt(0, 'invited user', {'gn' : gn_target}) if sent else common.mt(97, 'mail could not be sent')
 
 async def request_join(uid, name, **kwargs):
@@ -59,14 +59,13 @@ async def request_join(uid, name, **kwargs):
 	return common.mt(0, 'requested join', {'name' : name}) if sent else common.mt(97, 'mail could not be sent')
 
 async def respond(uid, nonce, **kwargs):
-	name, gn_target = await _lookup_nonce(nonce, **kwargs)
+	name, uid_target = await _lookup_nonce(nonce, **kwargs)
 	if not name: return common.mt(99, 'invalid nonce')
-	uid_target = await common.get_uid(gn_target, **kwargs)
 	in_family, _ = await _in_family(uid_target, **kwargs)
 	if in_family: return common.mt(98, 'already in a family')
 	exists, info = await _get_family_info(name, 'icon', 'exp', **kwargs)
 	if not exists: return common.mt(97, 'family no longer exists')
-	await _add_to_family(uid_target, name)
+	await _add_to_family(uid_target, name, **kwargs)
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1]})
 
 
@@ -107,7 +106,7 @@ async def _get_uid_officials(name, **kwargs):
 async def _lookup_nonce(nonce, **kwargs):
 	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce_new', json = {'nonce' : [nonce]}) as resp:
 		data = await resp.json(content_type = 'text/json')
-		return (None, None) if data[nonce]['status'] != 0 else (data[nonce]['name'], data[nonce]['target'])
+		return (None, None) if data[nonce]['status'] != 0 else (data[nonce]['name'], data[nonce]['uid_target'])
 
 async def _remove_from_family(uid, name, **kwargs):
 	await asyncio.gather(common.execute(f'UPDATE player SET fid = "" WHERE uid = "{uid}";', **kwargs),
