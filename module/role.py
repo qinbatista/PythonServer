@@ -43,6 +43,9 @@ async def get_all(uid, **kwargs):
 				role[f'p{str(pid.value)}'] = 0 
 	return common.mt(0, 'success', {'roles' : roles})
 
+async def get_config(**kwargs):
+	return common.mt(0, 'success', {'seg' : STANDARD_SEGMENT, 'exp_pot' : STANDARD_EXP_POT_COUNT})
+
 #################################################################################
 
 async def _get_role_info(uid, rid, *args, **kwargs):
