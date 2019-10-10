@@ -63,10 +63,10 @@ async def respond(uid, nonce, **kwargs):
 	if not name: return common.mt(99, 'invalid nonce')
 	in_family, _ = await _in_family(uid_target, **kwargs)
 	if in_family: return common.mt(98, 'already in a family')
-	exists, info = await _get_family_info(name, 'icon', 'exp', **kwargs)
+	exists, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
 	if not exists: return common.mt(97, 'family no longer exists')
 	await _add_to_family(uid_target, name, **kwargs)
-	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1]})
+	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3]})
 
 
 ########################################################################
