@@ -18,7 +18,7 @@ async def create(uid, name, **kwargs):
 	await asyncio.gather(common.execute(f'INSERT INTO family(name) VALUES("{name}");', **kwargs),
 						common.execute(f'INSERT INTO familyrole(uid, name, role) VALUES("{uid}", "{name}", "{enums.FamilyRole.OWNER.value}");', **kwargs),
 						common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs))
-	return common.mt(0, 'success!!')
+	return common.mt(0, 'created family', {'name' : name})
 
 async def leave(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -26,7 +26,7 @@ async def leave(uid, **kwargs):
 	role = await _get_role(uid, name, **kwargs)
 	if role == enums.FamilyRole.OWNER: return common.mt(98, 'owner can not leave family')
 	await _remove_from_family(uid, name, **kwargs)
-	return common.mt(0, 'success')
+	return common.mt(0, 'left family')
 
 async def remove_user(uid, gn_target, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -38,7 +38,7 @@ async def remove_user(uid, gn_target, **kwargs):
 	role_target = await _get_role(uid_target, name, **kwargs)
 	if not _check_remove_permissions(role, role_target): return common.mt(97, 'insufficient permissions')
 	await _remove_from_family(uid_target, name, **kwargs)
-	return common.mt(0, 'success')
+	return common.mt(0, 'removed user', {'gn' : gn_target})
 
 async def invite_user(uid, gn_target, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -47,7 +47,7 @@ async def invite_user(uid, gn_target, **kwargs):
 	if not _check_invite_permissions(role): return common.mt(98, 'insufficient permissions')
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, uid_target, from_ = name, subject = 'Family Invitation', body = f'You have been invited to join:\n{name}', name = name, target = gn_target)
-	return common.mt(0, 'success') if sent else common.mt(97, 'mail could not be sent')
+	return common.mt(0, 'invited user', {'gn' : gn_target}) if sent else common.mt(97, 'mail could not be sent')
 
 async def request_join(uid, name, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -56,7 +56,7 @@ async def request_join(uid, name, **kwargs):
 	officials = await _get_uid_officials(name, **kwargs)
 	if not officials: return common.mt(98, 'invalid family')
 	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, *officials, from_ = name, subject = 'Family Request', body = f'{gn} requests to join your family.', name = name, target = gn)
-	return common.mt(0, 'success') if sent else common.mt(97, 'mail could not be sent')
+	return common.mt(0, 'requested join', {'name' : name}) if sent else common.mt(97, 'mail could not be sent')
 
 async def respond(uid, nonce, **kwargs):
 	name, gn_target = await _lookup_nonce(nonce, **kwargs)
@@ -64,8 +64,10 @@ async def respond(uid, nonce, **kwargs):
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	in_family, _ = await _in_family(uid_target, **kwargs)
 	if in_family: return common.mt(98, 'already in a family')
+	exists, info = await _get_family_info(name, 'icon', 'exp', **kwargs)
+	if not exists: return common.mt(97, 'family no longer exists')
 	await _add_to_family(uid_target, name)
-	return common.mt(0, 'success')
+	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1]})
 
 
 ########################################################################
@@ -79,6 +81,10 @@ def _check_remove_permissions(remover, to_remove):
 
 def _check_invite_permissions(inviter):
 	return inviter >= enums.FamilyRole.ADMIN
+
+async def _get_family_info(name, *args, **kwargs):
+	data = await common.execute(f'SELECT {",".join(args)} FROM family WHERE name = "{name}";', **kwargs)
+	return (True, data[0]) if data != () else (False, ())
 
 async def _add_to_family(uid, name, **kwargs):
 	await asyncio.gather(common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs),
