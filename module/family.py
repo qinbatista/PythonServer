@@ -46,16 +46,16 @@ async def invite_user(uid, gn_target, **kwargs):
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_invite_permissions(role): return common.mt(98, 'insufficient permissions')
 	uid_target = await common.get_uid(gn_target, **kwargs)
-	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, uid_target, subj = 'Family Invitation', body = f'You have been invited to join:\n{name}', name = name, uid_target = uid_target, **kwargs)
+	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, uid_target, subj = 'Family Invitation', body = f'You have been invited to join: {name}', name = name, uid_target = uid_target, **kwargs)
 	return common.mt(0, 'invited user', {'gn' : gn_target}) if sent else common.mt(97, 'mail could not be sent')
 
 async def request_join(uid, name, **kwargs):
-	in_family, name = await _in_family(uid, **kwargs)
+	in_family, _ = await _in_family(uid, **kwargs)
 	if in_family: return common.mt(99, 'already in a family')
 	gn = await common.get_gn(uid, **kwargs)
 	officials = await _get_uid_officials(name, **kwargs)
 	if not officials: return common.mt(98, 'invalid family')
-	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, *officials, from_ = name, subject = 'Family Request', body = f'{gn} requests to join your family.', name = name, target = gn)
+	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, *officials, subj = 'Family Request', body = f'{gn} requests to join your family.', name = name, uid_target = uid, **kwargs)
 	return common.mt(0, 'requested join', {'name' : name}) if sent else common.mt(97, 'mail could not be sent')
 
 async def respond(uid, nonce, **kwargs):
@@ -100,6 +100,7 @@ async def _get_role(uid, name, **kwargs):
 
 
 async def _get_uid_officials(name, **kwargs):
+	print(f'querying: SELECT uid FROM familyrole WHERE `name` = "{name}" AND `role` >= {enums.FamilyRole.ADMIN.value};')
 	data = await common.execute(f'SELECT uid FROM familyrole WHERE `name` = "{name}" AND `role` >= {enums.FamilyRole.ADMIN.value};', **kwargs)
 	return None if data == () else [u[0] for u in data]
 
