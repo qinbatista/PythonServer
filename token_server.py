@@ -68,7 +68,7 @@ class TokenServer:
 				self._nonce_table[nonce]['uid_sender'] = kwargs['uid_sender']
 			elif enums.MailType(int(mtype)) == enums.MailType.FAMILY_REQUEST:
 				self._nonce_table[nonce]['name'] = kwargs['name']
-				self._nonce_table[nonce]['uid_target'] = kwargs['target']
+				self._nonce_table[nonce]['uid_target'] = kwargs['uid_target']
 			self._nonce_table[nonce]['type'] = mtype
 		except KeyError:
 			return self._message_typesetting(-1, 'invalid request format')
