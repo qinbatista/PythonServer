@@ -68,10 +68,33 @@ async def respond(uid, nonce, **kwargs):
 	await _add_to_family(uid_target, name, **kwargs)
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3]})
 
+async def set_notice(uid, msg, **kwargs):
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(99, 'not in family')
+	role = await _get_role(uid, name, **kwargs)
+	if not _check_notice_permissions(role): return common.mt(98,'insufficient permissions')
+	await common.execute(f'UPDATE family SET notice = "{msg}" WHERE `name` = "{name}";', **kwargs)
+	return common.mt(0, 'success', {'notice' : msg})
+
+
+async def set_blackboard(uid, msg, **kwargs):
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(99, 'not in family')
+	role = await _get_role(uid, name, **kwargs)
+	if not _check_blackboard_permissions(role): return common.mt(98, 'insufficient permissions')
+	await common.execute(f'UPDATE family SET board = "{msg}" WHERE `name` = "{name}";', **kwargs)
+	return common.mt(0, 'success', {'board' : msg})
+
 
 ########################################################################
 def _valid_family_name(name):
 	return bool(name)
+
+def _check_notice_permissions(check):
+	return check >= enums.FamilyRole.ADMIN
+
+def _check_blackboard_permissions(check):
+	return check >= enums.FamilyRole.ADMIN
 
 def _check_remove_permissions(remover, to_remove):
 	if remover == enums.FamilyRole.OWNER: return True
