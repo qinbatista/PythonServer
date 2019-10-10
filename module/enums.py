@@ -33,6 +33,7 @@ class Item(enum.IntEnum):
 	CRYSTAL_CARD = 22
 	DIAMOND_CARD = 23
 	MINE = 24
+	ENERGY = 25
 # qin end
 
 
@@ -278,3 +279,10 @@ class Achievement(enum.IntEnum):
 	FRIEND_REQUEST = 29
 	FRIEND_GIFT = 30
 	CHECK_IN_FAMILY = 31
+
+
+class Progress(enum.IntEnum):
+	STAGE = 0
+	HANG_STAGE = 1
+	TOWER_STAGE = 2
+
