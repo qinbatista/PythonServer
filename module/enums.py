@@ -6,6 +6,7 @@ Contains definitions of global enums.
 
 import enum
 
+
 class Item(enum.IntEnum):
 	COIN = 1
 	IRON = 2
@@ -32,7 +33,7 @@ class Item(enum.IntEnum):
 	CRYSTAL_CARD = 22
 	DIAMOND_CARD = 23
 	MINE = 24
-	# qin end
+# qin end
 
 
 class FamilyRole(enum.IntEnum):
@@ -41,17 +42,20 @@ class FamilyRole(enum.IntEnum):
 	ADMIN = 8
 	OWNER = 10
 
+
 class MailType(enum.IntEnum):
 	SIMPLE = 0
 	GIFT = 1
 	FRIEND_REQUEST = 2
 	FAMILY_REQUEST = 3
 
+
 class Tier(enum.IntEnum):
 	BASIC = 0
 	FRIEND = 1
 	PRO = 2
 	PROPHET = 3
+
 
 class Group(enum.IntEnum):
 	WEAPON = 0
@@ -103,11 +107,13 @@ class Weapon(enum.IntEnum):
 	W39 = 39
 	W40 = 40
 
+
 class WeaponPassive(enum.IntEnum):
 	P1 = 1
 	P2 = 2
 	P3 = 3
 	P4 = 4
+
 
 class Skill(enum.IntEnum):
 	M1 = 0
@@ -149,6 +155,7 @@ class Skill(enum.IntEnum):
 	G131 = 36
 	G132 = 37
 	G133 = 38
+
 
 class Role(enum.IntEnum):
 	R1 = 1
@@ -199,6 +206,7 @@ class Armor(enum.IntEnum):
 	A3 = 3
 	A4 = 4
 
+
 class ArmorTier(enum.IntEnum):
 	T1 = 1
 	T2 = 2
@@ -211,19 +219,20 @@ class ArmorTier(enum.IntEnum):
 	T9 = 9
 	T10 = 10
 
+
 class Timer(enum.IntEnum):
 	HANG_UP_TIME = 1
 	DAILY_REWARD_TIME = 2
-	TAKS_TIME = 3
-	ADD_FRIENDS_TIME =4
+	TASK_TIME = 3
+	ADD_FRIENDS_TIME = 4
 	DARK_MARKET_TIME = 5
 	WORLD_BOSS_CHALLENGE_TIME = 6
 	FAMILY_CHECK_IN_TIME = 7
 	FAMILY_REMOVE_USER_TIME = 8
 	FAMILY_DISBANDED_TIME = 9
 	FAMILY_LEAVE_TIME = 10
-	ENERGY_REOCVER_TIME =11
-	LOGIN_TIME =12
+	ENERGY_REOCVER_TIME = 11
+	LOGIN_TIME = 12
 	FACTORY_FOOD_TIME = 13
 	FACTORY_MINE_TIME = 14
 	FACTORY_CRYSTAL_TIME = 15
@@ -238,6 +247,7 @@ class Limits(enum.IntEnum):
 	WORLD_BOSS_CHALLENGE_LIMITS = 3
 	FAMILY_REMOVE_USER_LIMITS = 4
 	FACTORY_WISHING_POOL_COUNT = 5
+
 
 class Achievement(enum.IntEnum):
 	TOTAL_LOGIN = 1
