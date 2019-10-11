@@ -185,7 +185,7 @@ class MessageHandler:
 		return await family.set_blackboard(data['data']['unique_id'], data['data']['msg'], **data)
 
 	async def _set_role_family(self, data: dict) -> str:
-		return await family.set_role(data['data']['unique_id'], int(data['data']['role']), **data)
+		return await family.set_role(data['data']['unique_id'], data['data']['gn_target'], int(data['data']['role']), **data)
 
 	# TODO
 
@@ -612,6 +612,7 @@ FUNCTION_LIST = {
 	'respond_family' : MessageHandler._respond_family,
 	'set_notice_family' : MessageHandler._set_notice_family,
 	'set_blackboard_family' : MessageHandler._set_blackboard_family,
+	'set_role_family' : MessageHandler._set_role_family,
 	# TODO
 	'sign_in_family' : MessageHandler._sign_in_family,
 	'get_store_family' : MessageHandler._get_store_family,
