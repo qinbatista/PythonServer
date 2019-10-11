@@ -28,12 +28,15 @@ async def enter_stage(uid, stage, **kwargs):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
 		values[i] += data[0][0]
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
+
 	# try_energy 扣体力看是否足够
-	# if energy_data["status"] >= 97:
-	# 	return common.mt(status=97, message="Insufficient energy")
+	energy_consume = 2
+	energy_data = await common.try_energy(uid, -1 * energy_consume, **kwargs)
+	if energy_data["status"] >= 97:
+		return common.mt(97, "Insufficient energy")
 
 	# 根据消耗体力来增加用户经验，10*energy
-	exp += 10 * 2  # 这里模拟消耗两点体力
+	exp += 10 * energy_consume  # 这里模拟消耗energy_consume点体力
 	_, _ = await common.execute(f'UPDATE progress set exp = {exp} WHERE uid = "{uid}";', **kwargs)
 
 	enter_stages = []
@@ -41,7 +44,8 @@ async def enter_stage(uid, stage, **kwargs):
 		_, data = await common.execute_update(f'UPDATE item set value = {values[i]} WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		enter_stages.append({'iid': iid, 'value': data[0][0], 'consume': entry_consume[stage][iid]})
 
-	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': await increase_exp(uid, 0, **kwargs), 'enemy_layout': enemy_layout})
+	_, exp_info = await increase_exp(uid, 0, **kwargs)
+	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy_data': energy_data['data']})
 
 
 ############################################ 私有方法 ############################################
