@@ -31,7 +31,7 @@ async def accept_gift(uid, nonce, **kwargs):
 	if not gift: return common.mt(99, 'invalid nonce')
 	item = common.decode_items(gift)
 	_, remaining = await common.try_item(uid, item[0][1], item[0][2], **kwargs)
-	await mail.delete_mail(uid, nonce, **kwargs)
+	await mail.mark_read(uid, nonce, **kwargs)
 	return common.mt(0, 'success', {'items' : [{'iid' : item[0][1].value, 'value' : remaining}]})
 
 async def change_name(uid, name, **kwargs):
