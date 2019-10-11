@@ -6,7 +6,10 @@ from module import enums
 from module import common
 
 
+# 进入普通关卡的
 async def enter_stage(uid, stage, **kwargs):
+	enter_stages = []
+	energy_consume = 2
 	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
 	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
 	enemy_layout = enemy_layouts[-1]['enemyLayout'] if stage > len(enemy_layouts) else enemy_layouts[stage - 1]['enemyLayout']
@@ -27,25 +30,59 @@ async def enter_stage(uid, stage, **kwargs):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
 		values[i] += data[0][0]
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
+
 	# try_energy 扣体力看是否足够
-	# if energy_data["status"] >= 97:
-	# 	return common.mt(status=97, message="Insufficient energy")
+	energy_data = await common.try_energy(uid, -1 * energy_consume, **kwargs)
+	if energy_data["status"] >= 97:
+		return common.mt(97, "Insufficient energy")
 
 	# 根据消耗体力来增加用户经验，10*energy
-	exp += 10 * 2  # 这里模拟消耗两点体力
+	exp += 10 * energy_consume  # 这里模拟消耗energy_consume点体力
 	_, _ = await common.execute(f'UPDATE progress set exp = {exp} WHERE uid = "{uid}";', **kwargs)
 
-	enter_stages = []
 	for i, iid in enumerate(iid_s):
 		_, data = await common.execute_update(f'UPDATE item set value = {values[i]} WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		enter_stages.append({'iid': iid, 'value': data[0][0], 'consume': entry_consume[stage][iid]})
 
-	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': await increase_exp(uid, 0, **kwargs), 'enemy_layout': enemy_layout})
+	_, exp_info = await increase_exp(uid, 0, **kwargs)
+	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy_data': energy_data['data']})
 
 
+# 通过普通关卡
+async def pass_stage(uid, stage, **kwargs):
+	# success ===> 0
+	# 0 : success
+	# 99 : Parameter error
+	# print(f'stage:{stage}, type:{type(stage)}')
+	can_s, stage_s = await get_progress(uid, 'stage', **kwargs)
+	if not can_s or stage <= 0 or stage_s + 1 < stage:
+		return common.mt(99, 'Parameter error')
+
+	pass_stages = []
+	pass_reward = kwargs['pass_reward']  # self._stage_reward["stage"]
+	stages = [int(x) for x in pass_reward.keys() if str.isdigit(x)]
+	pass_reward = pass_reward[str(max(stages))] if stage not in stages else pass_reward[str(stage)]
+
+	p_exp = {'remaining': -1, 'reward': -1}
+	for key, value in pass_reward.items():
+		if key == 'exp':
+			_, exp_data = await common.execute_update(f'UPDATE progress SET exp = exp + {value} WHERE uid = "{uid}"')
+			p_exp['remaining'] = exp_data[0][0]
+			p_exp['reward'] = value
+		else:
+			_, data = await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}"')
+			pass_stages.append({'iid': key, 'remaining': data[0][0], 'reward': value})
+
+	p_stage = {'finally': stage_s, 'vary': 0}
+	if stage_s + 1 == stage:  # 通过新关卡
+		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"')
+		p_stage['finally'] = stage
+		p_stage['vary'] = 1
+	return common.mt(0, 'success', data={'pass_stages': pass_stages, 'p_exp': p_exp, 'p_stage': p_stage})
 
 
-####################################################################################
+############################################ 私有方法 ############################################
+
 
 async def get_progress(uid, pid, **kwargs):
 	pdata = await common.execute(f'SELECT {pid} FROM progress WHERE uid = "{uid}";', **kwargs)
@@ -70,6 +107,3 @@ async def increase_exp(uid, exp, **kwargs):
 	exp_s += exp
 	_, exp_s = await common.execute_update(f'UPDATE progress SET exp = {exp_s} WHERE uid = "{uid}";', **kwargs)
 	return True, {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
-
-
-
