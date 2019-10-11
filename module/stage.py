@@ -6,8 +6,12 @@ from module import enums
 from module import common
 
 
-# 进入普通关卡的
+# 进入普通关卡
 async def enter_stage(uid, stage, **kwargs):
+	# 0 - success
+	# 97 - Insufficient energy
+	# 98 - key insufficient
+	# 99 - parameter error
 	enter_stages = []
 	energy_consume = 2
 	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
@@ -79,6 +83,50 @@ async def pass_stage(uid, stage, **kwargs):
 		p_stage['finally'] = stage
 		p_stage['vary'] = 1
 	return common.mt(0, 'success', data={'pass_stages': pass_stages, 'p_exp': p_exp, 'p_stage': p_stage})
+
+
+# 进入闯塔关卡
+async def enter_tower(uid, stage, **kwargs):
+	# 0 - success
+	# 97 - Insufficient energy
+	# 98 - key insufficient
+	# 99 - parameter error
+	enter_towers = []
+	energy_consume = 2
+	entry_consume = kwargs['entry_consume']  # self._entry_consumables["tower"]
+
+	can_s, stage_s = await get_progress(uid, 'towerstage', **kwargs)
+	if not can_s or stage <= 0 or stage > stage_s + 1:
+		return common.mt(99, 'Parameter error')
+	_, exp = await get_progress(uid, 'exp', **kwargs)
+
+	stages = [int(x) for x in entry_consume.keys() if x.isdigit()]
+	if stage not in stages: stage = max(stages)
+
+	stage = str(stage)
+	iid_s = list(entry_consume[stage].keys())
+	values = [-1 * int(v) for v in list(entry_consume[stage].values())]
+
+	for i, iid in enumerate(iid_s):
+		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
+		values[i] += data[0][0]
+		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
+
+	# try_energy 扣体力看是否足够
+	energy_data = await common.try_energy(uid, -1 * energy_consume, **kwargs)
+	if energy_data["status"] >= 97:
+		return common.mt(97, "Insufficient energy")
+
+	# 根据消耗体力来增加用户经验，10*energy
+	exp += 10 * energy_consume  # 这里模拟消耗energy_consume点体力
+	_, _ = await common.execute(f'UPDATE progress set exp = {exp} WHERE uid = "{uid}";', **kwargs)
+
+	for i, iid in enumerate(iid_s):
+		_, data = await common.execute_update(f'UPDATE item set value = {values[i]} WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
+		enter_towers.append({'iid': iid, 'value': data[0][0], 'consume': entry_consume[stage][iid]})
+
+	_, exp_info = await increase_exp(uid, 0, **kwargs)
+	return common.mt(0, 'success', {'enter_towers': enter_towers, 'exp_info': exp_info, 'energy_data': energy_data['data']})
 
 
 ############################################ 私有方法 ############################################
