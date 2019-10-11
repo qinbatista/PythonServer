@@ -6,6 +6,7 @@ from module import enums
 from module import common
 
 
+# 进入普通关卡的方法
 async def enter_stage(uid, stage, **kwargs):
 	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
 	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
@@ -43,9 +44,8 @@ async def enter_stage(uid, stage, **kwargs):
 	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': await increase_exp(uid, 0, **kwargs), 'enemy_layout': enemy_layout})
 
 
+############################################ 私有方法 ############################################
 
-
-####################################################################################
 
 async def get_progress(uid, pid, **kwargs):
 	pdata = await common.execute(f'SELECT {pid} FROM progress WHERE uid = "{uid}";', **kwargs)
@@ -70,6 +70,3 @@ async def increase_exp(uid, exp, **kwargs):
 	exp_s += exp
 	_, exp_s = await common.execute_update(f'UPDATE progress SET exp = {exp_s} WHERE uid = "{uid}";', **kwargs)
 	return True, {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
-
-
-
