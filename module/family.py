@@ -2,6 +2,7 @@
 family.py
 '''
 import asyncio
+import pymysql
 
 from module import mail
 from module import enums
@@ -101,6 +102,20 @@ async def set_role(uid, gn_target, role, **kwargs):
 	await common.execute(f'UPDATE familyrole SET role = {new_role.value} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
 	return common.mt(0, 'success', {'gn' : gn_target, 'role' : new_role.value})
 
+async def change_name(uid, new_name, **kwargs):
+	if not _valid_family_name(new_name): return common.mt(99, 'invalid family name')
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(98, 'not in family')
+	role = await _get_role(uid, name, **kwargs)
+	if not _check_change_name_permissions(role): return common.mt(97, 'insufficient permissions')
+	try:
+		await common.execute(f'UPDATE family SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
+	except pymysql.err.IntegrityError:
+		return common.mt(96, 'family name already exists')
+	await common.execute(f'UPDATE player SET fid = "{new_name}" WHERE fid = "{name}";', **kwargs)
+	await common.execute(f'UPDATE familyrole SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
+	return common.mt(0, 'success', {'name' : new_name})
+
 
 
 ########################################################################
@@ -111,6 +126,9 @@ SET_ROLE_PERMISSIONS = {\
 
 def _valid_family_name(name):
 	return bool(name)
+
+def _check_change_name_permissions(check):
+	return check >= enums.FamilyRole.ADMIN
 
 def _check_set_role_permissions(actors_role, targets_role, new_role):
 	try:

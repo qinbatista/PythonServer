@@ -188,6 +188,9 @@ class MessageHandler:
 	async def _set_role_family(self, data: dict) -> str:
 		return await family.set_role(data['data']['unique_id'], data['data']['gn_target'], int(data['data']['role']), **data)
 
+	async def _change_name_family(self, data: dict) -> str:
+		return await family.change_name(data['data']['unique_id'], data['data']['name'], **data)
+
 	# TODO
 
 	async def _sign_in_family(self, data: dict) -> str:
