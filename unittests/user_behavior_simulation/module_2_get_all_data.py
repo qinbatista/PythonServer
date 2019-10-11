@@ -245,7 +245,11 @@ def create_random_data():
 		_execute_statement(f'INSERT INTO armor (uid, aid, level,quantity) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,10)},{random.randint(1,100)})  ON DUPLICATE KEY UPDATE `quantity`= values(`quantity`)')
 		_execute_statement(f'INSERT INTO item (uid, iid, value) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,1000)}) ON DUPLICATE KEY UPDATE `value`= values(`value`)')
 		_execute_statement(f'INSERT INTO weapon (uid, wid, star,level, skillpoint, segment) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,5)},{0},{random.randint(1,5000)},{random.randint(1,5000)}) ON DUPLICATE KEY UPDATE `segment`= values(`segment`)')
-		_execute_statement(f'INSERT INTO friend (uid, fid, recover,since) VALUES ("{module_1_login.unique_id}", "unique_id{random.randint(1,31)}", "2019-01-01","2019-01-01") ON DUPLICATE KEY UPDATE `since`= values(`since`)')
+
+		fname = f'f_unique_id_{random.randint(1,31)}'
+		_execute_statement(f'INSERT INTO friend (uid, fid, recover,since) VALUES ("{module_1_login.unique_id}", "{fname}", "2019-01-01","2019-01-01") ON DUPLICATE KEY UPDATE `since`= values(`since`)')
+		_execute_statement(f'INSERT INTO player (uid, gn, fid) VALUES ("{fname}", "f_name_{random.randint(1,31)}", "") ON DUPLICATE KEY UPDATE `fid`= values(`fid`)')
+
 		_execute_statement(f'INSERT INTO skill (uid, sid, level) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,31)}) ON DUPLICATE KEY UPDATE `level`= values(`level`)')
 		_execute_statement(f'INSERT INTO role (uid, rid, star, level, skillpoint, segment) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,5)},{random.randint(1,30)},{random.randint(1,5)},{random.randint(1,500)}) ON DUPLICATE KEY UPDATE `level`= values(`level`)')
 		_execute_statement(f'INSERT INTO darkmarketitems (uid, mid, gid, qty, cid, amt) VALUES ("{module_1_login.unique_id}", {random.randint(1,5)}, {random.randint(1,5)},{random.randint(1,30)},{random.randint(1,5)},{random.randint(1,500)}) ON DUPLICATE KEY UPDATE `amt`= values(`amt`)')

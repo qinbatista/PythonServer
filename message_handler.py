@@ -510,7 +510,9 @@ class MessageHandler:
 	async def _get_hang_up_info(self, data: dict) -> str:
 		# 这个信息不知道怎么去拿，后面详细说一下，新数据库不知道这些放到哪里了
 		# sql_str = "SELECT hang_up_time, hang_stage, stage, tower_stage FROM player WHERE unique_id='%s'" % unique_id
-		return 'function'
+		return {'status' : 0, 'message' : 'temp function success', 'data' :
+				{'stage' :
+				{'world_boss_enter_time':"2019/10/10 17:00:00",'world_boss_remaining_times':"20",'hp_values':["%.2f" %(int(self._boss_life_remaining[i])/int(self._boss_life[i])) for i in range(0,9)]}}}
 
 	# TODO
 	async def _check_boss_status(self, data: dict) -> str:
