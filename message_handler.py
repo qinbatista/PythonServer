@@ -203,9 +203,6 @@ class MessageHandler:
 	async def _sign_in_family(self, data: dict) -> str:
 		return 'function'
 
-	async def _get_store_family(self, data: dict) -> str:
-		return 'function'
-
 	async def _market_purchase_family(self, data: dict) -> str:
 		return 'function'
 
