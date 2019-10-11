@@ -77,6 +77,8 @@ async def get_all(uid, **kwargs):
 	members = await _get_member_info(name, **kwargs)
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members})
 
+async def get_store(**kwargs):
+	return common.mt(0, 'success', {'merchandise' : [{'item' : '3:6:1', 'cost' : '3:1:80'}]})
 
 async def set_notice(uid, msg, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)

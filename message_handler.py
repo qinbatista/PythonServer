@@ -194,6 +194,10 @@ class MessageHandler:
 	async def _get_all_family(self, data: dict) -> str:
 		return await family.get_all(data['data']['unique_id'], **data)
 
+	async def _get_store_family(self, data: dict) -> str:
+		return await family.get_store(**data)
+
+
 	# TODO
 
 	async def _sign_in_family(self, data: dict) -> str:
@@ -625,9 +629,9 @@ FUNCTION_LIST = {
 	'set_role_family' : MessageHandler._set_role_family,
 	'change_name_family' : MessageHandler._change_name_family,
 	'get_all_family' : MessageHandler._get_all_family,
+	'get_store_family' : MessageHandler._get_store_family,
 	# TODO
 	'sign_in_family' : MessageHandler._sign_in_family,
-	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
 	'gift_package_family' : MessageHandler._gift_package_family,
 	'officer_family' : MessageHandler._officer_family,
