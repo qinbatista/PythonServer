@@ -133,8 +133,6 @@ class MessageHandler:
 	# TODO
 
 
-	async def _get_player_info(self, data: dict) -> str:
-		return await player.get_player_info(data['data']['unique_id'], **data)
 
 	async def _get_player_config(self, data: dict) -> str:
 		return common.mt(0, 'success', {'player_config': self._player})
@@ -157,6 +155,9 @@ class MessageHandler:
 
 	async def _accept_gift(self, data: dict) -> str:
 		return await player.accept_gift(data['data']['unique_id'], data['data']['key'], **data)
+
+	async def _get_info_player(self, data: dict) -> str:
+		return await player.get_info(data['data']['unique_id'], **data)
 
 
 	###################### family.py ######################
@@ -592,7 +593,6 @@ FUNCTION_LIST = {
 	'bind_email' : MessageHandler._bind_email,
 	'verify_email_code' : MessageHandler._verify_email_code,
 	# TODO
-	'get_player_info' : MessageHandler._get_player_info,
 	'get_player_config' : MessageHandler._get_player_config,
 	'create_account' : MessageHandler._create_account,
 	'change_game_name' : MessageHandler._change_game_name,
@@ -602,6 +602,7 @@ FUNCTION_LIST = {
 	'accept_gift' : MessageHandler._accept_gift,
 	'create_player' : MessageHandler._create_player,
 	'get_account_world_info' : MessageHandler._get_account_world_info,
+	'get_info_player' : MessageHandler._get_info_player,
 
 	###################### family.py ######################
 	'create_family': MessageHandler._create_family,

@@ -44,10 +44,10 @@ async def get_all_resource(uid, **kwargs):
 	item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)
 	return common.mt(0, 'success', {'items': [{'iid': i[0], 'value': i[1]} for i in item]})
 
-async def get_player_info(uid, **kwargs):
-	player = await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs)
+async def get_info(uid, **kwargs):
+	data = await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs)
 	# 根据朋友id查朋友的游戏名字
-	return common.mt(0, 'success', {'player_info': [{'gn': 'cc', 'fgn': 'fcc'}]})
+	return common.mt(0, 'success', {'gn': data[0][0] , 'name': data[0][1]})
 
 #########################################################################################
 
