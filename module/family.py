@@ -71,7 +71,12 @@ async def respond(uid, nonce, **kwargs):
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3]})
 
 async def get_all(uid, **kwargs):
-	pass
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(99, 'not in a family')
+	_, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
+	members = await _get_member_info(name, **kwargs)
+	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members})
+
 
 async def set_notice(uid, msg, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -154,6 +159,10 @@ def _check_remove_permissions(remover, to_remove):
 
 def _check_invite_permissions(inviter):
 	return inviter >= enums.FamilyRole.ADMIN
+
+async def _get_member_info(name, **kwargs):
+	data = await common.execute(f'SELECT player.gn, familyrole.role, progress.exp FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid WHERE familyrole.name = "{name}";', **kwargs)
+	return [{'gn' : data[0], 'role' : data[1], 'exp' : data[2], 'icon' : 0} for m in data]
 
 async def _get_family_info(name, *args, **kwargs):
 	data = await common.execute(f'SELECT {",".join(args)} FROM family WHERE name = "{name}";', **kwargs)
