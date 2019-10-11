@@ -96,8 +96,8 @@ async def set_role(uid, gn_target, role, **kwargs):
 	actors_role = await _get_role(uid, name, **kwargs)
 	targets_role = await _get_role(uid_target, name, **kwargs)
 	if not _check_set_role_permissions(actors_role, targets_role, new_role): return common.mt(96, 'insufficient permissions')
-	await common.execute(f'UPDATE familyrole SET role = {role.value} WHERE uid = "{uid}" AND `name` = "{name}";', **kwargs)
-	return common.mt(0, 'success', {'gn' : gn_target, 'role' : role})
+	await common.execute(f'UPDATE familyrole SET role = {new_role.value} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
+	return common.mt(0, 'success', {'gn' : gn_target, 'role' : new_role.value})
 
 async def get_all(uid, **kwargs):
 	pass

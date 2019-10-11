@@ -31,7 +31,7 @@ async def accept_gift(uid, nonce, **kwargs):
 	if not gift: return common.mt(99, 'invalid nonce')
 	item = common.decode_items(gift)
 	_, remaining = await common.try_item(uid, item[0][1], item[0][2], **kwargs)
-	await mail.delete_mail(uid, nonce, **kwargs)
+	await mail.mark_read(uid, nonce, **kwargs)
 	return common.mt(0, 'success', {'items' : [{'iid' : item[0][1].value, 'value' : remaining}]})
 
 async def change_name(uid, name, **kwargs):
@@ -44,10 +44,10 @@ async def get_all_resource(uid, **kwargs):
 	item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)
 	return common.mt(0, 'success', {'items': [{'iid': i[0], 'value': i[1]} for i in item]})
 
-async def get_player_info(uid, **kwargs):
-	player = await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs)
+async def get_info(uid, **kwargs):
+	data = await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs)
 	# 根据朋友id查朋友的游戏名字
-	return common.mt(0, 'success', {'player_info': [{'gn': 'cc', 'fgn': 'fcc'}]})
+	return common.mt(0, 'success', {'gn': data[0][0] , 'name': data[0][1]})
 
 #########################################################################################
 

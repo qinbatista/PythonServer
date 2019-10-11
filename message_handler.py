@@ -133,8 +133,6 @@ class MessageHandler:
 	# TODO
 
 
-	async def _get_player_info(self, data: dict) -> str:
-		return await player.get_player_info(data['data']['unique_id'], **data)
 
 	async def _get_player_config(self, data: dict) -> str:
 		return common.mt(0, 'success', {'player_config': self._player})
@@ -157,6 +155,9 @@ class MessageHandler:
 
 	async def _accept_gift(self, data: dict) -> str:
 		return await player.accept_gift(data['data']['unique_id'], data['data']['key'], **data)
+
+	async def _get_info_player(self, data: dict) -> str:
+		return await player.get_info(data['data']['unique_id'], **data)
 
 
 	###################### family.py ######################
@@ -185,7 +186,7 @@ class MessageHandler:
 		return await family.set_blackboard(data['data']['unique_id'], data['data']['msg'], **data)
 
 	async def _set_role_family(self, data: dict) -> str:
-		return await family.set_role(data['data']['unique_id'], int(data['data']['role']), **data)
+		return await family.set_role(data['data']['unique_id'], data['data']['gn_target'], int(data['data']['role']), **data)
 
 	# TODO
 
@@ -457,6 +458,10 @@ class MessageHandler:
 	async def _get_all_achievement(self, data: dict) -> str:
 		return await achievement.get_all_achievement(data['data']['unique_id'], **data)
 
+	async def _record_achievement(self, data: dict) -> str:
+		data.update({"config":self._acheviement})
+		return await achievement.record_achievement(data['data']['unique_id'], **data)
+
 	###################### armor ######################
 	# TODO
 	async def _upgrade_armor(self, data: dict) -> str:
@@ -594,7 +599,6 @@ FUNCTION_LIST = {
 	'bind_email' : MessageHandler._bind_email,
 	'verify_email_code' : MessageHandler._verify_email_code,
 	# TODO
-	'get_player_info' : MessageHandler._get_player_info,
 	'get_player_config' : MessageHandler._get_player_config,
 	'create_account' : MessageHandler._create_account,
 	'change_game_name' : MessageHandler._change_game_name,
@@ -604,6 +608,7 @@ FUNCTION_LIST = {
 	'accept_gift' : MessageHandler._accept_gift,
 	'create_player' : MessageHandler._create_player,
 	'get_account_world_info' : MessageHandler._get_account_world_info,
+	'get_info_player' : MessageHandler._get_info_player,
 
 	###################### family.py ######################
 	'create_family': MessageHandler._create_family,
@@ -614,6 +619,7 @@ FUNCTION_LIST = {
 	'respond_family' : MessageHandler._respond_family,
 	'set_notice_family' : MessageHandler._set_notice_family,
 	'set_blackboard_family' : MessageHandler._set_blackboard_family,
+	'set_role_family' : MessageHandler._set_role_family,
 	# TODO
 	'sign_in_family' : MessageHandler._sign_in_family,
 	'get_store_family' : MessageHandler._get_store_family,
@@ -720,6 +726,7 @@ FUNCTION_LIST = {
 	# TODO
 	###################### achievement ######################
 	'get_all_achievement': MessageHandler._get_all_achievement,
+	'get_achievement_reward':MessageHandler._get_achievement_reward
 
 	# TODO
 	###################### armor ######################
@@ -743,6 +750,7 @@ FUNCTION_LIST = {
 	'get_family_config':MessageHandler._get_family_config,
 	'get_factory_info':MessageHandler._get_factory_info,
 	'refresh_all_storage':MessageHandler._refresh_all_storage,
-	'get_all_family_info': MessageHandler._get_all_family_info
+	'get_all_family_info': MessageHandler._get_all_family_info,
+
 }
 

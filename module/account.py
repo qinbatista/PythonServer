@@ -11,10 +11,10 @@ import random
 import asyncio
 import hashlib
 import secrets
-
 from module import common
+from module import enums
 from utility import direct_mail
-
+from module import achievement
 N = 2**10
 R = 8
 P = 1

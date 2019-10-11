@@ -15,10 +15,6 @@ token = ""
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
-def purchase_energy():
-	print_module("[purchase_energy]")
-	response = send_tcp_message({'world' : world, 'function' : 'purchase_energy', 'data' : {'token' : token,"pakage_id":random.randint(1,2)}})#能量包，1是10体力， 2是100体力
-	print_method("[purchase_energy]"+response)
 
 def purchase_basic_summon_scroll():
 	print_module("[purchase_basic_summon_scroll]")
