@@ -68,6 +68,9 @@ async def respond(uid, nonce, **kwargs):
 	await _add_to_family(uid_target, name, **kwargs)
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3]})
 
+async def get_all(uid, **kwargs):
+	pass
+
 async def set_notice(uid, msg, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
@@ -75,7 +78,6 @@ async def set_notice(uid, msg, **kwargs):
 	if not _check_notice_permissions(role): return common.mt(98,'insufficient permissions')
 	await common.execute(f'UPDATE family SET notice = "{msg}" WHERE `name` = "{name}";', **kwargs)
 	return common.mt(0, 'success', {'notice' : msg})
-
 
 async def set_blackboard(uid, msg, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -99,17 +101,23 @@ async def set_role(uid, gn_target, role, **kwargs):
 	await common.execute(f'UPDATE familyrole SET role = {new_role.value} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
 	return common.mt(0, 'success', {'gn' : gn_target, 'role' : new_role.value})
 
-async def get_all(uid, **kwargs):
-	pass
 
 
 ########################################################################
+SET_ROLE_PERMISSIONS = {\
+		enums.FamilyRole.OWNER : {'target' : {enums.FamilyRole.ADMIN, enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}, 'new' : {enums.FamilyRole.ADMIN, enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}},
+		enums.FamilyRole.ADMIN : {'target' : {enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}, 'new' : {enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}}
+		}
 
 def _valid_family_name(name):
 	return bool(name)
 
 def _check_set_role_permissions(actors_role, targets_role, new_role):
-	return True
+	try:
+		return targets_role in SET_ROLE_PERMISSIONS[actors_role]['target'] and new_role in SET_ROLE_PERMISSIONS[actors_role]['new']
+	except KeyError:
+		pass
+	return False
 
 def _check_notice_permissions(check):
 	return check >= enums.FamilyRole.ADMIN
