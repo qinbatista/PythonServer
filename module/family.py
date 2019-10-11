@@ -10,6 +10,8 @@ from module import common
 
 CHANGE_NAME_DIAMOND = 100
 
+MERCHANDISE = { '3:6:1' : '3:1:80' }
+
 async def create(uid, name, **kwargs):
 	if not _valid_family_name(name): return common.mt(99, 'invalid family name')
 	in_family, _ = await _in_family(uid, **kwargs)
@@ -78,7 +80,11 @@ async def get_all(uid, **kwargs):
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members})
 
 async def get_store(**kwargs):
-	return common.mt(0, 'success', {'merchandise' : [{'item' : '3:6:1', 'cost' : '3:1:80'}]})
+	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k,v in MERCHANDISE.items()]})
+
+async def purchase(uid, item, **kwargs):
+	gid, iid, value = (common.decode_items(item))[0]
+	return common.mt(0, 'success')
 
 async def set_notice(uid, msg, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
