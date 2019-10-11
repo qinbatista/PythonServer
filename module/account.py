@@ -61,7 +61,7 @@ async def bind_account(uid, account, password, **kwargs):
 
 async def bind_email(uid, email, **kwargs):
 	if not await _account_bound(uid, **kwargs): return common.mt(99, 'account is not bound')
-	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), db = 'accountdb', **kwargs))
+	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), account = True, **kwargs))
 	if bound: return common.mt(98, 'email has already been bound')
 	if exists: return common.mt(97, 'email already exists')
 	code = await _gen_email_code(email, **kwargs)

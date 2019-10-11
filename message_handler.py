@@ -176,7 +176,13 @@ class MessageHandler:
 		return await family.request_join(data['data']['unique_id'], data['data']['name'], **data)
 
 	async def _respond_family(self, data: dict) -> str:
-		return await family.respond(data['data']['unique_id'], data['data']['nonce'], **data)
+		return await family.respond(data['data']['unique_id'], data['data']['key'], **data)
+
+	async def _set_notice_family(self, data: dict) -> str:
+		return await family.set_notice(data['data']['unique_id'], data['data']['msg'], **data)
+
+	async def _set_blackboard_family(self, data: dict) -> str:
+		return await family.set_blackboard(data['data']['unique_id'], data['data']['msg'], **data)
 
 	# TODO
 
@@ -601,6 +607,8 @@ FUNCTION_LIST = {
 	'invite_user_family' : MessageHandler._invite_user_family,
 	'request_join_family' : MessageHandler._request_join_family,
 	'respond_family' : MessageHandler._respond_family,
+	'set_notice_family' : MessageHandler._set_notice_family,
+	'set_blackboard_family' : MessageHandler._set_blackboard_family,
 	# TODO
 	'sign_in_family' : MessageHandler._sign_in_family,
 	'get_store_family' : MessageHandler._get_store_family,
