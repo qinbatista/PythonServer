@@ -162,7 +162,7 @@ def _check_invite_permissions(inviter):
 
 async def _get_member_info(name, **kwargs):
 	data = await common.execute(f'SELECT player.gn, familyrole.role, progress.exp FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid WHERE familyrole.name = "{name}";', **kwargs)
-	return [{'gn' : data[0], 'role' : data[1], 'exp' : data[2], 'icon' : 0} for m in data]
+	return [{'gn' : m[0], 'role' : m[1], 'exp' : m[2], 'icon' : 0} for m in data]
 
 async def _get_family_info(name, *args, **kwargs):
 	data = await common.execute(f'SELECT {",".join(args)} FROM family WHERE name = "{name}";', **kwargs)
