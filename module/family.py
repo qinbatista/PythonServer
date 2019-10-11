@@ -83,8 +83,14 @@ async def get_store(**kwargs):
 	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k,v in MERCHANDISE.items()]})
 
 async def purchase(uid, item, **kwargs):
-	gid, iid, value = (common.decode_items(item))[0]
-	return common.mt(0, 'success')
+	in_family, _ = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(99, 'not in a family')
+	if item not in MERCHANDISE: return common.mt(98, 'invalid item')
+	i, c = common.decode_items(','.join(item, MERCHANDISE[item]))
+	can_pay, cost_remaining = await common.try_item(uid, c[1], c[2], **kwargs)
+	if not can_pay: return common.mt(97, 'insufficient funds')
+	_, item_remaining = await common.try_item(uid, i[1], i[2], **kwargs)
+	return common.mt(0, 'success', { enums.Group.ITEM.value : [ {'iid' : i[1], 'value' : item_remaining}, {'iid' : c[1], 'value' : cost_remaining}]})
 
 async def set_notice(uid, msg, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
