@@ -13,7 +13,7 @@ async def enter_stage(uid, stage, **kwargs):
 	# 98 - key insufficient
 	# 99 - parameter error
 	enter_stages = []
-	energy_consume = 2
+	energy_consume = 2  # 虚拟消耗能量为2
 	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
 	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
 	enemy_layout = enemy_layouts[-1]['enemyLayout'] if stage > len(enemy_layouts) else enemy_layouts[stage - 1]['enemyLayout']
@@ -92,7 +92,7 @@ async def enter_tower(uid, stage, **kwargs):
 	# 98 - key insufficient
 	# 99 - parameter error
 	enter_towers = []
-	energy_consume = 2
+	energy_consume = 2  # 虚拟消耗能量为2
 	entry_consume = kwargs['entry_consume']  # self._entry_consumables["tower"]
 
 	can_s, stage_s = await get_progress(uid, 'towerstage', **kwargs)
