@@ -85,10 +85,31 @@ async def set_blackboard(uid, msg, **kwargs):
 	await common.execute(f'UPDATE family SET board = "{msg}" WHERE `name` = "{name}";', **kwargs)
 	return common.mt(0, 'success', {'board' : msg})
 
+async def set_role(uid, gn_target, role, **kwargs):
+	new_role = enums.FamilyRole(role)
+	uid_target = await common.get_uid(gn_target, **kwargs)
+	if uid == uid_target: return common.mt(99, 'can not modify self')
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(98, 'not in family')
+	target_in_family, target_name = await _in_family(uid_target, **kwargs)
+	if not target_in_family or target_name != name: return common.mt(97, 'target not in your family')
+	actors_role = await _get_role(uid, name, **kwargs)
+	targets_role = await _get_role(uid_target, name, **kwargs)
+	if not _check_set_role_permissions(actors_role, targets_role, new_role): return common.mt(96, 'insufficient permissions')
+	await common.execute(f'UPDATE familyrole SET role = {role.value} WHERE uid = "{uid}" AND `name` = "{name}";', **kwargs)
+	return common.mt(0, 'success', {'gn' : gn_target, 'role' : role})
+
+async def get_all(uid, **kwargs):
+	pass
+
 
 ########################################################################
+
 def _valid_family_name(name):
 	return bool(name)
+
+def _check_set_role_permissions(actors_role, targets_role, new_role):
+	return True
 
 def _check_notice_permissions(check):
 	return check >= enums.FamilyRole.ADMIN

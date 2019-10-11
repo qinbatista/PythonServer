@@ -184,6 +184,9 @@ class MessageHandler:
 	async def _set_blackboard_family(self, data: dict) -> str:
 		return await family.set_blackboard(data['data']['unique_id'], data['data']['msg'], **data)
 
+	async def _set_role_family(self, data: dict) -> str:
+		return await family.set_role(data['data']['unique_id'], int(data['data']['role']), **data)
+
 	# TODO
 
 	async def _sign_in_family(self, data: dict) -> str:
