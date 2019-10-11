@@ -211,9 +211,6 @@ class MessageHandler:
 	async def _dismiss_officer_family(self, data: dict) -> str:
 		return 'function'
 
-	async def _change_name_family(self, data: dict) -> str:
-		return 'function'
-
 	async def _blackboard_family(self, data: dict) -> str:
 		return 'function'
 
@@ -623,6 +620,7 @@ FUNCTION_LIST = {
 	'set_notice_family' : MessageHandler._set_notice_family,
 	'set_blackboard_family' : MessageHandler._set_blackboard_family,
 	'set_role_family' : MessageHandler._set_role_family,
+	'change_name_family' : MessageHandler._change_name_family,
 	# TODO
 	'sign_in_family' : MessageHandler._sign_in_family,
 	'get_store_family' : MessageHandler._get_store_family,
@@ -630,7 +628,6 @@ FUNCTION_LIST = {
 	'gift_package_family' : MessageHandler._gift_package_family,
 	'officer_family' : MessageHandler._officer_family,
 	'dismiss_officer_family' : MessageHandler._dismiss_officer_family,
-	'change_name_family' : MessageHandler._change_name_family,
 	'blackboard_family' : MessageHandler._blackboard_family,
 	'announcement_family' : MessageHandler._announcement_family,
 	'update_login_in_time' : MessageHandler._update_login_in_time,
