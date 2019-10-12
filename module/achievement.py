@@ -24,14 +24,21 @@ async def get_achievement_reward(uid, **kwargs):
 	# achievement_id_name_list=["total_login","keeping_login","vip_level","get_role_4_star","get_role_5_star","get_role_6_star","level_up_role","get_weapon_4_star","get_weapon_5_star","get_weapon_6_star","level_up_weapon","reward_level","collect_food","collect_mine","collect_crystal","upgrade_food_factory","upgrade_mine_factory","upgrade_crystal_crystal","summon_times","friend_request","friend_gift","check_in_family"]
 	# if achievement_id not in achievement_id_list:#check if achievement is in list
 	# 	return self._message_typesetting(99, f'this achivement is not in list: {str(achievement_id)}')
-	print("enums.Achievement.TOTAL_LOGIN._name_="+enums.Achievement.TOTAL_LOGIN._name_)
-	config = kwargs["config"][enums.Achievement.TOTAL_LOGIN._name_]
-	quantity = config["quantity"]
-	amount = config["diamond"]
-	data = await common.execute(world, f'SELECT value, reward FROM achievement WHERE uid = "{kwargs["uid"]}" AND aid = "{kwargs["aid"]}"')
-	if len(data)==0:
-		return common.mt(1, f'no reward for this achievement {str(kwargs["aid"])}')
-	return common.mt(0, f'get {str(kwargs["aid"])} reward success')
+	config = kwargs["config"][str.lower(enums.Achievement.TOTAL_LOGIN.name)]
+	quantity = config["quantity"][::-1]
+	amount = config["diamond"][::-1]
+	print("quantity="+str(quantity))
+	print("amount="+str(amount))
+	data = await common.execute(f'SELECT value, reward FROM achievement WHERE uid = "{uid}" AND aid = "{kwargs["data"]["achievement_id"]}"',**kwargs)
+	print("data = "+str(data))
+	for qindex,my_quantity in enumerate(quantity):
+		if data[0][0]>=my_quantity:
+			for aindex,myamount in enumerate(amount):
+				if data[0][1] == myamount:
+					_,remaining = await common.try_item(uid,enums.Item.DIAMOND,amount[aindex-1], **kwargs)
+					await common.execute_update(f'UPDATE achievement set reward = {amount[aindex-1]} WHERE uid = "{uid}" AND aid = "{kwargs["data"]["achievement_id"]}";', **kwargs)
+					return common.mt(0, 'get reward success',{"achievement":{"diamond":remaining,"value":data[0][0],"reward":amount[aindex-1],"name":str.lower(enums.Achievement.TOTAL_LOGIN.name)}})
+	return common.mt(99,'no reward for this achievement {str.lower(enums.Achievement.TOTAL_LOGIN.name}')
 	# kwargs["uid"]
 	# achievement_id_name = achievement_id_name_list[achievement_id]
 	# # print("achievement_id_name="+achievement_id_name)

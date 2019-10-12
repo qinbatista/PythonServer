@@ -458,9 +458,9 @@ class MessageHandler:
 	async def _get_all_achievement(self, data: dict) -> str:
 		return await achievement.get_all_achievement(data['data']['unique_id'], **data)
 
-	async def _record_achievement(self, data: dict) -> str:
+	async def _get_achievement_reward(self, data: dict) -> str:
 		data.update({"config":self._acheviement})
-		return await achievement.record_achievement(data['data']['unique_id'], **data)
+		return await achievement.get_achievement_reward(data['data']['unique_id'], **data)
 
 	###################### armor ######################
 	# TODO
@@ -726,7 +726,7 @@ FUNCTION_LIST = {
 	# TODO
 	###################### achievement ######################
 	'get_all_achievement': MessageHandler._get_all_achievement,
-	'get_achievement_reward':MessageHandler._get_achievement_reward
+	'get_achievement_reward':MessageHandler._get_achievement_reward,
 
 	# TODO
 	###################### armor ######################
