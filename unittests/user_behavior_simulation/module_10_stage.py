@@ -21,44 +21,40 @@ def print_method(my_string):
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
-def purchase_energy():
-	pass
+def login_decoration(func):
+	def wrapper():
+		response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
+		global token
+		token = response['data']['token']
+		func()
+	return wrapper
 
-def enter_stage(token,world,response):
-	print_module("[enter_level]:"+str(response))
-	while True:
-		my_number = random.randint(0,4)
-		if my_number==0:#剧情
-			yourstage = response["data"]["remaining"]["stage"]
-			print_method("[enter_level] play normal level")
-			stage = random.randint(1,yourstage+1)
-			response_enter = send_tcp_message({'world' : world, 'function' : 'enter_stage', 'data' : {'token' : token, 'stage' : stage}})#进入关卡
-			if response_enter["status"]==0:
-				response_enter = send_tcp_message({'world' : '0', 'function' : 'pass_stage', 'data' : {'token' : token, 'stage' : stage, 'clear_time' : 'we dont care what this string is'}})#挑战成功
-				print_method("[enter_level] normal level passed")
-			else:
-				my_choice = random.choice([0,1])
-				if my_choice==0:
-					purchase_energy()
-				else:
-					break
-		elif my_number==1:#世界boss
-			print_method("[enter_level] play world boss")
-			response_enter = send_tcp_message({'world' : world, 'function' : 'enter_world_boss_stage', 'data' : {'token' : token}})
-			if response_enter["status"]==0:
-				response_enter = send_tcp_message({'world' : world, 'function' : 'leave_world_boss_stage', 'data' : {'token' : token,"total_damage":random.randint(1,100000)}})
-				print_method("[enter_level] challange boss success")
-			else:
-				my_choice = random.choice([0,1])
-				if my_choice==0:
-					response_enter = send_tcp_message({'world' : world, 'function' : 'get_top_damage', 'data' : {'token' : token,"range_number":random.randint(1,5)}})
-					print_method("[enter_level] get top damage")
-				else:
-					break
-		elif my_number==2:#无尽试炼
-			print_method("[enter_level] endless training")
-		elif my_number==3:#活动试炼
-			print_method("[enter_level] party training")
-		elif my_number==4:#退出
-			print_method("[enter_level] quit level playing")
-			break
+
+@ login_decoration
+def enter_stage():
+	response = send_tcp_message({'world': world, 'function': 'enter_stage', 'data': {'token': token, 'stage': 1}})
+	print(response)
+
+@ login_decoration
+def pass_stage():
+	response = send_tcp_message({'world': world, 'function': 'pass_stage', 'data': {'token': token, 'stage': 1}})
+	print(response)
+
+@ login_decoration
+def enter_tower():
+	response = send_tcp_message({'world': world, 'function': 'pass_stage', 'data': {'token': token, 'stage': 1}})
+	print(response)
+
+@ login_decoration
+def pass_tower():
+	response = send_tcp_message({'world': world, 'function': 'pass_stage', 'data': {'token': token, 'stage': 1}})
+	print(response)
+
+
+if __name__ == '__main__':
+	enter_stage()
+	# pass_stage()
+	# enter_tower()
+	# pass_tower()
+
+
