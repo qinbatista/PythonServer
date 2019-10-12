@@ -10,9 +10,9 @@ import module_8_roles
 import module_9_family
 import module_10_stage
 import module_11_mail
-
 import module_13_achievement
 import module_14_vip
+import module_15_summon
 import multiprocessing
 import time
 from datetime import datetime, timedelta
@@ -66,14 +66,15 @@ def dark_market():
 
 def vip_system():
 	module_14_vip.vip_dialog(token,world)
-def achievement(get_all_achievement):
-	module_13_achievement.achievement_dialog(token,world,get_all_achievement)
 unique_id=""
 def run_task(name):
 	global unique_id
 	unique_id = name
 	call_login(str(name))
-	# info_list = call_get_all_info()#加载所有参数信息
+	info_list = call_get_all_info()#加载所有参数信息
+	# module_13_achievement.achievement_dialog(token,world,info_list[0])
+	# module_15_summon.summon_dialog(token,world)#召唤所有
+	module_5_weapons.weapon_dialog(token,world,info_list[5])
 	# dark_market()#*加载黑市信息
 	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
@@ -85,7 +86,6 @@ def run_task(name):
 	# family_dialog(info_list[9],info_list[19])
 	# stage_dialog(info_list[19])#关卡界面
 	# announcement()#公告界面
-	achievement("")
 	# vip_system()
 
 
