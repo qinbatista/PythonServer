@@ -40,9 +40,10 @@
 			"weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30",
 			"weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"
 		],
-		"skill_scroll": ["skill_scroll_10", "skill_scroll_30", "skill_scroll_100"],
+		"skill_scroll": [6, 7, 8],
+		"scroll_range": [1, 10],
 		"weights": [0.5, 0.3, 0.2],
-		"segment": [30, 60]
+		"segment_range": [30, 60]
 	},
 	"stage": {
 		"1":{

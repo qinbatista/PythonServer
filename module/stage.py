@@ -140,55 +140,46 @@ async def pass_tower(uid, stage, **kwargs):
 	if not can_s or stage <= 0 or stage_s + 1 < stage:
 		return common.mt(99, 'Parameter error')
 
+	p_stage = {'finally': stage_s, 'vary': 0}
+	if stage_s + 1 == stage:  # 通过新关卡
+		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"')
+		p_stage['finally'] = stage
+		p_stage['vary'] = 1
+
 	pass_towers = []
-	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["stage"]
+	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["tower"]
 	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x)]
 	pass_reward = pass_rewards[str(max(stages))] if stage not in stages else pass_rewards[str(stage)]
 
-	p_exp = {'remaining': -1, 'reward': -1}
 	if stage % 10 == 0:
 		reward = random.choices(population=pass_reward)[0]
-		if 'skill' in reward:
-			mpg = {'M': 0, 'P': 13, 'G': 26}
-			sid = reward.replace('skill', '')
-			enums.Skill
+		if reward in pass_rewards['skill']:
+			skill_mpg = pass_rewards['skill_MPG']
+			if 'skill_M' in reward:
+				sid = skill_mpg['M'] + int(reward.replace('skill_M', ''))
+			elif 'skill_P' in reward:
+				sid = skill_mpg['P'] + int(reward.replace('skill_P', ''))
+			else:
+				sid = skill_mpg['G'] + int(reward.replace('skill_G', ''))
 			if await try_unlock_skill(uid, sid, **kwargs):
-				pass
-				# TODO
-			if reward_data["status"] == 0:
-				tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage",
-														value=1 if sql_stage + 1 == stage else 0))["remaining"]
-				return self._message_typesetting(status=1, message="Successfully unlock new skills",
-												 data={"remaining": {reward: 1, "tower_stage": tower_stage},
-													   "reward": {reward: 1}})
+				return common.mt(1, 'Successfully unlock new skills', {'pass_tower': [{'reward_kind': 'skill', 'sid': sid, 'level': 1, 'p_stage': p_stage}]})
 			else:
-				scroll = random.choices(population=pass_tower_data["skill_scroll"], weights=pass_tower_data["weights"])[
-					0]
-				scroll_data = await self._try_material(world=world, unique_id=unique_id, material=scroll, value=1)
-				if scroll_data["status"] == 1:
-					return self._message_typesetting(status=95, message="skill -> database operating error")
-				tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage",
-														value=1 if sql_stage + 1 == stage else 0))["remaining"]
-				return self._message_typesetting(status=2, message="Gain a scroll", data={
-					"remaining": {scroll: scroll_data["remaining"], "tower_stage": tower_stage}, "reward": {scroll: 1}})
-		elif reward in pass_tower_data["weapon"]:  # weapon
-			if len(pass_tower_data["segment"]) == 2:
-				segment = random.randint(pass_tower_data["segment"][0], pass_tower_data["segment"][1])
-			else:
-				segment = pass_tower_data["segment"][0]
-			sql_str = "update %s set segment=segment+%s where unique_id='%s'" % (reward, segment, unique_id)
-			if await self._execute_statement_update(world=world, statement=sql_str) == 0:
-				return self._message_typesetting(status=94, message="weapon -> database operating error")
-			segment_result = await self._get_segment(world=world, unique_id=unique_id, weapon=reward)
-			tower_stage = (await self._try_material(world=world, unique_id=unique_id, material="tower_stage",
-													value=1 if sql_stage + 1 == stage else 0))["remaining"]
-			return self._message_typesetting(status=3, message="Gain weapon fragments", data={
-				"remaining": {"weapon": reward, "segment": segment_result, "tower_stage": tower_stage},
-				"reward": {"segment": segment}})
+				scroll_iid = random.choices(population=pass_rewards["skill_scroll"], weights=pass_rewards["weights"])[0]
+				_, scroll_value = await common.try_item(uid, enums.Item(scroll_iid), 1, **kwargs)
+				return common.mt(2, 'Get a scroll', {'pass_tower': [{'reward_kind': 'scroll', 'iid': scroll_iid, 'value': scroll_value, 'reward': 1, 'p_stage': p_stage}]})
+		elif reward in pass_rewards['weapon']:  # weapon
+			wid = int(reward.replace('weapon', ''))
+			segment_range = pass_rewards['segment_range']
+			segment = random.randint(segment_range[0], segment_range[1]) if len(segment_range) == 2 else segment_range[0]
+			weapon_data = await increase_weapon_segment(uid, wid, segment, **kwargs)
+			return common.mt(3, 'Get weapon segment', {'pass_tower': [{'reward_kind': 'weapon', 'wid': wid, 'segment': weapon_data[0][0], 'reward': segment, 'p_stage': p_stage}]})
 		else:
-			return self._message_typesetting(status=96, message="Accidental prize -> " + reward)
-		_, exp_data = await common.execute_update(f'UPDATE progress SET exp = exp + {value} WHERE uid = "{uid}"')
+			scroll_range = pass_rewards['scroll_range']
+			scroll_iid = random.choices(population=pass_rewards["skill_scroll"], weights=pass_rewards["weights"])[0]
+			_, scroll_value = await common.try_item(uid, enums.Item(scroll_iid), scroll_range, **kwargs)
+			return common.mt(4, 'Get scroll', {'pass_tower': [{'reward_kind': 'scroll', 'iid': scroll_iid, 'value': scroll_value, 'reward': scroll_range, 'p_stage': p_stage}]})
 	else:
+		p_exp = {'remaining': -1, 'reward': -1}
 		for key, value in pass_reward.items():
 			if key == 'exp':
 				_, exp_data = await common.execute_update(f'UPDATE progress SET exp = exp + {value} WHERE uid = "{uid}"')
@@ -198,11 +189,6 @@ async def pass_tower(uid, stage, **kwargs):
 				_, data = await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}"')
 				pass_towers.append({'iid': key, 'remaining': data[0][0], 'reward': value})
 
-	p_stage = {'finally': stage_s, 'vary': 0}
-	if stage_s + 1 == stage:  # 通过新关卡
-		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"')
-		p_stage['finally'] = stage
-		p_stage['vary'] = 1
 	return common.mt(0, 'success', data={'pass_stages': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
 
 ############################################ 私有方法 ############################################
@@ -217,7 +203,7 @@ async def try_unlock_skill(uid, sid, **kwargs):
 		await common.execute_update(f'INSERT INTO skill (uid, sid, value) VALUES ("{uid}", "{sid}", 1);', **kwargs)
 		return True
 	elif skill[0][0] == 0:
-		await common.execute_update(f'UPDATE skill SET value = 1 WHERE uid = "{uid}" AND sid = "{sid};"', **kwargs)
+		await common.execute_update(f'UPDATE skill SET level = 1 WHERE uid = "{uid}" AND sid = "{sid};"', **kwargs)
 		return True
 	return False
 
@@ -245,3 +231,23 @@ async def increase_exp(uid, exp, **kwargs):
 	exp_s += exp
 	_, exp_s = await common.execute_update(f'UPDATE progress SET exp = {exp_s} WHERE uid = "{uid}";', **kwargs)
 	return True, {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
+
+
+async def increase_weapon_segment(uid, wid, segment, **kwargs):
+	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
+	if data == ():
+		await common.execute_update(f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", "{wid}", "{segment}");', **kwargs)
+	else:
+		await common.execute_update(f'UPDATE weapon SET segment = segment + {segment} WHERE uid = "{uid}" AND wid = "{wid}"', **kwargs)
+	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
+	return data
+
+
+async def increase_role_segment(uid, rid, segment, **kwargs):
+	data = await common.execute(f'SELECT segment FROM role WHERE uid = "{uid}" AND wid = "{rid}";', **kwargs)
+	if data == ():
+		await common.execute_update(f'INSERT INTO role (uid, rid, segment) VALUES ("{uid}", "{rid}", "{segment}");', **kwargs)
+	else:
+		await common.execute_update(f'UPDATE role SET segment = segment + {segment} WHERE uid = "{uid}" AND wid = "{rid}"', **kwargs)
+	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
+	return data
