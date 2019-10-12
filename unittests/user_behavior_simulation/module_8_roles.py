@@ -11,7 +11,7 @@ import random
 lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
 world = "0"
 token = ""
-role_list=["role1", "role2", "role3", "role4", "role5", "role6", "role7", "role8", "role9", "role10", "role11", "role12", "role13", "role14", "role15", "role16", "role17", "role18", "role19", "role20", "role21", "role22", "role23", "role24", "role25", "role26", "role27", "role28", "role29", "role30", "role31", "role32", "role33", "role34", "role35", "role36", "role37", "role38", "role39", "role40"]
+role_list=[i for i in range(1,40)]
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
@@ -35,17 +35,11 @@ def role_dialog(_token,_world):
 	while True:
 		random_int = random.randint(0,2)
 		if random_int ==0:#升级角色
-			new_response = send_tcp_message({'world' : world, 'function' : 'upgrade_role_level', 'data' : {'token' : token, "role":random.choice(role_list),"experience_potion":random.randint(30,400)}})#升级请求
-			print_method("[role_dialog] level up role:"+str(new_response))
-			if new_response["status"]==95:#没有此角色
-				get_random_role()
-			if new_response["status"]==97:#材料不足冲关卡
-				enter_level()
+			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_role', 'data' : {'token' : token, "role":random.choice(role_list),"amount":random.randint(40000000000,300000000000)}})#升级请求
+			print_method("[level_up_role] level up role:"+str(new_response))
 		elif random_int ==1:#突破角色
-			new_response = send_tcp_message({'world' : world, 'function' : 'upgrade_role_star', 'data' : {'token' : token, "role":random.choice(role_list)}})#升级请求
-			print_method("[role_dialog] level up role star:"+str(new_response))
-			if new_response["status"]==98:
-				get_random_role()
+			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_star_role', 'data' : {'token' : token, "role":random.choice(role_list)}})#升级请求
+			print_method("[level_up_star_role] level up role star:"+str(new_response))
 		elif random_int ==2:#退出
 			print_method("[role_dialog] quit role_dialog")
 			break

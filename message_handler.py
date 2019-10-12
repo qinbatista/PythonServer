@@ -188,15 +188,22 @@ class MessageHandler:
 	async def _set_role_family(self, data: dict) -> str:
 		return await family.set_role(data['data']['unique_id'], data['data']['gn_target'], int(data['data']['role']), **data)
 
+	async def _change_name_family(self, data: dict) -> str:
+		return await family.change_name(data['data']['unique_id'], data['data']['name'], **data)
+
+	async def _get_all_family(self, data: dict) -> str:
+		return await family.get_all(data['data']['unique_id'], **data)
+
+	async def _get_store_family(self, data: dict) -> str:
+		return await family.get_store(**data)
+
+	async def _market_purchase_family(self, data: dict) -> str:
+		return await family.purchase(data['data']['unique_id'], data['data']['item'], **data)
+
+
 	# TODO
 
 	async def _sign_in_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _get_store_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _market_purchase_family(self, data: dict) -> str:
 		return 'function'
 
 	async def _gift_package_family(self, data: dict) -> str:
@@ -206,9 +213,6 @@ class MessageHandler:
 		return 'function'
 
 	async def _dismiss_officer_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _change_name_family(self, data: dict) -> str:
 		return 'function'
 
 	async def _blackboard_family(self, data: dict) -> str:
@@ -620,14 +624,15 @@ FUNCTION_LIST = {
 	'set_notice_family' : MessageHandler._set_notice_family,
 	'set_blackboard_family' : MessageHandler._set_blackboard_family,
 	'set_role_family' : MessageHandler._set_role_family,
-	# TODO
-	'sign_in_family' : MessageHandler._sign_in_family,
+	'change_name_family' : MessageHandler._change_name_family,
+	'get_all_family' : MessageHandler._get_all_family,
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
+	# TODO
+	'sign_in_family' : MessageHandler._sign_in_family,
 	'gift_package_family' : MessageHandler._gift_package_family,
 	'officer_family' : MessageHandler._officer_family,
 	'dismiss_officer_family' : MessageHandler._dismiss_officer_family,
-	'change_name_family' : MessageHandler._change_name_family,
 	'blackboard_family' : MessageHandler._blackboard_family,
 	'announcement_family' : MessageHandler._announcement_family,
 	'update_login_in_time' : MessageHandler._update_login_in_time,

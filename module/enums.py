@@ -24,7 +24,6 @@ class Item(enum.IntEnum):
 	FORTUNE_WHEEL_BASIC = 14
 	FORTUNE_WHEEL_PRO = 15
 	FRIEND_GIFT = 16
-	# qin start
 	UNIVERSAL_SEGMENT = 17
 	COIN_CARD = 18
 	EXP_CARD = 19
@@ -33,7 +32,6 @@ class Item(enum.IntEnum):
 	CRYSTAL_CARD = 22
 	DIAMOND_CARD = 23
 	MINE = 24
-# qin end
 
 
 class FamilyRole(enum.IntEnum):
