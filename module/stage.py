@@ -72,18 +72,18 @@ async def pass_stage(uid, stage, **kwargs):
 	p_exp = {'remaining': -1, 'reward': -1}
 	for key, value in pass_reward.items():
 		if key == 'exp':
-			await common.execute_update(f'UPDATE progress SET exp = exp + {value} WHERE uid = "{uid}";')
-			exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";')
+			await common.execute_update(f'UPDATE progress SET exp = exp + {value} WHERE uid = "{uid}";', **kwargs)
+			exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
 			p_exp['remaining'] = exp_data[0][0]
 			p_exp['reward'] = value
 		else:
-			await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";')
-			data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";')
+			await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
+			data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 			pass_stages.append({'iid': key, 'remaining': data[0][0], 'reward': value})
 
 	p_stage = {'finally': stage_s, 'vary': 0}
 	if stage_s + 1 == stage:  # 通过新关卡
-		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"')
+		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"', **kwargs)
 		p_stage['finally'] = stage
 		p_stage['vary'] = 1
 	return common.mt(0, 'success', data={'pass_stages': pass_stages, 'p_exp': p_exp, 'p_stage': p_stage})
@@ -146,7 +146,7 @@ async def pass_tower(uid, stage, **kwargs):
 
 	p_stage = {'finally': stage_s, 'vary': 0}
 	if stage_s + 1 == stage:  # 通过新关卡
-		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"')
+		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"', **kwargs)
 		p_stage['finally'] = stage
 		p_stage['vary'] = 1
 
@@ -186,13 +186,13 @@ async def pass_tower(uid, stage, **kwargs):
 		p_exp = {'remaining': -1, 'reward': -1}
 		for key, value in pass_reward.items():
 			if key == 'exp':
-				await common.execute_update(f'UPDATE progress SET exp = exp + {value} WHERE uid = "{uid}";')
-				exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";')
+				await common.execute_update(f'UPDATE progress SET exp = exp + {value} WHERE uid = "{uid}";', **kwargs)
+				exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
 				p_exp['remaining'] = exp_data[0][0]
 				p_exp['reward'] = value
 			else:
-				await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";')
-				data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";')
+				await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
+				data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 				pass_towers.append({'iid': key, 'remaining': data[0][0], 'reward': value})
 
 	return common.mt(0, 'success', data={'pass_stages': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})

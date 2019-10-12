@@ -499,7 +499,10 @@ def operating_test():
 	# cursor.execute(f'DROP TABLE progress')
 	# creat_progress(cursor)
 	# cursor.execute(f'insert into progress (uid, exp) value ("1", 0)')
-	code = cursor.execute(f'insert into timer (uid, tid) value ("1", 11)')
+	# code = cursor.execute(f'insert into timer (uid, tid) value ("1", 11)')
+	cursor.execute('select iid from item where uid = "1";')
+	print(cursor.fetchall())
+	code = cursor.execute(f'insert into item (uid, iid) value ("1", 10)')
 	print(code)
 	# for i in range(1, 100):
 	# 	cursor.execute(f'insert into progress (uid, exp) values ("{i}", 0)')

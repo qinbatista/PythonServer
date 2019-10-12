@@ -52,8 +52,8 @@ def pass_tower():
 
 
 if __name__ == '__main__':
-	enter_stage()
-	# pass_stage()
+	# enter_stage()
+	pass_stage()
 	# enter_tower()
 	# pass_tower()
 
