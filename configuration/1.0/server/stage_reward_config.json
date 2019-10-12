@@ -15,18 +15,31 @@
 			"coin": 220,
 			"energy": 3
 		},
-		"10": ["m1_level", "p1_level", "g1_level"],
+		"10": ["skill_M0", "skill_P0", "skill_G0"],
 		"20": ["weapon1", "weapon2", "weapon3"],
 		"30": ["weapon4", "weapon5", "weapon6", "weapon7"],
-		"40": ["m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level"],
+		"40": ["skill_M0", "skill_M1", "skill_M2", "skill_P0", "skill_P1", "skill_P2", "skill_G0", "skill_G1", "skill_G2"],
 		"50": ["weapon8", "weapon9", "weapon10"],
-		"60": ["m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level"],
+		"60": ["skill_M3", "skill_M4", "skill_M5", "skill_M6", "skill_M7", "skill_M8", "skill_M9", "skill_M10", "skill_M11", "skill_M12"],
 		"70": ["weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20"],
-		"80": ["p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"],
+		"80": ["skill_P3", "skill_P4", "skill_P5", "skill_P6", "skill_P7", "skill_P8", "skill_P9", "skill_P10", "skill_P11", "skill_P12"],
 		"90": ["weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30"],
-		"100": ["weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"],
-		"skill": ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level", "m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level", "p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level", "g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"],
-		"weapon": ["weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10", "weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20", "weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30", "weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"],
+		"100": [
+			"weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40",
+			"skill_G0", "skill_G1", "skill_G2", "skill_G3", "skill_G4", "skill_G5", "skill_G6", "skill_G7", "skill_G8", "skill_G9", "skill_G10", "skill_G11", "skill_G12"
+		],
+		"skill_MPG" : {"M": 0, "P": 13, "G": 26},
+		"skill": [
+			"skill_M0", "skill_M1", "skill_M2", "skill_M3", "skill_M4", "skill_M5", "skill_M6", "skill_M7", "skill_M8", "skill_M9", "skill_M10", "skill_M11", "skill_M12",
+			"skill_P0", "skill_P1", "skill_P2", "skill_P3", "skill_P4", "skill_P5", "skill_P6", "skill_P7", "skill_P8", "skill_P9", "skill_P10", "skill_P11", "skill_P12",
+			"skill_G0", "skill_G1", "skill_G2", "skill_G3", "skill_G4", "skill_G5", "skill_G6", "skill_G7", "skill_G8", "skill_G9", "skill_G10", "skill_G11", "skill_G12"
+		],
+		"weapon": [
+			"weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10",
+			"weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20",
+			"weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30",
+			"weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"
+		],
 		"skill_scroll": ["skill_scroll_10", "skill_scroll_30", "skill_scroll_100"],
 		"weights": [0.5, 0.3, 0.2],
 		"segment": [30, 60]
