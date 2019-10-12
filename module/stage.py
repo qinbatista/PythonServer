@@ -149,7 +149,9 @@ async def pass_tower(uid, stage, **kwargs):
 	if stage % 10 == 0:
 		reward = random.choices(population=pass_reward)[0]
 		if 'skill' in reward:
+			mpg = {'M': 0, 'P': 13, 'G': 26}
 			sid = reward.replace('skill', '')
+			enums.Skill
 			if await try_unlock_skill(uid, sid, **kwargs):
 				pass
 				# TODO
