@@ -33,7 +33,7 @@ async def level_up_star(uid, rid, **kwargs):
 	return common.mt(0, 'success', {'rid' : rid.value, 'star' : star + 1, 'seg' : segment - cost})
 
 async def get_all(uid, **kwargs):
-	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs)})
+	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs),"config":{'seg' : STANDARD_SEGMENT, 'exp_pot' : STANDARD_EXP_POT_COUNT}})
 
 async def get_config(**kwargs):
 	return common.mt(0, 'success', {'seg' : STANDARD_SEGMENT, 'exp_pot' : STANDARD_EXP_POT_COUNT})

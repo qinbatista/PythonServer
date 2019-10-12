@@ -28,8 +28,6 @@ def call_login(unique_id):
 			if token!="" and world!="":break
 def get_number():
 	return testing_people_number
-def call_get_all_info():
-	return module_2_get_all_data.get_all_info(token,world)
 
 def call_friend_dialog(get_all_friend_info):
 	module_3_friends.freind_dialog(token,world,get_all_friend_info)
@@ -71,10 +69,11 @@ def run_task(name):
 	global unique_id
 	unique_id = name
 	call_login(str(name))
-	info_list = call_get_all_info()#加载所有参数信息
+	info_list =  module_2_get_all_data.get_all_info(token,world)#加载所有参数信息
 	# module_13_achievement.achievement_dialog(token,world,info_list[0])
 	# module_15_summon.summon_dialog(token,world)#召唤所有
-	module_5_weapons.weapon_dialog(token,world,info_list[5])
+	# module_5_weapons.weapon_dialog(token,world,info_list[5])
+	# module_8_roles.role_dialog(token,world)
 	# dark_market()#*加载黑市信息
 	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
