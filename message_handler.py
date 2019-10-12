@@ -18,6 +18,7 @@ from module import armor
 from module import player
 from module import role
 from module import task
+from module import stage
 from datetime import datetime, timedelta
 
 
@@ -478,6 +479,22 @@ class MessageHandler:
 	async def _get_all_tower(self, data: dict) -> str:
 		return common.mt(0, 'success', {'tower_config': self._entry_consumables})
 
+	async def _enter_stage(self, data: dict) -> str:
+		data.update({'entry_consume': self._entry_consumables["stage"], 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player['player_level']['experience']})
+		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
+
+	async def _pass_stage(self, data: dict) -> str:
+		data.update({'pass_rewards': self._stage_reward["stage"]})
+		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
+
+	async def _enter_tower(self, data: dict) -> str:
+		data.update({'entry_consume': self._entry_consumables["tower"], 'exp_config': self._player['player_level']['experience']})
+		return await stage.enter_tower(data['data']['unique_id'], data['data']['stage'], **data)
+
+	async def _pass_tower(self, data: dict) -> str:
+		data.update({'pass_rewards': self._stage_reward["tower"]})
+		return await stage.pass_tower(data['data']['unique_id'], data['data']['stage'], **data)
+
 	###################### tasks ######################
 	async def _get_all_task(self, data: dict) -> str:
 		return await task.get_all_task(data['data']['unique_id'], **data)
@@ -741,6 +758,10 @@ FUNCTION_LIST = {
 	# TODO
 	###################### stage ######################
 	'get_all_tower': MessageHandler._get_all_tower,
+	'enter_stage': MessageHandler._enter_stage,
+	'pass_stage': MessageHandler._pass_stage,
+	'enter_tower': MessageHandler._enter_tower,
+	'pass_tower': MessageHandler._pass_tower,
 
 	###################### tasks ######################
 	'get_all_task': MessageHandler._get_all_task,

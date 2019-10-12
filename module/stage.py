@@ -65,9 +65,9 @@ async def pass_stage(uid, stage, **kwargs):
 		return common.mt(99, 'Parameter error')
 
 	pass_stages = []
-	pass_reward = kwargs['pass_reward']  # self._stage_reward["stage"]
-	stages = [int(x) for x in pass_reward.keys() if str.isdigit(x)]
-	pass_reward = pass_reward[str(max(stages))] if stage not in stages else pass_reward[str(stage)]
+	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["stage"]
+	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x)]
+	pass_reward = pass_rewards[str(max(stages))] if stage not in stages else pass_rewards[str(stage)]
 
 	p_exp = {'remaining': -1, 'reward': -1}
 	for key, value in pass_reward.items():
@@ -244,7 +244,7 @@ async def increase_weapon_segment(uid, wid, segment, **kwargs):
 	if data == ():
 		await common.execute_update(f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", "{wid}", "{segment}");', **kwargs)
 	else:
-		await common.execute_update(f'UPDATE weapon SET segment = segment + {segment} WHERE uid = "{uid}" AND wid = "{wid}"', **kwargs)
+		await common.execute_update(f'UPDATE weapon SET segment = segment + {segment} WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
 	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
 	return data
 
@@ -254,6 +254,6 @@ async def increase_role_segment(uid, rid, segment, **kwargs):
 	if data == ():
 		await common.execute_update(f'INSERT INTO role (uid, rid, segment) VALUES ("{uid}", "{rid}", "{segment}");', **kwargs)
 	else:
-		await common.execute_update(f'UPDATE role SET segment = segment + {segment} WHERE uid = "{uid}" AND wid = "{rid}"', **kwargs)
+		await common.execute_update(f'UPDATE role SET segment = segment + {segment} WHERE uid = "{uid}" AND wid = "{rid}";', **kwargs)
 	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
 	return data
