@@ -74,13 +74,13 @@ def run_task(name):
 	# module_15_summon.summon_dialog(token,world)#召唤所有
 	# module_5_weapons.weapon_dialog(token,world,info_list[5])
 	# module_8_roles.role_dialog(token,world)
+	module_7_lottery.get_random_item(token,world)
 	# dark_market()#*加载黑市信息
 	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
 	# skill_dialog(info_list[4])#技能界面
 	# weapon_dialog(info_list[5])#武器界面
 	# factory_dialog(info_list[6])#工厂界面
-	# get_random_item()#抽奖界面
 	# role_dialog()#角色界面
 	# family_dialog(info_list[9],info_list[19])
 	# stage_dialog(info_list[19])#关卡界面
