@@ -95,7 +95,8 @@ async def try_energy(uid, amount, **kwargs):
 		await execute_update(f'UPDATE timer SET time = "" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";')
 	if amount > 0:  # 购买能量
 		data = (await _decrease_energy(uid, 0, **kwargs))['data']
-		status, energy_data = await execute_update(f'UPDATE progress SET energy = energy + {amount} WHERE uid = "{uid}";', **kwargs)
+		status, _ = await execute_update(f'UPDATE progress SET energy = energy + {amount} WHERE uid = "{uid}";', **kwargs)
+		energy_data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
 		if status == 0:
 			return mt(status=99, message="Database operation error")
 		elif energy_data[0][0] >= max_energy:
