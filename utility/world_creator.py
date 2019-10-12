@@ -427,6 +427,23 @@ def creat_limits(cursor):
 	"""
 	cursor.execute(statement)
 
+def creat_progress(cursor):
+	statement = \
+	"""
+	CREATE TABLE `progress` (
+	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一id',
+	  `energy` smallint(6) DEFAULT 10 COMMENT '玩家体力值，默认10',
+	  `exp` smallint(6) DEFAULT 0 COMMENT '玩家经验值',
+	  `role` smallint(6) DEFAULT 0 COMMENT '拥有的角色数',
+	  `weapon` smallint(6) DEFAULT 0 COMMENT '拥有的武器数',
+	  `stage` smallint(6) DEFAULT 0 COMMENT '最高普通关卡',
+	  `towerstage` smallint(6) DEFAULT 0 COMMENT '冲塔最高关卡',
+	  `hangstage` smallint(6) DEFAULT 0 COMMENT '当前挂机的关卡',
+	  PRIMARY KEY (`uid`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+	cursor.execute(statement)
+
 def create_world(world):
 	c = pymysql.connect(host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8mb4', autocommit=True)
 	cursor = c.cursor()
@@ -474,10 +491,18 @@ def operating_test():
 	# create_table_armor(cursor)
 	# create_achievement(cursor)
 	# create_table_union_store(cursor)
-	create_check_in(cursor)
+	# create_check_in(cursor)
 	# create_table_player(cursor)
 	# create_table_families(cursor)
-	creat_limits(cursor)
+	# creat_limits(cursor)
+
+	# cursor.execute(f'DROP TABLE progress')
+	# creat_progress(cursor)
+	# cursor.execute(f'insert into progress (uid, exp) value ("1", 0)')
+	code = cursor.execute(f'insert into timer (uid, tid) value ("1", 11)')
+	print(code)
+	# for i in range(1, 100):
+	# 	cursor.execute(f'insert into progress (uid, exp) values ("{i}", 0)')
 
 
 if __name__ == '__main__':

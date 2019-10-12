@@ -480,7 +480,8 @@ class MessageHandler:
 		return common.mt(0, 'success', {'tower_config': self._entry_consumables})
 
 	async def _enter_stage(self, data: dict) -> str:
-		data.update({'entry_consume': self._entry_consumables["stage"], 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player['player_level']['experience']})
+		data.update({'player_energy': self._player['energy']})  # try_energy
+		data.update({'entry_consume': self._entry_consumables["stage"], 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
 		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_stage(self, data: dict) -> str:
@@ -488,7 +489,8 @@ class MessageHandler:
 		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _enter_tower(self, data: dict) -> str:
-		data.update({'entry_consume': self._entry_consumables["tower"], 'exp_config': self._player['player_level']['experience']})
+		data.update({'player_energy': self._player['energy']})  # try_energy
+		data.update({'entry_consume': self._entry_consumables["tower"], 'exp_config': self._player_experience['player_level']['experience']})
 		return await stage.enter_tower(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_tower(self, data: dict) -> str:
