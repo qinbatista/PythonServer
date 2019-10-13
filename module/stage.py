@@ -240,6 +240,36 @@ async def start_hang_up(uid, stage, **kwargs):
 		return common.mt(1, 'Repeated hang up successfully', {'start_hang_up_reward': start_hang_up_reward, 'hang_up_info': {'hang_stage': stage, 'tid': enums.Timer.HANG_UP_TIME.value, 'time': current_time}})
 
 
+# 获取挂机奖励
+async def get_hang_up_reward(uid, **kwargs):
+	"""
+	success ===> 0
+	# 0 - Settlement reward success
+	# 99 - Temporarily no on-hook record
+	"""
+	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+	hang_up_time = data[0][0]
+	if hang_up_time == '':
+		return common.mt(99, 'Temporarily no on-hook record')
+
+	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+	get_hang_up_rewards = []
+	_, hang_stage = await get_progress(uid, 'hangstage', **kwargs)
+	probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
+	hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
+	delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
+	minute = int(delta_time.total_seconds()) // 60
+	current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+	for iid, value in hang_stage_rewards.items():
+		# value[抽中得到的数目，分子， 分母]    minute是次数，value[0]单次奖励的数值
+		increment = value * minute if iid not in probability_reward else sum(random.choices(value[1] * [value[0]] + (value[2] - value[1]) * [0], k=minute))  # 耗内存，省时间
+		# increment = value * minute if iid not in probability_reward else sum([value[0] * int(random.randint(0, value[2]) - value[1] < 0) for i in range(minute)])  # 耗时间，省内存
+		_, value = await common.try_item(uid, enums.Item(int(iid)), increment, **kwargs)
+		get_hang_up_rewards.append({'iid': iid, 'value': value, 'increment': increment})
+	await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+	return common.mt(0, 'Settlement reward success', {'get_hang_up_rewards': get_hang_up_rewards, 'hang_up_info': {'hang_stage': hang_stage, 'tid': enums.Timer.HANG_UP_TIME.value, 'time': current_time}})
+
+
 ############################################ 私有方法 ############################################
 
 

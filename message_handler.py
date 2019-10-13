@@ -501,6 +501,10 @@ class MessageHandler:
 		data.update({'hang_rewards': self._hang_reward})
 		return await stage.start_hang_up(data['data']['unique_id'], data['data']['stage'], **data)
 
+	async def _get_hang_up_reward(self, data: dict) -> str:
+		data.update({'hang_rewards': self._hang_reward})
+		return await stage.get_hang_up_reward(data['data']['unique_id'], **data)
+
 	###################### tasks ######################
 	async def _get_all_task(self, data: dict) -> str:
 		return await task.get_all_task(data['data']['unique_id'], **data)
@@ -769,6 +773,7 @@ FUNCTION_LIST = {
 	'enter_tower': MessageHandler._enter_tower,
 	'pass_tower': MessageHandler._pass_tower,
 	'start_hang_up': MessageHandler._start_hang_up,
+	'get_hang_up_reward': MessageHandler._get_hang_up_reward,
 
 	###################### tasks ######################
 	'get_all_task': MessageHandler._get_all_task,
