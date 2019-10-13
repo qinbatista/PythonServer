@@ -32,7 +32,7 @@ async def leave(uid, **kwargs):
 	if role == enums.FamilyRole.OWNER: return common.mt(98, 'owner can not leave family')
 	await _remove_from_family(uid, name, **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
-	await _record_change(name, f'{gn} has left.', **kwargs)
+	await _record_family_change(name, f'{gn} has left.', **kwargs)
 	return common.mt(0, 'left family')
 
 async def remove_user(uid, gn_target, **kwargs):
@@ -46,7 +46,7 @@ async def remove_user(uid, gn_target, **kwargs):
 	if not _check_remove_permissions(role, role_target): return common.mt(97, 'insufficient permissions')
 	await _remove_from_family(uid_target, name, **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
-	await _record_change(name, f'{gn_target} was removed by {gn}.', **kwargs)
+	await _record_family_change(name, f'{gn_target} was removed by {gn}.', **kwargs)
 	return common.mt(0, 'removed user', {'gn' : gn_target})
 
 async def invite_user(uid, gn_target, **kwargs):
@@ -76,7 +76,7 @@ async def respond(uid, nonce, **kwargs):
 	if not exists: return common.mt(97, 'family no longer exists')
 	await _add_to_family(uid_target, name, **kwargs)
 	gn_target = await common.get_gn(uid_target, **kwargs)
-	await _record_change(name, f'{gn_target} has joined.', **kwargs)
+	await _record_family_change(name, f'{gn_target} has joined.', **kwargs)
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3]})
 
 async def get_all(uid, **kwargs):
@@ -99,7 +99,7 @@ async def purchase(uid, item, **kwargs):
 	if not can_pay: return common.mt(97, 'insufficient funds')
 	_, item_remaining = await common.try_item(uid, i[1], i[2], **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
-	await _record_change(name, f'{gn} purchased {item}.', **kwargs)
+	await _record_family_change(name, f'{gn} purchased {item}.', **kwargs)
 	return common.mt(0, 'success', { enums.Group.ITEM.value : [ {'iid' : i[1], 'value' : item_remaining}, {'iid' : c[1], 'value' : cost_remaining}]})
 
 async def set_notice(uid, msg, **kwargs):
@@ -131,7 +131,7 @@ async def set_role(uid, gn_target, role, **kwargs):
 	if not _check_set_role_permissions(actors_role, targets_role, new_role): return common.mt(96, 'insufficient permissions')
 	await common.execute(f'UPDATE familyrole SET role = {new_role.value} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
-	await _record_change(name, f'{gn} set {gn_target} role to {role.name}.', **kwargs)
+	await _record_family_change(name, f'{gn} set {gn_target} role to {role.name}.', **kwargs)
 	return common.mt(0, 'success', {'gn' : gn_target, 'role' : new_role.value})
 
 async def change_name(uid, new_name, **kwargs):
