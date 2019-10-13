@@ -4,6 +4,8 @@ stage.py
 
 from module import enums
 from module import common
+from datetime import datetime, timedelta
+import time
 import random
 
 
@@ -196,6 +198,51 @@ async def pass_tower(uid, stage, **kwargs):
 				pass_towers.append({'iid': key, 'remaining': data[0][0], 'reward': value})
 
 	return common.mt(0, 'success', data={'pass_stages': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
+
+
+# 启动挂机方法
+async def start_hang_up(uid, stage, **kwargs):
+	"""
+	success ===> 0 , 1
+	# 0 - hang up success
+	# 1 - Repeated hang up successfully
+	# 98 - database operating error
+	# 99 - Parameter error
+	1分钟奖励有可能奖励1颗钻石，30颗金币，10个铁
+	minute = 1 ==> reward 0 or 1 diamond and 30 coin and 10 iron
+	minute = 2 ==> reward 0 or 1 or 2 diamond and 60 coin and 20 iron
+	"""
+	# 挂机方法是挂普通关卡
+	can_s, stage_s = await get_progress(uid, 'stage', **kwargs)
+	if not can_s or stage <= 0 or stage_s < stage:
+		return common.mt(99, 'Parameter error')
+
+	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+	hang_up_time = data[0][0]
+
+	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+	if hang_up_time == '':
+		await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+		await common.execute_update(f'UPDATE progress SET hangstage = "{stage}" WHERE uid = "{uid}";', **kwargs)
+		return common.mt(0, 'hang up success', {'hang_up_info': {'hang_stage': stage, 'tid': enums.Timer.HANG_UP_TIME.value, 'time': current_time}})
+	else:
+		start_hang_up_reward = []
+		_, hang_stage = await get_progress(uid, 'hangstage', **kwargs)
+		probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
+		hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
+		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
+		minute = int(delta_time.total_seconds()) // 60
+		current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+		for iid, value in hang_stage_rewards.items():
+			# value[抽中得到的数目，分子， 分母]    minute是次数，value[0]单次奖励的数值
+			increment = value * minute if iid not in probability_reward else sum(random.choices(value[1]*[value[0]] + (value[2] - value[1])*[0], k=minute))  # 耗内存，省时间
+			# increment = value * minute if iid not in probability_reward else sum([value[0] * int(random.randint(0, value[2]) - value[1] < 0) for i in range(minute)])  # 耗时间，省内存
+			_, value = await common.try_item(uid, enums.Item(int(iid)), increment, **kwargs)
+			start_hang_up_reward.append({'iid': iid, 'value': value, 'increment': increment})
+		await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+		await common.execute_update(f'UPDATE progress SET hangstage = "{stage}" WHERE uid = "{uid}";', **kwargs)
+		return common.mt(1, 'Repeated hang up successfully', {'start_hang_up_reward': start_hang_up_reward, 'hang_up_info': {'hang_stage': stage, 'tid': enums.Timer.HANG_UP_TIME.value, 'time': current_time}})
+
 
 ############################################ 私有方法 ############################################
 

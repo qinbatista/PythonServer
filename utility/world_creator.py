@@ -497,7 +497,7 @@ def operating_test():
 	# creat_limits(cursor)
 
 	# cursor.execute(f'DROP TABLE progress')
-	# creat_progress(cursor)
+	creat_progress(cursor)
 	# cursor.execute(f'insert into progress (uid, exp) value ("1", 0)')
 	# code = cursor.execute(f'insert into timer (uid, tid) value ("1", 11)')
 	cursor.execute('select iid from item where uid = "1";')
