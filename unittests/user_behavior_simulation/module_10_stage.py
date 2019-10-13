@@ -50,11 +50,17 @@ def pass_tower():
 	response = send_tcp_message({'world': world, 'function': 'pass_tower', 'data': {'token': token, 'stage': 1}})
 	print(response)
 
+@ login_decoration
+def start_hang_up():
+	response = send_tcp_message({'world': world, 'function': 'start_hang_up', 'data': {'token': token, 'stage': 1}})
+	print(response)
+
 
 if __name__ == '__main__':
 	# enter_stage()
 	# pass_stage()
-	enter_tower()
+	# enter_tower()
 	# pass_tower()
+	start_hang_up()
 
 
