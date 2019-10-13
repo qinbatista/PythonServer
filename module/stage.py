@@ -146,7 +146,7 @@ async def pass_tower(uid, stage, **kwargs):
 
 	p_stage = {'finally': stage_s, 'vary': 0}
 	if stage_s + 1 == stage:  # 通过新关卡
-		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"', **kwargs)
+		await common.execute_update(f'UPDATE progress SET towerstage = {stage} WHERE uid = "{uid}"', **kwargs)
 		p_stage['finally'] = stage
 		p_stage['vary'] = 1
 

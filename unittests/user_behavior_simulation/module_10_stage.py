@@ -42,19 +42,19 @@ def pass_stage():
 
 @ login_decoration
 def enter_tower():
-	response = send_tcp_message({'world': world, 'function': 'pass_stage', 'data': {'token': token, 'stage': 1}})
+	response = send_tcp_message({'world': world, 'function': 'enter_tower', 'data': {'token': token, 'stage': 1}})
 	print(response)
 
 @ login_decoration
 def pass_tower():
-	response = send_tcp_message({'world': world, 'function': 'pass_stage', 'data': {'token': token, 'stage': 1}})
+	response = send_tcp_message({'world': world, 'function': 'pass_tower', 'data': {'token': token, 'stage': 1}})
 	print(response)
 
 
 if __name__ == '__main__':
 	# enter_stage()
-	pass_stage()
-	# enter_tower()
+	# pass_stage()
+	enter_tower()
 	# pass_tower()
 
 
