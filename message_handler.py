@@ -482,6 +482,7 @@ class MessageHandler:
 	async def _enter_stage(self, data: dict) -> str:
 		data.update({'player_energy': self._player['energy']})  # try_energy
 		data.update({'entry_consume': self._entry_consumables["stage"], 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
+		data['monster_config'] = self._monster_config
 		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_stage(self, data: dict) -> str:

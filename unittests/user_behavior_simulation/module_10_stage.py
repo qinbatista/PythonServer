@@ -54,11 +54,11 @@ def get_hang_up_reward(**kwargs):
 
 
 if __name__ == '__main__':
-	# enter_stage()
+	enter_stage()
 	# pass_stage()
 	# enter_tower()
 	# pass_tower()
 	# start_hang_up()
-	get_hang_up_reward()
+	# get_hang_up_reward()
 
 
