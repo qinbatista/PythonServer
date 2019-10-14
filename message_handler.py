@@ -524,14 +524,14 @@ class MessageHandler:
 			"refresh_time": "2019-10-10 12:41:52",
 			"refreshable_quantity": 3,
 			"items": [
-				{"item":1,"quantity":100, "currency_item":5,"quantity":100},
-				{"item":2,"quantity":1200,"currency_item":5,"quantity":100},
-				{"item":3,"quantity":3100,"currency_item":5,"quantity":100},
-				{"item":4,"quantity":100, "currency_item":5,"quantity":100},
-				{"item":5,"quantity":1200,"currency_imte":5,"quantity":100},
-				{"item":6,"quantity":1200,"currency_imte":5,"quantity":100},
-				{"item":7,"quantity":1200,"currency_imte":5,"quantity":100},
-				{"item":8,"quantity":1200,"currency_imte":5,"quantity":100}
+				{"group":1,"item":1,"quantity":100, "currency_item":5,"quantity":100},
+				{"group":2,"item":2,"quantity":1200,"currency_item":5,"quantity":100},
+				{"group":3,"item":3,"quantity":3100,"currency_item":5,"quantity":100},
+				{"group":0,"item":4,"quantity":100, "currency_item":5,"quantity":100},
+				{"group":4,"item":5,"quantity":1200,"currency_imte":5,"quantity":100},
+				{"group":1,"item":6,"quantity":1200,"currency_imte":5,"quantity":100},
+				{"group":1,"item":7,"quantity":1200,"currency_imte":5,"quantity":100},
+				{"group":1,"item":8,"quantity":1200,"currency_imte":5,"quantity":100}
 			]
 		}
 		return common.mt(0, 'success', {'darkmarket': darkmarket})
