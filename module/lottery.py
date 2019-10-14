@@ -7,36 +7,6 @@ from module import common
 from module import summoning
 from module import enums
 
-unused = \
-{
-	"WEAPON" : {
-		"weights" : {
-			"BASIC" : [0.6, 0.4]
-		},
-		"rewards":[
-			[1, 2, 3],
-			[4, 5, 6, 7]
-			]
-	},
-	"SKILL" : {
-		"weights" : {
-			"BASIC" : [0.6, 0.4]
-		},
-		"rewards":[
-			[1, 2, 3],
-			[4, 5, 6, 7]
-			]
-	},
-	"ROLE" : {
-		"weights" : {
-			"BASIC" : [0.6, 0.4]
-		},
-		"rewards":[
-			[1, 2, 3],
-			[4, 5, 6, 7]
-			]
-	}
-}
 STANDARD_SEG_COUNT = 30
 
 SWITCH = {}
