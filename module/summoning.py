@@ -22,7 +22,8 @@ async def summon_multi(uid, item, tier, rewardgroup, num_times = 10, **kwargs):
 ##############################################################
 
 async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
-	can_pay, remaining = await common.try_item(uid, item, -100, **kwargs)
+	cost = kwargs['config']['lottery']['random_gift'][tier.name]['cost'][f'{enums.Group.ITEM.value}:{item.value}']
+	can_pay, remaining = await common.try_item(uid, item, -cost, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient materials')
 	new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
 	return await _response_factory(uid, rewardgroup, new, reward, item, remaining, **kwargs)
