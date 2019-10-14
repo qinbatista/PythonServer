@@ -59,6 +59,7 @@ class MessageHandler:
 		self._player_experience = d['player_experience']
 		self._monster_config = d['monster_config']
 		self._level_enemy_layouts = d['level_enemy_layouts']
+		self._level_enemy_layouts_tower = d['level_enemy_layouts_tower']
 		self._acheviement = d['acheviement']
 		self._task = d['task']
 		self._check_in = d['check_in']
@@ -480,7 +481,9 @@ class MessageHandler:
 		return common.mt(0, 'success', {'tower_config': self._entry_consumables})
 
 	async def _enter_stage(self, data: dict) -> str:
-		data.update({'entry_consume': self._entry_consumables["stage"], 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player['player_level']['experience']})
+		data.update({'player_energy': self._player['energy']})  # try_energy
+		data.update({'entry_consume': self._entry_consumables["stage"], 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
+		data['monster_config'] = self._monster_config
 		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_stage(self, data: dict) -> str:
@@ -488,12 +491,22 @@ class MessageHandler:
 		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _enter_tower(self, data: dict) -> str:
-		data.update({'entry_consume': self._entry_consumables["tower"], 'exp_config': self._player['player_level']['experience']})
+		data.update({'player_energy': self._player['energy']})  # try_energy
+		data.update({'entry_consume': self._entry_consumables["tower"], 'enemy_layouts': self._level_enemy_layouts_tower['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
+		data['monster_config'] = self._monster_config
 		return await stage.enter_tower(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_tower(self, data: dict) -> str:
 		data.update({'pass_rewards': self._stage_reward["tower"]})
 		return await stage.pass_tower(data['data']['unique_id'], data['data']['stage'], **data)
+
+	async def _start_hang_up(self, data: dict) -> str:
+		data.update({'hang_rewards': self._hang_reward})
+		return await stage.start_hang_up(data['data']['unique_id'], data['data']['stage'], **data)
+
+	async def _get_hang_up_reward(self, data: dict) -> str:
+		data.update({'hang_rewards': self._hang_reward})
+		return await stage.get_hang_up_reward(data['data']['unique_id'], **data)
 
 	###################### tasks ######################
 	async def _get_all_task(self, data: dict) -> str:
@@ -762,6 +775,8 @@ FUNCTION_LIST = {
 	'pass_stage': MessageHandler._pass_stage,
 	'enter_tower': MessageHandler._enter_tower,
 	'pass_tower': MessageHandler._pass_tower,
+	'start_hang_up': MessageHandler._start_hang_up,
+	'get_hang_up_reward': MessageHandler._get_hang_up_reward,
 
 	###################### tasks ######################
 	'get_all_task': MessageHandler._get_all_task,
