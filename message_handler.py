@@ -327,8 +327,8 @@ class MessageHandler:
 	async def _fortune_wheel_pro(self, data: dict) -> str:
 		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.PRO, enums.Item(int(data['data']['item'])), **data)
 
-	async def _get_config_info_lottery(self, data: dict) -> str:
-		return 'function'
+	async def _get_config_lottery(self, data: dict) -> str:
+		return data['config']['lottery']
 
 	###################### skill.py ######################
 	async def _get_skill(self, data: dict) -> str:
@@ -708,8 +708,7 @@ FUNCTION_LIST = {
 	###################### lottery.py ######################
 	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
 	'fortune_wheel_pro' : MessageHandler._fortune_wheel_pro,
-	# TODO
-	'get_config_info_lottery' : MessageHandler._get_config_info_lottery,
+	'get_config_lottery' : MessageHandler._get_config_lottery,
 
 	###################### skill.py ######################
 	'get_skill' : MessageHandler._get_skill,
