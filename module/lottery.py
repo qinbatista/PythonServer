@@ -38,7 +38,7 @@ L = \
 	}
 }
 # wep = 0, skill = 1, role = 2, item = 3
-F = \
+unused = \
 {
 	"weights" : {
 		"BASIC" : [0.6, 0.1, 0.25, 0.05]
@@ -68,12 +68,12 @@ async def random_gift(uid, tier, rewardgroup, **kwargs):
 async def fortune_wheel(uid, tier, item, **kwargs):
 	can_pay, remaining = await common.try_item(uid, item, -100, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient materials')
-	t = (random.choices(range(len(F['weights'][tier.name])), F['weights'][tier.name]))[0]
-	giftcode = (random.choices(F['items'][t]))[0]
-	group, enum_id = giftcode.split(',')
+	t = (random.choices(range(len(kwargs['config']['lottery']['fortune_wheel']['weights'][tier.name])), kwargs['config']['lottery']['fortune_wheel']['weights'][tier.name]))[0]
+	giftcode = (random.choices(kwargs['config']['lottery']['fortune_wheel']['items'][t]))[0]
+	group, enum_id = giftcode.split(':')
 	if enums.Group(int(group)) == enums.Group.ITEM:
-		_, quantity = await common.try_item(uid, enums.Item(int(enum_id)), F['rewards'][tier.name][giftcode], **kwargs)
-		return common.mt(5, 'get item', {'remaining' : {'cost_item' : item.value, 'cost_quantity' : remaining, 'group_id' : group, 'enum_id' : enum_id, 'item_quantity' : quantity}, 'reward' : {'group_id' : group, 'enum_id' : enum_id, 'item_quantity' : F['rewards'][tier.name][giftcode]}})
+		_, quantity = await common.try_item(uid, enums.Item(int(enum_id)), kwargs['config']['lottery']['fortune_wheel']['rewards'][tier.name][giftcode], **kwargs)
+		return common.mt(5, 'get item', {'remaining' : {'cost_item' : item.value, 'cost_quantity' : remaining, 'group_id' : group, 'enum_id' : enum_id, 'item_quantity' : quantity}, 'reward' : {'group_id' : group, 'enum_id' : enum_id, 'item_quantity' : kwargs['config']['lottery']['fortune_wheel']['rewards'][tier.name][giftcode]}})
 	else:
 		new, reward = await SWITCH[enums.Group(int(group))](uid, int(enum_id), **kwargs)
 		return await summoning._response_factory(uid, enums.Group(int(group)), new, reward, item, remaining, **kwargs)
