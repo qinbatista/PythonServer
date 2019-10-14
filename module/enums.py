@@ -284,4 +284,19 @@ class Progress(enum.IntEnum):
 	TOWER_STAGE = 2
 	ENERGY = 3
 
+class Task(enum.IntEnum):
+	login = 1
+	check_in = 2
+	role_level_up = 3
+	weapon_level_up = 4
+	pass_main_stage = 5
+	pass_special_stage = 6
+	pass_world_boss = 7
+	basic_summoning = 8
+	pro_summoning = 9
+	check_factory = 10
+	get_friend_gift = 11
+	family_check_in = 12
+	done_10_task = 13
+
 

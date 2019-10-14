@@ -22,10 +22,7 @@ async def get_achievement_reward(uid, **kwargs):
 	config = kwargs["config"][str.lower(enums.Achievement.TOTAL_LOGIN.name)]
 	quantity = config["quantity"][::-1]
 	amount = config["diamond"][::-1]
-	print("quantity="+str(quantity))
-	print("amount="+str(amount))
 	data = await common.execute(f'SELECT value, reward FROM achievement WHERE uid = "{uid}" AND aid = "{kwargs["data"]["achievement_id"]}"',**kwargs)
-	print("data = "+str(data))
 	for qindex,my_quantity in enumerate(quantity):
 		if data[0][0]>=my_quantity:
 			for aindex,myamount in enumerate(amount):

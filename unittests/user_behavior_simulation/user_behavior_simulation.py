@@ -13,6 +13,7 @@ import module_11_mail
 import module_13_achievement
 import module_14_vip
 import module_15_summon
+import module_16_daily_task
 import multiprocessing
 import time
 from datetime import datetime, timedelta
@@ -74,7 +75,8 @@ def run_task(name):
 	# module_15_summon.summon_dialog(token,world)#召唤所有
 	# module_5_weapons.weapon_dialog(token,world,info_list[5])
 	# module_8_roles.role_dialog(token,world)
-	module_7_lottery.get_random_item(token,world)
+	# module_7_lottery.get_random_item(token,world)
+	# module_16_daily_task.task_dialog(token,world,info_list[5])
 	# dark_market()#*加载黑市信息
 	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
