@@ -219,7 +219,7 @@ async def pass_tower(uid, stage, **kwargs):
 				data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 				pass_towers.append({'iid': key, 'remaining': data[0][0], 'reward': value})
 
-	return common.mt(0, 'success', data={'pass_stages': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
+	return common.mt(0, 'success', data={'pass_towers': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
 
 
 # 启动挂机方法
