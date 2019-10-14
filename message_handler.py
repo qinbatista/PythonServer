@@ -510,11 +510,13 @@ class MessageHandler:
 
 	###################### tasks ######################
 	async def _get_all_task(self, data: dict) -> str:
-		return await task.get_all_task(data['data']['unique_id'], **data)
+		data.update({"config":self._task})
+		return await task.get_all_task(data['data']['unique_id'],**data)
 		# return common.mt(0, 'success', {'tasks': [{'tid': 1, 'value': 1, 'reward': 0, 'timer': '2019-10-05'}, {'tid': 2, 'value': 1, 'reward': 0, 'timer': '2019-10-06'}]})
 
-
-
+	async def _get_task_reward(self, data: dict) -> str:
+		data.update({"config":self._task},)
+		return await task.get_task_reward(data['data']['unique_id'],data['data']['task_id'], **data)
 
 	# TODO 新增
 	async def _automatically_refresh_store(self, data: dict) -> str:
@@ -780,7 +782,7 @@ FUNCTION_LIST = {
 
 	###################### tasks ######################
 	'get_all_task': MessageHandler._get_all_task,
-
+	'get_task_reward': MessageHandler._get_task_reward,
 
 	# TODO 新增
 	'automatically_refresh_store': MessageHandler._automatically_refresh_store,
