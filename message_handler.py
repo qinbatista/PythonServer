@@ -59,6 +59,7 @@ class MessageHandler:
 		self._player_experience = d['player_experience']
 		self._monster_config = d['monster_config']
 		self._level_enemy_layouts = d['level_enemy_layouts']
+		self._level_enemy_layouts_tower = d['level_enemy_layouts_tower']
 		self._acheviement = d['acheviement']
 		self._task = d['task']
 		self._check_in = d['check_in']
@@ -491,7 +492,8 @@ class MessageHandler:
 
 	async def _enter_tower(self, data: dict) -> str:
 		data.update({'player_energy': self._player['energy']})  # try_energy
-		data.update({'entry_consume': self._entry_consumables["tower"], 'exp_config': self._player_experience['player_level']['experience']})
+		data.update({'entry_consume': self._entry_consumables["tower"], 'enemy_layouts': self._level_enemy_layouts_tower['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
+		data['monster_config'] = self._monster_config
 		return await stage.enter_tower(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_tower(self, data: dict) -> str:

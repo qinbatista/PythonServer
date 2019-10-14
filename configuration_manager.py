@@ -32,6 +32,7 @@ MYSQL_DATA = loc() + '/configuration/{}/server/mysql_data_config.json'
 WORLD_BOSS = loc() + '/configuration/{}/server/world_boss_config.json'
 HANG_REWARD = loc() + '/configuration/{}/server/hang_reward_config.json'
 ENEMY_LAYOUT = loc() + '/configuration/{}/client/level_enemy_layouts_config.json'
+ENEMY_LAYOUT_TOWER = loc() + '/configuration/{}/client/level_enemy_layouts_config_tower.json'
 SERVER_CONFIG = loc() + '/configuration/{}/server/server_config.json'
 ENTRY_CONSUMABLES = loc() + '/configuration/{}/server/entry_consumables_config.json'
 ANNOUNCEMENT = loc() + '/configuration/{}/announcement_info.json'
@@ -53,6 +54,7 @@ class ConfigurationManager:
 	def _refresh_configurations(self):
 		self._read_version()
 		self._read_level_enemy_layouts_config()
+		self._read_level_enemy_layouts_config_tower()
 		self._read_monster_config()
 		self._read_stage_reward_config()
 		self._read_hang_reward_config()
@@ -144,6 +146,7 @@ class ConfigurationManager:
 			"mall": self._mall_config, "announcement": self._announcement_info,
 			'player_experience': self._player_experience, 'monster_config': self._monster_config,
 			'level_enemy_layouts': self._level_enemy_layouts_config,
+			'level_enemy_layouts_tower': self._level_enemy_layouts_config_tower,
 			'acheviement': self._acheviement_config, 'task': self._task_config,
 			'check_in': self._check_in_config,
 			'vip_config': self._vip_config
@@ -151,6 +154,9 @@ class ConfigurationManager:
 
 	def _read_level_enemy_layouts_config(self):
 		self._level_enemy_layouts_config = json.load(open(ENEMY_LAYOUT.format(self._cv), encoding = 'utf-8'))
+
+	def _read_level_enemy_layouts_config_tower(self):
+		self._level_enemy_layouts_config_tower = json.load(open(ENEMY_LAYOUT_TOWER.format(self._cv), encoding = 'utf-8'))
 
 	def _read_entry_consumables_config(self):
 		self._entry_consumables_config = json.load(open(ENTRY_CONSUMABLES.format(self._cv), encoding = 'utf-8'))

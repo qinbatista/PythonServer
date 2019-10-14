@@ -109,7 +109,19 @@ async def enter_tower(uid, stage, **kwargs):
 	# 99 - parameter error
 	enter_towers = []
 	energy_consume = 2  # 虚拟消耗能量为2
-	entry_consume = kwargs['entry_consume']  # self._entry_consumables["tower"]
+	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
+	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
+	monster_config = kwargs['monster_config']  # self._monster_config
+	enemy_layout = enemy_layouts[-1]['enemyLayout'] if stage > len(enemy_layouts) else enemy_layouts[stage - 1]['enemyLayout']
+	enemy_list = []
+	key_words = []
+	for layout in enemy_layout:
+		for enemy in layout['enemyList']:
+			enemy_name = enemy['enemysPrefString']
+			if enemy_name not in key_words:
+				key_words.append(enemy_name)
+				enemy_list.append({enemy_name: monster_config[enemy_name]})
+	del key_words
 
 	can_s, stage_s = await get_progress(uid, 'towerstage', **kwargs)
 	if not can_s or stage <= 0 or stage > stage_s + 1:
@@ -143,7 +155,7 @@ async def enter_tower(uid, stage, **kwargs):
 		enter_towers.append({'iid': iid, 'value': data[0][0], 'consume': entry_consume[stage][iid]})
 
 	_, exp_info = await increase_exp(uid, 0, **kwargs)
-	return common.mt(0, 'success', {'enter_towers': enter_towers, 'exp_info': exp_info, 'energy_data': energy_data['data']})
+	return common.mt(0, 'success', {'enter_towers': enter_towers, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy_data': energy_data['data'], 'monster': enemy_list})
 
 
 # 通过闯塔关卡
