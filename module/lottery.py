@@ -7,7 +7,7 @@ from module import common
 from module import summoning
 from module import enums
 
-L = \
+unused = \
 {
 	"WEAPON" : {
 		"weights" : {
@@ -37,14 +37,13 @@ L = \
 			]
 	}
 }
-# wep = 0, skill = 1, role = 2, item = 3
 STANDARD_SEG_COUNT = 30
 
 SWITCH = {}
 
 async def random_gift(uid, tier, rewardgroup, **kwargs):
-	t = (random.choices(range(len(L[rewardgroup.name]['weights'][tier.name])), L[rewardgroup.name]['weights'][tier.name]))[0]
-	gift = (random.choices(L[rewardgroup.name]['rewards'][t]))[0]
+	t = (random.choices(range(len(kwargs['config']['lottery']['random_gift'][rewardgroup.name]['weights'][tier.name])), kwargs['config']['lottery']['random_gift'][rewardgroup.name]['weights'][tier.name]))[0]
+	gift = (random.choices(kwargs['config']['lottery']['random_gift'][rewardgroup.name]['rewards'][t]))[0]
 	return await SWITCH[rewardgroup](uid, gift, **kwargs)
 
 async def fortune_wheel(uid, tier, item, **kwargs):
