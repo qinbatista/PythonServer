@@ -26,7 +26,7 @@ def get_all_task(token,world):
 
 def get_task_reward(token,world):
 	print_module("[get_task_reward]")
-	response = send_tcp_message({'world' : world, 'function' : 'get_task_reward', 'data' : {'token' : token,"task_id":3}})#能量包，1是1张， 2是3张，3是10张
+	response = send_tcp_message({'world' : world, 'function' : 'get_task_reward', 'data' : {'token' : token,"task_id":1}})#能量包，1是1张， 2是3张，3是10张
 	print_method("[get_task_reward]"+str(response))
 
 def task_dialog(token,world,respons):

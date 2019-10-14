@@ -21,15 +21,20 @@ def login_decoration(func):
 		func(**{'token': response['data']['token'], 'world': 0})
 	return wrapper
 
-
-@ login_decoration
 def enter_stage(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': 1}})
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': random.randint(1,20)}})
 	print(response)
 
-@ login_decoration
 def pass_stage(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'pass_stage', 'data': {'token': kwargs['token'], 'stage': 1}})
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'pass_stage', 'data': {'token': kwargs['token'], 'stage': random.randint(1,20)}})
+	print(response)
+
+def start_hang_up(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'start_hang_up', 'data': {'token': kwargs['token'], 'stage': random.randint(1,20)}})
+	print(response)
+
+def get_hang_up_reward(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_hang_up_reward', 'data': {'token': kwargs['token'], 'stage': random.randint(1,20)}})
 	print(response)
 
 @ login_decoration
@@ -42,23 +47,14 @@ def pass_tower(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'pass_tower', 'data': {'token': kwargs['token'], 'stage': 1}})
 	print(response)
 
-@ login_decoration
-def start_hang_up(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'start_hang_up', 'data': {'token': kwargs['token'], 'stage': 1}})
-	print(response)
 
-@ login_decoration
-def get_hang_up_reward(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_hang_up_reward', 'data': {'token': kwargs['token'], 'stage': 1}})
-	print(response)
-
+def stage_dialog(token,world,info_list):
+	enter_stage(**{"world":world,"token":token})
+	pass_stage(**{"world":world,"token":token})
+	start_hang_up(**{"world":world,"token":token})
+	get_hang_up_reward(**{"world":world,"token":token})
 
 if __name__ == '__main__':
-	# enter_stage()
-	# pass_stage()
-	enter_tower()
-	# pass_tower()
-	# start_hang_up()
-	# get_hang_up_reward()
+	pass
 
 
