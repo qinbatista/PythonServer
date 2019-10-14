@@ -31,10 +31,10 @@ async def enter_stage(uid, stage, **kwargs):
 				enemy_list.append({enemy_name: monster_config[enemy_name]})
 	del key_words
 
-	can_s, stage_s = await get_progress(uid, 'stage', **kwargs)
-	if not can_s or stage <= 0 or stage > stage_s + 1:
+	stage_s = await get_progress(uid, 'stage', **kwargs)
+	if stage <= 0 or stage > stage_s + 1:
 		return common.mt(99, 'Parameter error')
-	_, exp = await get_progress(uid, 'exp', **kwargs)
+	exp = await get_progress(uid, 'exp', **kwargs)
 
 	stages = [int(x) for x in entry_consume.keys() if x.isdigit()]
 	if stage not in stages: stage = max(stages)
@@ -45,6 +45,9 @@ async def enter_stage(uid, stage, **kwargs):
 
 	for i, iid in enumerate(iid_s):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
+		if data == ():
+			await common.execute_update(f'INSERT INTO item (uid, iid) VALUES ("{uid}", "{iid}");', **kwargs)
+			data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
 		values[i] += data[0][0]
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
@@ -62,6 +65,7 @@ async def enter_stage(uid, stage, **kwargs):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		enter_stages.append({'iid': iid, 'value': data[0][0], 'consume': entry_consume[stage][iid]})
 
+	print('测试数组越界问题')
 	_, exp_info = await increase_exp(uid, 0, **kwargs)
 	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy_data': energy_data['data'], 'monster': enemy_list})
 
@@ -72,8 +76,8 @@ async def pass_stage(uid, stage, **kwargs):
 	# 0 : success
 	# 99 : Parameter error
 	# print(f'stage:{stage}, type:{type(stage)}')
-	can_s, stage_s = await get_progress(uid, 'stage', **kwargs)
-	if not can_s or stage <= 0 or stage_s + 1 < stage:
+	stage_s = await get_progress(uid, 'stage', **kwargs)
+	if stage <= 0 or stage_s + 1 < stage:
 		return common.mt(99, 'Parameter error')
 
 	pass_stages = []
@@ -89,9 +93,12 @@ async def pass_stage(uid, stage, **kwargs):
 			p_exp['remaining'] = exp_data[0][0]
 			p_exp['reward'] = value
 		else:
-			await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 			data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
-			pass_stages.append({'iid': key, 'remaining': data[0][0], 'reward': value})
+			if data == ():
+				await common.execute_update(f'INSERT INTO item (uid, iid) VALUES ("{uid}", "{key}");', **kwargs)
+				data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
+			await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
+			pass_stages.append({'iid': key, 'remaining': data[0][0] + value, 'reward': value})
 
 	p_stage = {'finally': stage_s, 'vary': 0}
 	if stage_s + 1 == stage:  # 通过新关卡
@@ -123,10 +130,10 @@ async def enter_tower(uid, stage, **kwargs):
 				enemy_list.append({enemy_name: monster_config[enemy_name]})
 	del key_words
 
-	can_s, stage_s = await get_progress(uid, 'towerstage', **kwargs)
-	if not can_s or stage <= 0 or stage > stage_s + 1:
+	stage_s = await get_progress(uid, 'towerstage', **kwargs)
+	if stage <= 0 or stage > stage_s + 1:
 		return common.mt(99, 'Parameter error')
-	_, exp = await get_progress(uid, 'exp', **kwargs)
+	exp = await get_progress(uid, 'exp', **kwargs)
 
 	stages = [int(x) for x in entry_consume.keys() if x.isdigit()]
 	if stage not in stages: stage = max(stages)
@@ -137,6 +144,9 @@ async def enter_tower(uid, stage, **kwargs):
 
 	for i, iid in enumerate(iid_s):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
+		if data == ():
+			await common.execute_update(f'INSERT INTO item (uid, iid) VALUES ("{uid}", "{iid}");', **kwargs)
+			data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
 		values[i] += data[0][0]
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
@@ -164,8 +174,8 @@ async def pass_tower(uid, stage, **kwargs):
 	# 0 : success
 	# 99 : Parameter error
 	# print(f'stage:{stage}, type:{type(stage)}')
-	can_s, stage_s = await get_progress(uid, 'towerstage', **kwargs)
-	if not can_s or stage <= 0 or stage_s + 1 < stage:
+	stage_s = await get_progress(uid, 'towerstage', **kwargs)
+	if stage <= 0 or stage_s + 1 < stage:
 		return common.mt(99, 'Parameter error')
 
 	p_stage = {'finally': stage_s, 'vary': 0}
@@ -215,9 +225,12 @@ async def pass_tower(uid, stage, **kwargs):
 				p_exp['remaining'] = exp_data[0][0]
 				p_exp['reward'] = value
 			else:
-				await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 				data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
-				pass_towers.append({'iid': key, 'remaining': data[0][0], 'reward': value})
+				if data == ():
+					await common.execute_update(f'INSERT INTO item (uid, iid) VALUES ("{uid}", "{key}");', **kwargs)
+					data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
+				await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
+				pass_towers.append({'iid': key, 'remaining': data[0][0] + value, 'reward': value})
 
 	return common.mt(0, 'success', data={'pass_towers': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
 
@@ -231,11 +244,14 @@ async def start_hang_up(uid, stage, **kwargs):
 	# 99 - Parameter error
 	"""
 	# 挂机方法是挂普通关卡
-	can_s, stage_s = await get_progress(uid, 'stage', **kwargs)
-	if not can_s or stage <= 0 or stage_s < stage:
+	stage_s = await get_progress(uid, 'stage', **kwargs)
+	if stage <= 0 or stage_s < stage:
 		return common.mt(99, 'Parameter error')
 
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+	if data == ():
+		await common.execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.HANG_UP_TIME.value}");', **kwargs)
+		data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
 	hang_up_time = data[0][0]
 
 	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -245,7 +261,7 @@ async def start_hang_up(uid, stage, **kwargs):
 		return common.mt(0, 'hang up success', {'hang_up_info': {'hang_stage': stage, 'tid': enums.Timer.HANG_UP_TIME.value, 'time': current_time}})
 	else:
 		start_hang_up_reward = []
-		_, hang_stage = await get_progress(uid, 'hangstage', **kwargs)
+		hang_stage = await get_progress(uid, 'hangstage', **kwargs)
 		probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
 		hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
@@ -276,7 +292,7 @@ async def get_hang_up_reward(uid, **kwargs):
 
 	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 	get_hang_up_rewards = []
-	_, hang_stage = await get_progress(uid, 'hangstage', **kwargs)
+	hang_stage = await get_progress(uid, 'hangstage', **kwargs)
 	probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
 	hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 	delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
@@ -310,8 +326,11 @@ async def try_unlock_skill(uid, sid, **kwargs):
 
 
 async def get_progress(uid, pid, **kwargs):
-	pdata = await common.execute(f'SELECT {pid} FROM progress WHERE uid = "{uid}";', **kwargs)
-	return (True, pdata[0][0]) if pdata != () else (False, 0)
+	data = await common.execute(f'SELECT {pid} FROM progress WHERE uid = "{uid}";', **kwargs)
+	if data == ():
+		await common.execute_update(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
+		data = await common.execute(f'SELECT {pid} FROM progress WHERE uid = "{uid}";', **kwargs)
+	return data[0][0]
 
 
 async def increase_exp(uid, exp, **kwargs):

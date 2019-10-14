@@ -90,13 +90,21 @@ async def try_energy(uid, amount, **kwargs):
 	# - 99 - 数据库操作错误 === Database operation error
 	max_energy = kwargs["player_energy"]['max_energy']  # self._player["energy"]["max_energy"]
 	data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
+	if data == ():
+		await execute_update(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
+		data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
 	sql_energy = data[0][0]
 	if sql_energy >= max_energy:
-		await execute_update(f'UPDATE timer SET time = "" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
+		can, _ = await execute_update(f'UPDATE timer SET time = "" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
+		if can == 0: await execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.ENERGY_RECOVER_TIME.value}");', **kwargs)
+
 	if amount > 0:  # 购买能量
 		data = (await _decrease_energy(uid, 0, **kwargs))['data']
 		status, _ = await execute_update(f'UPDATE progress SET energy = energy + {amount} WHERE uid = "{uid}";', **kwargs)
 		energy_data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
+		if energy_data == ():
+			await execute_update(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
+			energy_data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
 		if status == 0:
 			return mt(status=99, message="Database operation error")
 		elif energy_data[0][0] >= max_energy:
@@ -118,8 +126,14 @@ async def _decrease_energy(uid, amount, **kwargs) -> dict:
 	max_energy = kwargs['player_energy']['max_energy']  # self._player["energy"]
 	_cooling_time = kwargs['player_energy']['cooling_time']  # self._player["energy"]
 	data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
+	if data == ():
+		await execute_update(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
+		data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
 	current_energy = data[0][0]
 	data = await execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
+	if data == ():
+		await execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.ENERGY_RECOVER_TIME.value}");', **kwargs)
+		data = await execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
 	recover_time = data[0][0]
 	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 	if recover_time == '':

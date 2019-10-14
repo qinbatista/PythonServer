@@ -32,9 +32,9 @@ def get_hang_up_reward(**kwargs):
 
 def stage_dialog(token,world,info_list):
 	enter_stage(**{"world":world,"token":token})
-	pass_stage(**{"world":world,"token":token})
-	start_hang_up(**{"world":world,"token":token})
-	get_hang_up_reward(**{"world":world,"token":token})
+	# pass_stage(**{"world":world,"token":token})
+	# start_hang_up(**{"world":world,"token":token})
+	# get_hang_up_reward(**{"world":world,"token":token})
 
 if __name__ == '__main__':
 	pass
