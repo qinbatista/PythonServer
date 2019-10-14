@@ -38,24 +38,6 @@ L = \
 	}
 }
 # wep = 0, skill = 1, role = 2, item = 3
-unused = \
-{
-	"weights" : {
-		"BASIC" : [0.6, 0.1, 0.25, 0.05]
-		},
-	"items" : [
-		["2,1", "2,1", "2,1", "2,1"],
-		["2,1", "2,1", "2,1", "2,1"],
-		["2,1", "2,1", "2,1", "2,1"],
-		["2,1", "2,1", "2,1", "2,1"],
-		],
-	"rewards" : {
-		"BASIC" : {
-			"2,1" : 1
-			}
-		}
-}
-
 STANDARD_SEG_COUNT = 30
 
 SWITCH = {}
@@ -66,7 +48,8 @@ async def random_gift(uid, tier, rewardgroup, **kwargs):
 	return await SWITCH[rewardgroup](uid, gift, **kwargs)
 
 async def fortune_wheel(uid, tier, item, **kwargs):
-	can_pay, remaining = await common.try_item(uid, item, -100, **kwargs)
+	cost = kwargs['config']['lottery']['fortune_wheel']['cost'][f'{enums.Group.ITEM.value}:{item.value}']
+	can_pay, remaining = await common.try_item(uid, item, -cost, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient materials')
 	t = (random.choices(range(len(kwargs['config']['lottery']['fortune_wheel']['weights'][tier.name])), kwargs['config']['lottery']['fortune_wheel']['weights'][tier.name]))[0]
 	giftcode = (random.choices(kwargs['config']['lottery']['fortune_wheel']['items'][t]))[0]
@@ -79,6 +62,7 @@ async def fortune_wheel(uid, tier, item, **kwargs):
 		return await summoning._response_factory(uid, enums.Group(int(group)), new, reward, item, remaining, **kwargs)
 
 #######################################################################################################
+
 
 async def _try_unlock_weapon(uid, gift, **kwargs):
 	weapon = enums.Weapon(gift)
