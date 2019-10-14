@@ -108,6 +108,7 @@ class MessageHandler:
 		message['tokenserverbaseurl'] = TOKEN_BASE_URL
 		message['mailserverbaseurl'] = MAIL_BASE_URL
 		message['world'] = '0'
+		message['config'] = {'lottery' : self._lottery}
 		return json.dumps(await fn(self, message))
 
 	async def validate_token(self, msg, session):
