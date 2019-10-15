@@ -85,7 +85,7 @@ class MessageHandler:
 		pass
 
 	# json.decoder.JSONDecodeError
-	async def resolve(self, message: str, resource) -> str:
+	async def resolve(self, message: str, resource, configs) -> str:
 		'''
 		Resolves the message included in the request. If required, ensures that a valid token is present.
 		'''
@@ -108,7 +108,7 @@ class MessageHandler:
 		message['tokenserverbaseurl'] = TOKEN_BASE_URL
 		message['mailserverbaseurl'] = MAIL_BASE_URL
 		message['world'] = '0'
-		message['config'] = {'lottery' : self._lottery}
+		message['config'] = configs
 		return json.dumps(await fn(self, message))
 
 	async def validate_token(self, msg, session):

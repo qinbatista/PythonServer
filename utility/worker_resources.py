@@ -11,6 +11,7 @@ The worker provides these resources to the message handler.
 import aiohttp
 import aioredis
 import aiomysql
+import requests
 import concurrent
 
 class WorkerResources:
@@ -38,3 +39,36 @@ class WorkerResources:
 
 	def __getitem__(self, key):
 		return self.resources[key]
+
+class ModuleConfigurations:
+	def __init__(self, baseurl = 'http://localhost:8000'):
+		self.baseurl = baseurl
+		self.configs = {}
+		self.refresh()
+	
+	def refresh(self):
+		r = requests.get(self.baseurl + '/get_game_manager_config')
+		self.configs['lottery'] = r.json()['lottery']
+
+	def __getitem__(self, key):
+		return self.configs[key]
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
