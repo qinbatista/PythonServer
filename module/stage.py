@@ -286,6 +286,9 @@ async def get_hang_up_reward(uid, **kwargs):
 	# 99 - Temporarily no on-hook record
 	"""
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+	if data == ():
+		await common.execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.HANG_UP_TIME.value}");', **kwargs)
+		data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
 	hang_up_time = data[0][0]
 	if hang_up_time == '':
 		return common.mt(99, 'Temporarily no on-hook record')
@@ -294,6 +297,8 @@ async def get_hang_up_reward(uid, **kwargs):
 	get_hang_up_rewards = []
 	hang_stage = await get_progress(uid, 'hangstage', **kwargs)
 	probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
+	stages = [int(s) for s in kwargs['hang_rewards'].keys() if s.isdigit()]
+	if hang_stage not in stages: hang_stage = max(stages)
 	hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 	delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 	minute = int(delta_time.total_seconds()) // 60
