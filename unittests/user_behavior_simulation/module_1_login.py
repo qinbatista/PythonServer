@@ -118,7 +118,7 @@ def get_account_world_info(token):
 		return []
 def login_module(unique_id_p: str):
 	global world,unique_id
-	unique_id = "unique_id"+unique_id_p
+	unique_id = unique_id_p
 	int_number = random.choice([0,1])
 	if int_number==0:
 		return login_account()

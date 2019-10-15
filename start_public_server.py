@@ -65,6 +65,8 @@ def main():
 		# processes.append(subprocess.Popen(['python3', loc() + '/game_manager_houyao.py']))
 		# processes.append(subprocess.Popen(['python', loc() + '/worker.py']))
 		# processes.append(subprocess.Popen(['python', loc() + '/gate.py']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker.py', get_host_ip()]))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate.py', get_host_ip()]))
 		time.sleep(0.2)
 		print('Done spawning servers...')
 		while (len(processes) > 0):

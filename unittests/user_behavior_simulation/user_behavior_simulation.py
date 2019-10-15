@@ -75,9 +75,10 @@ def run_task(name):
 	# module_15_summon.summon_dialog(token,world)#召唤所有
 	# module_5_weapons.weapon_dialog(token,world,info_list[5])
 	# module_8_roles.role_dialog(token,world)
-	module_7_lottery.get_random_item(token,world)
+	# module_7_lottery.get_random_item(token,world)
 	# module_16_daily_task.task_dialog(token,world,info_list[5])
 	# module_10_stage.stage_dialog(token,world,info_list[5])
+	module_17_check_in.check_in_dialog(token,world,info_list[5])
 	# dark_market()#*加载黑市信息
 	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
@@ -96,11 +97,11 @@ def run_all_task():
 	print("cpu:"+str(multiprocessing.cpu_count()))
 	p = multiprocessing.Pool()
 	for i in range(0,testing_people_number):
-		p.apply_async(run_task, args=(i,))
+		p.apply_async(run_task, args=("unique_id"+str(i),))
 	p.close()
 	p.join()
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("11")
+	run_task("unique_id11")
 	# run_all_task()
