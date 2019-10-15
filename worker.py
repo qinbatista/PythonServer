@@ -35,7 +35,7 @@ class Worker:
 		self.ujobs   = 0
 		self.running = False
 
-		self.configs = worker_resources.ModuleConfigurations(CFG)
+		self.configs = worker_resources.ModuleConfigurations()
 		self.resource= worker_resources.WorkerResources(CFG)
 		self.sid     = None
 		self.nats    = None
