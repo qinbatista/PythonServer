@@ -85,7 +85,7 @@ class MessageHandler:
 		pass
 
 	# json.decoder.JSONDecodeError
-	async def resolve(self, message: str, resource) -> str:
+	async def resolve(self, message: str, resource, configs) -> str:
 		'''
 		Resolves the message included in the request. If required, ensures that a valid token is present.
 		'''
@@ -108,6 +108,7 @@ class MessageHandler:
 		message['tokenserverbaseurl'] = TOKEN_BASE_URL
 		message['mailserverbaseurl'] = MAIL_BASE_URL
 		message['world'] = '0'
+		message['config'] = configs
 		return json.dumps(await fn(self, message))
 
 	async def validate_token(self, msg, session):
@@ -202,6 +203,8 @@ class MessageHandler:
 	async def _market_purchase_family(self, data: dict) -> str:
 		return await family.purchase(data['data']['unique_id'], data['data']['item'], **data)
 
+	async def _get_config_family(self, data: dict) -> str:
+		return data['config']['family']
 
 	# TODO
 
@@ -232,8 +235,6 @@ class MessageHandler:
 	async def _cancel_disbanded_family(self, data: dict) -> str:
 		return 'function'
 
-	async def _get_config_family(self, data: dict) -> str:
-		return 'function'
 
 	async def _get_all_info_family(self, data: dict) -> str:
 		return 'function'
@@ -326,8 +327,8 @@ class MessageHandler:
 	async def _fortune_wheel_pro(self, data: dict) -> str:
 		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.PRO, enums.Item(int(data['data']['item'])), **data)
 
-	async def _get_config_info_lottery(self, data: dict) -> str:
-		return 'function'
+	async def _get_config_lottery(self, data: dict) -> str:
+		return data['config']['lottery']
 
 	###################### skill.py ######################
 	async def _get_skill(self, data: dict) -> str:
@@ -660,6 +661,7 @@ FUNCTION_LIST = {
 	'get_all_family' : MessageHandler._get_all_family,
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
+	'get_config_family' : MessageHandler._get_config_family,
 	# TODO
 	'sign_in_family' : MessageHandler._sign_in_family,
 	'gift_package_family' : MessageHandler._gift_package_family,
@@ -670,7 +672,6 @@ FUNCTION_LIST = {
 	'update_login_in_time' : MessageHandler._update_login_in_time,
 	'disband_family' : MessageHandler._disband_family,
 	'cancel_disbanded_family' : MessageHandler._cancel_disbanded_family,
-	'get_config_family' : MessageHandler._get_config_family,
 	'get_all_info_family' : MessageHandler._get_all_info_family,
 
 	###################### mail.py ######################
@@ -707,8 +708,7 @@ FUNCTION_LIST = {
 	###################### lottery.py ######################
 	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
 	'fortune_wheel_pro' : MessageHandler._fortune_wheel_pro,
-	# TODO
-	'get_config_info_lottery' : MessageHandler._get_config_info_lottery,
+	'get_config_lottery' : MessageHandler._get_config_lottery,
 
 	###################### skill.py ######################
 	'get_skill' : MessageHandler._get_skill,

@@ -35,6 +35,7 @@ class Worker:
 		self.ujobs   = 0
 		self.running = False
 
+		self.configs = worker_resources.ModuleConfigurations()
 		self.resource= worker_resources.WorkerResources(CFG)
 		self.sid     = None
 		self.nats    = None
@@ -61,7 +62,7 @@ class Worker:
 		try:
 			#response = await self.mh.resolve(work, self.session)
 			print(f'worker: calling messagehandler with args: {work}')
-			response = await asyncio.wait_for(self.mh.resolve(work, self.resource), 3)
+			response = await asyncio.wait_for(self.mh.resolve(work, self.resource, self.configs), 3)
 		except asyncio.TimeoutError:
 			print(f'worker: message handler call with args: {work} timed out...')
 			response = '{"status" : -2, "message" : "request timed out"}'

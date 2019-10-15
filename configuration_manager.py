@@ -18,14 +18,15 @@ def loc():
 
 VERSION = loc() + '/configuration/config_timer_setting.json'
 
+LOTTERY = loc() + '/configuration/{}/server/lottery.json'
+FAMILY = loc() + '/configuration/{}/server/family.json'
+
 SKILL = loc() + '/configuration/{}/server/skill_level_up_config.json'
 REWARD = loc() + '/configuration/{}/server/stage_reward_config.json'
 WEAPON = loc() + '/configuration/{}/server/weapon_config.json'
 ROLE = loc() + '/configuration/{}/server/role_config.json'
 PLAYER = loc() + '/configuration/{}/server/player_config.json'
-LOTTERY = loc() + '/configuration/{}/server/lottery_config.json'
 FACTORY = loc() + '/configuration/{}/server/factory_config.json'
-FAMILY = loc() + '/configuration/{}/server/family_config.json'
 MALL = loc() + '/configuration/{}/server/mall_config.json'
 MONSTER = loc() + '/configuration/{}/client/monster_config.json'
 MYSQL_DATA = loc() + '/configuration/{}/server/mysql_data_config.json'
