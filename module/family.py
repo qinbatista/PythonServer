@@ -17,9 +17,9 @@ async def create(uid, name, **kwargs):
 	if not _valid_family_name(name): return common.mt(99, 'invalid family name')
 	in_family, _ = await _in_family(uid, **kwargs)
 	if in_family: return common.mt(98, 'already in a family')
-	_, iid, cost = kwargs['config']['family']['general']['costs']['create'].split(':')
-	enough, _ = await common.try_item(uid, enums.Item(int(iid)), -cost, **kwargs)
-	if not enough: return common.mt(97, 'need coins')
+	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['costs']['create']))[0]
+	enough, _ = await common.try_item(uid, iid, -cost, **kwargs)
+	if not enough: return common.mt(97, 'insufficient materials')
 	if await common.exists('family', ('name', name), **kwargs): return common.mt(96, 'name already exists!')
 	await asyncio.gather(common.execute(f'INSERT INTO family(name) VALUES("{name}");', **kwargs),
 						common.execute(f'INSERT INTO familyrole(uid, name, role) VALUES("{uid}", "{name}", "{enums.FamilyRole.OWNER.value}");', **kwargs),
