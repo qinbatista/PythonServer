@@ -24,12 +24,13 @@ def print_module(my_string):
 
 def fortune_wheel_basic():
 	print_module("[fortune_wheel_basic]")
-	int_n = random.randint(0,1)
+	int_n = random.randint(1,1)
 	if int_n == 0:
-		new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_basic', 'data' : {'token' : token,"item":random.choices([1,5])}})#发送好友信息
+		new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_basic', 'data' : {'token' : token,"item":random.choice([1,5])}})#发送好友信息
 		print_method("[fortune_wheel_basic][diamond]"+str(new_response))
 	elif int_n == 1:
-		new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_pro', 'data' : {'token' : token,"item":random.choices([1,5])}})#发送好友信息
+		print({'world' : world, 'function' : 'fortune_wheel_pro', 'data' : {'token' : token,"item":random.choice([1,5])}})
+		new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_pro', 'data' : {'token' : token,"item":random.choice([1,5])}})#发送好友信息
 		print_method("[fortune_wheel_basic][fortune_wheel_ticket_basic]"+str(new_response))
 def get_random_item(_token,_world):
 	global token,world

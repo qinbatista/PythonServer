@@ -29,7 +29,7 @@ async def get_achievement_reward(uid, **kwargs):
 				if data[0][1] == myamount:
 					_,remaining = await common.try_item(uid,enums.Item.DIAMOND,amount[aindex-1], **kwargs)
 					await common.execute_update(f'UPDATE achievement set reward = {amount[aindex-1] if data[0][1] != amount[0] else amount[aindex]} WHERE uid = "{uid}" AND aid = "{kwargs["data"]["achievement_id"]}";', **kwargs)
-					return common.mt(0, 'get reward success',{"achievement":{"diamond":remaining,"value":data[0][0],"reward":amount[aindex-1] if data[0][1] != amount[0] else amount[aindex],"name":str.lower(enums.Achievement.TOTAL_LOGIN.name)}})
+					return common.mt(0, 'get reward success',{"achievement":{"diamond":remaining,"value":data[0][0],"reward":amount[aindex-1] if data[0][1] != amount[0] else amount[aindex],"aid":enums.Achievement.TOTAL_LOGIN.value}})
 	return common.mt(99,'no reward for this achievement {str.lower(enums.Achievement.TOTAL_LOGIN.name}')
 	# kwargs["uid"]
 	# achievement_id_name = achievement_id_name_list[achievement_id]
