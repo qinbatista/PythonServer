@@ -9,7 +9,6 @@ from module import mail
 from module import enums
 from module import common
 
-CHANGE_NAME_DIAMOND = 100
 
 MERCHANDISE = { '3:6:1' : '3:1:80' }
 
@@ -89,7 +88,7 @@ async def get_all(uid, **kwargs):
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news})
 
 async def get_store(**kwargs):
-	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k,v in MERCHANDISE.items()]})
+	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k,v in kwargs['config']['family']['store']['items'].items()]})
 
 async def purchase(uid, item, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
