@@ -7,6 +7,15 @@ PythonVersion=""
 def loc():
 	return os.path.dirname(os.path.realpath(__file__))
 
+def get_host_ip():
+	try:
+		s = socket(AF_INET, SOCK_DGRAM)
+		s.connect(('8.8.8.8', 80))
+		ip = s.getsockname()[0]
+	finally:
+		s.close()
+	return ip
+
 def GetPythonCommand():
 	global PythonVersion
 	if PythonVersion!="":
