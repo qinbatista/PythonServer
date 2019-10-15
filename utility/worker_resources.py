@@ -49,6 +49,7 @@ class ModuleConfigurations:
 	def refresh(self):
 		r = requests.get(self.baseurl + '/get_game_manager_config')
 		self.configs['lottery'] = r.json()['lottery']
+		self.configs['family']  = r.json()['family']
 
 	def __getitem__(self, key):
 		return self.configs[key]
