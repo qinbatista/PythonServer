@@ -141,12 +141,13 @@ async def change_name(uid, new_name, **kwargs):
 	if not in_family: return common.mt(98, 'not in family')
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_change_name_permissions(role): return common.mt(97, 'insufficient permissions')
-	can_pay, remaining = await common.try_item(uid, enums.Item.DIAMOND, -CHANGE_NAME_DIAMOND, **kwargs)
+	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['costs']['change_name']))[0]
+	can_pay, remaining = await common.try_item(uid, iid, -cost, **kwargs)
 	if not can_pay: return common.mt(96, 'insufficient funds')
 	try:
 		await common.execute(f'UPDATE family SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	except pymysql.err.IntegrityError:
-		await common.try_item(uid, enums.Item.DIAMOND, CHANGE_NAME_DIAMOND, **kwargs)
+		await common.try_item(uid, iid, cost, **kwargs)
 		return common.mt(95, 'family name already exists')
 	await common.execute(f'UPDATE player SET fid = "{new_name}" WHERE fid = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyrole SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
