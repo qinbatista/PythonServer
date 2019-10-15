@@ -286,6 +286,9 @@ async def get_hang_up_reward(uid, **kwargs):
 	# 99 - Temporarily no on-hook record
 	"""
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+	if data == ():
+		await common.execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.HANG_UP_TIME.value}");', **kwargs)
+		data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
 	hang_up_time = data[0][0]
 	if hang_up_time == '':
 		return common.mt(99, 'Temporarily no on-hook record')
