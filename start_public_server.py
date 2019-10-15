@@ -3,6 +3,7 @@ import time
 import subprocess
 import signal
 import requests
+from socket import *
 PythonVersion=""
 def loc():
 	return os.path.dirname(os.path.realpath(__file__))
