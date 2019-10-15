@@ -203,6 +203,8 @@ class MessageHandler:
 	async def _market_purchase_family(self, data: dict) -> str:
 		return await family.purchase(data['data']['unique_id'], data['data']['item'], **data)
 
+	async def _get_config_family(self, data: dict) -> str:
+		return data['config']['family']
 
 	# TODO
 
@@ -233,8 +235,6 @@ class MessageHandler:
 	async def _cancel_disbanded_family(self, data: dict) -> str:
 		return 'function'
 
-	async def _get_config_family(self, data: dict) -> str:
-		return 'function'
 
 	async def _get_all_info_family(self, data: dict) -> str:
 		return 'function'
@@ -661,6 +661,7 @@ FUNCTION_LIST = {
 	'get_all_family' : MessageHandler._get_all_family,
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
+	'get_config_family' : MessageHandler._get_config_family,
 	# TODO
 	'sign_in_family' : MessageHandler._sign_in_family,
 	'gift_package_family' : MessageHandler._gift_package_family,
@@ -671,7 +672,6 @@ FUNCTION_LIST = {
 	'update_login_in_time' : MessageHandler._update_login_in_time,
 	'disband_family' : MessageHandler._disband_family,
 	'cancel_disbanded_family' : MessageHandler._cancel_disbanded_family,
-	'get_config_family' : MessageHandler._get_config_family,
 	'get_all_info_family' : MessageHandler._get_all_info_family,
 
 	###################### mail.py ######################
