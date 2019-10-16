@@ -164,7 +164,6 @@ CREATE TABLE `progress` (
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
-<<<<<<< .merge_file_5NtewO
 ROLE = \
 """
 CREATE TABLE `role` (
@@ -214,55 +213,6 @@ CREATE TABLE `task` (
 	  CONSTRAINT `task_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
-=======
-
-def creat_darkmarket(cursor):
-	statement = \
-	"""
-	CREATE TABLE `darkmarket` (
-	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
-	  `pid` smallint(6) NOT NULL COMMENT 'position id',
-	  `gid` smallint(6) NOT NULL COMMENT '组id',
-	  `mid` smallint(6) NOT NULL COMMENT '商品id',
-	  `qty` smallint(6) NOT NULL COMMENT '商品数量',
-	  `cid` smallint(6) NOT NULL COMMENT '消耗品id',
-	  `amt` smallint(6) NOT NULL COMMENT '消耗品数量',
-	  PRIMARY KEY (`uid`, `pid`)
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-	"""
-	cursor.execute(statement)
-
-def create_world(world):
-	c = pymysql.connect(host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8mb4', autocommit=True)
-	cursor = c.cursor()
-	cursor.execute(f'CREATE DATABASE `{world}`;')
-	c.select_db(world)
-	cursor = c.cursor()
-	create_table_armor(cursor)
-	create_table_dark_market(cursor)
-	create_table_union_store(cursor)
-	create_table_factory(cursor)
-	create_table_families(cursor)
-	create_table_friend(cursor)
-	create_table_leader_board(cursor)
-	create_table_player(cursor)
-	create_table_role(cursor)
-	create_table_skill(cursor)
-	create_table_weapon(cursor)
-	creat_table_task(cursor)
-	create_achievement(cursor)
-	create_triggers_player(cursor)
-
-def create_mailbox(world):
-	boxlocation = os.path.dirname(os.path.realpath(__file__)) + '/../box'
-	box = mailbox.Maildir(boxlocation)
-	try:
-		wbox = box.get_folder(str(world))
-		print('mailbox already exists, skipping...')
-	except mailbox.NoSuchMailboxError:
-		box.add_folder(str(world))
-		print('added mailbox...')
->>>>>>> .merge_file_1AzpG5
 
 TIMER = \
 """
@@ -315,7 +265,6 @@ def database_exists(db):
 		if e.args[0] == 1049: return False
 	return True
 
-<<<<<<< .merge_file_5NtewO
 def create_world(world):
 	if not database_exists(world):
 		connection = pymysql.connect(host = '192.168.1.102', user = 'root',
@@ -325,33 +274,6 @@ def create_world(world):
 		for table in TABLES:
 			connection.cursor().execute(table)
 
-
-=======
-def operating_test():
-	c = pymysql.connect(host='127.0.0.1', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
-	c.select_db("experimental")
-	cursor = c.cursor()
-	# creat_table_task(cursor)
-	# create_table_armor(cursor)
-	# create_achievement(cursor)
-	# create_table_union_store(cursor)
-	# create_check_in(cursor)
-	# create_table_player(cursor)
-	# create_table_families(cursor)
-	# creat_limits(cursor)
-
-	# cursor.execute(f'DROP TABLE progress')
-	creat_darkmarket(cursor)
-	# creat_progress(cursor)
-	# cursor.execute(f'insert into progress (uid, exp) value ("1", 0)')
-	# code = cursor.execute(f'insert into timer (uid, tid) value ("1", 11)')
-	# cursor.execute('select iid from item where uid = "1";')
-	# print(cursor.fetchall())
-	# code = cursor.execute(f'insert into item (uid, iid) value ("1", 10)')
-	# print(code)
-	# for i in range(1, 100):
-	# 	cursor.execute(f'insert into progress (uid, exp) values ("{i}", 0)')
->>>>>>> .merge_file_1AzpG5
 
 
 if __name__ == '__main__':
