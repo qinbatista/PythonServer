@@ -1,26 +1,27 @@
 '''
 task.py
 '''
-
+from datetime import datetime, timedelta
 from module import enums
 from module import common
-
+import time
 
 async def supplement_check_in(uid, **kwargs) -> dict:
+	print("!supplement_check_in")
 	"""补签"""
 	# 0 - Successful signing
 	# 98 - You have completed all current check-ins
 	# 99 - Insufficient diamond
 	month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取每月需要补签的日期前缀
-	data = await common.execute(f'select date from check_in where uid="{uid}" and date like "{month_pre}%"')
+	data = await common.execute(f'select date from check_in where uid="{uid}" and date like "{month_pre}%"',**kwargs)
 	day_list = [int(d[0][-2:]) for d in data]
 	today = datetime.today()
 	# max_day = calendar.monthrange(today.year, today.month)[1]  # 获取本月的总天数
 	missing_num = today.day - len(day_list)
 	if missing_num == 0:
 		return common.mt(98, 'You have completed all current check-ins')
-	need_diamond = -1 * missing_num * self._check_in['patch_diamond']
-	diamond_data = await self.try_diamond( uid, need_diamond)
+	need_diamond = -1 * missing_num * check_in['patch_diamond']
+	diamond_data = await common.try_item(uid,enums.Item.DIAMOND,amount[aindex-1], **kwargs)
 	if diamond_data['status'] != 0:
 		return common.mt(99, 'Insufficient diamond')
 	# remaining = {'diamond': diamond_data['remaining'], 'missing_date': []}
@@ -30,33 +31,35 @@ async def supplement_check_in(uid, **kwargs) -> dict:
 			check_date = f'{month_pre}{d}'
 			if d < 10: check_date = f'{month_pre}0{d}'
 			remaining['missing_date'].append(check_date)
-			await common.execute_update( f'insert into check_in(uid, date) values("{uid}", "{check_date}")')
-	data = await self.receive_all_check_reward( uid)
+			await common.execute_update( f'insert into check_in(uid, date) values("{uid}", "{check_date}")',**kwargs)
+	data = await receive_all_check_reward( uid)
 	remaining.update({'check_in_data': data['data']})
 	return common.mt(0, 'Successful signing', data={'remaining': remaining})
 
 async def check_in(uid, **kwargs) -> dict:
+	print("!check_in")
 	"""每日签到"""
 	# 0 - Sign-in success
 	# 99 - You have already signed in today
 	current_time = time.strftime('%Y-%m-%d', time.localtime())
-	s_data = await common.execute( f'select * from check_in where uid="{uid}" and date="{current_time}"')
+	s_data = await common.execute( f'select * from check_in where uid="{uid}" and date="{current_time}"', **kwargs)
 	if s_data != ():
 		return common.mt(99, 'You have already signed in today')
 	# 更新签到表
 	config  = kwargs["config"]
-	check_insert_str = f'insert into check_in(uid, date) values("{uid}", "{current_time}")'
-	await common.execute_update( check_insert_str)
-	data = await self.receive_all_check_reward( uid)
+	await common.execute_update( f'insert into check_in(uid, date) values("{uid}", "{current_time}")',**kwargs)
+	data = await receive_all_check_reward( uid)
 	return common.mt(0, 'Sign-in success', data=data['data'])
 
 async def get_all_check_in_table(uid, **kwargs) -> dict:
+	print("!get_all_check_in_table")
 	"""获取所有签到情况"""
 	# 0 - Successfully obtained all check-in status
 	# 0 - Successfully obtained all check-in status this month
 	# data = await common.execute( f'select * from check_in where uid="{uid}"')
 	month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取本月的日期前缀
-	data = await common.execute( f'select * from check_in where uid="{uid}" and date like "{month_pre}%"')
+	data = await common.execute( f'select * from check_in where uid="{uid}" and date like "{month_pre}%"',**kwargs)
+	print(str(data))
 	remaining = {}
 	for i, d in enumerate(data):
 		remaining.update({i: {'date': d[1], 'reward': d[2]}})
@@ -66,7 +69,7 @@ async def receive_all_check_reward(uid, **kwargs) -> dict:
 	"""领取本月所有签到奖励"""
 	# 0 - Successfully received the reward
 	month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取本月的日期前缀
-	data = await common.execute( f'select * from check_in where uid="{uid}" and date like "{month_pre}%" and reward=0')
+	data = await common.execute( f'select * from check_in where uid="{uid}" and date like "{month_pre}%" and reward=0', **kwargs)
 	key_words = ['role', 'weapon']
 	vip_dict = await self.increase_vip_exp( uid, 0)
 	if vip_dict == {}: return common.mt(99, 'function increase_vip_exp error')

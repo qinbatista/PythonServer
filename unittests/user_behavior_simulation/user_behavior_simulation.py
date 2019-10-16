@@ -14,6 +14,7 @@ import module_13_achievement
 import module_14_vip
 import module_15_summon
 import module_16_daily_task
+import module_17_check_in
 import multiprocessing
 import time
 from datetime import datetime, timedelta
@@ -103,5 +104,5 @@ def run_all_task():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("unique_id11")
+	run_task("unique_id10")
 	# run_all_task()

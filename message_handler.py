@@ -416,9 +416,9 @@ class MessageHandler:
 		return await check_in.supplement_check_in(data['data']['unique_id'],**data)
 
 	async def _get_all_check_in_table(self, data: dict) -> str:
-		# data.update({"config":self._acheviement})
-		# return await check_in.get_all_check_in_table(data['data']['unique_id'],**data)
-		return common.mt(0, 'success', {'check_in': [{'date':  '2019-10-05', 'reward': 0}, {'date':  '2019-10-06', 'reward': 0}]})
+		data.update({"config":self._acheviement})
+		return await check_in.get_all_check_in_table(data['data']['unique_id'],**data)
+		# return common.mt(0, 'success', {'check_in': [{'date':  '2019-10-05', 'reward': 0}, {'date':  '2019-10-06', 'reward': 0}]})
 
 	###################### VIP ######################
 	# TODO
