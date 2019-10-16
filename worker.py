@@ -13,9 +13,6 @@ Completed jobs are sent to the gate server which contains the requesting client.
 import sys
 import signal
 import asyncio
-import aiohttp
-import aiomysql
-import aioredis
 import message_handler
 import nats.aio.client
 
