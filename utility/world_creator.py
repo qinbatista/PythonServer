@@ -97,7 +97,7 @@ CREATE TABLE `familyrole` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `name` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `role` int(11) NOT NULL,
-	  PRIMARY KEY (`uid`,`name`)
+	  PRIMARY KEY (`uid`,`name`),
 	  CONSTRAINT `familyrole_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
@@ -301,8 +301,8 @@ CREATE TABLE `weaponpassive` (
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
-TABLES = [ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKETITEMS, FACTORY, FAMILY, \
-		FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LIMITS, PLAYER, PROGRESS, \
+TABLES = [PLAYER, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKETITEMS, FACTORY, FAMILY, \
+		FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LIMITS, PROGRESS, \
 		ROLE, ROLEPASSIVE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE]
 
 #########################################################################################
@@ -321,6 +321,7 @@ def create_world(world):
 		connection = pymysql.connect(host = '192.168.1.102', user = 'root',
 				password = 'lukseun', charset = 'utf8mb4', autocommit = True)
 		connection.cursor().execute(f'CREATE DATABASE `{world}`;')
+		connection.select_db(world)
 		for table in TABLES:
 			connection.cursor().execute(table)
 
