@@ -273,7 +273,7 @@ def database_exists(db):
 		if e.args[0] == 1049: return False
 	return True
 
-def create_world(world):
+def create_db(world):
 	if not database_exists(world):
 		connection = pymysql.connect(host = '192.168.1.102', user = 'root',
 				password = 'lukseun', charset = 'utf8mb4', autocommit = True)
@@ -281,6 +281,22 @@ def create_world(world):
 		connection.select_db(world)
 		for table in TABLES:
 			connection.cursor().execute(table)
+		print(f'created new database for world {world}..')
+	else: print(f'database for world {world} already exists, skipping..')
+
+def create_mailbox(world):
+	path = os.path.dirname(os.path.realpath(__file__)) + '/../box'
+	box  = mailbox.Maildir(path)
+	try:
+		worldbox = box.get_folder(str(world))
+		print(f'mailbox for world {world} already exists, skipping..')
+	except mailbox.NoSuchMailboxError:
+		box.add_folder(str(world))
+		print(f'added mailbox for world {world}..')
+
+def create_world(world):
+	create_db(world)
+	create_mailbox(world)
 
 
 
