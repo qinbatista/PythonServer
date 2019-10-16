@@ -439,6 +439,7 @@ def creat_progress(cursor):
 	  `stage` smallint(6) DEFAULT 0 COMMENT '最高普通关卡',
 	  `towerstage` smallint(6) DEFAULT 0 COMMENT '冲塔最高关卡',
 	  `hangstage` smallint(6) DEFAULT 0 COMMENT '当前挂机的关卡',
+	  `videxp` smallint(6) DEFAULT 0 COMMENT 'vip经验',
 	  PRIMARY KEY (`uid`),
 	  CONSTRAINT FK_PlayerProgress FOREIGN KEY (`uid`) REFERENCES Player(`uid`) ON DELETE CASCADE;
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -450,14 +451,14 @@ def creat_darkmarket(cursor):
 	statement = \
 	"""
 	CREATE TABLE `darkmarket` (
-	  `pid` smallint(6) NOT NULL COMMENT 'position id',
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
+	  `pid` smallint(6) NOT NULL COMMENT 'position id',
 	  `gid` smallint(6) NOT NULL COMMENT '组id',
 	  `mid` smallint(6) NOT NULL COMMENT '商品id',
 	  `qty` smallint(6) NOT NULL COMMENT '商品数量',
 	  `cid` smallint(6) NOT NULL COMMENT '消耗品id',
 	  `amt` smallint(6) NOT NULL COMMENT '消耗品数量',
-	  PRIMARY KEY (`pid`)
+	  PRIMARY KEY (`uid`, `pid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 	cursor.execute(statement)
