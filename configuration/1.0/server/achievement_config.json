@@ -86,7 +86,7 @@
 		"quantity":[0,2,5,10,15,20,25,30],
 		"diamond":[0,40,60,80,100,120,140,200]
 	},
-	"upgrade_crystal_crystal" :
+	"upgrade_crystal_factory" :
 	{
 		"quantity":[0,2,4,6,9,12,15],
 		"diamond":[0,90,120,150,180,210,300]
