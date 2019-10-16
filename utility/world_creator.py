@@ -445,6 +445,23 @@ def creat_progress(cursor):
 	"""
 	cursor.execute(statement)
 
+
+def creat_darkmarket(cursor):
+	statement = \
+	"""
+	CREATE TABLE `darkmarket` (
+	  `pid` smallint(6) NOT NULL COMMENT 'position id',
+	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
+	  `gid` smallint(6) NOT NULL COMMENT '组id',
+	  `mid` smallint(6) NOT NULL COMMENT '商品id',
+	  `qty` smallint(6) NOT NULL COMMENT '商品数量',
+	  `cid` smallint(6) NOT NULL COMMENT '消耗品id',
+	  `amt` smallint(6) NOT NULL COMMENT '消耗品数量',
+	  PRIMARY KEY (`pid`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+	cursor.execute(statement)
+
 def create_world(world):
 	c = pymysql.connect(host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8mb4', autocommit=True)
 	cursor = c.cursor()
@@ -485,7 +502,7 @@ def already_exists(world):
 	return True
 
 def operating_test():
-	c = pymysql.connect(host='192.168.1.102', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
+	c = pymysql.connect(host='127.0.0.1', user='root', password='lukseun', charset='utf8mb4', autocommit=True)
 	c.select_db("experimental")
 	cursor = c.cursor()
 	# creat_table_task(cursor)
@@ -498,13 +515,14 @@ def operating_test():
 	# creat_limits(cursor)
 
 	# cursor.execute(f'DROP TABLE progress')
-	creat_progress(cursor)
+	creat_darkmarket(cursor)
+	# creat_progress(cursor)
 	# cursor.execute(f'insert into progress (uid, exp) value ("1", 0)')
 	# code = cursor.execute(f'insert into timer (uid, tid) value ("1", 11)')
-	cursor.execute('select iid from item where uid = "1";')
-	print(cursor.fetchall())
-	code = cursor.execute(f'insert into item (uid, iid) value ("1", 10)')
-	print(code)
+	# cursor.execute('select iid from item where uid = "1";')
+	# print(cursor.fetchall())
+	# code = cursor.execute(f'insert into item (uid, iid) value ("1", 10)')
+	# print(code)
 	# for i in range(1, 100):
 	# 	cursor.execute(f'insert into progress (uid, exp) values ("{i}", 0)')
 
