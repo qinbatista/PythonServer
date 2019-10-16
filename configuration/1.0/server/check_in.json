@@ -1,39 +1,10 @@
 {
-	"1":
-	{
-		"coin_card": 1
-	},
-	"2":
-	{
-		"diamond": 100
-	},
-	"3":
-	{
-		"experience_potion": 100
-	},
-	"4":
-	{
-		"small_energy_potion": 100
-	},
-	"5":
-	{
-		"role":
-		{
-			"type": "role1",
-			"quantity": 5
-		}
-	},
-	"6":
-	{
-		"weapon":
-		{
-			"type": "weapon1",
-			"quantity": 5
-		}
-	},
-	"7":
-	{
-		"universal_segment": 100
-	},
+	"1":"3:18:1",
+	"2":"3:5:100",
+	"3":"3:9:100",
+	"4":"3:25:100",
+	"5":"2:1:5",
+	"6":"0:1:5",
+	"7":"3:25:100",
 	"patch_diamond": 80
 }

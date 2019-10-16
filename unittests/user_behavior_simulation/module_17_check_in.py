@@ -36,7 +36,7 @@ def get_all_check_in_table(token,world):
 
 def check_in_dialog(token,world,respons):
 	get_all_check_in_table(token,world)
-	# check_in(token,world)
+	check_in(token,world)
 	# supplement_check_in(token,world)
 
 

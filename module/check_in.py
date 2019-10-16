@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from module import enums
 from module import common
 import time
-
+from module import lottery
 async def supplement_check_in(uid, **kwargs) -> dict:
 	print("!supplement_check_in")
 	"""补签"""
@@ -21,7 +21,7 @@ async def supplement_check_in(uid, **kwargs) -> dict:
 	if missing_num == 0:
 		return common.mt(98, 'You have completed all current check-ins')
 	need_diamond = -1 * missing_num * check_in['patch_diamond']
-	diamond_data = await common.try_item(uid,enums.Item.DIAMOND,amount[aindex-1], **kwargs)
+	_,diamond_data = await common.try_item(uid,  enums.Item("IRON").value ,amount[aindex-1], **kwargs)
 	if diamond_data['status'] != 0:
 		return common.mt(99, 'Insufficient diamond')
 	# remaining = {'diamond': diamond_data['remaining'], 'missing_date': []}
@@ -37,7 +37,7 @@ async def supplement_check_in(uid, **kwargs) -> dict:
 	return common.mt(0, 'Successful signing', data={'remaining': remaining})
 
 async def check_in(uid, **kwargs) -> dict:
-	print("!check_in")
+	print("!1")
 	"""每日签到"""
 	# 0 - Sign-in success
 	# 99 - You have already signed in today
@@ -45,24 +45,27 @@ async def check_in(uid, **kwargs) -> dict:
 	s_data = await common.execute( f'select * from check_in where uid="{uid}" and date="{current_time}"', **kwargs)
 	if s_data != ():
 		return common.mt(99, 'You have already signed in today')
-	# 更新签到表
-	config  = kwargs["config"]
+	item_set = kwargs["config"][str(int(current_time[-2:])%7)].split(":")
+	print("item_set[0]="+str(item_set[0]))
+	print("enums.Group.ITEM="+str(enums.Group.ITEM.value))
+	print("enums.Group.WEAPON="+str(enums.Group.WEAPON.value))
+	print("enums.Group.ROLE="+str(enums.Group.ROLE.value))
+	if int(item_set[0])==enums.Group.ITEM.value:   isok,quantity = await common.try_item(uid, enums.Item(int(item_set[1])), int(item_set[2]), **kwargs)
+	if int(item_set[0])==enums.Group.WEAPON.value: isok,quantity = lottery._try_unlock_weapon(uid,enums.Weapon(int(item_set[1])),**kwargs)
+	if int(item_set[0])==enums.Group.ROLE.value:   isok,quantity = lottery._try_unlock_role(uid,enums.Role(int(item_set[1])),**kwargs)
+	print("isok="+str(isok))
+	print("quantity="+str(quantity))
 	await common.execute_update( f'insert into check_in(uid, date) values("{uid}", "{current_time}")',**kwargs)
-	data = await receive_all_check_reward( uid)
-	return common.mt(0, 'Sign-in success', data=data['data'])
+	# data = await receive_all_check_reward( uid)
+	return common.mt(0, 'Sign-in success',{"remaining":[f'{item_set[0])}:{enums.Item(int(item_set[1]))}:{quantity}'])
 
 async def get_all_check_in_table(uid, **kwargs) -> dict:
-	print("!get_all_check_in_table")
 	"""获取所有签到情况"""
 	# 0 - Successfully obtained all check-in status
-	# 0 - Successfully obtained all check-in status this month
-	# data = await common.execute( f'select * from check_in where uid="{uid}"')
-	month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取本月的日期前缀
-	data = await common.execute( f'select * from check_in where uid="{uid}" and date like "{month_pre}%"',**kwargs)
-	print(str(data))
+	data = await common.execute( f'select * from check_in where uid="{uid}" and date like "{time.strftime("%Y-%m-", time.localtime())}%"',**kwargs)
 	remaining = {}
-	for i, d in enumerate(data):
-		remaining.update({i: {'date': d[1], 'reward': d[2]}})
+	for d in data:
+		remaining.update({d[1][-2:]: {'date': d[1], 'reward': d[2]}})
 	return common.mt(0, 'Successfully obtained all check-in status this month', data={'remaining': remaining})
 
 async def receive_all_check_reward(uid, **kwargs) -> dict:

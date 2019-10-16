@@ -32,6 +32,7 @@ class Item(enum.IntEnum):
 	CRYSTAL_CARD = 22
 	DIAMOND_CARD = 23
 	MINE = 24
+	SMALL_ENERGY_POTION = 25
 
 
 class FamilyRole(enum.IntEnum):
