@@ -9,7 +9,6 @@ from module import mail
 from module import enums
 from module import common
 
-CHANGE_NAME_DIAMOND = 100
 
 MERCHANDISE = { '3:6:1' : '3:1:80' }
 
@@ -89,13 +88,14 @@ async def get_all(uid, **kwargs):
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news})
 
 async def get_store(**kwargs):
-	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k,v in MERCHANDISE.items()]})
+	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k,v in kwargs['config']['family']['store']['items'].items()]})
 
 async def purchase(uid, item, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in a family')
-	if item not in MERCHANDISE: return common.mt(98, 'invalid item')
-	i, c = common.decode_items(','.join([item, MERCHANDISE[item]]))
+	if item not in kwargs['config']['family']['store']['items']:
+		return common.mt(98, 'invalid item')
+	i, c = common.decode_items(','.join([item, kwargs['config']['family']['store']['items'][item]]))
 	can_pay, cost_remaining = await common.try_item(uid, c[1], -1 * c[2], **kwargs)
 	if not can_pay: return common.mt(97, 'insufficient funds')
 	_, item_remaining = await common.try_item(uid, i[1], i[2], **kwargs)
@@ -141,12 +141,13 @@ async def change_name(uid, new_name, **kwargs):
 	if not in_family: return common.mt(98, 'not in family')
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_change_name_permissions(role): return common.mt(97, 'insufficient permissions')
-	can_pay, remaining = await common.try_item(uid, enums.Item.DIAMOND, -CHANGE_NAME_DIAMOND, **kwargs)
+	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['costs']['change_name']))[0]
+	can_pay, remaining = await common.try_item(uid, iid, -cost, **kwargs)
 	if not can_pay: return common.mt(96, 'insufficient funds')
 	try:
 		await common.execute(f'UPDATE family SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	except pymysql.err.IntegrityError:
-		await common.try_item(uid, enums.Item.DIAMOND, CHANGE_NAME_DIAMOND, **kwargs)
+		await common.try_item(uid, iid, cost, **kwargs)
 		return common.mt(95, 'family name already exists')
 	await common.execute(f'UPDATE player SET fid = "{new_name}" WHERE fid = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyrole SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
