@@ -474,7 +474,7 @@ class MessageHandler:
 
 	async def _get_achievement_reward(self, data: dict) -> str:
 		data.update({"config":self._acheviement})
-		return await achievement.get_achievement_reward(data['data']['unique_id'], **data)
+		return await achievement.get_achievement_reward(data['data']['unique_id'],**data)
 
 	###################### armor ######################
 	# TODO
