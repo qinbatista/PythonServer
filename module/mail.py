@@ -17,7 +17,7 @@ Required Kwargs By MailType:
 	SIMPLE: No kwargs required
 	GIFT: items
 	FRIEND_REQUEST: sender, uid_sender
-	FAMILY_REQUEST: name, target
+	FAMILY_REQUEST: name, uid_target
 '''
 async def send_mail(mailtype, *args, **kwargs):
 	try:
