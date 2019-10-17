@@ -261,9 +261,26 @@ CREATE TABLE `weaponpassive` (
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
+DARKMARKET = \
+	"""
+	CREATE TABLE `darkmarket` (
+	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
+	  `pid` smallint(6) NOT NULL COMMENT 'position id',
+	  `gid` smallint(6) NOT NULL COMMENT '组id',
+	  `mid` smallint(6) NOT NULL COMMENT '商品id',
+	  `qty` smallint(6) NOT NULL COMMENT '商品数量',
+	  `cid` smallint(6) NOT NULL COMMENT '消耗品id',
+	  `amt` smallint(6) NOT NULL COMMENT '消耗品数量',
+	  PRIMARY KEY (`uid`, `pid`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	"""
+
 TABLES = [PLAYER, PLAYERAFTERINSERT, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKETITEMS, \
 		FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LIMITS, PROGRESS, \
-		ROLE, ROLEPASSIVE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE]
+		ROLE, ROLEPASSIVE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE,DARKMARKET]
+
+
+
 
 #########################################################################################
 
@@ -284,7 +301,18 @@ def create_db(world):
 		for table in TABLES:
 			connection.cursor().execute(table)
 		print(f'created new database for world {world}..')
-	else: print(f'database for world {world} already exists, skipping..')
+	else:
+		print(f'database for world {world} already exists, skipping..')
+		connection = pymysql.connect(host = '192.168.1.102', user = 'root',
+				password = 'lukseun', charset = 'utf8mb4', autocommit = True)
+		connection.select_db(world)
+		for table in TABLES:
+			try:
+				connection.cursor().execute(table)
+			except:
+				print("error")
+		print(f'created new database for world {world}..')
+
 
 def create_mailbox(world):
 	path = os.path.dirname(os.path.realpath(__file__)) + '/../box'
