@@ -7,52 +7,45 @@ from module import common
 import time
 from module import lottery
 async def supplement_check_in(uid, **kwargs) -> dict:
-	print("!supplement_check_in")
 	"""补签"""
 	# 0 - Successful signing
 	# 98 - You have completed all current check-ins
 	# 99 - Insufficient diamond
 	month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取每月需要补签的日期前缀
 	data = await common.execute(f'select date from check_in where uid="{uid}" and date like "{month_pre}%"',**kwargs)
-	day_list = [int(d[0][-2:]) for d in data]
-	today = datetime.today()
-	# max_day = calendar.monthrange(today.year, today.month)[1]  # 获取本月的总天数
-	missing_num = today.day - len(day_list)
-	if missing_num == 0:
-		return common.mt(98, 'You have completed all current check-ins')
-	need_diamond = -1 * missing_num * check_in['patch_diamond']
-	_,diamond_data = await common.try_item(uid,  enums.Item("IRON").value ,amount[aindex-1], **kwargs)
-	if diamond_data['status'] != 0:
-		return common.mt(99, 'Insufficient diamond')
-	# remaining = {'diamond': diamond_data['remaining'], 'missing_date': []}
-	remaining = {'missing_date': []}
-	for d in range(1, today.day + 1):
-		if d not in day_list:
-			check_date = f'{month_pre}{d}'
-			if d < 10: check_date = f'{month_pre}0{d}'
-			remaining['missing_date'].append(check_date)
-			await common.execute_update( f'insert into check_in(uid, date) values("{uid}", "{check_date}")',**kwargs)
-	data = await receive_all_check_reward( uid)
-	remaining.update({'check_in_data': data['data']})
-	return common.mt(0, 'Successful signing', data={'remaining': remaining})
+	today_number = datetime.today().day
+	missing_days = today_number - len(data)
+	if missing_days == 0:return common.mt(98, 'no day missing')
+	isok,diamond_data = await common.try_item(uid, enums.Item.DIAMOND, -missing_days * kwargs["config"]["patch_diamond"], **kwargs)
+	if isok == False:return common.mt(99, 'Insufficient diamond')
+	check_data={}
+	for i in range(1,today_number):
+		kwargs.update({"hard_day":i if i>10 else "0"+str(i)})
+		result = await check_in(uid,**kwargs)
+		check_data.update({i: result["data"]})
+	return common.mt(0, 'Successful signing', data={'supplement': check_data})
 
 async def check_in(uid, **kwargs) -> dict:
 	"""每日签到"""
 	# 0 - Sign-in success
 	# 99 - You have already signed in today
-	current_time = time.strftime('%Y-%m-%d', time.localtime())
+	current_time = time.strftime('%Y-%m-'+str(kwargs["hard_day"]), time.localtime()) if kwargs.__contains__("hard_day") else time.strftime('%Y-%m-%d', time.localtime())
 	s_data = await common.execute( f'select * from check_in where uid="{uid}" and date="{current_time}"', **kwargs)
 	if s_data != ():return common.mt(99, 'You have already signed in today')
 	which_day = int(current_time[-2:])%7
 	item_set = kwargs["config"][str(which_day)].split(":")
-	vip_bond =1 if which_day<=await common.get_vip_level(uid) else 2
+	vip_exp  = kwargs["vip_exp"]["vip_level"]["experience"]
+	my_exp = await common.get_vip_exp(uid,**kwargs)
+	for i, exp in enumerate(vip_exp):
+		if my_exp <= exp:
+			vip_level = i
+			break
+	vip_bond =1 if which_day >= vip_level else 2
 	if int(item_set[0])==enums.Group.ITEM.value:   isok,quantity = await common.try_item(   uid, enums.Item(int(item_set[1])),   vip_bond*int(item_set[2]), **kwargs)
 	if int(item_set[0])==enums.Group.WEAPON.value: isok,quantity = await common.try_weapon( uid, enums.Weapon(int(item_set[1])), vip_bond*int(item_set[2]), **kwargs)
 	if int(item_set[0])==enums.Group.ROLE.value:   isok,quantity = await common.try_role(   uid, enums.Role(int(item_set[1])),   vip_bond*int(item_set[2]), **kwargs)
-	print("isok="+str(isok))
-	print("quantity="+str(quantity))
 	await common.execute_update( f'insert into check_in(uid, date) values("{uid}", "{current_time}")',**kwargs)
-	return common.mt(0, 'Sign-in success',{"remaining":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{quantity}'],"reward":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{item_set[2]}']})
+	return common.mt(0, 'Sign-in success',{"remaining":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{quantity}'],"reward":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{vip_bond*int(item_set[2])}']})
 
 async def get_all_check_in_table(uid, **kwargs) -> dict:
 	"""获取所有签到情况"""
@@ -62,83 +55,3 @@ async def get_all_check_in_table(uid, **kwargs) -> dict:
 	for d in data:
 		remaining.update({d[1][-2:]: {'date': d[1], 'reward': d[2]}})
 	return common.mt(0, 'Successfully obtained all check-in status this month', data={'remaining': remaining})
-
-async def receive_all_check_reward(uid, **kwargs) -> dict:
-	"""领取本月所有签到奖励"""
-	# 0 - Successfully received the reward
-	month_pre = time.strftime('%Y-%m-', time.localtime())  # 获取本月的日期前缀
-	data = await common.execute( f'select * from check_in where uid="{uid}" and date like "{month_pre}%" and reward=0', **kwargs)
-	key_words = ['role', 'weapon']
-	vip_dict = await self.increase_vip_exp( uid, 0)
-	if vip_dict == {}: return common.mt(99, 'function increase_vip_exp error')
-	vip_level = vip_dict['vip_level']
-	remaining = {}
-	reward = {}
-	for d in data:
-		# 领奖的操作
-		day = int(d[1][-2:])
-		item_index = day % 7
-		if item_index < vip_level:
-			for key, value in self._check_in[str(item_index + 1)].items():
-				if key in key_words:
-					k = value['type']
-					quantity = 2 * value['quantity']
-					select_str = f'select segment from {key} where uid="{uid}" and {key}_name="{k}"'
-					update_str = f'update {key} set segment=segment+{quantity} where uid="{uid}" and {key}_name="{k}"'
-					insert_str = f'insert into {key}(uid, {key}_name, segment) values("{uid}", "{k}", {quantity})'
-					k_data = await common.execute( select_str)
-					if k_data == ():
-						await common.execute_update( insert_str)
-						remaining.update({key: {k: quantity}})
-					else:
-						await common.execute_update( update_str)
-						remaining.update({key: {k: k_data[0][0] + quantity}})
-					if key in reward.keys():
-						if k in reward[key].keys():
-							reward[key][k] += quantity
-						else:
-							reward[key].update({k: quantity})
-					else:
-						reward.update({key: {k: quantity}})
-				else:
-					quantity = 2 * value
-					key_data = await self._try_material( uid, key, quantity)
-					remaining.update({key: key_data['remaining']})
-					if key in reward.keys():
-						reward[key] += quantity
-					else:
-						reward.update({key: quantity})
-		else:
-			for key, value in self._check_in[str(item_index + 1)].items():
-				if key in key_words:
-					k = value['type']
-					quantity = value['quantity']
-					select_str = f'select segment from {key} where uid="{uid}" and {key}_name="{k}"'
-					update_str = f'update {key} set segment=segment+{quantity} where uid="{uid}" and {key}_name="{k}"'
-					insert_str = f'insert into {key}(uid, {key}_name, segment) values("{uid}", "{k}", {quantity})'
-					k_data = await common.execute( select_str)
-					if k_data == ():
-						await common.execute_update( insert_str)
-						remaining.update({key: {k: quantity}})
-					else:
-						await common.execute_update( update_str)
-						remaining.update({key: {k: k_data[0][0] + quantity}})
-					if key in reward.keys():
-						if k in reward[key].keys():
-							reward[key][k] += quantity
-						else:
-							reward[key].update({k: quantity})
-					else:
-						reward.update({key: {k: quantity}})
-				else:
-					quantity = value
-					key_data = await self._try_material( uid, key, quantity)
-					remaining.update({key: key_data['remaining']})
-					if key in reward.keys():
-						reward[key] += quantity
-					else:
-						reward.update({key: quantity})
-		# 领完奖励后，将签到表中的reward置为1
-		await common.execute_update( f'update check_in set reward=1 where uid="{uid}" and date="{d[1]}"')
-
-	return common.mt(0, 'Successfully received the reward', data={'remaining': remaining, 'reward': reward})

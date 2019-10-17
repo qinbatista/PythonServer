@@ -168,7 +168,7 @@ CREATE TABLE `progress` (
 	  `stage` smallint(6) DEFAULT 0 COMMENT '最高普通关卡',
 	  `towerstage` smallint(6) DEFAULT 0 COMMENT '冲塔最高关卡',
 	  `hangstage` smallint(6) DEFAULT 0 COMMENT '当前挂机的关卡',
-	  `videxp` smallint(6) DEFAULT 0 COMMENT 'vip经验',
+	  `vipexp` smallint(6) DEFAULT 0 COMMENT 'vip经验',
 	  PRIMARY KEY (`uid`),
 	  CONSTRAINT `fk_progress_t1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

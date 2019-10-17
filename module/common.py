@@ -59,8 +59,8 @@ async def try_role(uid, gift,quantity, **kwargs):
 	await execute(f'UPDATE role SET segment = segment + {quantity} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
 	return (False, role)
 
-async def get_vip_level(uid, **kwargs):
-	data = await execute(f'SELECT vip_exp FROM progress WHERE uid = "{uid}";', **kwargs)
+async def get_vip_exp(uid, **kwargs):
+	data = await execute(f'SELECT vipexp FROM progress WHERE uid = "{uid}";', **kwargs)
 	if data==():return 0
 	else:return data[0][0]
 
