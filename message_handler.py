@@ -20,6 +20,7 @@ from module import role
 from module import task
 from module import stage
 from module import check_in
+from module import darkmarket
 from datetime import datetime, timedelta
 
 
@@ -526,23 +527,10 @@ class MessageHandler:
 		data.update({"config":self._task},)
 		return await task.get_task_reward(data['data']['unique_id'],data['data']['task_id'], **data)
 
-	# TODO 新增
-	async def _automatically_refresh_store(self, data: dict) -> str:
-		darkmarket = {
-			"refresh_time": "2019-10-10 12:41:52",
-			"refreshable_quantity": 3,
-			"items": [
-				{"group":1,"item":1,"quantity":100, "currency_item":5,"quantity":100},
-				{"group":2,"item":2,"quantity":1200,"currency_item":5,"quantity":100},
-				{"group":3,"item":3,"quantity":3100,"currency_item":5,"quantity":100},
-				{"group":0,"item":4,"quantity":100, "currency_item":5,"quantity":100},
-				{"group":4,"item":5,"quantity":1200,"currency_imte":5,"quantity":100},
-				{"group":1,"item":6,"quantity":1200,"currency_imte":5,"quantity":100},
-				{"group":1,"item":7,"quantity":1200,"currency_imte":5,"quantity":100},
-				{"group":1,"item":8,"quantity":1200,"currency_imte":5,"quantity":100}
-			]
-		}
-		return common.mt(0, 'success', {'darkmarket': darkmarket})
+	###################### darkmarket ######################
+	async def _automatically_refresh(self, data: dict) -> str:
+		data['dark_market'] = self._player['dark_market']
+		return await darkmarket.automatically_refresh(data['data']['unique_id'], **data)
 
 	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
 	async def _stage_reward_config(self, data: dict) -> str:
@@ -780,7 +768,7 @@ FUNCTION_LIST = {
 	'get_task_reward': MessageHandler._get_task_reward,
 
 	# TODO 新增
-	'automatically_refresh_store': MessageHandler._automatically_refresh_store,
+	'automatically_refresh': MessageHandler._automatically_refresh,
 	'stage_reward_config': MessageHandler._stage_reward_config,
 	'get_lottery_config_info': MessageHandler._get_lottery_config_info,
 	'get_hang_up_info': MessageHandler._get_hang_up_info,

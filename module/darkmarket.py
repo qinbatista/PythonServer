@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 #
 
 
-async def automatically_refresh(uid, **kwargs) -> dict:
+async def automatically_refresh(uid, **kwargs):
 	"""
 	# kwargs['dark_market']  self._player['dark_market']
 	success -> 0 and 1
