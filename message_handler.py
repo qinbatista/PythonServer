@@ -409,10 +409,12 @@ class MessageHandler:
 	# TODO
 	async def _check_in(self, data: dict) -> str:
 		data.update({"config":self._check_in})
+		data.update({"vip_exp":self._vip_config})
 		return await check_in.check_in(data['data']['unique_id'],**data)
 
 	async def _supplement_check_in(self, data: dict) -> str:
 		data.update({"config":self._check_in})
+		data.update({"vip_exp":self._vip_config})
 		return await check_in.supplement_check_in(data['data']['unique_id'],**data)
 
 	async def _get_all_check_in_table(self, data: dict) -> str:
@@ -472,7 +474,7 @@ class MessageHandler:
 
 	async def _get_achievement_reward(self, data: dict) -> str:
 		data.update({"config":self._acheviement})
-		return await achievement.get_achievement_reward(data['data']['unique_id'], **data)
+		return await achievement.get_achievement_reward(data['data']['unique_id'],**data)
 
 	###################### armor ######################
 	# TODO
@@ -549,9 +551,9 @@ class MessageHandler:
 	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
 	async def _get_lottery_config_info(self, data: dict) -> str:
 		cost = {
-			"skills": self._lottery["skills"]["cost"],
-			"weapons": self._lottery["weapons"]["cost"],
-			"roles": self._lottery["roles"]["cost"],
+			"skills": self._lottery["random_gift"]["SKILL"]["cost"],
+			"weapons": self._lottery["random_gift"]["WEAPON"]["cost"],
+			"roles": self._lottery["random_gift"]["ROLE"]["cost"],
 			"fortune_wheel": self._lottery["fortune_wheel"]["cost"]
 		}
 		return common.mt(0, 'success', {'config': cost})
