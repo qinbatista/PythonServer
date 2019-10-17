@@ -46,7 +46,7 @@ async def send_gift(uid, gn_target, **kwargs):
 	if not friends or since == '': return common.mt(99, 'not friends')
 	now = datetime.now(timezone.utc)
 	if not _can_send_gift(now, recover): return common.mt(98, 'gift cooldown')
-	kwargs['data']['items'] = common.encode_item(enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1)
+	kwargs['items'] = common.encode_item(enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1)
 	sent = await mail.send_mail(enums.MailType.GIFT, fid, **kwargs)
 	if not sent: return common.mt(97, 'mailbox error')
 	await common.execute(f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
