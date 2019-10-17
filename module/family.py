@@ -74,6 +74,8 @@ async def respond(uid, nonce, **kwargs):
 	if in_family: return common.mt(98, 'already in a family')
 	exists, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
 	if not exists: return common.mt(97, 'family no longer exists')
+	member_count = await _count_members(name, **kwargs)
+	if member_count >= kwargs['config']['family']['general']['members']['max']: return common.mt(96, 'family is full')
 	await _add_to_family(uid_target, name, **kwargs)
 	gn_target = await common.get_gn(uid_target, **kwargs)
 	await _record_family_change(name, f'{gn_target} has joined.', **kwargs)
@@ -188,6 +190,10 @@ def _check_remove_permissions(remover, to_remove):
 
 def _check_invite_permissions(inviter):
 	return inviter >= enums.FamilyRole.ADMIN
+
+async def _count_members(name, **kwargs):
+	count = await common.execute(f'SELECT COUNT(*) FROM familyrole WHERE `name` = "{name}";', **kwargs)
+	return count[0][0]
 
 async def _get_family_changes(name, **kwargs):
 	data = await common.execute(f'SELECT `date`, `msg` FROM familyhistory WHERE `name` = "{name}" ORDER BY `hid` LIMIT 30;', **kwargs)
