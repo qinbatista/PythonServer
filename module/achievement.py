@@ -28,5 +28,5 @@ async def get_achievement_reward(uid, **kwargs):
 		if data[0][0]>=my_quantity and data[0][1]<my_quantity:
 			_,remaining = await common.try_item(uid,enums.Item.DIAMOND,amount[qindex], **kwargs)
 			await common.execute_update(f'UPDATE achievement set reward = {quantity[qindex]} WHERE uid = "{uid}" AND aid = "{kwargs["data"]["achievement_id"]}";', **kwargs)
-			return common.mt(0, 'get reward success',{"achievement":{"item":{"item_id":5,"remaining":remaining,"reward":amount[qindex]},"achievement":{"value":data[0][0],"reward":quantity[qindex],"aid":enums.Achievement(kwargs["data"]["achievement_id"])}}})
+			return common.mt(0, 'get reward success',{"item":{"item_id":5,"remaining":remaining,"reward":amount[qindex]},"achievement":{"value":data[0][0],"reward":quantity[qindex],"aid":enums.Achievement(kwargs["data"]["achievement_id"])}})
 	return common.mt(99,f'no reward for this achievement:{enums.Achievement(kwargs["data"]["achievement_id"]).name}')
