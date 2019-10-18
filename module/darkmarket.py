@@ -4,6 +4,7 @@ black_market.py
 
 from module import enums
 from module import common
+from module import weapon
 import time
 import random
 from datetime import datetime, timedelta
@@ -108,6 +109,54 @@ async def automatically_refresh(uid, **kwargs):
 	return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, 'refresh_time': refresh_time, 'refreshable': refreshable})
 
 
+async def transaction(uid, pid, **kwargs):
+	# 0  : Purchase success
+	# 94 : The server found an abnormal group id
+	# 95 : You already have this skill
+	# 96 : Insufficient currency
+	# 97 : The item has been purchased
+	# 98 : You have not yet done an automatic refresh
+	# 99 : parameter error
+	if pid < 0 or pid > 7:
+		return common.mt(99, 'parameter error')
+
+	data = await common.execute(f'SELECT gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}" AND pid = "{pid}";', **kwargs)
+	if data == ():
+		return common.mt(98, 'You have not yet done an automatic refresh')
+
+	gid, mid, qty, cid, amt = data[0]
+	if amt < 0:
+		return common.mt(97, 'The item has been purchased')
+
+	transactions = {'pid': pid, 'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': amt}
+	amt = -amt
+	can, currency = await common.try_item(uid, enums.Item(cid), amt, **kwargs)
+	if not can:
+		return common.mt(96, 'Insufficient currency')
+	transactions['_amt'] = currency
+
+	if gid == enums.Group.WEAPON.value:
+		transactions['_qty'] = await weapon._update_segment(uid, mid, qty, **kwargs)
+	elif gid == enums.Group.SKILL.value:
+		data = await common.execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND wid = "{mid}"', **kwargs)
+		if data == ():
+			await common.execute_update(f'INSERT INTO skill (uid, sid, level) VALUES ("{uid}", {mid}, {qty});', **kwargs)
+			transactions['_qty'] = qty
+		else:
+			await common.try_item(uid, enums.Item(cid), abs(amt), **kwargs)
+			return common.mt(95, 'You already have this skill')
+	elif gid == enums.Group.ITEM.value:
+		_, item = await common.try_item(uid, enums.Item(mid), qty, **kwargs)
+		transactions['_qty'] = item
+	else:
+		return common.mt(94, 'The server found an abnormal group id')
+	await set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs)
+	return common.mt(0, 'Purchase success', {'transactions': transactions})
+
+
+########################################### 私有方法 private ###########################################
+
+
 async def refresh_darkmarket(uid, **kwargs):
 	dark_markets = []
 	dark_market_data = kwargs['dark_market']  # self._player['dark_market']
@@ -157,8 +206,6 @@ async def refresh_darkmarket(uid, **kwargs):
 		else:
 			print(f'WARNING 未知商品 -> {merchandise}')
 	return dark_markets
-
-
 
 
 async def set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs):

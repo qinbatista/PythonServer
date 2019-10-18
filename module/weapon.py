@@ -72,6 +72,11 @@ async def get_all(uid, **kwargs):
 
 ####################################################################################
 
+async def _update_segment(uid, wid, segment, **kwargs):
+	await common.execute_update( f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {wid}, {segment}) ON DUPLICATE KEY UPDATE segment = segment + {segment};', **kwargs)
+	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}"', **kwargs)
+	return data[0][0]
+
 async def _get_weapon_info(uid, wid, *args, **kwargs):
 	data = await common.execute(f'SELECT {",".join(args)} FROM weapon WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
 	return (True, data[0]) if data != () else (False, ())
