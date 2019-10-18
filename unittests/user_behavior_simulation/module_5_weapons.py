@@ -4,10 +4,12 @@ import os
 import requests
 import configparser
 import asyncio
-import tool_lukseun_client
+import tool_lukseun_client as tc
 import random
 import module_12_store
-lukseun = tool_lukseun_client.LukseunClient('aliya',  port = 8880)
+lukseun = tc.LukseunClient('aliya',  port = 8880)
+logger = tc.logger
+
 world = "0"
 token = ""
 weapon_list = [i for i in range(1,40)]
@@ -16,13 +18,8 @@ passive_list = [i for i in range(1,4)]
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
-def print_method(my_string):
-	print("\033[0;37;44m\t"+my_string+"\033[0m")
-def print_module(my_string):
-	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
 def get_random_weapon():
-	print_module("[get_random_weapon]")
 	while True:
 		int_n = random.randint(0,1)
 		if int_n == 0: #金币召唤
@@ -31,7 +28,7 @@ def get_random_weapon():
 				new_response = send_tcp_message({'world' : world, 'function' : 'basic_summon', 'data' : {'token' : token,"cost_item":"coin"}})
 			else:
 				new_response = send_tcp_message({'world' : world, 'function' : 'basic_summon_10_times', 'data' : {'token' : token,"cost_item":"coin"}})#发送好友信息
-			print_method("[get_random_weapon] coin to get weapon="+str(new_response))
+			logger.debug(new_response)
 			if new_response["status"]!=0:
 				purchase_item_success("coin")#购买金币
 				coin_item = random.randint(0,2)
@@ -42,7 +39,6 @@ def get_random_weapon():
 
 
 		elif int_n == 1:#高级召唤
-			print_method("[get_random_weapon] diamond gift to get weapon")
 			is_10 = random.choice([0,1])
 			if is_10==0:
 				new_response = send_tcp_message({'world' : world, 'function' : 'pro_summon', 'data' : {'token' : token,"cost_item":"basic_summon_scroll"}})
@@ -64,27 +60,26 @@ def weapon_dialog(_token,_world,get_all_skill_info):
 	global token, world
 	token = _token
 	world = _world
-	print_module("[weapon_dialog]")
 	while True:
 		random_int = random.randint(0,5)#用户所有行为，目前只有抽取武器到时候，没有武器会重新抽取，其余逻辑如材料不足还未做
 		if random_int ==0:#升级武器
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_weapon', 'data' : {'token' : token, "weapon":random.choice(weapon_list),"amount":random.randint(30,400)}})#升级请求
-			print_method("[level_up_weapon] level up weapon:"+str(new_response))
+			logger.debug("[get_random_weapon] coin to get weapon="+str(new_response))
 		elif random_int ==1:#突破武器
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_star_weapon', 'data' : {'token' : token, "weapon":random.choice(weapon_list)}})#升级请求
-			print_method("[level_up_star_weapon] level up weapon star:"+str(new_response))
+			logger.debug("[level_up_star_weapon] level up weapon star:"+str(new_response))
 		elif random_int ==2:#升级被动
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_passive_weapon', 'data' : {'token' : token, "weapon":random.choice(weapon_list),"passive":random.choice(passive_list)}})#升级请求
-			print_method("[level_up_passive_weapon] level up weapon skill"+str(new_response))
+			logger.debug("[level_up_passive_weapon] level up weapon skill"+str(new_response))
 		elif random_int ==3:#重制技能
 			new_response = send_tcp_message({'world' : world, 'function' : 'reset_skill_point_weapon', 'data' : {'token' : token, "weapon":random.choice(weapon_list)}})#升级请求
-			print_method("[reset_skill_point_weapon] reset weapon skill"+str(new_response))
+			logger.debug("[reset_skill_point_weapon] reset weapon skill"+str(new_response))
 			if new_response["status"]==96:#武器没有抽武器
 				get_random_weapon()
 		elif random_int ==4:#退出
-			print_method("[weapon_dialog] quit weapon_dialog")
+			logger.debug("[weapon_dialog] quit weapon_dialog")
 			break
 		elif random_int ==5:#升级盔甲
 			new_response = send_tcp_message({'world' : world, 'function' : 'upgrade_armor', 'data' : {'token' : token, "armor":random.choice(weapon_list)}})#升级请求
-			print_method("[weapon_dialog] level up armor star:"+str(new_response))
+			logger.debug("[weapon_dialog] level up armor star:"+str(new_response))
 
