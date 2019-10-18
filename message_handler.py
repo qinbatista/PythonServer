@@ -541,6 +541,10 @@ class MessageHandler:
 		data['dark_market'] = self._player['dark_market']
 		return await darkmarket.free_refresh(data['data']['unique_id'], **data)
 
+	async def _diamond_refresh(self, data: dict) -> str:
+		data['dark_market'] = self._player['dark_market']
+		return await darkmarket.diamond_refresh(data['data']['unique_id'], **data)
+
 	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
 	async def _stage_reward_config(self, data: dict) -> str:
 		return common.mt(0, 'success', {'config': self._stage_reward})
@@ -781,6 +785,7 @@ FUNCTION_LIST = {
 	###################### darkmarket ######################
 	'automatically_refresh': MessageHandler._automatically_refresh,
 	'free_refresh': MessageHandler._free_refresh,
+	'diamond_refresh': MessageHandler._diamond_refresh,
 
 	# TODO 新增
 	'stage_reward_config': MessageHandler._stage_reward_config,

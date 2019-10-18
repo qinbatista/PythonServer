@@ -9,6 +9,32 @@ import random
 from datetime import datetime, timedelta
 
 
+async def diamond_refresh(uid, **kwargs):
+	"""
+	0- Dark market refreshed successfully
+	98 - Insufficient diamond
+	99 - You have not yet done an automatic refresh
+	"""
+	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}"', **kwargs)
+	if data == ():
+		await common.execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.DARK_MARKET_TIME.value}")', **kwargs)
+		data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}"', **kwargs)
+	refresh_time = data[0][0]
+
+	need_diamond = -kwargs['dark_market']['diamond_refresh_store']['diamond']
+	can, diamond = await common.try_item(uid, enums.Item.DIAMOND, need_diamond, **kwargs)
+	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+	if refresh_time == '':
+		return common.mt(99, 'You have not yet done an automatic refresh')
+	elif not can:
+		return common.mt(98, 'Insufficient diamond')
+	else:
+		refresh_time = current_time
+		dark_markets = await refresh_darkmarket(uid, **kwargs)
+		await common.execute_update(f'UPDATE timer SET time = "{refresh_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}"', **kwargs)
+		return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, 'refresh_time': refresh_time, 'diamond': diamond})
+
+
 async def free_refresh(uid, **kwargs):
 	"""
 	0- Dark market refreshed successfully
@@ -37,7 +63,7 @@ async def free_refresh(uid, **kwargs):
 		refresh_time = current_time
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
 		await common.execute_update(f'UPDATE timer SET time = "{refresh_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}"', **kwargs)
-		await common.execute_update( f'UPDATE limits SET value = {refreshable} WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}"', **kwargs)
+		await common.execute_update(f'UPDATE limits SET value = {refreshable} WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}"', **kwargs)
 		return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, 'refresh_time': refresh_time, 'refreshable': refreshable})
 
 

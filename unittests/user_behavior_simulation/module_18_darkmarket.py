@@ -30,6 +30,11 @@ def free_refresh(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'free_refresh', 'data': {'token' : kwargs['token']}})
 	logger.debug(response)
 
+@login_decoration
+def diamond_refresh(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'diamond_refresh', 'data': {'token' : kwargs['token']}})
+	logger.debug(response)
+
 def darkmarket_dialog(token,world,info_list):
 	automatically_refresh(**{"world": world, "token": token})
 	free_refresh(**{"world": world, "token": token})
@@ -41,7 +46,8 @@ if __name__ == '__main__':
 	# free_refresh(**kwargs)
 	# automatically_refresh(**{'token': response['data']['token'], 'world': 0})
 	# automatically_refresh()
-	free_refresh()
+	# free_refresh()
+	diamond_refresh()
 
 
 
