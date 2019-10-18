@@ -8,7 +8,37 @@ import time
 import random
 from datetime import datetime, timedelta
 
-#
+
+async def free_refresh(uid, **kwargs):
+	"""
+	0- Dark market refreshed successfully
+	98 - Insufficient free refresh
+	99 - You have not yet done an automatic refresh
+	"""
+	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}"', **kwargs)
+	if data == ():
+		await common.execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.DARK_MARKET_TIME.value}")', **kwargs)
+		data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}"', **kwargs)
+	refresh_time = data[0][0]
+
+	limit_data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}"', **kwargs)
+	if limit_data == ():
+		await common.execute_update(f'INSERT INTO limits (uid, lid) VALUES ("{uid}", "{enums.Limits.DARK_MARKET_LIMITS.value}")', **kwargs)
+		limit_data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}"', **kwargs)
+	refreshable = limit_data[0][0]
+
+	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+	if refresh_time == '':
+		return common.mt(99, 'You have not yet done an automatic refresh')
+	elif refreshable <= 0:
+		return common.mt(98, 'Insufficient free refresh')
+	else:
+		refreshable -= 1
+		refresh_time = current_time
+		dark_markets = await refresh_darkmarket(uid, **kwargs)
+		await common.execute_update(f'UPDATE timer SET time = "{refresh_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}"', **kwargs)
+		await common.execute_update( f'UPDATE limits SET value = {refreshable} WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}"', **kwargs)
+		return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, 'refresh_time': refresh_time, 'refreshable': refreshable})
 
 
 async def automatically_refresh(uid, **kwargs):
