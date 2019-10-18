@@ -72,7 +72,7 @@ def encode_item(gid, iid, value):
 
 def decode_items(items):
 	decoded = []
-	for item in items.split(','):
+	for item in items.split(','):  # "gid:iid:value,gid:iid:value"
 		gid, iid, value = item.split(':')
 		gid = enums.Group(int(gid))
 		if gid == enums.Group.ITEM:
