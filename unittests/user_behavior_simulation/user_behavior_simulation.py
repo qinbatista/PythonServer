@@ -76,9 +76,9 @@ def run_task(name):
 	call_login(str(name))
 	kwargs = {"world": world, "token": token}
 	info_list =  module_2_get_all_data.get_all_info(token,world)#加载所有参数信息
-	# module_13_achievement.achievement_dialog(info_list[0], **kwargs)
+	module_13_achievement.achievement_dialog(info_list[0], **kwargs)
 	# module_15_summon.summon_dialog(**kwargs)#召唤所有
-	module_5_weapons.weapon_dialog(token,world,info_list[5])
+	# module_5_weapons.weapon_dialog(token,world,info_list[5])
 	# module_8_roles.role_dialog(token,world)
 	# module_7_lottery.get_random_item(token,world)
 	# module_16_daily_task.task_dialog(token,world,info_list[5])
