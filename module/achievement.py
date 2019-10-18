@@ -4,14 +4,17 @@ achievement.py
 
 from module import enums
 from module import common
-
+from module import mail
 #
 
 
 async def get_all_achievement(uid, **kwargs):
 	achievement = await common.execute(f'SELECT aid, value, reward FROM achievement WHERE uid = "{uid}";', **kwargs)
-	kwargs.update({"aid":enums.Achievement.TOTAL_LOGIN.value,"value":1})
-	await record_achievement(uid,**kwargs)
+	if achievement==():return common.mt(0, 'success', {'achievements': []})
+	# kwargs.update({"aid":enums.Achievement.TOTAL_LOGIN.value,"value":1})
+	# await record_achievement(uid,**kwargs)
+	# kwargs['items'] = common.encode_item(enums.Group.ITEM, enums.Item.DIAMOND, 1)
+	# await mail.send_mail(enums.MailType.GIFT, uid, **kwargs)
 	return common.mt(0, 'success', {'achievements': [{'aid': a[0], 'value': a[1], 'reward': a[2]} for a in achievement]})
 
 async def record_achievement(uid, **kwargs):# aid->enums.Achievement,value->string
