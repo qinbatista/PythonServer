@@ -17,7 +17,6 @@ def send_tcp_message(msg):
 
 def login_decoration(func):
 	def wrapper(**kwargs):
-		# func(**kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): print(response))()
 		func(**kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(**{'token': response['data']['token'], 'world': 0}))()
 	return wrapper
 

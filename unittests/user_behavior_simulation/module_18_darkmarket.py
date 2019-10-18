@@ -10,9 +10,8 @@ import random
 
 lukseun = tc.LukseunClient('aliya', port = 8880)
 logger = tc.logger
-world = "0"
-unique_id = "4"
-token = ""
+
+
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
