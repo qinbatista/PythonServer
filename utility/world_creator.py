@@ -271,7 +271,8 @@ DARKMARKET = \
 	  `qty` smallint(6) NOT NULL COMMENT '商品数量',
 	  `cid` smallint(6) NOT NULL COMMENT '消耗品id',
 	  `amt` smallint(6) NOT NULL COMMENT '消耗品数量',
-	  PRIMARY KEY (`uid`, `pid`)
+	  PRIMARY KEY (`uid`, `pid`),
+	  CONSTRAINT `darkmarket_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 
