@@ -4,137 +4,137 @@ import os
 import requests
 import configparser
 import asyncio
-import tool_lukseun_client
+import tool_lukseun_client as tc
 import random
 
 
-lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
-world = "0"
-unique_id = "4"
-token = ""
+lukseun = tc.LukseunClient('aliya', port = 8880)
+logger = tc.logger
+
+
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
-def print_method(my_string):
-	print("\033[0;37;44m\t"+my_string+"\033[0m")
-def print_module(my_string):
-	print("\033[0;37;41m\t"+my_string+"\033[0m")
-def basic_summon():
-	print_module("[basic_summon]")
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon', 'data' : {'token' : token,"item":random.choice([1,5,11])}})
-	print_method("[basic_summon]"+str(response))
 
-def pro_summon():
-	print_module("[pro_summon]")
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon', 'data' : {'token' : token,"item":random.choice([1,5,12])}})
-	print_method("[pro_summon]"+str(response))
+def login_decoration(func):
+	def wrapper(**kwargs):
+		# func(**kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): print(response))()
+		func(**kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(**{'token': response['data']['token'], 'world': 0}))()
+	return wrapper
 
-def friend_summon():
-	print_module("[friend_summon]")
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon', 'data' : {'token' : token,"item":random.choice([1,5,16])}})
-	print_method("[friend_summon]"+str(response))
+@login_decoration
+def basic_summon(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'basic_summon', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,11])}})
+	logger.debug(response)
 
-def basic_summon_skill():
-	print_module("[basic_summon_skill]")
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_skill', 'data' : {'token' : token,"item":random.choice([1,5,11])}})
-	print_method("[basic_summon_skill]"+str(response))
+@login_decoration
+def pro_summon(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,12])}})
+	logger.debug(response)
 
-def pro_summon_skill():
-	print_module("[pro_summon_skill]")
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon_skill', 'data' : {'token' : token,"item":random.choice([1,5,12])}})
-	print_method("[pro_summon_skill]"+str(response))
+@login_decoration
+def friend_summon(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'friend_summon', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,16])}})
+	logger.debug(response)
 
-def friend_summon_skill():
-	print_module("[friend_summon_skill]")
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_skill', 'data' : {'token' : token,"item":random.choice([1,5,16])}})
-	print_method("[friend_summon_skill]"+str(response))
+@login_decoration
+def basic_summon_skill(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'basic_summon_skill', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,11])}})
+	logger.debug(response)
 
-def basic_summon_role():
-	print_module("[basic_summon_role]")
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_role', 'data' : {'token' : token,"item":random.choice([1,5,11])}})
-	print_method("[basic_summon_role]"+str(response))
+@login_decoration
+def pro_summon_skill(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon_skill', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,12])}})
+	logger.debug(response)
 
-def pro_summon_role():
-	print_module("[pro_summon_role]")
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon_role', 'data' : {'token' : token,"item":random.choice([1,5,12])}})
-	print_method("[pro_summon_role]"+str(response))
+@login_decoration
+def friend_summon_skill(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'friend_summon_skill', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,16])}})
+	logger.debug(response)
 
-def friend_summon_role():
-	print_module("[friend_summon_role]")
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_role', 'data' : {'token' : token,"item":random.choice([1,5,16])}})
-	print_method("[friend_summon_role]"+str(response))
+@login_decoration
+def basic_summon_role(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'basic_summon_role', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,11])}})
+	logger.debug(response)
 
-def basic_summon_10_times():
-	print_module("[basic_summon_10_times]")
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_10_times', 'data' : {'token' : token,"item":random.choice([1,5,11])}})
-	print_method("[basic_summon_10_times]"+str(response))
+@login_decoration
+def pro_summon_role(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon_role', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,12])}})
+	logger.debug(response)
 
-def pro_summon_10_times():
-	print_module("[pro_summon_10_times]")
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_10_times', 'data' : {'token' : token,"item":random.choice([1,5,12])}})
-	print_method("[pro_summon_10_times]"+str(response))
+@login_decoration
+def friend_summon_role(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'friend_summon_role', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,16])}})
+	logger.debug(response)
 
-def friend_summon_10_times():
-	print_module("[friend_summon_10_times]")
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_10_times', 'data' : {'token' : token,"item":random.choice([1,3,16])}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[friend_summon_10_times]"+str(response))
+@login_decoration
+def basic_summon_10_times(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'basic_summon_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,11])}})
+	logger.debug(response)
 
-def basic_summon_skill_10_times():
-	print_module("[basic_summon_skill_10_times]")
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_skill_10_times', 'data' : {'token' : token,"item":random.choice([1,3,11])}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[basic_summon_skill_10_times]"+str(response))
+@login_decoration
+def pro_summon_10_times(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'basic_summon_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,12])}})
+	logger.debug(response)
 
-def pro_summon_skill_10_times():
-	print_module("[pro_summon_skill_10_times]")
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon_skill_10_times', 'data' : {'token' : token,"item":random.choice([1,3,12])}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[pro_summon_skill_10_times]"+str(response))
+@login_decoration
+def friend_summon_10_times(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'friend_summon_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,3,16])}})#能量包，1是1张， 2是3张，3是10张
+	logger.debug(response)
 
-def friend_summon_skill_10_times():
-	print_module("[friend_summon_skill_10_times]")
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_skill_10_times', 'data' : {'token' : token,"item":random.choice([1,3,16])}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[friend_summon_skill_10_times]"+str(response))
+@login_decoration
+def basic_summon_skill_10_times(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'basic_summon_skill_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,3,11])}})#能量包，1是1张， 2是3张，3是10张
+	logger.debug(response)
 
-def basic_summon_role_10_times():
-	print_module("[basic_summon_role_10_times]")
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_role_10_times', 'data' : {'token' : token,"item":random.choice([1,3,11])}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[basic_summon_role_10_times]"+str(response))
+@login_decoration
+def pro_summon_skill_10_times(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon_skill_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,3,12])}})#能量包，1是1张， 2是3张，3是10张
+	logger.debug(response)
 
-def pro_summon_role_10_times():
-	print_module("[pro_summon_role_10_times]")
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon_role_10_times', 'data' : {'token' : token,"item":random.choice([1,3,12])}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[pro_summon_role_10_times]"+str(response))
+@login_decoration
+def friend_summon_skill_10_times(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'friend_summon_skill_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,3,16])}})#能量包，1是1张， 2是3张，3是10张
+	logger.debug(response)
 
-def friend_summon_role_10_times():
-	print_module("[friend_summon_role_10_times]")
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_role_10_times', 'data' : {'token' : token,"item":random.choice([1,3,16])}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[friend_summon_role_10_times]"+str(response))
+@login_decoration
+def basic_summon_role_10_times(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'basic_summon_role_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,3,11])}})#能量包，1是1张， 2是3张，3是10张
+	logger.debug(response)
 
-def summon_dialog(_token,_world):
-	global world,token
-	world = _world
-	token = _token
-	basic_summon()
-	pro_summon()
-	friend_summon()
+@login_decoration
+def pro_summon_role_10_times(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon_role_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,3,12])}})#能量包，1是1张， 2是3张，3是10张
+	logger.debug(response)
 
-	basic_summon_skill()
-	pro_summon_skill()
-	friend_summon_skill()
+@login_decoration
+def friend_summon_role_10_times(**kwargs):
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'friend_summon_role_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,3,16])}})#能量包，1是1张， 2是3张，3是10张
+	logger.debug(response)
 
-	basic_summon_role()
-	pro_summon_role()
-	friend_summon_role()
+def summon_dialog(**kwargs):
+	basic_summon(**kwargs)
+	pro_summon(**kwargs)
+	friend_summon(**kwargs)
 
-	basic_summon_10_times()
-	pro_summon_10_times()
-	friend_summon_10_times()
+	basic_summon_skill(**kwargs)
+	pro_summon_skill(**kwargs)
+	friend_summon_skill(**kwargs)
 
-	basic_summon_skill_10_times()
-	pro_summon_skill_10_times()
-	friend_summon_skill_10_times()
+	basic_summon_role(**kwargs)
+	pro_summon_role(**kwargs)
+	friend_summon_role(**kwargs)
 
-	basic_summon_role_10_times()
-	pro_summon_role_10_times()
-	friend_summon_role_10_times()
+	basic_summon_10_times(**kwargs)
+	pro_summon_10_times(**kwargs)
+	friend_summon_10_times(**kwargs)
+
+	basic_summon_skill_10_times(**kwargs)
+	pro_summon_skill_10_times(**kwargs)
+	friend_summon_skill_10_times(**kwargs)
+
+	basic_summon_role_10_times(**kwargs)
+	pro_summon_role_10_times(**kwargs)
+	friend_summon_role_10_times(**kwargs)
 
 
 

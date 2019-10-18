@@ -1,4 +1,4 @@
-import tool_lukseun_client
+import tool_lukseun_client as tc
 import module_1_login
 import module_2_get_all_data
 import module_3_friends
@@ -18,6 +18,9 @@ import module_17_check_in
 import multiprocessing
 import time
 from datetime import datetime, timedelta
+
+logger = tc.logger
+
 world = "0"
 token = ""
 testing_people_number = 20
@@ -71,15 +74,18 @@ def run_task(name):
 	global unique_id
 	unique_id = name
 	call_login(str(name))
-	info_list =  module_2_get_all_data.get_all_info(token,world)#加载所有参数信息
-	module_13_achievement.achievement_dialog(token,world,info_list[0])
-	# module_15_summon.summon_dialog(token,world)#召唤所有
+	kwargs = {"world": world, "token": token}
+	# info_list =  module_2_get_all_data.get_all_info(token,world)#加载所有参数信息
+	# module_13_achievement.achievement_dialog(token,world,info_list[0])
+	module_15_summon.summon_dialog(**kwargs)#召唤所有
 	# module_5_weapons.weapon_dialog(token,world,info_list[5])
 	# module_8_roles.role_dialog(token,world)
 	# module_7_lottery.get_random_item(token,world)
 	# module_16_daily_task.task_dialog(token,world,info_list[5])
 	# module_10_stage.stage_dialog(token,world,info_list[5])
 	# module_17_check_in.check_in_dialog(token,world,info_list[5])
+
+
 	# dark_market()#*加载黑市信息
 	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面

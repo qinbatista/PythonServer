@@ -4,17 +4,12 @@ import os
 import requests
 import configparser
 import asyncio
-import tool_lukseun_client
+import tool_lukseun_client as tc
 import random
-import logging
-logging.basicConfig(
-	level=logging.DEBUG,
-	format='%(asctime)s %(filename)s %(levelname)s message：%(message)s',
-	datefmt='%Y-%m-%d %H:%M:%S',
-)
-logger = logging.getLogger(__name__)
 
-lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
+
+lukseun = tc.LukseunClient('aliya', port = 8880)
+logger = tc.logger
 world = "0"
 unique_id = "4"
 token = ""
@@ -35,9 +30,11 @@ def darkmarket_dialog(token,world,info_list):
 	automatically_refresh(**{"world": world, "token": token})
 
 if __name__ == '__main__':
-	# response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
+	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
+	kwargs = {"world": 0, "token": response['data']['token']}
+	automatically_refresh(**kwargs)
 	# automatically_refresh(**{'token': response['data']['token'], 'world': 0})
-	automatically_refresh()
+	# automatically_refresh()
 
 
 

@@ -8,6 +8,14 @@ sys.path.insert(0, '..')
 
 import asyncio
 import json
+import logging
+logging.basicConfig(
+	level=logging.DEBUG,
+	format='%(asctime)s [%(filename)s] [%(funcName)s] %(levelname)s message：%(message)s',
+	datefmt='%Y-%m-%d %H:%M:%S',
+)
+logger = logging.getLogger(__name__)
+
 
 
 class LukseunClient:
