@@ -179,53 +179,44 @@ def get_player_config():
 	print_method("[get_player_config]"+str(response))
 	return response
 
+def get_task_config():
+	response = send_tcp_message({'world' : world, 'function' : 'get_task_config', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+	print_method("[get_task_config]"+str(response))
+	return response
+
+def get_achievement_config():
+	response = send_tcp_message({'world' : world, 'function' : 'get_achievement_config', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+	print_method("[get_achievement_config]"+str(response))
+	return response
+
 def get_all_info(_token,_world):
 	print_module("[module_2_get_all_data] get_all_info")
 	global world,token
 	world = _world
 	token = _token
-	get_all_achievement_str = get_all_achievement()
-	get_all_armor_str = get_all_armor()
-	get_all_resource_str = get_all_resource()
-	get_all_tower_str = get_all_tower()
-	get_all_task_str = get_all_task()
-	get_all_weapon_str = get_all_weapon()
-	get_all_check_in_table_str = get_all_check_in_table()
-	get_all_friend_str = get_all_friend()
-	get_all_skill_str = get_all_skill()
-	get_player_info_str =get_player_info()
-	get_all_role_str = get_all_role()
-	automatically_refresh_store_str =automatically_refresh_store()
-	stage_reward_config_str = stage_reward_config()
-	get_lottery_config_info_str = get_lottery_config_info()
-	refresh_all_storage_str = refresh_all_storage()
-	get_all_vip_info_str = get_all_vip_info()
-	get_factory_info_str = get_factory_info()
-	get_all_family_info_str = get_all_family_info()
-	get_family_config_str = get_family_config()
-	check_boss_status_str = check_boss_status()
-	get_player_config_str = get_player_config()
 	return [
-			get_all_achievement_str,
-			get_all_armor_str,
-			get_all_resource_str,
-			get_all_tower_str,
-			get_all_task_str,
-			get_all_weapon_str,
-			get_all_check_in_table_str,
-			get_all_friend_str,
-			get_all_skill_str,
-			get_player_info_str,
-			automatically_refresh_store_str,
-			stage_reward_config_str,
-			get_lottery_config_info_str,
-			refresh_all_storage_str,
-			get_all_vip_info_str,
-			get_all_role_str,
-			get_factory_info_str,
-			get_all_family_info_str,
-			get_family_config_str,
-			check_boss_status_str
+			get_all_achievement(),
+			get_all_armor(),
+			get_all_resource(),
+			get_all_tower,
+			get_all_task(),
+			get_all_weapon(),
+			get_all_check_in_table(),
+			get_all_friend(),
+			get_all_skill(),
+			get_player_info(),
+			automatically_refresh_store(),
+			stage_reward_config(),
+			get_lottery_config_info(),
+			refresh_all_storage(),
+			get_all_vip_info(),
+			get_all_role(),
+			get_factory_info(),
+			get_all_family_info(),
+			get_family_config(),
+			check_boss_status(),
+			get_task_config(),
+			get_achievement_config()
 			]
 
 def _execute_statement(statement: str) -> tuple:

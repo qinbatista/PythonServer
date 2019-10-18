@@ -477,6 +477,9 @@ class MessageHandler:
 		data.update({"config":self._acheviement})
 		return await achievement.get_achievement_reward(data['data']['unique_id'],**data)
 
+	async def _get_achievement_config(self, data: dict) -> str:
+		return self._acheviement
+
 	###################### armor ######################
 	# TODO
 	async def _upgrade_armor(self, data: dict) -> str:
@@ -521,7 +524,9 @@ class MessageHandler:
 	async def _get_all_task(self, data: dict) -> str:
 		data.update({"config":self._task})
 		return await task.get_all_task(data['data']['unique_id'],**data)
-		# return common.mt(0, 'success', {'tasks': [{'tid': 1, 'value': 1, 'reward': 0, 'timer': '2019-10-05'}, {'tid': 2, 'value': 1, 'reward': 0, 'timer': '2019-10-06'}]})
+
+	async def _get_task_config(self, data: dict) -> str:
+		return self._task
 
 	async def _get_task_reward(self, data: dict) -> str:
 		data.update({"config":self._task},)
@@ -747,6 +752,7 @@ FUNCTION_LIST = {
 	###################### achievement ######################
 	'get_all_achievement': MessageHandler._get_all_achievement,
 	'get_achievement_reward':MessageHandler._get_achievement_reward,
+	'get_achievement_config':MessageHandler._get_achievement_config,
 
 	# TODO
 	###################### armor ######################
@@ -764,6 +770,7 @@ FUNCTION_LIST = {
 	'get_hang_up_reward': MessageHandler._get_hang_up_reward,
 
 	###################### tasks ######################
+	'get_task_config':MessageHandler._get_task_config,
 	'get_all_task': MessageHandler._get_all_task,
 	'get_task_reward': MessageHandler._get_task_reward,
 
