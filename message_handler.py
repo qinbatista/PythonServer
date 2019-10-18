@@ -206,7 +206,7 @@ class MessageHandler:
 		return await family.purchase(data['data']['unique_id'], data['data']['item'], **data)
 
 	async def _get_config_family(self, data: dict) -> str:
-		return data['config']['family']
+		return common.mt(0, 'success', data={'config': self._family_config})
 
 	# TODO
 
