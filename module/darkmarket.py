@@ -69,7 +69,7 @@ async def refresh_darkmarket(uid, **kwargs):
 					mid = int(merchandise.replace(f'skill_{mpg}', '')) + value
 					break
 			if mid == 999999:
-				continue
+				print(f'WARNING 未知技能 -> {merchandise}')
 			else:
 				currency_type = (random.choices(list(dark_market_data['reward_skill'].keys()), k=1))[0]
 				merchandise_quantity = 1
@@ -106,13 +106,6 @@ async def get_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs):
 	return data[0]
 
 async def set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs):
-	select = f'SELECT gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}" AND pid = "{pid}";'
-	update = f'UPDATE darkmarket SET gid={gid}, mid={mid}, qty={qty}, cid={cid}, amt={amt} WHERE uid = "{uid}" AND pid = "{pid}";'
-	insert = f'INSERT INTO darkmarket (uid, pid, gid, mid, qty, cid, amt) VALUES darkmarket ("{uid}", {pid}, {gid}, {mid}, {qty}, {cid}, {amt});'
-	data = await common.execute(select, **kwargs)
-	if data == ():
-		await common.execute_update(insert, **kwargs)
-	else:
-		await common.execute_update(update, **kwargs)
+	await common.execute_update(f'INSERT INTO darkmarket (uid, pid, gid, mid, qty, cid, amt) VALUES ("{uid}", {pid}, {gid}, {mid}, {qty}, {cid}, {amt}) ON DUPLICATE KEY UPDATE `gid`= values(`gid`), `mid`= values(`mid`), `qty`= values(`qty`), `cid`= values(`cid`), `amt`= values(`amt`);', **kwargs)
 
 
