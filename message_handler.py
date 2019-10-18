@@ -478,7 +478,7 @@ class MessageHandler:
 		return await achievement.get_achievement_reward(data['data']['unique_id'],**data)
 
 	async def _get_achievement_config(self, data: dict) -> str:
-		return self._acheviement
+		return common.mt(0, 'success', data={'config': self._acheviement})
 
 	###################### armor ######################
 	# TODO
@@ -526,7 +526,7 @@ class MessageHandler:
 		return await task.get_all_task(data['data']['unique_id'],**data)
 
 	async def _get_task_config(self, data: dict) -> str:
-		return self._task
+		return common.mt(0, 'success', data={'config': self._task})
 
 	async def _get_task_reward(self, data: dict) -> str:
 		data.update({"config":self._task},)
