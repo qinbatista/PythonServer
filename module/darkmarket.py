@@ -44,7 +44,7 @@ async def diamond_refresh(uid, **kwargs):
 
 async def free_refresh(uid, **kwargs):
 	"""
-	0- Dark market refreshed successfully
+	0 - Dark market refreshed successfully
 	98 - Insufficient free refresh
 	99 - You have not yet done an automatic refresh
 	"""
@@ -79,6 +79,7 @@ async def automatically_refresh(uid, **kwargs):
 	# kwargs['dark_market']  self._player['dark_market']
 	success -> 0 and 1
 	# 0 - Dark market refreshed successfully
+	# 1 - Get all black market information
 	"""
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}";', **kwargs)
 	if data == ():

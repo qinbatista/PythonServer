@@ -50,10 +50,10 @@ if __name__ == '__main__':
 	# automatically_refresh(**kwargs)
 	# free_refresh(**kwargs)
 	# automatically_refresh(**{'token': response['data']['token'], 'world': 0})
-	automatically_refresh()
+	# automatically_refresh()
 	# free_refresh()
 	# diamond_refresh()
-	# darkmarket_transaction()
+	darkmarket_transaction()
 
 
 
