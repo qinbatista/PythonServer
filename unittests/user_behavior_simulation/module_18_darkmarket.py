@@ -37,7 +37,7 @@ def diamond_refresh(**kwargs):
 
 @login_decoration
 def darkmarket_transaction(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'darkmarket_transaction', 'data': {'token' : kwargs['token'], 'pid': 0}})
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'darkmarket_transaction', 'data': {'token' : kwargs['token'], 'pid': 6}})
 	logger.debug(response)
 
 def darkmarket_dialog(token,world,info_list):
