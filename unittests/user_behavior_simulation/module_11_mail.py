@@ -23,12 +23,12 @@ def print_module(my_string):
 
 def friend_request(nonce):
 	print_method("friend_request")
-	new_response = send_tcp_message({'world' : world, 'function' : 'response_friend', 'data' : {'token' : token,"nonce":nonce}})
+	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"nonce":nonce}})
 	return new_response
 
-def gift_request(nonce):
+def gift_request(world,token, key):
 	print_method("gift_request")
-	new_response = send_tcp_message({'world' : world, 'function' : 'redeem_nonce', 'data' : {'token' : token,"nonce":nonce}})
+	new_response = send_tcp_message({'world' : world, 'function' : 'accept_gift', 'data' : {'token' : token,"key":key}})
 	return new_response
 
 def family_request(nonce):
@@ -65,20 +65,24 @@ def send_gift():
 	print_method("[request_friend] requst_friend:"+str(new_response))
 
 def mail_dialog(_token,_world,_all_info,_name):
-	global world,token,all_info,name
 	name = _name
 	token = _token
 	world = _world
 	all_info = _all_info
-	send_friend()
-	send_family()
+	# send_friend()
+	# send_family()
+	# send_gift()
 	print_module("mail_dialog")
 	if _all_info["status"]==62:
 		return print_method("your email is empty")
-	for i in range(len(_all_info["data"]["mail"]["new"])):
-		request_type = _all_info["data"]["mail"]["new"][i]["type"]
+	for i in range(len(_all_info["data"]["mail"])):
+		request_type = _all_info["data"]["mail"][i]["type"]
 		print_method("request_type:"+request_type)
-		if request_type == "friend_request":
-			friend_request(_all_info["data"]["mail"]["new"][i]["data"]["nonce"])
-		if request_type == "gift":
-			gift_request(_all_info["data"]["mail"]["new"][i]["data"]["nonce"])
+		if request_type == '0':#simple
+			friend_request(_all_info["data"]["mail"][i]["key"])
+		if request_type == '1':#gift
+			gift_request(world,token,_all_info["data"]["mail"][i]["key"])
+		if request_type == '2':#friend_request
+			friend_request(_all_info["data"]["mail"][i]["key"])
+		if request_type == '3':#family_request
+			gift_request(_all_info["data"]["mail"][i]["key"])

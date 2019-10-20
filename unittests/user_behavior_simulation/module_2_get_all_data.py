@@ -187,6 +187,8 @@ def get_task_config():
 def get_achievement_config():
 	response = send_tcp_message({'world' : world, 'function' : 'get_achievement_config', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
 	print_method("[get_achievement_config]"+str(response))
+
+
 	return response
 
 def get_all_info(_token,_world):
@@ -198,13 +200,14 @@ def get_all_info(_token,_world):
 			get_all_achievement(),
 			get_all_armor(),
 			get_all_resource(),
-			get_all_tower,
+			get_all_tower(),
 			get_all_task(),
 			get_all_weapon(),
 			get_all_check_in_table(),
 			get_all_friend(),
 			get_all_skill(),
 			get_player_info(),
+			get_all_mail(),
 			automatically_refresh_store(),
 			stage_reward_config(),
 			get_lottery_config_info(),
