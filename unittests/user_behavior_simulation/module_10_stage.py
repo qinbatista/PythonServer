@@ -37,7 +37,7 @@ def get_hang_up_reward(**kwargs):
 def stage_dialog(token,world,info_list):
 	while True:
 		my_choice =  random.randint(0,4)
-		opeation_stage = random.randint(2,2)
+		opeation_stage = random.randint(0,2)
 		if my_choice==0: enter_stage(**{"world":world,"token":token,"stage":opeation_stage})
 		if my_choice==1: pass_stage(**{"world":world,"token":token,"stage":opeation_stage})
 		if my_choice==2: start_hang_up(**{"world":world,"token":token,"stage":opeation_stage})

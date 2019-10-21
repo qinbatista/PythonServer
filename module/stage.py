@@ -65,8 +65,6 @@ async def enter_stage(uid, stage, **kwargs):
 		await common.execute_update(f'UPDATE item set value = {values[i]} WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		enter_stages.append({'iid': iid, 'value': data[0][0], 'consume': entry_consume[stage][iid]})
-
-	print('测试数组越界问题')
 	_, exp_info = await increase_exp(uid, 0, **kwargs)
 	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy_data': energy_data['data'], 'monster': enemy_list})
 
