@@ -533,17 +533,13 @@ class MessageHandler:
 		return await task.get_task_reward(data['data']['unique_id'],data['data']['task_id'], **data)
 
 	###################### darkmarket ######################
-	async def _automatically_refresh(self, data: dict) -> str:
+	async def _get_all_market(self, data: dict) -> str:
 		data['dark_market'] = self._player['dark_market']
-		return await darkmarket.automatically_refresh(data['data']['unique_id'], **data)
+		return await darkmarket.get_all_market(data['data']['unique_id'], **data)
 
-	async def _free_refresh(self, data: dict) -> str:
+	async def _refresh_market(self, data: dict) -> str:
 		data['dark_market'] = self._player['dark_market']
-		return await darkmarket.free_refresh(data['data']['unique_id'], **data)
-
-	async def _diamond_refresh(self, data: dict) -> str:
-		data['dark_market'] = self._player['dark_market']
-		return await darkmarket.diamond_refresh(data['data']['unique_id'], **data)
+		return await darkmarket.refresh_market(data['data']['unique_id'], **data)
 
 	async def _darkmarket_transaction(self, data: dict) -> str:
 		return await darkmarket.transaction(data['data']['unique_id'], data['data']['pid'], **data)
@@ -786,9 +782,8 @@ FUNCTION_LIST = {
 	'get_task_reward': MessageHandler._get_task_reward,
 
 	###################### darkmarket ######################
-	'automatically_refresh': MessageHandler._automatically_refresh,
-	'free_refresh': MessageHandler._free_refresh,
-	'diamond_refresh': MessageHandler._diamond_refresh,
+	'get_all_market': MessageHandler._get_all_market,
+	'refresh_market': MessageHandler._refresh_market,
 	'darkmarket_transaction': MessageHandler._darkmarket_transaction,
 
 	# TODO 新增

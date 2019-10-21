@@ -17,7 +17,7 @@ async def enter_stage(uid, stage, **kwargs):
 	# 98 - key insufficient
 	# 99 - parameter error
 	enter_stages = []
-	energy_consume = 2  # 虚拟消耗能量为2
+	energy_consume = kwargs['player_energy']['cost']  # 虚拟消耗能量为2
 	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
 	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
 	monster_config = kwargs['monster_config']  # self._monster_config
@@ -117,7 +117,7 @@ async def enter_tower(uid, stage, **kwargs):
 	# 98 - key insufficient
 	# 99 - parameter error
 	enter_towers = []
-	energy_consume = 2  # 虚拟消耗能量为2
+	energy_consume = kwargs['player_energy']['cost']  # 虚拟消耗能量为2
 	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
 	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
 	monster_config = kwargs['monster_config']  # self._monster_config
