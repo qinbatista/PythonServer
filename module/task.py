@@ -5,7 +5,7 @@ task.py
 from module import enums
 from module import common
 from module import achievement
-
+import time
 async def get_all_task(uid, **kwargs):
 	task = await common.execute(f'SELECT tid, value, reward, timer FROM task WHERE uid = "{uid}";', **kwargs)
 	kwargs.update({"tid":enums.Task.LOGIN,"value":1})
@@ -26,8 +26,8 @@ async def get_all_task(uid, **kwargs):
 	return common.mt(0, 'success', {'tasks': [{'tid': t[0], 'value': t[1], 'reward': t[2], 'timer': t[3]} for t in task]})
 
 async def record_task(uid, **kwargs):
-	data = await common.execute(f'INSERT INTO task (uid, aid, value,reward,timer) VALUES ("{uid}", {kwargs["aid"]}, {kwargs["value"]},0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {kwargs["value"]}',**kwargs)
-	return common.mt(0, 'record:'+str(kwargs["aid"])+" success")
+	data = await common.execute(f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["tid"]}, {kwargs["value"]},0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {kwargs["value"]}',**kwargs)
+	return common.mt(0, 'record:'+str(kwargs["tid"])+" success")
 
 async def get_task_reward(uid,task_id,**kwargs):
 	my_task = str.lower(enums.Task(kwargs["data"]["task_id"]).name)
