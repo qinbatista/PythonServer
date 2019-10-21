@@ -5,6 +5,7 @@ summoning.py
 from module import enums
 from module import common
 from module import lottery
+from module import task
 
 # Tier
 # basic, friend, pro, prophet
@@ -22,6 +23,12 @@ async def summon_multi(uid, item, tier, rewardgroup, num_times = 10, **kwargs):
 ##############################################################
 
 async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
+	if enums.Tier.BASIC:
+		kwargs.update({"tid":enums.Task.BASIC_SUMMONING,"value":1})
+		await task.record_task(uid,**kwargs)
+	if enums.Tier.PRO:
+		kwargs.update({"tid":enums.Task.PRO_SUMMONING,"value":1})
+		await task.record_task(uid,**kwargs)
 	cost = kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'][f'{enums.Group.ITEM.value}:{item.value}']
 	can_pay, remaining = await common.try_item(uid, item, -cost, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient materials')

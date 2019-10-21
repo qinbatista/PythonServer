@@ -4,13 +4,17 @@ role.py
 
 from module import enums
 from module import common
-
+from module import task
 from collections import defaultdict
 
 STANDARD_EXP_POT_COUNT = 5
 STANDARD_SEGMENT = 25
 
 async def level_up(uid, rid, amount, **kwargs):
+
+	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP,"value":1})
+	await task.record_task(uid,**kwargs)
+
 	rid = enums.Role(rid)
 	exists, payload = await _get_role_info(uid, rid, 'star', 'level', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')

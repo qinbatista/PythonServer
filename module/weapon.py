@@ -10,6 +10,7 @@ from module import enums
 from module import common
 
 from collections import defaultdict
+from module import task
 
 STANDARD_IRON = 40
 STANDARD_RESET = 100
@@ -19,6 +20,10 @@ async def get_config(**kwargs):
 	return common.mt(0, 'success', {'seg' : STANDARD_SEGMENT, 'reset' : STANDARD_RESET, 'cost' : STANDARD_IRON})
 
 async def level_up(uid, wid, amount, **kwargs):
+
+	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP,"value":1})
+	await task.record_task(uid,**kwargs)
+
 	wid = enums.Weapon(wid)
 	exists, payload = await _get_weapon_info(uid, wid, 'star', 'level', 'skillpoint', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')
