@@ -4,12 +4,25 @@ task.py
 
 from module import enums
 from module import common
-
+from module import achievement
 
 async def get_all_task(uid, **kwargs):
 	task = await common.execute(f'SELECT tid, value, reward, timer FROM task WHERE uid = "{uid}";', **kwargs)
-	# kwargs.update({"tid":enums.Task.family_check_in,"value":1})
-	# await record_achievement(uid,**kwargs)
+	kwargs.update({"tid":enums.Task.LOGIN,"value":1})
+	await record_task(uid,**kwargs)
+
+	#世界boss自动通关
+	kwargs.update({"tid":enums.Task.LOGIN,"value":1})
+	await record_task(uid,**kwargs)
+
+	#工厂领取物品
+	kwargs.update({"tid":enums.Task.CHECK_FACTORY,"value":1})
+	await record_task(uid,**kwargs)
+
+	#家族签到
+	kwargs.update({"tid":enums.Task.FAMILY_CHECK_IN,"value":1})
+	await record_task(uid,**kwargs)
+
 	return common.mt(0, 'success', {'tasks': [{'tid': t[0], 'value': t[1], 'reward': t[2], 'timer': t[3]} for t in task]})
 
 async def record_task(uid, **kwargs):

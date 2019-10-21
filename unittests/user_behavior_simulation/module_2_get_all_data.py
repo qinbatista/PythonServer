@@ -206,7 +206,7 @@ def get_all_info(_token,_world):
 			get_all_check_in_table(),
 			get_all_friend(),
 			get_all_skill(),
-			get_player_info(),
+			# get_player_info(),
 			get_all_mail(),
 			automatically_refresh_store(),
 			stage_reward_config(),

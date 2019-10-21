@@ -4,6 +4,7 @@ stage.py
 
 from module import enums
 from module import common
+from module import task
 from datetime import datetime, timedelta
 import time
 import random
@@ -76,6 +77,9 @@ async def pass_stage(uid, stage, **kwargs):
 	# 0 : success
 	# 99 : Parameter error
 	# print(f'stage:{stage}, type:{type(stage)}')
+	kwargs.update({"tid":enums.Task.PASS_MAIN_STAGE,"value":1})
+	await task.record_task(uid,**kwargs)
+
 	stage_s = await get_progress(uid, 'stage', **kwargs)
 	if stage <= 0 or stage_s + 1 < stage:
 		return common.mt(99, 'Parameter error')
@@ -174,6 +178,9 @@ async def pass_tower(uid, stage, **kwargs):
 	# 0 : success
 	# 99 : Parameter error
 	# print(f'stage:{stage}, type:{type(stage)}')
+	kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE,"value":1})
+	await task.record_task(uid,**kwargs)
+
 	stage_s = await get_progress(uid, 'towerstage', **kwargs)
 	if stage <= 0 or stage_s + 1 < stage:
 		return common.mt(99, 'Parameter error')

@@ -9,6 +9,7 @@ import asyncio
 from module import mail
 from module import enums
 from module import common
+from module import task
 from datetime import datetime, timezone
 
 
@@ -41,6 +42,10 @@ async def respond(uid, nonce, **kwargs):
 	return common.mt(0, 'success', {'gn' : info[0], 'exp' : info[1]})
 
 async def send_gift(uid, gn_target, **kwargs):
+	#发送朋友礼物
+	kwargs.update({"tid":enums.Task.GET_FRIEND_GIFT,"value":1})
+	await task.record_task(uid,**kwargs)
+
 	fid = await common.get_uid(gn_target, **kwargs)
 	friends, recover, since = await _are_friends(uid, fid, **kwargs)
 	if not friends or since == '': return common.mt(99, 'not friends')

@@ -55,8 +55,8 @@ if __name__ == '__main__':
 	# automatically_refresh(**{'token': response['data']['token'], 'world': 0})
 	# automatically_refresh()
 	# free_refresh()
-	# diamond_refresh()
-	darkmarket_transaction(1)
+	diamond_refresh()
+	# darkmarket_transaction(1)
 
 
 
