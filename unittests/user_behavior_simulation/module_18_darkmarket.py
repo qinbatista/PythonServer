@@ -16,8 +16,8 @@ def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
 def login_decoration(func):
-	def wrapper(**kwargs):
-		func(**kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(**{'token': response['data']['token'], 'world': 0}))()
+	def wrapper(*args, **kwargs):
+		func(*args, **kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(*args, **{'token': response['data']['token'], 'world': 0}))()
 	return wrapper
 
 @login_decoration
@@ -36,13 +36,16 @@ def diamond_refresh(**kwargs):
 	logger.debug(response)
 
 @login_decoration
-def darkmarket_transaction(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'darkmarket_transaction', 'data': {'token' : kwargs['token'], 'pid': 6}})
+def darkmarket_transaction(pid, **kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'darkmarket_transaction', 'data': {'token' : kwargs['token'], 'pid': pid}})
 	logger.debug(response)
 
-def darkmarket_dialog(token,world,info_list):
-	automatically_refresh(**{"world": world, "token": token})
-	free_refresh(**{"world": world, "token": token})
+def darkmarket_dialog(pid, **kwargs):
+	automatically_refresh(**kwargs)
+	free_refresh(**kwargs)
+	diamond_refresh(**kwargs)
+	darkmarket_transaction(pid, **kwargs)
+
 
 if __name__ == '__main__':
 	# response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
@@ -53,7 +56,7 @@ if __name__ == '__main__':
 	# automatically_refresh()
 	# free_refresh()
 	# diamond_refresh()
-	darkmarket_transaction()
+	darkmarket_transaction(1)
 
 
 

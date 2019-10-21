@@ -15,6 +15,10 @@ token = ""
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
+def login_decoration(func):
+	def wrapper(*args, **kwargs):
+		func(*args, **kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(*args, **{'token': response['data']['token'], 'world': 0}))()
+	return wrapper
 
 def print_method(my_string):
 	print("\033[0;37;44m\t"+my_string+"\033[0m")
@@ -60,8 +64,12 @@ def send_family():
 	new_response = send_tcp_message({'world' : world, 'function' : 'request_join_family', 'data' : {'token' : module_1_login.get_token("unique_id19"),"friend_name":"name_unique_id"+str(10)}})#发送好友信息
 	print_method("[request_friend] requst_friend:"+str(new_response))
 
-def send_gift():
-	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : module_1_login.get_token("unique_id19"),"friend_name":"name_unique_id"+str(10)}})#发送好友信息
+# @login_decoration
+def send_gift(**kwargs):
+	# new_response = send_tcp_message({'world' : kwargs['world'], 'function' : 'request_friend', 'data' : {'token' : kwargs['token'],"gn_target": "qqw"}})#发送好友信息
+	# new_response = send_tcp_message({'world' : kwargs['world'], 'function' : 'send_gift_friend', 'data' : {'token' : kwargs['token'],"gn_target": "qqw"}})#发送好友信息
+	# print("[request_friend] requst_friend:"+str(new_response))
+	new_response = send_tcp_message({'world': world, 'function': 'request_friend', 'data': {'token': module_1_login.get_token("unique_id19"), "friend_name": "name_unique_id" + str(10)}})  # 发送好友信息
 	print_method("[request_friend] requst_friend:"+str(new_response))
 
 def mail_dialog(_token,_world,_all_info,_name):
@@ -86,3 +94,6 @@ def mail_dialog(_token,_world,_all_info,_name):
 			friend_request(_all_info["data"]["mail"][i]["key"])
 		if request_type == '3':#family_request
 			gift_request(_all_info["data"]["mail"][i]["key"])
+
+if __name__ == '__main__':
+	send_gift()

@@ -14,6 +14,11 @@ token = ""
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
+def login_decoration(func):
+	def wrapper(*args, **kwargs):
+		func(*args, **kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(*args, **{'token': response['data']['token'], 'world': 0}))()
+	return wrapper
+
 def print_method(my_string):
 	print("\033[0;37;44m\t"+my_string+"\033[0m")
 def print_module(my_string):
@@ -81,8 +86,18 @@ def family_dialog(token,world,get_all_family_info,player_info):
 
 	response = send_tcp_message({'world' : 0, 'function' : 'leave_family', 'data' : {'token': token}})
 	print_method(str(response))
-if __name__ == '__main__':
-	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
+
+@login_decoration
+def invite_user_family(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'create_family', 'data': {'token': kwargs['token'], 'name': 'qqqqfamily_name'}})
 	print_method(str(response))
-	token = response['data']['token']
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'invite_user_family', 'data' : {'token': kwargs['token'], 'gn_target': 'qqw'}})
+	print_method(str(response))
+
+
+if __name__ == '__main__':
+	# response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : '4'}})
+	# print_method(str(response))
+	# token = response['data']['token']
 	# family_dialog(token, 0, '')
+	invite_user_family()
