@@ -145,7 +145,7 @@ async def transaction(uid, pid, **kwargs):
 	if gid == enums.Group.WEAPON.value:
 		remaining['qty'] = await weapon._update_segment(uid, mid, qty, **kwargs)
 	elif gid == enums.Group.SKILL.value:
-		data = await common.execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND wid = "{mid}";', **kwargs)
+		data = await common.execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND sid = "{mid}";', **kwargs)
 		if data == ():
 			await common.execute_update(f'INSERT INTO skill (uid, sid, level) VALUES ("{uid}", {mid}, {qty});', **kwargs)
 			remaining['qty'] = qty
