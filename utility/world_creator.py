@@ -64,7 +64,6 @@ CREATE TABLE `factory` (
 	  `level` int(11) NOT NULL DEFAULT 0,
 	  `workers` int(11) NOT NULL DEFAULT 0,
 	  `storage` int(11) NOT NULL DEFAULT 0,
-	  `timer` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 	  PRIMARY KEY (`uid`,`fid`),
 	  CONSTRAINT `factory_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
