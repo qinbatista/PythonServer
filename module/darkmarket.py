@@ -97,3 +97,25 @@ async def automatically_refresh(uid, **kwargs) -> dict:
 			remaining.pop('unique_id')
 			return self._message_typesetting(2, 'Refresh time is not over yet, market information has been obtained', {'remaining' : remaining})
 
+
+
+async def get_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs):
+	select = f'SELECT gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}" AND pid = "{pid}";'
+	insert = f'INSERT INTO darkmarket (uid, pid, gid, mid, qty, cid, amt) VALUES darkmarket ("{uid}", {pid}, {gid}, {mid}, {qty}, {cid}, {amt});'
+	data = await common.execute(select, **kwargs)
+	if data == ():
+		await common.execute_update(insert, **kwargs)
+		data = await common.execute(select, **kwargs)
+	return data[0]
+
+async def set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs):
+	select = f'SELECT gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}" AND pid = "{pid}";'
+	update = f'UPDATE darkmarket SET gid={gid}, mid={mid}, qty={qty}, cid={cid}, amt={amt} WHERE uid = "{uid}" AND pid = "{pid}";'
+	insert = f'INSERT INTO darkmarket (uid, pid, gid, mid, qty, cid, amt) VALUES darkmarket ("{uid}", {pid}, {gid}, {mid}, {qty}, {cid}, {amt});'
+	data = await common.execute(select, **kwargs)
+	if data == ():
+		await common.execute_update(insert, **kwargs)
+	else:
+		await common.execute_update(update, **kwargs)
+
+
