@@ -26,7 +26,7 @@ def can_produce(current, factory_type, **kwargs):
 def step(current, workers, **kwargs):
 	for fac in reversed(enums.Factory):
 		for _ in range(workers[fac]):
-			if fac == enums.Factory.FOOD or can_produce(fac, current, **kwargs):
+			if fac == enums.Factory.FOOD or can_produce(current, fac, **kwargs):
 				current[fac] += 1
 			else: break
 	return current
