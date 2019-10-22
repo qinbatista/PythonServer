@@ -7,6 +7,7 @@ from module import mail
 from module import enums
 from module import skill
 from module import family
+from module import factory
 from module import friend
 from module import common
 from module import account
