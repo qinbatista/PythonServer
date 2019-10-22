@@ -301,3 +301,7 @@ class Task(enum.IntEnum):
 	DONE_10_TASK = 13
 
 
+class Factory(enum.IntEnum):
+	FOOD = 0
+	IRON = 1
+	CRYSTAL = 2
