@@ -6,10 +6,9 @@ from module import enums
 from module import common
 
 async def refresh(uid, **kwargs):
-	current = {enums.Factory.FOOD : 0, enums.Factory.IRON : 0, enums.Factory.CRYSTAL : 0}
-	workers = {enums.Factory.FOOD : 1, enums.Factory.IRON : 1, enums.Factory.CRYSTAL : 1}
-	current = step(current, workers, **kwargs)
-	return common.mt(0, 'success', current)
+	levels, workers, storage = await _get_factory_info(uid, **kwargs)
+	storage = step(storage, workers, **kwargs)
+	return common.mt(0, 'success', storage)
 
 
 ###################################################################################
@@ -30,3 +29,14 @@ def step(current, workers, **kwargs):
 				current[fac] += 1
 			else: break
 	return current
+
+async def _get_factory_info(uid, **kwargs):
+	data = await common.execute(f'SELECT fid, level, workers, storage FROM factory WHERE uid = "{uid}";', **kwargs)
+	current = {e : 0 for e in enums.Factory}
+	workers = {e : 0 for e in enums.Factory}
+	levels  = {e : 1 for e in enums.Factory}
+	for fac in data:
+		levels[enums.Factory(fac[0])]  = fac[1]
+		workers[enums.Factory(fac[0])] = fac[2]
+		current[enums.Factory(fac[0])] = fac[3]
+	return (levels, workers, storage)
