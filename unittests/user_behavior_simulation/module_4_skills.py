@@ -4,11 +4,11 @@ import os
 import requests
 import configparser
 import asyncio
-import tool_lukseun_client
+import tool_lukseun_client as tc
 import random
 import module_12_store
 
-lukseun = tool_lukseun_client.LukseunClient('aliya',  port = 8880)
+lukseun = tc.LukseunClient('aliya',  port = 8880)
 world = "0"
 unique_id = "4"
 token = ""
@@ -70,5 +70,41 @@ def print_method(my_string):
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
+
+logger = tc.logger
+def login_decoration(func):
+	def wrapper(*args, **kwargs):
+		func(*args, **kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(*args, **{'token': response['data']['token'], 'world': 0}))()
+	return wrapper
+
+
+@login_decoration
+def get_skill(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_skill', 'data': {'token' : kwargs['token'], 'skill': 13}})
+	logger.debug(response)
+
+@login_decoration
+def get_all_skill(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_all_skill', 'data': {'token' : kwargs['token']}})
+	logger.debug(response)
+
+@login_decoration
+def level_up_skill(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'level_up_skill', 'data': {'token' : kwargs['token'], 'skill': 13, 'item': 6}})
+	logger.debug(response)
+
+@login_decoration
+def get_level_up_config_skill(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_level_up_config_skill', 'data': {'token' : kwargs['token']}})
+	logger.debug(response)
+
+
+skill_test = {
+	0: get_skill,
+	1: get_all_skill,
+	2: level_up_skill,
+	3: get_level_up_config_skill,
+}
+
 if __name__ == "__main__":
-	pass
+	skill_test[int(input('测试(0-3):'))]()

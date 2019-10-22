@@ -343,6 +343,7 @@ class MessageHandler:
 		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']),  **data)
 
 	async def _get_level_up_config_skill(self, data: dict) -> str:
+		# 0 - success
 		return common.mt(0, 'success', self._skill)
 
 	###################### friend.py ######################
