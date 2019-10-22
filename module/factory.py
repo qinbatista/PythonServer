@@ -8,6 +8,7 @@ from module import common
 async def refresh(uid, **kwargs):
 	levels, workers, storage = await _get_factory_info(uid, **kwargs)
 	storage = step(storage, workers, **kwargs)
+	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
 
 
@@ -29,6 +30,10 @@ def step(current, workers, **kwargs):
 				current[fac] += 1
 			else: break
 	return current
+
+async def _record_storage(uid, storage, **kwargs):
+	for fac, amount in storage.items():
+		await common.execute(f'INSERT INTO factory (uid, fid, storage) VALUES ("{uid}", {fac.value}, {amount}) ON DUPLICATE KEY UPDATE storage = {amount};', **kwargs)
 
 async def _get_factory_info(uid, **kwargs):
 	data = await common.execute(f'SELECT fid, level, workers, storage FROM factory WHERE uid = "{uid}";', **kwargs)
