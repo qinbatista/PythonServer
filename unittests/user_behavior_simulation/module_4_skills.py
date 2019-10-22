@@ -12,6 +12,10 @@ lukseun = tc.LukseunClient('aliya',  port = 8880)
 world = "0"
 unique_id = "4"
 token = ""
+skill_list = ["m1_level", "p1_level", "g1_level", "m11_level", "m12_level", "m13_level", "p11_level", "p12_level", "p13_level", "g11_level", "g12_level", "g13_level",
+				"m111_level", "m112_level", "m113_level", "m121_level", "m122_level", "m123_level", "m131_level", "m132_level", "m133_level",
+				"p111_level", "p112_level", "p113_level", "p121_level", "p122_level", "p123_level", "p131_level", "p132_level", "p133_level",
+				"g111_level", "g112_level", "g113_level", "g121_level", "g122_level", "g123_level", "g131_level", "g132_level", "g133_level"]
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
@@ -98,6 +102,17 @@ def get_level_up_config_skill(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_level_up_config_skill', 'data': {'token' : kwargs['token']}})
 	logger.debug(response)
 
+def skill_dialog(_token,_world,get_all_skill_info,**kwargs):
+	while True:
+		my_int = random.randint(0,2)
+		if my_int==0:
+			break
+		if my_int==1:
+			kwargs.update({"skill":random.choice([skill_list])})
+			get_all_skill(**kwargs)
+		if my_int==2:
+			kwargs.update({"skill":random.choice([skill_list])})
+			level_up_skill(**kwargs)
 
 skill_test = {
 	0: get_skill,
