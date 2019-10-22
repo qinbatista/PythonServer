@@ -49,6 +49,21 @@ async def try_item(uid, item, value, **kwargs):
 				return (True, quantity[0][0] + value) if quantity != () else (True, value)
 			return (False, quantity[0][0] + value) if quantity != () else (False, value)
 
+async def try_weapon(uid, gift,quantity, **kwargs):
+	weapon = enums.Weapon(gift)
+	await execute(f'UPDATE weapon SET segment = segment + {quantity} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
+	return (False, weapon)
+
+async def try_role(uid, gift,quantity, **kwargs):
+	role = enums.Role(gift)
+	await execute(f'UPDATE role SET segment = segment + {quantity} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
+	return (False, role)
+
+async def get_vip_level(uid, **kwargs):
+	data = await execute(f'SELECT vip_exp FROM progress WHERE uid = "{uid}";', **kwargs)
+	if data==():return 0
+	else:return data[0][0]
+
 async def get_db(**kwargs):
 	return kwargs['worlddb']
 

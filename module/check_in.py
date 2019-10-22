@@ -37,27 +37,22 @@ async def supplement_check_in(uid, **kwargs) -> dict:
 	return common.mt(0, 'Successful signing', data={'remaining': remaining})
 
 async def check_in(uid, **kwargs) -> dict:
-	print("!1")
 	"""每日签到"""
 	# 0 - Sign-in success
 	# 99 - You have already signed in today
 	current_time = time.strftime('%Y-%m-%d', time.localtime())
 	s_data = await common.execute( f'select * from check_in where uid="{uid}" and date="{current_time}"', **kwargs)
-	if s_data != ():
-		return common.mt(99, 'You have already signed in today')
-	item_set = kwargs["config"][str(int(current_time[-2:])%7)].split(":")
-	print("item_set[0]="+str(item_set[0]))
-	print("enums.Group.ITEM="+str(enums.Group.ITEM.value))
-	print("enums.Group.WEAPON="+str(enums.Group.WEAPON.value))
-	print("enums.Group.ROLE="+str(enums.Group.ROLE.value))
-	if int(item_set[0])==enums.Group.ITEM.value:   isok,quantity = await common.try_item(uid, enums.Item(int(item_set[1])), int(item_set[2]), **kwargs)
-	if int(item_set[0])==enums.Group.WEAPON.value: isok,quantity = lottery._try_unlock_weapon(uid,enums.Weapon(int(item_set[1])),**kwargs)
-	if int(item_set[0])==enums.Group.ROLE.value:   isok,quantity = lottery._try_unlock_role(uid,enums.Role(int(item_set[1])),**kwargs)
+	if s_data != ():return common.mt(99, 'You have already signed in today')
+	which_day = int(current_time[-2:])%7
+	item_set = kwargs["config"][str(which_day)].split(":")
+	vip_bond =1 if which_day<=await common.get_vip_level(uid) else 2
+	if int(item_set[0])==enums.Group.ITEM.value:   isok,quantity = await common.try_item(   uid, enums.Item(int(item_set[1])),   vip_bond*int(item_set[2]), **kwargs)
+	if int(item_set[0])==enums.Group.WEAPON.value: isok,quantity = await common.try_weapon( uid, enums.Weapon(int(item_set[1])), vip_bond*int(item_set[2]), **kwargs)
+	if int(item_set[0])==enums.Group.ROLE.value:   isok,quantity = await common.try_role(   uid, enums.Role(int(item_set[1])),   vip_bond*int(item_set[2]), **kwargs)
 	print("isok="+str(isok))
 	print("quantity="+str(quantity))
 	await common.execute_update( f'insert into check_in(uid, date) values("{uid}", "{current_time}")',**kwargs)
-	# data = await receive_all_check_reward( uid)
-	return common.mt(0, 'Sign-in success',{"remaining":[f'{item_set[0])}:{enums.Item(int(item_set[1]))}:{quantity}'])
+	return common.mt(0, 'Sign-in success',{"remaining":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{quantity}'],"reward":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{item_set[2]}']})
 
 async def get_all_check_in_table(uid, **kwargs) -> dict:
 	"""获取所有签到情况"""
