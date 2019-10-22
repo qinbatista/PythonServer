@@ -38,4 +38,4 @@ async def get_task_reward(uid,task_id,**kwargs):
 		_,remaining = await common.try_item(uid,enums.Item(item),quantity,**kwargs)
 		await common.execute_update(f'UPDATE task set reward = 1 WHERE uid = "{uid}" AND tid = "{task_id}";', **kwargs)
 		return common.mt(0, 'get reward success',{"reward":[{item:{"value":remaining,"reward":quantity}}],"task":enums.Achievement.TOTAL_LOGIN.value})
-	return common.mt(99,'no reward for this task ')
+	return common.mt(99,'no reward for this task:'+str(task_id))
