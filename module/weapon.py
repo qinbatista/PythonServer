@@ -21,8 +21,6 @@ async def get_config(**kwargs):
 
 async def level_up(uid, wid, amount, **kwargs):
 
-	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP,"value":1})
-	await task.record_task(uid,**kwargs)
 
 	wid = enums.Weapon(wid)
 	exists, payload = await _get_weapon_info(uid, wid, 'star', 'level', 'skillpoint', **kwargs)
@@ -32,6 +30,8 @@ async def level_up(uid, wid, amount, **kwargs):
 	if upgrade_cnt == 0: return common.mt(98, 'too few incoming materials')
 	can_pay, remaining = await common.try_item(uid, enums.Item.IRON, -upgrade_cnt * STANDARD_IRON, **kwargs)
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
+	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP,"value":1})
+	await task.record_task(uid,**kwargs)
 	await common.execute(f'UPDATE weapon SET level = {level + upgrade_cnt}, skillpoint = {sp + upgrade_cnt} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
 	return common.mt(0, 'success', {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : level + upgrade_cnt, 'sp' : sp + upgrade_cnt}, enums.Group.ITEM.value : { 'iid' : enums.Item.IRON.value, 'value' : remaining}})
 
