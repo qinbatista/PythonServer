@@ -61,7 +61,7 @@ FACTORY = \
 CREATE TABLE `factory` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `fid` int(11) NOT NULL,
-	  `level` int(11) NOT NULL DEFAULT 0,
+	  `level` int(11) NOT NULL DEFAULT 1,
 	  `workers` int(11) NOT NULL DEFAULT 0,
 	  `storage` int(11) NOT NULL DEFAULT 0,
 	  PRIMARY KEY (`uid`,`fid`),
