@@ -49,8 +49,7 @@ class MessageHandler:
 		self._factory_config = d['factory']
 		self._family_config = d['family']
 		self._stage_reward = d['reward']
-		self._skill_scroll_functions = d['skill']['skill_scroll_functions']
-		self._upgrade_chance = d['skill']['upgrade_chance']
+		self._skill = d['skill']
 		self._weapon_config = d['weapon']
 		self._role_config = d['role']
 		self._lottery = d['lottery']
@@ -340,11 +339,11 @@ class MessageHandler:
 		return await skill.get_all_levels(data['data']['unique_id'], **data)
 
 	async def _level_up_skill(self, data: dict) -> str:
+		data['skill'] = self._skill
 		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']),  **data)
 
-	# TODO
 	async def _get_level_up_config_skill(self, data: dict) -> str:
-		return 'function'
+		return common.mt(0, 'success', self._skill)
 
 	###################### friend.py ######################
 	async def _get_all_friend(self, data: dict) -> str:
