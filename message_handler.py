@@ -362,13 +362,9 @@ class MessageHandler:
 	async def _send_gift_friend(self, data: dict) -> str:
 		return await friend.send_gift(data['data']['unique_id'], data['data']['gn_target'], **data)
 
-	# TODO 原 send_all_friend_gift
-	async def _send_all_gift_friend(self, data: dict) -> str:
-		return 'function'
+	async def _send_gift_all(self, data: dict) -> str:
+		return await friend.send_gift_all(data['data']['unique_id'], **data)
 
-	# TODO 原 redeem_all_nonce
-	async def _accept_all_gift_friend(self, data: dict) -> str:
-		return 'function'
 
 	###################### weapon.py ######################
 	async def _level_up_weapon(self, data: dict) -> str:
@@ -382,7 +378,7 @@ class MessageHandler:
 
 	async def _reset_skill_point_weapon(self, data: dict) -> str:
 		return await weapon.reset_skill_point(data['data']['unique_id'], int(data['data']['weapon']), **data)
-	
+
 	async def _get_all_weapon(self, data: dict) -> str:
 		return await weapon.get_all(data['data']['unique_id'], **data)
 
@@ -716,11 +712,9 @@ FUNCTION_LIST = {
 	'get_all_friend' : MessageHandler._get_all_friend,
 	'remove_friend' : MessageHandler._remove_friend,
 	'request_friend' : MessageHandler._request_friend,
-	'respond_friend' : MessageHandler._respond_friend,
 	'send_gift_friend' : MessageHandler._send_gift_friend,
-	# TODO
-	'send_all_gift_friend' : MessageHandler._send_all_gift_friend,
-	'accept_all_gift_friend' : MessageHandler._accept_all_gift_friend,
+	'send_gift_all' : MessageHandler._send_gift_all,
+	'respond_friend':MessageHandler._respond_friend,
 
 	###################### weapon.py ######################
 	'level_up_weapon' : MessageHandler._level_up_weapon,

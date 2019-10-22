@@ -82,8 +82,8 @@ def run_task(name):
 	# module_10_stage.stage_dialog(token,world,info_list[5])
 	# module_17_check_in.check_in_dialog(token,world,info_list[5])
 	# module_18_darkmarket.darkmarket_dialog(token,world,info_list[5])
-	# module_3_friends.freind_dialog(token,world,get_all_friend_info)
-	module_4_skills.skill_dialog(token,world,info_list[5],**kwargs)
+	module_3_friends.freind_dialog(token,world,info_list[7])
+	# module_4_skills.skill_dialog(token,world,info_list[5],**kwargs)
 	# dark_market()#*加载黑市信息
 	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面

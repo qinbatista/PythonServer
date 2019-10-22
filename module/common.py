@@ -35,7 +35,8 @@ async def get_gn(uid, **kwargs):
 
 async def get_uid(gn, **kwargs):
 	data = await execute(f'SELECT uid FROM player WHERE gn = "{gn}";', **kwargs)
-	return data[0][0]
+	if data==():return ""
+	else:return data[0][0]
 
 async def try_item(uid, item, value, **kwargs):
 	async with (await get_db(**kwargs)).acquire() as conn:
