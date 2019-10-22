@@ -5,6 +5,9 @@ factory.py
 from module import enums
 from module import common
 
+async def refresh(uid, **kwargs):
+	return common.mt(0, 'success')
+
 
 ###################################################################################
 def can_produce(current, factory_type, **kwargs):
