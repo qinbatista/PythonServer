@@ -6,7 +6,10 @@ from module import enums
 from module import common
 
 async def refresh(uid, **kwargs):
-	return common.mt(0, 'success')
+	current = {enums.Factory.FOOD : 0, enums.Factory.IRON : 0, enums.Factory.CRYSTAL : 0}
+	workers = {enums.Factory.FOOD : 1, enums.Factory.IRON : 1, enums.Factory.CRYSTAL : 1}
+	current = step(current, workers, **kwargs)
+	return common.mt(0, 'success', current)
 
 
 ###################################################################################
