@@ -1,6 +1,7 @@
 {
 	"general" : 
 	{
+		"step" : 10,
 		"costs" : 
 		{
 			"1" :
