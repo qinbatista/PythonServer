@@ -20,6 +20,9 @@ async def upgrade(uid, fid, **kwargs):
 	await common.execute(f'UPDATE factory SET level = {levels[fid] + 1}, storage = {storage[fid] - upgrade_cost} WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
 	return common.mt(0, 'success', {'level' : levels[fid] + 1, 'storage' : storage[fid] - upgrade_cost})
 
+async def buy_worker(uid, **kwargs):
+	return common.mt(0, 'success')
+
 
 ###################################################################################
 def can_produce(current, factory_type, **kwargs):

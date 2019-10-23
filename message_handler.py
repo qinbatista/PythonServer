@@ -365,6 +365,9 @@ class MessageHandler:
 	async def _upgrade_factory(self, data: dict) -> str:
 		return await factory.upgrade(data['data']['unique_id'], int(data['data']['fid']), **data)
 
+	async def _buy_worker_factory(self, data: dict) -> str:
+		return await factory.buy_worker(data['data']['unique_id'], **data)
+
 
 	###################### weapon.py ######################
 	async def _level_up_weapon(self, data: dict) -> str:
@@ -715,6 +718,7 @@ FUNCTION_LIST = {
 	###################### factory.py ######################
 	'refresh_factory' : MessageHandler._refresh_factory,
 	'upgrade_factory' : MessageHandler._upgrade_factory,
+	'buy_worker_factory' : MessageHandler._buy_worker_factory,
 
 	###################### weapon.py ######################
 	'level_up_weapon' : MessageHandler._level_up_weapon,
