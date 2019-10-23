@@ -21,11 +21,13 @@ async def upgrade(uid, fid, **kwargs):
 	return common.mt(0, 'success', {'level' : levels[fid] + 1, 'storage' : storage[fid] - upgrade_cost})
 
 async def buy_worker(uid, **kwargs):
-	existing, workers, max_worker = await _get_unassigned_workers(uid, **kwargs)
+	existing, workers, max_workers = await _get_unassigned_workers(uid, **kwargs)
 	print(f'existing: {existing}')
 	print(f'workers : {workers}')
-	print(f'max_workers : {max_worker}')
-	upgrade_cost = kwargs['config']['factory']['workers']['cost'][str(max_workers)]
+	print(f'max_workers : {max_workers}')
+	if max_workers >= kwargs['config']['factory']['workers']['max']:
+		return common.mt(99, 'already max workers')
+	upgrade_cost = kwargs['config']['factory']['workers']['cost'][str(max_workers + 1)]
 	print(f'upgrade_cost: {upgrade_cost}')
 	return common.mt(0, 'success')
 
