@@ -12,6 +12,8 @@ async def refresh(uid, **kwargs):
 	return common.mt(0, 'success', storage)
 
 async def upgrade(uid, fid, **kwargs):
+	fid = enums.Factory(fid)
+	if fid == enums.Factory.UNASSIGNED: return common.mt(99, 'invalid fid')
 	return common.mt(0, 'success')
 
 
