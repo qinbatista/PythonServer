@@ -38,11 +38,12 @@ async def _record_storage(uid, storage, **kwargs):
 
 async def _get_factory_info(uid, **kwargs):
 	data = await common.execute(f'SELECT fid, level, workers, storage FROM factory WHERE uid = "{uid}";', **kwargs)
-	storage = {e : 0 for e in enums.Factory}
-	workers = {e : 0 for e in enums.Factory}
-	levels  = {e : 1 for e in enums.Factory}
+	storage = {e : 0 for e in enums.Factory if e != enums.Factory.UNASSIGNED}
+	workers = {e : 0 for e in enums.Factory if e != enums.Factory.UNASSIGNED}
+	levels  = {e : 1 for e in enums.Factory if e != enums.Factory.UNASSIGNED}
 	for fac in data:
-		levels[enums.Factory(fac[0])]  = fac[1]
-		workers[enums.Factory(fac[0])] = fac[2]
-		storage[enums.Factory(fac[0])] = fac[3]
+		if fac[0] != enums.Factory.UNASSIGNED.value:
+			levels[enums.Factory(fac[0])]  = fac[1]
+			workers[enums.Factory(fac[0])] = fac[2]
+			storage[enums.Factory(fac[0])] = fac[3]
 	return (levels, workers, storage)
