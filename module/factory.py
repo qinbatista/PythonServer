@@ -17,7 +17,8 @@ async def upgrade(uid, fid, **kwargs):
 	levels, _, storage = await _get_factory_info(uid, **kwargs)
 	upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(levels[fid] + 1)]
 	if storage[fid] < upgrade_cost: return common.mt(98, 'insufficient funds')
-	return common.mt(0, 'success')
+	await common.execute(f'INSERT INTO factory (uid, fid, level, storage) VALUES ("{uid}", {fid.value}, {levels[fid] + 1}, {storage[fid] - upgrade_cost}) ON DUPLICATE KEY UPDATE level = {levels[fid] + 1}, storage = {storage[fid] - upgrade_cost};', **kwargs)
+	return common.mt(0, 'success', {'level' : levels[fid] + 1, 'storage' : storage[fid] - upgrade_cost})
 
 
 ###################################################################################
