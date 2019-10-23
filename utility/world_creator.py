@@ -22,10 +22,10 @@ CREATE TABLE `achievement` (
 ARMOR = \
 """
 CREATE TABLE `armor` (
-	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
-	  `aid` int(11) NOT NULL COMMENT '盔甲唯一id标识1-40种盔甲',
-	  `level` int(11) NOT NULL COMMENT '盔甲等级唯一id标识1-10级',
-	  `quantity` int(11) DEFAULT 0 COMMENT '完成成就领奖的次数',
+	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户id',
+	  `aid` int(11) NOT NULL COMMENT '盔甲id1-40种盔甲',
+	  `level` int(11) NOT NULL COMMENT '盔甲等级1-10级',
+	  `quantity` int(11) DEFAULT 0 COMMENT '盔甲数量',
 	  PRIMARY KEY (`uid`, `aid`, `level`),
 	  CONSTRAINT `armor_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -143,6 +143,7 @@ CREATE TABLE `player` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `gn` varchar(65) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `fid` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+	  `intro` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 	  PRIMARY KEY (`uid`),
 	  UNIQUE KEY `u_gn` (`gn`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

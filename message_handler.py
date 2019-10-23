@@ -162,7 +162,7 @@ class MessageHandler:
 		return await player.accept_gift(data['data']['unique_id'], data['data']['key'], **data)
 
 	async def _get_info_player(self, data: dict) -> str:
-		return await player.get_info(data['data']['unique_id'], **data)
+		return await player.get_info(data['data']['unique_id'], self._player_experience, **data)
 
 
 	###################### family.py ######################
@@ -333,19 +333,11 @@ class MessageHandler:
 		return data['config']['lottery']
 
 	###################### skill.py ######################
-	async def _get_skill(self, data: dict) -> str:
-		return await skill.get_skill(data['data']['unique_id'], int(data['data']['skill']), **data)
-
 	async def _get_all_skill(self, data: dict) -> str:
-		return await skill.get_all_levels(data['data']['unique_id'], **data)
+		return await skill.get_all(data['data']['unique_id'], self._skill, **data)
 
 	async def _level_up_skill(self, data: dict) -> str:
-		data['skill'] = self._skill
-		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']),  **data)
-
-	async def _get_level_up_config_skill(self, data: dict) -> str:
-		# 0 - success
-		return common.mt(0, 'success', self._skill)
+		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']),  self._skill, **data)
 
 	###################### friend.py ######################
 	async def _get_all_friend(self, data: dict) -> str:
@@ -485,12 +477,11 @@ class MessageHandler:
 		return common.mt(0, 'success', data={'config': self._acheviement})
 
 	###################### armor ######################
-	# TODO
 	async def _upgrade_armor(self, data: dict) -> str:
-		return 'function'
+		return await armor.upgrade(data['data']['unique_id'], data['data']['aid'], data['data']['level'], **data)
 
 	async def _get_all_armor(self, data: dict) -> str:
-		return await armor.get_all_armor(data['data']['unique_id'], **data)
+		return await armor.get_all(data['data']['unique_id'], **data)
 
 	###################### stage ######################
 	async def _get_all_tower(self, data: dict) -> str:
@@ -710,11 +701,8 @@ FUNCTION_LIST = {
 	'get_config_lottery' : MessageHandler._get_config_lottery,
 
 	###################### skill.py ######################
-	'get_skill' : MessageHandler._get_skill,
 	'get_all_skill' : MessageHandler._get_all_skill,
 	'level_up_skill' : MessageHandler._level_up_skill,
-	# TODO
-	'get_level_up_config_skill': MessageHandler._get_level_up_config_skill,
 
 	###################### friend.py ######################
 	'get_all_friend' : MessageHandler._get_all_friend,
@@ -767,7 +755,6 @@ FUNCTION_LIST = {
 	'get_achievement_reward':MessageHandler._get_achievement_reward,
 	'get_achievement_config':MessageHandler._get_achievement_config,
 
-	# TODO
 	###################### armor ######################
 	'upgrade_armor': MessageHandler._upgrade_armor,
 	'get_all_armor': MessageHandler._get_all_armor,
