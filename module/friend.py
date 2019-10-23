@@ -24,6 +24,8 @@ async def remove(uid, gn_target, **kwargs):
 	return common.mt(0, 'removed target', {'gn' : gn_target})
 
 async def request(uid, gn_target, **kwargs):
+	if await _is_request_max(uid,**kwargs)==True:
+		return common.mt(97, '6 request for 1 day, try tommorrow')
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid_target=="": return common.mt(98, 'no such person')
 	if uid == uid_target: return common.mt(99, 'do not be an idiot')
@@ -31,6 +33,8 @@ async def request(uid, gn_target, **kwargs):
 	sender = await common.get_gn(uid, **kwargs)
 	if not await mail.send_mail(enums.MailType.FRIEND_REQUEST, uid_target, from_ = sender, sender = sender, uid_sender = uid, **kwargs):
 		return common.mt(98, 'could not send mail')
+	print("sss:"+f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, value+1) ON DUPLICATE KEY UPDATE value = value+1;')
+	await common.execute(f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, value+1) ON DUPLICATE KEY UPDATE value = value+1;', **kwargs)
 	return common.mt(0, 'request sent', {'gn' : gn_target})
 
 async def respond(uid, nonce, **kwargs):
@@ -74,6 +78,23 @@ def _can_send_gift(now, recover):
 	if recover == '': return True
 	delta_time = now - datetime.strptime(recover, '%Y-%m-%d').replace(tzinfo = timezone.utc)
 	return delta_time.days >= 1
+
+async def _is_request_max(uid, **kwargs):
+	now = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+	data = await common.execute(f"SELECT limits.value, timer.time FROM limits JOIN timer ON limits.uid = timer.uid WHERE limits.uid='{uid}' and limits.lid={enums.Limits.REQUEST_FRIEND_LIMITS} and timer.tid={enums.Timer.REQUEST_FRIEND_TIME}", **kwargs)
+	if data==():
+		await common.execute(f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, 0) ON DUPLICATE KEY UPDATE value = 0;',**kwargs)
+		await common.execute(f'INSERT INTO timer(uid, tid, time) VALUES ("{uid}", {enums.Timer.REQUEST_FRIEND_TIME}, "{now}") ON DUPLICATE KEY UPDATE time = "{now}";',**kwargs)
+		count,record_time = 0,now
+	else:count,record_time = data[0][0],data[0][1]
+	delta_time = datetime.now(timezone.utc) - datetime.strptime(record_time, '%Y-%m-%d').replace(tzinfo = timezone.utc)
+	if delta_time.days>=1:
+		await common.execute(f'INSERT INTO timer(uid, tid, time) VALUES ("{uid}", {enums.Timer.REQUEST_FRIEND_TIME}, "{now}") ON DUPLICATE KEY UPDATE time = "{now}";',**kwargs)
+		await common.execute(f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, 0) ON DUPLICATE KEY UPDATE value = 0;',**kwargs)
+	if delta_time.days<1 and count<=5:
+		return False
+	if delta_time.days<1 and count>5:
+		return True
 
 async def _add_friend(uid, fid, **kwargs):
 	now = datetime.now(timezone.utc).strftime('%Y-%m-%d')
