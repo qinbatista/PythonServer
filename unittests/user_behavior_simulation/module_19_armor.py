@@ -31,7 +31,7 @@ def get_all_armor(**kwargs):
 
 @login_decoration
 def upgrade_armor(aid=1, level=2, **kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'upgrade_armor', 'data': {'token' : kwargs['token']}})
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'upgrade_armor', 'data': {'token' : kwargs['token'], 'aid': aid, 'level': level}})
 	logger.debug(response)
 
 
