@@ -302,6 +302,7 @@ class Task(enum.IntEnum):
 
 
 class Factory(enum.IntEnum):
+	UNASSIGNED = -1
 	FOOD = 0
 	IRON = 1
 	CRYSTAL = 2

@@ -25,10 +25,11 @@ def can_produce(current, factory_type, **kwargs):
 
 def step(current, workers, levels, **kwargs):
 	for fac in reversed(enums.Factory):
-		for _ in range(workers[fac]):
-			if fac == enums.Factory.FOOD or can_produce(current, fac, **kwargs):
-				current[fac] = min(current[fac] + 1, kwargs['config']['factory']['general']['storage_limits'][str(fac.value)][str(levels[fac])])
-			else: break
+		if fac != enums.Factory.UNASSIGNED:
+			for _ in range(workers[fac]):
+				if fac == enums.Factory.FOOD or can_produce(current, fac, **kwargs):
+					current[fac] = min(current[fac] + 1, kwargs['config']['factory']['general']['storage_limits'][str(fac.value)][str(levels[fac])])
+				else: break
 	return current
 
 async def _record_storage(uid, storage, **kwargs):
