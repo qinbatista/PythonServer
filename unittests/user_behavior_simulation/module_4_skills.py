@@ -83,11 +83,6 @@ def login_decoration(func):
 
 
 @login_decoration
-def get_skill(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_skill', 'data': {'token' : kwargs['token'], 'skill': 13}})
-	logger.debug(response)
-
-@login_decoration
 def get_all_skill(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_all_skill', 'data': {'token' : kwargs['token']}})
 	logger.debug(response)
@@ -95,11 +90,6 @@ def get_all_skill(**kwargs):
 @login_decoration
 def level_up_skill(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'level_up_skill', 'data': {'token' : kwargs['token'], 'skill': 13, 'item': 6}})
-	logger.debug(response)
-
-@login_decoration
-def get_level_up_config_skill(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_level_up_config_skill', 'data': {'token' : kwargs['token']}})
 	logger.debug(response)
 
 def skill_dialog(_token,_world,get_all_skill_info,**kwargs):
@@ -115,11 +105,9 @@ def skill_dialog(_token,_world,get_all_skill_info,**kwargs):
 			level_up_skill(**kwargs)
 
 skill_test = {
-	0: get_skill,
 	1: get_all_skill,
 	2: level_up_skill,
-	3: get_level_up_config_skill,
 }
 
 if __name__ == "__main__":
-	skill_test[int(input('测试(0-3):'))]()
+	skill_test[int(input('测试(1-2):'))]()
