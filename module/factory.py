@@ -29,7 +29,15 @@ async def buy_worker(uid, **kwargs):
 		return common.mt(99, 'already max workers')
 	upgrade_cost = kwargs['config']['factory']['workers']['cost'][str(max_workers + 1)]
 	print(f'upgrade_cost: {upgrade_cost}')
-	return common.mt(0, 'success')
+	_, __, storage = await _get_factory_info(uid, **kwargs)
+	if storage[enums.Factory.FOOD] < upgrade_cost:return common.mt(98,'insufficient funds')
+	await common.execute(f'UPDATE factory SET storage = {storage[enums.Factory.FOOD] - upgrade_cost} WHERE uid = "{uid}" AND fid = {enums.Factory.FOOD.value};', **kwargs)
+	if existing:
+		stmt = f'UPDATE factory SET workers = {workers + 1}, storage = {max_workers + 1} WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};'
+	else:
+		stmt = f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED.value}, {workers + 1}, {max_workers + 1};'
+	await common.execute(stmt, **kwargs) 
+	return common.mt(0, 'success', {'unassigned' : workers + 1, 'total' : max_workers + 1})
 
 
 ###################################################################################
