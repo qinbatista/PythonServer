@@ -22,13 +22,9 @@ async def upgrade(uid, fid, **kwargs):
 
 async def buy_worker(uid, **kwargs):
 	existing, workers, max_workers = await _get_unassigned_workers(uid, **kwargs)
-	print(f'existing: {existing}')
-	print(f'workers : {workers}')
-	print(f'max_workers : {max_workers}')
 	if max_workers >= kwargs['config']['factory']['workers']['max']:
 		return common.mt(99, 'already max workers')
 	upgrade_cost = kwargs['config']['factory']['workers']['cost'][str(max_workers + 1)]
-	print(f'upgrade_cost: {upgrade_cost}')
 	_, __, storage = await _get_factory_info(uid, **kwargs)
 	if storage[enums.Factory.FOOD] < upgrade_cost:return common.mt(98,'insufficient funds')
 	await common.execute(f'UPDATE factory SET storage = {storage[enums.Factory.FOOD] - upgrade_cost} WHERE uid = "{uid}" AND fid = {enums.Factory.FOOD.value};', **kwargs)
@@ -37,7 +33,7 @@ async def buy_worker(uid, **kwargs):
 	else:
 		stmt = f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED.value}, {workers + 1}, {max_workers + 1});'
 	await common.execute(stmt, **kwargs) 
-	return common.mt(0, 'success', {'unassigned' : workers + 1, 'total' : max_workers + 1})
+	return common.mt(0, 'success', {'unassigned' : workers + 1, 'total' : max_workers + 1, 'food' : storage[enums.Factory.FOOD] - upgrade_cost})
 
 
 ###################################################################################
