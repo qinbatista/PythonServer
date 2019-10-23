@@ -25,6 +25,8 @@ async def buy_worker(uid, **kwargs):
 	print(f'existing: {existing}')
 	print(f'workers : {workers}')
 	print(f'max_workers : {max_worker}')
+	upgrade_cost = kwargs['config']['factory']['workers']['cost'][str(max_workers)]
+	print(f'upgrade_cost: {upgrade_cost}')
 	return common.mt(0, 'success')
 
 
