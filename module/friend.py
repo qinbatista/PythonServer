@@ -25,6 +25,7 @@ async def remove(uid, gn_target, **kwargs):
 
 async def request(uid, gn_target, **kwargs):
 	uid_target = await common.get_uid(gn_target, **kwargs)
+	if uid_target=="": return common.mt(98, 'no such person')
 	if uid == uid_target: return common.mt(99, 'do not be an idiot')
 	await common.execute(f'INSERT INTO friend (uid, fid) VALUES ("{uid}", "{uid_target}") ON DUPLICATE KEY UPDATE uid = uid;', **kwargs)
 	sender = await common.get_gn(uid, **kwargs)
@@ -38,8 +39,9 @@ async def respond(uid, nonce, **kwargs):
 	await _add_friend(uid, uid_sender, **kwargs)
 	info = await _get_friend_info(uid_sender, **kwargs)
 	await mail.delete_mail(uid, nonce, **kwargs)
-	# {'gn' : new friend, 'exp' : new friend, 'icon' : 0 new friend, 'recover' : NF, 'since' : since new friend}
-	return common.mt(0, 'success', {'gn' : info[0], 'exp' : info[1]})
+	if info ==():
+		return common.mt(98, 'this person has date exception')
+	return common.mt(0, 'success', {'gn' : info[0][0], 'exp' : info[0][1]})
 
 async def send_gift(uid, gn_target, **kwargs):
 	#发送朋友礼物
@@ -60,7 +62,7 @@ async def send_gift(uid, gn_target, **kwargs):
 	return common.mt(0, 'success')
 
 async def send_gift_all(uid, **kwargs):
-	pass
+	return common.mt(0, 'function is not done yet')
 
 
 
@@ -81,7 +83,8 @@ async def _are_friends(uid, fid, **kwargs):
 
 async def _get_friend_info(uid, **kwargs):
 	info = await common.execute(f'SELECT player.gn, progress.exp, friend.recover, friend.since FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
-	return info
+	if info==():return ()
+	else:return info
 
 async def _lookup_nonce(nonce, **kwargs):
 	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce_new', json = {'nonce' : [nonce]}) as resp:
