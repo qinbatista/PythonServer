@@ -11,6 +11,9 @@ async def refresh(uid, **kwargs):
 	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
 
+async def upgrade(uid, fid, **kwargs):
+	return common.mt(0, 'success')
+
 
 ###################################################################################
 def can_produce(current, factory_type, **kwargs):
