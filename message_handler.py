@@ -477,12 +477,11 @@ class MessageHandler:
 		return common.mt(0, 'success', data={'config': self._acheviement})
 
 	###################### armor ######################
-	# TODO
 	async def _upgrade_armor(self, data: dict) -> str:
-		return 'function'
+		return await armor.upgrade(data['data']['unique_id'], data['data']['aid'], data['data']['level'], **data)
 
 	async def _get_all_armor(self, data: dict) -> str:
-		return await armor.get_all_armor(data['data']['unique_id'], **data)
+		return await armor.get_all(data['data']['unique_id'], **data)
 
 	###################### stage ######################
 	async def _get_all_tower(self, data: dict) -> str:
@@ -756,7 +755,6 @@ FUNCTION_LIST = {
 	'get_achievement_reward':MessageHandler._get_achievement_reward,
 	'get_achievement_config':MessageHandler._get_achievement_config,
 
-	# TODO
 	###################### armor ######################
 	'upgrade_armor': MessageHandler._upgrade_armor,
 	'get_all_armor': MessageHandler._get_all_armor,
