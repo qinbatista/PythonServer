@@ -7,6 +7,7 @@ from module import mail
 from module import enums
 from module import skill
 from module import family
+from module import factory
 from module import friend
 from module import common
 from module import account
@@ -357,6 +358,13 @@ class MessageHandler:
 	async def _send_gift_all(self, data: dict) -> str:
 		return await friend.send_gift_all(data['data']['unique_id'], **data)
 
+	###################### factory.py ######################
+	async def _refresh_factory(self, data: dict) -> str:
+		return await factory.refresh(data['data']['unique_id'], **data)
+
+	async def _upgrade_factory(self, data: dict) -> str:
+		return await factory.upgrade(data['data']['unique_id'], int(data['data']['fid']), **data)
+
 
 	###################### weapon.py ######################
 	async def _level_up_weapon(self, data: dict) -> str:
@@ -704,6 +712,10 @@ FUNCTION_LIST = {
 	'send_gift_friend' : MessageHandler._send_gift_friend,
 	'send_gift_all' : MessageHandler._send_gift_all,
 	'respond_friend':MessageHandler._respond_friend,
+
+	###################### factory.py ######################
+	'refresh_factory' : MessageHandler._refresh_factory,
+	'upgrade_factory' : MessageHandler._upgrade_factory,
 
 	###################### weapon.py ######################
 	'level_up_weapon' : MessageHandler._level_up_weapon,
