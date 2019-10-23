@@ -371,7 +371,7 @@ class MessageHandler:
 		return await factory.refresh(data['data']['unique_id'], **data)
 
 	async def _upgrade_factory(self, data: dict) -> str:
-		return await factory.upgrade(data['data']['unique_id'], data['data']['fid'], **data)
+		return await factory.upgrade(data['data']['unique_id'], int(data['data']['fid']), **data)
 
 
 	###################### weapon.py ######################
