@@ -14,9 +14,9 @@ async def refresh(uid, **kwargs):
 async def upgrade(uid, fid, **kwargs):
 	fid = enums.Factory(fid)
 	if fid == enums.Factory.UNASSIGNED: return common.mt(99, 'invalid fid')
-	levels, _, __ = await _get_factory_info(uid, **kwargs)
+	levels, _, storage = await _get_factory_info(uid, **kwargs)
 	upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(levels[fid] + 1)]
-	print(f'upgrade cost: {upgrade_cost}')
+	if storage[fid] < upgrade_cost: return common.mt(98, 'insufficient funds')
 	return common.mt(0, 'success')
 
 
