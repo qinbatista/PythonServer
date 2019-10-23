@@ -21,6 +21,9 @@ async def upgrade(uid, fid, **kwargs):
 	return common.mt(0, 'success', {'level' : levels[fid] + 1, 'storage' : storage[fid] - upgrade_cost})
 
 async def buy_worker(uid, **kwargs):
+	existing, workers = await _get_unassigned_workers(uid, **kwargs)
+	print(f'existing: {existing}')
+	print(f'workers : {workers}')
 	return common.mt(0, 'success')
 
 
@@ -59,3 +62,7 @@ async def _get_factory_info(uid, **kwargs):
 			workers[enums.Factory(fac[0])] = fac[2]
 			storage[enums.Factory(fac[0])] = fac[3]
 	return (levels, workers, storage)
+
+async def _get_unassigned_workers(uid, **kwargs):
+	data = await common.execute(f'SELECT workers FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
+	return (False, 0) if data == () else (True, data[0][0])
