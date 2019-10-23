@@ -7,7 +7,7 @@ from module import common
 
 async def refresh(uid, **kwargs):
 	levels, workers, storage = await _get_factory_info(uid, **kwargs)
-	storage = step(storage, workers, **kwargs)
+	storage = step(storage, workers, levels, **kwargs)
 	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
 
@@ -23,11 +23,11 @@ def can_produce(current, factory_type, **kwargs):
 		current[material] -= amount
 	return True
 
-def step(current, workers, **kwargs):
+def step(current, workers, levels, **kwargs):
 	for fac in reversed(enums.Factory):
 		for _ in range(workers[fac]):
 			if fac == enums.Factory.FOOD or can_produce(current, fac, **kwargs):
-				current[fac] += 1
+				current[fac] = min(current[fac] + 1, kwargs['config']['factory']['general']['storage_limits'][str(fac.value)][str(levels[fac])])
 			else: break
 	return current
 
