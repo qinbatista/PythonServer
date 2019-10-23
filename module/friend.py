@@ -54,16 +54,18 @@ async def send_gift(uid, gn_target, **kwargs):
 	sent = await mail.send_mail(enums.MailType.GIFT, fid, **kwargs)
 	if not sent: return common.mt(97, 'mailbox error')
 	await common.execute(f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
-
 	kwargs.update({"tid":enums.Task.GET_FRIEND_GIFT,"value":1})
 	await task.record_task(uid,**kwargs)
-
-	# {'gn' : gn, 'recover' : rt}
 	return common.mt(0, 'success')
 
 async def send_gift_all(uid, **kwargs):
-	return common.mt(0, 'function is not done yet')
-
+	info = await common.execute(f'SELECT player.gn FROM friend JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
+	if info==():return common.mt(0, 'no friend to send gift')
+	message_dic = []
+	for index, i in enumerate(info):
+		result =  await send_gift(uid,i[0],**kwargs)
+		if result["status"]==0:message_dic.append(i[0])
+	return common.mt(0, 'you send all friend gift success',message_dic)
 
 
 ##########################################################################################################
