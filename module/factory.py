@@ -63,6 +63,9 @@ async def decrease_worker(uid, fid, num, **kwargs):
 	await common.execute(f'UPDATE factory SET workers = {unassigned + num} WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
 	return common.mt(0, 'success', {'unassigned' : unassigned + num, 'workers' : current_workers[fid] - num})
 
+async def purchase_acceleration(uid, **kwargs):
+	return common.mt(0, 'success')
+
 
 
 ###################################################################################
@@ -108,3 +111,4 @@ async def _get_unassigned_workers(uid, **kwargs):
 async def _get_time_since_last_refresh(uid, **kwargs):
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_REFRESH.value};', **kwargs)
 	return (True, None) if data == () else (False, data[0][0])
+
