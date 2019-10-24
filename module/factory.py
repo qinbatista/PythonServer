@@ -12,9 +12,12 @@ async def refresh(uid, **kwargs):
 	if first_time:
 		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_REFRESH.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
 		return common.mt(1, 'factory initiated')
+	await common.execute(f'UPDATE timer SET time = "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}" WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_REFRESH.value};', **kwargs)
 	seconds_since = int((datetime.now(timezone.utc) - datetime.strptime(timer, '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc)).total_seconds())
 	levels, workers, storage = await _get_factory_info(uid, **kwargs)
-	storage = step(storage, workers, levels, **kwargs)
+	for _ in range(seconds_since // kwargs['config']['factory']['general']['step']):
+		print(f'step number: {_}')
+		storage = step(storage, workers, levels, **kwargs)
 	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
 
