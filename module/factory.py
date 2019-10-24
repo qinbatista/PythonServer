@@ -5,7 +5,16 @@ factory.py
 from module import enums
 from module import common
 
+from datetime import datetime, timezone
+
 async def refresh(uid, **kwargs):
+	first_time, timer = await _get_time_since_last_refresh(uid, **kwargs)
+	if first_time:
+		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_REFRESH.value}, {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")});', **kwargs)
+		return common.mt(1, 'factory initiated')
+	time = datetime.strptime(timer, '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc)
+	delta = datetime.now(timezone.utc) - time
+	print(f'seconds since: {int(delta.total_seconds())}')
 	levels, workers, storage = await _get_factory_info(uid, **kwargs)
 	storage = step(storage, workers, levels, **kwargs)
 	await _record_storage(uid, storage, **kwargs)
@@ -95,3 +104,7 @@ async def _get_factory_info(uid, **kwargs):
 async def _get_unassigned_workers(uid, **kwargs):
 	data = await common.execute(f'SELECT workers, storage FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
 	return (False, 0, 0) if data == () else (True, data[0][0], data[0][1])
+
+async def _get_time_since_last_refresh(uid, **kwargs):
+	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_REFRESH.value};', **kwargs)
+	return (True, None) if data == () else (False, data[0][0])
