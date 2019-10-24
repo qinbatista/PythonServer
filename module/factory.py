@@ -49,7 +49,7 @@ async def decrease_worker(uid, fid, num, **kwargs):
 	fid = enums.Factory(fid)
 	_, current_workers, __ = await _get_factory_info(uid, **kwargs)
 	_, unassigned, __ = await _get_unassigned_workers(uid, **kwargs)
-	if fid > current_workers[fid]: return common.mt(99, 'insufficient assigned workers')
+	if num > current_workers[fid]: return common.mt(99, 'insufficient assigned workers')
 	await common.execute(f'INSERT INTO factory (uid, fid, workers) VALUES ("{uid}", {fid.value}, {current_workers[fid] - num}) ON DUPLICATE KEY UPDATE workers = {current_workers[fid] - num};', **kwargs)
 	await common.execute(f'UPDATE factory SET workers = {unassigned + num} WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
 	return common.mt(0, 'success', {'unassigned' : unassigned + num, 'workers' : current_workers[fid] - num})
