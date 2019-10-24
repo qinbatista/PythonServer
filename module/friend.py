@@ -71,8 +71,10 @@ async def send_gift_all(uid, **kwargs):
 		if result["status"]==0:message_dic.append(i[0])
 	return common.mt(0, 'you send all friend gift success',message_dic)
 
-
-##########################################################################################################
+async def find_person(uid, gn_target, **kwargs):
+	data = await _get_person_info(await common.get_uid(gn_target, **kwargs), **kwargs)
+	if  data==():return common.mt(99, 'no such person')
+	return common.mt(0, 'find person success', {'gn' : data[0][0], 'intro' : data[0][1], 'fid' : data[0][2], 'exp' : data[0][3],'stage' : data[0][4],'role' : data[0][5]})
 
 def _can_send_gift(now, recover):
 	if recover == '': return True
@@ -106,6 +108,11 @@ async def _are_friends(uid, fid, **kwargs):
 
 async def _get_friend_info(uid, **kwargs):
 	info = await common.execute(f'SELECT player.gn, progress.exp, friend.recover, friend.since, player.fid, player.intro FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
+	if info==():return ()
+	else:return info
+
+async def _get_person_info(uid, **kwargs):
+	info = await common.execute(f'SELECT player.gn, player.intro, player.fid, progress.exp, progress.stage, progress.role FROM progress JOIN player ON progress.uid = player.uid WHERE player.uid = "{uid}";', **kwargs)
 	if info==():return ()
 	else:return info
 
