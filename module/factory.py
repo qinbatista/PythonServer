@@ -20,6 +20,7 @@ async def refresh(uid, **kwargs):
 	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
 
+# TODO max level checking
 async def upgrade(uid, fid, **kwargs):
 	fid = enums.Factory(fid)
 	if fid == enums.Factory.UNASSIGNED: return common.mt(99, 'invalid fid')
