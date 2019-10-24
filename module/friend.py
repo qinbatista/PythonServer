@@ -27,13 +27,14 @@ async def request(uid, gn_target, **kwargs):
 	if await _is_request_max(uid,**kwargs)==True:
 		return common.mt(97, '6 request for 1 day, try tommorrow')
 	uid_target = await common.get_uid(gn_target, **kwargs)
-	if uid_target=="": return common.mt(98, 'no such person')
+	if uid_target=="": return common.mt(97, 'no such person')
 	if uid == uid_target: return common.mt(99, 'do not be an idiot')
+	friends, _, _ = await _are_friends(uid, uid_target, **kwargs)
+	if friends: return common.mt(95, 'already friends')
 	await common.execute(f'INSERT INTO friend (uid, fid) VALUES ("{uid}", "{uid_target}") ON DUPLICATE KEY UPDATE uid = uid;', **kwargs)
 	sender = await common.get_gn(uid, **kwargs)
 	if not await mail.send_mail(enums.MailType.FRIEND_REQUEST, uid_target, from_ = sender, sender = sender, uid_sender = uid, **kwargs):
 		return common.mt(98, 'could not send mail')
-	print("sss:"+f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, value+1) ON DUPLICATE KEY UPDATE value = value+1;')
 	await common.execute(f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, value+1) ON DUPLICATE KEY UPDATE value = value+1;', **kwargs)
 	return common.mt(0, 'request sent', {'gn' : gn_target})
 
@@ -73,8 +74,12 @@ async def send_gift_all(uid, **kwargs):
 
 async def find_person(uid, gn_target, **kwargs):
 	data = await _get_person_info(await common.get_uid(gn_target, **kwargs), **kwargs)
+	uid_target = await common.get_uid(gn_target, **kwargs)
+	if  uid ==uid_target:return common.mt(98, "can't add yourself")
 	if  data==():return common.mt(99, 'no such person')
-	return common.mt(0, 'find person success', {'gn' : data[0][0], 'intro' : data[0][1], 'fid' : data[0][2], 'exp' : data[0][3],'stage' : data[0][4],'role' : data[0][5]})
+	isfriends, _, _ = await _are_friends(uid, uid_target, **kwargs)
+	isfamily  = await _are_family(uid, uid_target, **kwargs)
+	return common.mt(0, 'find person success', {'gn' : data[0][0], 'intro' : data[0][1], 'fid' : data[0][2], 'exp' : data[0][3],'stage' : data[0][4],'role' : data[0][5],"isfriend":str(isfriends),"isfamily":str(isfamily)})
 
 def _can_send_gift(now, recover):
 	if recover == '': return True
@@ -105,6 +110,12 @@ async def _add_friend(uid, fid, **kwargs):
 async def _are_friends(uid, fid, **kwargs):
 	data = await common.execute(f'SELECT recover, since FROM friend WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
 	return (True, data[0][0], data[0][1]) if data != () else (False, None, None)
+
+async def _are_family(uid, fid, **kwargs):
+	data1 = await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}"', **kwargs)
+	data2 = await common.execute(f'SELECT fid FROM player WHERE uid = "{fid}"', **kwargs)
+	if data1==data2: return True
+	else: return False
 
 async def _get_friend_info(uid, **kwargs):
 	info = await common.execute(f'SELECT player.gn, progress.exp, friend.recover, friend.since, player.fid, player.intro FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)

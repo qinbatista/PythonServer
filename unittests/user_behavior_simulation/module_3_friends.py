@@ -24,7 +24,7 @@ def send_gift_friend(_all_info):
 	names = _all_info["data"]["friends"]
 	for name in names:
 		new_response = send_tcp_message({'world' : world, 'function' : 'send_gift_friend', 'data' : {'token' : token,"gn_target":name["gn"]}})
-	print_method("[send_gift_friend]"+str(new_response))
+		print_method("[send_gift_friend]"+str(new_response))
 
 def send_gift_all():
 	new_response = send_tcp_message({'world' : world, 'function' : 'send_gift_all', 'data' : {'token' : token}})#发送好友信息
@@ -33,7 +33,7 @@ def send_gift_all():
 def request_friend():
 	print_method("[request_friend]")
 	# new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"gn_target":"name_unique_id"+str(random.randint(0,user_behavior_simulation.get_number()))}})#发送好友信息
-	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"gn_target":"name_4"}})#发送好友信息
+	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"gn_target":"name_unique_id12"}})#发送好友信息
 	print_method("[request_friend] requst_friend:"+str(new_response))
 
 def remove_friend():
@@ -41,6 +41,11 @@ def remove_friend():
 	new_response = send_tcp_message({'world' : world, 'function' : 'remove_friend', 'data' : {'token' : token,"gn_target":"name_unique_id"+str(random.randint(0,user_behavior_simulation.get_number()))}})#发送好友信息
 	# new_response = send_tcp_message({'world' : world, 'function' : 'remove_friend', 'data' : {'token' : token,"gn_target":"name_4"}})#发送好友信息
 	print_method("[remove_friend] remove_friend:"+str(new_response))
+
+def find_person():
+	print_method("[find_person]")
+	new_response = send_tcp_message({'world' : world, 'function' : 'find_person', 'data' : {'token' : token,"gn_target":"name_unique_id13"}})#发送好友信息
+	print_method("[find_person]:"+str(new_response))
 
 def freind_dialog(_token,_world,_all_info):
 	print_module("[freind_dialog]"+str(_all_info))
@@ -61,6 +66,8 @@ def freind_dialog(_token,_world,_all_info):
 		elif int_random ==4:
 			print_method("[freind_dialog] quit friend dialog")
 			break
+		elif int_random ==5:
+			find_person()
 
 if __name__ == "__main__":
 	pass
