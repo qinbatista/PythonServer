@@ -337,7 +337,7 @@ class MessageHandler:
 		return await skill.get_all(data['data']['unique_id'], self._skill, **data)
 
 	async def _level_up_skill(self, data: dict) -> str:
-		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']),  self._skill, **data)
+		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']), self._skill, **data)
 
 	###################### friend.py ######################
 	async def _get_all_friend(self, data: dict) -> str:
