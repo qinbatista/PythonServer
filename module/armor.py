@@ -7,7 +7,8 @@ from module import common
 
 
 async def upgrade(uid, aid, level, **kwargs):
-	if level < 1 or level > 10: return common.mt(99, 'invalid level')  # 最高合成10级盔甲
+	"""盔甲等级限制1-10，level限制2-10"""
+	if level < 2 or level > 10: return common.mt(99, 'invalid level')  # 最高合成10级盔甲
 	if int(aid) not in enums.Armor._value2member_map_: return common.mt(98, 'invalid aid')
 	b_quantity = await _get_armor(uid, aid, level - 1, **kwargs)
 	r_quantity = await _get_armor(uid, aid, level, **kwargs)
