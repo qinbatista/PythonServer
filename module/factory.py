@@ -35,6 +35,20 @@ async def buy_worker(uid, **kwargs):
 	await common.execute(stmt, **kwargs) 
 	return common.mt(0, 'success', {'unassigned' : workers + 1, 'total' : max_workers + 1, 'food' : storage[enums.Factory.FOOD] - upgrade_cost})
 
+async def increase_worker(uid, fid, num, **kwargs):
+	fid = enums.Factory(fid)
+	_, unassigned, max_workers = await _get_unassigned_workers(uid, **kwargs)
+	levels, current_workers, _ = await _get_factory_info(uid, **kwargs)
+	if num > unassigned: return common.mt(99, 'insufficient unassigned workers')
+	if current_workers[fid] + num > kwargs['config']['factory']['general']['worker_limits'][str(fid.value)][str(levels[fid])]: return common.mt(98, 'cant increase past max worker')
+	await common.execute(f'UPDATE factory SET workers = {unassigned - num} WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
+	await common.execute(f'INSERT INTO factory (uid, fid, workers) VALUES ("{uid}", {fid.value}, {current_workers[fid] + num}) ON DUPLICATE KEY UPDATE workers = {current_workers[fid] + num};', **kwargs)
+	return common.mt(0, 'success', {'unassigned' : unassigned - num, 'workers' : current_workers[fid] + num})
+
+async def decrease_workers(uid, fid, num, **kwargs):
+	pass
+
+
 
 ###################################################################################
 def can_produce(current, factory_type, **kwargs):
