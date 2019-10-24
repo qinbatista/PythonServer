@@ -16,7 +16,6 @@ async def refresh(uid, **kwargs):
 	seconds_since = int((datetime.now(timezone.utc) - datetime.strptime(timer, '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc)).total_seconds())
 	levels, workers, storage = await _get_factory_info(uid, **kwargs)
 	for _ in range(seconds_since // kwargs['config']['factory']['general']['step']):
-		print(f'step number: {_}')
 		storage = step(storage, workers, levels, **kwargs)
 	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
