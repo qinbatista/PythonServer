@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 async def refresh(uid, **kwargs):
 	first_time, timer = await _get_time_since_last_refresh(uid, **kwargs)
 	if first_time:
-		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_REFRESH.value}, {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")});', **kwargs)
+		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_REFRESH.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
 		return common.mt(1, 'factory initiated')
 	seconds_since = int((datetime.now(timezone.utc) - datetime.strptime(timer, '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc)).total_seconds())
 	levels, workers, storage = await _get_factory_info(uid, **kwargs)
