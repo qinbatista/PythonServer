@@ -25,7 +25,7 @@ async def remove(uid, gn_target, **kwargs):
 
 async def request(uid, gn_target, **kwargs):
 	if await _is_request_max(uid,**kwargs)==True:
-		return common.mt(97, '6 request for 1 day, try tommorrow')
+		return common.mt(96, '6 request for 1 day, try tommorrow')
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid_target=="": return common.mt(97, 'no such person')
 	if uid == uid_target: return common.mt(99, 'do not be an idiot')
