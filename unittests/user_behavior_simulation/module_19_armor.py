@@ -20,24 +20,24 @@ def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
 def login_decoration(func):
-	def wrapper(*args, **kwargs):
-		func(*args, **kwargs) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(*args, **{'token': response['data']['token'], 'world': 0}))()
+	def wrapper(world=0, token=None, *args, **kwargs):
+		func(world, token, *args, **kwargs) if token else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(world, response['data']['token'], *args, **kwargs))()
 	return wrapper
 
 @login_decoration
-def get_all_armor(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_all_armor', 'data': {'token' : kwargs['token']}})
+def get_all_armor(world, token, **kwargs):
+	response = send_tcp_message({'world': world, 'function': 'get_all_armor', 'data': {'token': token}})
 	logger.debug(response)
 
 @login_decoration
-def upgrade_armor(aid=1, level=2, **kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'upgrade_armor', 'data': {'token' : kwargs['token'], 'aid': aid, 'level': level}})
+def upgrade_armor(world, token, aid=1, level=2, **kwargs):
+	response = send_tcp_message({'world': world, 'function': 'upgrade_armor', 'data': {'token': token, 'aid': aid, 'level': level}})
 	logger.debug(response)
 
 
-def darkmarket_dialog(aid, level, **kwargs):
-	get_all_armor(**kwargs)
-	upgrade_armor(aid, level, **kwargs)
+def darkmarket_dialog(world, token, aid, level, **kwargs):
+	get_all_armor(world, token, **kwargs)
+	upgrade_armor(world, token, aid, level, **kwargs)
 
 
 armor_func = {
@@ -46,12 +46,11 @@ armor_func = {
 }
 
 if __name__ == '__main__':
-	# response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
-	# kwargs = {"world": 0, "token": response['data']['token']}
-	# get_all_armor(**kwargs)
-	armor_func[int(input('请输入需要执行的方法（0-1）：'))]()
-	# get_all_armor()
-	# upgrade_armor(1, 2)
+	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
+	darkmarket_dialog(0, response['data']['token'], 1, 2)
+	# armor_func[int(input('请输入需要执行的方法（0-1）：'))](0)
+	# get_all_armor(0)
+	# upgrade_armor(0, None, 1, 2)
 
 
 
