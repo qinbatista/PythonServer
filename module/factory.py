@@ -12,12 +12,15 @@ async def refresh(uid, **kwargs):
 	if first_time:
 		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_REFRESH.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
 		return common.mt(1, 'factory initiated')
+	await common.execute(f'UPDATE timer SET time = "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}" WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_REFRESH.value};', **kwargs)
 	seconds_since = int((datetime.now(timezone.utc) - datetime.strptime(timer, '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc)).total_seconds())
 	levels, workers, storage = await _get_factory_info(uid, **kwargs)
-	storage = step(storage, workers, levels, **kwargs)
+	for _ in range(seconds_since // kwargs['config']['factory']['general']['step']):
+		storage = step(storage, workers, levels, **kwargs)
 	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
 
+# TODO max level checking
 async def upgrade(uid, fid, **kwargs):
 	fid = enums.Factory(fid)
 	if fid == enums.Factory.UNASSIGNED: return common.mt(99, 'invalid fid')
@@ -60,6 +63,9 @@ async def decrease_worker(uid, fid, num, **kwargs):
 	await common.execute(f'INSERT INTO factory (uid, fid, workers) VALUES ("{uid}", {fid.value}, {current_workers[fid] - num}) ON DUPLICATE KEY UPDATE workers = {current_workers[fid] - num};', **kwargs)
 	await common.execute(f'UPDATE factory SET workers = {unassigned + num} WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
 	return common.mt(0, 'success', {'unassigned' : unassigned + num, 'workers' : current_workers[fid] - num})
+
+async def purchase_acceleration(uid, **kwargs):
+	return common.mt(0, 'success')
 
 
 
@@ -106,3 +112,4 @@ async def _get_unassigned_workers(uid, **kwargs):
 async def _get_time_since_last_refresh(uid, **kwargs):
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_REFRESH.value};', **kwargs)
 	return (True, None) if data == () else (False, data[0][0])
+

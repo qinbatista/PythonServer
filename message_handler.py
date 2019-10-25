@@ -376,6 +376,9 @@ class MessageHandler:
 	async def _decrease_worker_factory(self, data: dict) -> str:
 		return await factory.decrease_worker(data['data']['unique_id'], int(data['data']['fid']), int(data['data']['num']), **data)
 
+	async def _get_config_factory(self, data: dict) -> str:
+		return common.mt(0, 'success', data['config']['factory'])
+
 	###################### weapon.py ######################
 	async def _level_up_weapon(self, data: dict) -> str:
 		return await weapon.level_up(data['data']['unique_id'], int(data['data']['weapon']), int(data['data']['amount']), **data)
@@ -729,6 +732,7 @@ FUNCTION_LIST = {
 	'buy_worker_factory' : MessageHandler._buy_worker_factory,
 	'increase_worker_factory' : MessageHandler._increase_worker_factory,
 	'decrease_worker_factory' : MessageHandler._decrease_worker_factory,
+	'get_config_factory' : MessageHandler._get_config_factory,
 
 	###################### weapon.py ######################
 	'level_up_weapon' : MessageHandler._level_up_weapon,
