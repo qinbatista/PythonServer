@@ -33,7 +33,7 @@ def send_gift_all():
 def request_friend():
 	print_method("[request_friend]")
 	# new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"gn_target":"name_unique_id"+str(random.randint(0,user_behavior_simulation.get_number()))}})#发送好友信息
-	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"gn_target":"name_unique_id12"}})#发送好友信息
+	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"gn_target":"我我"}})#发送好友信息
 	print_method("[request_friend] requst_friend:"+str(new_response))
 
 def remove_friend():
@@ -44,7 +44,7 @@ def remove_friend():
 
 def find_person():
 	print_method("[find_person]")
-	new_response = send_tcp_message({'world' : world, 'function' : 'find_person', 'data' : {'token' : token,"gn_target":"name_unique_id13"}})#发送好友信息
+	new_response = send_tcp_message({'world' : world, 'function' : 'find_person', 'data' : {'token' : token,"gn_target":"我我"}})#发送好友信息
 	print_method("[find_person]:"+str(new_response))
 
 def freind_dialog(_token,_world,_all_info):
@@ -66,7 +66,7 @@ def freind_dialog(_token,_world,_all_info):
 		elif int_random ==4:
 			print_method("[freind_dialog] quit friend dialog")
 			break
-		elif int_random ==5:
+		elif int_random ==5:#查找好友
 			find_person()
 
 if __name__ == "__main__":

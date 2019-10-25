@@ -82,14 +82,14 @@ def run_task(name):
 	# module_10_stage.stage_dialog(token,world,info_list[5])
 	# module_17_check_in.check_in_dialog(token,world,info_list[5])
 	# module_18_darkmarket.darkmarket_dialog(token,world,info_list[5])
-	module_3_friends.freind_dialog(token,world,info_list[7])
+	# module_3_friends.freind_dialog(token,world,info_list[7])
 	# module_4_skills.skill_dialog(token,world,info_list[5],**kwargs)
+	module_6_factory.factory_dialog(token,world,info_list[5])
 	# dark_market()#*加载黑市信息
 	# mail_dialog(info_list[10],name)#邮箱界面
 	# call_friend_dialog(info_list[3])#朋友界面
 	# skill_dialog(info_list[4])#技能界面
 	# weapon_dialog(info_list[5])#武器界面
-	# factory_dialog(info_list[6])#工厂界面
 	# role_dialog()#角色界面
 	# family_dialog(info_list[9],info_list[19])
 
@@ -108,5 +108,5 @@ def run_all_task():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("unique_id12")
+	run_task("unique_id10")
 	# run_all_task()
