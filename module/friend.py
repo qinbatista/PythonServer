@@ -114,7 +114,7 @@ async def _are_friends(uid, fid, **kwargs):
 async def _are_family(uid, fid, **kwargs):
 	data1 = await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}"', **kwargs)
 	data2 = await common.execute(f'SELECT fid FROM player WHERE uid = "{fid}"', **kwargs)
-	if data1==data2: return True
+	if data1==data2 and data2!=(): return True
 	else: return False
 
 async def _get_friend_info(uid, **kwargs):
