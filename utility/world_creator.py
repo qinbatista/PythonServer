@@ -143,6 +143,7 @@ CREATE TABLE `player` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `gn` varchar(65) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `fid` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+	  `intro` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 	  PRIMARY KEY (`uid`),
 	  UNIQUE KEY `u_gn` (`gn`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
