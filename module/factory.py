@@ -70,8 +70,10 @@ async def purchase_acceleration(uid, **kwargs):
 
 
 ###################################################################################
-def can_produce(current, factory_type, **kwargs):
+def can_produce(current, factory_type, levels, **kwargs):
 	cost = {}
+	if current[factory_type] + 1 > kwargs['config']['factory']['general']['storage_limits'][str(factory_type.value)][str(levels[factory_type])]:
+		return False
 	for material, amount in kwargs['config']['factory']['general']['costs'][str(factory_type.value)].items():
 		if current[enums.Factory(int(material))] < amount:
 			return False
@@ -84,8 +86,8 @@ def step(current, workers, levels, **kwargs):
 	for fac in reversed(enums.Factory):
 		if fac != enums.Factory.UNASSIGNED:
 			for _ in range(workers[fac]):
-				if fac == enums.Factory.FOOD or can_produce(current, fac, **kwargs):
-					current[fac] = min(current[fac] + 1, kwargs['config']['factory']['general']['storage_limits'][str(fac.value)][str(levels[fac])])
+				if can_produce(current, fac, levels, **kwargs):
+					current[fac] += 1
 				else: break
 	return current
 
