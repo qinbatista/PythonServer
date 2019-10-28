@@ -56,6 +56,7 @@ async def send_gift(uid, gn_target, **kwargs):
 	now = datetime.now(timezone.utc)
 	if not _can_send_gift(now, recover): return common.mt(98, 'gift cooldown')
 	kwargs['items'] = common.encode_item(enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1)
+	kwargs['from_'] = await common.get_gn(uid, **kwargs)
 	sent = await mail.send_mail(enums.MailType.GIFT, fid, **kwargs)
 	if not sent: return common.mt(97, 'mailbox error')
 	await common.execute(f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
@@ -80,6 +81,8 @@ async def find_person(uid, gn_target, **kwargs):
 	isfriends, _, _ = await _are_friends(uid, uid_target, **kwargs)
 	isfamily  = await _are_family(uid, uid_target, **kwargs)
 	return common.mt(0, 'find person success', {'gn' : data[0][0], 'intro' : data[0][1], 'fid' : data[0][2], 'exp' : data[0][3],'stage' : data[0][4],'role' : data[0][5],"isfriend":str(isfriends),"isfamily":str(isfamily)})
+
+###########################################################################################################
 
 def _can_send_gift(now, recover):
 	if recover == '': return True
