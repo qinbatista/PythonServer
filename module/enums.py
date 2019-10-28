@@ -301,6 +301,7 @@ class Task(enum.IntEnum):
 
 
 class Factory(enum.IntEnum):
+	ARMOR = -3
 	WISHING_POOL = -2
 	UNASSIGNED = -1
 	FOOD = 0

@@ -73,6 +73,8 @@ async def purchase_acceleration(uid, **kwargs):
 	return common.mt(0, 'success')
 
 # adds random number of segments to the given weapon, regardless if they have unlocked that weapon or not
+# TODO bad code, should refactor
+# TODO update return formats
 async def activate_wishing_pool(uid, wid, **kwargs):
 	wid = enums.Weapon(wid)
 	first_time, timer = await _get_time_since_last_wishing_pool(uid, **kwargs)
@@ -93,6 +95,16 @@ async def activate_wishing_pool(uid, wid, **kwargs):
 			await common.execute(f'INSERT INTO limits VALUES ("{uid}", {enums.Limits.FACTORY_WISHING_POOL_COUNT.value}, {count + 1}) ON DUPLICATE KEY UPDATE value = {count + 1};', **kwargs)
 	remaining_seg = await weapon._update_segment(uid, wid, roll_segment_value(**kwargs), **kwargs)
 	return common.mt(0, 'success', {'wid' : wid.value, 'seg' : remaining_seg, 'diamond' : remaining_diamond})
+
+async def upgrade_wishing_pool(uid, **kwargs):
+	level = await _get_wishing_pool_level(uid, **kwargs)
+	return common.mt(0, 'success')
+
+
+async def set_armor(uid, aid, **kwargs):
+	aid = enums.Armor(aid)
+	await common.execute(f'INSERT INTO factory (uid, fid, storage) VALUES ("{uid}", {enums.Factory.ARMOR.value}, {aid.value}) ON DUPLICATE KEY UPDATE storage = {aid.value};', **kwargs)
+	return common.mt(0, 'success', {'aid' : aid.value})
 
 
 
