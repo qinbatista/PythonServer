@@ -376,6 +376,9 @@ class MessageHandler:
 	async def _decrease_worker_factory(self, data: dict) -> str:
 		return await factory.decrease_worker(data['data']['unique_id'], int(data['data']['fid']), int(data['data']['num']), **data)
 
+	async def _activate_wishing_pool_factory(self, data: dict) -> str:
+		return await factory.activate_wishing_pool(data['data']['unique_id'], int(data['data']['wid']), **data)
+
 	async def _get_config_factory(self, data: dict) -> str:
 		return common.mt(0, 'success', data['config']['factory'])
 
@@ -732,6 +735,7 @@ FUNCTION_LIST = {
 	'buy_worker_factory' : MessageHandler._buy_worker_factory,
 	'increase_worker_factory' : MessageHandler._increase_worker_factory,
 	'decrease_worker_factory' : MessageHandler._decrease_worker_factory,
+	'activate_wishing_pool_factory' : MessageHandler._activate_wishing_pool_factory,
 	'get_config_factory' : MessageHandler._get_config_factory,
 
 	###################### weapon.py ######################

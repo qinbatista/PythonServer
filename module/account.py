@@ -48,6 +48,7 @@ async def login(identifier, value, password, **kwargs):
 	return common.mt(0, 'success', data)
 
 async def bind_account(uid, account, password, **kwargs):
+	if await _account_bound(uid, **kwargs): return common.mt(96, 'account already bound')
 	if not _valid_account(account): return common.mt(99, 'invalid account name')
 	if not _valid_password(password): return common.mt(98, 'invalid password')
 	if await common.exists('info', ('account', account), account = True, **kwargs):
@@ -74,7 +75,7 @@ async def verify_email_code(uid, code, **kwargs):
 	if not email: return common.mt(99, 'invalid code')
 	email = email.decode()
 	await kwargs['redis'].delete('nonce.verify.email.' + code)
-	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), db = 'accountdb', **kwargs))
+	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), account = True, **kwargs))
 	if bound: return common.mt(98, 'account already bound email')
 	if exists: return common.mt(97, 'email already exists')
 	await _set_email(uid, email, **kwargs)

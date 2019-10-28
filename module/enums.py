@@ -233,6 +233,7 @@ class Timer(enum.IntEnum):
 	LOGIN_TIME = 12
 	FACTORY_REFRESH = 13
 	FACTORY_ACCELERATION = 14
+	FACTORY_WISHING_POOL = 15
 	REQUEST_FRIEND_TIME = 19
 
 
@@ -300,6 +301,7 @@ class Task(enum.IntEnum):
 
 
 class Factory(enum.IntEnum):
+	WISHING_POOL = -2
 	UNASSIGNED = -1
 	FOOD = 0
 	IRON = 1

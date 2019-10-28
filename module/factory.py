@@ -1,11 +1,16 @@
 '''
 factory.py
 '''
+import random
 
 from module import enums
 from module import common
+from module import weapon
 
 from datetime import datetime, timezone
+
+BASIC_FACTORIES = {enums.Factory.FOOD, enums.Factory.IRON, enums.Factory.CRYSTAL}
+
 
 async def refresh(uid, **kwargs):
 	first_time, timer = await _get_time_since_last_refresh(uid, **kwargs)
@@ -23,7 +28,7 @@ async def refresh(uid, **kwargs):
 # TODO max level checking
 async def upgrade(uid, fid, **kwargs):
 	fid = enums.Factory(fid)
-	if fid == enums.Factory.UNASSIGNED: return common.mt(99, 'invalid fid')
+	if fid not in BASIC_FACTORIES: return common.mt(99, 'invalid fid')
 	levels, _, storage = await _get_factory_info(uid, **kwargs)
 	upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(levels[fid] + 1)]
 	if storage[fid] < upgrade_cost: return common.mt(98, 'insufficient funds')
@@ -67,11 +72,44 @@ async def decrease_worker(uid, fid, num, **kwargs):
 async def purchase_acceleration(uid, **kwargs):
 	return common.mt(0, 'success')
 
+# adds random number of segments to the given weapon, regardless if they have unlocked that weapon or not
+async def activate_wishing_pool(uid, wid, **kwargs):
+	wid = enums.Weapon(wid)
+	first_time, timer = await _get_time_since_last_wishing_pool(uid, **kwargs)
+	level = await _get_wishing_pool_level(uid, **kwargs)
+	_, remaining_diamond = await common.try_item(uid, enums.Item.DIAMOND, 0, **kwargs)
+	if first_time:
+		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_WISHING_POOL.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
+		await common.execute(f'INSERT INTO limits VALUES ("{uid}", {enums.Limits.FACTORY_WISHING_POOL_COUNT.value}, 0);', **kwargs)
+	else:
+		seconds_since = int((datetime.now(timezone.utc) - datetime.strptime(timer, '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc)).total_seconds())
+		if seconds_since >= (kwargs['config']['factory']['wishing_pool']['base_recover'] - level) * 3600:
+			await common.execute(f'UPDATE timer SET time = "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}" WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_WISHING_POOL.value};', **kwargs)
+			await common.execute(f'UPDATE limits SET value = 0 WHERE uid = "{uid}" AND lid = {enums.Limits.FACTORY_WISHING_POOL_COUNT.value};', **kwargs)
+		else:
+			_, count = await _get_wishing_pool_count(uid, **kwargs)
+			can_pay, remaining_diamond = await common.try_item(uid, enums.Item.DIAMOND, -1 * count * kwargs['config']['factory']['wishing_pool']['base_diamond'], **kwargs)
+			if not can_pay: return common.mt(99, 'insufficient diamonds')
+			await common.execute(f'INSERT INTO limits VALUES ("{uid}", {enums.Limits.FACTORY_WISHING_POOL_COUNT.value}, {count + 1}) ON DUPLICATE KEY UPDATE value = {count + 1};', **kwargs)
+	remaining_seg = await weapon._update_segment(uid, wid, roll_segment_value(**kwargs), **kwargs)
+	return common.mt(0, 'success', {'wid' : wid.value, 'seg' : remaining_seg, 'diamond' : remaining_diamond})
+
 
 
 ###################################################################################
-def can_produce(current, factory_type, **kwargs):
+def roll_segment_value(**kwargs):
+	base_seg = kwargs['config']['factory']['wishing_pool']['base_segment']
+	rng = random.randint(0, 100)
+	if 0 <= rng < 10:
+		base_seg *= 3
+	elif 10 <= rng < 55:
+		base_seg *= 2
+	return base_seg
+
+def can_produce(current, factory_type, levels, **kwargs):
 	cost = {}
+	if current[factory_type] + 1 > kwargs['config']['factory']['general']['storage_limits'][str(factory_type.value)][str(levels[factory_type])]:
+		return False
 	for material, amount in kwargs['config']['factory']['general']['costs'][str(factory_type.value)].items():
 		if current[enums.Factory(int(material))] < amount:
 			return False
@@ -82,10 +120,10 @@ def can_produce(current, factory_type, **kwargs):
 
 def step(current, workers, levels, **kwargs):
 	for fac in reversed(enums.Factory):
-		if fac != enums.Factory.UNASSIGNED:
+		if fac in BASIC_FACTORIES:
 			for _ in range(workers[fac]):
-				if fac == enums.Factory.FOOD or can_produce(current, fac, **kwargs):
-					current[fac] = min(current[fac] + 1, kwargs['config']['factory']['general']['storage_limits'][str(fac.value)][str(levels[fac])])
+				if can_produce(current, fac, levels, **kwargs):
+					current[fac] += 1
 				else: break
 	return current
 
@@ -95,9 +133,9 @@ async def _record_storage(uid, storage, **kwargs):
 
 async def _get_factory_info(uid, **kwargs):
 	data = await common.execute(f'SELECT fid, level, workers, storage FROM factory WHERE uid = "{uid}";', **kwargs)
-	storage = {e : 0 for e in enums.Factory if e != enums.Factory.UNASSIGNED}
-	workers = {e : 0 for e in enums.Factory if e != enums.Factory.UNASSIGNED}
-	levels  = {e : 1 for e in enums.Factory if e != enums.Factory.UNASSIGNED}
+	storage = {e : 0 for e in enums.Factory if e in BASIC_FACTORIES}
+	workers = {e : 0 for e in enums.Factory if e in BASIC_FACTORIES}
+	levels  = {e : 1 for e in enums.Factory if e in BASIC_FACTORIES}
 	for fac in data:
 		if fac[0] != enums.Factory.UNASSIGNED.value:
 			levels[enums.Factory(fac[0])]  = fac[1]
@@ -112,4 +150,16 @@ async def _get_unassigned_workers(uid, **kwargs):
 async def _get_time_since_last_refresh(uid, **kwargs):
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_REFRESH.value};', **kwargs)
 	return (True, None) if data == () else (False, data[0][0])
+
+async def _get_time_since_last_wishing_pool(uid, **kwargs):
+	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_WISHING_POOL.value};', **kwargs)
+	return (True, None) if data == () else (False, data[0][0])
+
+async def _get_wishing_pool_count(uid, **kwargs):
+	data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.FACTORY_WISHING_POOL_COUNT.value};', **kwargs)
+	return (True, 0) if data == () else (False, data[0][0])
+
+async def _get_wishing_pool_level(uid, **kwargs):
+	data = await common.execute(f'SELECT level FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.WISHING_POOL.value};', **kwargs)
+	return 0 if data == () else data[0][0]
 

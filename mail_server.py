@@ -96,6 +96,7 @@ class MailServer:
 		dump = {k : v for k, v in msg.items() if k not in {'uid_sender', 'name', 'uid_target'}}
 		dump['body'] = msg.get_payload()
 		dump['read'] = 0 if 'S' not in msg.get_flags() else 1
+		dump['from'] = urllib.parse.unquote(dump['from'])
 		return dump
 
 	def _open_mail_folder(self, world, uid):
