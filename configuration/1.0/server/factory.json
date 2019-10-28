@@ -420,9 +420,9 @@
 	},
 	"wishing_pool" : 
 	{
-		"basic_segment" : 1,
-		"basic_recover_time" : 49,
-		"basic_diamond" : 50,
+		"base_segment" : 1,
+		"base_recover" : 49,
+		"base_diamond" : 50,
 		"upgrade_costs" :
 		{
 			"2": 0,
