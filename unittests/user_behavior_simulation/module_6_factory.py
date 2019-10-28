@@ -40,6 +40,9 @@ def factory_dialog(token,world,get_all_weapon):
 		elif int_number=="4":#减少工人
 			new_response = send_tcp_message({'world' : world, 'function' : 'decrease_worker_factory', 'data' : {'token':token, "fid":1, "fid":2, "num":1}})
 			print(str(new_response))
+		elif int_number=="5":#减少工人
+			new_response = send_tcp_message({'world' : world, 'function' : 'activate_wishing_pool_factory', 'data' : {'token':token, "wid":1}})
+			print(str(new_response))
 		else:
 			print_method("输入错误")
 			continue

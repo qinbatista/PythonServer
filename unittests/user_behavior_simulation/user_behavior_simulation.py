@@ -86,9 +86,9 @@ def run_task(name):
 	# module_18_darkmarket.darkmarket_dialog(token,world,info_list[5])
 	# module_3_friends.freind_dialog(token,world,info_list[7])
 	# module_4_skills.skill_dialog(token,world,info_list[5],**kwargs)
-	# module_6_factory.factory_dialog(token,world,info_list[5])
+	module_6_factory.factory_dialog(token,world,info_list[5])
 	# module_18_darkmarket.darkmarket_dialog(token,world,info_list[23])
-	module_19_armor.armor_dialog(token,world,info_list[1])
+	# module_19_armor.armor_dialog(token,world,info_list[1])
 
 	# call_friend_dialog(info_list[3])#朋友界面
 	# skill_dialog(info_list[4])#技能界面
