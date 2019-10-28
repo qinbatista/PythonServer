@@ -48,6 +48,7 @@ async def login(identifier, value, password, **kwargs):
 	return common.mt(0, 'success', data)
 
 async def bind_account(uid, account, password, **kwargs):
+	if await _account_bound(uid, **kwargs): return common.mt(96, 'account already bound')
 	if not _valid_account(account): return common.mt(99, 'invalid account name')
 	if not _valid_password(password): return common.mt(98, 'invalid password')
 	if await common.exists('info', ('account', account), account = True, **kwargs):
