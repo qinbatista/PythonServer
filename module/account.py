@@ -75,7 +75,7 @@ async def verify_email_code(uid, code, **kwargs):
 	if not email: return common.mt(99, 'invalid code')
 	email = email.decode()
 	await kwargs['redis'].delete('nonce.verify.email.' + code)
-	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), db = 'accountdb', **kwargs))
+	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), account = True, **kwargs))
 	if bound: return common.mt(98, 'account already bound email')
 	if exists: return common.mt(97, 'email already exists')
 	await _set_email(uid, email, **kwargs)
