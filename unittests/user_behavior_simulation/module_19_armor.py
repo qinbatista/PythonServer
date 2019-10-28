@@ -21,23 +21,24 @@ def send_tcp_message(msg):
 
 def login_decoration(func):
 	def wrapper(world=0, token=None, *args, **kwargs):
-		func(world, token, *args, **kwargs) if token else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(world, response['data']['token'], *args, **kwargs))()
+		func(token, world, *args, **kwargs) if token else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(world, response['data']['token'], *args, **kwargs))()
 	return wrapper
 
-@login_decoration
-def get_all_armor(world, token, **kwargs):
+# @login_decoration
+def get_all_armor(token, world, **kwargs):
 	response = send_tcp_message({'world': world, 'function': 'get_all_armor', 'data': {'token': token}})
 	logger.debug(response)
 
-@login_decoration
-def upgrade_armor(world, token, aid=1, level=2, **kwargs):
+# @login_decoration
+def upgrade_armor(token, world, aid=1, level=2, **kwargs):
 	response = send_tcp_message({'world': world, 'function': 'upgrade_armor', 'data': {'token': token, 'aid': aid, 'level': level}})
 	logger.debug(response)
 
 
-def darkmarket_dialog(world, token, aid, level, **kwargs):
-	get_all_armor(world, token, **kwargs)
-	upgrade_armor(world, token, aid, level, **kwargs)
+def armor_dialog(token, world, aid, **kwargs):
+	# get_all_armor(token, world, **kwargs)
+	for i in range(1,10):
+		upgrade_armor(token, world, 1, i, **kwargs)
 
 
 armor_func = {
@@ -46,11 +47,7 @@ armor_func = {
 }
 
 if __name__ == '__main__':
-	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
-	darkmarket_dialog(0, response['data']['token'], 1, 2)
-	# armor_func[int(input('请输入需要执行的方法（0-1）：'))](0)
-	# get_all_armor(0)
-	# upgrade_armor(0, None, 1, 2)
+	pass
 
 
 

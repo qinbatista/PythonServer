@@ -1,4 +1,4 @@
-import tool_lukseun_client as tc
+import tool_lukseun_client
 import module_1_login
 import module_2_get_all_data
 import module_3_friends
@@ -15,11 +15,13 @@ import module_14_vip
 import module_15_summon
 import module_16_daily_task
 import module_17_check_in
+import module_18_darkmarket
+import module_19_armor
 import multiprocessing
 import time
 from datetime import datetime, timedelta
 
-logger = tc.logger
+logger = tool_lukseun_client.logger
 
 world = "0"
 token = ""
@@ -84,9 +86,10 @@ def run_task(name):
 	# module_18_darkmarket.darkmarket_dialog(token,world,info_list[5])
 	# module_3_friends.freind_dialog(token,world,info_list[7])
 	# module_4_skills.skill_dialog(token,world,info_list[5],**kwargs)
-	module_6_factory.factory_dialog(token,world,info_list[5])
-	# dark_market()#*加载黑市信息
-	# mail_dialog(info_list[10],name)#邮箱界面
+	# module_6_factory.factory_dialog(token,world,info_list[5])
+	# module_18_darkmarket.darkmarket_dialog(token,world,info_list[23])
+	module_19_armor.armor_dialog(token,world,info_list[1])
+
 	# call_friend_dialog(info_list[3])#朋友界面
 	# skill_dialog(info_list[4])#技能界面
 	# weapon_dialog(info_list[5])#武器界面

@@ -41,21 +41,6 @@ CREATE TABLE `check_in` (
 	 CONSTRAINT `checkin_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
-
-DARKMARKETITEMS = \
-"""
-CREATE TABLE `darkmarketitems` (
-	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-	  `mid` int(11) NOT NULL,
-	  `gid` int(11) NOT NULL,
-	  `qty` int(11) NOT NULL DEFAULT 0,
-	  `cid` int(11) NOT NULL,
-	  `amt` int(11) NOT NULL,
-	  PRIMARY KEY (`uid`,`mid`),
-	  CONSTRAINT `darkmarketitems_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-"""
-
 FACTORY = \
 """
 CREATE TABLE `factory` (

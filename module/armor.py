@@ -12,16 +12,18 @@ async def upgrade(uid, aid, level, **kwargs):
 	# 97 - Insufficient basic armor
 	# 98 - invalid aid
 	# 99 - invalid level
-	if level < 2 or level > 10: return common.mt(99, 'invalid level')  # 最高合成10级盔甲
+	if level <= 0 or level >= 10: return common.mt(99, 'invalid level')  # 最高合成10级盔甲
 	if int(aid) not in enums.Armor._value2member_map_: return common.mt(98, 'invalid aid')
-	b_quantity = await _get_armor(uid, aid, level - 1, **kwargs)
-	r_quantity = await _get_armor(uid, aid, level, **kwargs)
-	if b_quantity < 3: return common.mt(97, 'Insufficient basic armor')
-	b_quantity -= 3
-	r_quantity += 1
-	await common.execute(f'UPDATE armor SET quantity = {b_quantity} WHERE uid = "{uid}" AND aid = {aid} AND level = {level - 1};', **kwargs)
-	await common.execute(f'UPDATE armor SET quantity = {r_quantity} WHERE uid = "{uid}" AND aid = {aid} AND level = {level};', **kwargs)
-	return common.mt(0, 'success', {'armors': [{'aid': aid, 'level': level - 1, 'quantity': b_quantity}, {'aid': aid, 'level': level, 'quantity': r_quantity}]})
+	basic_quantity = await _get_armor(uid, aid, level, **kwargs)
+	pro_quantity = await _get_armor(uid, aid, level+1, **kwargs)
+	if basic_quantity < 3: return common.mt(97, 'Insufficient basic armor')
+	remaining_basic_quantity = basic_quantity%3
+	remaining_pro_quantity =pro_quantity + basic_quantity//3
+	print("basic_quantity="+str(remaining_basic_quantity))
+	print("pro_quantity="+str(remaining_pro_quantity))
+	await common.execute(f'UPDATE armor SET quantity = {remaining_basic_quantity} WHERE uid = "{uid}" AND aid = {aid} AND level = {level};', **kwargs)
+	await common.execute(f'UPDATE armor SET quantity = {remaining_pro_quantity} WHERE uid = "{uid}" AND aid = {aid} AND level = {level+1};', **kwargs)
+	return common.mt(0, 'success', {'armors': [{'aid': aid, 'level': level, 'quantity': remaining_basic_quantity}, {'aid': aid, 'level': level+1, 'quantity': remaining_pro_quantity}]})
 
 
 async def get_all(uid, **kwargs):
