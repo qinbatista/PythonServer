@@ -185,7 +185,6 @@ class ChatServer:
 
 	# sends a message to the given writers
 	async def _send(self, message, *args):
-		self.sent_messages += len(args)
 		for writer in args:
 			if not writer.is_closing():
 				writer.write(message)

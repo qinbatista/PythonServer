@@ -7,20 +7,19 @@ from module import enums
 from module import common
 from module import weapon
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 BASIC_FACTORIES = {enums.Factory.FOOD, enums.Factory.IRON, enums.Factory.CRYSTAL}
 
 
 async def refresh(uid, **kwargs):
-	first_time, timer = await _get_time_since_last_refresh(uid, **kwargs)
-	if first_time:
+	steps = await _steps_since(uid, enums.Timer.FACTORY_REFRESH, **kwargs)
+	if steps is None:
 		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_REFRESH.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
 		return common.mt(1, 'factory initiated')
 	await common.execute(f'UPDATE timer SET time = "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}" WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_REFRESH.value};', **kwargs)
-	seconds_since = int((datetime.now(timezone.utc) - datetime.strptime(timer, '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc)).total_seconds())
 	levels, workers, storage = await _get_factory_info(uid, **kwargs)
-	for _ in range(seconds_since // kwargs['config']['factory']['general']['step']):
+	for _ in range(steps):
 		storage = step(storage, workers, levels, **kwargs)
 	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
@@ -70,7 +69,19 @@ async def decrease_worker(uid, fid, num, **kwargs):
 	return common.mt(0, 'success', {'unassigned' : unassigned + num, 'workers' : current_workers[fid] - num})
 
 async def purchase_acceleration(uid, **kwargs):
-	return common.mt(0, 'success')
+	can_pay, remaining_diamond = await common.try_item(uid, enums.Item.DIAMOND, -kwargs['config']['factory']['general']['acceleration_cost'], **kwargs)
+	if not can_pay: return common.mt(99, 'insufficient funds')
+	accel_start, accel_end = await _acceleration_time(uid, **kwargs)
+	now = datetime.now(timezone.utc)
+	if accel_start is None:
+		await common.execute(f'INSERT INTO `timer` VALUES ("{uid}", {enums.Timer.FACTORY_ACCELERATION_START.value}, "{now.strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
+		await common.execute(f'INSERT INTO `timer` VALUES ("{uid}", {enums.Timer.FACTORY_ACCELERATION_END.value}, "{(now + timedelta(days = 1)).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
+	else:
+		if now > accel_start:
+			await common.execute(f'UPDATE `timer` SET `time` = "{now.strftime("%Y-%m-%d %H:%M:%S")}" WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_ACCELERATION_START.value};', **kwargs)
+		await common.execute(f'UPDATE `timer` SET `time` = "{max(accel_end + timedelta(days = 1), now + timedelta(days = 1)).strftime("%Y-%m-%d %H:%M:%S")}" WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_ACCELERATION_END.value};', **kwargs)
+	accel_start, accel_end = await _acceleration_time(uid, **kwargs)
+	return common.mt(0, 'success', {'start' : accel_start.strftime('%Y-%m-%d %H:%M:%S'), 'end' : accel_end.strftime('%Y-%m-%d %H:%M:%S'), 'diamond' : remaining_diamond})
 
 # adds random number of segments to the given weapon, regardless if they have unlocked that weapon or not
 # TODO bad code, should refactor
@@ -106,6 +117,22 @@ async def set_armor(uid, aid, **kwargs):
 	await common.execute(f'INSERT INTO factory (uid, fid, storage) VALUES ("{uid}", {enums.Factory.ARMOR.value}, {aid.value}) ON DUPLICATE KEY UPDATE storage = {aid.value};', **kwargs)
 	return common.mt(0, 'success', {'aid' : aid.value})
 
+async def get_armor(uid, **kwargs):
+	data = await common.execute(f'SELECT storage FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.ARMOR.value};', **kwargs)
+	return common.mt(0, 'success', {'aid' : enums.Armor.A1.value if data == () else data[0][0]})
+
+async def refresh_equipment(uid, **kwargs):
+	first_time, time = await _get_time_since_last_equipment(uid, **kwargs)
+	if first_time:
+		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_EQUIPMENT.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
+	else:
+		pass
+	return common.mt(0, 'success')
+
+async def test(uid, tid, **kwargs):
+	tid = enums.Timer(tid)
+	return common.mt(0, 'test function success', {'steps' : await _steps_since(uid, tid, **kwargs)})
+
 
 
 ###################################################################################
@@ -139,6 +166,34 @@ def step(current, workers, levels, **kwargs):
 				else: break
 	return current
 
+# NEW
+def _steps_between(big, small, step, **kwargs):
+	return int((big - small).total_seconds()) // step
+
+# NEW
+# returns None if factory has not started yet
+async def _steps_since(uid, tid, **kwargs):
+	accel_start, accel_end = await _acceleration_time(uid, **kwargs)
+	first_time, timer = await _get_timer(uid, tid, **kwargs)
+	if first_time: return None
+	if accel_start is None:
+		accel_start, accel_end = timer, timer
+	now = datetime.now(timezone.utc)
+	return int(_steps_between(max(accel_start, timer), timer, kwargs['config']['factory']['general']['step']) + \
+			_steps_between(min(accel_end, now), accel_start, kwargs['config']['factory']['general']['step'] / 2) + \
+			_steps_between(now, min(accel_end, now), kwargs['config']['factory']['general']['step']))
+
+
+# NEW
+async def _acceleration_time(uid, **kwargs):
+	data = await common.execute(f'SELECT `time` FROM `timer` WHERE uid = "{uid}" AND (tid = {enums.Timer.FACTORY_ACCELERATION_START} OR tid = {enums.Timer.FACTORY_ACCELERATION_END}) ORDER BY `tid`;', **kwargs)
+	return (None, None) if data == () else tuple(datetime.strptime(t[0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc) for t in data) # (start, end)
+
+# NEW
+async def _get_timer(uid, tid, **kwargs):
+	data = await common.execute(f'SELECT `time` FROM `timer` WHERE uid = "{uid}" AND tid = {tid.value};', **kwargs)
+	return (True, None) if data == () else (False, datetime.strptime(data[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc))
+
 async def _record_storage(uid, storage, **kwargs):
 	for fac, amount in storage.items():
 		await common.execute(f'INSERT INTO factory (uid, fid, storage) VALUES ("{uid}", {fac.value}, {amount}) ON DUPLICATE KEY UPDATE storage = {amount};', **kwargs)
@@ -165,6 +220,10 @@ async def _get_time_since_last_refresh(uid, **kwargs):
 
 async def _get_time_since_last_wishing_pool(uid, **kwargs):
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_WISHING_POOL.value};', **kwargs)
+	return (True, None) if data == () else (False, data[0][0])
+
+async def _get_time_since_last_equipment(uid, **kwargs):
+	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_EQUIPMENT.value};', **kwargs)
 	return (True, None) if data == () else (False, data[0][0])
 
 async def _get_wishing_pool_count(uid, **kwargs):
