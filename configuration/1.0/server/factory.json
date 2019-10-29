@@ -2,6 +2,7 @@
 	"general" : 
 	{
 		"step" : 10,
+		"acceleration_cost" : 30,
 		"costs" : 
 		{
 			"0" :
