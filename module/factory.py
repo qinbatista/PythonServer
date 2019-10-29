@@ -128,11 +128,6 @@ async def refresh_equipment(uid, **kwargs):
 		return common.mt(1, 'factory initiated')
 	return common.mt(0, 'success')
 
-async def test(uid, tid, **kwargs):
-	tid = enums.Timer(tid)
-	return common.mt(0, 'test function success', {'steps' : await _steps_since(uid, tid, **kwargs)})
-
-
 
 ###################################################################################
 def roll_segment_value(**kwargs):
