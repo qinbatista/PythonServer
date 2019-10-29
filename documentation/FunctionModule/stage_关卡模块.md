@@ -8,6 +8,8 @@
 
 ##start_hang_up
 
+#####发送消息JSON格式
+
 开始挂机，玩家在`通过`关卡以后才能开始挂机，挂机的奖励列表来自`hang_reward_config.json`配置表。
 
 ```json
