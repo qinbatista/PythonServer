@@ -80,7 +80,7 @@ async def pass_stage(uid, stage, **kwargs):
 
 	stage_s = await get_progress(uid, 'stage', **kwargs)
 	if stage <= 0 or stage_s + 1 < stage:
-		return common.mt(99, 'Parameter error')
+		return common.mt(99, 'stage level is not correct, cant be '+str(stage))
 
 	pass_stages = []
 	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["stage"]
@@ -256,7 +256,7 @@ async def start_hang_up(uid, stage, **kwargs):
 	# 挂机方法是挂普通关卡
 	stage_s = await get_progress(uid, 'stage', **kwargs)
 	if stage <= 0 or stage_s < stage:
-		return common.mt(99, 'Parameter error')
+		return common.mt(99, 'stage level is not correct, cant be '+str(stage))
 
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
 	if data == ():

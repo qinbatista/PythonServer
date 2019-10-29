@@ -19,12 +19,14 @@ def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
 def enter_stage(**kwargs):
+	print("stage:"+str(kwargs['stage']))
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
-	print_method("[enter_stage]"+str(response)+" stage:"+str(kwargs['stage']))
+	print_method("[enter_stage]"+str(response))
 
 def pass_stage(**kwargs):
+	print("stage:"+str(kwargs['stage']))
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'pass_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
-	print_method("[pass_stage]"+str(response)+" stage:"+str(kwargs['stage']))
+	print_method("[pass_stage]"+str(response))
 
 def start_hang_up(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'start_hang_up', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
@@ -36,7 +38,7 @@ def get_hang_up_reward(**kwargs):
 
 def stage_dialog(token,world,info_list):
 	while True:
-		my_choice =  random.randint(0,4)
+		my_choice =  random.randint(3,3)
 		opeation_stage = random.randint(0,2)
 		if my_choice==0: enter_stage(**{"world":world,"token":token,"stage":opeation_stage})
 		if my_choice==1: pass_stage(**{"world":world,"token":token,"stage":opeation_stage})
