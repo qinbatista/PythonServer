@@ -118,8 +118,17 @@ async def activate_wishing_pool(uid, wid, **kwargs):
 
 
 async def upgrade_wishing_pool(uid, **kwargs):
+	factory = (await refresh(uid, **kwargs))['data']
 	level = await _get_factory_level(uid, enums.Factory.WISHING_POOL, **kwargs)
-	return common.mt(0, 'success')
+	try:
+		upgrade_cost = kwargs['config']['factory']['wishing_pool']['upgrade_costs'][str(level + 1)]
+	except KeyError:
+		return common.mt(97, 'max level')
+	if factory[enums.Factory.CRYSTAL.value] < upgrade_cost: return common.mt(99, 'insufficient funds')
+	await common.execute(f'UPDATE `factory` SET storage = {factory[enums.Factory.CRYSTAL.value] - upgrade_cost} WHERE uid = "{uid}" AND fid = {enums.Factory.CRYSTAL.value};', **kwargs)
+	await common.execute(f'INSERT INTO `factory` (uid, fid, level) VALUES ("{uid}", {enums.Factory.WISHING_POOL.value}, {level + 1}) ON DUPLICATE KEY UPDATE level = {level + 1};', **kwargs)
+	factory = (await refresh(uid, **kwargs))['data']
+	return common.mt(0, 'success', {'factory' : factory, 'level' : level + 1})
 
 async def set_armor(uid, aid, **kwargs):
 	aid = enums.Armor(aid)
@@ -234,7 +243,7 @@ async def _get_wishing_pool_count(uid, **kwargs):
 
 async def _get_factory_level(uid, fid, **kwargs):
 	data = await common.execute(f'SELECT level FROM factory WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
-	return 0 if data == () else data[0][0]
+	return 1 if data == () else data[0][0]
 
 # TODO rework _get_factory_info function and rename this to it
 async def _get_single_factory_info(uid, fid, **kwargs):
