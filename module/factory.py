@@ -122,11 +122,10 @@ async def get_armor(uid, **kwargs):
 	return common.mt(0, 'success', {'aid' : enums.Armor.A1.value if data == () else data[0][0]})
 
 async def refresh_equipment(uid, **kwargs):
-	first_time, time = await _get_time_since_last_equipment(uid, **kwargs)
-	if first_time:
+	steps = await _get_steps(uid, enums.Timer.FACTORY_EQUIPMENT, **kwargs)
+	if steps is None:
 		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_EQUIPMENT.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
-	else:
-		pass
+		return common.mt(1, 'factory initiated')
 	return common.mt(0, 'success')
 
 async def test(uid, tid, **kwargs):
@@ -180,7 +179,7 @@ async def _steps_since(uid, tid, **kwargs):
 		accel_start, accel_end = timer, timer
 	now = datetime.now(timezone.utc)
 	return int(_steps_between(max(accel_start, timer), timer, kwargs['config']['factory']['general']['step']) + \
-			_steps_between(min(accel_end, now), accel_start, kwargs['config']['factory']['general']['step'] / 2) + \
+			_steps_between(min(accel_end, now), max(accel_start, timer), kwargs['config']['factory']['general']['step'] / 2) + \
 			_steps_between(now, min(accel_end, now), kwargs['config']['factory']['general']['step']))
 
 
@@ -214,17 +213,10 @@ async def _get_unassigned_workers(uid, **kwargs):
 	data = await common.execute(f'SELECT workers, storage FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
 	return (False, 0, 0) if data == () else (True, data[0][0], data[0][1])
 
-async def _get_time_since_last_refresh(uid, **kwargs):
-	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_REFRESH.value};', **kwargs)
-	return (True, None) if data == () else (False, data[0][0])
-
 async def _get_time_since_last_wishing_pool(uid, **kwargs):
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_WISHING_POOL.value};', **kwargs)
 	return (True, None) if data == () else (False, data[0][0])
 
-async def _get_time_since_last_equipment(uid, **kwargs):
-	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_EQUIPMENT.value};', **kwargs)
-	return (True, None) if data == () else (False, data[0][0])
 
 async def _get_wishing_pool_count(uid, **kwargs):
 	data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.FACTORY_WISHING_POOL_COUNT.value};', **kwargs)

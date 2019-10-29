@@ -364,6 +364,9 @@ class MessageHandler:
 	async def _refresh_factory(self, data: dict) -> str:
 		return await factory.refresh(data['data']['unique_id'], **data)
 
+	async def _refresh_equipment_factory(self, data: dict) -> str:
+		return await factory.refresh_equipment(data['data']['unique_id'], **data)
+
 	async def _upgrade_factory(self, data: dict) -> str:
 		return await factory.upgrade(data['data']['unique_id'], int(data['data']['fid']), **data)
 
@@ -742,6 +745,7 @@ FUNCTION_LIST = {
 
 	###################### factory.py ######################
 	'refresh_factory' : MessageHandler._refresh_factory,
+	'refresh_equipment_factory' : MessageHandler._refresh_equipment_factory,
 	'upgrade_factory' : MessageHandler._upgrade_factory,
 	'buy_worker_factory' : MessageHandler._buy_worker_factory,
 	'increase_worker_factory' : MessageHandler._increase_worker_factory,
