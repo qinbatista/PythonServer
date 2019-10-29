@@ -128,16 +128,6 @@ async def refresh_equipment(uid, **kwargs):
 		return common.mt(1, 'factory initiated')
 	return common.mt(0, 'success')
 
-
-
-
-	first_time, time = await _get_time_since_last_equipment(uid, **kwargs)
-	if first_time:
-		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_EQUIPMENT.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
-	else:
-		pass
-	return common.mt(0, 'success')
-
 async def test(uid, tid, **kwargs):
 	tid = enums.Timer(tid)
 	return common.mt(0, 'test function success', {'steps' : await _steps_since(uid, tid, **kwargs)})
@@ -223,17 +213,10 @@ async def _get_unassigned_workers(uid, **kwargs):
 	data = await common.execute(f'SELECT workers, storage FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
 	return (False, 0, 0) if data == () else (True, data[0][0], data[0][1])
 
-async def _get_time_since_last_refresh(uid, **kwargs):
-	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_REFRESH.value};', **kwargs)
-	return (True, None) if data == () else (False, data[0][0])
-
 async def _get_time_since_last_wishing_pool(uid, **kwargs):
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_WISHING_POOL.value};', **kwargs)
 	return (True, None) if data == () else (False, data[0][0])
 
-async def _get_time_since_last_equipment(uid, **kwargs):
-	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_EQUIPMENT.value};', **kwargs)
-	return (True, None) if data == () else (False, data[0][0])
 
 async def _get_wishing_pool_count(uid, **kwargs):
 	data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.FACTORY_WISHING_POOL_COUNT.value};', **kwargs)
