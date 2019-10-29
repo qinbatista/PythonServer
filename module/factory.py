@@ -32,14 +32,16 @@ async def refresh(uid, **kwargs):
 async def upgrade(uid, fid, **kwargs):
 	fid = enums.Factory(fid)
 	if fid not in BASIC_FACTORIES: return common.mt(99, 'invalid fid')
-	levels, _, storage = await _get_factory_info(uid, **kwargs)
+	factory = (await refresh(uid, **kwargs))['data']
+	level = await _get_factory_level(uid, fid, **kwargs)
 	try:
-		upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(levels[fid] + 1)]
+		upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(level + 1)]
 	except KeyError:
 		return common.mt(97, 'max level')
-	if storage[fid] < upgrade_cost: return common.mt(98, 'insufficient funds')
-	await common.execute(f'UPDATE factory SET level = {levels[fid] + 1}, storage = {storage[fid] - upgrade_cost} WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
-	return common.mt(0, 'success', {'level' : levels[fid] + 1, 'storage' : storage[fid] - upgrade_cost})
+	if factory[fid.value] < upgrade_cost: return common.mt(98, 'insufficient funds')
+	await common.execute(f'UPDATE factory SET level = {level + 1}, storage = {factory[fid.value] - upgrade_cost} WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
+	factory = (await refresh(uid, **kwargs))['data']
+	return common.mt(0, 'success', {'factory' : factory, 'level' : level + 1})
 
 async def buy_worker(uid, **kwargs):
 	existing, workers, max_workers = await _get_unassigned_workers(uid, **kwargs)
