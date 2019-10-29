@@ -1,15 +1,20 @@
 '''
 factory.py
+
+CHECKED RETURN TYPES WITH LIANG
 '''
 import random
 
 from module import enums
+from module import armor
 from module import common
 from module import weapon
 
 from datetime import datetime, timezone, timedelta
 
 BASIC_FACTORIES = {enums.Factory.FOOD, enums.Factory.IRON, enums.Factory.CRYSTAL}
+HAVE_WORKERS_FACTORIES = {enums.Factory.FOOD, enums.Factory.IRON, enums.Factory.CRYSTAL, \
+		enums.Factory.EQUIPMENT}
 
 
 async def refresh(uid, **kwargs):
@@ -24,15 +29,19 @@ async def refresh(uid, **kwargs):
 	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
 
-# TODO max level checking
 async def upgrade(uid, fid, **kwargs):
 	fid = enums.Factory(fid)
 	if fid not in BASIC_FACTORIES: return common.mt(99, 'invalid fid')
-	levels, _, storage = await _get_factory_info(uid, **kwargs)
-	upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(levels[fid] + 1)]
-	if storage[fid] < upgrade_cost: return common.mt(98, 'insufficient funds')
-	await common.execute(f'UPDATE factory SET level = {levels[fid] + 1}, storage = {storage[fid] - upgrade_cost} WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
-	return common.mt(0, 'success', {'level' : levels[fid] + 1, 'storage' : storage[fid] - upgrade_cost})
+	factory = (await refresh(uid, **kwargs))['data']
+	level = await _get_factory_level(uid, fid, **kwargs)
+	try:
+		upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(level + 1)]
+	except KeyError:
+		return common.mt(97, 'max level')
+	if factory[fid.value] < upgrade_cost: return common.mt(98, 'insufficient funds')
+	await common.execute(f'UPDATE factory SET level = {level + 1}, storage = {factory[fid.value] - upgrade_cost} WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
+	factory = (await refresh(uid, **kwargs))['data']
+	return common.mt(0, 'success', {'factory' : factory, 'level' : level + 1})
 
 async def buy_worker(uid, **kwargs):
 	existing, workers, max_workers = await _get_unassigned_workers(uid, **kwargs)
@@ -51,22 +60,24 @@ async def buy_worker(uid, **kwargs):
 
 async def increase_worker(uid, fid, num, **kwargs):
 	fid = enums.Factory(fid)
+	if fid not in HAVE_WORKERS_FACTORIES: return common.mt(97, 'invalid fid')
 	_, unassigned, max_workers = await _get_unassigned_workers(uid, **kwargs)
 	levels, current_workers, _ = await _get_factory_info(uid, **kwargs)
 	if num > unassigned: return common.mt(99, 'insufficient unassigned workers')
 	if current_workers[fid] + num > kwargs['config']['factory']['general']['worker_limits'][str(fid.value)][str(levels[fid])]: return common.mt(98, 'cant increase past max worker')
 	await common.execute(f'UPDATE factory SET workers = {unassigned - num} WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
 	await common.execute(f'INSERT INTO factory (uid, fid, workers) VALUES ("{uid}", {fid.value}, {current_workers[fid] + num}) ON DUPLICATE KEY UPDATE workers = {current_workers[fid] + num};', **kwargs)
-	return common.mt(0, 'success', {'unassigned' : unassigned - num, 'workers' : current_workers[fid] + num})
+	return common.mt(0, 'success', {'fid' : fid.value, 'unassigned' : unassigned - num, 'workers' : current_workers[fid] + num})
 
 async def decrease_worker(uid, fid, num, **kwargs):
 	fid = enums.Factory(fid)
+	if fid not in HAVE_WORKERS_FACTORIES: return common.mt(97, 'invalid fid')
 	_, current_workers, __ = await _get_factory_info(uid, **kwargs)
 	_, unassigned, __ = await _get_unassigned_workers(uid, **kwargs)
 	if num > current_workers[fid]: return common.mt(99, 'insufficient assigned workers')
 	await common.execute(f'INSERT INTO factory (uid, fid, workers) VALUES ("{uid}", {fid.value}, {current_workers[fid] - num}) ON DUPLICATE KEY UPDATE workers = {current_workers[fid] - num};', **kwargs)
 	await common.execute(f'UPDATE factory SET workers = {unassigned + num} WHERE uid = "{uid}" AND fid = {enums.Factory.UNASSIGNED.value};', **kwargs)
-	return common.mt(0, 'success', {'unassigned' : unassigned + num, 'workers' : current_workers[fid] - num})
+	return common.mt(0, 'success', {'fid' : fid.value, 'unassigned' : unassigned + num, 'workers' : current_workers[fid] - num})
 
 async def purchase_acceleration(uid, **kwargs):
 	can_pay, remaining_diamond = await common.try_item(uid, enums.Item.DIAMOND, -kwargs['config']['factory']['general']['acceleration_cost'], **kwargs)
@@ -89,16 +100,16 @@ async def purchase_acceleration(uid, **kwargs):
 async def activate_wishing_pool(uid, wid, **kwargs):
 	wid = enums.Weapon(wid)
 	first_time, timer = await _get_time_since_last_wishing_pool(uid, **kwargs)
-	level = await _get_wishing_pool_level(uid, **kwargs)
+	level = await _get_factory_level(uid, enums.Factory.WISHING_POOL, **kwargs)
 	_, remaining_diamond = await common.try_item(uid, enums.Item.DIAMOND, 0, **kwargs)
 	if first_time:
 		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_WISHING_POOL.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
-		await common.execute(f'INSERT INTO limits VALUES ("{uid}", {enums.Limits.FACTORY_WISHING_POOL_COUNT.value}, 0);', **kwargs)
+		await common.execute(f'INSERT INTO limits VALUES ("{uid}", {enums.Limits.FACTORY_WISHING_POOL_COUNT.value}, 1);', **kwargs)
 	else:
 		seconds_since = int((datetime.now(timezone.utc) - datetime.strptime(timer, '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc)).total_seconds())
 		if seconds_since >= (kwargs['config']['factory']['wishing_pool']['base_recover'] - level) * 3600:
 			await common.execute(f'UPDATE timer SET time = "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}" WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_WISHING_POOL.value};', **kwargs)
-			await common.execute(f'UPDATE limits SET value = 0 WHERE uid = "{uid}" AND lid = {enums.Limits.FACTORY_WISHING_POOL_COUNT.value};', **kwargs)
+			await common.execute(f'UPDATE limits SET value = 1 WHERE uid = "{uid}" AND lid = {enums.Limits.FACTORY_WISHING_POOL_COUNT.value};', **kwargs)
 		else:
 			_, count = await _get_wishing_pool_count(uid, **kwargs)
 			can_pay, remaining_diamond = await common.try_item(uid, enums.Item.DIAMOND, -1 * count * kwargs['config']['factory']['wishing_pool']['base_diamond'], **kwargs)
@@ -107,31 +118,47 @@ async def activate_wishing_pool(uid, wid, **kwargs):
 	remaining_seg = await weapon._update_segment(uid, wid, roll_segment_value(**kwargs), **kwargs)
 	return common.mt(0, 'success', {'wid' : wid.value, 'seg' : remaining_seg, 'diamond' : remaining_diamond})
 
-async def upgrade_wishing_pool(uid, **kwargs):
-	level = await _get_wishing_pool_level(uid, **kwargs)
-	return common.mt(0, 'success')
 
+async def upgrade_wishing_pool(uid, **kwargs):
+	factory = (await refresh(uid, **kwargs))['data']
+	level = await _get_factory_level(uid, enums.Factory.WISHING_POOL, **kwargs)
+	try:
+		upgrade_cost = kwargs['config']['factory']['wishing_pool']['upgrade_costs'][str(level + 1)]
+	except KeyError:
+		return common.mt(97, 'max level')
+	if factory[enums.Factory.CRYSTAL.value] < upgrade_cost: return common.mt(99, 'insufficient funds')
+	await common.execute(f'UPDATE `factory` SET storage = {factory[enums.Factory.CRYSTAL.value] - upgrade_cost} WHERE uid = "{uid}" AND fid = {enums.Factory.CRYSTAL.value};', **kwargs)
+	await common.execute(f'INSERT INTO `factory` (uid, fid, level) VALUES ("{uid}", {enums.Factory.WISHING_POOL.value}, {level + 1}) ON DUPLICATE KEY UPDATE level = {level + 1};', **kwargs)
+	factory = (await refresh(uid, **kwargs))['data']
+	return common.mt(0, 'success', {'factory' : factory, 'level' : level + 1})
 
 async def set_armor(uid, aid, **kwargs):
 	aid = enums.Armor(aid)
-	await common.execute(f'INSERT INTO factory (uid, fid, storage) VALUES ("{uid}", {enums.Factory.ARMOR.value}, {aid.value}) ON DUPLICATE KEY UPDATE storage = {aid.value};', **kwargs)
+	await common.execute(f'INSERT INTO factory (uid, fid, storage) VALUES ("{uid}", {enums.Factory.EQUIPMENT.value}, {aid.value}) ON DUPLICATE KEY UPDATE storage = {aid.value};', **kwargs)
 	return common.mt(0, 'success', {'aid' : aid.value})
 
 async def get_armor(uid, **kwargs):
-	data = await common.execute(f'SELECT storage FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.ARMOR.value};', **kwargs)
+	data = await common.execute(f'SELECT storage FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.EQUIPMENT.value};', **kwargs)
 	return common.mt(0, 'success', {'aid' : enums.Armor.A1.value if data == () else data[0][0]})
 
 async def refresh_equipment(uid, **kwargs):
-	steps = await _get_steps(uid, enums.Timer.FACTORY_EQUIPMENT, **kwargs)
+	factory = (await refresh(uid, **kwargs))['data']
+	steps = await _steps_since(uid, enums.Timer.FACTORY_EQUIPMENT, **kwargs)
 	if steps is None:
 		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_EQUIPMENT.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
 		return common.mt(1, 'factory initiated')
-	return common.mt(0, 'success')
-
-async def test(uid, tid, **kwargs):
-	tid = enums.Timer(tid)
-	return common.mt(0, 'test function success', {'steps' : await _steps_since(uid, tid, **kwargs)})
-
+	await common.execute(f'UPDATE timer SET time = "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}" WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_EQUIPMENT.value};', **kwargs)
+	_, workers, _ = await _get_single_factory_info(uid, enums.Factory.EQUIPMENT, **kwargs)
+	try:
+		seg = min(factory[enums.Factory.IRON.value] // (kwargs['config']['factory']['equipment']['cost'] * workers), workers * steps * kwargs['config']['factory']['equipment']['cost'])
+	except ZeroDivisionError:
+		seg = 0
+	if seg != 0:
+		await common.execute(f'UPDATE factory SET storage = {factory[enums.Factory.IRON.value] - seg} WHERE uid = "{uid}" AND fid = {enums.Factory.IRON.value};', **kwargs)
+	armor_type = (await get_armor(uid, **kwargs))['data']['aid']
+	await common.execute(f'INSERT INTO `armor` VALUES ("{uid}", {armor_type}, 1, {seg}) ON DUPLICATE KEY UPDATE quantity = quantity + {seg};', **kwargs)
+	factory = (await refresh(uid, **kwargs))['data']
+	return common.mt(0, 'success', {'factory' : factory, 'aid' : armor_type, 'quantity' : await armor._get_armor(uid, armor_type, 1, **kwargs)})
 
 
 ###################################################################################
@@ -165,12 +192,9 @@ def step(current, workers, levels, **kwargs):
 				else: break
 	return current
 
-# NEW
 def _steps_between(big, small, step, **kwargs):
 	return int((big - small).total_seconds()) // step
 
-# NEW
-# returns None if factory has not started yet
 async def _steps_since(uid, tid, **kwargs):
 	accel_start, accel_end = await _acceleration_time(uid, **kwargs)
 	first_time, timer = await _get_timer(uid, tid, **kwargs)
@@ -183,12 +207,10 @@ async def _steps_since(uid, tid, **kwargs):
 			_steps_between(now, min(accel_end, now), kwargs['config']['factory']['general']['step']))
 
 
-# NEW
 async def _acceleration_time(uid, **kwargs):
 	data = await common.execute(f'SELECT `time` FROM `timer` WHERE uid = "{uid}" AND (tid = {enums.Timer.FACTORY_ACCELERATION_START} OR tid = {enums.Timer.FACTORY_ACCELERATION_END}) ORDER BY `tid`;', **kwargs)
 	return (None, None) if data == () else tuple(datetime.strptime(t[0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc) for t in data) # (start, end)
 
-# NEW
 async def _get_timer(uid, tid, **kwargs):
 	data = await common.execute(f'SELECT `time` FROM `timer` WHERE uid = "{uid}" AND tid = {tid.value};', **kwargs)
 	return (True, None) if data == () else (False, datetime.strptime(data[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc))
@@ -203,7 +225,7 @@ async def _get_factory_info(uid, **kwargs):
 	workers = {e : 0 for e in enums.Factory if e in BASIC_FACTORIES}
 	levels  = {e : 1 for e in enums.Factory if e in BASIC_FACTORIES}
 	for fac in data:
-		if fac[0] != enums.Factory.UNASSIGNED.value:
+		if fac[0] in BASIC_FACTORIES:
 			levels[enums.Factory(fac[0])]  = fac[1]
 			workers[enums.Factory(fac[0])] = fac[2]
 			storage[enums.Factory(fac[0])] = fac[3]
@@ -217,12 +239,15 @@ async def _get_time_since_last_wishing_pool(uid, **kwargs):
 	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = {enums.Timer.FACTORY_WISHING_POOL.value};', **kwargs)
 	return (True, None) if data == () else (False, data[0][0])
 
-
 async def _get_wishing_pool_count(uid, **kwargs):
 	data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.FACTORY_WISHING_POOL_COUNT.value};', **kwargs)
 	return (True, 0) if data == () else (False, data[0][0])
 
-async def _get_wishing_pool_level(uid, **kwargs):
-	data = await common.execute(f'SELECT level FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.WISHING_POOL.value};', **kwargs)
-	return 0 if data == () else data[0][0]
+async def _get_factory_level(uid, fid, **kwargs):
+	data = await common.execute(f'SELECT level FROM factory WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
+	return 1 if data == () else data[0][0]
 
+# TODO rework _get_factory_info function and rename this to it
+async def _get_single_factory_info(uid, fid, **kwargs):
+	data = await common.execute(f'SELECT level, workers, storage FROM `factory` WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
+	return (0, 0, 0) if data == () else (data[0][0], data[0][1], data[0][2])
