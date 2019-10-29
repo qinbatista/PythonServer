@@ -45,6 +45,15 @@ def stage_dialog(token,world,info_list):
 		if my_choice==4: break
 
 if __name__ == '__main__':
-	pass
+	unique_id = '1'
+	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': unique_id}})
+	print(response)
+	enter_stage(**{"world": 0, "token": response['data']['token'], "stage": 1})
+
+
+
+# player_info = await common.execute(f'select * from player;', **kwargs)
+# print(player_info)
+
 
 

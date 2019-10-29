@@ -64,9 +64,11 @@ async def enter_stage(uid, stage, **kwargs):
 	for i, iid in enumerate(iid_s):
 		await common.execute_update(f'UPDATE item set value = {values[i]} WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
-		enter_stages.append({'iid': iid, 'value': data[0][0], 'consume': entry_consume[stage][iid]})
+		enter_stages.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
 	_, exp_info = await increase_exp(uid, 0, **kwargs)
-	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy_data': energy_data['data'], 'monster': enemy_list})
+	energy_data = energy_data['data']
+	energy = {'time': '-1' if energy_data['cooling_time'] < 0 else str(timedelta(seconds=energy_data['cooling_time'])), 'remaining': energy_data['energy'], 'reward': -energy_consume}
+	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy': energy, 'monster': enemy_list})
 
 
 # 通过普通关卡
@@ -165,10 +167,12 @@ async def enter_tower(uid, stage, **kwargs):
 	for i, iid in enumerate(iid_s):
 		await common.execute_update(f'UPDATE item set value = {values[i]} WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
-		enter_towers.append({'iid': iid, 'value': data[0][0], 'consume': entry_consume[stage][iid]})
+		enter_towers.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
 
 	_, exp_info = await increase_exp(uid, 0, **kwargs)
-	return common.mt(0, 'success', {'enter_towers': enter_towers, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy_data': energy_data['data'], 'monster': enemy_list})
+	energy_data = energy_data['data']
+	energy = {'time': '-1' if energy_data['cooling_time'] < 0 else str(timedelta(seconds=energy_data['cooling_time'])), 'remaining': energy_data['energy'], 'reward': -energy_consume}
+	return common.mt(0, 'success', {'enter_towers': enter_towers, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy': energy, 'monster': enemy_list})
 
 
 # 通过闯塔关卡
