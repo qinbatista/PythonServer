@@ -92,7 +92,7 @@ async def purchase_acceleration(uid, **kwargs):
 async def activate_wishing_pool(uid, wid, **kwargs):
 	wid = enums.Weapon(wid)
 	first_time, timer = await _get_time_since_last_wishing_pool(uid, **kwargs)
-	level = await _get_wishing_pool_level(uid, **kwargs)
+	level = await _get_factory_level(uid, enums.Factory.WISHING_POOL, **kwargs)
 	_, remaining_diamond = await common.try_item(uid, enums.Item.DIAMOND, 0, **kwargs)
 	if first_time:
 		await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FACTORY_WISHING_POOL.value}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
@@ -111,7 +111,7 @@ async def activate_wishing_pool(uid, wid, **kwargs):
 	return common.mt(0, 'success', {'wid' : wid.value, 'seg' : remaining_seg, 'diamond' : remaining_diamond})
 
 async def upgrade_wishing_pool(uid, **kwargs):
-	level = await _get_wishing_pool_level(uid, **kwargs)
+	level = await _get_factory_level(uid, enums.Factory.WISHING_POOL, **kwargs)
 	return common.mt(0, 'success')
 
 async def set_armor(uid, aid, **kwargs):
@@ -222,7 +222,7 @@ async def _get_wishing_pool_count(uid, **kwargs):
 	data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.FACTORY_WISHING_POOL_COUNT.value};', **kwargs)
 	return (True, 0) if data == () else (False, data[0][0])
 
-async def _get_wishing_pool_level(uid, **kwargs):
-	data = await common.execute(f'SELECT level FROM factory WHERE uid = "{uid}" AND fid = {enums.Factory.WISHING_POOL.value};', **kwargs)
+async def _get_factory_level(uid, fid, **kwargs):
+	data = await common.execute(f'SELECT level FROM factory WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
 	return 0 if data == () else data[0][0]
 
