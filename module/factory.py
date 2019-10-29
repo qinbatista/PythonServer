@@ -13,6 +13,8 @@ from module import weapon
 from datetime import datetime, timezone, timedelta
 
 BASIC_FACTORIES = {enums.Factory.FOOD, enums.Factory.IRON, enums.Factory.CRYSTAL}
+HAVE_WORKERS_FACTORIES = {enums.Factory.FOOD, enums.Factory.IRON, enums.Factory.CRYSTAL, \
+		enums.Factory.EQUIPMENT}
 
 
 async def refresh(uid, **kwargs):
@@ -54,6 +56,7 @@ async def buy_worker(uid, **kwargs):
 
 async def increase_worker(uid, fid, num, **kwargs):
 	fid = enums.Factory(fid)
+	if fid not in HAVE_WORKERS_FACTORIES: return common.mt(97, 'invalid fid')
 	_, unassigned, max_workers = await _get_unassigned_workers(uid, **kwargs)
 	levels, current_workers, _ = await _get_factory_info(uid, **kwargs)
 	if num > unassigned: return common.mt(99, 'insufficient unassigned workers')
@@ -64,6 +67,7 @@ async def increase_worker(uid, fid, num, **kwargs):
 
 async def decrease_worker(uid, fid, num, **kwargs):
 	fid = enums.Factory(fid)
+	if fid not in HAVE_WORKERS_FACTORIES: return common.mt(97, 'invalid fid')
 	_, current_workers, __ = await _get_factory_info(uid, **kwargs)
 	_, unassigned, __ = await _get_unassigned_workers(uid, **kwargs)
 	if num > current_workers[fid]: return common.mt(99, 'insufficient assigned workers')
