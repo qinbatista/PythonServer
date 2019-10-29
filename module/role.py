@@ -20,7 +20,7 @@ async def level_up(uid, rid, amount, **kwargs):
 	can_pay, remaining = await common.try_item(uid, enums.Item.EXPERIENCE_POTION, -upgrade_cnt * STANDARD_EXP_POT_COUNT, **kwargs)
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
 	await common.execute(f'UPDATE role SET level = {level + upgrade_cnt} WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
-	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP,"value":1})
+	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP,"task_value":1})
 	await task.record_task(uid,**kwargs)
 	return common.mt(0, 'success', {enums.Group.ROLE.value : {'rid' : rid.value, 'level' : level + upgrade_cnt}, enums.Group.ITEM.value : {'iid' : enums.Item.EXPERIENCE_POTION.value, 'value' : remaining}})
 

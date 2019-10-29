@@ -107,7 +107,7 @@ async def pass_stage(uid, stage, **kwargs):
 		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"', **kwargs)
 		p_stage['finally'] = stage
 		p_stage['vary'] = 1
-	kwargs.update({"tid":enums.Task.PASS_MAIN_STAGE,"value":1})
+	kwargs.update({"tid":enums.Task.PASS_MAIN_STAGE,"task_value":1})
 	await task.record_task(uid,**kwargs)
 
 	return common.mt(0, 'success', data={'pass_stages': pass_stages, 'p_exp': p_exp, 'p_stage': p_stage})
@@ -240,7 +240,7 @@ async def pass_tower(uid, stage, **kwargs):
 					data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 				await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 				pass_towers.append({'iid': key, 'remaining': data[0][0] + value, 'reward': value})
-	kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE,"value":1})
+	kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE,"task_value":1})
 	await task.record_task(uid,**kwargs)
 	return common.mt(0, 'success', data={'pass_towers': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
 

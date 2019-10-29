@@ -31,10 +31,8 @@ async def check_in(uid, **kwargs) -> dict:
 	"""每日签到"""
 	# 0 - Sign-in success
 	# 99 - You have already signed in today
-	kwargs.update({"tid":enums.Task.CHECK_IN,"value":1})
+	kwargs.update({"tid":enums.Task.CHECK_IN,"task_value":1})
 	await task.record_task(uid,**kwargs)
-	kwargs.update({"tid":enums.Task.family_check_in,"value":1})
-	await achievement.record_achievement(uid,**kwargs)
 	current_time = time.strftime('%Y-%m-'+str(kwargs["hard_day"]), time.localtime()) if kwargs.__contains__("hard_day") else time.strftime('%Y-%m-%d', time.localtime())
 	s_data = await common.execute( f'select * from check_in where uid="{uid}" and date="{current_time}"', **kwargs)
 	if s_data != ():return common.mt(99, 'You have already signed in today')

@@ -29,10 +29,10 @@ async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
 	if not can_pay: return common.mt(99, 'insufficient materials')
 	new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
 	if enums.Tier.BASIC:
-		kwargs.update({"tid":enums.Task.BASIC_SUMMONING,"value":1})
+		kwargs.update({"tid":enums.Task.BASIC_SUMMONING,"task_value":1})
 		await task.record_task(uid,**kwargs)
 	if enums.Tier.PRO:
-		kwargs.update({"tid":enums.Task.PRO_SUMMONING,"value":1})
+		kwargs.update({"tid":enums.Task.PRO_SUMMONING,"task_value":1})
 		await task.record_task(uid,**kwargs)
 	return await _response_factory(uid, rewardgroup, new, reward, item, remaining, **kwargs)
 
