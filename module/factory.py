@@ -29,12 +29,14 @@ async def refresh(uid, **kwargs):
 	await _record_storage(uid, storage, **kwargs)
 	return common.mt(0, 'success', storage)
 
-# TODO max level checking
 async def upgrade(uid, fid, **kwargs):
 	fid = enums.Factory(fid)
 	if fid not in BASIC_FACTORIES: return common.mt(99, 'invalid fid')
 	levels, _, storage = await _get_factory_info(uid, **kwargs)
-	upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(levels[fid] + 1)]
+	try:
+		upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(levels[fid] + 1)]
+	except KeyError:
+		return common.mt(97, 'max level')
 	if storage[fid] < upgrade_cost: return common.mt(98, 'insufficient funds')
 	await common.execute(f'UPDATE factory SET level = {levels[fid] + 1}, storage = {storage[fid] - upgrade_cost} WHERE uid = "{uid}" AND fid = {fid.value};', **kwargs)
 	return common.mt(0, 'success', {'level' : levels[fid] + 1, 'storage' : storage[fid] - upgrade_cost})
@@ -113,6 +115,7 @@ async def activate_wishing_pool(uid, wid, **kwargs):
 			await common.execute(f'INSERT INTO limits VALUES ("{uid}", {enums.Limits.FACTORY_WISHING_POOL_COUNT.value}, {count + 1}) ON DUPLICATE KEY UPDATE value = {count + 1};', **kwargs)
 	remaining_seg = await weapon._update_segment(uid, wid, roll_segment_value(**kwargs), **kwargs)
 	return common.mt(0, 'success', {'wid' : wid.value, 'seg' : remaining_seg, 'diamond' : remaining_diamond})
+
 
 async def upgrade_wishing_pool(uid, **kwargs):
 	level = await _get_factory_level(uid, enums.Factory.WISHING_POOL, **kwargs)
