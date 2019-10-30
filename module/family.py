@@ -85,6 +85,10 @@ async def respond(uid, nonce, **kwargs):
 async def get_all(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in a family')
+	timer = await _get_disband_timer(name, **kwargs)
+	if timer is not None and datetime.now(timezone.utc) > timer:
+		await _delete_family(name, **kwargs)
+		return common.mt(99, 'not in a family')
 	_, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
 	members = await _get_member_info(name, **kwargs)
 	news = await _get_family_changes(name, **kwargs)
@@ -214,6 +218,15 @@ def _check_remove_permissions(remover, to_remove):
 
 def _check_invite_permissions(inviter):
 	return inviter >= enums.FamilyRole.ADMIN
+
+# TODO parallelize with asyncio.gather and asyncio tasks
+async def _delete_family(name, **kwargs):
+	data = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
+	members = [m[0] for m in data]
+	for member in members:
+		await common.execute(f'UPDATE `player` SET fid = "" WHERE uid = "{member}";', **kwargs)
+	await common.execute(f'DELETE FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
+	await common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
 
 async def _get_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
