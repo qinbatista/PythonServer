@@ -29,7 +29,7 @@ def factory_dialog(token,world,get_all_weapon):
 			new_response = send_tcp_message({'world' : world, 'function' : 'refresh_factory', 'data' : {'token' : token}})
 			print(str(new_response))
 		elif int_number=="1":#添加工人
-			new_response = send_tcp_message({'world' : world, 'function' : 'increase_worker_factory', 'data' : {'token':token, "fid":2, "num":1}})
+			new_response = send_tcp_message({'world' : world, 'function' : 'increase_worker_factory', 'data' : {'token':token, "fid":0, "num":1}})
 			print(str(new_response))
 		elif int_number=="2":#购买工人工人
 			new_response = send_tcp_message({'world' : world, 'function' : 'buy_worker_factory', 'data' : {'token':token, "fid":0, "num":1}})
@@ -38,10 +38,25 @@ def factory_dialog(token,world,get_all_weapon):
 			new_response = send_tcp_message({'world' : world, 'function' : 'upgrade_factory', 'data' : {'token':token, "fid":1}})
 			print(str(new_response))
 		elif int_number=="4":#减少工人
-			new_response = send_tcp_message({'world' : world, 'function' : 'decrease_worker_factory', 'data' : {'token':token, "fid":1, "fid":2, "num":1}})
+			new_response = send_tcp_message({'world' : world, 'function' : 'decrease_worker_factory', 'data' : {'token':token, "fid":0, "num":1}})
 			print(str(new_response))
-		elif int_number=="5":#减少工人
-			new_response = send_tcp_message({'world' : world, 'function' : 'activate_wishing_pool_factory', 'data' : {'token':token, "wid":1}})
+		elif int_number=="5":#武器碎片许愿池
+			new_response = send_tcp_message({'world' : world, 'function' : 'activate_wishing_pool_factory', 'data' : {'token':token, "wid":5}})
+			print(str(new_response))
+		elif int_number=="6":#获取配置文件
+			new_response = send_tcp_message({'world' : world, 'function' : 'get_config_factory', 'data' : {'token' : token}})
+			print(str(new_response))
+		elif int_number=="7":#购买加速
+			new_response = send_tcp_message({'world' : world, 'function' : 'purchase_acceleration_factory', 'data' : {'token' : token}})
+			print(str(new_response))
+		elif int_number=="8":#升级许愿池
+			new_response = send_tcp_message({'world' : world, 'function' : 'upgrade_wishing_pool_factory', 'data' : {'token' : token}})
+			print(str(new_response))
+		elif int_number=="9":#刷新盔甲工厂
+			new_response = send_tcp_message({'world' : world, 'function' : 'refresh_equipment_factory', 'data' : {'token' : token}})
+			print(str(new_response))
+		elif int_number=="10":#设置盔甲
+			new_response = send_tcp_message({'world' : world, 'function' : 'set_armor_factory', 'data' : {'token' : token,'aid':1}})
 			print(str(new_response))
 		else:
 			print_method("输入错误")
