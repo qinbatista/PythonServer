@@ -18,13 +18,13 @@ async def create(uid, name, **kwargs):
 	in_family, _ = await _in_family(uid, **kwargs)
 	if in_family: return common.mt(98, 'already in a family')
 	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['costs']['create']))[0]
-	enough, _ = await common.try_item(uid, iid, -cost, **kwargs)
+	enough, remaining = await common.try_item(uid, iid, -cost, **kwargs)
 	if not enough: return common.mt(97, 'insufficient materials')
 	if await common.exists('family', ('name', name), **kwargs): return common.mt(96, 'name already exists!')
 	await asyncio.gather(common.execute(f'INSERT INTO family(name) VALUES("{name}");', **kwargs),
 						common.execute(f'INSERT INTO familyrole(uid, name, role) VALUES("{uid}", "{name}", "{enums.FamilyRole.OWNER.value}");', **kwargs),
 						common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs))
-	return common.mt(0, 'created family', {'name' : name})
+	return common.mt(0, 'created family', {'name' : name, 'iid' : iid.value, 'value' : remaining})
 
 async def leave(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
