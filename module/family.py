@@ -159,6 +159,7 @@ async def change_name(uid, new_name, **kwargs):
 	await common.execute(f'UPDATE player SET fid = "{new_name}" WHERE fid = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyrole SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyhistory SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} changed family name to: {new_name}.', **kwargs)
 	return common.mt(0, 'success', {'name' : new_name, 'iid' : enums.Item.DIAMOND.value, 'value' : remaining})
 
 async def disband(uid, **kwargs):
@@ -169,6 +170,7 @@ async def disband(uid, **kwargs):
 	timer = await _get_disband_timer(name, **kwargs)
 	if timer is not None: return common.mt(97, 'family already disbanded')
 	timer = await _set_disband_timer(name, **kwargs)
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} disbanded family.', **kwargs)
 	return common.mt(0, 'success', {'timer' : timer})
 
 async def cancel_disband(uid, **kwargs):
@@ -179,6 +181,7 @@ async def cancel_disband(uid, **kwargs):
 	timer = await _get_disband_timer(name, **kwargs)
 	if timer is None: return common.mt(97, 'family is not disbanded')
 	await _delete_disband_timer(name, **kwargs)
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} canceled family disband.', **kwargs)
 	return common.mt(0, 'success')
 
 async def check_in(uid, **kwargs):
@@ -193,6 +196,7 @@ async def check_in(uid, **kwargs):
 	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['rewards']['check_in']))[0]
 	_, remaining = await common.try_item(uid, iid, cost, **kwargs)
 	return common.mt(0, 'success', {'iid' : iid.value, 'value' : remaining})
+
 
 
 ########################################################################
@@ -243,6 +247,7 @@ async def _delete_family(name, **kwargs):
 	for member in members:
 		await common.execute(f'UPDATE `player` SET fid = "" WHERE uid = "{member}";', **kwargs)
 	await common.execute(f'DELETE FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
+	await common.execute(f'DELETE FROM `familyhistory` WHERE `name` = "{name}";', **kwargs)
 	await common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
 
 async def _get_disband_timer(name, **kwargs):
