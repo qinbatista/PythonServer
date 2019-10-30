@@ -155,6 +155,12 @@ async def change_name(uid, new_name, **kwargs):
 	await common.execute(f'UPDATE familyhistory SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	return common.mt(0, 'success', {'name' : new_name, 'iid' : enums.Item.DIAMOND.value, 'value' : remaining})
 
+async def disband(uid, **kwargs):
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(98, 'not in family')
+	role = await _get_role(uid, name, **kwargs)
+	return common.mt(0, 'success')
+
 
 
 ########################################################################
@@ -165,6 +171,9 @@ SET_ROLE_PERMISSIONS = {\
 
 def _valid_family_name(name):
 	return bool(name)
+
+def _check_disband_permissions(check):
+	return check >= enums.FamilyRole.ADMIN
 
 def _check_change_name_permissions(check):
 	return check >= enums.FamilyRole.ADMIN
