@@ -92,7 +92,7 @@ async def get_all(uid, **kwargs):
 	_, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
 	members = await _get_member_info(name, **kwargs)
 	news = await _get_family_changes(name, **kwargs)
-	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news})
+	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news, 'timer' : '' if timer is None else timer.strftime('%Y-%d-%d %H:%M:%S')})
 
 async def get_store(**kwargs):
 	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k,v in kwargs['config']['family']['store']['items'].items()]})
@@ -221,6 +221,7 @@ def _check_invite_permissions(inviter):
 
 # TODO parallelize with asyncio.gather and asyncio tasks
 async def _delete_family(name, **kwargs):
+	await _delete_disband_timer(name, **kwargs)
 	data = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
 	members = [m[0] for m in data]
 	for member in members:
