@@ -8,7 +8,7 @@ from module import mail
 from module import enums
 from module import common
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 
 
@@ -85,10 +85,14 @@ async def respond(uid, nonce, **kwargs):
 async def get_all(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in a family')
+	timer = await _get_disband_timer(name, **kwargs)
+	if timer is not None and datetime.now(timezone.utc) > timer:
+		await _delete_family(name, **kwargs)
+		return common.mt(99, 'not in a family')
 	_, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
 	members = await _get_member_info(name, **kwargs)
 	news = await _get_family_changes(name, **kwargs)
-	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news})
+	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news, 'timer' : '' if timer is None else timer.strftime('%Y-%d-%d %H:%M:%S')})
 
 async def get_store(**kwargs):
 	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k,v in kwargs['config']['family']['store']['items'].items()]})
@@ -165,7 +169,17 @@ async def disband(uid, **kwargs):
 	timer = await _get_disband_timer(name, **kwargs)
 	if timer is not None: return common.mt(97, 'family already disbanded')
 	timer = await _set_disband_timer(name, **kwargs)
-	return common.mt(0, 'success', {'disband_timer' : timer})
+	return common.mt(0, 'success', {'timer' : timer})
+
+async def cancel_disband(uid, **kwargs):
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(99, 'not in family')
+	role = await _get_role(uid, name, **kwargs)
+	if not _check_disband_permissions(role): return common.mt(98, 'insufficient permissions')
+	timer = await _get_disband_timer(name, **kwargs)
+	if timer is None: return common.mt(97, 'family is not disbanded')
+	await _delete_disband_timer(name, **kwargs)
+	return common.mt(0, 'success')
 
 
 
@@ -205,6 +219,16 @@ def _check_remove_permissions(remover, to_remove):
 def _check_invite_permissions(inviter):
 	return inviter >= enums.FamilyRole.ADMIN
 
+# TODO parallelize with asyncio.gather and asyncio tasks
+async def _delete_family(name, **kwargs):
+	await _delete_disband_timer(name, **kwargs)
+	data = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
+	members = [m[0] for m in data]
+	for member in members:
+		await common.execute(f'UPDATE `player` SET fid = "" WHERE uid = "{member}";', **kwargs)
+	await common.execute(f'DELETE FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
+	await common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
+
 async def _get_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
 	timer = await common.execute(f'SELECT time FROM `timer` WHERE uid = "{owner_uid[0][0]}" AND tid = {enums.Timer.FAMILY_DISBAND.value};', **kwargs)
@@ -212,9 +236,13 @@ async def _get_disband_timer(name, **kwargs):
 
 async def _set_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
-	now = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
-	await common.execute(f'INSERT INTO `timer` VALUES ("{owner_uid[0][0]}", {enums.Timer.FAMILY_DISBAND.value}, "{now}");', **kwargs)
-	return now
+	time = (datetime.now(timezone.utc) + timedelta(days = 1)).strftime('%Y-%m-%d %H:%M:%S')
+	await common.execute(f'INSERT INTO `timer` VALUES ("{owner_uid[0][0]}", {enums.Timer.FAMILY_DISBAND.value}, "{time}");', **kwargs)
+	return time
+
+async def _delete_disband_timer(name, **kwargs):
+	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
+	await common.execute(f'DELETE FROM `timer` WHERE uid = "{owner_uid[0][0]}" AND tid = {enums.Timer.FAMILY_DISBAND.value};', **kwargs)
 
 async def _count_members(name, **kwargs):
 	count = await common.execute(f'SELECT COUNT(*) FROM familyrole WHERE `name` = "{name}";', **kwargs)
