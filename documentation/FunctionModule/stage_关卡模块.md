@@ -68,7 +68,7 @@
 
 ```json
 {
-	"status": 1,
+	"status": 2,
 	"message": "same stage"
 }
 ```
