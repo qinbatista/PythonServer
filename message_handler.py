@@ -205,6 +205,9 @@ class MessageHandler:
 	async def _market_purchase_family(self, data: dict) -> str:
 		return await family.purchase(data['data']['unique_id'], data['data']['item'], **data)
 
+	async def _disband_family(self, data: dict) -> str:
+		return await family.disband(data['data']['unique_id'], **data)
+
 	async def _get_config_family(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': self._family_config})
 
