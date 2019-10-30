@@ -181,6 +181,18 @@ async def cancel_disband(uid, **kwargs):
 	await _delete_disband_timer(name, **kwargs)
 	return common.mt(0, 'success')
 
+async def check_in(uid, **kwargs):
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(99, 'not in family')
+	timer = await _get_check_in_timer(uid, **kwargs)
+	now = datetime.now(timezone.utc)
+	if timer is not None and now < timer: return common.mt(98, 'already checked in today')
+	time = (now + timedelta(days = 1)).strftime('%Y-%m-%d')
+	await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FAMILY_CHECK_IN.value}, "{time}") ON DUPLICATE KEY UPDATE `time` = "{time}";', **kwargs)
+	await common.execute(f'UPDATE family SET exp = exp + 1 WHERE name = "{name}";', **kwargs)
+	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['rewards']['check_in']))[0]
+	_, remaining = await common.try_item(uid, iid, cost, **kwargs)
+	return common.mt(0, 'success', {'iid' : iid.value, 'value' : remaining})
 
 
 ########################################################################
@@ -218,6 +230,10 @@ def _check_remove_permissions(remover, to_remove):
 
 def _check_invite_permissions(inviter):
 	return inviter >= enums.FamilyRole.ADMIN
+
+async def _get_check_in_timer(uid, **kwargs):
+	timer = await common.execute(f'SELECT time FROM `timer` WHERE uid = "{uid}" AND tid = {enums.Timer.FAMILY_CHECK_IN.value};', **kwargs)
+	return None if timer == () else datetime.strptime(timer[0][0], '%Y-%m-%d').replace(tzinfo = timezone.utc)
 
 # TODO parallelize with asyncio.gather and asyncio tasks
 async def _delete_family(name, **kwargs):

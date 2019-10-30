@@ -211,6 +211,9 @@ class MessageHandler:
 	async def _cancel_disband_family(self, data: dict) -> str:
 		return await family.cancel_disband(data['data']['unique_id'], **data)
 
+	async def _check_in_family(self, data: dict) -> str:
+		return await family.check_in(data['data']['unique_id'], **data)
+
 	async def _get_config_family(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': self._family_config})
 
@@ -687,6 +690,7 @@ FUNCTION_LIST = {
 	'cancel_disband_family' : MessageHandler._cancel_disband_family,
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
+	'check_in_family' : MessageHandler._check_in_family,
 	'get_config_family' : MessageHandler._get_config_family,
 	# TODO
 	'sign_in_family' : MessageHandler._sign_in_family,
