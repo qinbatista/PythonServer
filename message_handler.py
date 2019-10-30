@@ -211,39 +211,17 @@ class MessageHandler:
 	async def _cancel_disband_family(self, data: dict) -> str:
 		return await family.cancel_disband(data['data']['unique_id'], **data)
 
+	async def _check_in_family(self, data: dict) -> str:
+		return await family.check_in(data['data']['unique_id'], **data)
+
 	async def _get_config_family(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': self._family_config})
 
-	# TODO
-
-	async def _sign_in_family(self, data: dict) -> str:
-		return 'function'
-
 	async def _gift_package_family(self, data: dict) -> str:
-		return 'function'
+		return await family.gift_package(data['data']['unique_id'], **data)
 
-	async def _officer_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _dismiss_officer_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _blackboard_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _announcement_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _update_login_in_time(self, data: dict) -> str:
-		return 'function'
-
-
-	async def _cancel_disbanded_family(self, data: dict) -> str:
-		return 'function'
-
-
-	async def _get_all_info_family(self, data: dict) -> str:
-		return 'function'
+	async def _get_random_family(self, data: dict) -> str:
+		return await family.get_random(**data)
 
 	###################### mail.py ######################
 	async def _send_mail(self, data: dict) -> str:
@@ -687,17 +665,10 @@ FUNCTION_LIST = {
 	'cancel_disband_family' : MessageHandler._cancel_disband_family,
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
-	'get_config_family' : MessageHandler._get_config_family,
-	# TODO
-	'sign_in_family' : MessageHandler._sign_in_family,
+	'check_in_family' : MessageHandler._check_in_family,
 	'gift_package_family' : MessageHandler._gift_package_family,
-	'officer_family' : MessageHandler._officer_family,
-	'dismiss_officer_family' : MessageHandler._dismiss_officer_family,
-	'blackboard_family' : MessageHandler._blackboard_family,
-	'announcement_family' : MessageHandler._announcement_family,
-	'update_login_in_time' : MessageHandler._update_login_in_time,
-	'cancel_disbanded_family' : MessageHandler._cancel_disbanded_family,
-	'get_all_info_family' : MessageHandler._get_all_info_family,
+	'get_config_family' : MessageHandler._get_config_family,
+	'get_random_family' : MessageHandler._get_random_family,
 
 	###################### mail.py ######################
 	'send_mail' : MessageHandler._send_mail,
