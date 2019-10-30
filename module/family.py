@@ -160,7 +160,7 @@ async def change_name(uid, new_name, **kwargs):
 	await common.execute(f'UPDATE familyrole SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyhistory SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} changed family name to: {new_name}.', **kwargs)
-	return common.mt(0, 'success', {'name' : new_name, 'iid' : enums.Item.DIAMOND.value, 'value' : remaining})
+	return common.mt(0, 'success', {'name' : new_name, 'iid' : iid.value, 'value' : remaining})
 
 async def disband(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
