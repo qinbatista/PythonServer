@@ -3,11 +3,13 @@ family.py
 '''
 import asyncio
 import pymysql
-import datetime
 
 from module import mail
 from module import enums
 from module import common
+
+from datetime import datetime, timezone
+
 
 
 
@@ -157,9 +159,13 @@ async def change_name(uid, new_name, **kwargs):
 
 async def disband(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
-	if not in_family: return common.mt(98, 'not in family')
+	if not in_family: return common.mt(99, 'not in family')
 	role = await _get_role(uid, name, **kwargs)
-	return common.mt(0, 'success')
+	if not _check_disband_permissions(role): return common.mt(98, 'insufficient permissions')
+	timer = await _get_disband_timer(name, **kwargs)
+	if timer is not None: return common.mt(97, 'family already disbanded')
+	timer = await _set_disband_timer(name, **kwargs)
+	return common.mt(0, 'success', {'disband_timer' : timer})
 
 
 
@@ -199,6 +205,17 @@ def _check_remove_permissions(remover, to_remove):
 def _check_invite_permissions(inviter):
 	return inviter >= enums.FamilyRole.ADMIN
 
+async def _get_disband_timer(name, **kwargs):
+	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
+	timer = await common.execute(f'SELECT time FROM `timer` WHERE uid = "{owner_uid[0][0]}" AND tid = {enums.Timer.FAMILY_DISBAND.value};', **kwargs)
+	return None if timer == () else datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc)
+
+async def _set_disband_timer(name, **kwargs):
+	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
+	now = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+	await common.execute(f'INSERT INTO `timer` VALUES ("{owner_uid[0][0]}", {enums.Timer.FAMILY_DISBAND.value}, "{now}");', **kwargs)
+	return now
+
 async def _count_members(name, **kwargs):
 	count = await common.execute(f'SELECT COUNT(*) FROM familyrole WHERE `name` = "{name}";', **kwargs)
 	return count[0][0]
@@ -208,7 +225,7 @@ async def _get_family_changes(name, **kwargs):
 	return data
 
 async def _record_family_change(name, msg, **kwargs):
-	await common.execute(f'INSERT INTO familyhistory(name, date, msg) VALUES("{name}", "{datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}", "{msg}");', **kwargs)
+	await common.execute(f'INSERT INTO familyhistory(name, date, msg) VALUES("{name}", "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}", "{msg}");', **kwargs)
 
 async def _get_member_info(name, **kwargs):
 	data = await common.execute(f'SELECT player.gn, familyrole.role, progress.exp FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid WHERE familyrole.name = "{name}";', **kwargs)
