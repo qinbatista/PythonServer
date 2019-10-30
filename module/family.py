@@ -206,6 +206,7 @@ async def gift_package(uid, **kwargs):
 		for item in kwargs['config']['family']['store']['gift']:
 			_, iid, cost = (common.decode_items(item))[0]
 			await common.try_item(member, iid, cost, **kwargs)
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} purchased family gift package.', **kwargs)
 	return common.mt(0, 'success')
 
 
