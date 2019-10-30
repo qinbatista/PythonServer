@@ -10,7 +10,6 @@ from module import enums
 from module import common
 
 
-MERCHANDISE = { '3:6:1' : '3:1:80' }
 
 async def create(uid, name, **kwargs):
 	if not _valid_family_name(name): return common.mt(99, 'invalid family name')
