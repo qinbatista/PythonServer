@@ -66,8 +66,8 @@ async def enter_stage(uid, stage, **kwargs):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		enter_stages.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
 	_, exp_info = await increase_exp(uid, 0, **kwargs)
-	energy_data = energy_data['data']
-	energy = {'time': '-1' if energy_data['cooling_time'] < 0 else str(timedelta(seconds=energy_data['cooling_time'])), 'remaining': energy_data['energy'], 'reward': -energy_consume}
+	seconds = energy_data['data']['cooling_time']
+	energy = {'time': '0:00:00' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}', 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
 	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy': energy, 'monster': enemy_list})
 
 
@@ -170,8 +170,8 @@ async def enter_tower(uid, stage, **kwargs):
 		enter_towers.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
 
 	_, exp_info = await increase_exp(uid, 0, **kwargs)
-	energy_data = energy_data['data']
-	energy = {'time': '-1' if energy_data['cooling_time'] < 0 else str(timedelta(seconds=energy_data['cooling_time'])), 'remaining': energy_data['energy'], 'reward': -energy_consume}
+	seconds = energy_data['data']['cooling_time']
+	energy = {'time': '0:00:00' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}', 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
 	return common.mt(0, 'success', {'enter_towers': enter_towers, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy': energy, 'monster': enemy_list})
 
 
@@ -251,6 +251,7 @@ async def start_hang_up(uid, stage, **kwargs):
 	success ===> 0 , 1
 	# 0 - hang up success
 	# 1 - Repeated hang up successfully
+	# 2 - same stage
 	# 99 - Parameter error
 	"""
 	# 挂机方法是挂普通关卡
@@ -268,10 +269,12 @@ async def start_hang_up(uid, stage, **kwargs):
 	if hang_up_time == '':
 		await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
 		await common.execute_update(f'UPDATE progress SET hangstage = "{stage}" WHERE uid = "{uid}";', **kwargs)
-		return common.mt(0, 'hang up success', {'hang_up_info': {'hang_stage': stage, 'tid': enums.Timer.HANG_UP_TIME.value, 'time': current_time}})
+		return common.mt(0, 'hang up success', {'hang_up_info': {'hang_stage': stage, 'time': '0:00:00'}})
 	else:
-		start_hang_up_reward = []
 		hang_stage = await get_progress(uid, 'hangstage', **kwargs)
+		if hang_stage == stage: return common.mt(2, 'same stage')
+
+		start_hang_up_reward = []
 		probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
 		hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
@@ -285,7 +288,7 @@ async def start_hang_up(uid, stage, **kwargs):
 			start_hang_up_reward.append({'iid': iid, 'value': value, 'increment': increment})
 		await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
 		await common.execute_update(f'UPDATE progress SET hangstage = "{stage}" WHERE uid = "{uid}";', **kwargs)
-		return common.mt(1, 'Repeated hang up successfully', {'start_hang_up_reward': start_hang_up_reward, 'hang_up_info': {'hang_stage': stage, 'tid': enums.Timer.HANG_UP_TIME.value, 'time': current_time}})
+		return common.mt(1, 'Repeated hang up successfully', {'start_hang_up_reward': start_hang_up_reward, 'hang_up_info': {'hang_stage': stage, 'time': f'{minute//60}:{"0" if minute%60 < 10 else ""}{minute%60}:00'}})
 
 
 # 获取挂机奖励
@@ -320,7 +323,7 @@ async def get_hang_up_reward(uid, **kwargs):
 		_, value = await common.try_item(uid, enums.Item(int(iid)), increment, **kwargs)
 		get_hang_up_rewards.append({'iid': iid, 'value': value, 'increment': increment})
 	await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
-	return common.mt(0, 'Settlement reward success', {'get_hang_up_rewards': get_hang_up_rewards, 'hang_up_info': {'hang_stage': hang_stage, 'tid': enums.Timer.HANG_UP_TIME.value, 'time': current_time}})
+	return common.mt(0, 'Settlement reward success', {'get_hang_up_rewards': get_hang_up_rewards, 'hang_up_info': {'hang_stage': hang_stage, 'time': f'{minute//60}:{"0" if minute%60 < 10 else ""}{minute%60}:00'}})
 
 
 ############################################ 私有方法 ############################################
