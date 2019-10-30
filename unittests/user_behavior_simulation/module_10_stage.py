@@ -50,7 +50,13 @@ if __name__ == '__main__':
 	unique_id = '1'
 	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': unique_id}})
 	print(response)
-	enter_stage(**{"world": 0, "token": response['data']['token'], "stage": 1})
+	token = response['data']['token']
+	response = send_tcp_message({'world': 0, 'function': 'enter_tower', 'data': {'token': token, 'stage': 1}})
+	print_method("="*100 + str(response))
+	response = send_tcp_message({'world': 0, 'function': 'start_hang_up', 'data': {'token': token, 'stage': 1}})
+	print_method("="*100 + str(response))
+	response = send_tcp_message({'world': 0, 'function': 'start_hang_up', 'data': {'token': token, 'stage': 1}})
+	print_method("="*100 + str(response))
 
 
 
