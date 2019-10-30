@@ -234,8 +234,6 @@ class MessageHandler:
 	async def _update_login_in_time(self, data: dict) -> str:
 		return 'function'
 
-	async def _disband_family(self, data: dict) -> str:
-		return 'function'
 
 	async def _cancel_disbanded_family(self, data: dict) -> str:
 		return 'function'
