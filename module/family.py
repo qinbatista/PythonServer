@@ -197,6 +197,17 @@ async def check_in(uid, **kwargs):
 	_, remaining = await common.try_item(uid, iid, cost, **kwargs)
 	return common.mt(0, 'success', {'iid' : iid.value, 'value' : remaining})
 
+async def gift_package(uid, **kwargs):
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(99, 'not in family')
+	data = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
+	members = [m[0] for m in data]
+	for member in members:
+		for item in kwargs['config']['family']['store']['gift']:
+			_, iid, cost = (common.decode_items(item))[0]
+			await common.try_item(member, iid, cost, **kwargs)
+	return common.mt(0, 'success')
+
 
 
 ########################################################################

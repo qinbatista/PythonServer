@@ -217,13 +217,16 @@ class MessageHandler:
 	async def _get_config_family(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': self._family_config})
 
+	async def _gift_package_family(self, data: dict) -> str:
+		return await family.gift_package(data['data']['unique_id'], **data)
+
+
+
 	# TODO
 
 	async def _sign_in_family(self, data: dict) -> str:
 		return 'function'
 
-	async def _gift_package_family(self, data: dict) -> str:
-		return 'function'
 
 	async def _officer_family(self, data: dict) -> str:
 		return 'function'
@@ -691,10 +694,10 @@ FUNCTION_LIST = {
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
 	'check_in_family' : MessageHandler._check_in_family,
+	'gift_package_family' : MessageHandler._gift_package_family,
 	'get_config_family' : MessageHandler._get_config_family,
 	# TODO
 	'sign_in_family' : MessageHandler._sign_in_family,
-	'gift_package_family' : MessageHandler._gift_package_family,
 	'officer_family' : MessageHandler._officer_family,
 	'dismiss_officer_family' : MessageHandler._dismiss_officer_family,
 	'blackboard_family' : MessageHandler._blackboard_family,
