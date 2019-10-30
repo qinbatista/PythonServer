@@ -210,7 +210,8 @@ async def gift_package(uid, **kwargs):
 	return common.mt(0, 'success')
 
 async def get_random(**kwargs):
-	return common.mt(0, 'success')
+	data = await common.execute(f'SELECT `name`, `icon`, `exp`, `notice` FROM `family` ORDER BY RAND() LIMIT 10;', **kwargs)
+	return common.mt(0, 'success', {'families' : [{'name' : f[0], 'icon' : f[1], 'exp' : f[2], 'notice' : f[3]} for f in data]})
 
 
 ########################################################################
