@@ -8,7 +8,7 @@ from module import mail
 from module import enums
 from module import common
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 
 
@@ -167,6 +167,16 @@ async def disband(uid, **kwargs):
 	timer = await _set_disband_timer(name, **kwargs)
 	return common.mt(0, 'success', {'disband_timer' : timer})
 
+async def cancel_disband(uid, **kwargs):
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(99, 'not in family')
+	role = await _get_role(uid, name, **kwargs)
+	if not _check_disband_permissions(role): return common.mt(98, 'insufficient permissions')
+	timer = await _get_disband_timer(name, **kwargs)
+	if timer is None: return common.mt(97, 'family is not disbanded')
+	await _delete_disband_timer(name, **kwargs)
+	return common.mt(0, 'success')
+
 
 
 ########################################################################
@@ -212,9 +222,13 @@ async def _get_disband_timer(name, **kwargs):
 
 async def _set_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
-	now = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
-	await common.execute(f'INSERT INTO `timer` VALUES ("{owner_uid[0][0]}", {enums.Timer.FAMILY_DISBAND.value}, "{now}");', **kwargs)
-	return now
+	time = (datetime.now(timezone.utc) + timedelta(days = 1)).strftime('%Y-%m-%d %H:%M:%S')
+	await common.execute(f'INSERT INTO `timer` VALUES ("{owner_uid[0][0]}", {enums.Timer.FAMILY_DISBAND.value}, "{time}");', **kwargs)
+	return time
+
+async def _delete_disband_timer(name, **kwargs):
+	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
+	await common.execute(f'DELETE FROM `timer` WHERE uid = "{owner_uid[0][0]}" AND tid = {enums.Timer.FAMILY_DISBAND.value};', **kwargs)
 
 async def _count_members(name, **kwargs):
 	count = await common.execute(f'SELECT COUNT(*) FROM familyrole WHERE `name` = "{name}";', **kwargs)

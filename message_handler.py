@@ -208,6 +208,9 @@ class MessageHandler:
 	async def _disband_family(self, data: dict) -> str:
 		return await family.disband(data['data']['unique_id'], **data)
 
+	async def _cancel_disband_family(self, data: dict) -> str:
+		return await family.cancel_disband(data['data']['unique_id'], **data)
+
 	async def _get_config_family(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': self._family_config})
 
@@ -680,6 +683,8 @@ FUNCTION_LIST = {
 	'set_role_family' : MessageHandler._set_role_family,
 	'change_name_family' : MessageHandler._change_name_family,
 	'get_all_family' : MessageHandler._get_all_family,
+	'disband_family' : MessageHandler._disband_family,
+	'cancel_disband_family' : MessageHandler._cancel_disband_family,
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
 	'get_config_family' : MessageHandler._get_config_family,
@@ -691,7 +696,6 @@ FUNCTION_LIST = {
 	'blackboard_family' : MessageHandler._blackboard_family,
 	'announcement_family' : MessageHandler._announcement_family,
 	'update_login_in_time' : MessageHandler._update_login_in_time,
-	'disband_family' : MessageHandler._disband_family,
 	'cancel_disbanded_family' : MessageHandler._cancel_disbanded_family,
 	'get_all_info_family' : MessageHandler._get_all_info_family,
 
