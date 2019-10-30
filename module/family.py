@@ -169,7 +169,7 @@ async def disband(uid, **kwargs):
 	timer = await _get_disband_timer(name, **kwargs)
 	if timer is not None: return common.mt(97, 'family already disbanded')
 	timer = await _set_disband_timer(name, **kwargs)
-	return common.mt(0, 'success', {'disband_timer' : timer})
+	return common.mt(0, 'success', {'timer' : timer})
 
 async def cancel_disband(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
