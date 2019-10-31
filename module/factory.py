@@ -66,6 +66,21 @@ async def decrease_worker(uid, fid, n, **kwargs):
 			'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
 			'unassigned' : unassigned + n, 'workers' : current_workers[fid] - n}})
 
+async def buy_worker(uid, **kwargs):
+	unassigned, max_worker = await get_unassigned_workers(uid, **kwargs)
+	if max_worker >= kwargs['config']['factory']['workers']['max']:
+		return common.mt(99, 'already max workers')
+	upgrade_cost  = kwargs['config']['factory']['workers']['cost'][str(max_worker + 1)]
+	_, _, storage = await get_state(uid, **kwargs)
+	if storage[enums.Factory.FOOD] < upgrade_cost:
+		return common.mt(98, 'insufficient food')
+	await common.execute(f'UPDATE `factory` SET `storage` = {storage[enums.Factory.FOOD] - upgrade_cost} \
+			WHERE `uid` = "{uid}" AND `fid` = {enums.Factory.FOOD.value};', **kwargs)
+	await common.execute(f'UPDATE `factory` SET `workers` = {unassigned + 1}, `storage` = {max_worker + 1} \
+			WHERE `uid` = "{uid}" AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
+	return common.mt(0, 'success', {'worker' : {'unassigned' : unassigned + 1, 'total' : max_worker + 1, \
+			'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, 'reward' : -upgrade_cost}}})
+
 ######################################################
 def update_state(steps, level, worker, storage, **kwargs):
 	initial_storage = {k : v for k, v in storage.items()}
