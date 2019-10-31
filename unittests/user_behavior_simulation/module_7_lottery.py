@@ -22,22 +22,21 @@ def print_method(my_string):
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
+def fortune_wheel_pro():
+	new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_pro', 'data' : {'token' : token,"item":random.choice([1,5])}})#发送好友信息
+	print_method("[fortune_wheel_pro][fortune_wheel_ticket_basic]"+str(new_response))
+
 def fortune_wheel_basic():
-	print_module("[fortune_wheel_basic]")
-	int_n = random.randint(1,1)
-	if int_n == 0:
-		new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_basic', 'data' : {'token' : token,"item":random.choice([1,5])}})#发送好友信息
-		print_method("[fortune_wheel_basic][diamond]"+str(new_response))
-	elif int_n == 1:
-		print({'world' : world, 'function' : 'fortune_wheel_pro', 'data' : {'token' : token,"item":random.choice([1,5])}})
-		new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_pro', 'data' : {'token' : token,"item":random.choice([1,5])}})#发送好友信息
-		print_method("[fortune_wheel_basic][fortune_wheel_ticket_basic]"+str(new_response))
+	new_response = send_tcp_message({'world' : world, 'function' : 'fortune_wheel_basic', 'data' : {'token' : token,"item":random.choice([1,5])}})#发送好友信息
+	print_method("[fortune_wheel_basic][diamond]"+str(new_response))
+
 def get_random_item(_token,_world):
 	global token,world
 	token = _token
 	world = _world
 	print_module("[get_random_item]")
 	while True:
-		int_number = random.randint(0,1)
+		int_number = random.randint(0,0)
 		if int_number==0: fortune_wheel_basic()
-		if int_number==1: break
+		if int_number==1: fortune_wheel_pro()
+		if int_number==2: break
