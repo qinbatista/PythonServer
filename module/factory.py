@@ -25,12 +25,12 @@ async def refresh(uid, **kwargs):
 	pool   = await remaining_pool_time(uid, now, **kwargs)
 	ua, mw = await get_unassigned_workers(uid, **kwargs)
 	return common.mt(0, 'success', {'steps' : steps, 'resource' : \
-			{'remaining' : {k : storage[k] for k in RESOURCE_FACTORIES}, \
-			'reward' : {k : delta[k] for k in RESOURCE_FACTORIES}}, \
+			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES}, \
+			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}}, \
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
 			'pool' : pool if pool is not None else '', \
-			'worker' : {'unassigned' : ua, 'total' : mw, **{k : worker[k] for k in BASIC_FACTORIES}}, \
-			'level' : {k : level[k] for k in BASIC_FACTORIES}})
+			'worker' : {'unassigned' : ua, 'total' : mw, **{k.value: worker[k] for k in BASIC_FACTORIES}}, \
+			'level' : {k.value : level[k] for k in BASIC_FACTORIES}})
 
 async def increase_worker(uid, fid, n, **kwargs):
 	fid = enums.Factory(fid)
@@ -81,7 +81,31 @@ async def buy_worker(uid, **kwargs):
 	return common.mt(0, 'success', {'worker' : {'unassigned' : unassigned + 1, 'total' : max_worker + 1, \
 			'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, 'reward' : -upgrade_cost}}})
 
-######################################################
+async def upgrade(uid, fid, **kwargs):
+	fid = enums.Factory(fid)
+	if fid not in BASIC_FACTORIES: return common.mt(99, 'invalid fid')
+	r = await refresh(uid, **kwargs)
+	print(r)
+	l = r['data']['level'][fid.value]
+	crystal = r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value]
+	try:
+		upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(l + 1)]
+	except KeyError:
+		return common.mt(97, 'max level', {'refresh' : {'resource' : r['data']['resource'], \
+				'armor' : r['data']['armor']}})
+	if crystal < upgrade_cost:
+		return common.mt(98, 'insufficient funds', {'refresh' : {'resource' : r['data']['resource'], \
+				'armor' : r['data']['armor']}})
+	await common.execute(f'UPDATE `factory` SET `level` = {l + 1} WHERE `uid` = "{uid}" AND \
+			`fid` = {fid.value};', **kwargs)
+	await common.execute(f'UPDATE `factory` SET `storage` = {crystal - upgrade_cost} WHERE `uid` = "{uid}" \
+			AND `fid` = {enums.Factory.CRYSTAL.value};', **kwargs)
+	r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value] = crystal - upgrade_cost
+	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
+			'armor' : r['data']['armor']}, 'upgrade' : {'cost' : upgrade_cost, 'fid' : fid.value, \
+			'level' : l + 1}})
+
+####################################################################################
 def update_state(steps, level, worker, storage, **kwargs):
 	initial_storage = {k : v for k, v in storage.items()}
 	for _ in range(steps):
