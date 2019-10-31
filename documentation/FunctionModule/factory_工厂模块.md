@@ -10,7 +10,7 @@
 > * [`purchase_acceleration_factory`](##purchase_acceleration_factory)
 > * [`set_armor_factory`](##set_armor_factory)
 >
-> ##activate_wishing_pool_factory
+> ## activate_wishing_pool_factory
 >
 > ##### 发送消息JSON格式
 >
@@ -64,7 +64,7 @@
 >
 > 
 >
-> ##purchase_acceleration_factory
+> ## purchase_acceleration_factory
 >
 > ##### 发送消息JSON格式
 >
@@ -114,7 +114,7 @@
 >
 > 
 >
-> ##refresh_factory
+> ## refresh_factory
 >
 > ##### 发送消息JSON格式
 >
@@ -142,7 +142,7 @@
 > >
 > > pool: 许愿池的倒计时
 > >
-> > worker: 工人的现有情况，`unassigned`空闲工人,`total`工人总数，`facotry`工厂的工人情况
+> > worker: 工人的现有情况，`unassigned`空闲工人,`total`工人总数，`factory`工厂的工人情况
 >
 > ```json
 > {
@@ -208,7 +208,7 @@
 >
 > 
 >
-> ##increase_worker_factory
+> ## increase_worker_factory
 >
 > ##### 发送消息JSON格式
 >
@@ -284,7 +284,7 @@
 >
 > 
 >
-> ##decrease_worker_factory
+> ## decrease_worker_factory
 >
 > ##### 发送消息JSON格式
 >
@@ -360,7 +360,7 @@
 >
 > 
 >
-> ##buy_worker_factory
+> ## buy_worker_factory
 >
 > ##### 发送消息JSON格式
 >
@@ -413,7 +413,7 @@
 >
 > 
 >
-> ##upgrade_factory
+> ## upgrade_factory
 >
 > ##### 发送消息JSON格式
 >
@@ -459,7 +459,7 @@
 >
 > 
 >
-> ##get_config_factory
+> ## get_config_factory
 >
 > ##### 发送消息JSON格式
 >
@@ -497,7 +497,7 @@
 >
 > 
 >
-> ##set_armor_factory
+> ## set_armor_factory
 >
 > ##### 发送消息JSON格式
 >
