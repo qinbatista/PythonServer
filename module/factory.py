@@ -22,11 +22,12 @@ async def refresh(uid, **kwargs):
 	await record_resources(uid, storage, **kwargs)
 	aid   = await get_armor(uid, **kwargs)
 	_, aq = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
-
+	pool  = await remaining_pool_time(uid, now, **kwargs)
 	return common.mt(0, 'success', {'steps' : steps, 'resource' : \
 			{'remaining' : {k : storage[k] for k in RESOURCE_FACTORIES}, \
 			'reward' : {k : delta[k] for k in RESOURCE_FACTORIES}}, \
-			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}})
+			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
+			'pool' : pool if pool is not None else ''})
 
 ######################################################
 def update_state(steps, level, worker, storage, **kwargs):
@@ -104,3 +105,12 @@ async def get_armor(uid, **kwargs):
 	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND \
 			`fid` = {enums.Factory.ARMOR.value};', **kwargs)
 	return enums.Armor.A1
+
+async def remaining_pool_time(uid, now, **kwargs):
+	timer = await get_timer(uid, enums.Timer.FACTORY_WISHING_POOL, timeformat = '%Y-%m-%d', **kwargs)
+	if timer is not None:
+		delta = timer - now
+		if delta >= timedelta():
+			return str(delta).split('.')[0] # return remaining time in %H:%M:%S format
+	return None
+
