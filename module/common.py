@@ -50,6 +50,21 @@ async def try_item(uid, item, value, **kwargs):
 				return (True, quantity[0][0] + value) if quantity != () else (True, value)
 			return (False, quantity[0][0] + value) if quantity != () else (False, value)
 
+async def try_armor(uid, aid, level, value, **kwargs):
+	async with (await get_db(**kwargs)).acquire() as conn:
+		# await conn.select_db()
+		async with conn.cursor() as cursor:
+			await cursor.execute(f'SELECT `quantity` FROM `armor` WHERE `uid` = "{uid}" AND \
+					`aid` = {aid.value} AND `level` = {level} FOR UPDATE;')
+			quantity = await cursor.fetchall()
+			if value >= 0 or (quantity != () and quantity[0][0] + value >= 0):
+				if await cursor.execute(f'INSERT INTO `armor` VALUES ("{uid}", {aid.value}, {level}, \
+						{value}) ON DUPLICATE KEY UPDATE quantity = quantity + {value};') == 1:
+					await cursor.execute(f'UPDATE `armor` SET `quantity` = {value} WHERE `uid` = "{uid}" \
+							AND `aid` = {aid.value} AND `level` = {level};')
+				return (True, quantity[0][0] + value) if quantity != () else (True, value)
+			return (False, quantity[0][0] + value) if quantity != () else (False, value)
+
 async def try_weapon(uid, gift,quantity, **kwargs):
 	weapon = enums.Weapon(gift)
 	await execute(f'UPDATE weapon SET segment = segment + {quantity} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
