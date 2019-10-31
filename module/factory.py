@@ -27,7 +27,29 @@ async def refresh(uid, **kwargs):
 			{'remaining' : {k : storage[k] for k in RESOURCE_FACTORIES}, \
 			'reward' : {k : delta[k] for k in RESOURCE_FACTORIES}}, \
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
-			'pool' : pool if pool is not None else ''})
+			'pool' : pool if pool is not None else '', 'worker' : {}})
+
+async def increase_worker(uid, fid, n, **kwargs):
+	fid = enums.Factory(fid)
+	if fid not in BASIC_FACTORIES: return common.mt(97, 'invalid fid')
+	unassigned, max_worker    = await get_unassigned_workers(uid, **kwargs)
+	level, current_workers, _ = await get_state(uid, **kwargs)
+	if n > unassigned: return common.mt(99, 'insufficient unassigned workers')
+	if current_workers[fid] + n > \
+			kwargs['config']['factory']['general']['worker_limits'][str(fid.value)][str(level[fid])]:
+		return common.mt(98, 'cant increase past max worker')
+	r = await refresh(uid, **kwargs)
+	await common.execute(f'UPDATE `factory` SET `workers` = {unassigned - n} WHERE `uid` = "{uid}" \
+			AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`) VALUES ("{uid}", {fid.value}, \
+			{current_workers[fid] + n}) ON DUPLICATE KEY UPDATE \
+			`workers` = {current_workers[fid] + n};', **kwargs)
+	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
+			'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
+			'unassigned' : unassigned - n, 'workers' : current_workers[fid] + n}})
+
+async def decrease_worker(uid, fid, n, **kwargs):
+	pass
 
 ######################################################
 def update_state(steps, level, worker, storage, **kwargs):
@@ -74,15 +96,10 @@ async def steps_since(uid, now, **kwargs):
 			sb(now, min(accel_end_t, now), delta))
 	return (steps, refresh_t)
 
-async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
-	data = await common.execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
-			`tid` = {tid.value};', **kwargs)
-	return datetime.strptime(data[0][0], timeformat).replace(tzinfo = timezone.utc) if data != () else None
-
-async def set_timer(uid, tid, time, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
-	await common.execute(f'INSERT INTO `timer` VALUES ("{uid}", {tid.value}, \
-			"{time.strftime(timeformat)}") ON DUPLICATE KEY UPDATE \
-			`time` = "{time.strftime(timeformat)}";', **kwargs)
+async def get_armor(uid, **kwargs):
+	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND \
+			`fid` = {enums.Factory.ARMOR.value};', **kwargs)
+	return enums.Armor.A1
 
 async def get_state(uid, **kwargs):
 	data = await common.execute(f'SELECT `fid`, `level`, `workers`, `storage` FROM `factory` WHERE \
@@ -95,16 +112,27 @@ async def get_state(uid, **kwargs):
 			s[enums.Factory(f[0])] = f[3]
 	return (l, w, s)
 
+async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
+	data = await common.execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
+			`tid` = {tid.value};', **kwargs)
+	return datetime.strptime(data[0][0], timeformat).replace(tzinfo = timezone.utc) if data != () else None
+
+async def set_timer(uid, tid, time, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
+	await common.execute(f'INSERT INTO `timer` VALUES ("{uid}", {tid.value}, \
+			"{time.strftime(timeformat)}") ON DUPLICATE KEY UPDATE \
+			`time` = "{time.strftime(timeformat)}";', **kwargs)
+
+async def get_unassigned_workers(uid, **kwargs):
+	data = await common.execute(f'SELECT `workers`, `storage` FROM `factory` WHERE uid = "{uid}" \
+			AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
+	return (data[0][0], data[0][1])
+
+
 async def record_resources(uid, storage, **kwargs):
 	for factory in RESOURCE_FACTORIES:
 		await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `storage`) VALUES ("{uid}", \
 				{factory.value}, {storage[factory]}) ON DUPLICATE KEY UPDATE \
 				`storage` = {storage[factory]};', **kwargs)
-
-async def get_armor(uid, **kwargs):
-	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND \
-			`fid` = {enums.Factory.ARMOR.value};', **kwargs)
-	return enums.Armor.A1
 
 async def remaining_pool_time(uid, now, **kwargs):
 	timer = await get_timer(uid, enums.Timer.FACTORY_WISHING_POOL, timeformat = '%Y-%m-%d', **kwargs)
