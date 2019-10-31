@@ -20,14 +20,17 @@ async def refresh(uid, **kwargs):
 	level, worker, storage = await get_state(uid, **kwargs)
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)
 	await record_resources(uid, storage, **kwargs)
-	aid   = await get_armor(uid, **kwargs)
-	_, aq = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
-	pool  = await remaining_pool_time(uid, now, **kwargs)
+	aid    = await get_armor(uid, **kwargs)
+	_, aq  = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
+	pool   = await remaining_pool_time(uid, now, **kwargs)
+	ua, mw = await get_unassigned_workers(uid, **kwargs)
 	return common.mt(0, 'success', {'steps' : steps, 'resource' : \
 			{'remaining' : {k : storage[k] for k in RESOURCE_FACTORIES}, \
 			'reward' : {k : delta[k] for k in RESOURCE_FACTORIES}}, \
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
-			'pool' : pool if pool is not None else '', 'worker' : {}})
+			'pool' : pool if pool is not None else '', \
+			'worker' : {'unassigned' : ua, 'total' : mw, **{k : worker[k] for k in BASIC_FACTORIES}}, \
+			'level' : {k : level[k] for k in BASIC_FACTORIES}})
 
 async def increase_worker(uid, fid, n, **kwargs):
 	fid = enums.Factory(fid)
