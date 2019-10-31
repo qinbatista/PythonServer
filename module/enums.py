@@ -307,8 +307,8 @@ class Factory(enum.IntEnum):
 	UNASSIGNED = -1
 	FOOD = 0
 	IRON = 1
-	ARMOR = 2
-	CRYSTAL = 3
+	CRYSTAL = 2
+	ARMOR = 3
 
 
 
