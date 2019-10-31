@@ -49,7 +49,19 @@ async def increase_worker(uid, fid, n, **kwargs):
 			'unassigned' : unassigned - n, 'workers' : current_workers[fid] + n}})
 
 async def decrease_worker(uid, fid, n, **kwargs):
-	pass
+	fid = enums.Factory(fid)
+	if fid not in BASIC_FACTORIES: return common.mt(97, 'invalid fid')
+	unassigned, max_worker    = await get_unassigned_workers(uid, **kwargs)
+	level, current_workers, _ = await get_state(uid, **kwargs)
+	if n > current_workers[fid]: return common.mt(99, 'insufficient assigned workers')
+	r = await refresh(uid, **kwargs)
+	await common.execute(f'UPDATE `factory` SET `workers` = {unassigned + n} WHERE `uid` = "{uid}" \
+			AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
+	await common.execute(f'UPDATE `factory` SET `workers` = {current_workers[fid] - n} WHERE \
+			`uid` = "{uid}" AND `fid` = {fid.value};', **kwargs)
+	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
+			'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
+			'unassigned' : unassigned + n, 'workers' : current_workers[fid] - n}})
 
 ######################################################
 def update_state(steps, level, worker, storage, **kwargs):
