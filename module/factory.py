@@ -90,7 +90,6 @@ async def buy_worker(uid, **kwargs):
 async def upgrade(uid, fid, **kwargs):
 	if fid not in BASIC_FACTORIES: return common.mt(99, 'invalid fid')
 	r = await refresh(uid, **kwargs)
-	print(r)
 	l = r['data']['level'][fid.value]
 	crystal = r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value]
 	try:
@@ -121,17 +120,11 @@ async def wishing_pool(uid, wid, **kwargs):
 		await common.set_timer(uid, enums.Timer.FACTORY_WISHING_POOL, now+timedelta(seconds=pool), **kwargs)
 		_, dia_remain = await common.try_item(uid, enums.Item.DIAMOND, dia_cost, **kwargs)
 	else:
-		print('one')
 		count               = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
-		print('two')
 		dia_cost            = -1 * count * kwargs['config']['factory']['wishing_pool']['base_diamond']
-		print('three')
 		can_pay, dia_remain = await common.try_item(uid, enums.Item.DIAMOND, dia_cost, **kwargs)
-		print('four')
 		if not can_pay: return common.mt(99, 'insufficient diamonds')
-		print('five')
 		await common.set_limit(uid, enums.Limits.FACTORY_WISHING_POOL, count + 1, **kwargs)
-		print('six')
 	seg_reward     = roll_segment_value(**kwargs)
 	seg_remain     = await weapon._update_segment(uid, wid, seg_reward, **kwargs)
 	return common.mt(0, 'success', {'pool' : pool, \
