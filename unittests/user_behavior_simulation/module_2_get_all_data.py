@@ -222,8 +222,7 @@ def get_all_info(_token,_world):
 			get_family_config(),
 			check_boss_status(),
 			get_task_config(),
-			get_achievement_config(),
-			get_all_market()
+			get_achievement_config()
 			]
 
 def _execute_statement(statement: str) -> tuple:

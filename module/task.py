@@ -26,7 +26,7 @@ async def get_all_task(uid, **kwargs):
 	return common.mt(0, 'success', {'tasks': [{'tid': t[0], 'task_value': t[1], 'reward': t[2], 'timer': t[3]} for t in task]})
 
 async def record_task(uid, **kwargs):
-	data = await common.execute(f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["tid"]}, {kwargs["task_value"]},0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {kwargs["value"]}',**kwargs)
+	data = await common.execute(f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["tid"]}, {kwargs["task_value"]},0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {kwargs["task_value"]}',**kwargs)
 	return common.mt(0, 'record:'+str(kwargs["tid"])+" success")
 
 async def get_task_reward(uid,task_id,**kwargs):
