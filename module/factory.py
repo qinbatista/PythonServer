@@ -24,7 +24,7 @@ async def refresh(uid, **kwargs):
 	now              = datetime.now(timezone.utc)
 	steps, refresh_t = await steps_since(uid, now, **kwargs)
 	remainder        = kwargs['config']['factory']['general']['step'] % int((now-refresh_t).total_seconds())
-	await set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds = remainder), **kwargs)
+	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds = remainder), **kwargs)
 	level, worker, storage = await get_state(uid, **kwargs)
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)
 	await record_resources(uid, storage, **kwargs)
@@ -111,20 +111,29 @@ async def upgrade(uid, fid, **kwargs):
 			'level' : l + 1}})
 
 async def wishing_pool(uid, wid, **kwargs):
-	now  = datetime.now(timezone.utc)
-	pool = await remaining_pool_time(uid, now, **kwargs)
+	now, dia_cost = datetime.now(timezone.utc), 0
+	pool          = await remaining_pool_time(uid, now, **kwargs)
+	level, _, _   = await get_state(uid, **kwargs)
 	if pool == 0:
-		await common.execute(f'INSERT INTO `limits` VALUES ("{uid}", \
-				{enums.Limits.FACTORY_WISHING_POOL.value}, 1) ON DUPLICATE KEY UPDATE \
-				`value` = 1;', **kwargs)
-		await common.execute(f'INSERT INTO `factory` VALUES ("{uid}", \
-				{enums.Timer.FACTORY_WISHING_POOL.value}, "") ON DUPLICATE KEY UPDATE \
-				`time` = "";', **kwargs)
+		pool  = ((kwargs['config']['factory']['wishing_pool']['base_recover'] - \
+				level[enums.Factory.WISHING_POOL]) * 3600)
+		await common.set_limit(uid, enums.Limits.FACTORY_WISHING_POOL, 1, **kwargs)
+		await common.set_timer(uid, enums.Timer.FACTORY_WISHING_POOL, now+timedelta(seconds=pool), **kwargs)
+		_, dia_remain = await common.try_item(uid, enums.Item.DIAMOND, dia_cost, **kwargs)
 	else:
-		dia_cost = 0
+		print('one')
+		count               = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
+		print('two')
+		dia_cost            = -1 * count * kwargs['config']['factory']['wishing_pool']['base_diamond']
+		print('three')
+		can_pay, dia_remain = await common.try_item(uid, enums.Item.DIAMOND, dia_cost, **kwargs)
+		print('four')
+		if not can_pay: return common.mt(99, 'insufficient diamonds')
+		print('five')
+		await common.set_limit(uid, enums.Limits.FACTORY_WISHING_POOL, count + 1, **kwargs)
+		print('six')
 	seg_reward     = roll_segment_value(**kwargs)
 	seg_remain     = await weapon._update_segment(uid, wid, seg_reward, **kwargs)
-	_, dia_remain  = await common.try_item(uid, enums.Item.DIAMOND, dia_cost, **kwargs)
 	return common.mt(0, 'success', {'pool' : pool, \
 			'remaining' : {'wid' : wid.value, 'seg' : seg_remain, 'diamond' : dia_remain}, \
 			'reward'    : {'wid' : wid.value, 'seg' : seg_reward, 'diamond' : dia_cost}})
@@ -171,9 +180,9 @@ def can_produce(current, factory, level, **kwargs):
 	return True
 
 async def steps_since(uid, now, **kwargs):
-	accel_start_t = await get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)
-	accel_end_t   = await get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
-	refresh_t     = await get_timer(uid, enums.Timer.FACTORY_REFRESH,            **kwargs)
+	accel_start_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)
+	accel_end_t   = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
+	refresh_t     = await common.get_timer(uid, enums.Timer.FACTORY_REFRESH,            **kwargs)
 	if refresh_t is None:
 		return (0, now)
 	if accel_start_t is None:
@@ -201,15 +210,6 @@ async def get_state(uid, **kwargs):
 		s[enums.Factory(f[0])] = f[3]
 	return (l, w, s)
 
-async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
-	data = await common.execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
-			`tid` = {tid.value};', **kwargs)
-	return datetime.strptime(data[0][0], timeformat).replace(tzinfo = timezone.utc) if data != () else None
-
-async def set_timer(uid, tid, time, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
-	await common.execute(f'INSERT INTO `timer` VALUES ("{uid}", {tid.value}, \
-			"{time.strftime(timeformat)}") ON DUPLICATE KEY UPDATE \
-			`time` = "{time.strftime(timeformat)}";', **kwargs)
 
 async def get_unassigned_workers(uid, **kwargs):
 	data = await common.execute(f'SELECT `workers`, `storage` FROM `factory` WHERE uid = "{uid}" \
@@ -224,7 +224,7 @@ async def record_resources(uid, storage, **kwargs):
 				`storage` = {storage[factory]};', **kwargs)
 
 async def remaining_pool_time(uid, now, **kwargs):
-	timer = await get_timer(uid, enums.Timer.FACTORY_WISHING_POOL, **kwargs)
+	timer = await common.get_timer(uid, enums.Timer.FACTORY_WISHING_POOL, **kwargs)
 	if timer is None:
 		return 0
 	return max(int((timer - now).total_seconds()), 0)
