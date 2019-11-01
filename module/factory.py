@@ -132,7 +132,20 @@ async def wishing_pool(uid, wid, **kwargs):
 			'reward'    : {'wid' : wid.value, 'seg' : seg_reward, 'diamond' : dia_cost}})
 
 async def buy_acceleration(uid, **kwargs):
-	return common.mt(0, 'success')
+	now                 = datetime.now(timezone.utc)
+	dia_cost            = kwargs['config']['factory']['general']['acceleration_cost']
+	can_pay, dia_remain = await common.try_item(uid, enums.Item.DIAMOND, -dia_cost, **kwargs)
+	if not can_pay: return common.mt(99, 'insufficient funds')
+	accel_start_t       = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)
+	accel_end_t         = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
+	accel_start_t       = accel_start_t if accel_start_t is not None else now
+	accel_end_t         = accel_end_t   if accel_end_t   is not None else now
+	if now >= accel_start_t:
+		await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, now, **kwargs)
+	await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, \
+			max(now + timedelta(days = 1), accel_end_t + timedelta(days = 1)), **kwargs)
+	return common.mt(0, 'success', {'time' : accel_end_t.strftime('%Y-%m-%d %H:%M:%S'), \
+			'remaining' : {'diamond' : dia_remain}, 'reward' : {'diamond' : -dia_cost}})
 
 ####################################################################################
 def roll_segment_value(**kwargs):
