@@ -2,8 +2,11 @@
 factory.py
 '''
 
+import random
+
 from module import enums
 from module import common
+from module import weapon
 from datetime import datetime, timezone, timedelta
 
 BASIC_FACTORIES    = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
@@ -28,12 +31,11 @@ async def refresh(uid, **kwargs):
 			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES}, \
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}}, \
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
-			'pool' : pool if pool is not None else '', \
+			'pool' : pool, \
 			'worker' : {'unassigned' : ua, 'total' : mw, **{k.value: worker[k] for k in BASIC_FACTORIES}}, \
 			'level' : {k.value : level[k] for k in BASIC_FACTORIES}})
 
 async def increase_worker(uid, fid, n, **kwargs):
-	fid = enums.Factory(fid)
 	if fid not in BASIC_FACTORIES: return common.mt(97, 'invalid fid')
 	unassigned, max_worker    = await get_unassigned_workers(uid, **kwargs)
 	level, current_workers, _ = await get_state(uid, **kwargs)
@@ -52,7 +54,6 @@ async def increase_worker(uid, fid, n, **kwargs):
 			'unassigned' : unassigned - n, 'workers' : current_workers[fid] + n}})
 
 async def decrease_worker(uid, fid, n, **kwargs):
-	fid = enums.Factory(fid)
 	if fid not in BASIC_FACTORIES: return common.mt(97, 'invalid fid')
 	unassigned, max_worker    = await get_unassigned_workers(uid, **kwargs)
 	level, current_workers, _ = await get_state(uid, **kwargs)
@@ -82,7 +83,6 @@ async def buy_worker(uid, **kwargs):
 			'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, 'reward' : -upgrade_cost}}})
 
 async def upgrade(uid, fid, **kwargs):
-	fid = enums.Factory(fid)
 	if fid not in BASIC_FACTORIES: return common.mt(99, 'invalid fid')
 	r = await refresh(uid, **kwargs)
 	print(r)
@@ -105,7 +105,38 @@ async def upgrade(uid, fid, **kwargs):
 			'armor' : r['data']['armor']}, 'upgrade' : {'cost' : upgrade_cost, 'fid' : fid.value, \
 			'level' : l + 1}})
 
+async def wishing_pool(uid, wid, **kwargs):
+	now  = datetime.now(timezone.utc)
+	pool = await remaining_pool_time(uid, now, **kwargs)
+	if pool == 0:
+		await common.execute(f'INSERT INTO `limits` VALUES ("{uid}", \
+				{enums.Limits.FACTORY_WISHING_POOL.value}, 1) ON DUPLICATE KEY UPDATE \
+				`value` = 1;', **kwargs)
+		await common.execute(f'INSERT INTO `factory` VALUES ("{uid}", \
+				{enums.Timer.FACTORY_WISHING_POOL.value}, "{}") ON DUPLICATE KEY UPDATE \
+				`time` = "{}";', **kwargs)
+	else:
+		dia_cost = 0
+	seg_reward     = roll_segment_value(**kwargs)
+	seg_remain     = await weapon._update_segment(uid, wid, seg_reward, **kwargs)
+	_, dia_remain  = await common.try_item(uid, enums.Item.DIAMOND, dia_cost, **kwargs)
+	return common.mt(0, 'success', {'pool' : pool, \
+			'remaining' : {'wid' : wid.value, 'seg' : seg_remain, 'diamond' : dia_remain}, \
+			'reward'    : {'wid' : wid.value, 'seg' : seg_reward, 'diamond' : dia_cost}})
+
+async def buy_acceleration(uid, **kwargs):
+	return common.mt(0, 'success')
+
 ####################################################################################
+def roll_segment_value(**kwargs):
+	rng      = random.randint(0, 100)
+	base_seg = kwargs['config']['factory']['wishing_pool']['base_segment']
+	if 0 <= rng < 10:
+		base_seg *= 3
+	elif 10 <= rng < 55:
+		base_seg *= 2
+	return base_seg
+
 def update_state(steps, level, worker, storage, **kwargs):
 	initial_storage = {k : v for k, v in storage.items()}
 	for _ in range(steps):
@@ -189,10 +220,8 @@ async def record_resources(uid, storage, **kwargs):
 				`storage` = {storage[factory]};', **kwargs)
 
 async def remaining_pool_time(uid, now, **kwargs):
-	timer = await get_timer(uid, enums.Timer.FACTORY_WISHING_POOL, timeformat = '%Y-%m-%d', **kwargs)
-	if timer is not None:
-		delta = timer - now
-		if delta >= timedelta():
-			return str(delta).split('.')[0] # return remaining time in %H:%M:%S format
-	return None
+	timer = await get_timer(uid, enums.Timer.FACTORY_WISHING_POOL, **kwargs)
+	if timer is None:
+		return 0
+	return max(int((timer - now).total_seconds()), 0)
 
