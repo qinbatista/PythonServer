@@ -147,6 +147,12 @@ async def buy_acceleration(uid, **kwargs):
 	return common.mt(0, 'success', {'time' : accel_end_t.strftime('%Y-%m-%d %H:%M:%S'), \
 			'remaining' : {'diamond' : dia_remain}, 'reward' : {'diamond' : -dia_cost}})
 
+async def set_armor(uid, aid, **kwargs):
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `storage`) VALUES \
+			("{uid}", {enums.Factory.ARMOR.value}, {aid.value}) ON DUPLICATE KEY UPDATE \
+			`storage` = {aid.value};', **kwargs)
+	return common.mt(0, 'success', {'aid' : aid.value})
+
 ####################################################################################
 def roll_segment_value(**kwargs):
 	rng      = random.randint(0, 100)
@@ -204,7 +210,7 @@ async def steps_since(uid, now, **kwargs):
 async def get_armor(uid, **kwargs):
 	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND \
 			`fid` = {enums.Factory.ARMOR.value};', **kwargs)
-	return enums.Armor.A1
+	return enums.Armor(data[0][0]) if data != () else enums.Armor.A1
 
 async def get_state(uid, **kwargs):
 	data = await common.execute(f'SELECT `fid`, `level`, `workers`, `storage` FROM `factory` WHERE \
@@ -215,7 +221,6 @@ async def get_state(uid, **kwargs):
 		w[enums.Factory(f[0])] = f[2]
 		s[enums.Factory(f[0])] = f[3]
 	return (l, w, s)
-
 
 async def get_unassigned_workers(uid, **kwargs):
 	data = await common.execute(f'SELECT `workers`, `storage` FROM `factory` WHERE uid = "{uid}" \
