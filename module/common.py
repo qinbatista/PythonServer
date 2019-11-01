@@ -6,7 +6,7 @@ When desinging a function, try to make it as general as possible to allow the re
 '''
 from module import enums
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 
 async def exists(table, *conditions, account = False, **kwargs):
@@ -50,6 +50,21 @@ async def try_item(uid, item, value, **kwargs):
 				return (True, quantity[0][0] + value) if quantity != () else (True, value)
 			return (False, quantity[0][0] + value) if quantity != () else (False, value)
 
+async def try_armor(uid, aid, level, value, **kwargs):
+	async with (await get_db(**kwargs)).acquire() as conn:
+		# await conn.select_db()
+		async with conn.cursor() as cursor:
+			await cursor.execute(f'SELECT `quantity` FROM `armor` WHERE `uid` = "{uid}" AND \
+					`aid` = {aid.value} AND `level` = {level} FOR UPDATE;')
+			quantity = await cursor.fetchall()
+			if value >= 0 or (quantity != () and quantity[0][0] + value >= 0):
+				if await cursor.execute(f'INSERT INTO `armor` VALUES ("{uid}", {aid.value}, {level}, \
+						{value}) ON DUPLICATE KEY UPDATE quantity = quantity + {value};') == 1:
+					await cursor.execute(f'UPDATE `armor` SET `quantity` = {value} WHERE `uid` = "{uid}" \
+							AND `aid` = {aid.value} AND `level` = {level};')
+				return (True, quantity[0][0] + value) if quantity != () else (True, value)
+			return (False, quantity[0][0] + value) if quantity != () else (False, value)
+
 async def try_weapon(uid, gift,quantity, **kwargs):
 	weapon = enums.Weapon(gift)
 	await execute(f'UPDATE weapon SET segment = segment + {quantity} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
@@ -59,6 +74,26 @@ async def try_role(uid, gift,quantity, **kwargs):
 	role = enums.Role(gift)
 	await execute(f'UPDATE role SET segment = segment + {quantity} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
 	return (False, role)
+
+async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
+	data = await execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
+			`tid` = {tid.value};', **kwargs)
+	return datetime.strptime(data[0][0], timeformat).replace(tzinfo = timezone.utc) if data != () else None
+
+async def set_timer(uid, tid, time, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
+	await execute(f'INSERT INTO `timer` VALUES ("{uid}", {tid.value}, \
+			"{time.strftime(timeformat)}") ON DUPLICATE KEY UPDATE \
+			`time` = "{time.strftime(timeformat)}";', **kwargs)
+
+async def get_limit(uid, lid, **kwargs):
+	data = await execute(f'SELECT `value` FROM `limits` WHERE `uid` = "{uid}" AND \
+			`lid` = {lid.value};', **kwargs)
+	return data[0][0] if data != () else None
+
+async def set_limit(uid, lid, value, **kwargs):
+	await execute(f'INSERT INTO `limits` VALUES ("{uid}", {lid.value}, {value}) \
+			ON DUPLICATE KEY UPDATE `value` = {value};', **kwargs)
+
 
 async def get_vip_exp(uid, **kwargs):
 	data = await execute(f'SELECT vipexp FROM progress WHERE uid = "{uid}";', **kwargs)

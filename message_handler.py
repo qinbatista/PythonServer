@@ -347,31 +347,23 @@ class MessageHandler:
 		return await factory.refresh(data['data']['unique_id'], **data)
 
 	async def _upgrade_factory(self, data: dict) -> str:
-		return await factory.upgrade(data['data']['unique_id'], int(data['data']['fid']), **data)
-
-	async def _refresh_equipment_factory(self, data: dict) -> str:
-		return await factory.refresh_equipment(data['data']['unique_id'], **data)
-
+		return await factory.upgrade(data['data']['unique_id'], enums.Factory(int(data['data']['fid'])), **data)
 	async def _activate_wishing_pool_factory(self, data: dict) -> str:
-		return await factory.activate_wishing_pool(data['data']['unique_id'], int(data['data']['wid']), **data)
-
-	async def _upgrade_wishing_pool_factory(self, data: dict) -> str:
-		return await factory.upgrade_wishing_pool(data['data']['unique_id'], **data)
+		return await factory.wishing_pool(data['data']['unique_id'], enums.Weapon(int(data['data']['wid'])), **data)
 
 	async def _buy_worker_factory(self, data: dict) -> str:
 		return await factory.buy_worker(data['data']['unique_id'], **data)
 
 	async def _increase_worker_factory(self, data: dict) -> str:
-		return await factory.increase_worker(data['data']['unique_id'], int(data['data']['fid']), int(data['data']['num']), **data)
+		return await factory.increase_worker(data['data']['unique_id'], enums.Factory(int(data['data']['fid'])), int(data['data']['num']), **data)
 
 	async def _decrease_worker_factory(self, data: dict) -> str:
-		return await factory.decrease_worker(data['data']['unique_id'], int(data['data']['fid']), int(data['data']['num']), **data)
+		return await factory.decrease_worker(data['data']['unique_id'], enums.Factory(int(data['data']['fid'])), int(data['data']['num']), **data)
 
 	async def _set_armor_factory(self, data: dict) -> str:
-		return await factory.set_armor(data['data']['unique_id'], int(data['data']['aid']), **data)
-
-	async def _purchase_acceleration_factory(self, data: dict) -> str:
-		return await factory.purchase_acceleration(data['data']['unique_id'], **data)
+		return await factory.set_armor(data['data']['unique_id'], enums.Armor(int(data['data']['aid'])), **data)
+	async def _buy_acceleration_factory(self, data: dict) -> str:
+		return await factory.buy_acceleration(data['data']['unique_id'], **data)
 
 	async def _get_config_factory(self, data: dict) -> str:
 		return common.mt(0, 'success', data['config']['factory'])
@@ -721,14 +713,12 @@ FUNCTION_LIST = {
 
 	###################### factory.py ######################
 	'refresh_factory' : MessageHandler._refresh_factory,
-	'refresh_equipment_factory' : MessageHandler._refresh_equipment_factory,
 	'upgrade_factory' : MessageHandler._upgrade_factory,
 	'buy_worker_factory' : MessageHandler._buy_worker_factory,
 	'increase_worker_factory' : MessageHandler._increase_worker_factory,
 	'decrease_worker_factory' : MessageHandler._decrease_worker_factory,
 	'activate_wishing_pool_factory' : MessageHandler._activate_wishing_pool_factory,
-	'upgrade_wishing_pool_factory' : MessageHandler._upgrade_wishing_pool_factory,
-	'purchase_acceleration_factory' : MessageHandler._purchase_acceleration_factory,
+	'buy_acceleration_factory' : MessageHandler._buy_acceleration_factory,
 	'set_armor_factory' : MessageHandler._set_armor_factory,
 	'get_config_factory' : MessageHandler._get_config_factory,
 
