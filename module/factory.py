@@ -9,10 +9,15 @@ from module import common
 from module import weapon
 from datetime import datetime, timezone, timedelta
 
-BASIC_FACTORIES    = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
-				      enums.Factory.IRON    : None, enums.Factory.FOOD  : None}
+BASIC_FACTORIES     = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
+				       enums.Factory.IRON    : None, enums.Factory.FOOD  : None}
 
-RESOURCE_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None}
+RESOURCE_FACTORIES  = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None}
+
+HAS_LEVEL_FACTORIES = {enums.Factory.FOOD         : None, enums.Factory.IRON  : None, \
+				       enums.Factory.CRYSTAL      : None, enums.Factory.ARMOR : None, \
+					   enums.Factory.WISHING_POOL : None }
+
 
 
 async def refresh(uid, **kwargs):
@@ -33,7 +38,7 @@ async def refresh(uid, **kwargs):
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
 			'pool' : pool, \
 			'worker' : {'unassigned' : ua, 'total' : mw, **{k.value: worker[k] for k in BASIC_FACTORIES}}, \
-			'level' : {k.value : level[k] for k in BASIC_FACTORIES}})
+			'level' : {k.value : level[k] for k in HAS_LEVEL_FACTORIES}})
 
 async def increase_worker(uid, fid, n, **kwargs):
 	if fid not in BASIC_FACTORIES: return common.mt(97, 'invalid fid')
@@ -113,8 +118,8 @@ async def wishing_pool(uid, wid, **kwargs):
 				{enums.Limits.FACTORY_WISHING_POOL.value}, 1) ON DUPLICATE KEY UPDATE \
 				`value` = 1;', **kwargs)
 		await common.execute(f'INSERT INTO `factory` VALUES ("{uid}", \
-				{enums.Timer.FACTORY_WISHING_POOL.value}, "{}") ON DUPLICATE KEY UPDATE \
-				`time` = "{}";', **kwargs)
+				{enums.Timer.FACTORY_WISHING_POOL.value}, "") ON DUPLICATE KEY UPDATE \
+				`time` = "";', **kwargs)
 	else:
 		dia_cost = 0
 	seg_reward     = roll_segment_value(**kwargs)
@@ -189,12 +194,11 @@ async def get_armor(uid, **kwargs):
 async def get_state(uid, **kwargs):
 	data = await common.execute(f'SELECT `fid`, `level`, `workers`, `storage` FROM `factory` WHERE \
 			uid = "{uid}";', **kwargs)
-	l, w, s = {e:1 for e in BASIC_FACTORIES}, {e:0 for e in BASIC_FACTORIES}, {e:0 for e in BASIC_FACTORIES}
+	l, w, s = {e:1 for e in enums.Factory}, {e:0 for e in enums.Factory}, {e:0 for e in enums.Factory}
 	for f in data:
-		if f[0] in BASIC_FACTORIES:
-			l[enums.Factory(f[0])] = f[1]
-			w[enums.Factory(f[0])] = f[2]
-			s[enums.Factory(f[0])] = f[3]
+		l[enums.Factory(f[0])] = f[1]
+		w[enums.Factory(f[0])] = f[2]
+		s[enums.Factory(f[0])] = f[3]
 	return (l, w, s)
 
 async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
