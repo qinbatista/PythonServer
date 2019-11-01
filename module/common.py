@@ -6,7 +6,7 @@ When desinging a function, try to make it as general as possible to allow the re
 '''
 from module import enums
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 
 
 async def exists(table, *conditions, account = False, **kwargs):
