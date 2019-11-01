@@ -84,8 +84,8 @@ async def buy_worker(uid, **kwargs):
 			WHERE `uid` = "{uid}" AND `fid` = {enums.Factory.FOOD.value};', **kwargs)
 	await common.execute(f'UPDATE `factory` SET `workers` = {unassigned + 1}, `storage` = {max_worker + 1} \
 			WHERE `uid` = "{uid}" AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
-	return common.mt(0, 'success', {'worker' : {'unassigned' : unassigned + 1, 'total' : max_worker + 1, \
-			'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, 'reward' : -upgrade_cost}}})
+	return common.mt(0, 'success', {'worker' : {'unassigned' : unassigned + 1, 'total' : max_worker + 1}, \
+			'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, 'reward' : -upgrade_cost}})
 
 async def upgrade(uid, fid, **kwargs):
 	if fid not in HAS_LEVEL_FACTORIES: return common.mt(99, 'invalid fid')
@@ -140,11 +140,13 @@ async def buy_acceleration(uid, **kwargs):
 	accel_end_t         = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
 	accel_start_t       = accel_start_t if accel_start_t is not None else now
 	accel_end_t         = accel_end_t   if accel_end_t   is not None else now
+	r                   = await refresh(uid, **kwargs)
 	if now >= accel_start_t:
 		await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, now, **kwargs)
 	await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, \
 			max(now + timedelta(days = 1), accel_end_t + timedelta(days = 1)), **kwargs)
-	return common.mt(0, 'success', {'time' : accel_end_t.strftime('%Y-%m-%d %H:%M:%S'), \
+	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
+			'armor' : r['data']['armor']}, 'time' : accel_end_t.strftime('%Y-%m-%d %H:%M:%S'), \
 			'remaining' : {'diamond' : dia_remain}, 'reward' : {'diamond' : -dia_cost}})
 
 async def set_armor(uid, aid, **kwargs):
