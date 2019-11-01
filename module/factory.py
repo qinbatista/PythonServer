@@ -88,7 +88,7 @@ async def buy_worker(uid, **kwargs):
 			'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, 'reward' : -upgrade_cost}}})
 
 async def upgrade(uid, fid, **kwargs):
-	if fid not in BASIC_FACTORIES: return common.mt(99, 'invalid fid')
+	if fid not in HAS_LEVEL_FACTORIES: return common.mt(99, 'invalid fid')
 	r = await refresh(uid, **kwargs)
 	l = r['data']['level'][fid.value]
 	crystal = r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value]
@@ -100,8 +100,8 @@ async def upgrade(uid, fid, **kwargs):
 	if crystal < upgrade_cost:
 		return common.mt(98, 'insufficient funds', {'refresh' : {'resource' : r['data']['resource'], \
 				'armor' : r['data']['armor']}})
-	await common.execute(f'UPDATE `factory` SET `level` = {l + 1} WHERE `uid` = "{uid}" AND \
-			`fid` = {fid.value};', **kwargs)
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `level`) VALUES ("{uid}", {fid.value}, \
+			{l + 1}) ON DUPLICATE KEY UPDATE `level` = {l + 1};', **kwargs)
 	await common.execute(f'UPDATE `factory` SET `storage` = {crystal - upgrade_cost} WHERE `uid` = "{uid}" \
 			AND `fid` = {enums.Factory.CRYSTAL.value};', **kwargs)
 	r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value] = crystal - upgrade_cost
