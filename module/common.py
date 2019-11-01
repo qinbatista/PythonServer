@@ -76,22 +76,22 @@ async def try_role(uid, gift,quantity, **kwargs):
 	return (False, role)
 
 async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
-	data = await common.execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
+	data = await execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
 			`tid` = {tid.value};', **kwargs)
 	return datetime.strptime(data[0][0], timeformat).replace(tzinfo = timezone.utc) if data != () else None
 
 async def set_timer(uid, tid, time, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
-	await common.execute(f'INSERT INTO `timer` VALUES ("{uid}", {tid.value}, \
+	await execute(f'INSERT INTO `timer` VALUES ("{uid}", {tid.value}, \
 			"{time.strftime(timeformat)}") ON DUPLICATE KEY UPDATE \
 			`time` = "{time.strftime(timeformat)}";', **kwargs)
 
 async def get_limit(uid, lid, **kwargs):
-	data = await common.execute(f'SELECT `value` FROM `limits` WHERE `uid` = "{uid}" AND \
+	data = await execute(f'SELECT `value` FROM `limits` WHERE `uid` = "{uid}" AND \
 			`lid` = {lid.value};', **kwargs)
 	return data[0][0] if data != () else None
 
 async def set_limit(uid, lid, value, **kwargs):
-	await common.execute(f'INSERT INTO `limits` VALUES ("{uid}", {lid.value}, {value}) \
+	await execute(f'INSERT INTO `limits` VALUES ("{uid}", {lid.value}, {value}) \
 			ON DUPLICATE KEY UPDATE `value` = {value};', **kwargs)
 
 
