@@ -7,9 +7,9 @@
 * [`pass_stage`](##pass_stage)
 * [`check_boss_status`](##check_boss_status)
 
-##start_hang_up
+## start_hang_up
 
-#####发送消息JSON格式
+##### 发送消息JSON格式
 
 开始挂机，玩家在`通过`关卡以后才能开始挂机，挂机的奖励列表来自`hang_reward_config.json`配置表，只有普通关卡比如，1，2，3，4，5才能挂机。
 
@@ -36,28 +36,11 @@
 
 {
 	"status": 1,
-	"message": "Repeated hang up successfully",
+	"message": "hang up success",
 	"data": {
-		"start_hang_up_reward": [
-			{
-				"iid": "2",
-				"value": 2665,
-				"increment": 20
-			},
-			{
-				"iid": "1",
-				"value": 7995,
-				"increment": 60
-			},
-			{
-				"iid": "11",
-				"value": 0,
-				"increment": 0
-			}
-		],
 		"hang_up_info": {
 			"hang_stage": 2,
-      "time":"25:00:00"
+      		"time":"10:00:00"
 		}
 	}
 }
@@ -90,7 +73,7 @@
 
 
 
-##get_hang_up_reward
+## get_hang_up_reward
 
 ##### 发送消息JSON格式
 
@@ -145,9 +128,9 @@
 
 
 
-##get_hang_up_info
+## get_hang_up_info（暂时未用）
 
-#####发送消息JSON格式
+##### 发送消息JSON格式
 
 获取挂机奖励，`不会`立即结算资源到玩家的物品栏，只是作为挂机资源的显示
 
@@ -172,7 +155,7 @@
 ```json
 {
 	"status": 0,
-	"message": "Settlement reward success",
+	"message": "Successfully get hook information",
 	"data": {
 		"get_hang_up_info": [
 			{
@@ -202,9 +185,9 @@
 
 
 
-##enter_stage
+## enter_stage
 
-#####发送消息JSON格式
+##### 发送消息JSON格式
 
 进入关卡，玩家在扣除相应的资源后即可进入关卡，消耗的资源列表来自`entry_consumables_config.json`配置表，消耗的体力来自`player_config.json`配置表，关切对应表如下：
 
@@ -278,17 +261,16 @@
 			"level": 18,
 			"need": 60
 		},
-		"world_boss":
-    {
+		"world_boss": {
     		"time":"23:20:00",
-				'remaining' : 2,
-    }
+            'remaining' : 2,
+    	}
 		"energy": {
 			"time": "0:20:00",
 			"remaining": 9998,
 			"reward": -2
 		},
-    "enemy_layout": [.....],
+    	"enemy_layout": [.....],
 		"monster": [.....]
 	}
 }
@@ -303,9 +285,9 @@
 
 
 
-##pass_stage
+## pass_stage
 
-#####发送消息JSON格式
+##### 发送消息JSON格式
 
 进入关卡，玩家在扣除相应的资源后即可进入关卡，消耗的资源列表来自`stage_reward_config.json`配置表。
 

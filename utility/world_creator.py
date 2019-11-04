@@ -151,7 +151,7 @@ CREATE TABLE `progress` (
 	  `role` smallint(6) DEFAULT 1 COMMENT '拥有的角色数',
 	  `weapon` smallint(6) DEFAULT 0 COMMENT '拥有的武器数',
 	  `stage` smallint(6) DEFAULT 0 COMMENT '最高普通关卡',
-	  `towerstage` smallint(6) DEFAULT 0 COMMENT '冲塔最高关卡',
+	  `towerstage` smallint(6) DEFAULT 1000 COMMENT '冲塔最高关卡',
 	  `hangstage` smallint(6) DEFAULT 0 COMMENT '当前挂机的关卡',
 	  `vipexp` smallint(6) DEFAULT 0 COMMENT 'vip经验',
 	  PRIMARY KEY (`uid`),

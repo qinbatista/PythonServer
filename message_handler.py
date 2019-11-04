@@ -493,23 +493,23 @@ class MessageHandler:
 
 	async def _enter_stage(self, data: dict) -> str:
 		data.update({'player_energy': self._player['energy']})  # try_energy
-		data.update({'entry_consume': self._entry_consumables["stage"], 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
+		data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
 		data['monster_config'] = self._monster_config
 		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_stage(self, data: dict) -> str:
-		data.update({'pass_rewards': self._stage_reward["stage"]})
+		data.update({'pass_rewards': self._stage_reward})
 		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
-	async def _enter_tower(self, data: dict) -> str:
-		data.update({'player_energy': self._player['energy']})  # try_energy
-		data.update({'entry_consume': self._entry_consumables["tower"], 'enemy_layouts': self._level_enemy_layouts_tower['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
-		data['monster_config'] = self._monster_config
-		return await stage.enter_tower(data['data']['unique_id'], data['data']['stage'], **data)
-
-	async def _pass_tower(self, data: dict) -> str:
-		data.update({'pass_rewards': self._stage_reward["tower"]})
-		return await stage.pass_tower(data['data']['unique_id'], data['data']['stage'], **data)
+	# async def _enter_tower(self, data: dict) -> str:
+	# 	data.update({'player_energy': self._player['energy']})  # try_energy
+	# 	data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts_tower['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
+	# 	data['monster_config'] = self._monster_config
+	# 	return await stage.e_tower_stage(data['data']['unique_id'], data['data']['stage'], **data)
+	#
+	# async def _pass_tower(self, data: dict) -> str:
+	# 	data.update({'pass_rewards': self._stage_reward["tower"]})
+	# 	return await stage.pass_tower(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _start_hang_up(self, data: dict) -> str:
 		data.update({'hang_rewards': self._hang_reward})
@@ -518,6 +518,10 @@ class MessageHandler:
 	async def _get_hang_up_reward(self, data: dict) -> str:
 		data.update({'hang_rewards': self._hang_reward})
 		return await stage.get_hang_up_reward(data['data']['unique_id'], **data)
+
+	# async def _get_hang_up_info(self, data: dict) -> str:
+	# 	data.update({'hang_rewards': self._hang_reward})
+	# 	return await stage.get_hang_up_info(data['data']['unique_id'], **data)
 
 	###################### tasks ######################
 	async def _get_all_task(self, data: dict) -> str:
@@ -557,13 +561,6 @@ class MessageHandler:
 		}
 		return common.mt(0, 'success', {'config': cost})
 
-	# TODO
-	async def _get_hang_up_info(self, data: dict) -> str:
-		# 这个信息不知道怎么去拿，后面详细说一下，新数据库不知道这些放到哪里了
-		# sql_str = "SELECT hang_up_time, hang_stage, stage, tower_stage FROM player WHERE unique_id='%s'" % unique_id
-		return {'status' : 0, 'message' : 'temp function success', 'data' :
-				{'stage' :
-				{'world_boss_enter_time':"2019/10/10 17:00:00",'world_boss_remaining_times':"20",'hp_values':["%.2f" %(int(self._boss_life_remaining[i])/int(self._boss_life[i])) for i in range(0,9)]}}}
 
 	# TODO
 	async def _check_boss_status(self, data: dict) -> str:
@@ -770,8 +767,8 @@ FUNCTION_LIST = {
 	'get_all_tower': MessageHandler._get_all_tower,
 	'enter_stage': MessageHandler._enter_stage,
 	'pass_stage': MessageHandler._pass_stage,
-	'enter_tower': MessageHandler._enter_tower,
-	'pass_tower': MessageHandler._pass_tower,
+	# 'enter_tower': MessageHandler._enter_tower,
+	# 'pass_tower': MessageHandler._pass_tower,
 	'start_hang_up': MessageHandler._start_hang_up,
 	'get_hang_up_reward': MessageHandler._get_hang_up_reward,
 
@@ -788,7 +785,7 @@ FUNCTION_LIST = {
 	# TODO 新增
 	'stage_reward_config': MessageHandler._stage_reward_config,
 	'get_lottery_config_info': MessageHandler._get_lottery_config_info,
-	'get_hang_up_info': MessageHandler._get_hang_up_info,
+	# 'get_hang_up_info': MessageHandler._get_hang_up_info,
 	'check_boss_status':MessageHandler._check_boss_status,
 	'get_family_config':MessageHandler._get_family_config,
 	'get_factory_info':MessageHandler._get_factory_info,
