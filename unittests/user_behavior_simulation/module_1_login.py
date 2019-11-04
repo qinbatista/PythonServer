@@ -33,6 +33,7 @@ def login_unique():#游客登陆
 	my_unique_id = unique_id
 	print_module("[login_unique] unique_id="+my_unique_id)
 	response = send_tcp_message({'function' : 'login_unique', 'data' : {'unique_id' : my_unique_id}})
+	print(str(response))
 	if response["status"]==0 or response["status"]==1:#登陆成功返回数据
 		world = random.choice([0])#随机选择世界,目前世界只有0,未完成
 		print_method("[login_unique] login success, token="+response["data"]["token"] + ",world="+str(world))
@@ -45,6 +46,7 @@ def login_unique():#游客登陆
 		int_number = random.choice([0,0])#登陆成功是否绑定账户0账号绑定，1手机绑定，2邮箱绑定，目前手机和邮箱未完成
 		if int_number==0:
 			response = send_tcp_message({'function' : 'bind_account', 'data' : {"token":token, "password":"123456","account":my_unique_id+"account","email":"","phone_number":""}})
+			print(str(response))
 		return token,world
 	elif response["status"]==2:#账户已经被绑定
 		int_number = random.choice([0,1])
@@ -68,6 +70,7 @@ def login_account():#账户登陆
 	if num =="email": account = my_unique_id+"@email.com"
 	if num =="phone_number": account = "86"+my_unique_id[9:]
 	response = send_tcp_message({'function' : 'login', 'data' : {'identifier':num, "value":account, "password":"123456"}})
+	print(str(response))
 	if response["status"]==0:
 		token = response["data"]["token"]
 	else:
@@ -92,6 +95,7 @@ def login_account():#账户登陆
 def enter_world(token,target_world):
 	print_module("[enter_world]")
 	response = send_tcp_message({'function' : 'enter_world', 'data' : {"token":token,"target_world":target_world}})
+	print(str(response))
 	if response["status"]==0:#已有角色，正常进入
 		return target_world
 	else:
@@ -100,6 +104,7 @@ def enter_world(token,target_world):
 def create_player(token,target_world,game_name):
 	print_module("[create_player] create user name="+game_name)
 	response = send_tcp_message({"world":target_world,'function' : 'create_player', 'data' : {"token":token,"gn":game_name}})
+	print(str(response))
 	if response["status"]==0:#角色创建成功,返回世界
 		return target_world
 	elif response["status"]==98 or response["status"]==99:#角色名字重复
@@ -111,6 +116,7 @@ def create_player(token,target_world,game_name):
 def get_account_world_info(token):
 	print_module("[get_account_world_info]")
 	response = send_tcp_message({'function' : 'get_account_world_info', 'data' : {"token":token}})
+	print(str(response))
 	# response = {"status":0,"data":{"remaining": [{"word1":{"game_name":"","level":"2222","server_status":"0"}}]}}
 	if response["status"]==0:#返回世界信息
 		return response["data"]["worlds"]

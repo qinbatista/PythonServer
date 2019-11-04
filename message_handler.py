@@ -208,41 +208,20 @@ class MessageHandler:
 	async def _disband_family(self, data: dict) -> str:
 		return await family.disband(data['data']['unique_id'], **data)
 
+	async def _cancel_disband_family(self, data: dict) -> str:
+		return await family.cancel_disband(data['data']['unique_id'], **data)
+
+	async def _check_in_family(self, data: dict) -> str:
+		return await family.check_in(data['data']['unique_id'], **data)
+
 	async def _get_config_family(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': self._family_config})
 
-	# TODO
-
-	async def _sign_in_family(self, data: dict) -> str:
-		return 'function'
-
 	async def _gift_package_family(self, data: dict) -> str:
-		return 'function'
+		return await family.gift_package(data['data']['unique_id'], **data)
 
-	async def _officer_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _dismiss_officer_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _blackboard_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _announcement_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _update_login_in_time(self, data: dict) -> str:
-		return 'function'
-
-	async def _disband_family(self, data: dict) -> str:
-		return 'function'
-
-	async def _cancel_disbanded_family(self, data: dict) -> str:
-		return 'function'
-
-
-	async def _get_all_info_family(self, data: dict) -> str:
-		return 'function'
+	async def _get_random_family(self, data: dict) -> str:
+		return await family.get_random(**data)
 
 	###################### mail.py ######################
 	async def _send_mail(self, data: dict) -> str:
@@ -368,31 +347,23 @@ class MessageHandler:
 		return await factory.refresh(data['data']['unique_id'], **data)
 
 	async def _upgrade_factory(self, data: dict) -> str:
-		return await factory.upgrade(data['data']['unique_id'], int(data['data']['fid']), **data)
-
-	async def _refresh_equipment_factory(self, data: dict) -> str:
-		return await factory.refresh_equipment(data['data']['unique_id'], **data)
-
+		return await factory.upgrade(data['data']['unique_id'], enums.Factory(int(data['data']['fid'])), **data)
 	async def _activate_wishing_pool_factory(self, data: dict) -> str:
-		return await factory.activate_wishing_pool(data['data']['unique_id'], int(data['data']['wid']), **data)
-
-	async def _upgrade_wishing_pool_factory(self, data: dict) -> str:
-		return await factory.upgrade_wishing_pool(data['data']['unique_id'], **data)
+		return await factory.wishing_pool(data['data']['unique_id'], enums.Weapon(int(data['data']['wid'])), **data)
 
 	async def _buy_worker_factory(self, data: dict) -> str:
 		return await factory.buy_worker(data['data']['unique_id'], **data)
 
 	async def _increase_worker_factory(self, data: dict) -> str:
-		return await factory.increase_worker(data['data']['unique_id'], int(data['data']['fid']), int(data['data']['num']), **data)
+		return await factory.increase_worker(data['data']['unique_id'], enums.Factory(int(data['data']['fid'])), int(data['data']['num']), **data)
 
 	async def _decrease_worker_factory(self, data: dict) -> str:
-		return await factory.decrease_worker(data['data']['unique_id'], int(data['data']['fid']), int(data['data']['num']), **data)
+		return await factory.decrease_worker(data['data']['unique_id'], enums.Factory(int(data['data']['fid'])), int(data['data']['num']), **data)
 
 	async def _set_armor_factory(self, data: dict) -> str:
-		return await factory.set_armor(data['data']['unique_id'], int(data['data']['aid']), **data)
-
-	async def _purchase_acceleration_factory(self, data: dict) -> str:
-		return await factory.purchase_acceleration(data['data']['unique_id'], **data)
+		return await factory.set_armor(data['data']['unique_id'], enums.Armor(int(data['data']['aid'])), **data)
+	async def _buy_acceleration_factory(self, data: dict) -> str:
+		return await factory.buy_acceleration(data['data']['unique_id'], **data)
 
 	async def _get_config_factory(self, data: dict) -> str:
 		return common.mt(0, 'success', data['config']['factory'])
@@ -682,20 +653,14 @@ FUNCTION_LIST = {
 	'set_role_family' : MessageHandler._set_role_family,
 	'change_name_family' : MessageHandler._change_name_family,
 	'get_all_family' : MessageHandler._get_all_family,
+	'disband_family' : MessageHandler._disband_family,
+	'cancel_disband_family' : MessageHandler._cancel_disband_family,
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
-	'get_config_family' : MessageHandler._get_config_family,
-	# TODO
-	'sign_in_family' : MessageHandler._sign_in_family,
+	'check_in_family' : MessageHandler._check_in_family,
 	'gift_package_family' : MessageHandler._gift_package_family,
-	'officer_family' : MessageHandler._officer_family,
-	'dismiss_officer_family' : MessageHandler._dismiss_officer_family,
-	'blackboard_family' : MessageHandler._blackboard_family,
-	'announcement_family' : MessageHandler._announcement_family,
-	'update_login_in_time' : MessageHandler._update_login_in_time,
-	'disband_family' : MessageHandler._disband_family,
-	'cancel_disbanded_family' : MessageHandler._cancel_disbanded_family,
-	'get_all_info_family' : MessageHandler._get_all_info_family,
+	'get_config_family' : MessageHandler._get_config_family,
+	'get_random_family' : MessageHandler._get_random_family,
 
 	###################### mail.py ######################
 	'send_mail' : MessageHandler._send_mail,
@@ -748,14 +713,12 @@ FUNCTION_LIST = {
 
 	###################### factory.py ######################
 	'refresh_factory' : MessageHandler._refresh_factory,
-	'refresh_equipment_factory' : MessageHandler._refresh_equipment_factory,
 	'upgrade_factory' : MessageHandler._upgrade_factory,
 	'buy_worker_factory' : MessageHandler._buy_worker_factory,
 	'increase_worker_factory' : MessageHandler._increase_worker_factory,
 	'decrease_worker_factory' : MessageHandler._decrease_worker_factory,
 	'activate_wishing_pool_factory' : MessageHandler._activate_wishing_pool_factory,
-	'upgrade_wishing_pool_factory' : MessageHandler._upgrade_wishing_pool_factory,
-	'purchase_acceleration_factory' : MessageHandler._purchase_acceleration_factory,
+	'buy_acceleration_factory' : MessageHandler._buy_acceleration_factory,
 	'set_armor_factory' : MessageHandler._set_armor_factory,
 	'get_config_factory' : MessageHandler._get_config_factory,
 

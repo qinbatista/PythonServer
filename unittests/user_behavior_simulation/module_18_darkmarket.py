@@ -21,10 +21,10 @@ def login_decoration(func):
 		func(world, token, *args, **kwargs) if token else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': user.unique_id}}): func(world, response['data']['token'], *args, **kwargs))()
 	return wrapper
 
-# @login_decoration
-def get_all_market(token,world, **kwargs):
-	response = send_tcp_message({'world': world, 'function': 'get_all_market', 'data': {'token' : token}})
-	logger.debug(response)
+# @login_decoration 此方法不再使用
+# def get_all_market(token,world, **kwargs):
+# 	response = send_tcp_message({'world': world, 'function': 'get_all_market', 'data': {'token' : token}})
+# 	logger.debug(response)
 
 # @login_decoration
 def refresh_market(token,world, **kwargs):
@@ -36,8 +36,8 @@ def darkmarket_transaction( token, world, pid, **kwargs):
 	response = send_tcp_message({'world': world, 'function': 'darkmarket_transaction', 'data': {'token' : token, 'pid': pid}})
 	logger.debug(response)
 
-def darkmarket_dialog(token, world, info, **kwargs):
-	refresh_market(token, world, **kwargs)
+def darkmarket_dialog(token, world,**kwargs):
+	# refresh_market(token, world, **kwargs)
 	darkmarket_transaction(token, world, random.randint(0,7), **kwargs)
 
 if __name__ == '__main__':
