@@ -23,7 +23,7 @@ HAS_LEVEL_FACTORIES = {enums.Factory.FOOD         : None, enums.Factory.IRON  : 
 async def refresh(uid, **kwargs):
 	now              = datetime.now(timezone.utc)
 	steps, refresh_t = await steps_since(uid, now, **kwargs)
-	remainder        = kwargs['config']['factory']['general']['step'] % int((now-refresh_t).total_seconds())
+	remainder        = int((now-refresh_t).total_seconds()) % kwargs['config']['factory']['general']['step']
 	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds = remainder), **kwargs)
 	level, worker, storage = await get_state(uid, **kwargs)
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)
