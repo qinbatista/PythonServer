@@ -98,7 +98,7 @@ async def p_general_stage(uid, stage, **kwargs):
 
 	pass_stages = []
 	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["stage"]
-	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x)]
+	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x) and int(x) < 1000]
 	pass_reward = pass_rewards[str(max(stages))] if stage not in stages else pass_rewards[str(stage)]
 
 	p_exp = {'remaining': -1, 'reward': -1}
@@ -209,8 +209,9 @@ async def p_tower_stage(uid, stage, **kwargs):
 
 	pass_towers = []
 	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["tower"]
-	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x)]
-	pass_reward = pass_rewards[str(max(stages))] if stage not in stages else pass_rewards[str(stage)]
+	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x) and base_stage <= int(x) < 2000]
+	if stage not in stages: stage = max(stages)
+	pass_reward = pass_rewards[str(stage)]
 
 	if stage % 10 == 0:
 		reward = random.choices(population=pass_reward)[0]
@@ -254,8 +255,8 @@ async def p_tower_stage(uid, stage, **kwargs):
 					data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 				await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 				pass_towers.append({'iid': key, 'remaining': data[0][0] + value, 'reward': value})
-	kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE,"task_value":1})
-	await task.record_task(uid,**kwargs)
+	kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE, "task_value":1})
+	await task.record_task(uid, **kwargs)
 	return common.mt(0, 'success', data={'pass_stages': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
 
 
@@ -383,7 +384,7 @@ async def try_unlock_skill(uid, sid, **kwargs):
 	# False - skill already unlocked
 	skill = await common.execute(f'SELECT level FROM skill WHERE uid = "{uid}";', **kwargs)
 	if skill == ():
-		await common.execute_update(f'INSERT INTO skill (uid, sid, value) VALUES ("{uid}", "{sid}", 1);', **kwargs)
+		await common.execute_update(f'INSERT INTO skill (uid, sid, level) VALUES ("{uid}", "{sid}", 1);', **kwargs)
 		return True
 	elif skill[0][0] == 0:
 		await common.execute_update(f'UPDATE skill SET level = 1 WHERE uid = "{uid}" AND sid = "{sid};"', **kwargs)

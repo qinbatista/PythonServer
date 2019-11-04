@@ -45,7 +45,7 @@ async def try_item(uid, item, value, **kwargs):
 			await cursor.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{item.value}" FOR UPDATE;')
 			quantity = await cursor.fetchall()
 			if value >= 0 or (quantity != () and quantity[0][0] + value >= 0):
-				if await cursor.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {item.value}, value) ON DUPLICATE KEY UPDATE value = value + {value};') == 1:
+				if await cursor.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {item.value}, value) ON DUPLICATE KEY UPDATE `value` = `value` + {value};') == 1:
 					await cursor.execute(f'UPDATE item SET value = {value} WHERE uid = "{uid}" AND iid = {item.value};')
 				return (True, quantity[0][0] + value) if quantity != () else (True, value)
 			return (False, quantity[0][0] + value) if quantity != () else (False, value)

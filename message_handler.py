@@ -498,7 +498,7 @@ class MessageHandler:
 		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_stage(self, data: dict) -> str:
-		data.update({'pass_rewards': self._stage_reward["stage"]})
+		data.update({'pass_rewards': self._stage_reward})
 		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	# async def _enter_tower(self, data: dict) -> str:
