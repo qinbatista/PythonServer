@@ -284,7 +284,7 @@ async def start_hang_up(uid, stage, **kwargs):
 	if hang_up_time == '':
 		await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
 		await common.execute_update(f'UPDATE progress SET hangstage = "{stage}" WHERE uid = "{uid}";', **kwargs)
-		return common.mt(0, 'hang up success', {'hang_up_info': {'hang_stage': stage, 'time': '0:00:00'}})
+		return common.mt(0, 'hang up success', {'start_hang_up_reward': [], 'hang_up_info': {'hang_stage': stage, 'time': '0:00:00'}})
 	else:
 		hang_stage = await get_progress(uid, 'hangstage', **kwargs)
 		if hang_stage == stage: return common.mt(2, 'same stage')

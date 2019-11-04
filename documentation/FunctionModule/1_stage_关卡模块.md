@@ -37,6 +37,7 @@
 	"status": 0,
 	"message": "hang up success",
 	"data": {
+        "start_hang_up_reward": [],
 		"hang_up_info": {
 			"hang_stage": 2,
       		"time":"10:00:00"
