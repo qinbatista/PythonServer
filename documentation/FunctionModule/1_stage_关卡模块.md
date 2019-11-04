@@ -5,7 +5,6 @@
 * [`get_hang_up_info`](##get_hang_up_info)
 * [`enter_stage`](##enter_stage)
 * [`pass_stage`](##pass_stage)
-* [`check_boss_status`](##check_boss_status)
 
 ## start_hang_up
 
@@ -35,12 +34,43 @@
 ```json
 
 {
-	"status": 1,
+	"status": 0,
 	"message": "hang up success",
 	"data": {
 		"hang_up_info": {
 			"hang_stage": 2,
       		"time":"10:00:00"
+		}
+	}
+}
+```
+
+[挂机关卡不同]()
+
+>  start_hang_up_reward：获取资源列表 `iid`商品列表，`remaining`剩余资源，`reward`增加的资源
+
+>  hang_up_info: 挂机信息, `time`挂机的时长（小时制），`hang_stage`挂机的关卡
+
+```json
+{
+	"status": 1,
+	"message": "Settlement reward success",
+	"data": {
+		"start_hang_up_reward": [
+			{
+				"iid": "2",
+				"remaining": 4290,
+				"reward": 1460
+			},
+			{
+				"iid": "1",
+				"remaining": 12870,
+				"reward": 4380
+			}
+		],
+		"hang_up_info": {
+			"hang_stage": 1,
+			"time": "17:14:17"
 		}
 	}
 }
