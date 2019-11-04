@@ -123,6 +123,7 @@ def decode_items(items):
 			decoded.append((gid, enums.Armor(int(iid)), int(value)))
 	return decoded
 
+
 async def try_energy(uid, amount, **kwargs):
 	# amount > 0 硬增加能量
 	# amount == 0 自动恢复能量
@@ -146,8 +147,9 @@ async def try_energy(uid, amount, **kwargs):
 		data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
 	sql_energy = data[0][0]
 	if sql_energy >= max_energy:
-		can, _ = await execute_update(f'UPDATE timer SET time = "" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-		if can == 0: await execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.ENERGY_RECOVER_TIME.value}");', **kwargs)
+		timer_data = await execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
+		if timer_data == (): await execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.ENERGY_RECOVER_TIME.value}");', **kwargs)
+		else: await execute(f'UPDATE timer SET time = "" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
 
 	if amount > 0:  # 购买能量
 		data = (await _decrease_energy(uid, 0, **kwargs))['data']
@@ -196,9 +198,8 @@ async def _decrease_energy(uid, amount, **kwargs) -> dict:
 		# 成功2：如果没有恢复时间且是消耗能量值，则直接用数据库的值减去消耗的能量值，
 		# 然后存入消耗之后的能量值，以及将当前的时间存入 恢复时间项
 		if current_energy >= max_energy: current_time = ""  # 能量超出满能力状态时，不计算恢复时间
-		cooling_time = _cooling_time * 60
+		cooling_time = -1
 		await execute_update(f'UPDATE progress SET energy = {current_energy} WHERE uid = "{uid}";', **kwargs)
-		await execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
 		return mt(3, 'Energy has been consumed, energy value and recovery time updated successfully', {'energy': current_energy, 'recover_time': current_time, 'cooling_time': cooling_time})
 	else:
 		"""此时 current_energy != _max_energy 成立，即能力已消耗，恢复能量状态"""

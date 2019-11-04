@@ -10,14 +10,27 @@ import time
 import random
 
 
-# 进入普通关卡
+# 进入关卡
 async def enter_stage(uid, stage, **kwargs):
+	if stage < 1000: return await e_general_stage(uid, stage, **kwargs)
+	elif 1000 <= stage < 2000: return await e_tower_stage(uid, stage, **kwargs)
+	else: return common.mt(50, 'Abnormal parameter')
+
+
+# 通过关卡
+async def pass_stage(uid, stage, **kwargs):
+	if stage < 1000: return await p_general_stage(uid, stage, **kwargs)
+	elif 1000 <= stage < 2000: return await p_tower_stage(uid, stage, **kwargs)
+	else: return common.mt(50, 'Abnormal parameter')
+
+
+# 进入普通关卡
+async def e_general_stage(uid, stage, **kwargs):
 	# 0 - success
 	# 97 - Insufficient energy
 	# 98 - key insufficient
 	# 99 - parameter error
 	enter_stages = []
-	energy_consume = kwargs['player_energy']['cost']  # 虚拟消耗能量为2
 	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
 	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
 	monster_config = kwargs['monster_config']  # self._monster_config
@@ -34,15 +47,16 @@ async def enter_stage(uid, stage, **kwargs):
 
 	stage_s = await get_progress(uid, 'stage', **kwargs)
 	if stage <= 0 or stage > stage_s + 1:
-		return common.mt(99, 'you can enter stage over '+str(stage_s + 1))
+		return common.mt(99, 'Parameter error')
 	exp = await get_progress(uid, 'exp', **kwargs)
 
 	stages = [int(x) for x in entry_consume.keys() if x.isdigit()]
 	if stage not in stages: stage = max(stages)
 
 	stage = str(stage)
-	iid_s = list(entry_consume[stage].keys())
-	values = [-1 * int(v) for v in list(entry_consume[stage].values())]
+	iid_s = [k for k in entry_consume[stage].keys() if k != 'cost']
+	values = [-1 * int(v) for k, v in list(entry_consume[stage].items()) if k != 'cost']
+	energy_consume = entry_consume[stage]['cost']  # 消耗能量数
 
 	for i, iid in enumerate(iid_s):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
@@ -67,12 +81,12 @@ async def enter_stage(uid, stage, **kwargs):
 		enter_stages.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
 	_, exp_info = await increase_exp(uid, 0, **kwargs)
 	seconds = energy_data['data']['cooling_time']
-	energy = {'time': '0:00:00' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}', 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
-	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy': energy, 'monster': enemy_list})
+	energy = {'time': get_time_format(seconds), 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
+	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'world_boss': {}, 'energy': energy, 'enemy_layout': enemy_layout, 'monster': enemy_list})
 
 
 # 通过普通关卡
-async def pass_stage(uid, stage, **kwargs):
+async def p_general_stage(uid, stage, **kwargs):
 	# success ===> 0
 	# 0 : success
 	# 99 : Parameter error
@@ -108,20 +122,20 @@ async def pass_stage(uid, stage, **kwargs):
 		p_stage['finally'] = stage
 		p_stage['vary'] = 1
 	kwargs.update({"tid":enums.Task.PASS_MAIN_STAGE,"task_value":1})
-	await task.record_task(uid,**kwargs)
+	await task.record_task(uid, **kwargs)
 
 	return common.mt(0, 'success', data={'pass_stages': pass_stages, 'p_exp': p_exp, 'p_stage': p_stage})
 
 
 # 进入闯塔关卡
-async def enter_tower(uid, stage, **kwargs):
+async def e_tower_stage(uid, stage, **kwargs):
 	# 0 - success
 	# 97 - Insufficient energy
 	# 98 - key insufficient
 	# 99 - parameter error
-	enter_towers = []
-	energy_consume = kwargs['player_energy']['cost']  # 虚拟消耗能量为2
-	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
+	base_stage = 1000
+	enter_stages = []
+	entry_consume = kwargs['entry_consume']
 	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
 	monster_config = kwargs['monster_config']  # self._monster_config
 	enemy_layout = enemy_layouts[-1]['enemyLayout'] if stage > len(enemy_layouts) else enemy_layouts[stage - 1]['enemyLayout']
@@ -136,7 +150,7 @@ async def enter_tower(uid, stage, **kwargs):
 	del key_words
 
 	stage_s = await get_progress(uid, 'towerstage', **kwargs)
-	if stage <= 0 or stage > stage_s + 1:
+	if stage <= base_stage or stage > stage_s + 1:
 		return common.mt(99, 'Parameter error')
 	exp = await get_progress(uid, 'exp', **kwargs)
 
@@ -144,8 +158,9 @@ async def enter_tower(uid, stage, **kwargs):
 	if stage not in stages: stage = max(stages)
 
 	stage = str(stage)
-	iid_s = list(entry_consume[stage].keys())
-	values = [-1 * int(v) for v in list(entry_consume[stage].values())]
+	iid_s = [k for k in entry_consume[stage].keys() if k != 'cost']
+	values = [-1 * int(v) for k, v in list(entry_consume[stage].items()) if k != 'cost']
+	energy_consume = entry_consume[stage]['cost']  # 消耗能量数
 
 	for i, iid in enumerate(iid_s):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
@@ -167,24 +182,23 @@ async def enter_tower(uid, stage, **kwargs):
 	for i, iid in enumerate(iid_s):
 		await common.execute_update(f'UPDATE item set value = {values[i]} WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
-		enter_towers.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
+		enter_stages.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
 
 	_, exp_info = await increase_exp(uid, 0, **kwargs)
 	seconds = energy_data['data']['cooling_time']
-	energy = {'time': '0:00:00' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}', 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
-	return common.mt(0, 'success', {'enter_towers': enter_towers, 'exp_info': exp_info, 'enemy_layout': enemy_layout, 'energy': energy, 'monster': enemy_list})
+	energy = {'time': get_time_format(seconds), 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
+	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'world_boss': {}, 'energy': energy, 'enemy_layout': enemy_layout, 'monster': enemy_list})
 
 
 # 通过闯塔关卡
-async def pass_tower(uid, stage, **kwargs):
+async def p_tower_stage(uid, stage, **kwargs):
 	# success ===> 0
 	# 0 : success
 	# 99 : Parameter error
 	# print(f'stage:{stage}, type:{type(stage)}')
-
-
+	base_stage = 1000
 	stage_s = await get_progress(uid, 'towerstage', **kwargs)
-	if stage <= 0 or stage_s + 1 < stage:
+	if stage <= base_stage or stage_s + 1 < stage:
 		return common.mt(99, 'Parameter error')
 
 	p_stage = {'finally': stage_s, 'vary': 0}
@@ -242,7 +256,7 @@ async def pass_tower(uid, stage, **kwargs):
 				pass_towers.append({'iid': key, 'remaining': data[0][0] + value, 'reward': value})
 	kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE,"task_value":1})
 	await task.record_task(uid,**kwargs)
-	return common.mt(0, 'success', data={'pass_towers': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
+	return common.mt(0, 'success', data={'pass_stages': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
 
 
 # 启动挂机方法
@@ -279,7 +293,7 @@ async def start_hang_up(uid, stage, **kwargs):
 		hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 		minute = int(delta_time.total_seconds()) // 60
-		current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+		# current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
 		for iid, value in hang_stage_rewards.items():
 			# value[抽中得到的数目，分子， 分母]    minute是次数，value[0]单次奖励的数值
 			increment = value * minute if iid not in probability_reward else sum(random.choices(value[1]*[value[0]] + (value[2] - value[1])*[0], k=minute))  # 耗内存，省时间
@@ -288,7 +302,7 @@ async def start_hang_up(uid, stage, **kwargs):
 			start_hang_up_reward.append({'iid': iid, 'value': value, 'increment': increment})
 		await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
 		await common.execute_update(f'UPDATE progress SET hangstage = "{stage}" WHERE uid = "{uid}";', **kwargs)
-		return common.mt(1, 'Repeated hang up successfully', {'start_hang_up_reward': start_hang_up_reward, 'hang_up_info': {'hang_stage': stage, 'time': f'{minute//60}:{"0" if minute%60 < 10 else ""}{minute%60}:00'}})
+		return common.mt(1, 'Repeated hang up successfully', {'start_hang_up_reward': start_hang_up_reward, 'hang_up_info': {'hang_stage': stage, 'time': get_time_format(int(delta_time.total_seconds()))}})
 
 
 # 获取挂机奖励
@@ -315,7 +329,7 @@ async def get_hang_up_reward(uid, **kwargs):
 	hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 	delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 	minute = int(delta_time.total_seconds()) // 60
-	current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+	# current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
 	for iid, value in hang_stage_rewards.items():
 		# value[抽中得到的数目，分子， 分母]    minute是次数，value[0]单次奖励的数值
 		increment = value * minute if iid not in probability_reward else sum(random.choices(value[1] * [value[0]] + (value[2] - value[1]) * [0], k=minute))  # 耗内存，省时间
@@ -323,7 +337,41 @@ async def get_hang_up_reward(uid, **kwargs):
 		_, value = await common.try_item(uid, enums.Item(int(iid)), increment, **kwargs)
 		get_hang_up_rewards.append({'iid': iid, 'value': value, 'increment': increment})
 	await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
-	return common.mt(0, 'Settlement reward success', {'get_hang_up_rewards': get_hang_up_rewards, 'hang_up_info': {'hang_stage': hang_stage, 'time': f'{minute//60}:{"0" if minute%60 < 10 else ""}{minute%60}:00'}})
+	return common.mt(0, 'Settlement reward success', {'get_hang_up_rewards': get_hang_up_rewards, 'hang_up_info': {'hang_stage': hang_stage, 'time': get_time_format(int(delta_time.total_seconds()))}})
+
+
+# 获取挂机信息
+async def get_hang_up_info(uid, **kwargs):
+	"""
+	success ===> 0
+	# 0 - Successfully get hook information
+	# 99 - Temporarily no on-hook record
+	"""
+	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+	if data == ():
+		await common.execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.HANG_UP_TIME.value}");', **kwargs)
+		data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
+	hang_up_time = data[0][0]
+	if hang_up_time == '':
+		return common.mt(99, 'Temporarily no on-hook record')
+
+	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+	get_hang_up_infos = []
+	hang_stage = await get_progress(uid, 'hangstage', **kwargs)
+	probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
+	stages = [int(s) for s in kwargs['hang_rewards'].keys() if s.isdigit()]
+	if hang_stage not in stages: hang_stage = max(stages)
+	hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
+	delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
+	minute = int(delta_time.total_seconds()) // 60
+	# current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
+	for iid, value in hang_stage_rewards.items():
+		# value[抽中得到的数目，分子， 分母]    minute是次数，value[0]单次奖励的数值
+		increment = value * minute if iid not in probability_reward else sum(random.choices(value[1] * [value[0]] + (value[2] - value[1]) * [0], k=minute))  # 耗内存，省时间
+		# increment = value * minute if iid not in probability_reward else sum([value[0] * int(random.randint(0, value[2]) - value[1] < 0) for i in range(minute)])  # 耗时间，省内存
+		_, value = await common.try_item(uid, enums.Item(int(iid)), 0, **kwargs)
+		get_hang_up_infos.append({'iid': iid, 'value': value, 'increment': increment})
+	return common.mt(0, 'Successfully get hook information', {'get_hang_up_info': get_hang_up_infos, 'hang_up_info': {'hang_stage': hang_stage, 'time': get_time_format(int(delta_time.total_seconds()))}})
 
 
 ############################################ 私有方法 ############################################
@@ -389,3 +437,8 @@ async def increase_role_segment(uid, rid, segment, **kwargs):
 		await common.execute_update(f'UPDATE role SET segment = segment + {segment} WHERE uid = "{uid}" AND wid = "{rid}";', **kwargs)
 	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
 	return data
+
+
+def get_time_format(seconds):
+	return '0:00:00' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}'
+

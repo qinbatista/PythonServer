@@ -2,8 +2,7 @@
 	"energy":
 	{
 		"cooling_time":20,
-		"max_energy":10,
-		"cost": 2
+		"max_energy":10
 	},
 	"disintegrate_weapon":
 	{
