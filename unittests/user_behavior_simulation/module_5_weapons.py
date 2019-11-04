@@ -60,8 +60,9 @@ def weapon_dialog(_token,_world,get_all_skill_info):
 	global token, world
 	token = _token
 	world = _world
+	weapon_list = [1]
 	while True:
-		random_int = random.randint(5,5)#用户所有行为，目前只有抽取武器到时候，没有武器会重新抽取，其余逻辑如材料不足还未做
+		random_int = random.randint(3,3)#用户所有行为，目前只有抽取武器到时候，没有武器会重新抽取，其余逻辑如材料不足还未做
 		if random_int ==0:#升级武器
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_weapon', 'data' : {'token' : token, "weapon":random.choice(weapon_list),"amount":random.randint(30,400)}})#升级请求
 			logger.debug("[get_random_weapon] coin to get weapon="+str(new_response))

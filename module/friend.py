@@ -66,7 +66,7 @@ async def send_gift(uid, gn_target, **kwargs):
 
 async def send_gift_all(uid, **kwargs):
 	info = await common.execute(f'SELECT player.gn FROM friend JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
-	if info==():return common.mt(0, 'no friend to send gift')
+	if info==():return common.mt(99, 'no friend to send gift')
 	message_dic = []
 	for index, i in enumerate(info):
 		result =  await send_gift(uid,i[0],**kwargs)
@@ -117,7 +117,11 @@ async def _are_friends(uid, fid, **kwargs):
 async def _are_family(uid, fid, **kwargs):
 	data1 = await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}"', **kwargs)
 	data2 = await common.execute(f'SELECT fid FROM player WHERE uid = "{fid}"', **kwargs)
-	if data1==data2 and data2!=(): return True
+	if data1==data2:
+		 if data1==() and data2==():
+			 return False
+		 else:
+			 return True
 	else: return False
 
 async def _get_friend_info(uid, **kwargs):
