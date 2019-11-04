@@ -82,19 +82,19 @@ def login_decoration(func):
 	return wrapper
 
 
-@login_decoration
+# @login_decoration
 def get_all_skill(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_all_skill', 'data': {'token' : kwargs['token']}})
 	logger.debug(response)
 
-@login_decoration
+# @login_decoration
 def level_up_skill(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'level_up_skill', 'data': {'token' : kwargs['token'], 'skill': 13, 'item': 6}})
 	logger.debug(response)
 
 def skill_dialog(_token,_world,get_all_skill_info,**kwargs):
 	while True:
-		my_int = random.randint(0,2)
+		my_int = random.randint(2,2)
 		if my_int==0:
 			break
 		if my_int==1:

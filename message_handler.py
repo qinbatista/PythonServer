@@ -4,6 +4,7 @@ import requests
 from utility import config_reader
 from utility import repeating_timer
 from module import mail
+from module import chat
 from module import enums
 from module import skill
 from module import family
@@ -47,8 +48,6 @@ class MessageHandler:
 		r = requests.get('http://localhost:8000/get_game_manager_config')
 		d = r.json()
 		self._mall_config = d['mall']
-		self._factory_config = d['factory']
-		self._family_config = d['family']
 		self._stage_reward = d['reward']
 		self._skill = d['skill']
 		self._weapon_config = d['weapon']
@@ -147,6 +146,11 @@ class MessageHandler:
 
 	async def _change_game_name(self, data: dict) -> str:
 		return 'function'
+
+	###################### chat.py ######################
+	async def _get_login_token_chat(self, data: dict) -> str:
+		return await chat.get_login_token(data['data']['unique_id'], **data)
+
 
 	###################### player.py ######################
 	async def _create_player(self, data: dict) -> str:
@@ -630,6 +634,9 @@ FUNCTION_LIST = {
 	'get_player_config' : MessageHandler._get_player_config,
 	'create_account' : MessageHandler._create_account,
 	'change_game_name' : MessageHandler._change_game_name,
+
+	###################### skill.py ######################
+	'get_login_token_chat' : MessageHandler._get_login_token_chat,
 
 	###################### player.py ######################
 	'enter_world' : MessageHandler._enter_world,
