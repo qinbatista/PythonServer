@@ -80,7 +80,7 @@ class Edge:
 		asyncio.get_running_loop().add_signal_handler(signal.SIGINT, \
 				lambda: asyncio.create_task(self.shutdown()))
 		await self.pubsub.connect('nats://192.168.1.102', max_reconnect_attempts = 1)
-		self.redis   = await aioredis.create_redis('redis://192.168.1.102')
+		self.redis   = await aioredis.create_redis('redis://192.168.1.102', encoding = 'utf-8')
 		self.server  = await asyncio.start_server(self.client_protocol, port = self.port)
 		self.running = True
 	
@@ -153,7 +153,11 @@ class Edge:
 	# checks if the login token provided by the client is valid.
 	# returns a User object on valid token, None otherwise.
 	async def validate_login_token(self, writer, nonce):
-		return User(writer, '1', 'matthew2', fn = 'testing')
+		token = await self.redis.hgetall(f'chat.logintokens.{nonce}')
+		if len(token) == 0:
+			return None
+		await self.redis.delete(f'chat.logintokens.{nonce}')
+		return User(writer, token['world'], token['gn'], token['fn'] if token['fn'] != '' else None)
 
 	# returns (command enum, message) if connection is alive.
 	# raises ConnectionResetError otherwise
