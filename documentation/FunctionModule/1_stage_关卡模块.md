@@ -295,7 +295,7 @@
 		"world_boss": {
     		"time":"23:20:00",
             'remaining' : 2,
-    	}
+    	},
 		"energy": {
 			"time": "0:20:00",
 			"remaining": 9998,
