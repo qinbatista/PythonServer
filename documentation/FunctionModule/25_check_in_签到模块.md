@@ -82,14 +82,14 @@
 > 	"status": 0,
 > 	"message": "Successful signing",
 > 	"data": {
->     "cost":{
->       "remaining": [
+>  "cost":{
+>    "remaining": [
 > 					"3:5:1000"
 > 				],
 > 				"reward": [
 > 					"3:5:50"
 > 				]
->     }
+>  }
 > 		"supplement": {
 > 			"1": {
 > 				"remaining": [
@@ -139,14 +139,19 @@
 >
 > [获取资源成功]()
 >
-> > remaining：数字1，2，3，4表示当月的日期，reward则表示是否领取奖励
+> > remaining：数字1，2，3，4表示当月的日期，reward则表示是否领取奖励(签到)
 > >
+> > today: 当前日期
+> >
+> > time：距离下次签到的时间（如果提示玩家还有多久可以进行下次签到，这个时间可以派上用场）
 >
 > ```json
 > {
 > 	"status": 0,
 > 	"message": "Successfully obtained all check-in status this month",
 > 	"data": {
+>     "today":28,
+>     "time":"22:00:12",
 > 		"remaining": {
 > 			"01": {
 > 				"date": "2019-10-01",
