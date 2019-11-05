@@ -6,7 +6,7 @@
 >
 > 
 >
-> ##check_in
+> ## check_in
 >
 > 签到按照`每月当天`进行签到，签到的奖励对照`check_in.json`,签到的内容为7天一循环(`1号为第一天天`)
 >
@@ -53,9 +53,9 @@
 >
 > 
 >
-> ##supplement_check_in
+> ## supplement_check_in
 >
-> #####发送消息JSON格式
+> ##### 发送消息JSON格式
 >
 > 补签功能，把之前没有签到的天数用钻石进行补签，`补钱一天`消耗的钻石数量在配置表`check_in.json`
 >
