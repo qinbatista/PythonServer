@@ -112,7 +112,8 @@ class Edge:
 							f'{user.gn}:{payload}'.encode())
 				else:
 					break
-		except (ValueError, ChatProtocolError, ConnectionResetError):
+		except (ValueError, ChatProtocolError, ConnectionResetError, \
+				asyncio.streams.IncompleteReadError):
 			pass
 		finally:
 			self.userlist.remove(user)
@@ -121,12 +122,11 @@ class Edge:
 
 	async def server_protocol(self, message):
 		world, family = self.decode_channel(message.subject)
-		message       = message.data.decode()
 		if not family:
-			await self.send(self.make_message(Command.PUBLIC, message), \
+			await self.send(self.make_message(Command.PUBLIC, message.data), \
 					*(self.userlist.get_public(world)))
 		else:
-			await self.send(self.make_message(Command.FAMILY, message), \
+			await self.send(self.make_message(Command.FAMILY, message.data), \
 					*(self.userlist.get_family(world, family)))
 	
 	# performs initial client handshake. requires client to provide a valid login token.
@@ -183,8 +183,8 @@ class Edge:
 			await self.pubsub.subscribe(channel, cb = self.server_protocol)
 
 	# returns encoded message formatted to protocol specifications
-	def make_message(self, cmd, msg = ''):
-		return (cmd.value.zfill(COMMAND_MAX_LENGTH) + msg + LINE_ENDING).encode()
+	def make_message(self, cmd, encodedmsg = b''):
+		return cmd.value.zfill(COMMAND_MAX_LENGTH).encode() + encodedmsg + LINE_ENDING_B
 
 	def encode_channel_public(self, world):
 		return f'chat~{world}~public'
