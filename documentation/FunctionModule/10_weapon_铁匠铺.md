@@ -6,7 +6,7 @@
 * [`level_up_passive_weapon`](##level_up_passive_weapon)
 * [`reset_skill_point_weapon`](##reset_skill_point_weapon)
 
-##get_all_weapon
+## get_all_weapon
 
 ##### 发送消息JSON格式
 
@@ -74,7 +74,7 @@
 
 
 
-##level_up_weapon
+## level_up_weapon
 
 ##### 发送消息JSON格式
 
@@ -88,7 +88,8 @@
 	"function": "level_up_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-    "weapon": 1
+    	"weapon": 1,
+        "amount": 90
 	}
 }
 ```
@@ -125,7 +126,7 @@
 			},
 			"3": {
 				"iid": 2,
-				"value": 60
+				"value": -80
 			}
 		}
 	}
@@ -140,7 +141,7 @@
 
 
 
-##level_up_star_weapon
+## level_up_star_weapon
 
 ##### 发送消息JSON格式
 
@@ -154,7 +155,7 @@
 	"function": "level_up_star_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-    "weapon": 1,
+    	"weapon": 1,
 	}
 }
 ```
@@ -182,7 +183,7 @@
 		{
 			"wid": 1,
 			"star": 2,
-			"seg": 30
+			"seg": -30
 		}
 	}
 }
@@ -195,7 +196,7 @@
 
 
 
-##level_up_passive_weapon
+## level_up_passive_weapon
 
 ##### 发送消息JSON格式
 
@@ -211,8 +212,8 @@
 	"function": "level_up_passive_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-    "weapon": 1,
-    "passive": 1
+    	"weapon": 1,
+    	"passive": 1
 	}
 }
 ```
@@ -233,14 +234,14 @@
 		"remaining": {
 			"wid": 1,
 			"pid": 2,
-			"level": 1,
-			"sp": 99
+			"level": 4,
+			"sp": 96
 		},
 		"reward": {
 			"wid": 1,
 			"pid": 2,
 			"level": 1,
-			"sp": 99
+			"sp": -1
 		}
 	}
 }
@@ -252,7 +253,7 @@
 
 
 
-##reset_skill_point_weapon
+## reset_skill_point_weapon
 
 ##### 发送消息JSON格式
 
@@ -266,7 +267,7 @@
 	"function": "get_config_lottery",
 	"data": {
 		"token": "my toekn ^_^",
-    "weapon": 1,
+    	"weapon": 1,
 	}
 }
 ```
@@ -297,11 +298,11 @@
 		"reward": {
 			"0": {
 				"wid": 1,
-				"sp": 100
+				"sp": 50
 			},
 			"3": {
 				"iid": 1,
-				"value": 100
+				"value": -100
 			}
 		}
 	}
