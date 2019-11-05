@@ -21,6 +21,7 @@ VERSION = loc() + '/configuration/config_timer_setting.json'
 LOTTERY = loc() + '/configuration/{}/server/lottery.json'
 FAMILY = loc() + '/configuration/{}/server/family.json'
 FACTORY = loc() + '/configuration/{}/server/factory.json'
+WORLD = loc() + '/configuration/{}/server/world.json'
 
 SKILL = loc() + '/configuration/{}/server/skill_level_up_config.json'
 REWARD = loc() + '/configuration/{}/server/stage_reward_config.json'
@@ -139,6 +140,7 @@ class ConfigurationManager:
 		skill = json.load(open(SKILL.format(self._sv), encoding = 'utf-8'))
 		player = json.load(open(PLAYER.format(self._sv), encoding = 'utf-8'))
 		world_boss = json.load(open(WORLD_BOSS.format(self._sv), encoding = 'utf-8'))
+		world = json.load(open(WORLD.format(self._sv), encoding = 'utf-8'))
 		self._game_manager_config = {
 			'reward' : self._stage_reward, 'lottery' : lottery, 'weapon' : weapon, 'role' : role,
 			'skill' : skill, 'hang_reward' : self._hang_reward_config, 'player' : player,
@@ -150,7 +152,8 @@ class ConfigurationManager:
 			'level_enemy_layouts_tower': self._level_enemy_layouts_config_tower,
 			'acheviement': self._acheviement_config, 'task': self._task_config,
 			'check_in': self._check_in_config,
-			'vip_config': self._vip_config
+			'vip_config': self._vip_config,
+			'world' : world
 		}
 
 	def _read_level_enemy_layouts_config(self):
