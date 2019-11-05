@@ -57,5 +57,5 @@ async def get_all_check_in_table(uid, **kwargs) -> dict:
 	data = await common.execute( f'select * from check_in where uid="{uid}" and date like "{time.strftime("%Y-%m-", time.localtime())}%"',**kwargs)
 	remaining = {}
 	for d in data:
-		remaining.update({d[1][-2:]: {'date': d[1], 'reward': d[2]}})
+		remaining.update({int(d[1][-2:]): {'date': d[1], 'reward': d[2]}})
 	return common.mt(0, 'Successfully obtained all check-in status this month', data={'remaining': remaining})

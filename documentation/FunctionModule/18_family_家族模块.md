@@ -273,6 +273,22 @@ Gets all information regarding your family.
 
 ##### 接受消息JSON格式
 
+> name: 家族名字
+>
+> icon:  家族icon
+>
+> exp: 家族经验值
+>
+> notice: 家族公告
+>
+> board：家族简介
+>
+> members：家族成员，`gn`家族名字，`role`使用角色，`exp`经验值，`icon`使用icon
+>
+> news: 家族消息，主要是谁离开，谁加入等信息
+>
+> timer：家族正式解散的时间
+
 
 ```json
 {
@@ -304,7 +320,7 @@ Gets all information regarding your family.
 
 ## get_store_family
 
-Retrieves the items listed on the family store.
+Retrieves the items listed on the family store, configuration depends on `family.json`
 
 ##### 发送消息JSON格式
 
