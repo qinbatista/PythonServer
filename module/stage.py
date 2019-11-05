@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import time
 import random
 
+TOWER_BASE_STAGE = 1000
 
 # 进入关卡
 async def enter_stage(uid, stage, **kwargs):
@@ -133,7 +134,6 @@ async def e_tower_stage(uid, stage, **kwargs):
 	# 97 - Insufficient energy
 	# 98 - key insufficient
 	# 99 - parameter error
-	base_stage = 1000
 	enter_stages = []
 	entry_consume = kwargs['entry_consume']
 	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
@@ -150,7 +150,7 @@ async def e_tower_stage(uid, stage, **kwargs):
 	del key_words
 
 	stage_s = await get_progress(uid, 'towerstage', **kwargs)
-	if stage <= base_stage or stage > stage_s + 1:
+	if stage <= TOWER_BASE_STAGE or stage > stage_s + 1:
 		return common.mt(99, 'Parameter error')
 	exp = await get_progress(uid, 'exp', **kwargs)
 
@@ -196,9 +196,8 @@ async def p_tower_stage(uid, stage, **kwargs):
 	# 0 : success
 	# 99 : Parameter error
 	# print(f'stage:{stage}, type:{type(stage)}')
-	base_stage = 1000
 	stage_s = await get_progress(uid, 'towerstage', **kwargs)
-	if stage <= base_stage or stage_s + 1 < stage:
+	if stage <= TOWER_BASE_STAGE or stage_s + 1 < stage:
 		return common.mt(99, 'Parameter error')
 
 	p_stage = {'finally': stage_s, 'vary': 0}
@@ -209,7 +208,7 @@ async def p_tower_stage(uid, stage, **kwargs):
 
 	pass_towers = []
 	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["tower"]
-	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x) and base_stage <= int(x) < 2000]
+	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x) and TOWER_BASE_STAGE <= int(x) < 2000]
 	if stage not in stages: stage = max(stages)
 	pass_reward = pass_rewards[str(stage)]
 
