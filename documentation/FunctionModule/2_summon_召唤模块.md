@@ -40,7 +40,7 @@
 
   
 
-##get_config_lottery
+## get_config_lottery
 
 ##### 发送消息JSON格式
 
@@ -121,7 +121,7 @@
 
 
 
-##basic_summon
+## basic_summon
 
 ##### 发送消息JSON格式
 
@@ -138,7 +138,7 @@
 	"function": "basic_summon",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -164,10 +164,10 @@
 			"cost_quantity": 12670
 		},
 		"reward": {
-			"weapon": 10,
-			"star": 1,
-      "segment": 0,
-      "cost_item": 1,
+            "weapon": 10,
+            "star": 1,
+            "segment": 0,
+            "cost_item": 1,
 			"cost_quantity": 100
 		}
 	}
@@ -180,7 +180,7 @@
 
 
 
-##pro_summon
+## pro_summon
 
 ##### 发送消息JSON格式
 
@@ -239,7 +239,7 @@
 
 
 
-##friend_summon
+## friend_summon
 
 ##### 发送消息JSON格式
 
@@ -298,7 +298,7 @@
 
 
 
-##basic_summon_skill
+## basic_summon_skill
 
 ##### 发送消息JSON格式
 
@@ -359,7 +359,7 @@
 
 
 
-##pro_summon_skill
+## pro_summon_skill
 
 ##### 发送消息JSON格式
 
@@ -420,7 +420,7 @@
 
 
 
-##friend_summon_skill
+## friend_summon_skill
 
 ##### 发送消息JSON格式
 
@@ -481,7 +481,7 @@
 
 
 
-##basic_summon_role
+## basic_summon_role
 
 ##### 发送消息JSON格式
 
@@ -542,7 +542,7 @@
 
 
 
-##pro_summon_role
+## pro_summon_role
 
 ##### 发送消息JSON格式
 
@@ -601,7 +601,7 @@
 
 
 
-##friend_summon_role
+## friend_summon_role
 
 ##### 发送消息JSON格式
 
@@ -660,11 +660,11 @@
 
 
 
-##basic_summon_10_times
+## basic_summon_10_times
 
-##pro_summon_10_times
+## pro_summon_10_times
 
-##friend_summon_10_times
+## friend_summon_10_times
 
 ##### 发送消息JSON格式
 
@@ -758,11 +758,11 @@
 
 ##
 
-- ##basic_summon_skill_10_times
+- ## basic_summon_skill_10_times
 
-- ##pro_summon_skill_10_times
+- ## pro_summon_skill_10_times
 
-- ##friend_summon_skill_10_times
+- ## friend_summon_skill_10_times
 
 ##### 发送消息JSON格式
 
@@ -862,11 +862,11 @@
 
 ##
 
-- ##basic_summon_role_10_times
+- ## basic_summon_role_10_times
 
-- ##pro_summon_role_10_times
+- ## pro_summon_role_10_times
 
-- ##friend_summon_role_10_times
+- ## friend_summon_role_10_times
 
 ##### 发送消息JSON格式
 

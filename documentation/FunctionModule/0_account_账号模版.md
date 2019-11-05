@@ -6,12 +6,13 @@
 * [`login_unique`](##login_unique)
 * [`login`](##login)
 * [`bind_account`](##bind_account)
+* [`bind_email`](##bind_email)
 * [`create_account`](##create_account)
 * [`verify_email`](##verify_email)
 
 
 
-##get_account_world_info
+## get_account_world_info
 
 ##### 接受消息JSON格式
 
@@ -72,7 +73,7 @@
 
 
 
-##login_unique
+## login_unique
 
 游客登陆，直接用机器的唯一标识符登陆设备
 
@@ -113,7 +114,7 @@
 
 
 
-##create_player
+## create_player
 
 创建玩家角色，玩家角色限制在10个字符串以内，不允许出现符号
 
@@ -153,7 +154,7 @@
 
 
 
-##enter_world
+## enter_world
 
 玩家进入特定的世界，这个世界会返回是否允许该玩家进入世界，这个世界如果繁忙，或者世界不存在，玩家则需要重新选择世界，进入世界成功则会给予玩家进入世界成功的提示并开始加载参数
 
@@ -188,7 +189,7 @@
 
 
 
-##login
+## login
 
 玩家使用账户和密码登陆账户
 
@@ -244,7 +245,7 @@
 
 
 
-##bind_account
+## bind_account
 
 此方法只有在玩家用游客登陆的时候才能使用，游客登陆玩家在设置里或者提示界面里使用此方法
 
@@ -290,14 +291,7 @@
 * 99：非法账户名字
 
 
-
-##verify_email_code
-
-验证玩家的邮箱，玩家需要对邮箱绑定œ
-
-> account：绑定用户的账号
->
-> password：用户的密码
+## bind_email
 
 ```json
 {
@@ -305,8 +299,40 @@
 	"function": "enter_stage",
 	"data": {
 		"token": "my token",
-    "account":"account",
-		'password':"123456", 
+		"email":"123451234@qq.com"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+	}
+}
+```
+
+[绑定失败]()
+
+* 99：account must be bound before binding email
+* 98：email has already been bound to this account
+* 97：email already exists
+* 96：verification email could not be sent
+
+
+## verify_email_code
+
+
+```json
+{
+	"world": 0,
+	"function": "enter_stage",
+	"data": {
+		"token": "my token",
+		"code":"123456"
 
 	}
 }
@@ -314,26 +340,22 @@
 
 ##### 接受消息JSON格式
 
-[绑定成功]()
-
-> account：绑定成功只会返回账户的id
 
 ```json
 {
 	"status": 0,
 	"message": "success",
 	"data": {
-		"account": "q3account"
+		"email": "12341523@qq.com"
 	}
 }
 ```
 
 [绑定失败]()
 
-* 96：账户已被绑定
-* 97：非法账户名字
-* 98：非法密码
-* 99：非法账户名字
+* 97：email already exists
+* 98：account already has an email bound
+* 99：invalid code
 
 
 

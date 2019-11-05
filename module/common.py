@@ -197,8 +197,12 @@ async def _decrease_energy(uid, amount, **kwargs) -> dict:
 		current_energy -= amount
 		# 成功2：如果没有恢复时间且是消耗能量值，则直接用数据库的值减去消耗的能量值，
 		# 然后存入消耗之后的能量值，以及将当前的时间存入 恢复时间项
-		if current_energy >= max_energy: current_time = ""  # 能量超出满能力状态时，不计算恢复时间
-		cooling_time = -1
+		if current_energy >= max_energy:  # 能量超出满能力状态时，不计算恢复时间
+			current_time = ""
+			cooling_time = -1
+		else:
+			await execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
+			cooling_time = 60 * _cooling_time
 		await execute_update(f'UPDATE progress SET energy = {current_energy} WHERE uid = "{uid}";', **kwargs)
 		return mt(3, 'Energy has been consumed, energy value and recovery time updated successfully', {'energy': current_energy, 'recover_time': current_time, 'cooling_time': cooling_time})
 	else:
