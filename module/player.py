@@ -18,14 +18,14 @@ async def enter_world(uid, **kwargs):
 	return common.mt(0, 'success')
 
 async def get_account_world_info(uid, **kwargs):
-	worlds = [{'server_status' : 0, 'world' : '1', 'world_name' : 'experimental_test1', 'gn' : '', 'exp' : ''},{'server_status' : 0, 'world' : '2', 'world_name' : 'experimental_test2', 'gn' : '', 'exp' : ''}]
-	exp = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
-	if exp != ():
-		world = {'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : await common.get_gn(uid, **kwargs), 'exp' : exp[0][0]}
-		worlds.append(world)
-	else:
-		world = {'server_status' : 0, 'world' : '0', 'world_name' : 'experimental', 'gn' : '', 'exp' : ''}
-		worlds.append(world)
+	worlds = []
+	for world in kwargs['config']['world']['worlds']:
+		kwargs['world'] = world['id']
+		data = await common.execute(f'SELECT `gn`, `exp` FROM `player` JOIN `progress` ON \
+				`player`.`uid` = `progress`.`uid` WHERE `player`.`uid` = "{uid}";', **kwargs)
+		if data != ():
+			worlds.append({'server_status' : world['status'], 'world' : world['id'], \
+					'world_name' : world['name'], 'gn' : data[0][0], 'exp' : data[0][1]})
 	return common.mt(0, 'success', {'worlds' : worlds})
 
 async def accept_gift(uid, nonce, **kwargs):

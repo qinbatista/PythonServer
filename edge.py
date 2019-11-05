@@ -9,6 +9,7 @@ import aioredis
 import contextlib
 import nats.aio.client
 
+from utility     import config_reader
 from collections import defaultdict
 
 LINE_ENDING        = '\r\n'
@@ -19,15 +20,14 @@ class ChatProtocolError(Exception):
 	pass
 
 class Command(enum.Enum):
-	EXIT     = 'EXIT'
 	FAMILY   = 'FAMILY'
 	PUBLIC   = 'PUBLIC'
 	REGISTER = 'REGISTER'
 
 class User:
-	def __init__(self, writer, world, gn, fn = None):
+	def __init__(self, writer, world, gn, fn = ''):
 		self.gn     = gn
-		self.fn     = fn
+		self.fn     = fn if fn != '' else None
 		self.world  = world
 		self.writer = writer
 
@@ -42,18 +42,19 @@ class Userlist:
 			self.family[user.world][user.fn].add(user.writer)
 
 	def remove(self, user):
-		self.public[user.world].remove(user.writer)
+		with contextlib.suppress(KeyError):
+			self.public[user.world].remove(user.writer)
 		if user.fn is not None:
-			self.family[user.world][user.fn].remove(user.writer)
+			with contextlib.suppress(KeyError):
+				self.family[user.world][user.fn].remove(user.writer)
 
 	def get_public(self, world):
 		return self.public[world]
 
 	def get_family(self, world, fn):
-		try:
+		with contextlib.suppress(KeyError):
 			return self.family[world][fn]
-		except KeyError:
-			return set()
+		return set()
 
 class Edge:
 	def __init__(self, port = 9000):
@@ -112,22 +113,27 @@ class Edge:
 							f'{user.gn}:{payload}'.encode())
 				else:
 					break
-		except (ValueError, ChatProtocolError, ConnectionResetError):
+		except (ValueError, ChatProtocolError, ConnectionResetError, \
+				asyncio.streams.IncompleteReadError):
 			pass
 		finally:
 			self.userlist.remove(user)
 			writer.close()
 			await writer.wait_closed()
+			if user != None: print(f'User {user.gn} has left world {user.world}')
 
+	# receives messages from pubsub server and distributes them to the interested connected clients
+	# unsubscribes from pubsub channels when there are no longer any interested clients
 	async def server_protocol(self, message):
 		world, family = self.decode_channel(message.subject)
-		message       = message.data.decode()
-		if not family:
-			await self.send(self.make_message(Command.PUBLIC, message), \
-					*(self.userlist.get_public(world)))
+		users = self.userlist.get_public(world) if not family \
+				else self.userlist.get_family(world, family)
+		if len(users) != 0:
+			await self.send(self.make_message(Command.PUBLIC if not family else Command.FAMILY, \
+					message.data), *users)
 		else:
-			await self.send(self.make_message(Command.FAMILY, message), \
-					*(self.userlist.get_family(world, family)))
+			await self.pubsub.unsubscribe(message.subject)
+			print(f'Unsubscribing to channel: {message.subject}')
 	
 	# performs initial client handshake. requires client to provide a valid login token.
 	# raises ChatProtocolError if protocol is not followed, or an invalid login token was provided.
@@ -157,7 +163,7 @@ class Edge:
 		if len(token) == 0:
 			return None
 		await self.redis.delete(f'chat.logintokens.{nonce}')
-		return User(writer, token['world'], token['gn'], token['fn'] if token['fn'] != '' else None)
+		return User(writer, token['world'], token['gn'], token['fn'])
 
 	# returns (command enum, message) if connection is alive.
 	# raises ConnectionResetError otherwise
@@ -183,8 +189,8 @@ class Edge:
 			await self.pubsub.subscribe(channel, cb = self.server_protocol)
 
 	# returns encoded message formatted to protocol specifications
-	def make_message(self, cmd, msg = ''):
-		return (cmd.value.zfill(COMMAND_MAX_LENGTH) + msg + LINE_ENDING).encode()
+	def make_message(self, cmd, encodedmsg = b''):
+		return cmd.value.zfill(COMMAND_MAX_LENGTH).encode() + encodedmsg + LINE_ENDING_B
 
 	def encode_channel_public(self, world):
 		return f'chat~{world}~public'
@@ -203,7 +209,8 @@ class Edge:
 
 ######################################################################################################
 async def main():
-	edge = Edge()
+	CFG  = config_reader.wait_config()
+	edge = Edge(CFG['edge']['port'])
 	await edge.start()
 
 if __name__ == '__main__':

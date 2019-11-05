@@ -12,6 +12,8 @@
 
 ## refresh_factory
 
+刷新工厂，获取刷新工厂的信息，任何会变化工厂算法结构的操作都会重新执行一次刷新工厂方法
+
 ##### 发送消息JSON格式
 
 ```json
@@ -32,23 +34,23 @@
 > `resource`: contains FOOD, IRON, CRYSTAL factories.
 >
 >			`remaining`: is the total amount
->
+>	
 >			`reward`: is the change since the last time
 >
 > `armor`: contains ARMOR factory
 >
 >			`aid`: the armor id that the factory is producing
->
+>	
 >			`remaining`: total quantity of level 1 armor with given aid
->
+>	
 >			`reward`: the quantity gained since the last time
 >
 > `worker`: information regarding the distribution of workers across all factories
 >
 >			`unassigned`: the number of available free workers
->
+>	
 >			`total`: the number of all assigned and unassigned workers
->
+>	
 >			`Factory ID` : `number of assigned workers`
 >
 > `level`: information regarding the distribution of levels across all factories
@@ -108,6 +110,8 @@
 ```
 
 ## upgrade_factory
+
+升级工厂需要水晶，工厂的水晶消耗列表参考`factory.json`，水晶的消耗量根据工厂等级来。
 
 ##### 发送消息JSON格式
 
@@ -242,6 +246,12 @@
 
 ## set_armor_factory
 
+设置需要生产的护甲，如果已经设置过护甲，需要把以前的护甲结算之后再设置新护甲
+
+##### 发送消息JSON格式
+
+> aid: 护甲的id值
+
 ```json
 {
 	"world"   : 0, 
@@ -256,18 +266,50 @@
 
 ##### 接受消息JSON格式
 
+> aid: 护甲的id值
+
 ```json
 {
 	"status" : 0, 
 	"message": "successfully set armor",
 	"data"   :
 	{
+		"refresh" :
+		{
+			"resource" :
+			{
+				"remaining" :
+				{
+					"0" : 253,
+					"1" :   2,
+					"2" : 182
+				},
+				"reward" :
+				{
+					"0" : -53,
+					"1" :   1,
+					"2" :  10
+				}
+			},
+			"armor" :
+			{
+				"aid"       : 1,
+				"remaining" : 5,
+				"reward"    : 1
+			}
+		},
 		"aid" : 2
 	}
 }
 ```
 
 ## get_config_factory
+
+返回工厂的配置信息，主要内容为工厂的等级信息和消耗详情, 返回的配置文件来自factory.json
+
+#####发送消息JSON格式
+
+> 无
 
 ```json
 {
@@ -298,6 +340,10 @@
 
 ## buy_worker_factory
 
+##### 发送消息JSON格式
+
+购买工人，工人的价格表参考`factory.json`，购买工人需要消耗食物
+
 ```json
 {
 	"world"   : 0, 
@@ -310,6 +356,10 @@
 ```
 
 ##### 接受消息JSON格式
+
+> worker：工人的详细内容，`unassigned`没有工作的工人，`total`工人总数
+>
+> food: 食物的详细信息，`remaining`剩余食物，`reward`食物改变量
 
 ```json
 {
@@ -333,12 +383,18 @@
 
 [获得失败]()
 >
-> * 99: already have max workers
 > * 98: insufficient food
 >
 
-
 ## increase_worker_factory
+
+##### 发送消息JSON格式
+
+向工厂添加工人，添加工人会改变工厂的算法结构，所以需要先结算后添加
+
+> fid: 工厂id
+>
+> num: 工人的数量
 
 ```json
 {
@@ -347,12 +403,21 @@
 	"data"    :
 	{
 		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
-		"fid"  : 2
+		"fid"  : 2,
+    "num" : 1
 	}
 }
 ```
 
 ##### 接受消息JSON格式
+
+> resource: 资源的配置情况
+>
+> reward: 资源的变化情况
+>
+> armor：护甲的变化情况
+>
+> worker：工人的情况
 
 ```json
 {
@@ -393,7 +458,8 @@
 }
 ```
 
-[获得失败]()
+[失败]()
+
 >
 > * 99: insufficient unassigned workers
 > * 98: can not increase past max worker limit
@@ -402,6 +468,14 @@
 
 ## decrease_worker_factory
 
+##### 发送消息JSON格式
+
+向工厂减少工人，添加工人会改变工厂的算法结构，所以需要先结算后添加
+
+> fid: 工厂的id
+>
+> num：工人的数量
+
 ```json
 {
 	"world"   : 0, 
@@ -409,12 +483,21 @@
 	"data"    :
 	{
 		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
-		"fid"  : 2
+		"fid"  : 2,
+    "num" : 1
 	}
 }
 ```
 
 ##### 接受消息JSON格式
+
+> resource: 资源的配置情况
+>
+> reward: 资源的变化情况
+>
+> armor：护甲的变化情况
+>
+> worker：工人的情况
 
 ```json
 {
@@ -463,6 +546,18 @@
 
 ## buy_acceleration_factory
 
+##### 发送消息JSON格式
+
+> resource: 资源的配置情况
+>
+> reward: 资源的变化情况
+>
+> armor：护甲的变化情况
+>
+> worker：工人的情况
+
+购买工厂加速，加速工厂需要消耗钻石，钻石的消耗数量依据factory.json的配置信息
+
 ```json
 {
 	"world"   : 0, 
@@ -506,7 +601,7 @@
 				"reward"    : 1
 			}
 		},
-		"time" : "2019-12-03 02:51:37",
+		"time" : 70580,
 		"remaining" : 
 		{
 			"diamond" : 1530
@@ -524,8 +619,9 @@
 > * 99: insufficient funds
 >
 
-
 ## activate_wishing_pool_factory
+
+##### 发送消息JSON格式
 
 ```json
 {
@@ -540,6 +636,8 @@
 ```
 
 ##### 接受消息JSON格式
+
+> 
 
 ```json
 {
