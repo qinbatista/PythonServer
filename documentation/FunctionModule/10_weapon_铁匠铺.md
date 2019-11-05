@@ -211,8 +211,8 @@
 	"function": "level_up_passive_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-    "weapon": 1,
-    "passive": 1
+		"weapon": 1,
+		"passive": 1
 	}
 }
 ```
@@ -263,10 +263,10 @@
 ```json
 {
 	"world": 0, 
-	"function": "get_config_lottery",
+	"function": "reset_skill_point_weapon",
 	"data": {
-		"token": "my toekn ^_^",
-    "weapon": 1,
+		"token": "token",
+		"weapon": 1
 	}
 }
 ```
