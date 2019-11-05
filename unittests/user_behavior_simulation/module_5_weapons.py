@@ -84,3 +84,13 @@ def weapon_dialog(_token,_world,get_all_skill_info):
 			new_response = send_tcp_message({'world' : world, 'function' : 'upgrade_armor', 'data' : {'token' : token, "armor":random.choice(weapon_list)}})#升级请求
 			logger.debug("[weapon_dialog] level up armor star:"+str(new_response))
 
+
+if __name__ == '__main__':
+	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
+	print(response)
+	token = response['data']['token']
+	# response = send_tcp_message({'world': 0, 'function': 'get_all_weapon', 'data': {'token': token}})
+	# response = send_tcp_message({'world': 0, 'function': 'level_up_star_weapon', 'data': {'token': token, 'weapon': 1}})
+	# response = send_tcp_message({'world': 0, 'function': 'level_up_passive_weapon', 'data': {'token': token, 'weapon': 1, 'passive': 3}})
+	response = send_tcp_message({'world': 0, 'function': 'reset_skill_point_weapon', 'data': {'token': token, 'weapon': 1}})
+	print(response)

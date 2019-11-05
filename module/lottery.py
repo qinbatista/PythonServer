@@ -28,7 +28,7 @@ async def fortune_wheel(uid, tier, item, **kwargs):
 		return common.mt(5, 'get item', {'remaining' : {'cost_item' : item.value, 'cost_quantity' : remaining, 'group_id' : group, 'enum_id' : enum_id, 'item_quantity' : quantity}, 'reward' : {'group_id' : group, 'enum_id' : enum_id, 'item_quantity' : kwargs['config']['lottery']['fortune_wheel']['rewards'][tier.name][giftcode]}})
 	else:
 		new, reward = await SWITCH[enums.Group(int(group))](uid, int(enum_id), **kwargs)
-		return await summoning._response_factory(uid, enums.Group(int(group)), new, reward, item, remaining, **kwargs)
+		return await summoning._response_factory(uid, enums.Group(int(group)), new, reward, item, remaining, cost, **kwargs)
 
 #######################################################################################################
 

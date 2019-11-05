@@ -82,14 +82,14 @@
 > 	"status": 0,
 > 	"message": "Successful signing",
 > 	"data": {
->  "cost":{
->    "remaining": [
+> "cost":{
+> "remaining": [
 > 					"3:5:1000"
 > 				],
 > 				"reward": [
 > 					"3:5:50"
 > 				]
->  }
+> }
 > 		"supplement": {
 > 			"1": {
 > 				"remaining": [
@@ -121,7 +121,7 @@
 >
 > 
 >
-> ##get_all_check_in_table
+> ## get_all_check_in_table
 >
 > 获取签到表的情况，只是获取数据，`不改变`任何服务器数值
 >
@@ -147,32 +147,42 @@
 >
 > ```json
 > {
-> 	"status": 0,
-> 	"message": "Successfully obtained all check-in status this month",
-> 	"data": {
->     "today":28,
->     "time":"22:00:12",
-> 		"remaining": {
-> 			"01": {
-> 				"date": "2019-10-01",
-> 				"reward": 0
-> 			},
-> 			"02": {
-> 				"date": "2019-10-02",
-> 				"reward": 0
-> 			},
-> 			"03": {
-> 				"date": "2019-10-03",
-> 				"reward": 0
-> 			},
-> 			.........
-> 			
-> 			"31": {
-> 				"date": "2019-10-09",
-> 				"reward": 0
-> 			}
+>     "status": 0,
+>     "message": "Successfully obtained all check-in status this month",
+>     "data": {
+>         "today": 28,
+>         "time":"22:00:12",
+>         "remaining": {
+>             "1": {
+>                 "date": "2019-10-01",
+>                 "reward": 0
+>             },
+>             "2": {
+>                 "date": "2019-10-02",
+>                 "reward": 0
+>             },
+>             "3": {
+>                 "date": "2019-10-03",
+>                 "reward": 0
+>             },
+>             .........
+> 
+>             "31": {
+>                 "date": "2019-10-09",
+>                 "reward": 0
+>             }
+>         },
+>         "config": {
+>             "1":"3:18:1",
+>             "2":"3:5:100",
+>             "3":"3:9:100",
+>             "4":"3:25:100",
+>             "5":"2:1:5",
+>             "6":"0:1:5",
+>             "0":"3:25:100",
+>             "patch_diamond": 80
 > 		}
-> 	}
+>     }
 > }
 > ```
 >
