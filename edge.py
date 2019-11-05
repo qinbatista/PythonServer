@@ -19,7 +19,6 @@ class ChatProtocolError(Exception):
 	pass
 
 class Command(enum.Enum):
-	EXIT     = 'EXIT'
 	FAMILY   = 'FAMILY'
 	PUBLIC   = 'PUBLIC'
 	REGISTER = 'REGISTER'
@@ -122,6 +121,8 @@ class Edge:
 			await writer.wait_closed()
 			if user != None: print(f'User {user.gn} has left world {user.world}')
 
+	# receives messages from pubsub server and distributes them to the interested connected clients
+	# unsubscribes from pubsub channels when there are no longer any interested clients
 	async def server_protocol(self, message):
 		world, family = self.decode_channel(message.subject)
 		users = self.userlist.get_public(world) if not family \
