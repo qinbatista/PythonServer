@@ -6,7 +6,7 @@
 * [`level_up_passive_weapon`](##level_up_passive_weapon)
 * [`reset_skill_point_weapon`](##reset_skill_point_weapon)
 
-##get_all_weapon
+## get_all_weapon
 
 ##### 发送消息JSON格式
 
@@ -74,7 +74,7 @@
 
 
 
-##level_up_weapon
+## level_up_weapon
 
 ##### 发送消息JSON格式
 
@@ -140,7 +140,7 @@
 
 
 
-##level_up_star_weapon
+## level_up_star_weapon
 
 ##### 发送消息JSON格式
 
@@ -195,7 +195,7 @@
 
 
 
-##level_up_passive_weapon
+## level_up_passive_weapon
 
 ##### 发送消息JSON格式
 
@@ -252,7 +252,7 @@
 
 
 
-##reset_skill_point_weapon
+## reset_skill_point_weapon
 
 ##### 发送消息JSON格式
 
