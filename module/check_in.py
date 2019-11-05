@@ -8,7 +8,7 @@ import time
 from module import lottery
 from module import achievement
 from module import task
-async def supplement_check_in(uid, **kwargs) -> dict:
+async def supplement_check_in(uid, **kwargs):
 	"""补签"""
 	# 0 - Successful signing
 	# 98 - You have completed all current check-ins
@@ -22,12 +22,12 @@ async def supplement_check_in(uid, **kwargs) -> dict:
 	if isok == False:return common.mt(99, 'Insufficient diamond')
 	check_data={}
 	for i in range(1,today_number):
-		kwargs.update({"hard_day":i if i>10 else "0"+str(i)})
+		kwargs.update({"hard_day": f'{"" if i > 9 else "0"}{i}'})
 		result = await check_in(uid,**kwargs)
 		check_data.update({i: result["data"]})
 	return common.mt(0, 'Successful signing', data={'supplement': check_data})
 
-async def check_in(uid, **kwargs) -> dict:
+async def check_in(uid, **kwargs):
 	"""每日签到"""
 	# 0 - Sign-in success
 	# 99 - You have already signed in today
@@ -51,11 +51,12 @@ async def check_in(uid, **kwargs) -> dict:
 	await common.execute_update( f'insert into check_in(uid, date) values("{uid}", "{current_time}")',**kwargs)
 	return common.mt(0, 'Sign-in success',{"remaining":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{quantity}'],"reward":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{vip_bond*int(item_set[2])}']})
 
-async def get_all_check_in_table(uid, **kwargs) -> dict:
+async def get_all_check_in_table(uid, **kwargs):
 	"""获取所有签到情况"""
 	# 0 - Successfully obtained all check-in status
 	data = await common.execute( f'select * from check_in where uid="{uid}" and date like "{time.strftime("%Y-%m-", time.localtime())}%"',**kwargs)
 	remaining = {}
 	for d in data:
 		remaining.update({int(d[1][-2:]): {'date': d[1], 'reward': d[2]}})
-	return common.mt(0, 'Successfully obtained all check-in status this month', data={'remaining': remaining})
+	seconds = int((datetime.strptime((datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d 00:00:00'), '%Y-%m-%d %H:%M:%S') - datetime.now()).total_seconds())
+	return common.mt(0, 'Successfully obtained all check-in status this month', data={'today': datetime.today().day, 'time': f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}', 'remaining': remaining, 'config': kwargs['config']})

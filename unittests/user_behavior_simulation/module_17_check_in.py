@@ -40,7 +40,14 @@ def check_in_dialog(token,world,respons):
 	supplement_check_in(token,world)
 
 
-
+if __name__ == '__main__':
+	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
+	print(response)
+	token = response['data']['token']
+	# response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
+	# response = send_tcp_message({'world': 0, 'function': 'friend_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
+	response = send_tcp_message({'world': 0, 'function': 'get_all_check_in_table', 'data': {'token': token}})
+	print(response)
 
 
 
