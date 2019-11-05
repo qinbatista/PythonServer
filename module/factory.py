@@ -150,10 +150,12 @@ async def buy_acceleration(uid, **kwargs):
 			'remaining' : {'diamond' : dia_remain}, 'reward' : {'diamond' : -dia_cost}})
 
 async def set_armor(uid, aid, **kwargs):
+	r = await refresh(uid, **kwargs)
 	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `storage`) VALUES \
 			("{uid}", {enums.Factory.ARMOR.value}, {aid.value}) ON DUPLICATE KEY UPDATE \
 			`storage` = {aid.value};', **kwargs)
-	return common.mt(0, 'success', {'aid' : aid.value})
+	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
+			'armor' : r['data']['armor']}, 'aid' : aid.value})
 
 ####################################################################################
 def roll_segment_value(**kwargs):

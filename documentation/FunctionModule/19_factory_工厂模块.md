@@ -262,6 +262,30 @@
 	"message": "successfully set armor",
 	"data"   :
 	{
+		"refresh" :
+		{
+			"resource" :
+			{
+				"remaining" :
+				{
+					"0" : 253,
+					"1" :   2,
+					"2" : 182
+				},
+				"reward" :
+				{
+					"0" : -53,
+					"1" :   1,
+					"2" :  10
+				}
+			},
+			"armor" :
+			{
+				"aid"       : 1,
+				"remaining" : 5,
+				"reward"    : 1
+			}
+		},
 		"aid" : 2
 	}
 }
