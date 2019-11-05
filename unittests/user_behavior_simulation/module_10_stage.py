@@ -52,7 +52,7 @@ if __name__ == '__main__':
 	print(response)
 	token = response['data']['token']
 	# response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, 'stage': 1015}})
-	response = send_tcp_message({'world': 0, 'function': 'enter_stage', 'data': {'token': token, 'stage': 2}})
+	response = send_tcp_message({'world': 0, 'function': 'get_config_stage', 'data': {'token': token, 'stage': 2}})
 	print(str(response))
 	# response = send_tcp_message({'world': 0, 'function': 'start_hang_up', 'data': {'token': token, 'stage': 1}})
 	# print(str(response))
