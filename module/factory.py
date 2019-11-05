@@ -74,9 +74,8 @@ async def decrease_worker(uid, fid, n, **kwargs):
 
 async def buy_worker(uid, **kwargs):
 	unassigned, max_worker = await get_unassigned_workers(uid, **kwargs)
-	if max_worker >= kwargs['config']['factory']['workers']['max']:
-		return common.mt(99, 'already max workers')
-	upgrade_cost  = kwargs['config']['factory']['workers']['cost'][str(max_worker + 1)]
+	max_cost_inc  = kwargs['config']['factory']['workers']['max']
+	upgrade_cost  = kwargs['config']['factory']['workers']['cost'][str(min(max_worker + 1, max_cost_inc))]
 	_, _, storage = await get_state(uid, **kwargs)
 	if storage[enums.Factory.FOOD] < upgrade_cost:
 		return common.mt(98, 'insufficient food')
@@ -145,15 +144,18 @@ async def buy_acceleration(uid, **kwargs):
 		await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, now, **kwargs)
 	await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, \
 			max(now + timedelta(days = 1), accel_end_t + timedelta(days = 1)), **kwargs)
+	pool = max(int((accel_end_t - now).total_seconds()), 0)
 	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
-			'armor' : r['data']['armor']}, 'time' : accel_end_t.strftime('%Y-%m-%d %H:%M:%S'), \
+			'armor' : r['data']['armor']}, 'time' : pool, \
 			'remaining' : {'diamond' : dia_remain}, 'reward' : {'diamond' : -dia_cost}})
 
 async def set_armor(uid, aid, **kwargs):
+	r = await refresh(uid, **kwargs)
 	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `storage`) VALUES \
 			("{uid}", {enums.Factory.ARMOR.value}, {aid.value}) ON DUPLICATE KEY UPDATE \
 			`storage` = {aid.value};', **kwargs)
-	return common.mt(0, 'success', {'aid' : aid.value})
+	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
+			'armor' : r['data']['armor']}, 'aid' : aid.value})
 
 ####################################################################################
 def roll_segment_value(**kwargs):
