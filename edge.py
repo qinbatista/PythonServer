@@ -9,6 +9,7 @@ import aioredis
 import contextlib
 import nats.aio.client
 
+from utility     import config_reader
 from collections import defaultdict
 
 LINE_ENDING        = '\r\n'
@@ -208,7 +209,8 @@ class Edge:
 
 ######################################################################################################
 async def main():
-	edge = Edge()
+	CFG  = config_reader.wait_config()
+	edge = Edge(CFG['edge']['port'])
 	await edge.start()
 
 if __name__ == '__main__':
