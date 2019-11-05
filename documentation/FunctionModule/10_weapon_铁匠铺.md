@@ -88,7 +88,8 @@
 	"function": "level_up_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-		"weapon": 1
+		"weapon": 1,
+        "amount": 90
 	}
 }
 ```
