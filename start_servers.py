@@ -75,15 +75,15 @@ def get_host_ip():
 def main():
 	processes = []
 	try:
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/configuration_manager.py']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/configuration_manager.py'], shell=False))
 		time.sleep(1)
 		# processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/mail_server.py']))
 		# processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/token_server.py']))
 		# processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/account_manager.py']))
 		# processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/game_manager_qin.py']))
 		# processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/game_manager_houyao.py']))
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker.py', get_host_ip()]))
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate.py', get_host_ip()]))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker.py', get_host_ip()], shell=False))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate.py', get_host_ip()], shell=False))
 		time.sleep(0.2)
 		print('Done spawning servers...')
 		while len(processes) > 0:
