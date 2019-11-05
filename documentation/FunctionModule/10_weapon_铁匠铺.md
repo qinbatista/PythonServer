@@ -154,7 +154,7 @@
 	"function": "level_up_star_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-    "weapon": 1,
+		"weapon": 1
 	}
 }
 ```
