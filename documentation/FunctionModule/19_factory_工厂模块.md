@@ -357,7 +357,6 @@
 
 [获得失败]()
 >
-> * 99: already have max workers
 > * 98: insufficient food
 >
 

@@ -74,9 +74,8 @@ async def decrease_worker(uid, fid, n, **kwargs):
 
 async def buy_worker(uid, **kwargs):
 	unassigned, max_worker = await get_unassigned_workers(uid, **kwargs)
-	if max_worker >= kwargs['config']['factory']['workers']['max']:
-		return common.mt(99, 'already max workers')
-	upgrade_cost  = kwargs['config']['factory']['workers']['cost'][str(max_worker + 1)]
+	max_cost_inc  = kwargs['config']['factory']['workers']['max']
+	upgrade_cost  = kwargs['config']['factory']['workers']['cost'][str(min(max_worker + 1, max_cost_inc))]
 	_, _, storage = await get_state(uid, **kwargs)
 	if storage[enums.Factory.FOOD] < upgrade_cost:
 		return common.mt(98, 'insufficient food')
