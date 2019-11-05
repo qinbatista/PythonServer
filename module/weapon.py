@@ -64,7 +64,11 @@ async def reset_skill_point(uid, wid, **kwargs):
 	can_pay, remaining = await common.try_item(uid, enums.Item.COIN, -STANDARD_RESET, **kwargs)
 	if not can_pay: return common.mt(98, 'insufficient coins')
 	reclaimed = await _reset_skill_point(uid, wid, **kwargs)
-	return common.mt(0, 'success', {enums.Group.WEAPON.value : {'wid' : wid.value, 'sp' : payload[0] + reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, 'value' : remaining}})
+	return common.mt(0, 'success', {'remaining' : {enums.Group.WEAPON.value : {'wid' : wid.value, \
+			'sp' : payload[0] + reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, \
+			'value' : remaining}}, 'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, \
+			'sp' : reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, \
+			'value' : STANDARD_RESET}}})
 
 async def get_all(uid, **kwargs):
 	weps = await _get_all_weapon_info(uid, **kwargs)
