@@ -31,14 +31,20 @@ async def level_up(uid, wid, amount, **kwargs):
 	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP,"task_value":1})
 	await task.record_task(uid,**kwargs)
 	await common.execute(f'UPDATE weapon SET level = {level + upgrade_cnt}, skillpoint = {sp + upgrade_cnt} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
-	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : level + upgrade_cnt, 'sp' : sp + upgrade_cnt}, enums.Group.ITEM.value : { 'iid' : enums.Item.IRON.value, 'value' : remaining}}, 'reward': {'wid' : wid.value, 'level' : upgrade_cnt, 'sp' : upgrade_cnt}, enums.Group.ITEM.value : { 'iid' : enums.Item.IRON.value, 'value' : -upgrade_cnt * STANDARD_IRON}})
+	return common.mt(0, 'success', {'remaining' : {enums.Group.WEAPON.value : {'wid' : wid.value, \
+			'level' : level + upgrade_cnt, 'sp' : sp + upgrade_cnt}, enums.Group.ITEM.value : \
+			{'iid' : enums.Item.IRON.value, 'value' : remaining}}, 'reward' : {enums.Group.WEAPON.value : \
+			{'wid' : wid.value, 'level' : upgrade_cnt, 'sp' : upgrade_cnt}, enums.Group.ITEM.value : \
+			{'iid' : enums.Item.IRON.value, 'value' : upgrade_cnt * STANDARD_IRON}}})
 
 async def level_up_passive(uid, wid, pid, **kwargs):
 	wid, pid = enums.Weapon(wid), enums.WeaponPassive(pid)
 	exists, payload = await _get_weapon_info(uid, wid, 'skillpoint', **kwargs)
 	if not exists or payload[0] <= 0: return common.mt(99, 'insufficient materials')
 	level = await _increase_passive_level(uid, wid, pid, **kwargs)
-	return common.mt(0, 'success', {'remaining': {'wid' : wid.value, 'pid' : pid.value, 'level' : level, 'sp' : payload[0] - 1}, 'reward': {'wid' : wid.value, 'pid' : pid.value, 'level' : 1, 'sp' : -1}})
+	return common.mt(0, 'success', {'remaining' : {'wid' : wid.value, 'pid' : pid.value, 'level' : level, \
+			'sp' : payload[0] - 1}, 'reward' : {'wid' : wid.value, 'pid' : pid.value, 'level' : 1, \
+			'sp' : 1}})
 
 async def level_up_star(uid, wid, **kwargs):
 	wid = enums.Weapon(wid)
@@ -48,7 +54,8 @@ async def level_up_star(uid, wid, **kwargs):
 	cost = STANDARD_SEGMENT * (1 + star)
 	if segment < cost: return common.mt(98, 'insufficient segments')
 	await common.execute(f'UPDATE weapon SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND wid = {wid.value};', **kwargs)
-	return common.mt(0, 'success', {'remaining': {'wid' : wid.value, 'star' : star + 1, 'seg' : segment - cost}, 'reward': {'wid' : wid.value, 'star' : 1, 'seg' : -cost}})
+	return common.mt(0, 'success', {'remaining' : {'wid' : wid.value, 'star' : star + 1, \
+			'seg' : segment - cost}, 'reward' : {'wid' : wid.value, 'star' : 1, 'seg' : cost}})
 
 async def reset_skill_point(uid, wid, **kwargs):
 	wid = enums.Weapon(wid)
@@ -57,7 +64,11 @@ async def reset_skill_point(uid, wid, **kwargs):
 	can_pay, remaining = await common.try_item(uid, enums.Item.COIN, -STANDARD_RESET, **kwargs)
 	if not can_pay: return common.mt(98, 'insufficient coins')
 	reclaimed = await _reset_skill_point(uid, wid, **kwargs)
-	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON.value : {'wid' : wid.value, 'sp' : payload[0] + reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, 'value' : remaining}}, 'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, 'sp' : reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, 'value' : -STANDARD_RESET}}})
+	return common.mt(0, 'success', {'remaining' : {enums.Group.WEAPON.value : {'wid' : wid.value, \
+			'sp' : payload[0] + reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, \
+			'value' : remaining}}, 'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, \
+			'sp' : reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, \
+			'value' : STANDARD_RESET}}})
 
 async def get_all(uid, **kwargs):
 	weps = await _get_all_weapon_info(uid, **kwargs)

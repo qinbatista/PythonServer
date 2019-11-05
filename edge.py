@@ -49,7 +49,9 @@ class Userlist:
 				self.family[user.world][user.fn].remove(user.writer)
 
 	def get_public(self, world):
-		return self.public[world]
+		with contextlib.suppress(KeyError):
+			return self.public[world]
+		return set()
 
 	def get_family(self, world, fn):
 		with contextlib.suppress(KeyError):

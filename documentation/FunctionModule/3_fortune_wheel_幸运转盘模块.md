@@ -6,7 +6,7 @@
 
 
 
-##get_fortune_wheel_config
+## get_fortune_wheel_config
 
 ##### 发送消息JSON格式
 
@@ -65,7 +65,7 @@
 
 
 
-##fortune_wheel_basic
+## fortune_wheel_basic
 
 ##### 发送消息JSON格式
 
@@ -127,7 +127,7 @@
 
 
 
-##fortune_wheel_pro
+## fortune_wheel_pro
 
 ##### 发送消息JSON格式
 

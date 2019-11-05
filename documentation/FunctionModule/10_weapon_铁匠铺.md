@@ -88,8 +88,7 @@
 	"function": "level_up_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-    	"weapon": 1,
-        "amount": 90
+		"weapon": 1
 	}
 }
 ```
@@ -126,7 +125,7 @@
 			},
 			"3": {
 				"iid": 2,
-				"value": -80
+				"value": 60
 			}
 		}
 	}
@@ -155,7 +154,7 @@
 	"function": "level_up_star_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-    	"weapon": 1,
+		"weapon": 1
 	}
 }
 ```
@@ -183,7 +182,7 @@
 		{
 			"wid": 1,
 			"star": 2,
-			"seg": -30
+			"seg": 30
 		}
 	}
 }
@@ -212,8 +211,8 @@
 	"function": "level_up_passive_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-    	"weapon": 1,
-    	"passive": 1
+		"weapon": 1,
+		"passive": 1
 	}
 }
 ```
@@ -234,14 +233,14 @@
 		"remaining": {
 			"wid": 1,
 			"pid": 2,
-			"level": 4,
-			"sp": 96
+			"level": 1,
+			"sp": 99
 		},
 		"reward": {
 			"wid": 1,
 			"pid": 2,
 			"level": 1,
-			"sp": -1
+			"sp": 99
 		}
 	}
 }
@@ -264,10 +263,10 @@
 ```json
 {
 	"world": 0, 
-	"function": "get_config_lottery",
+	"function": "reset_skill_point_weapon",
 	"data": {
-		"token": "my toekn ^_^",
-    	"weapon": 1,
+		"token": "token",
+		"weapon": 1
 	}
 }
 ```
@@ -298,11 +297,11 @@
 		"reward": {
 			"0": {
 				"wid": 1,
-				"sp": 50
+				"sp": 100
 			},
 			"3": {
 				"iid": 1,
-				"value": -100
+				"value": 100
 			}
 		}
 	}
