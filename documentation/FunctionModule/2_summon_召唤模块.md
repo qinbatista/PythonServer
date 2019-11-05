@@ -106,19 +106,6 @@
 }
 ```
 
-> 挂机相同关卡不需要结算资源，直接返回即可
-
-```json
-{
-	"status": 1,
-	"message": "same stage"
-}
-```
-
-[挂机关卡失败]()
-
-* 99: 关卡参数错误
-
 
 
 ## basic_summon
@@ -176,7 +163,10 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 
 
 
@@ -197,7 +187,7 @@
 	"function": "pro_summon",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -219,14 +209,14 @@
 			"weapon": 10,
 			"star": 1,
 			"segment": 0,
-			"cost_item": 1,
+			"cost_item": 11,
 			"cost_quantity": 12670
 		},
 		"reward": {
 			"weapon": 10,
 			"star": 1,
-      "segment": 0,
-      "cost_item": 1,
+      		"segment": 0,
+      		"cost_item": 11,
 			"cost_quantity": 100
 		}
 	}
@@ -235,7 +225,10 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 
 
 
@@ -256,7 +249,7 @@
 	"function": "friend_summon",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -278,14 +271,14 @@
 			"weapon": 10,
 			"star": 1,
 			"segment": 0,
-			"cost_item": 1,
+			"cost_item": 11,
 			"cost_quantity": 12670
 		},
 		"reward": {
 			"weapon": 10,
 			"star": 1,
-      "segment": 0,
-      "cost_item": 1,
+      		"segment": 0,
+      		"cost_item": 11,
 			"cost_quantity": 100
 		}
 	}
@@ -294,7 +287,10 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 
 
 
@@ -315,7 +311,7 @@
 	"function": "basic_summon_skill",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -336,18 +332,18 @@
 		"remaining": {
 			"skill": 13,
 			"level": 1,
+            "scroll_id":-1,
+            "scroll_quantity":-1,
 			"cost_item": 11,
-			"cost_quantity": 999999997,
-      "scroll_id":0,
-      "scroll_quantity":0
+			"cost_quantity": 999999997
 		},
 		"reward": {
 			"skill": 13,
 			"level": 1,
+            "scroll_id":-1,
+            "scroll_quantity":-1,
 			"cost_item": 11,
-			"cost_quantity": 10,
-      "scroll_id":0,
-      "scroll_quantity":0
+			"cost_quantity": 10
 		}
 	}
 }
@@ -355,7 +351,10 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 
 
 
@@ -376,7 +375,7 @@
 	"function": "pro_summon_skill",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -399,16 +398,16 @@
 			"level": 1,
 			"cost_item": 11,
 			"cost_quantity": 999999997,
-      "scroll_id":0,
-      "scroll_quantity":0
+            "scroll_id":0,
+            "scroll_quantity":0
 		},
 		"reward": {
 			"skill": 13,
 			"level": 1,
 			"cost_item": 11,
 			"cost_quantity": 10,
-      "scroll_id":0,
-      "scroll_quantity":0
+            "scroll_id":0,
+            "scroll_quantity":0
 		}
 	}
 }
@@ -416,7 +415,10 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 
 
 
@@ -437,7 +439,7 @@
 	"function": "friend_summon_skill",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -460,16 +462,16 @@
 			"level": 1,
 			"cost_item": 11,
 			"cost_quantity": 999999997,
-      "scroll_id":0,
-      "scroll_quantity":0
+      		"scroll_id": -1,
+      		"scroll_quantity": -1
 		},
 		"reward": {
 			"skill": 13,
 			"level": 1,
 			"cost_item": 11,
 			"cost_quantity": 10,
-      "scroll_id":0,
-      "scroll_quantity":0
+      		"scroll_id": -1,
+      		"scroll_quantity": -1
 		}
 	}
 }
@@ -477,7 +479,10 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 
 
 
@@ -490,7 +495,7 @@
 > item：表示需要消耗的物品，物品列表为item类，参考enums.py，常用有1（金币），5（钻石），11，12（基础召唤，高级召唤），如果`有此武器`则为`30`碎片，如果`没有此武器`，则奖励武器。不同的抽奖方式只是获得的概率不同，概率可以参考`lottery.json`
 
 * 4: 获得角色成功
-* 3: 角色重复，获得碎片
+* 5: 角色重复，获得碎片
 
 ```json
 {
@@ -498,7 +503,7 @@
 	"function": "basic_summon_role",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -513,8 +518,8 @@
 
 ```json
 {
-	"status": 0,
-	"message": "new skill unlocked",
+	"status": 4,
+	"message": "new role unlocked",
 	"data": {
 		"remaining": {
 			"role": 10,
@@ -527,8 +532,8 @@
 			"role": 10,
 			"star": 1,
 			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
+			"cost_item": 11,
+			"cost_quantity": 1
 		}
 	}
 }
@@ -536,7 +541,10 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 
 
 
@@ -551,7 +559,7 @@
 > item：表示需要消耗的物品，物品列表为item类，参考enums.py，常用有1（金币），5（钻石），11，12（基础召唤，高级召唤），如果`有此武器`则为`30`碎片，如果`没有此武器`，则奖励武器。不同的抽奖方式只是获得的概率不同，概率可以参考`lottery.json`
 
 * 4: 获得角色成功
-* 3: 角色重复，获得碎片
+* 5: 角色重复，获得碎片
 
 ```json
 {
@@ -559,7 +567,7 @@
 	"function": "basic_summon_role",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -581,15 +589,15 @@
 			"role": 10,
 			"star": 1,
 			"segment": 0,
-			"cost_item": 1,
+			"cost_item": 11,
 			"cost_quantity": 12670
 		},
 		"reward": {
 			"role": 10,
 			"star": 1,
 			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
+			"cost_item": 11,
+			"cost_quantity": 1
 		}
 	}
 }
@@ -597,7 +605,9 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+- 99：资源不足
 
 
 
@@ -610,7 +620,7 @@
 > item：表示需要消耗的物品，物品列表为item类，参考enums.py，常用有1（金币），5（钻石），11，12（基础召唤，高级召唤），如果`有此武器`则为`30`碎片，如果`没有此武器`，则奖励武器。不同的抽奖方式只是获得的概率不同，概率可以参考`lottery.json`
 
 * 4: 获得角色成功
-* 3: 角色重复，获得碎片
+* 5: 角色重复，获得碎片
 
 ```json
 {
@@ -618,7 +628,7 @@
 	"function": "basic_summon_role",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -640,15 +650,15 @@
 			"role": 10,
 			"star": 1,
 			"segment": 0,
-			"cost_item": 1,
+			"cost_item": 11,
 			"cost_quantity": 12670
 		},
 		"reward": {
 			"role": 10,
 			"star": 1,
 			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
+			"cost_item": 11,
+			"cost_quantity": 1
 		}
 	}
 }
@@ -656,7 +666,9 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+- 99：资源不足
 
 
 
@@ -678,7 +690,7 @@
 	"function": "basic_summon_10_times",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -697,56 +709,56 @@
 	"message": "new weapon unlocked",
 	"data": {
 		"remaining": {
-      "0":{
-			"weapon": 10,
-			"star": 1,
-			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
-      },
-       "1":{
-			"weapon": 10,
-			"star": 1,
-			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
-      },
+            "0":{
+                "weapon": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 1,
+                "cost_quantity": 12670
+            },
+            "1":{
+                "weapon": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 1,
+                "cost_quantity": 12670
+            },
       
       .......
       
-       "10":{
-			"weapon": 10,
-			"star": 1,
-			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
-      }
+            "10":{
+                "weapon": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 1,
+                "cost_quantity": 12670
+        	}
 		},
 		"reward": {
-        "0":{
-          "weapon": 10,
-          "star": 1,
-          "segment": 0,
-          "cost_item": 1,
-          "cost_quantity": 100
-        },
-     	  "1":{
-          "weapon": 10,
-          "star": 1,
-          "segment": 0,
-          "cost_item": 1,
-          "cost_quantity": 100
-        },
+            "0":{
+                "weapon": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 1,
+                "cost_quantity": 100
+            },
+     	  	"1":{
+                "weapon": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 1,
+                "cost_quantity": 100
+        	},
       
       ........
       
-      	"10":{
-          "weapon": 10,
-          "star": 1,
-          "segment": 0,
-          "cost_item": 1,
-          "cost_quantity": 100
-        },
+            "10":{
+                "weapon": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 1,
+                "cost_quantity": 100
+            },
 		}
 	}
 }
@@ -754,7 +766,10 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 
 ##
 
@@ -776,7 +791,7 @@
 	"function": "basic_summon_10_times",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -792,65 +807,65 @@
 ```json
 {
 	"status": 2,
-	"message": "new weapon unlocked",
+	"message": "success",
 	"data": {
 		"remaining": {
-      "0":{
-			"skill": 13,
-			"level": 1,
-			"cost_item": 11,
-			"cost_quantity": 999999997,
-      "scroll_id":0,
-      "scroll_quantity":0
-      },
-       "1":{
-			"skill": 13,
-			"level": 1,
-			"cost_item": 11,
-			"cost_quantity": 999999997,
-      "scroll_id":0,
-      "scroll_quantity":0
-      },
+            "0":{
+                "skill": 13,
+                "level": 1,
+                "cost_item": 11,
+                "cost_quantity": 999999997,
+                "scroll_id": -1,
+                "scroll_quantity": -1
+            },
+            "1":{
+                "skill": 13,
+                "level": 1,
+                "cost_item": 11,
+                "cost_quantity": 999999997,
+                "scroll_id": -1,
+                "scroll_quantity": -1
+      		},
       
       .......
-      
-       "10":{
-			"skill": 13,
-			"level": 1,
-			"cost_item": 11,
-			"cost_quantity": 999999997,
-      "scroll_id":0,
-      "scroll_quantity":0
-      }
+
+           "10":{
+                "skill": 13,
+                "level": 1,
+                "cost_item": 11,
+                "cost_quantity": 999999997,
+                "scroll_id": -1,
+                "scroll_quantity": -1
+            }
 		},
 		"reward": {
-        "0":{
-         "skill": 13,
-          "level": 1,
-          "cost_item": 11,
-          "cost_quantity": 999999997,
-          "scroll_id":0,
-          "scroll_quantity":0
-        },
-     	  "1":{
-          "skill": 13,
-          "level": 1,
-          "cost_item": 11,
-          "cost_quantity": 999999997,
-          "scroll_id":0,
-          "scroll_quantity":0
-        },
+            "0":{
+                "skill": 13,
+                "level": 1,
+                "cost_item": 11,
+                "cost_quantity": 1,
+                "scroll_id": -1,
+                "scroll_quantity": -1
+            },
+            "1":{
+                "skill": 13,
+                "level": 1,
+                "cost_item": 11,
+                "cost_quantity": 1,
+                "scroll_id": -1,
+                "scroll_quantity": -1
+            },
       
       ........
-      
-      	"10":{
-          "skill": 13,
-          "level": 1,
-          "cost_item": 11,
-          "cost_quantity": 999999997,
-          "scroll_id":0,
-          "scroll_quantity":0
-        },
+
+            "10":{
+                "skill": 13,
+                "level": 1,
+                "cost_item": 11,
+                "cost_quantity": 1,
+                "scroll_id": -1,
+                "scroll_quantity": -1
+            },
 		}
 	}
 }
@@ -858,7 +873,10 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 
 ##
 
@@ -880,7 +898,7 @@
 	"function": "basic_summon_10_times",
 	"data": {
 		"token": "my token",
-    "item":5
+    	"item":5
 	}
 }
 ```
@@ -899,56 +917,56 @@
 	"message": "new weapon unlocked",
 	"data": {
 		"remaining": {
-      "0":{
-			"role": 10,
-			"star": 1,
-			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
-      },
-       "1":{
-			"role": 10,
-			"star": 1,
-			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
-      },
+      		"0":{
+                "role": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 11,
+                "cost_quantity": 12670
+      		},
+           "1":{
+                "role": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 11,
+                "cost_quantity": 12670
+          	},
       
       .......
       
-       "10":{
-			"role": 10,
-			"star": 1,
-			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
-      }
+           "10":{
+                "role": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 11,
+                "cost_quantity": 12670
+          	}
 		},
 		"reward": {
-        "0":{
-          "role": 10,
-          "star": 1,
-          "segment": 0,
-          "cost_item": 1,
-          "cost_quantity": 100
-        },
-     	  "1":{
-          "role": 10,
-          "star": 1,
-          "segment": 0,
-          "cost_item": 1,
-          "cost_quantity": 100
-        },
+            "0":{
+                "role": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 11,
+                "cost_quantity": 100
+            },
+            "1":{
+                "role": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 11,
+                "cost_quantity": 100
+            },
       
       ........
       
-      	"10":{
-          "role": 10,
-          "star": 1,
-          "segment": 0,
-          "cost_item": 1,
-          "cost_quantity": 100
-        },
+            "10":{
+                "role": 10,
+                "star": 1,
+                "segment": 0,
+                "cost_item": 11,
+                "cost_quantity": 100
+            },
 		}
 	}
 }
@@ -956,5 +974,8 @@
 
 [调整关卡失败]()
 
-* 99: 资源不足
+- 97：需要消耗的物品id类型不对
+- 98：需要消耗的物品id不对
+
+* 99：资源不足
 

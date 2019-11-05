@@ -441,5 +441,5 @@ async def increase_role_segment(uid, rid, segment, **kwargs):
 
 
 def get_time_format(seconds):
-	return '0:00:00' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}'
+	return '' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}'
 
