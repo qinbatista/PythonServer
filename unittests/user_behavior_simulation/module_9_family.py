@@ -24,10 +24,66 @@ def print_method(my_string):
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
-def family_dialog(token,world,get_all_family_info,player_info):
-	print_module("player_info="+str(player_info))
-	print_module("get_all_family_info="+str(get_all_family_info))
-	myLevel = player_info["data"]["remaining"]["level"]
+def create_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'create_family', 'data' : {'token': _token, 'name': "四大天王"}})
+	print_method(str(response))
+
+def leave_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'leave_family', 'data' : {'token': _token}})
+	print_method(str(response))
+
+def invite_user_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'invite_user_family', 'data' : {'token': _token, 'gn_target': '四大天王1'}})
+	print_method(str(response))
+
+def remove_user_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'remove_user_family', 'data' : {'token': _token, 'gn_target': '四大天王1'}})
+	print_method(str(response))
+
+def request_join_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'request_join_family', 'data' : {'token': _token, 'name': 'a'}})
+	print_method(str(response))
+
+def get_all_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'get_all_family', 'data' : {'token': _token}})
+	print_method(str(response))
+
+def get_store_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'get_store_family', 'data' : {'token': _token}})
+	print_method(str(response))
+
+def market_purchase_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'market_purchase_family', 'data' : {'token': _token, 'item':"3:6:1"}})
+	print_method(str(response))
+
+def set_notice_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'set_notice_family', 'data' : {'token': _token, 'msg':"i呜呜呜呜呜呜呜"}})
+	print_method(str(response))
+
+def set_blackboard_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'set_blackboard_family', 'data' : {'token': _token, 'msg':"i呜呜呜呜呜呜呜"}})
+	print_method(str(response))
+
+def set_role_family(_token,_world):
+	response = send_tcp_message({'world' : 0, 'function' : 'set_role_family', 'data' : {'token': _token, 'gn_target':"去污","role":4}})
+	print_method(str(response))
+
+def family_dialog(_token,_world,info):
+	create_family(_token,_world)
+	# leave_family(_token,_world)
+	invite_user_family(_token,_world)
+	# remove_user_family(_token,_world)
+	# request_join_family(_token,_world)
+	# get_all_family(_token,_world)
+	# market_purchase_family(_token,_world)
+	# set_notice_family(_token,_world)
+	# set_blackboard_family(_token,_world)
+	# set_role_family(_token,_world)
+
+	return
+	print_module("player_info="+str(info))
+	print_module("get_all_family_info="+str(info))
+	myLevel = info["data"]["remaining"]["level"]
 
 	if myLevel<18:
 		response = send_tcp_message({'world' : 0, 'function' : 'request_join_family', 'data' : {'token': token, 'fname': 'family_name_'+str(random.randint(0,user_behavior_simulation.testing_people_number))}})
@@ -87,12 +143,7 @@ def family_dialog(token,world,get_all_family_info,player_info):
 	response = send_tcp_message({'world' : 0, 'function' : 'leave_family', 'data' : {'token': token}})
 	print_method(str(response))
 
-@login_decoration
-def invite_user_family(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'create_family', 'data': {'token': kwargs['token'], 'name': 'qqqqfamily_name'}})
-	print_method(str(response))
-	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'invite_user_family', 'data' : {'token': kwargs['token'], 'gn_target': 'qqw'}})
-	print_method(str(response))
+
 
 
 if __name__ == '__main__':
@@ -100,4 +151,5 @@ if __name__ == '__main__':
 	# print_method(str(response))
 	# token = response['data']['token']
 	# family_dialog(token, 0, '')
-	invite_user_family()
+	# invite_user_family()
+	pass
