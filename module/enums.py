@@ -285,6 +285,7 @@ class Progress(enum.IntEnum):
 	TOWER_STAGE = 2
 	ENERGY = 3
 
+
 class Task(enum.IntEnum):
 	LOGIN = 1
 	CHECK_IN = 2
@@ -309,5 +310,7 @@ class Factory(enum.IntEnum):
 	CRYSTAL = 2
 	ARMOR = 3
 
-class Leaderboard(enum.IntEnum):
+
+class LeaderBoard(enum.IntEnum):
 	WORLD_BOSS = 1
+

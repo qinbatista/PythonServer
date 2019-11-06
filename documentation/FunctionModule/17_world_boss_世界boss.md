@@ -2,7 +2,7 @@
 
 ## check_boss_status
 
-#####发送消息JSON格式
+##### 发送消息JSON格式
 
 获取世界boss的详细情况，返回的消息内容为所有boss的血量（目前为10个世界boss），挑战次数，刷新挑战次数时间，此方法只作为客户端显示实用，boss的生命值来自配置文件world_boss_config.json，玩家上传的分数会直接和配置文件的数值相减，配置文件boss的生命值每个月会刷新一次，生命值耗尽继续挑战下一个boss，世界boss打死之后服务器会在一天之内给所有玩家发送邮件礼物，每个月一号会刷新所有世界boss
 
@@ -55,7 +55,7 @@
 
 ## get_top_damage
 
-#####发送消息JSON格式
+##### 发送消息JSON格式
 
 获取世界boss的伤害排行榜，一次只会获取10个人的伤害排行榜
 
@@ -64,10 +64,10 @@
 ```json
 { 
 	"world": 0,
-	"function": "enter_stage",
+	"function": "get_top_damage",
 	"data": {
 		"token": "my token",
-    "rank":1
+    	"rank":1
 	}
 }
 ```
@@ -133,5 +133,65 @@
 [失败消息]()
 
 * 99: 关卡数量不对
+
+
+
+## leave_world_boss_stage
+
+##### 发送消息JSON格式
+
+离开世界boss房间，更新世界boss最高伤害
+
+```json
+{ 
+	"world": 0,
+	"function": "leave_world_boss_stage",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功消息]()
+
+>new_record: 是否是最新记录，0代表不是最新记录，1代表是最新记录
+>
+>highest_damage: 造成的最高伤害
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"new_record": 1,
+		"highest_damage": 999999
+	}
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
