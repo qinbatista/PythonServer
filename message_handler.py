@@ -310,10 +310,10 @@ class MessageHandler:
 
 	###################### lottery.py ######################
 	async def _fortune_wheel_basic(self, data: dict) -> str:
-		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.BASIC, data['data']['item'], **data)
+		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.BASIC, enums.Item(int(data['data']['item'])), **data)
 
 	async def _fortune_wheel_pro(self, data: dict) -> str:
-		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.PRO, data['data']['item'], **data)
+		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.PRO, enums.Item(int(data['data']['item'])), **data)
 
 	async def _get_config_lottery(self, data: dict) -> str:
 		return common.mt(0, 'success', {'config': {'skills': self._lottery['random_gift']['SKILL']['cost'], 'weapons': self._lottery['random_gift']['WEAPON']['cost'], 'roles': self._lottery['random_gift']['ROLE']['cost'], 'fortune_wheel': self._lottery['fortune_wheel']['cost']}})
