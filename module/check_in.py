@@ -18,14 +18,14 @@ async def supplement_check_in(uid, **kwargs):
 	today_number = datetime.today().day
 	missing_days = today_number - len(data)
 	if missing_days == 0:return common.mt(98, 'no day missing')
-	isok,diamond_data = await common.try_item(uid, enums.Item.DIAMOND, -missing_days * kwargs["config"]["patch_diamond"], **kwargs)
+	isok, diamond = await common.try_item(uid, enums.Item.DIAMOND, -missing_days * kwargs["config"]["patch_diamond"], **kwargs)
 	if isok == False:return common.mt(99, 'Insufficient diamond')
 	check_data={}
 	for i in range(1,today_number):
 		kwargs.update({"hard_day": f'{"" if i > 9 else "0"}{i}'})
 		result = await check_in(uid,**kwargs)
 		check_data.update({i: result["data"]})
-	return common.mt(0, 'Successful signing', data={'supplement': check_data})
+	return common.mt(0, 'Successful signing', data={'supplement': check_data, 'remaining': {'diamond': diamond}, 'reward': {'diamond': missing_days * kwargs["config"]["patch_diamond"]}})
 
 async def check_in(uid, **kwargs):
 	"""每日签到"""
