@@ -6,7 +6,7 @@
 
 
 
-## get_fortune_wheel_config
+## get_config_lottery
 
 ##### 发送消息JSON格式
 
@@ -17,7 +17,7 @@
 ```json
 {
 	"world": 0,
-	"function": "basic_summon",
+	"function": "get_config_lottery",
 	"data": {
 		"token": "my token"
 	}
@@ -34,11 +34,11 @@
 
 ```json
 {
-	"status": 2,
-	"message": "new weapon unlocked",
+	"status": 0,
+	"message": "success",
 	"data": {
 		"config": {
-			"cost": {
+			"skills": {
 				"3:1": 100,
 				"3:5": 100,
 				"3:11": 1,
@@ -46,19 +46,31 @@
 				"3:13": 1,
 				"3:12": 1
 			},
-			......
-				"PROPHET": {
-					"3:1": 10000,
-					"3:4": 50,
-					"3:6": 10,
-					"3:2": 30,
-					"3:7": 40,
-					"3:8": 10,
-					"3:12": 1
-				}
+			"weapons": {
+				"3:1": 100,
+				"3:5": 100,
+				"3:11": 1,
+				"3:16": 10,
+				"3:13": 1,
+				"3:12": 1
+			},
+			"roles": {
+				"3:1": 100,
+				"3:5": 100,
+				"3:11": 1,
+				"3:16": 10,
+				"3:13": 1,
+				"3:12": 1
+			},
+			"fortune_wheel": {
+				"3:1": 100,
+				"3:5": 100,
+				"3:11": 1,
+				"3:16": 10,
+				"3:13": 1,
+				"3:12": 1
 			}
-		},
-		"timer": "25:22:11"
+		}
 	}
 }
 ```
@@ -76,7 +88,7 @@
 ```json
 {
 	"world": 0, 
-	"function": "get_config_lottery",
+	"function": "fortune_wheel_basic",
 	"data": {
 		"token": "my toekn ^_^",
     "item": 1,
@@ -86,11 +98,13 @@
 
 ##### 接受消息JSON格式
 
-* 0: 获得技能
+* 0: 获得新技能
 * 1: 获得重复，变为卷轴
-* 2: 获得通用物品
-* 5: 获得角色碎片
+* 2: 获得新武器
 * 3: 获得武器碎片
+* 4: 获得新角色
+* 5: 获得角色碎片
+* 6: 获得通用物品
 
 [抽取成功]()
 
@@ -98,28 +112,107 @@
 >
 > reward：数据的改变量
 
+***0，1通用格式***
+
 ```json
 {
-	"status": 5,
-	"message": "get item",
+	"status": 1,
+	"message": "get scroll",
 	"data": {
 		"remaining": {
-			"group_id": "3",
-			"enum_id": "2",
-			"item_quantity": 4296,
+			"skill": -1,
+			"level": -1,
+			"scroll_id": 6,
+			"scroll_quantity": 24,
 			"cost_item": 5,
-			"cost_quantity": 987029
+			"cost_quantity": 297780
 		},
 		"reward": {
-			"group_id": "3",
-			"enum_id": "2",
-			"item_quantity": 3,
+			"skill": -1,
+			"level": -1,
+			"scroll_id": 6,
+			"scroll_quantity": 1,
 			"cost_item": 5,
-			"cost_quantity": 30
+			"cost_quantity": 100
 		}
 	}
 }
 ```
+
+***2，3通用格式***
+
+```json
+{
+	"status": 3,
+	"message": "get segment",
+	"data": {
+		"remaining": {
+			"weapon": 1,
+			"star": 1,
+			"segment": 40,
+			"cost_item": 5,
+			"cost_quantity": 296780
+		},
+		"reward": {
+			"weapon": 1,
+			"star": 0,
+			"segment": 30,
+			"cost_item": 5,
+			"cost_quantity": 100
+		}
+	}
+}
+```
+
+***4，5通用格式***
+
+```json
+{
+	"status": 5,
+	"message": "get segment",
+	"data": {
+		"remaining": {
+			"role": 6,
+			"star": 1,
+			"segment": 300,
+			"cost_item": 5,
+			"cost_quantity": 255080
+		},
+		"reward": {
+			"role": 6,
+			"star": 0,
+			"segment": 30,
+			"cost_item": 5,
+			"cost_quantity": 100
+		}
+	}
+}
+```
+
+***6通用格式***
+
+
+```json
+{
+	"status": 6,
+	"message": "get item",
+	"data": {
+		"remaining": {
+			"item_id": "6",
+			"item_quantity": 22,
+			"cost_item": 5,
+			"cost_quantity": 297980
+		},
+		"reward": {
+			"item_id": "6",
+			"item_quantity": 1,
+			"cost_item": 5,
+			"cost_quantity": 100
+		}
+	}
+}
+```
+
 
 [抽取失败]()
 
@@ -138,7 +231,7 @@
 ```json
 {
 	"world": 0,
-	"function": "basic_summon",
+	"function": "fortune_wheel_pro",
 	"data": {
 		"token": "my token",
     "item":5
@@ -148,11 +241,13 @@
 
 ##### 接受消息JSON格式
 
-* 0: 获得技能
+* 0: 获得新技能
 * 1: 获得重复，变为卷轴
-* 2: 获得通用物品
-* 5: 获得角色碎片
+* 2: 获得新武器
 * 3: 获得武器碎片
+* 4: 获得新角色
+* 5: 获得角色碎片
+* 6: 获得通用物品
 
 [抽取成功]()
 
@@ -160,23 +255,101 @@
 >
 > reward: 抽取之后资源的变化量
 
+***0，1通用格式***
+
 ```json
 {
-	"status": 2,
-	"message": "new weapon unlocked",
+	"status": 1,
+	"message": "get scroll",
 	"data": {
 		"remaining": {
-			"weapon": 10,
-			"star": 1,
-			"segment": 0,
-			"cost_item": 1,
-			"cost_quantity": 12670
+			"skill": -1,
+			"level": -1,
+			"scroll_id": 6,
+			"scroll_quantity": 24,
+			"cost_item": 5,
+			"cost_quantity": 297780
 		},
 		"reward": {
-			"weapon": 10,
+			"skill": -1,
+			"level": -1,
+			"scroll_id": 6,
+			"scroll_quantity": 1,
+			"cost_item": 5,
+			"cost_quantity": 100
+		}
+	}
+}
+```
+
+***2，3通用格式***
+
+```json
+{
+	"status": 3,
+	"message": "get segment",
+	"data": {
+		"remaining": {
+			"weapon": 1,
 			"star": 1,
-      "segment": 0,
-      "cost_item": 1,
+			"segment": 40,
+			"cost_item": 5,
+			"cost_quantity": 296780
+		},
+		"reward": {
+			"weapon": 1,
+			"star": 0,
+			"segment": 30,
+			"cost_item": 5,
+			"cost_quantity": 100
+		}
+	}
+}
+```
+
+***4，5通用格式***
+
+```json
+{
+	"status": 5,
+	"message": "get segment",
+	"data": {
+		"remaining": {
+			"role": 6,
+			"star": 1,
+			"segment": 300,
+			"cost_item": 5,
+			"cost_quantity": 255080
+		},
+		"reward": {
+			"role": 6,
+			"star": 0,
+			"segment": 30,
+			"cost_item": 5,
+			"cost_quantity": 100
+		}
+	}
+}
+```
+
+***6通用格式***
+
+
+```json
+{
+	"status": 6,
+	"message": "get item",
+	"data": {
+		"remaining": {
+			"item_id": "6",
+			"item_quantity": 22,
+			"cost_item": 5,
+			"cost_quantity": 297980
+		},
+		"reward": {
+			"item_id": "6",
+			"item_quantity": 1,
+			"cost_item": 5,
 			"cost_quantity": 100
 		}
 	}

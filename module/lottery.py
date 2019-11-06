@@ -25,7 +25,7 @@ async def fortune_wheel(uid, tier, item, **kwargs):
 	group, enum_id = giftcode.split(':')
 	if enums.Group(int(group)) == enums.Group.ITEM:
 		_, quantity = await common.try_item(uid, enums.Item(int(enum_id)), kwargs['config']['lottery']['fortune_wheel']['rewards'][tier.name][giftcode], **kwargs)
-		return common.mt(5, 'get item', {'remaining' : {'cost_item' : item.value, 'cost_quantity' : remaining, 'group_id' : group, 'enum_id' : enum_id, 'item_quantity' : quantity}, 'reward' : {'group_id' : group, 'enum_id' : enum_id, 'item_quantity' : kwargs['config']['lottery']['fortune_wheel']['rewards'][tier.name][giftcode]}})
+		return common.mt(6, 'get item', {'remaining' : {'item_id' : enum_id, 'item_quantity' : quantity, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'item_id' : enum_id, 'item_quantity' : kwargs['config']['lottery']['fortune_wheel']['rewards'][tier.name][giftcode], 'cost_item' : item.value, 'cost_quantity' : cost}})
 	else:
 		new, reward = await SWITCH[enums.Group(int(group))](uid, int(enum_id), **kwargs)
 		return await summoning._response_factory(uid, enums.Group(int(group)), new, reward, item, remaining, cost, **kwargs)
