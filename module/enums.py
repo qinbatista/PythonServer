@@ -309,8 +309,5 @@ class Factory(enum.IntEnum):
 	CRYSTAL = 2
 	ARMOR = 3
 
-
-
-
-
-
+class Leaderboard(enum.IntEnum):
+	WORLD_BOSS = 1

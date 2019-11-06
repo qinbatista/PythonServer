@@ -36,15 +36,26 @@ def get_hang_up_reward(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_hang_up_reward', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
 	print_method("[get_hang_up_reward]"+str(response)+" stage:"+str(kwargs['stage']))
 
+def check_boss_status(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'check_boss_status', 'data': {'token': kwargs['token']}})
+	print("[check_boss_status]"+str(response))
+
+def enter_stage(**kwargs):
+	response = send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
+	print("[enter_stage]"+str(response))
+
 def stage_dialog(token,world,info_list):
-	while True:
-		my_choice =  random.randint(3,3)
-		opeation_stage = random.randint(0,2)
-		if my_choice==0: enter_stage(**{"world":world,"token":token,"stage":opeation_stage})
-		if my_choice==1: pass_stage(**{"world":world,"token":token,"stage":opeation_stage})
-		if my_choice==2: start_hang_up(**{"world":world,"token":token,"stage":opeation_stage})
-		if my_choice==3: get_hang_up_reward(**{"world":world,"token":token,"stage":opeation_stage})
-		if my_choice==4: break
+	# while True:
+	my_choice =  random.randint(7,7)
+	opeation_stage = random.randint(0,2)
+	if my_choice==0: enter_stage(**{"world":world,"token":token,"stage":opeation_stage})
+	if my_choice==1: pass_stage(**{"world":world,"token":token,"stage":opeation_stage})
+	if my_choice==2: start_hang_up(**{"world":world,"token":token,"stage":opeation_stage})
+	if my_choice==3: get_hang_up_reward(**{"world":world,"token":token,"stage":opeation_stage})
+	if my_choice==4: pass#break
+	if my_choice==5: check_boss_status(**{"world":world,"token":token})
+	if my_choice==6: enter_stage(**{"world":world,"token":token,"stage":3000})
+	if my_choice==7: pass_stage(**{"world":world,"token":token,"stage":3000,"damage":30000})
 
 if __name__ == '__main__':
 	unique_id = '1'
