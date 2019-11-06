@@ -52,7 +52,7 @@ async def transaction(uid, pid, **kwargs):
 	else:
 		return common.mt(94, 'The server found an abnormal group id')
 	await set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs)
-	return common.mt(0, 'Purchase success', {'transactions': transactions, 'remaining': remaining})
+	return common.mt(0, 'Purchase success', {'reward': transactions, 'remaining': remaining})
 
 
 async def get_all_market(uid, **kwargs):
