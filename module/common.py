@@ -65,15 +65,23 @@ async def try_armor(uid, aid, level, value, **kwargs):
 				return (True, quantity[0][0] + value) if quantity != () else (True, value)
 			return (False, quantity[0][0] + value) if quantity != () else (False, value)
 
-async def try_weapon(uid, gift,quantity, **kwargs):
-	weapon = enums.Weapon(gift)
-	await execute(f'UPDATE weapon SET segment = segment + {quantity} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
-	return (False, weapon)
+async def try_weapon(uid, weapon, quantity, **kwargs):
+	data = await execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
+	if data == ():
+		await execute(f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {weapon.value}, {quantity});', **kwargs)
+	else:
+		quantity += data[0][0]
+		await execute(f'UPDATE weapon SET segment = {quantity} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
+	return quantity
 
-async def try_role(uid, gift,quantity, **kwargs):
-	role = enums.Role(gift)
-	await execute(f'UPDATE role SET segment = segment + {quantity} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
-	return (False, role)
+async def try_role(uid, role, quantity, **kwargs):
+	data = await execute(f'SELECT segment FROM role WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
+	if data == ():
+		await execute(f'INSERT INTO role (uid, rid, segment) VALUES ("{uid}", {role.value}, {quantity});', **kwargs)
+	else:
+		quantity += data[0][0]
+		await execute(f'UPDATE role SET segment = {quantity} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
+	return quantity
 
 async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
 	data = await execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \

@@ -46,7 +46,8 @@ if __name__ == '__main__':
 	token = response['data']['token']
 	# response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
 	# response = send_tcp_message({'world': 0, 'function': 'friend_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
-	response = send_tcp_message({'world': 0, 'function': 'get_all_check_in_table', 'data': {'token': token}})
+	# response = send_tcp_message({'world': 0, 'function': 'check_in', 'data': {'token': token}})
+	response = send_tcp_message({'world': 0, 'function': 'supplement_check_in', 'data': {'token': token}})
 	print(response)
 
 

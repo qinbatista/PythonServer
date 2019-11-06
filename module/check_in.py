@@ -18,20 +18,20 @@ async def supplement_check_in(uid, **kwargs):
 	today_number = datetime.today().day
 	missing_days = today_number - len(data)
 	if missing_days == 0:return common.mt(98, 'no day missing')
-	isok,diamond_data = await common.try_item(uid, enums.Item.DIAMOND, -missing_days * kwargs["config"]["patch_diamond"], **kwargs)
+	isok, diamond = await common.try_item(uid, enums.Item.DIAMOND, -missing_days * kwargs["config"]["patch_diamond"], **kwargs)
 	if isok == False:return common.mt(99, 'Insufficient diamond')
 	check_data={}
 	for i in range(1,today_number):
 		kwargs.update({"hard_day": f'{"" if i > 9 else "0"}{i}'})
 		result = await check_in(uid,**kwargs)
 		check_data.update({i: result["data"]})
-	return common.mt(0, 'Successful signing', data={'supplement': check_data})
+	return common.mt(0, 'Successful signing', data={'supplement': check_data, 'remaining': {'diamond': diamond}, 'reward': {'diamond': missing_days * kwargs["config"]["patch_diamond"]}})
 
 async def check_in(uid, **kwargs):
 	"""每日签到"""
 	# 0 - Sign-in success
 	# 99 - You have already signed in today
-	kwargs.update({"tid":enums.Task.CHECK_IN,"task_value":1})
+	kwargs.update({"tid": enums.Task.CHECK_IN, "task_value": 1})
 	await task.record_task(uid,**kwargs)
 	current_time = time.strftime('%Y-%m-'+str(kwargs["hard_day"]), time.localtime()) if kwargs.__contains__("hard_day") else time.strftime('%Y-%m-%d', time.localtime())
 	s_data = await common.execute( f'select * from check_in where uid="{uid}" and date="{current_time}"', **kwargs)
@@ -45,10 +45,10 @@ async def check_in(uid, **kwargs):
 			vip_level = i
 			break
 	vip_bond =1 if which_day >= vip_level else 2
-	if int(item_set[0])==enums.Group.ITEM.value:   isok,quantity = await common.try_item(   uid, enums.Item(int(item_set[1])),   vip_bond*int(item_set[2]), **kwargs)
-	if int(item_set[0])==enums.Group.WEAPON.value: isok,quantity = await common.try_weapon( uid, enums.Weapon(int(item_set[1])), vip_bond*int(item_set[2]), **kwargs)
-	if int(item_set[0])==enums.Group.ROLE.value:   isok,quantity = await common.try_role(   uid, enums.Role(int(item_set[1])),   vip_bond*int(item_set[2]), **kwargs)
-	await common.execute_update( f'insert into check_in(uid, date) values("{uid}", "{current_time}")',**kwargs)
+	if int(item_set[0])==enums.Group.ITEM.value: _, quantity = await common.try_item(   uid, enums.Item(int(item_set[1])),   vip_bond*int(item_set[2]), **kwargs)
+	if int(item_set[0])==enums.Group.WEAPON.value:  quantity = await common.try_weapon( uid, enums.Weapon(int(item_set[1])), vip_bond*int(item_set[2]), **kwargs)
+	if int(item_set[0])==enums.Group.ROLE.value:    quantity = await common.try_role(   uid, enums.Role(int(item_set[1])),   vip_bond*int(item_set[2]), **kwargs)
+	await common.execute_update( f'insert into check_in(uid, date, reward) values("{uid}", "{current_time}", 1)',**kwargs)
 	return common.mt(0, 'Sign-in success',{"remaining":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{quantity}'],"reward":[f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{vip_bond*int(item_set[2])}']})
 
 async def get_all_check_in_table(uid, **kwargs):

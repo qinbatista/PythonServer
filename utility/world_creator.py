@@ -36,7 +36,7 @@ CHECKIN = \
 CREATE TABLE `check_in` (
 	 `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一标识',
 	 `date` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到日期',
-	 `reward` smallint(6) DEFAULT 0 COMMENT '0：未领奖，1：已领奖',
+	 `reward` smallint(6) DEFAULT 1 COMMENT '0：未领奖，1：已领奖',
 	 PRIMARY KEY (`uid`, `date`),
 	 CONSTRAINT `checkin_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
