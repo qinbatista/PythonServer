@@ -66,14 +66,22 @@ async def try_armor(uid, aid, level, value, **kwargs):
 			return (False, quantity[0][0] + value) if quantity != () else (False, value)
 
 async def try_weapon(uid, weapon, quantity, **kwargs):
-	await execute(f'UPDATE weapon SET segment = segment + {quantity} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
-	quantity = (await execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs))[0][0]
-	return (False, quantity)
+	data = await execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
+	if data == ():
+		await execute(f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {weapon.value}, {quantity});', **kwargs)
+	else:
+		quantity += data[0][0]
+		await execute(f'UPDATE weapon SET segment = {quantity} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
+	return quantity
 
 async def try_role(uid, role, quantity, **kwargs):
-	await execute(f'UPDATE role SET segment = segment + {quantity} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
-	quantity = (await execute(f'SELECT segment FROM role WHERE uid = "{uid}" AND rid = {role.value};', **kwargs))[0][0]
-	return (False, quantity)
+	data = await execute(f'SELECT segment FROM role WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
+	if data == ():
+		await execute(f'INSERT INTO role (uid, rid, segment) VALUES ("{uid}", {role.value}, {quantity});', **kwargs)
+	else:
+		quantity += data[0][0]
+		await execute(f'UPDATE role SET segment = {quantity} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
+	return quantity
 
 async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
 	data = await execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
