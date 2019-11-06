@@ -620,6 +620,14 @@ class MessageHandler:
 				}
 				}
 
+	async def _get_config_player(self, data: dict) -> str:
+		data['exp_config'] = self._player_experience['player_level']['experience']
+		energy = self._player['energy']
+		_, exp_info = await stage.increase_exp(data['data']['unique_id'], 0, **data)
+		_, diamond = await common.try_item(data['data']['unique_id'], enums.Item.DIAMOND, 0, **data)
+		_, coin = await common.try_item(data['data']['unique_id'], enums.Item.COIN, 0, **data)
+		return common.mt(0, 'success', {'player_config': self._player_experience, 'energy': {'time': f'{energy["cooling_time"]//60}:{"0" if energy["cooling_time"] % 60 < 10 else ""}{energy["cooling_time"] % 60}:00', 'max_energy': energy['max_energy']}, 'exp_info': exp_info, 'diamond': diamond, 'coin': coin})
+
 
 ##########################################################################################################
 ##########################################################################################################
@@ -803,5 +811,7 @@ FUNCTION_LIST = {
 	'refresh_all_storage':MessageHandler._refresh_all_storage,
 	'get_all_family_info': MessageHandler._get_all_family_info,
 
+
+	'get_config_player': MessageHandler._get_config_player,
 }
 

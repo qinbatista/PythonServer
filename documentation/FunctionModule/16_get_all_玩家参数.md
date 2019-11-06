@@ -839,7 +839,7 @@
 
 
 
-##get_config_player
+## get_config_player
 
 获取player_config.json的配置文件 抽奖和转盘
 
@@ -868,23 +868,27 @@
 ```json
 {
 	"status": 0,
-	"message": "unlucky",
+	"message": "success",
 	"data": {
 		"player_config": {....},
-    "energy": {
+    	"energy": {
 			"time": "0:20:00",
-			"remaining": 9998,
-			"reward": -2
+			"max_energy": 10
 		},
-    "diamond":500,
-    "coin":100
+        "exp_info": {
+            "exp": 790,
+            "level": 9,
+            "need": 50
+        },
+    	"diamond":500,
+    	"coin":100
 	}
 }
 ```
 
 
 
-##get_config_factory
+## get_config_factory
 
 获取get_factory_config.json的配置文件 抽奖和转盘
 
