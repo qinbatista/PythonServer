@@ -37,6 +37,20 @@ def get_random_item(_token,_world):
 	print_module("[get_random_item]")
 	while True:
 		int_number = random.randint(0,0)
-		if int_number==0: fortune_wheel_basic()
-		if int_number==1: fortune_wheel_pro()
-		if int_number==2: break
+		if int_number == 0: fortune_wheel_basic()
+		if int_number == 1: fortune_wheel_pro()
+		if int_number == 2: break
+
+
+if __name__ == '__main__':
+	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
+	print(response)
+	token = response['data']['token']
+	# response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
+	# response = send_tcp_message({'world': 0, 'function': 'friend_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
+	# response = send_tcp_message({'world': 0, 'function': 'check_in', 'data': {'token': token}})
+	for i in range(100):
+		# response = send_tcp_message({'world': 0, 'function': 'fortune_wheel_basic', 'data': {'token': token, 'item': 5}})
+		response = send_tcp_message({'world': 0, 'function': 'fortune_wheel_pro', 'data': {'token': token, 'item': 5}})
+		print(response)
+
