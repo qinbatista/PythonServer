@@ -24,6 +24,9 @@ def get_stage_info():#获取关卡信息消耗，奖励和设置
 	print_method("[get_stage_info]"+str(response))
 	return response
 
+
+
+
 def get_monster_info():#获取怪物参数
 	response = send_tcp_message({'function' : 'get_monster_info', 'data' : {'token' : token}})#升级请求
 	print_method("[get_monster_info]"+str(response))
@@ -200,18 +203,18 @@ def get_all_info(_token,_world):
 	world = _world
 	token = _token
 	return [
-			#get_config_stage 获取关卡的消耗列表与关卡的奖励列表entry_consumables_config.json,stage_reward_config.json 关卡 hang_reward_config.json挂机信息
-			#get_config_lottery 获取lottery.json的配置文件  抽奖和转盘
-			#get_config_weapon 获取weapon_config.json 武器升级的概率
-			#get_config_skill 获取skill_level_up_config 技能升级的概率
-			#get_config_mall 获取mall_config.json 商店的物品
-			#get_config_role 获取role_config.json 角色的物品
-			#get_config_task 获取task.json 任务奖励
-			#get_config_achievement 获取achievement_config.json 获取成就
-			#get_config_check_in 获取check_in.json 获取签到成就
-			#get_config_vip 获取vip_config.json 获得vip系统
-			#get_config_player 获取player_config.json（卡片兑换，体力上限，恢复时间）和player_experience.json
-			#get_config_factory   获取get_factory_config.json 获取工厂配置信息
+			# get_config_stage 获取关卡的消耗列表与关卡的奖励列表entry_consumables_config.json,stage_reward_config.json 关卡 hang_reward_config.json挂机信息
+			# get_config_lottery 获取lottery.json的配置文件  抽奖和转盘
+			# get_config_weapon 获取weapon_config.json 武器升级的概率
+			# get_config_skill 获取skill_level_up_config 技能升级的概率
+			# get_config_mall 获取mall_config.json 商店的物品
+			# get_config_role 获取role_config.json 角色的物品
+			# get_config_task 获取task.json 任务奖励
+			# get_config_achievement 获取achievement_config.json 获取成就
+			# get_config_check_in 获取check_in.json 获取签到成就
+			# get_config_vip 获取vip_config.json 获得vip系统
+			# get_config_player 获取player_config.json（卡片兑换，体力上限，恢复时间）和player_experience.json, 玩家当前体力信息，金币数量，
+			# get_config_factory   获取get_factory_config.json 获取工厂配置信息
 
 			get_all_achievement(),
 			get_all_armor(),

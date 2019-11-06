@@ -14,14 +14,18 @@ TOWER_BASE_STAGE = 1000
 # 进入关卡
 async def enter_stage(uid, stage, **kwargs):
 	if stage < 1000: return await e_general_stage(uid, stage, **kwargs)
-	elif 1000 <= stage < 2000: return await e_tower_stage(uid, stage, **kwargs)
+	elif 1000 <= stage < 1999: return await e_tower_stage(uid, stage, **kwargs)
+	elif 2000 <= stage < 2999: return await e_tower_stage(uid, stage, **kwargs)
+	elif 3000 <= stage < 3999: return await enter_world_boss_stage(uid, stage, **kwargs)
 	else: return common.mt(50, 'Abnormal parameter')
 
 
 # 通过关卡
 async def pass_stage(uid, stage, **kwargs):
-	if stage < 1000: return await p_general_stage(uid, stage, **kwargs)
-	elif 1000 <= stage < 2000: return await p_tower_stage(uid, stage, **kwargs)
+	if 0<stage < 999: return await p_general_stage(uid, stage, **kwargs)
+	elif 1000 <= stage < 1999: return await p_tower_stage(uid, stage, **kwargs)
+	elif 2000<stage < 2999: return await p_general_stage(uid, stage, **kwargs)
+	elif 3000<stage < 3999: return await leave_world_boss_stage(uid, stage, **kwargs)
 	else: return common.mt(50, 'Abnormal parameter')
 
 
@@ -374,6 +378,52 @@ async def get_hang_up_info(uid, **kwargs):
 	return common.mt(0, 'Successfully get hook information', {'get_hang_up_info': get_hang_up_infos, 'hang_up_info': {'hang_stage': hang_stage, 'time': get_time_format(int(delta_time.total_seconds()))}})
 
 
+
+async def check_boss_status(uid,**kwargs):
+	timer = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" and tid = {enums.Timer.WORLD_BOSS_CHALLENGE_TIME};', **kwargs)
+	current_this_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+	if timer == ():
+		enter_times = 3
+		await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.WORLD_BOSS_CHALLENGE_TIME},"{current_this_time}") ON DUPLICATE KEY UPDATE `tid`= {enums.Timer.WORLD_BOSS_CHALLENGE_TIME}',**kwargs)
+		await common.execute(f'INSERT INTO limits (uid, lid, value) VALUES ("{uid}", {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS},"3") ON DUPLICATE KEY UPDATE `value`= {3}',**kwargs)
+	else:
+		delta_time = datetime.strptime(current_this_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S')
+		if delta_time.days>=1:
+			enter_times = 3
+			await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.WORLD_BOSS_CHALLENGE_TIME},"{current_this_time}") ON DUPLICATE KEY UPDATE `time`= "{current_this_time}"',**kwargs)
+			await common.execute(f'INSERT INTO limits (uid, lid, value) VALUES ("{uid}", {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS},"3") ON DUPLICATE KEY UPDATE `value`= {3}',**kwargs)
+		else:
+			limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" and lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
+			enter_times = limits[0][0]
+	d1 = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
+	d2 = datetime.strptime((datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d 00:00:00"), '%Y-%m-%d %H:%M:%S')
+	message_dic = {'remaining':{'remaining_enter_times':enter_times,'remaining_time':int((d2-d1).total_seconds())}}
+	for i in range(0, len(kwargs["boss_life_remaining"])):
+		message_dic["remaining"].update({'boss'+str(i) : "%.2f" %(int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))})
+	return common.mt(0, 'Successfully get hook information', message_dic)
+
+async def enter_world_boss_stage(uid, stage,**kwargs):
+	if kwargs["boss_life_remaining"][9]<=0:return common.mt(99, "boss all died")
+	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
+	if limits[0][0]>= 1:
+		isok,_ = await try_stage(uid, stage, **kwargs)
+		if isok==True:
+			await common.execute(f'UPDATE limits SET value = value - 1 WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
+			return common.mt(0, "enter world boss success")
+		else:
+			return common.mt(97, "no more energy")
+	else:
+		return common.mt(98, "no more ticket, try tomorrow")
+
+async def get_top_damage(uid, range, **kwargs):
+	return common.mt(98, "pass")
+
+async def leave_world_boss_stage(uid, wid, **kwargs):
+	current_time = time.strftime('%Y-%m-%d', time.localtime())
+	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
+	return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_world_boss"]}')
+
+
 ############################################ 私有方法 ############################################
 
 
@@ -438,7 +488,17 @@ async def increase_role_segment(uid, rid, segment, **kwargs):
 	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
 	return data
 
-
+async def try_stage(uid, stage, **kwargs):
+	entry_consume =  kwargs['entry_consume']
+	stages = [int(x) for x in entry_consume.keys() if x.isdigit()]
+	if stage not in stages: stage = max(stages)
+	energy_consume = entry_consume[str(stage)]['cost']  # 消耗能量数
+	# try_energy 扣体力看是否足够
+	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
+	if energy_data["status"] >= 97:
+		return False,common.mt(97, "Insufficient energy")
+	else:
+		return True,common.mt(0, "reduce energy successfully")
 def get_time_format(seconds):
 	return '' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}'
 

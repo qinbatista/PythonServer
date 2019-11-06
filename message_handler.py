@@ -499,6 +499,10 @@ class MessageHandler:
 		data.update({'player_energy': self._player['energy']})  # try_energy
 		data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
 		data['monster_config'] = self._monster_config
+		data['boss_life_remaining'] = self._boss_life_remaining
+		data['boss_life'] = self._boss_life
+		data['max_enter_time'] = self._max_enter_time
+		data['max_upload_damage'] = self._max_upload_damage
 		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_stage(self, data: dict) -> str:
@@ -508,6 +512,8 @@ class MessageHandler:
 	async def _get_config_stage(self, data: dict) -> str:
 		return common.mt(0, 'success', {'entry_consumables_config': self._entry_consumables, 'stage_reward_config': self._stage_reward, 'hang_reward_config': self._hang_reward})
 
+	async def _get_top_damage(self, data: dict) -> str:
+		return await stage.get_top_damage(data['data']['unique_id'], data['data']['range'], **data)
 	# async def _enter_tower(self, data: dict) -> str:
 	# 	data.update({'player_energy': self._player['energy']})  # try_energy
 	# 	data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts_tower['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
@@ -571,8 +577,13 @@ class MessageHandler:
 
 	# TODO
 	async def _check_boss_status(self, data: dict) -> str:
-		return {'status' : 0, 'message' : 'temp function success', 'data' :{'boss' :{'world_boss_enter_time':"2019/10/10 17:00:00",'world_boss_remaining_times':"20",'hp_values':["%.2f" %(int(self._boss_life_remaining[i])/int(self._boss_life[i])) for i in range(0,9)]}}}
-
+		data['boss_life_remaining'] = self._boss_life_remaining
+		data['boss_life'] = self._boss_life
+		data['max_enter_time'] = self._max_enter_time
+		data['max_upload_damage'] = self._max_upload_damage
+		return await stage.check_boss_status(data['data']['unique_id'], **data)
+		# return {'status' : 0, 'message' : 'temp function success', 'data' :{'boss' :{'world_boss_enter_time':"2019/10/10 17:00:00",'world_boss_remaining_times':"20",'hp_values':["%.2f" %(int(self._boss_life_remaining[i])/int(self._boss_life[i])) for i in range(0,9)]}}}
+	
 	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
 	async def _get_family_config(self, data: dict) -> str:
 		return common.mt(0, 'success', {'config': self._family_config})
@@ -810,8 +821,7 @@ FUNCTION_LIST = {
 	'get_factory_info':MessageHandler._get_factory_info,
 	'refresh_all_storage':MessageHandler._refresh_all_storage,
 	'get_all_family_info': MessageHandler._get_all_family_info,
-
-
+	'get_top_damage':MessageHandler._get_top_damage,
 	'get_config_player': MessageHandler._get_config_player,
 }
 
