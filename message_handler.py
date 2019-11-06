@@ -505,6 +505,9 @@ class MessageHandler:
 		data.update({'pass_rewards': self._stage_reward})
 		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
+	async def _get_config_stage(self, data: dict) -> str:
+		return common.mt(0, 'success', {'entry_consumables_config': self._entry_consumables, 'stage_reward_config': self._stage_reward, 'hang_reward_config': self._hang_reward})
+
 	# async def _enter_tower(self, data: dict) -> str:
 	# 	data.update({'player_energy': self._player['energy']})  # try_energy
 	# 	data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts_tower['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
@@ -778,6 +781,7 @@ FUNCTION_LIST = {
 	# 'pass_tower': MessageHandler._pass_tower,
 	'start_hang_up': MessageHandler._start_hang_up,
 	'get_hang_up_reward': MessageHandler._get_hang_up_reward,
+	'get_config_stage': MessageHandler._get_config_stage,
 
 	###################### tasks ######################
 	'get_task_config':MessageHandler._get_task_config,
