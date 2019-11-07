@@ -418,12 +418,33 @@ async def enter_world_boss_stage(uid, stage,**kwargs):
 		return common.mt(98, "no more ticket, try tomorrow")
 
 async def get_top_damage(uid, page, **kwargs):
-	return common.mt(98, "pass")
+	if page < 1: return common.mt(99, 'Page number error')
+	uid_str = f"""
+	SELECT c.value, c.NO FROM (
+		SELECT * FROM (
+			SELECT p.gn, l.value, (@i:=@i + 1) AS NO
+			FROM player p, leaderboard l
+			WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS.value} ORDER BY l.value DESC) temp,
+			(SELECT (@i:=0)) t ORDER BY temp.`value` DESC
+		) c, player p
+	WHERE p.uid = "{uid}" AND c.gn = p.gn
+	"""
+	damange = 0  # 玩家造成的伤害
+	ranking = -1  # 玩家在世界boss表中的排行
+	uid_data = await common.execute(uid_str, **kwargs)
+	if uid_data != (): damange, ranking = uid_data[0]
+	data = await common.execute( f'SELECT p.gn, l.value FROM player p, leaderboard l WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS.value} ORDER BY l.value DESC LIMIT {(page - 1)*10},10;', **kwargs)
+	if data == (): return common.mt(98, 'No data for this page')
+	rank = []
+	for d in data:
+		rank.append({'name': d[0], 'damange': d[1]})
+	return common.mt(0, 'success', {'damange': damange, 'ranking': ranking, 'rank': rank})
 
 async def leave_world_boss_stage(uid, wid, **kwargs):
-	current_time = time.strftime('%Y-%m-%d', time.localtime())
-	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
-	return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_world_boss"]}')
+	pass
+	# current_time = time.strftime('%Y-%m-%d', time.localtime())
+	# limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
+	# return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_world_boss"]}')
 
 
 ############################################ 私有方法 ############################################

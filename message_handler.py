@@ -513,7 +513,7 @@ class MessageHandler:
 		return common.mt(0, 'success', {'entry_consumables_config': self._entry_consumables, 'stage_reward_config': self._stage_reward, 'hang_reward_config': self._hang_reward})
 
 	async def _get_top_damage(self, data: dict) -> str:
-		return await stage.get_top_damage(data['data']['unique_id'], data['data']['range'], **data)
+		return await stage.get_top_damage(data['data']['unique_id'], data['data']['page'], **data)
 	# async def _enter_tower(self, data: dict) -> str:
 	# 	data.update({'player_energy': self._player['energy']})  # try_energy
 	# 	data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts_tower['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
