@@ -14,18 +14,18 @@ TOWER_BASE_STAGE = 1000
 # 进入关卡
 async def enter_stage(uid, stage, **kwargs):
 	if stage < 1000: return await e_general_stage(uid, stage, **kwargs)
-	elif 1000 <= stage < 1999: return await e_tower_stage(uid, stage, **kwargs)
-	elif 2000 <= stage < 2999: return await e_tower_stage(uid, stage, **kwargs)
-	elif 3000 <= stage < 3999: return await enter_world_boss_stage(uid, stage, **kwargs)
+	elif 1000 <= stage < 2000: return await e_tower_stage(uid, stage, **kwargs)
+	elif 2000 <= stage < 3000: return await e_tower_stage(uid, stage, **kwargs)
+	elif 3000 <= stage < 4000: return await enter_world_boss_stage(uid, stage, **kwargs)
 	else: return common.mt(50, 'Abnormal parameter')
 
 
 # 通过关卡
 async def pass_stage(uid, stage, **kwargs):
-	if 0<stage < 999: return await p_general_stage(uid, stage, **kwargs)
-	elif 1000 <= stage < 1999: return await p_tower_stage(uid, stage, **kwargs)
-	elif 2000<stage < 2999: return await p_general_stage(uid, stage, **kwargs)
-	elif 3000<stage < 3999: return await leave_world_boss_stage(uid, stage, **kwargs)
+	if 0 < stage < 1000: return await p_general_stage(uid, stage, **kwargs)
+	elif 1000 <= stage < 2000: return await p_tower_stage(uid, stage, **kwargs)
+	elif 2000 <= stage < 3000: return await p_general_stage(uid, stage, **kwargs)
+	elif 3000 <= stage < 4000: return await leave_world_boss_stage(uid, stage, **kwargs)
 	else: return common.mt(50, 'Abnormal parameter')
 
 
@@ -397,17 +397,19 @@ async def check_boss_status(uid,**kwargs):
 			enter_times = limits[0][0]
 	d1 = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
 	d2 = datetime.strptime((datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d 00:00:00"), '%Y-%m-%d %H:%M:%S')
-	message_dic = {'remaining':{'remaining_enter_times':enter_times,'remaining_time':int((d2-d1).total_seconds())}}
+	seconds = int((d2 - d1).total_seconds())
+	world_boss = {'remaining': enter_times, 'time': f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}'}
+	boss_life_ratio = {}
 	for i in range(0, len(kwargs["boss_life_remaining"])):
-		message_dic["remaining"].update({'boss'+str(i) : "%.2f" %(int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))})
-	return common.mt(0, 'Successfully get hook information', message_dic)
+		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))
+	return common.mt(0, 'Successfully get hook information', {'world_boss': world_boss, 'boss_life_ratio': boss_life_ratio})
 
 async def enter_world_boss_stage(uid, stage,**kwargs):
 	if kwargs["boss_life_remaining"][9]<=0:return common.mt(99, "boss all died")
 	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
-	if limits[0][0]>= 1:
-		isok,_ = await try_stage(uid, stage, **kwargs)
-		if isok==True:
+	if limits[0][0] >= 1:
+		isok, _ = await try_stage(uid, stage, **kwargs)
+		if isok:
 			await common.execute(f'UPDATE limits SET value = value - 1 WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 			return common.mt(0, "enter world boss success")
 		else:
@@ -415,7 +417,7 @@ async def enter_world_boss_stage(uid, stage,**kwargs):
 	else:
 		return common.mt(98, "no more ticket, try tomorrow")
 
-async def get_top_damage(uid, range, **kwargs):
+async def get_top_damage(uid, page, **kwargs):
 	return common.mt(98, "pass")
 
 async def leave_world_boss_stage(uid, wid, **kwargs):
