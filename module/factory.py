@@ -36,7 +36,7 @@ async def refresh(uid, **kwargs):
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}}, \
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
 			'pool' : pool, \
-			'worker' : {enums.Factory.UNASSIGNED.value : ua, **{k.value: worker[k] for k in BASIC_FACTORIES}}, \
+			'worker' : {enums.Factory.UNASSIGNED.value : ua, 'total' : mw, **{k.value: worker[k] for k in BASIC_FACTORIES}}, \
 			'level' : {k.value : level[k] for k in HAS_LEVEL_FACTORIES}})
 
 async def increase_worker(uid, fid, n, **kwargs):
