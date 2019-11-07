@@ -15,8 +15,7 @@ BASIC_FACTORIES     = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None,
 RESOURCE_FACTORIES  = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None}
 
 HAS_LEVEL_FACTORIES = {enums.Factory.FOOD         : None, enums.Factory.IRON  : None, \
-				       enums.Factory.CRYSTAL      : None, enums.Factory.ARMOR : None, \
-					   enums.Factory.WISHING_POOL : None }
+				       enums.Factory.CRYSTAL      : None, enums.Factory.WISHING_POOL : None }
 
 
 
@@ -41,7 +40,8 @@ async def refresh(uid, **kwargs):
 			'level' : {k.value : level[k] for k in HAS_LEVEL_FACTORIES}})
 
 async def increase_worker(uid, fid, n, **kwargs):
-	if fid not in BASIC_FACTORIES: return common.mt(97, 'invalid fid')
+	if n <= 0: return common.mt(96, 'number must be positive')
+	if fid not in BASIC_FACTORIES or fid == enums.Factory.ARMOR: return common.mt(97, 'invalid fid')
 	unassigned, max_worker    = await get_unassigned_workers(uid, **kwargs)
 	level, current_workers, _ = await get_state(uid, **kwargs)
 	if n > unassigned: return common.mt(99, 'insufficient unassigned workers')
@@ -59,7 +59,8 @@ async def increase_worker(uid, fid, n, **kwargs):
 			enums.Factory.UNASSIGNED.value : unassigned - n, 'workers' : current_workers[fid] + n}})
 
 async def decrease_worker(uid, fid, n, **kwargs):
-	if fid not in BASIC_FACTORIES: return common.mt(97, 'invalid fid')
+	if n <= 0: return common.mt(96, 'number must be positive')
+	if fid not in BASIC_FACTORIES or fid == enums.Factory.ARMOR: return common.mt(97, 'invalid fid')
 	unassigned, max_worker    = await get_unassigned_workers(uid, **kwargs)
 	level, current_workers, _ = await get_state(uid, **kwargs)
 	if n > current_workers[fid]: return common.mt(99, 'insufficient assigned workers')
