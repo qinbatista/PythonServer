@@ -506,7 +506,10 @@ class MessageHandler:
 		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_stage(self, data: dict) -> str:
-		data.update({'pass_rewards': self._stage_reward})
+		data['boss_life_remaining'] = self._boss_life_remaining
+		data['boss_life'] = self._boss_life
+		data['pass_rewards'] = self._stage_reward
+		data['max_upload_damage'] = self._max_upload_damage
 		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _get_config_stage(self, data: dict) -> str:

@@ -57,7 +57,7 @@
 
 获取世界boss的伤害排行榜，一次只会获取10个人的伤害排行榜
 
->page: 排行序数，比如1就是排行1～10名的信息，2就是排行11～20的信息依次类推
+>page: 排行序数，比如1就是排行1～10名的信息，2就是排行11～20的信息依次类推，页码从1开始
 
 ```json
 { 
@@ -145,14 +145,16 @@
 
 ##### 发送消息JSON格式
 
-离开世界boss房间，更新世界boss最高伤害
+离开世界boss房间，更新世界boss最高伤害，stage为3000-3999为世界boss关卡离开
 
 ```json
 { 
 	"world": 0,
-	"function": "leave_world_boss_stage",
+	"function": "pass_stage",
 	"data": {
-		"token": "my token"
+		"token": "my token",
+        "stage": 3000, 
+        "damange": 110000
 	}
 }
 ```
@@ -164,14 +166,28 @@
 >new_record: 是否是最新记录，0代表不是最新记录，1代表是最新记录
 >
 >highest_damage: 造成的最高伤害
+>
+>boss_life_ratio: 各个boss的生命值
 
 ```json
 {
 	"status": 0,
 	"message": "success",
 	"data": {
-		"new_record": 1,
-		"highest_damage": 999999
+		"new_record": 0,
+		"highest_damage": 110000,
+		"boss_life_ratio": {
+			"boss0": "0.00",
+			"boss1": "0.00",
+			"boss2": "1.00",
+			"boss3": "1.00",
+			"boss4": "1.00",
+			"boss5": "1.00",
+			"boss6": "1.00",
+			"boss7": "1.00",
+			"boss8": "1.00",
+			"boss9": "1.00"
+		}
 	}
 }
 ```

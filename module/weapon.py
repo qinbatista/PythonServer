@@ -51,6 +51,7 @@ async def level_up_star(uid, wid, **kwargs):
 	exists, payload = await _get_weapon_info(uid, wid, 'star', 'segment', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')
 	star, segment = payload
+	if star >= 10: return common.mt(97, 'max star')
 	cost = STANDARD_SEGMENT * (1 + star)
 	if segment < cost: return common.mt(98, 'insufficient segments')
 	await common.execute(f'UPDATE weapon SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND wid = {wid.value};', **kwargs)

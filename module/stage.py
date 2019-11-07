@@ -9,7 +9,9 @@ from datetime import datetime, timedelta
 import time
 import random
 
+GENERAL_BASE_STAGE = 0
 TOWER_BASE_STAGE = 1000
+BOSS_BASE_STAGE = 3000
 
 # 进入关卡
 async def enter_stage(uid, stage, **kwargs):
@@ -25,7 +27,7 @@ async def pass_stage(uid, stage, **kwargs):
 	if 0 < stage < 1000: return await p_general_stage(uid, stage, **kwargs)
 	elif 1000 <= stage < 2000: return await p_tower_stage(uid, stage, **kwargs)
 	elif 2000 <= stage < 3000: return await p_general_stage(uid, stage, **kwargs)
-	elif 3000 <= stage < 4000: return await leave_world_boss_stage(uid, stage, **kwargs)
+	elif 3000 <= stage < 4000: return await leave_world_boss_stage(uid, stage, kwargs['data']['damange'], **kwargs)
 	else: return common.mt(50, 'Abnormal parameter')
 
 
@@ -56,7 +58,11 @@ async def e_general_stage(uid, stage, **kwargs):
 	exp = await get_progress(uid, 'exp', **kwargs)
 
 	stages = [int(x) for x in entry_consume.keys() if x.isdigit()]
-	if stage not in stages: stage = max(stages)
+	for i in range(stage, GENERAL_BASE_STAGE, -1):
+		if i in stages:
+			stage = i
+			break
+	if stage not in stages: return common.mt(96, 'No stage config file')
 
 	stage = str(stage)
 	iid_s = [k for k in entry_consume[stage].keys() if k != 'cost']
@@ -104,7 +110,12 @@ async def p_general_stage(uid, stage, **kwargs):
 	pass_stages = []
 	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["stage"]
 	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x) and int(x) < 1000]
-	pass_reward = pass_rewards[str(max(stages))] if stage not in stages else pass_rewards[str(stage)]
+	for i in range(stage, GENERAL_BASE_STAGE, -1):
+		if i in stages:
+			stage = i
+			break
+	if stage not in stages: return common.mt(96, 'No stage config file')
+	pass_reward = pass_rewards[str(max(stage))]
 
 	p_exp = {'remaining': -1, 'reward': -1}
 	for key, value in pass_reward.items():
@@ -159,7 +170,12 @@ async def e_tower_stage(uid, stage, **kwargs):
 	exp = await get_progress(uid, 'exp', **kwargs)
 
 	stages = [int(x) for x in entry_consume.keys() if x.isdigit()]
-	if stage not in stages: stage = max(stages)
+
+	for i in range(stage, TOWER_BASE_STAGE, -1):
+		if i in stages:
+			stage = i
+			break
+	if stage not in stages: return common.mt(96, 'No stage config file')
 
 	stage = str(stage)
 	iid_s = [k for k in entry_consume[stage].keys() if k != 'cost']
@@ -212,8 +228,14 @@ async def p_tower_stage(uid, stage, **kwargs):
 
 	pass_towers = []
 	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["tower"]
-	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x) and TOWER_BASE_STAGE <= int(x) < 2000]
-	if stage not in stages: stage = max(stages)
+	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x)]
+
+	for i in range(stage, TOWER_BASE_STAGE, -1):
+		if i in stages:
+			stage = i
+			break
+	if stage not in stages: return common.mt(96, 'No stage config file')
+
 	pass_reward = pass_rewards[str(stage)]
 
 	if stage % 10 == 0:
@@ -329,7 +351,13 @@ async def get_hang_up_reward(uid, **kwargs):
 	hang_stage = await get_progress(uid, 'hangstage', **kwargs)
 	probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
 	stages = [int(s) for s in kwargs['hang_rewards'].keys() if s.isdigit()]
-	if hang_stage not in stages: hang_stage = max(stages)
+
+	for i in range(hang_stage, GENERAL_BASE_STAGE, -1):
+		if i in stages:
+			hang_stage = i
+			break
+	if hang_stage not in stages: return common.mt(96, 'No stage config file')
+
 	hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 	delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 	minute = int(delta_time.total_seconds()) // 60
@@ -364,7 +392,13 @@ async def get_hang_up_info(uid, **kwargs):
 	hang_stage = await get_progress(uid, 'hangstage', **kwargs)
 	probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
 	stages = [int(s) for s in kwargs['hang_rewards'].keys() if s.isdigit()]
-	if hang_stage not in stages: hang_stage = max(stages)
+
+	for i in range(hang_stage, GENERAL_BASE_STAGE, -1):
+		if i in stages:
+			hang_stage = i
+			break
+	if hang_stage not in stages: return common.mt(96, 'No stage config file')
+
 	hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 	delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 	minute = int(delta_time.total_seconds()) // 60
@@ -408,12 +442,14 @@ async def enter_world_boss_stage(uid, stage,**kwargs):
 	if kwargs["boss_life_remaining"][9]<=0:return common.mt(99, "boss all died")
 	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 	if limits[0][0] >= 1:
-		isok, _ = await try_stage(uid, stage, **kwargs)
-		if isok:
+		status = await try_stage(uid, stage, BOSS_BASE_STAGE, **kwargs)
+		if status == 0:
 			await common.execute(f'UPDATE limits SET value = value - 1 WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
-			return common.mt(0, "enter world boss success")
-		else:
+			return common.mt(0, "enter world boss success", {'times': limits[0][0] - 1})
+		elif status == 97:
 			return common.mt(97, "no more energy")
+		else:
+			return common.mt(96, 'No stage config file')
 	else:
 		return common.mt(98, "no more ticket, try tomorrow")
 
@@ -432,7 +468,10 @@ async def get_top_damage(uid, page, **kwargs):
 	damange = 0  # 玩家造成的伤害
 	ranking = -1  # 玩家在世界boss表中的排行
 	uid_data = await common.execute(uid_str, **kwargs)
-	if uid_data != (): damange, ranking = uid_data[0]
+	if uid_data != ():
+		damange = uid_data[0][0]
+		if uid_data[0][1] is None: uid_data = await common.execute(uid_str, **kwargs)
+		ranking = int(uid_data[0][1])
 	data = await common.execute( f'SELECT p.gn, l.value FROM player p, leaderboard l WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS.value} ORDER BY l.value DESC LIMIT {(page - 1)*10},10;', **kwargs)
 	if data == (): return common.mt(98, 'No data for this page')
 	rank = []
@@ -440,11 +479,32 @@ async def get_top_damage(uid, page, **kwargs):
 		rank.append({'name': d[0], 'damange': d[1]})
 	return common.mt(0, 'success', {'damange': damange, 'ranking': ranking, 'rank': rank})
 
-async def leave_world_boss_stage(uid, wid, **kwargs):
-	pass
-	# current_time = time.strftime('%Y-%m-%d', time.localtime())
-	# limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
-	# return await self._execute_statement_update(world, f'update task set timer="{current_time}", task_value=1 where unique_id="{unique_id}" and task_id={self._task["task_id"]["pass_world_boss"]}')
+async def leave_world_boss_stage(uid, stage, damange, **kwargs):
+	max_upload_damage = kwargs['max_upload_damage']
+	if damange <= 0 or damange >= max_upload_damage: return common.mt(status=99, message="abnormal data")
+
+	new_record = 0  # 0代表不是最新记录，1代表是最新记录
+	data = await common.execute(f'SELECT value FROM leaderboard WHERE uid = "{uid}" AND lid = {enums.LeaderBoard.WORLD_BOSS.value};', **kwargs)
+	if data == ():
+		new_record, highest_damage = 1, damange
+		await common.execute(f'INSERT INTO leaderboard (uid, lid, value) VALUES ("{uid}", {enums.LeaderBoard.WORLD_BOSS.value}, {damange});', **kwargs)
+	elif damange > data[0][0]:
+		new_record, highest_damage = 1, damange
+		await common.execute(f'UPDATE leaderboard SET value={damange} WHERE uid = "{uid}" AND lid = {enums.LeaderBoard.WORLD_BOSS.value};', **kwargs)
+	else:
+		highest_damage = data[0][0]
+
+	boss_life_ratio = {}
+	for i in range(0, len(kwargs["boss_life_remaining"])):
+		if kwargs["boss_life_remaining"][i] > 0 and damange > 0:
+			if kwargs["boss_life_remaining"][i] - damange <= 0:
+				damange -= kwargs["boss_life_remaining"][i]
+				kwargs["boss_life_remaining"][i] = 0
+			else:
+				kwargs["boss_life_remaining"][i] -= damange
+				damange = 0
+		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))
+	return common.mt(0, 'success', {'new_record': new_record, 'highest_damage': highest_damage, 'boss_life_ratio': boss_life_ratio})
 
 
 ############################################ 私有方法 ############################################
@@ -511,17 +571,19 @@ async def increase_role_segment(uid, rid, segment, **kwargs):
 	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
 	return data
 
-async def try_stage(uid, stage, **kwargs):
+async def try_stage(uid, stage, stage_type, **kwargs):
 	entry_consume =  kwargs['entry_consume']
 	stages = [int(x) for x in entry_consume.keys() if x.isdigit()]
-	if stage not in stages: stage = max(stages)
+	for i in range(stage, stage_type, -1):
+		if i in stages:
+			stage = i
+			break
+	if stage not in stages: return 96
 	energy_consume = entry_consume[str(stage)]['cost']  # 消耗能量数
 	# try_energy 扣体力看是否足够
 	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
-	if energy_data["status"] >= 97:
-		return False,common.mt(97, "Insufficient energy")
-	else:
-		return True,common.mt(0, "reduce energy successfully")
+	return 97 if energy_data["status"] >= 97 else 0
+
 def get_time_format(seconds):
 	return '' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}'
 
