@@ -33,15 +33,15 @@ def role_dialog(_token,_world):
 	token = _token
 	world = _world
 	while True:
-		random_int = random.randint(0,2)
+		random_int = random.randint(1,1)
 		if random_int ==0:#升级角色
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_role', 'data' : {'token' : token, "role":random.choice(role_list),"amount":random.randint(40000000000,300000000000)}})#升级请求
-			print_method("[level_up_role] level up role:"+str(new_response))
+			print("[level_up_role] level up role:"+str(new_response))
 		elif random_int ==1:#突破角色
 			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_star_role', 'data' : {'token' : token, "role":random.choice(role_list)}})#升级请求
-			print_method("[level_up_star_role] level up role star:"+str(new_response))
+			print("[level_up_star_role] level up role star:"+str(new_response))
 		elif random_int ==2:#退出
-			print_method("[role_dialog] quit role_dialog")
+			print("[role_dialog] quit role_dialog")
 			break
 if __name__ == "__main__":
 	pass

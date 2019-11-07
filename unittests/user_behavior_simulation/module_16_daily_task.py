@@ -22,12 +22,12 @@ def print_module(my_string):
 def get_all_task(token,world):
 	print_module("[get_all_task]")
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_task', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[get_all_task]"+str(response))
+	print("[get_all_task]"+str(response))
 
 def get_task_reward(token,world):
 	print_module("[get_task_reward]")
 	response = send_tcp_message({'world' : world, 'function' : 'get_task_reward', 'data' : {'token' : token,"task_id":1}})#能量包，1是1张， 2是3张，3是10张
-	print_method("[get_task_reward]"+str(response))
+	print("[get_task_reward]"+str(response))
 
 def task_dialog(token,world,respons):
 	get_all_task(token,world)

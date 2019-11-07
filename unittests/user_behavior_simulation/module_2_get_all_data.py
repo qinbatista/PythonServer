@@ -54,7 +54,7 @@ def refresh_all_storage():#获取所有仓库信息
 
 def get_all_role():#获取角色信息
 	response = send_tcp_message({'world' : world, 'function' : 'get_all_role', 'data' : {'token' : token}})#升级请求
-	print_method("[get_all_role]"+str(response))
+	print("[get_all_role]"+str(response))
 	return response
 
 def get_factory_info():#获取工厂详细参数
