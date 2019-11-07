@@ -141,7 +141,7 @@
 
 
 
-## leave_world_boss_stage
+## leave_world_boss_stage(pass_stage)
 
 ##### 发送消息JSON格式
 
