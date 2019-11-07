@@ -89,6 +89,7 @@
 		},
 		"worker" :
 		{
+			"total"      : 5,
 			"-1"         : 1,
 			"0"          : 1,
 			"1"          : 1,
@@ -463,6 +464,7 @@
 > * 99: insufficient unassigned workers
 > * 98: can not increase past max worker limit
 > * 97: invalid fid
+> * 96: number must be positive
 >
 
 ## decrease_worker_factory
@@ -483,7 +485,7 @@
 	{
 		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
 		"fid"  : 2,
-    "num" : 1
+		"num" : 1
 	}
 }
 ```
@@ -541,6 +543,7 @@
 >
 > * 99: insufficient assigned workers
 > * 97: invalid fid
+> * 96: number must be positive
 >
 
 ## buy_acceleration_factory
