@@ -89,8 +89,7 @@
 		},
 		"worker" :
 		{
-			"unassigned" : 1,
-			"total"      : 4,
+			"-1"         : 1,
 			"0"          : 1,
 			"1"          : 1,
 			"2"          : 1,
@@ -369,8 +368,8 @@
 	{
 		"worker" :
 		{
-			"unassigned" : 3,
-			"total"      : 10
+			"-1"    : 3,
+			"total" : 10
 		},
 		"food" :
 		{
@@ -404,7 +403,7 @@
 	{
 		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
 		"fid"  : 2,
-    "num" : 1
+		"num"  : 1
 	}
 }
 ```
@@ -451,8 +450,8 @@
 		},
 		"worker" :
 		{
-			"unassigned" : 3,
-			"workers"    : 5
+			"-1"      : 3,
+			"workers" : 5
 		}
 	}
 }
@@ -531,8 +530,8 @@
 		},
 		"worker" :
 		{
-			"unassigned" : 5,
-			"workers"    : 4
+			"-1"      : 5,
+			"workers" : 4
 		}
 	}
 }
@@ -637,6 +636,9 @@
 
 ##### 接受消息JSON格式
 
+>
+> `count`   : the number of times the non-free wishing pool has been used
+> `diamond` : the cost of the next non-free wishing pool
 > 
 
 ```json
@@ -646,11 +648,13 @@
 	"data"   :
 	{
 		"pool" : 3130,
+		"count" : 0,
+		"diamond" : 50,
 		"remaining" :
 		{
 			"wid" : 5,
 			"seg" : 2350,
-			"diamond : 3323
+			"diamond" : 3323
 		},
 		"reward" :
 		{

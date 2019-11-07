@@ -37,7 +37,7 @@ async def refresh(uid, **kwargs):
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}}, \
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
 			'pool' : pool, \
-			'worker' : {'unassigned' : ua, 'total' : mw, **{k.value: worker[k] for k in BASIC_FACTORIES}}, \
+			'worker' : {enums.Factory.UNASSIGNED.value : ua, **{k.value: worker[k] for k in BASIC_FACTORIES}}, \
 			'level' : {k.value : level[k] for k in HAS_LEVEL_FACTORIES}})
 
 async def increase_worker(uid, fid, n, **kwargs):
@@ -56,7 +56,7 @@ async def increase_worker(uid, fid, n, **kwargs):
 			`workers` = {current_workers[fid] + n};', **kwargs)
 	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
 			'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
-			'unassigned' : unassigned - n, 'workers' : current_workers[fid] + n}})
+			enums.Factory.UNASSIGNED.value : unassigned - n, 'workers' : current_workers[fid] + n}})
 
 async def decrease_worker(uid, fid, n, **kwargs):
 	if fid not in BASIC_FACTORIES: return common.mt(97, 'invalid fid')
@@ -70,7 +70,7 @@ async def decrease_worker(uid, fid, n, **kwargs):
 			`uid` = "{uid}" AND `fid` = {fid.value};', **kwargs)
 	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
 			'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
-			'unassigned' : unassigned + n, 'workers' : current_workers[fid] - n}})
+			enums.Factory.UNASSIGNED.value : unassigned + n, 'workers' : current_workers[fid] - n}})
 
 async def buy_worker(uid, **kwargs):
 	unassigned, max_worker = await get_unassigned_workers(uid, **kwargs)
@@ -83,8 +83,9 @@ async def buy_worker(uid, **kwargs):
 			WHERE `uid` = "{uid}" AND `fid` = {enums.Factory.FOOD.value};', **kwargs)
 	await common.execute(f'UPDATE `factory` SET `workers` = {unassigned + 1}, `storage` = {max_worker + 1} \
 			WHERE `uid` = "{uid}" AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
-	return common.mt(0, 'success', {'worker' : {'unassigned' : unassigned + 1, 'total' : max_worker + 1}, \
-			'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, 'reward' : -upgrade_cost}})
+	return common.mt(0, 'success', {'worker' : {enums.Factory.UNASSIGNED.value : unassigned + 1, \
+			'total' : max_worker + 1}, 'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, \
+			'reward' : -upgrade_cost}})
 
 async def upgrade(uid, fid, **kwargs):
 	if fid not in HAS_LEVEL_FACTORIES: return common.mt(99, 'invalid fid')
@@ -109,9 +110,9 @@ async def upgrade(uid, fid, **kwargs):
 			'level' : l + 1}})
 
 async def wishing_pool(uid, wid, **kwargs):
-	now, dia_cost = datetime.now(timezone.utc), 0
-	pool          = await remaining_pool_time(uid, now, **kwargs)
-	level, _, _   = await get_state(uid, **kwargs)
+	now, dia_cost, count = datetime.now(timezone.utc), 0, 0
+	pool                 = await remaining_pool_time(uid, now, **kwargs)
+	level, _, _          = await get_state(uid, **kwargs)
 	if pool == 0:
 		pool  = ((kwargs['config']['factory']['wishing_pool']['base_recover'] - \
 				level[enums.Factory.WISHING_POOL]) * 3600)
@@ -126,7 +127,8 @@ async def wishing_pool(uid, wid, **kwargs):
 		await common.set_limit(uid, enums.Limits.FACTORY_WISHING_POOL, count + 1, **kwargs)
 	seg_reward     = roll_segment_value(**kwargs)
 	seg_remain     = await weapon._update_segment(uid, wid, seg_reward, **kwargs)
-	return common.mt(0, 'success', {'pool' : pool, \
+	return common.mt(0, 'success', {'pool' : pool, 'count' : 0 if pool == 0 else count, \
+			'diamond' : (count + 1) * kwargs['config']['factory']['wishing_pool']['base_diamond'], \
 			'remaining' : {'wid' : wid.value, 'seg' : seg_remain, 'diamond' : dia_remain}, \
 			'reward'    : {'wid' : wid.value, 'seg' : seg_reward, 'diamond' : dia_cost}})
 
