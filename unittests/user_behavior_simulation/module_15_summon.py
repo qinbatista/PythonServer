@@ -147,7 +147,7 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'get_top_damage', 'data': {'token': token, "page": 1}})
 	# response = send_tcp_message({'world': 0, 'function': 'enter_stage', 'data': {'token': token, "stage": 3000, "damange": 110000}})
 	# response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, "stage": 3000, "damange": 110001}})
-	print(response)
+	print(response.replace("'", "\""))
 
 
 
