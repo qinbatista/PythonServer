@@ -143,7 +143,7 @@ if __name__ == '__main__':
 	token = response['data']['token']
 	# response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
 	# response = send_tcp_message({'world': 0, 'function': 'friend_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
-	response = send_tcp_message({'world': 0, 'function': 'basic_summon_role_10_times', 'data': {'token': token, "item": 11}})
+	response = send_tcp_message({'world': 0, 'function': 'check_boss_status', 'data': {'token': token, "item": 11}})
 	print(response)
 
 

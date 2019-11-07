@@ -383,7 +383,7 @@
 
 ## check_boss_status
 
-#####发送消息JSON格式
+##### 发送消息JSON格式
 
 获取世界boss的详细情况，返回的消息内容为所有boss的血量（目前为10个世界boss），挑战次数，刷新挑战次数时间，此方法只作为客户端显示实用，boss的生命值来自配置文件world_boss_config.json，玩家上传的分数会直接和配置文件的数值相减，配置文件boss的生命值每个月会刷新一次，生命值耗尽继续挑战下一个boss，世界boss打死之后服务器会在一天之内给所有玩家发送邮件礼物，每个月一号会刷新所有世界boss
 
@@ -403,29 +403,29 @@
 
 > world_boss：刷新挑战次数的时间，剩余挑战boss的次数，
 >
-> boss_life_ratio: 各个boss的生命值
+> boss_life_ratio: 各个boss的生命值百分比
 
 ```json
 {
 	"status": 0,
-	"message": "success",
+	"message": "Successfully get hook information",
 	"data": {
-			"world_boss": {
-				"time": "23:20:00",
-				"remaining": 2
-			},
-			"boss_life_ratio": {
-				"boss1": "0.12",
-				"boss2": "1",
-				"boss3": "1",
-				"boss4": "1",
-				"boss5": "1",
-				"boss6": "1",
-				"boss7": "1",
-				"boss8": "1",
-				"boss9": "1",
-				"boss10": "1"
-			}
+		"world_boss": {
+			"remaining": 3,
+			"time": "4:37:50"
+		},
+		"boss_life_ratio": {
+			"boss0": "1.00",
+			"boss1": "1.00",
+			"boss2": "1.00",
+			"boss3": "1.00",
+			"boss4": "1.00",
+			"boss5": "1.00",
+			"boss6": "1.00",
+			"boss7": "1.00",
+			"boss8": "1.00",
+			"boss9": "1.00"
+		}
 	}
 }
 ```
@@ -440,7 +440,7 @@
 
 ## get_top_damage
 
-#####发送消息JSON格式
+##### 发送消息JSON格式
 
 获取世界boss的伤害排行榜，一次只会获取10个人的伤害排行榜
 

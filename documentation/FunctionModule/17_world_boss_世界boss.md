@@ -1,5 +1,3 @@
-
-
 ## check_boss_status
 
 ##### 发送消息JSON格式
