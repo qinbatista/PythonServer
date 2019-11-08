@@ -9,21 +9,22 @@ from module import common
 from module import weapon
 from datetime import datetime, timezone, timedelta
 
-BASIC_FACTORIES     = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
-				       enums.Factory.IRON    : None, enums.Factory.FOOD  : None}
+BASIC_FACTORIES      = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
+				        enums.Factory.IRON    : None, enums.Factory.FOOD  : None}
 
-RESOURCE_FACTORIES  = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None}
+RESOURCE_FACTORIES   = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None}
 
-HAS_LEVEL_FACTORIES = {enums.Factory.FOOD         : None, enums.Factory.IRON  : None, \
-				       enums.Factory.CRYSTAL      : None, enums.Factory.WISHING_POOL : None }
+HAS_LEVEL_FACTORIES  = {enums.Factory.FOOD         : None, enums.Factory.IRON  : None, \
+				        enums.Factory.CRYSTAL      : None, enums.Factory.WISHING_POOL : None }
 
+HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None}
 
 
 async def refresh(uid, **kwargs):
 	now              = datetime.now(timezone.utc)
 	steps, refresh_t = await steps_since(uid, now, **kwargs)
-	remainder        = int((now-refresh_t).total_seconds()) % kwargs['config']['factory']['general']['step']
-	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds = remainder), **kwargs)
+	rem, next_ref    = await remaining_seconds(uid, now, refresh_t, **kwargs)
+	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds = rem), **kwargs)
 	level, worker, storage = await get_state(uid, **kwargs)
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)
 	await record_resources(uid, storage, **kwargs)
@@ -42,7 +43,7 @@ async def refresh(uid, **kwargs):
 
 async def increase_worker(uid, fid, n, **kwargs):
 	if n <= 0: return common.mt(96, 'number must be positive')
-	if fid not in BASIC_FACTORIES or fid == enums.Factory.ARMOR: return common.mt(97, 'invalid fid')
+	if fid not in HAS_WORKER_FACTORIES: return common.mt(97, 'invalid fid')
 	unassigned, max_worker    = await get_unassigned_workers(uid, **kwargs)
 	level, current_workers, _ = await get_state(uid, **kwargs)
 	if n > unassigned: return common.mt(99, 'insufficient unassigned workers')
@@ -61,7 +62,7 @@ async def increase_worker(uid, fid, n, **kwargs):
 
 async def decrease_worker(uid, fid, n, **kwargs):
 	if n <= 0: return common.mt(96, 'number must be positive')
-	if fid not in BASIC_FACTORIES or fid == enums.Factory.ARMOR: return common.mt(97, 'invalid fid')
+	if fid not in HAS_WORKER_FACTORIES: return common.mt(97, 'invalid fid')
 	unassigned, max_worker    = await get_unassigned_workers(uid, **kwargs)
 	level, current_workers, _ = await get_state(uid, **kwargs)
 	if n > current_workers[fid]: return common.mt(99, 'insufficient assigned workers')
@@ -73,6 +74,22 @@ async def decrease_worker(uid, fid, n, **kwargs):
 	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
 			'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
 			enums.Factory.UNASSIGNED.value : unassigned + n, 'workers' : current_workers[fid] - n}})
+
+async def update_worker(uid, workers, **kwargs):
+	r              = await refresh(uid, **kwargs)
+	r              = {'resource' : r['data']['resource'], 'armor' : r['data']['armor']}
+	l, w, _        = await get_state(uid, **kwargs)
+	ua, max_worker = await get_unassigned_workers(uid, **kwargs)
+	
+
+	if sum(w for w in workers.values()) > max_worker:
+		pass
+
+
+
+
+
+	return common.mt(0, 'success', {'refresh' : r})
 
 async def buy_worker(uid, **kwargs):
 	unassigned, max_worker = await get_unassigned_workers(uid, **kwargs)
@@ -199,13 +216,30 @@ def can_produce(current, factory, level, **kwargs):
 		current[f] -= a
 	return True
 
+async def has_acceleration(uid, now, **kwargs):
+	accel_end_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
+	if accel_end_t is not None and now < accel_end_t:
+		print('HAS ACCELERATION')
+		return True
+	print('NOT HAS ACCELERATION')
+	return False
+
+async def remaining_seconds(uid, now, refresh_t, **kwargs):
+	has_accel = await has_acceleration(uid, now, **kwargs)
+	delta     = kwargs['config']['factory']['general']['step'] / 2 if has_accel else \
+				kwargs['config']['factory']['general']['step']
+	remainder = int((now - refresh_t).total_seconds()) % delta
+	next_ref  = delta - remainder
+	print(f'remainder: {remainder}    next_ref: {next_ref}')
+	return (remainder, next_ref)
+
 async def steps_since(uid, now, **kwargs):
 	accel_start_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)
 	accel_end_t   = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
 	refresh_t     = await common.get_timer(uid, enums.Timer.FACTORY_REFRESH,            **kwargs)
 	if refresh_t is None:
 		return (0, now)
-	if accel_start_t is None:
+	if accel_end_t is None or now >= accel_end_t:
 		accel_start_t, accel_end_t = refresh_t, refresh_t
 	def sb(b, s, step):
 		return int((b - s).total_seconds()) // step
@@ -213,6 +247,7 @@ async def steps_since(uid, now, **kwargs):
 	steps = int(sb(max(accel_start_t, refresh_t), refresh_t, delta) + \
 			sb(min(accel_end_t, now), max(accel_start_t, refresh_t), delta / 2) + \
 			sb(now, min(accel_end_t, now), delta))
+	print(f'STEPS: {steps}     LAST REFRESH: {refresh_t}')
 	return (steps, refresh_t)
 
 async def get_armor(uid, **kwargs):
