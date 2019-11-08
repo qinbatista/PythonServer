@@ -2,36 +2,37 @@
 * [`exchange_card`](##exchange_card)
 
 ## exchange_card
-交换各种物品的卡片，如果物品的卡片与自己的等级有关
+交换各种物品的卡片，如果物品的卡片与自己的等级有关, 可以交换的物品为，金币卡，经验卡，食物卡，铁卡，水金卡，钻石卡，卡的枚举类型来自Item
 ##### 发送消息JSON格式
 ```json
 {
 	"world": 0, 
-	"function": "start_hang_up",
+	"function": "exchange_card",
 	"data": {
-		"token": "my toekn ^_^"
+		"token": "my toekn ^_^",
+    "card_id": 18
 	}
 }
 ```
 ##### 接受消息JSON格式
-[签到成功]()
-> remaining：物品剩余的数据 3:18:2分别表示 种类id : 商品id : 商品数量，所以3:18: 2表示金币2个
+[成功]()
+
+> remaining： 累积的物品数量，iid：物品的id：value物品的数量
 >
-> reward：变化的量
+> reward：变化的物品数量
 ```json
 {
 	"status": 0,
-	"message": "Sign-in success",
+	"message": "exchange successful",
 	"data": {
-		"remaining": [
-			"3:18:2"
-		],
-		"reward": [
-			"3:18:1"
-		]
+		"remaining": "3:2:1999000",
+		"reward": "3:2:1000"
+    }
 	}
 } 
 ```
-[签到失败]()
-* 99: 已签到，不会重复获得奖励
+[失败]()
+
+* 99: 卡片数量不足
+* 98: 卡片id不对
 
