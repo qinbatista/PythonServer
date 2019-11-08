@@ -6,6 +6,7 @@
 import sys
 sys.path.insert(0, '..')
 
+import ssl
 import asyncio
 import json
 
@@ -15,13 +16,19 @@ class LukseunClient:
 		self._host = host
 		self._port = port
 		self.token = ""
+		self.response = None
 	
 	async def send_message(self, message: str) -> dict:
 		'''
 		send_message() sends the given message to the server and
 		returns the decoded callback response
 		'''
-		reader, writer = await asyncio.open_connection(self._host, self._port)
+		context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+		path = './cert'
+		context.load_verify_locations(path + '/mycert.crt')
+		context.check_hostname = False
+		#context.verify_mode = ssl.CERT_NONE
+		reader, writer = await asyncio.open_connection(self._host, self._port, ssl = context)
 		writer.write((message + '\r\n').encode())
 		await writer.drain()
 		raw = await reader.readuntil(b'\r\n')
@@ -31,8 +38,7 @@ class LukseunClient:
 		if resp != '':
 			data = json.loads(resp, encoding = 'utf-8')
 			print(f'received: {data}')
-			if 'data' in data and 'token' in data['data']:
-				self.token = data['data']['token']
+			self.response = data
 			return data
 		return {}
 
