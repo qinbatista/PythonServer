@@ -118,11 +118,8 @@ class Gate:
 		self.ws = await asyncio.start_server(self.worker_protocol, port = self.wport)
 		# initialize SSL
 		context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-		path = '/home/matthew/lukseunserversys/cert'
-		context.load_cert_chain(certfile = path + '/mycert.crt', keyfile = path + '/rsa_private.key', \
-						password = 'lukseun1')
+		context.load_cert_chain(certfile = './cert/mycert.crt', keyfile = './cert/rsa_private.key', password = 'lukseun1')
 		self.cs = await asyncio.start_server(self.client_protocol, port = self.cport, ssl = context)
-		#self.cs = await asyncio.start_server(self.client_protocol, port = self.cport)
 		print(f'gate {self.gid}: find me at {self.ip} on ports client: {self.cport}  worker: {self.wport}')
 		self.running = True
 
