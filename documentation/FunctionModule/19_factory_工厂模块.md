@@ -5,8 +5,7 @@
 * [`set_armor_factory`](#set_armor_factory)
 * [`get_config_factory`](#get_config_factory)
 * [`buy_worker_factory`](#buy_worker_factory)
-* [`increase_worker_factory`](#increase_worker_factory)
-* [`decrease_worker_factory`](#decrease_worker_factory)
+* [`update_worker_factory`](#update_worker_factory)
 * [`buy_acceleration_factory`](#buy_acceleration_factory)
 * [`activate_wishing_pool_factory`](#activate_wishing_pool_factory)
 
@@ -94,15 +93,13 @@
 			"0"          : 1,
 			"1"          : 1,
 			"2"          : 1,
-			"3"          : 1
 		},
 		"level" :
 		{
 			"0"  : 3,
 			"1"  : 1,
 			"2"  : 2,
-			"3"  : 5,
-			"-2" : 1,
+			"-2" : 1
 		},
 		"pool" : 15530
 	}
@@ -386,119 +383,42 @@
 > * 98: insufficient food
 >
 
-## increase_worker_factory
+## update_worker_factory
 
 ##### 发送消息JSON格式
 
-向工厂添加工人，添加工人会改变工厂的算法结构，所以需要先结算后添加
-
-> fid: 工厂id
->
-> num: 工人的数量
 
 ```json
 {
 	"world"   : 0, 
-	"function": "increase_worker_factory",
+	"function": "update_worker_factory",
 	"data"    :
 	{
-		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
-		"fid"  : 2,
-		"num"  : 1
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-> resource: 资源的配置情况
->
-> reward: 资源的变化情况
->
-> armor：护甲的变化情况
->
-> worker：工人的情况
-
-```json
-{
-	"status" : 0, 
-	"message": "success",
-	"data"   :
-	{
-		"refresh" :
-		{
-			"resource" :
-			{
-				"remaining" :
-				{
-					"0" : 253,
-					"1" :   2,
-					"2" : 182
-				},
-				"reward" :
-				{
-					"0" : -53,
-					"1" :   1,
-					"2" :  10
-				}
-			},
-			"armor" :
-			{
-				"aid"       : 2,
-				"remaining" : 5,
-				"reward"    : 1
-			}
-		},
+		"token"   : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
 		"worker" :
 		{
-			"-1"      : 3,
-			"workers" : 5
+			"0" : 3,
+			"1" : 1,
+			"2" : 2
 		}
 	}
 }
 ```
 
-[失败]()
-
->
-> * 99: insufficient unassigned workers
-> * 98: can not increase past max worker limit
-> * 97: invalid fid
-> * 96: number must be positive
->
-
-## decrease_worker_factory
-
-##### 发送消息JSON格式
-
-向工厂减少工人，添加工人会改变工厂的算法结构，所以需要先结算后添加
-
-> fid: 工厂的id
->
-> num：工人的数量
-
-```json
-{
-	"world"   : 0, 
-	"function": "decrease_worker_factory",
-	"data"    :
-	{
-		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
-		"fid"  : 2,
-		"num" : 1
-	}
-}
-```
-
 ##### 接受消息JSON格式
 
-> resource: 资源的配置情况
+> `resource`: 资源的配置情况
 >
-> reward: 资源的变化情况
+> `reward`: 资源的变化情况
 >
-> armor：护甲的变化情况
+> `armor`：护甲的变化情况
 >
-> worker：工人的情况
+> `worker`：工人的情况
+>
+> `next_refresh`：the number of seconds remaining until the server calculates the next STEP
+>
+> Even if there is an error, the server will return the number of workers the SERVER says the client has.
+>
 
 ```json
 {
@@ -530,10 +450,139 @@
 				"reward"    : 1
 			}
 		},
+		"next_refresh" : 4,
 		"worker" :
 		{
-			"-1"      : 5,
-			"workers" : 4
+			"-1" : 5,
+			"0"  : 4,
+			"1"  : 2,
+			"2"  : 1
+		}
+	}
+}
+```
+
+```json
+{
+	"status" : 99, 
+	"message": "insufficient workers",
+	"data"   :
+	{
+		"refresh" :
+		{
+			"resource" :
+			{
+				"remaining" :
+				{
+					"0" : 253,
+					"1" :   2,
+					"2" : 182
+				},
+				"reward" :
+				{
+					"0" : -53,
+					"1" :   1,
+					"2" :  10
+				}
+			},
+			"armor" :
+			{
+				"aid"       : 2,
+				"remaining" : 5,
+				"reward"    : 1
+			}
+		},
+		"next_refresh" : 4,
+		"worker" :
+		{
+			"-1" : 5,
+			"0"  : 4,
+			"1"  : 2,
+			"2"  : 1
+		}
+	}
+}
+```
+
+```json
+{
+	"status" : 98, 
+	"message": "factory worker over limits",
+	"data"   :
+	{
+		"refresh" :
+		{
+			"resource" :
+			{
+				"remaining" :
+				{
+					"0" : 253,
+					"1" :   2,
+					"2" : 182
+				},
+				"reward" :
+				{
+					"0" : -53,
+					"1" :   1,
+					"2" :  10
+				}
+			},
+			"armor" :
+			{
+				"aid"       : 2,
+				"remaining" : 5,
+				"reward"    : 1
+			}
+		},
+		"next_refresh" : 4,
+		"worker" :
+		{
+			"-1" : 5,
+			"0"  : 4,
+			"1"  : 2,
+			"2"  : 1
+		}
+	}
+}
+```
+
+```json
+{
+	"status" : 97, 
+	"message": "invalid fid supplied",
+	"data"   :
+	{
+		"refresh" :
+		{
+			"resource" :
+			{
+				"remaining" :
+				{
+					"0" : 253,
+					"1" :   2,
+					"2" : 182
+				},
+				"reward" :
+				{
+					"0" : -53,
+					"1" :   1,
+					"2" :  10
+				}
+			},
+			"armor" :
+			{
+				"aid"       : 2,
+				"remaining" : 5,
+				"reward"    : 1
+			}
+		},
+		"next_refresh" : 4,
+		"worker" :
+		{
+			"-1" : 5,
+			"0"  : 4,
+			"1"  : 2,
+			"2"  : 1
 		}
 	}
 }
@@ -541,9 +590,48 @@
 
 [获得失败]()
 >
-> * 99: insufficient assigned workers
-> * 97: invalid fid
-> * 96: number must be positive
+> * 99: insufficient workers
+> * 98: factory worker over limits
+> * 97: invalid fid supplied
+>
+
+## buy_acceleration_factory
+
+##### 发送消息JSON格式
+
+> resource: 资源的配置情况
+>
+> reward: 资源的变化情况
+>
+> armor：护甲的变化情况
+>
+> worker：工人的情况
+
+购买工厂加速，加速工厂需要消耗钻石，钻石的消耗数量依据factory.json的配置信息
+
+```json
+{
+	"world"   : 0, 
+	"function": "buy_acceleration_factory",
+	"data"    :
+	{
+		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+```json
+{
+	"status" : 0, 
+	"message": "success",
+
+[获得失败]()
+>
+> * 99: insufficient workers
+> * 98: factory worker over limits
+> * 97: invalid fid supplied
 >
 
 ## buy_acceleration_factory

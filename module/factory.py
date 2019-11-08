@@ -76,21 +76,38 @@ async def decrease_worker(uid, fid, n, **kwargs):
 			'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
 			enums.Factory.UNASSIGNED.value : unassigned + n, 'workers' : current_workers[fid] - n}})
 
+
 async def update_worker(uid, workers, **kwargs):
-	r              = await refresh(uid, **kwargs)
-	r              = {'resource' : r['data']['resource'], 'armor' : r['data']['armor']}
-	l, w, _        = await get_state(uid, **kwargs)
-	ua, max_worker = await get_unassigned_workers(uid, **kwargs)
-	
+	# refresh with current settings
+	r = await refresh(uid, **kwargs)
+	l, w, _ = await get_state(uid, **kwargs)
+	ua, mw = await get_unassigned_workers(uid, **kwargs)
+	r_ret = {'resource' : r['data']['resource'], 'armor' : r['data']['armor'], \
+			'next_refresh' : r['data']['next_refresh']}
 
-	if sum(w for w in workers.values()) > max_worker:
-		pass
+	# sum workers <= max_worker else: return refresh + current workers
+	uw = sum(w for w in workers.values())
+	if uw > mw:
+		return common.mt(99, 'insufficient workers', {'refresh' : r_ret, 'worker' : \
+				{enums.Factory.UNASSIGNED.value : ua, **{k : w[k] for k in HAS_WORKER_FACTORIES}}})
 
+	# worker_factories each do not exceed worker limit based on level else: return refresh + current workers
+	for fac, new in workers.items():
+		fid = enums.Factory(int(fac))
+		if fid in HAS_WORKER_FACTORIES:
+			if new > kwargs['config']['factory']['general']['worker_limits'][fac][str(l[fid])]:
+				return common.mt(98, 'factory worker over limits', {'refresh' : r_ret, 'worker' : \
+						{enums.Factory.UNASSIGNED.value : ua, **{k : w[k] for k in HAS_WORKER_FACTORIES}}})
+		else:
+			return common.mt(97, 'invalid fid supplied', {'refresh' : r_ret, 'worker' : \
+					{enums.Factory.UNASSIGNED.value : ua, **{k : w[k] for k in HAS_WORKER_FACTORIES}}})
 
-
-
-
-	return common.mt(0, 'success', {'refresh' : r})
+	for fac, new in workers.items():
+		fid = enums.Factory(int(fac))
+		await set_worker(uid, fid, new, **kwargs)
+	await set_worker(uid, enums.Factory.UNASSIGNED, mw - uw, **kwargs)
+	return common.mt(0, 'success', {'refresh' : r_ret, \
+			'worker' : {enums.Factory.UNASSIGNED.value : mw - uw, **workers}})
 
 async def buy_worker(uid, **kwargs):
 	unassigned, max_worker = await get_unassigned_workers(uid, **kwargs)
@@ -251,6 +268,10 @@ async def get_armor(uid, **kwargs):
 	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND \
 			`fid` = {enums.Factory.ARMOR.value};', **kwargs)
 	return enums.Armor(data[0][0]) if data != () else enums.Armor.A1
+
+async def set_worker(uid, fid, val, **kwargs):
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`) VALUES \
+			("{uid}", {fid.value}, {val}) ON DUPLICATE KEY UPDATE `workers` = {val};', **kwargs)
 
 async def get_state(uid, **kwargs):
 	data = await common.execute(f'SELECT `fid`, `level`, `workers`, `storage` FROM `factory` WHERE \
