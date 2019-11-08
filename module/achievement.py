@@ -18,7 +18,7 @@ async def get_all_achievement(uid, **kwargs):
 	return common.mt(0, 'success', {'achievements': [{'aid': a[0], 'value': a[1], 'reward': a[2]} for a in achievement]})
 
 async def record_achievement(uid, **kwargs):# aid->enums.Achievement,value->string
-	data = await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {kwargs["value"]},0) ON DUPLICATE KEY UPDATE `value`= `value`+{kwargs["value"]}',**kwargs)
+	data = await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {kwargs["achie_value"]},0) ON DUPLICATE KEY UPDATE `value`= `value`+{kwargs["achie_value"]}',**kwargs)
 	return common.mt(0, 'record:'+str(kwargs["aid"])+" success")
 
 async def get_achievement_reward(uid, **kwargs):

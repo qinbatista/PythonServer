@@ -2,6 +2,7 @@
 
 * [`get_task_reward`](##get_task_reward)
 * [`get_all_task`](##get_all_task)
+* 内部方法[`record_task`](##record_task)
 
 ## get_task_reward
 
@@ -142,6 +143,22 @@
 }
 ```
 
+
+
+## record_task
+
+##### 发送消息JSON格式
+
+内部使用记录每日任务的方法
+
+> **kwargs：传入需要的任务id和任务值，tid为任务id，可以从枚举中获得，task_value为任务值，0表示未完成，1表示完成
+>
+> record_task：uid为玩家的唯一id
+
+```json
+kwargs.update({"tid": enums.Task.CHECK_IN, "task_value": 1})
+record_task(uid,**kwargs)
+```
 
 
 
