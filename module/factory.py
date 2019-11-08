@@ -37,6 +37,7 @@ async def refresh(uid, **kwargs):
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}}, \
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
 			'pool' : pool, \
+			'next_refresh' : next_ref, \
 			'worker' : {enums.Factory.UNASSIGNED.value : ua, 'total' : mw, \
 			**{k.value: worker[k] for k in BASIC_FACTORIES}}, \
 			'level' : {k.value : level[k] for k in HAS_LEVEL_FACTORIES}})
@@ -219,9 +220,7 @@ def can_produce(current, factory, level, **kwargs):
 async def has_acceleration(uid, now, **kwargs):
 	accel_end_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
 	if accel_end_t is not None and now < accel_end_t:
-		print('HAS ACCELERATION')
 		return True
-	print('NOT HAS ACCELERATION')
 	return False
 
 async def remaining_seconds(uid, now, refresh_t, **kwargs):
@@ -230,7 +229,6 @@ async def remaining_seconds(uid, now, refresh_t, **kwargs):
 				kwargs['config']['factory']['general']['step']
 	remainder = int((now - refresh_t).total_seconds()) % delta
 	next_ref  = delta - remainder
-	print(f'remainder: {remainder}    next_ref: {next_ref}')
 	return (remainder, next_ref)
 
 async def steps_since(uid, now, **kwargs):
@@ -247,7 +245,6 @@ async def steps_since(uid, now, **kwargs):
 	steps = int(sb(max(accel_start_t, refresh_t), refresh_t, delta) + \
 			sb(min(accel_end_t, now), max(accel_start_t, refresh_t), delta / 2) + \
 			sb(now, min(accel_end_t, now), delta))
-	print(f'STEPS: {steps}     LAST REFRESH: {refresh_t}')
 	return (steps, refresh_t)
 
 async def get_armor(uid, **kwargs):
