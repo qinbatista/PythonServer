@@ -1,5 +1,6 @@
 ## 方法列表
 
+* [`get_config_version`](##get_config_version)
 * [`get_config_stage`](##get_config_stage)
 * [`get_config_lottery`](##get_config_lottery)
 * [`get_config_weapon`](##get_config_weapon)
@@ -12,6 +13,38 @@
 * [`get_config_vip`](##get_config_vip)
 * [`get_config_player`](##get_config_player)
 * [`get_config_factory`](##get_config_factory)
+
+## get_config_version
+
+##### 发送消息JSON格式
+
+```json
+{
+	"world": 0,
+	"function": "get_config_version",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+>  version: 版本号
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"version": "1.0"
+	}
+}
+```
+
+
 
 
 
