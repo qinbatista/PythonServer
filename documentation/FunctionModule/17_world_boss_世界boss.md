@@ -25,24 +25,24 @@
 ```json
 {
 	"status": 0,
-	"message": "success",
+	"message": "Successfully get hook information",
 	"data": {
-			"world_boss": {
-				"time": "23:20:00",
-				"remaining": 2
-			},
-			"boss_life_ratio": {
-				"boss1": "0.12",
-				"boss2": "1",
-				"boss3": "1",
-				"boss4": "1",
-				"boss5": "1",
-				"boss6": "1",
-				"boss7": "1",
-				"boss8": "1",
-				"boss9": "1",
-				"boss10": "1"
-			}
+		"world_boss": {
+			"remaining": 0,
+			"time": "5:19:18"
+		},
+		"boss_life_ratio": {
+			"boss0": "0.00",
+			"boss1": "0.00",
+			"boss2": "0.00",
+			"boss3": "0.00",
+			"boss4": "0.00",
+			"boss5": "0.70",
+			"boss6": "1.00",
+			"boss7": "1.00",
+			"boss8": "1.00",
+			"boss9": "1.00"
+		}
 	}
 }
 ```
@@ -141,7 +141,7 @@
 
 
 
-## leave_world_boss_stage
+## leave_world_boss_stage(pass_stage)
 
 ##### 发送消息JSON格式
 
