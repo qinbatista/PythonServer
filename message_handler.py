@@ -725,7 +725,6 @@ FUNCTION_LIST = {
 	###################### lottery.py ######################
 	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
 	'fortune_wheel_pro' : MessageHandler._fortune_wheel_pro,
-	'get_config_lottery' : MessageHandler._get_config_lottery,
 
 	###################### skill.py ######################
 	'get_all_skill' : MessageHandler._get_all_skill,
@@ -749,7 +748,6 @@ FUNCTION_LIST = {
 	'activate_wishing_pool_factory' : MessageHandler._activate_wishing_pool_factory,
 	'buy_acceleration_factory' : MessageHandler._buy_acceleration_factory,
 	'set_armor_factory' : MessageHandler._set_armor_factory,
-	'get_config_factory' : MessageHandler._get_config_factory,
 
 	###################### weapon.py ######################
 	'level_up_weapon' : MessageHandler._level_up_weapon,
@@ -757,14 +755,12 @@ FUNCTION_LIST = {
 	'level_up_star_weapon' : MessageHandler._level_up_star_weapon,
 	'reset_skill_point_weapon' : MessageHandler._reset_skill_point_weapon,
 	'get_all_weapon' : MessageHandler._get_all_weapon,
-	'get_config_weapon' : MessageHandler._get_config_weapon,
 
 	# TODO
 	###################### role.py ######################
 	'level_up_star_role' : MessageHandler._level_up_star_role,
 	'level_up_role' : MessageHandler._level_up_role,
 	'get_all_role' : MessageHandler._get_all_role,
-	'get_config_role' : MessageHandler._get_config_role,
 
 	# TODO
 	###################### 签到系统 ######################
@@ -803,7 +799,6 @@ FUNCTION_LIST = {
 	# 'pass_tower': MessageHandler._pass_tower,
 	'start_hang_up': MessageHandler._start_hang_up,
 	'get_hang_up_reward': MessageHandler._get_hang_up_reward,
-	'get_config_stage': MessageHandler._get_config_stage,
 
 	###################### tasks ######################
 	'get_task_config':MessageHandler._get_task_config,
@@ -825,6 +820,19 @@ FUNCTION_LIST = {
 	'refresh_all_storage':MessageHandler._refresh_all_storage,
 	'get_all_family_info': MessageHandler._get_all_family_info,
 	'get_top_damage':MessageHandler._get_top_damage,
+
+	###################### get_config ######################
+	'get_config_stage': MessageHandler._get_config_stage,
+	'get_config_lottery': MessageHandler._get_config_lottery,
+	'get_config_weapon': MessageHandler._get_config_weapon,
+	'get_config_skill': MessageHandler._get_config_skill,
+	'get_config_mall': MessageHandler._get_config_mall,
+	'get_config_role': MessageHandler._get_config_role,
+	'get_config_task': MessageHandler._get_config_task,
+	'get_config_achievement': MessageHandler._get_config_achievement,
+	'get_config_check_in': MessageHandler._get_config_check_in,
+	'get_config_vip': MessageHandler._get_config_vip,
 	'get_config_player': MessageHandler._get_config_player,
+	'get_config_factory': MessageHandler._get_config_factory,
 }
 

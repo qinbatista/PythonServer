@@ -13,11 +13,13 @@
 * [`get_config_player`](##get_config_player)
 * [`get_config_factory`](##get_config_factory)
 
+
+
 ## get_config_stage
 
 ##### 发送消息JSON格式
 
-获取关卡的消耗列表与关卡的奖励列表entry_consumables_config.json,stage_reward_config.json 关卡 hang_reward_config.json挂机信息
+获取关卡的消耗列表与关卡的奖励列表entry_consumables_config.json, stage_reward_config.json 关卡 hang_reward_config.json挂机信息
 
 > 无
 >
