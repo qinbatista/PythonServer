@@ -4,6 +4,7 @@
 # Uses asyncio to handle the sending and receipt of messages to the server.
 #
 import sys
+import ssl
 sys.path.insert(0, '..')
 
 import asyncio
@@ -29,7 +30,13 @@ class LukseunClient:
 		send_message() sends the given message to the server and
 		returns the decoded callback response
 		'''
-		reader, writer = await asyncio.open_connection(self._host, self._port)
+		path = './../../cert'
+		context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+		# 加载服务器所用证书和私钥
+		context.load_verify_locations(path + '/mycert.crt')
+		context.check_hostname = False
+		reader, writer = await asyncio.open_connection(self._host, self._port, ssl=context)
+
 		writer.write((message + '\r\n').encode())
 		await writer.drain()
 		raw = await reader.readuntil(b'\r\n')
