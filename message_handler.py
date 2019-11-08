@@ -358,11 +358,8 @@ class MessageHandler:
 	async def _buy_worker_factory(self, data: dict) -> str:
 		return await factory.buy_worker(data['data']['unique_id'], **data)
 
-	async def _increase_worker_factory(self, data: dict) -> str:
-		return await factory.increase_worker(data['data']['unique_id'], enums.Factory(int(data['data']['fid'])), int(data['data']['num']), **data)
-
-	async def _decrease_worker_factory(self, data: dict) -> str:
-		return await factory.decrease_worker(data['data']['unique_id'], enums.Factory(int(data['data']['fid'])), int(data['data']['num']), **data)
+	async def _update_worker_factory(self, data: dict) -> str:
+		return await factory.update_worker(data['data']['unique_id'], data['data']['worker'], **data)
 
 	async def _set_armor_factory(self, data: dict) -> str:
 		return await factory.set_armor(data['data']['unique_id'], enums.Armor(int(data['data']['aid'])), **data)
@@ -730,8 +727,7 @@ FUNCTION_LIST = {
 	'refresh_factory' : MessageHandler._refresh_factory,
 	'upgrade_factory' : MessageHandler._upgrade_factory,
 	'buy_worker_factory' : MessageHandler._buy_worker_factory,
-	'increase_worker_factory' : MessageHandler._increase_worker_factory,
-	'decrease_worker_factory' : MessageHandler._decrease_worker_factory,
+	'update_worker_factory' : MessageHandler._update_worker_factory,
 	'activate_wishing_pool_factory' : MessageHandler._activate_wishing_pool_factory,
 	'buy_acceleration_factory' : MessageHandler._buy_acceleration_factory,
 	'set_armor_factory' : MessageHandler._set_armor_factory,
