@@ -109,7 +109,7 @@ class MessageHandler:
 		message['tokenserverbaseurl'] = TOKEN_BASE_URL
 		message['mailserverbaseurl'] = MAIL_BASE_URL
 		message['world'] = '0'
-		message['config'] = configs
+		message['config'] = configs  ############configs#################
 		return json.dumps(await fn(self, message))
 
 	async def validate_token(self, msg, session):
@@ -325,6 +325,9 @@ class MessageHandler:
 	async def _level_up_skill(self, data: dict) -> str:
 		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']), self._skill, **data)
 
+	async def _get_config_skill(self, data: dict) -> str:
+		return common.mt(0, 'success', {'skill_config': self._skill})
+
 	###################### friend.py ######################
 	async def _get_all_friend(self, data: dict) -> str:
 		return await friend.get_all(data['data']['unique_id'], **data)
@@ -366,6 +369,7 @@ class MessageHandler:
 
 	async def _set_armor_factory(self, data: dict) -> str:
 		return await factory.set_armor(data['data']['unique_id'], enums.Armor(int(data['data']['aid'])), **data)
+
 	async def _buy_acceleration_factory(self, data: dict) -> str:
 		return await factory.buy_acceleration(data['data']['unique_id'], **data)
 
@@ -391,6 +395,7 @@ class MessageHandler:
 		return await weapon.get_all(data['data']['unique_id'], **data)
 
 	async def _get_config_weapon(self, data: dict) -> str:
+		data['config'] = self._weapon_config
 		return await weapon.get_config(**data)
 
 	###################### role.py ######################
@@ -404,6 +409,7 @@ class MessageHandler:
 		return await role.level_up_star(data['data']['unique_id'], int(data['data']['role']), **data)
 
 	async def _get_config_role(self, data: dict) -> str:
+		data['config'] = self._role_config
 		return await role.get_config(**data)
 
 
@@ -411,7 +417,6 @@ class MessageHandler:
 
 
 	###################### 签到系统 ######################
-	# TODO
 	async def _check_in(self, data: dict) -> str:
 		data.update({"config":self._check_in})
 		data.update({"vip_exp":self._vip_config})
@@ -425,7 +430,9 @@ class MessageHandler:
 	async def _get_all_check_in_table(self, data: dict) -> str:
 		data.update({"config":self._check_in})
 		return await check_in.get_all_check_in_table(data['data']['unique_id'],**data)
-		# return common.mt(0, 'success', {'check_in': [{'date':  '2019-10-05', 'reward': 0}, {'date':  '2019-10-06', 'reward': 0}]})
+
+	async def _get_config_check_in(self, data: dict) -> str:
+		return common.mt(0, 'success', {'check_in_config': self._check_in})
 
 	###################### VIP ######################
 	# TODO
@@ -465,6 +472,9 @@ class MessageHandler:
 							}
 					}}}
 
+	async def _get_config_vip(self, data: dict) -> str:
+		return common.mt(0, 'success', {'vip_config': self._vip_config})
+
 	###################### player ######################
 	# TODO
 	async def _exchange_card(self, data: dict) -> str:
@@ -483,6 +493,9 @@ class MessageHandler:
 
 	async def _get_achievement_config(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': self._acheviement})
+
+	async def _get_config_achievement(self, data: dict) -> str:
+		return common.mt(0, 'success', {'achievement_config': self._acheviement})
 
 	###################### armor ######################
 	async def _upgrade_armor(self, data: dict) -> str:
@@ -551,6 +564,9 @@ class MessageHandler:
 		data.update({"config":self._task},)
 		return await task.get_task_reward(data['data']['unique_id'],data['data']['task_id'], **data)
 
+	async def _get_config_task(self, data: dict) -> str:
+		return common.mt(0, 'success', {'task_config': self._task})
+
 	###################### darkmarket ######################
 	async def _get_all_market(self, data: dict) -> str:
 		data['dark_market'] = self._player['dark_market']
@@ -577,6 +593,8 @@ class MessageHandler:
 		}
 		return common.mt(0, 'success', {'config': cost})
 
+	async def _get_config_mall(self, data: dict) -> str:
+		return common.mt(0, 'success', {'mall_config': self._mall_config})
 
 	# TODO
 	async def _check_boss_status(self, data: dict) -> str:
@@ -825,13 +843,13 @@ FUNCTION_LIST = {
 	'get_config_stage': MessageHandler._get_config_stage,
 	'get_config_lottery': MessageHandler._get_config_lottery,
 	'get_config_weapon': MessageHandler._get_config_weapon,
-	# 'get_config_skill': MessageHandler._get_config_skill,
-	# 'get_config_mall': MessageHandler._get_config_mall,
+	'get_config_skill': MessageHandler._get_config_skill,
+	'get_config_mall': MessageHandler._get_config_mall,
 	'get_config_role': MessageHandler._get_config_role,
-	# 'get_config_task': MessageHandler._get_config_task,
-	# 'get_config_achievement': MessageHandler._get_config_achievement,
-	# 'get_config_check_in': MessageHandler._get_config_check_in,
-	# 'get_config_vip': MessageHandler._get_config_vip,
+	'get_config_task': MessageHandler._get_config_task,
+	'get_config_achievement': MessageHandler._get_config_achievement,
+	'get_config_check_in': MessageHandler._get_config_check_in,
+	'get_config_vip': MessageHandler._get_config_vip,
 	'get_config_player': MessageHandler._get_config_player,
 	'get_config_factory': MessageHandler._get_config_factory,
 }

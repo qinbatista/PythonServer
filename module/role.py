@@ -38,7 +38,7 @@ async def get_all(uid, **kwargs):
 	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs),"config":{'seg' : STANDARD_SEGMENT, 'exp_pot' : STANDARD_EXP_POT_COUNT}})
 
 async def get_config(**kwargs):
-	return common.mt(0, 'success', {'seg' : STANDARD_SEGMENT, 'exp_pot' : STANDARD_EXP_POT_COUNT})
+	return common.mt(0, 'success', {'seg' : STANDARD_SEGMENT, 'exp_pot' : STANDARD_EXP_POT_COUNT, 'role_config': kwargs['config']})
 
 #################################################################################
 

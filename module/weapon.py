@@ -17,7 +17,7 @@ STANDARD_RESET = 100
 STANDARD_SEGMENT = 25
 
 async def get_config(**kwargs):
-	return common.mt(0, 'success', {'seg' : STANDARD_SEGMENT, 'reset' : STANDARD_RESET, 'cost' : STANDARD_IRON})
+	return common.mt(0, 'success', {'seg' : STANDARD_SEGMENT, 'reset' : STANDARD_RESET, 'cost' : STANDARD_IRON, 'weapon_config': kwargs['config']})
 
 async def level_up(uid, wid, amount, **kwargs):
 	wid = enums.Weapon(wid)
