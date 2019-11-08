@@ -419,6 +419,7 @@
 >
 > Even if there is an error, the server will return the number of workers the SERVER says the client has.
 >
+> 服务器计算下一步之前剩余的秒数，即使出现错误，服务器也会返回客户机所拥有的worker的数量。
 
 ```json
 {
@@ -609,44 +610,7 @@
 
 购买工厂加速，加速工厂需要消耗钻石，钻石的消耗数量依据factory.json的配置信息
 
-```json
-{
-	"world"   : 0, 
-	"function": "buy_acceleration_factory",
-	"data"    :
-	{
-		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
-	}
-}
-```
-
 ##### 接受消息JSON格式
-
-```json
-{
-	"status" : 0, 
-	"message": "success",
-
-[获得失败]()
->
-> * 99: insufficient workers
-> * 98: factory worker over limits
-> * 97: invalid fid supplied
->
-
-## buy_acceleration_factory
-
-##### 发送消息JSON格式
-
-> resource: 资源的配置情况
->
-> reward: 资源的变化情况
->
-> armor：护甲的变化情况
->
-> worker：工人的情况
-
-购买工厂加速，加速工厂需要消耗钻石，钻石的消耗数量依据factory.json的配置信息
 
 ```json
 {

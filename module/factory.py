@@ -254,7 +254,7 @@ async def steps_since(uid, now, **kwargs):
 	refresh_t     = await common.get_timer(uid, enums.Timer.FACTORY_REFRESH,            **kwargs)
 	if refresh_t is None:
 		return (0, now)
-	if accel_end_t is None or now >= accel_end_t:
+	if accel_end_t is None or now >= accel_end_t:  # 时间比较
 		accel_start_t, accel_end_t = refresh_t, refresh_t
 	def sb(b, s, step):
 		return int((b - s).total_seconds()) // step

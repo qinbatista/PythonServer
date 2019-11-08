@@ -27,7 +27,7 @@ async def pass_stage(uid, stage, **kwargs):
 	if 0 < stage < 1000: return await p_general_stage(uid, stage, **kwargs)
 	elif 1000 <= stage < 2000: return await p_tower_stage(uid, stage, **kwargs)
 	elif 2000 <= stage < 3000: return await p_general_stage(uid, stage, **kwargs)
-	elif 3000 <= stage < 4000: return await leave_world_boss_stage(uid, stage, kwargs['data']['damange'], **kwargs)
+	elif 3000 <= stage < 4000: return await leave_world_boss_stage(uid, stage, kwargs['data']['damage'] if kwargs.__contains__('damage') else 0, **kwargs)
 	else: return common.mt(50, 'Abnormal parameter')
 
 
@@ -465,44 +465,44 @@ async def get_top_damage(uid, page, **kwargs):
 		) c, player p
 	WHERE p.uid = "{uid}" AND c.gn = p.gn
 	"""
-	damange = 0  # 玩家造成的伤害
+	damage = 0  # 玩家造成的伤害
 	ranking = -1  # 玩家在世界boss表中的排行
 	uid_data = await common.execute(uid_str, **kwargs)
 	if uid_data != ():
-		damange = uid_data[0][0]
+		damage = uid_data[0][0]
 		if uid_data[0][1] is None: uid_data = await common.execute(uid_str, **kwargs)
 		ranking = int(uid_data[0][1])
 	data = await common.execute( f'SELECT p.gn, l.value FROM player p, leaderboard l WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS.value} ORDER BY l.value DESC LIMIT {(page - 1)*10},10;', **kwargs)
 	if data == (): return common.mt(98, 'No data for this page')
 	rank = []
 	for d in data:
-		rank.append({'name': d[0], 'damange': d[1]})
-	return common.mt(0, 'success', {'damange': damange, 'ranking': ranking, 'rank': rank})
+		rank.append({'name': d[0], 'damage': d[1]})
+	return common.mt(0, 'success', {'damage': damage, 'ranking': ranking, 'rank': rank})
 
-async def leave_world_boss_stage(uid, stage, damange, **kwargs):
+async def leave_world_boss_stage(uid, stage, damage, **kwargs):
 	max_upload_damage = kwargs['max_upload_damage']
-	if damange <= 0 or damange >= max_upload_damage: return common.mt(status=99, message="abnormal data")
+	if damage < 0 or damage >= max_upload_damage: return common.mt(status=99, message="abnormal data")
 
 	new_record = 0  # 0代表不是最新记录，1代表是最新记录
 	data = await common.execute(f'SELECT value FROM leaderboard WHERE uid = "{uid}" AND lid = {enums.LeaderBoard.WORLD_BOSS.value};', **kwargs)
 	if data == ():
-		new_record, highest_damage = 1, damange
-		await common.execute(f'INSERT INTO leaderboard (uid, lid, value) VALUES ("{uid}", {enums.LeaderBoard.WORLD_BOSS.value}, {damange});', **kwargs)
-	elif damange > data[0][0]:
-		new_record, highest_damage = 1, damange
-		await common.execute(f'UPDATE leaderboard SET value={damange} WHERE uid = "{uid}" AND lid = {enums.LeaderBoard.WORLD_BOSS.value};', **kwargs)
+		new_record, highest_damage = 1, damage
+		await common.execute(f'INSERT INTO leaderboard (uid, lid, value) VALUES ("{uid}", {enums.LeaderBoard.WORLD_BOSS.value}, {damage});', **kwargs)
+	elif damage > data[0][0]:
+		new_record, highest_damage = 1, damage
+		await common.execute(f'UPDATE leaderboard SET value={damage} WHERE uid = "{uid}" AND lid = {enums.LeaderBoard.WORLD_BOSS.value};', **kwargs)
 	else:
 		highest_damage = data[0][0]
 
 	boss_life_ratio = {}
 	for i in range(0, len(kwargs["boss_life_remaining"])):
-		if kwargs["boss_life_remaining"][i] > 0 and damange > 0:
-			if kwargs["boss_life_remaining"][i] - damange <= 0:
-				damange -= kwargs["boss_life_remaining"][i]
+		if kwargs["boss_life_remaining"][i] > 0 and damage > 0:
+			if kwargs["boss_life_remaining"][i] - damage <= 0:
+				damage -= kwargs["boss_life_remaining"][i]
 				kwargs["boss_life_remaining"][i] = 0
 			else:
-				kwargs["boss_life_remaining"][i] -= damange
-				damange = 0
+				kwargs["boss_life_remaining"][i] -= damage
+				damage = 0
 		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))
 	return common.mt(0, 'success', {'new_record': new_record, 'highest_damage': highest_damage, 'boss_life_ratio': boss_life_ratio})
 
