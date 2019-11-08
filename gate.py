@@ -18,6 +18,7 @@ and then sending the completed job back to the correct client. Once a job has be
 a client, close the connection to the client.
 '''
 
+import ssl
 import sys
 import uuid
 import signal
@@ -115,7 +116,13 @@ class Gate:
 		await self._next_avail_gid()
 		await self.redis.set('gates.id.' + self.gid, self.ip + ':' + str(self.wport), expire = 600)
 		self.ws = await asyncio.start_server(self.worker_protocol, port = self.wport)
-		self.cs = await asyncio.start_server(self.client_protocol, port = self.cport)
+		# initialize SSL
+		context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+		path = '/home/matthew/lukseunserversys/cert'
+		context.load_cert_chain(certfile = path + '/mycert.crt', keyfile = path + '/rsa_private.key', \
+						password = 'lukseun1')
+		self.cs = await asyncio.start_server(self.client_protocol, port = self.cport, ssl = context)
+		#self.cs = await asyncio.start_server(self.client_protocol, port = self.cport)
 		print(f'gate {self.gid}: find me at {self.ip} on ports client: {self.cport}  worker: {self.wport}')
 		self.running = True
 
@@ -130,7 +137,8 @@ class Gate:
 		except (asyncio.LimitOverrunError, asyncio.IncompleteReadError):
 			writer.close()
 		finally:
-			await writer.wait_closed()
+			with contextlib.suppress(ConnectionResetError):
+				await writer.wait_closed()
 
 	'''
 	Listens for completed jobs from a worker. Once a completed job has been received,
@@ -159,7 +167,8 @@ class Gate:
 		cwriter.write((response + '\r\n').encode())
 		await cwriter.drain()
 		cwriter.close()
-		await cwriter.wait_closed()
+		with contextlib.suppress(ConnectionResetError):
+			await cwriter.wait_closed()
 
 	'''
 	Generates a unique job id, registers the client and gate to redis, and
