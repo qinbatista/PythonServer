@@ -3,7 +3,7 @@
 * [`upgrade_armor`](##upgrade_armor)
 * [`get_all_armor`](##get_all_armor)
 
-##upgrade_armor
+## upgrade_armor
 
 ##### 发送消息JSON格式
 
@@ -16,11 +16,11 @@
 ```json
 {
 	"world": 0,
-	"function": "get_all_weapon",
+	"function": "upgrade_armor",
 	"data": {
 		"token": "my token",
-    "aid":1,
-    "level":1
+    	"aid":1,
+    	"level":1
 	}
 }
 ```
@@ -31,9 +31,9 @@
 
 > armors：返回所有关于护甲的信息
 >
-> resource：消耗护甲的当前量
+> resource：消耗护甲的当前信息
 >
-> production：升级护甲的当前量
+> production：升级护甲的当前信息
 
 ```json
 {
@@ -43,13 +43,13 @@
 		"armors": {
 			"resource": {
 				"aid": 1,
-				"level": 4,
-				"quantity": 0
+				"level": 1,
+				"quantity": 1
 			},
 			"production": {
 				"aid": 1,
-				"level": 5,
-				"quantity": 182714
+				"level": 2,
+				"quantity": 3
 			}
 		}
 	}
@@ -60,7 +60,7 @@
 
 * 99: 盔甲不足
 
-##get_all_armor
+## get_all_armor
 
 ##### 发送消息JSON格式
 
@@ -69,7 +69,7 @@
 ```json
 {
 	"world": 0, 
-	"function": "level_up_weapon",
+	"function": "get_all_armor",
 	"data": {
 		"token": "my toekn ^_^"
 	}
@@ -95,32 +95,12 @@
 			{
 				"aid": 1,
 				"level": 1,
-				"quantity": 0
+				"quantity": 1
 			},
 			{
 				"aid": 1,
 				"level": 2,
-				"quantity": 0
-			},
-			{
-				"aid": 1,
-				"level": 3,
-				"quantity": 2
-			},
-			{
-				"aid": 1,
-				"level": 4,
-				"quantity": 0
-			},
-			{
-				"aid": 1,
-				"level": 5,
-				"quantity": 2
-			},
-			{
-				"aid": 1,
-				"level": 6,
-				"quantity": 160903
+				"quantity": 3
 			}
 		]
 	}

@@ -145,7 +145,7 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'friend_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
 	# response = send_tcp_message({'world': 0, 'function': 'check_boss_status', 'data': {'token': token, "item": 11}})
 	# response = send_tcp_message({'world': 0, 'function': 'update_worker_factory', 'data': {'token': token, "worker": {"0": 0, "1": 1, "2": 0}}})
-	response = send_tcp_message({'world': 0, 'function': 'find_person', 'data': {'token': token, 'gn_target': '222'}})
+	response = send_tcp_message({'world': 0, 'function': 'get_all_armor', 'data': {'token': token, 'aid': 1, 'level': 1}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_top_damage', 'data': {'token': token, "page": 1}})
 	# response = send_tcp_message({'world': 0, 'function': 'enter_stage', 'data': {'token': token, "stage": 3000, "damange": 110000}})
 	# response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, "stage": 3000, "damange": 110001}})
