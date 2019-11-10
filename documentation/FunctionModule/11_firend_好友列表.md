@@ -7,7 +7,7 @@
 * [`send_gift_all`](##send_gift_all)
 * [`find_person`](##find_person)
 
-##get_all_friend
+## get_all_friend
 
 ##### 发送消息JSON格式
 
@@ -36,19 +36,19 @@
 	"data": {
 		"friends": [
 			{
-				"gn": "哈哈",
-				"exp": 20,
-				"recover": "",
-				"since": "2019-10-27",
+				"gn": "妻雾脓翟纽屉",
+				"exp": 0,
+				"recover": "2019-11-03",
+				"since": "2019-10-28",
 				"fid": "",
 				"intro": "",
 				"icon": 0
 			},
 			{
-				"gn": "我v",
-				"exp": 20,
-				"recover": "",
-				"since": "2019-10-24",
+				"gn": "222",
+				"exp": 200,
+				"recover": "2019-11-03",
+				"since": "2019-10-28",
 				"fid": "",
 				"intro": "",
 				"icon": 0
@@ -62,21 +62,21 @@
 
 * 没有朋友会返回空列表
 
-##request_friend
+## request_friend
 
 ##### 发送消息JSON格式
 
 向某一个陌生人发送邮件要求，发送之后，对方玩家会收到一封邮件，每日可以发送好友申请的上限为6此，添加好友后会立即单方加好友，如果对方没同意，则会一直保持单方加好友
 
-> weapon：指定需要升级的武器id
+> gn_target：需要添加的玩家名字
 
 ```json
 {
 	"world": 0, 
-	"function": "level_up_weapon",
+	"function": "request_friend",
 	"data": {
 		"token": "my toekn ^_^",
-    "gn_target": "后起之秀"
+    	"gn_target": "后起之秀"
 	}
 }
 ```
@@ -108,21 +108,21 @@
 
 
 
-##remove_friend
+## remove_friend
 
 ##### 发送消息JSON格式
 
-武器的升级需要消耗该物品的碎片，武器碎片的消耗量参考weapon_config.json
+删除好友列表中的朋友
 
 > gn_target：需要删除朋友的名字，删除朋友只会执行删除操作，如果没有朋友也不会有所不同
 
 ```json
 {
 	"world": 0, 
-	"function": "level_up_star_weapon",
+	"function": "remove_friend",
 	"data": {
 		"token": "my toekn ^_^",
-    "gn_target": "后起之秀"
+    	"gn_target": "后起之秀"
 	}
 }
 ```
@@ -139,7 +139,7 @@
 	"status": 0,
 	"message": "removed target",
 	"data": {
-		"gn": "哲帅蛰引瞩锑"
+		"gn": "后起之秀"
 	}
 }
 ```
@@ -150,23 +150,21 @@
 
 
 
-##send_gift_friend
+## send_gift_friend
 
 ##### 发送消息JSON格式
 
 升级被动，武器等级与技能点总数保持一致
 
-> weapon：武器的id
->
-> passive：武器的被动id
+> gn_target：朋友名字
 
 ```json
 {
 	"world": 0, 
-	"function": "level_up_passive_weapon",
+	"function": "send_gift_friend",
 	"data": {
 		"token": "my toekn ^_^",
-    "gn_target":"后起之秀"
+    	"gn_target":"后起之秀"
 	}
 }
 ```
@@ -194,7 +192,7 @@
 
 
 
-##send_gift_all
+## send_gift_all
 
 ##### 发送消息JSON格式
 
@@ -203,7 +201,7 @@
 ```json
 {
 	"world": 0, 
-	"function": "get_config_lottery",
+	"function": "send_gift_all",
 	"data": {
 		"token": "my toekn ^_^"
 	}
@@ -234,21 +232,21 @@
 
 
 
-##find_person
+## find_person
 
 ##### 发送消息JSON格式
 
 查找特定玩家的信息
 
-> gn_target : 查找指定玩家的信息
+> gn_target : 查找指定玩家的名字
 
 ```json
 {
 	"world": 0, 
-	"function": "get_config_lottery",
+	"function": "find_person",
 	"data": {
 		"token": "my toekn ^_^",
-    "gn_target": 1,
+    	"gn_target": 1,
 	}
 }
 ```
