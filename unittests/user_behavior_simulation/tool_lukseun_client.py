@@ -3,7 +3,7 @@
 # A simple proof of concept client for internal use only.
 # Uses asyncio to handle the sending and receipt of messages to the server.
 #
-import sys
+import sys, os
 import ssl
 sys.path.insert(0, '..')
 
@@ -17,7 +17,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
+def loc():
+	return os.path.dirname(os.path.realpath(__file__))
 
 class LukseunClient:
 	def __init__(self, client_type: str = 'workingcat', host: str = '127.0.0.1', port: int = 8880):
@@ -30,10 +31,9 @@ class LukseunClient:
 		send_message() sends the given message to the server and
 		returns the decoded callback response
 		'''
-		path = './../../cert'
 		context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 		# 加载服务器所用证书和私钥
-		context.load_verify_locations(path + '/mycert.crt')
+		context.load_verify_locations(os.path.join(loc() + '/../../cert/mycert.crt'))
 		context.check_hostname = False
 		reader, writer = await asyncio.open_connection(self._host, self._port, ssl=context)
 
