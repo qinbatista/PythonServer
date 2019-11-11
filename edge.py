@@ -44,11 +44,12 @@ class Userlist:
 			self.family[user.world][user.fn].add(user.writer)
 
 	def remove(self, user):
-		if user.fn is not None:
+		if user is not None:
 			with contextlib.suppress(KeyError):
 				self.public[user.world].remove(user.writer)
-			with contextlib.suppress(KeyError):
-				self.family[user.world][user.fn].remove(user.writer)
+			if user.fn is not None:
+				with contextlib.suppress(KeyError):
+					self.family[user.world][user.fn].remove(user.writer)
 
 	def get_public(self, world):
 		with contextlib.suppress(KeyError):
