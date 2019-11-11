@@ -24,7 +24,7 @@ async def enter_stage(uid, stage, **kwargs):
 
 # 通过关卡
 async def pass_stage(uid, stage, **kwargs):
-	damage = kwargs['data']['damage'] if kwargs['data'].__contains__('damage') else 0
+	damage = kwargs['data'].get('damage', 0)
 	if 0 < stage < 1000: return await p_general_stage(uid, stage, **kwargs)
 	elif 1000 <= stage < 2000: return await p_tower_stage(uid, stage, **kwargs)
 	elif 2000 <= stage < 3000: return await p_general_stage(uid, stage, **kwargs)
