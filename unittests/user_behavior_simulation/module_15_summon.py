@@ -149,7 +149,7 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'check_boss_status', 'data': {'token': token, 'page': 1, 'item': 6}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_top_damage', 'data': {'token': token, "page": 1}})
 	# response = send_tcp_message({'world': 0, 'function': 'enter_stage', 'data': {'token': token, "stage": 3000, "damage": 110000}})
-	response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, "stage": 3000, "damage": 110001}})
+	# response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, "stage": 3000, "damage": 110001}})
 	# response = send_tcp_message({'world': 0, 'function': 'invite_user_family', 'data': {'token': token, "gn_target": 'matthewtesting'}})
 	# response = send_tcp_message({'world': 0, 'function': 'respond_family', 'data': {'token': token, "key": '1573454081.M824901P5352Q255.debian'}})
 	# response = send_tcp_message({'world': 0, 'function': 'set_role_family', 'data': {'token': token, "gn_target": 'matthewtesting', 'role': 4}})
@@ -164,6 +164,7 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'request_join_family', 'data': {'token': token, "name": '1newname'}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_new_mail', 'data': {'token': token, "name": '1newname'}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_all_mail', 'data': {'token': token, "name": '1newname'}})
+	response = send_tcp_message({'world': 0, 'function': 'refresh_factory', 'data': {'token': token, "name": '1newname'}})
 	print(str(response).replace("'", "\""))
 
 
