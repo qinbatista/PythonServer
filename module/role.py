@@ -32,7 +32,7 @@ async def level_up_star(uid, rid, **kwargs):
 	cost = STANDARD_SEGMENT * (1 + star)
 	if segment < cost: return common.mt(98, 'insufficient segments')
 	await common.execute(f'UPDATE role SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND rid = {rid.value};', **kwargs)
-	return common.mt(0, 'success', {'rid' : rid.value, 'star' : star + 1, 'seg' : segment - cost})
+	return common.mt(0, 'success', {'remaining': {'rid' : rid.value, 'star' : star + 1, 'seg' : segment - cost}, 'reward': {'rid' : rid.value, 'star' : 1, 'seg' : cost}})
 
 async def get_all(uid, **kwargs):
 	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs),"config":{'seg' : STANDARD_SEGMENT, 'exp_pot' : STANDARD_EXP_POT_COUNT}})

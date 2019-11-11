@@ -124,7 +124,7 @@ async def buy_worker(uid, **kwargs):
 			'total' : max_worker + 1}, 'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, \
 			'reward' : -upgrade_cost}})
 
-async def upgrade(uid, fid, **kwargs):
+async def upgrade(uid, fid, **kwargs):  # 测试返回98
 	if fid not in HAS_LEVEL_FACTORIES: return common.mt(99, 'invalid fid')
 	r = await refresh(uid, **kwargs)
 	l = r['data']['level'][fid.value]

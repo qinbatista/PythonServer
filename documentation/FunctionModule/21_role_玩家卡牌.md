@@ -160,7 +160,7 @@
 
 升级武器等级，升级武器消耗的铁参考weapon_config.json
 
-> weapon：指定需要升级的武器id
+> role：指定需要升级的角色id
 
 ```json
 {
@@ -169,7 +169,7 @@
 	"data": {
 		"token": "my token",
 		"role": 24,
-		"amount": 147730523636
+		"amount": 20
 	}
 }
 ```
@@ -210,14 +210,14 @@
 
 ##### 发送消息JSON格式
 
-武器的升级需要消耗该物品的碎片，武器碎片的消耗量参考role_config.json
+角色的升级需要消耗该角色的碎片，角色碎片的消耗量参考role_config.json
 
-> weapon：武器的id
+> role：角色的id
 
 ```json
 {
 	"world": 0, 
-	"function": "level_up_star_weapon",
+	"function": "level_up_star_role",
 	"data": {
 		"token": "my toekn ^_^",
 		"role": 1
@@ -229,7 +229,7 @@
 
 [抽取成功]()
 
-> remaining：`rid`角色id，`star`物品的星数，`seg`该武器的碎片
+> remaining：`rid`角色id，`star`物品的星数，`seg`该角色的碎片
 >
 > reward：与上述一样，此值均为变化量
 
@@ -238,9 +238,16 @@
 	"status": 0,
 	"message": "success",
 	"data": {
-		"rid": 6,
-		"star": 2,
-		"seg": 370
+		"remaining": {
+			"rid": 1,
+			"star": 3,
+			"seg": 175
+		},
+		"reward": {
+			"rid": 1,
+			"star": 1,
+			"seg": 75
+		}
 	}
 }
 ```
@@ -263,7 +270,7 @@
 ```json
 {
 	"world": 0, 
-	"function": "level_up_passive_weapon",
+	"function": "get_config_role",
 	"data": {
 		"token": "my toekn ^_^"
 	}
@@ -277,13 +284,71 @@
 [成功]()
 
 > role_config：返回role_config.json
+>
+> seg：角色突破需要消耗的碎片基础数据
+>
+> exp_pot：角色升级需要消耗的经验
 
 ```json
 {
 	"status": 0,
-	"message": "unlucky",
+	"message": "success",
 	"data": {
-		"role_config": {....}
+		"seg": 25,
+		"exp_pot": 5,
+		"role_config": {
+			"standard_experience_potion_count": 20,
+			"standard_segment_count": 30,
+			"standard_reset_role_skill_coin_count": 100,
+			"valid_passive_skills": [
+				"passive_skill_1_level",
+				"passive_skill_2_level",
+				"passive_skill_3_level",
+				"passive_skill_4_level"
+			],
+			"roles": [
+				"role1",
+				"role2",
+				"role3",
+				"role4",
+				"role5",
+				"role6",
+				"role7",
+				"role8",
+				"role9",
+				"role10",
+				"role11",
+				"role12",
+				"role13",
+				"role14",
+				"role15",
+				"role16",
+				"role17",
+				"role18",
+				"role19",
+				"role20",
+				"role21",
+				"role22",
+				"role23",
+				"role24",
+				"role25",
+				"role26",
+				"role27",
+				"role28",
+				"role29",
+				"role30",
+				"role31",
+				"role32",
+				"role33",
+				"role34",
+				"role35",
+				"role36",
+				"role37",
+				"role38",
+				"role39",
+				"role40"
+			]
+		}
 	}
 }
 ```

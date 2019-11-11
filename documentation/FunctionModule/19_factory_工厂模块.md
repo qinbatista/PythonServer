@@ -28,35 +28,34 @@
 
 ##### 接受消息JSON格式
 
-> `steps`: the number of steps since the last refresh
+> `steps`: the number of steps since the last refresh（自上次刷新后剩余的次数）
 >
-> `resource`: contains FOOD, IRON, CRYSTAL factories.
+> `resource`: contains FOOD, IRON, CRYSTAL factories.（含有食品、铁、水晶的工厂）
 >
->			`remaining`: is the total amount
->	
->			`reward`: is the change since the last time
+> - `remaining`: is the total amount（剩余的物资数量）
 >
-> `armor`: contains ARMOR factory
+> - `reward`: is the change since the last time（物资变化量）
 >
->			`aid`: the armor id that the factory is producing
->	
->			`remaining`: total quantity of level 1 armor with given aid
->	
->			`reward`: the quantity gained since the last time
+> `armor`: contains ARMOR factory（盔甲信息）
 >
-> `worker`: information regarding the distribution of workers across all factories
+> - `aid`: the armor id that the factory is producing（盔甲id）
 >
->			`unassigned`: the number of available free workers
->	
->			`total`: the number of all assigned and unassigned workers
->	
->			`Factory ID` : `number of assigned workers`
+> - `remaining`: total quantity of level 1 armor with given aid（盔甲剩余数量）
 >
-> `level`: information regarding the distribution of levels across all factories
+> - `reward`: the quantity gained since the last time（盔甲变化量）
 >
->			`Factory ID` : `level`
 >
-> `pool` : number of seconds remaining until the wishing pool refreshes
+> `worker`:  information regarding the distribution of workers across all factories（工人信息）
+>
+> - `total`: the number of all assigned and unassigned workers（所有工人数量）
+> - `unassigned`: the number of available free workers（可分配的工人数量，如下-1）
+> - `Factory ID` : `number of assigned workers`（各个工厂工人数量，如下0-3）
+>
+> `level`: information regarding the distribution of levels across all factories（ 关于所有工厂级别分布的信息）
+>
+> - `Factory ID` : `level`
+>
+> `pool` : number of seconds remaining until the wishing pool refreshes（许愿池刷新之前剩余的秒数）
 
 ```json
 {
@@ -109,6 +108,8 @@
 ## upgrade_factory
 
 升级工厂需要水晶，工厂的水晶消耗列表参考`factory.json`，水晶的消耗量根据工厂等级来。
+
+> fid：工厂id
 
 ##### 发送消息JSON格式
 

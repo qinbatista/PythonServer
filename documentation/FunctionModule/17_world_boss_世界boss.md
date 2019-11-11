@@ -1,3 +1,8 @@
+- [`check_boss_status`](##check_boss_status)
+- [`get_top_damage`](##get_top_damage)
+- [`enter_stage`](##enter_world_boss_stage(enter_stage))
+- [`pass_stage`](##leave_world_boss_stage(pass_stage))
+
 ## check_boss_status
 
 ##### 发送消息JSON格式
@@ -7,7 +12,7 @@
 ```json
 {
 	"world": 0,
-	"function": "enter_stage",
+	"function": "check_boss_status",
 	"data": {
 		"token": "my token"
 	}
@@ -138,6 +143,46 @@
 - 98: 此页面无数据
 
 * 99: 页码错误
+
+
+
+## enter_world_boss_stage(enter_stage)
+
+##### 发送消息JSON格式
+
+进入世界boss房间
+
+```json
+{ 
+	"world": 0,
+	"function": "enter_stage",
+	"data": {
+		"token": "my token",
+        "stage": 3000
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功消息]()
+
+> times: 剩余挑战boss次数
+
+```json
+{
+	"status": 0,
+	"message": "enter world boss success",
+	"data": {
+		"times": 0
+	}
+}
+```
+
+- 99：boss已全部死亡
+- 98：没有挑战次数
+- 97：能量不够
+- 96：没有配置文件
 
 
 

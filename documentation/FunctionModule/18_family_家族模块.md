@@ -21,6 +21,9 @@
 Creates a new family with the given name.
 The cost to create a family is determined by `family.json` configuration file.
 
+用给定的名称创建一个新的家庭。
+创建一个家庭的成本由' `family.json`'配置文件决定。 
+
 ##### 发送消息JSON格式
 
 ```json
@@ -62,6 +65,9 @@ The cost to create a family is determined by `family.json` configuration file.
 Leave your current family.
 The family owner can not leave.
 
+离开你现在的家庭。
+这家族族长不能离开。
+
 ##### 发送消息JSON格式
 
 ```json
@@ -97,6 +103,12 @@ Remove a user from the family.
 The owner can remove anyone.
 Admins can remove anyone with a role lower than Admin.
 
+将用户从家庭中移除。
+
+所有者可以移除任何人。
+
+管理员可以删除任何角色低于管理员的人。
+
 ##### 发送消息JSON格式
 
 ```json
@@ -127,6 +139,7 @@ Admins can remove anyone with a role lower than Admin.
 * 99: not in a family
 * 98: target is not in your family
 * 97: insufficient permissions
+* 96: You can't remove yourself
 
 
 ## invite_user_family
@@ -134,6 +147,12 @@ Admins can remove anyone with a role lower than Admin.
 Invite a user to your family.
 Only the Owner and Admins can invite users.
 An invitation will be sent the the user's mailbox.
+
+邀请一个用户到你的家庭。
+
+只有所有者和管理员可以邀请用户。
+
+一个邀请将被发送到用户的邮箱。
 
 ##### 发送消息JSON格式
 
@@ -172,6 +191,12 @@ An invitation will be sent the the user's mailbox.
 Request to join a family.
 The request will be sent to the family Owner and all Admins.
 If any of them accept the invitation, user will be added to the family.
+
+请求加入一个家庭。
+
+请求将被发送到家庭所有者和所有管理员。
+
+如果他们中的任何一个接受邀请，用户将被添加到家庭。
 
 ##### 发送消息JSON格式
 
@@ -213,11 +238,14 @@ If any of them accept the invitation, user will be added to the family.
 Respond to a family request or invitation.
 Calling this function adds the user to the family.
 
+回应家人的请求或邀请。
+调用此函数将用户添加到家庭中。
+
 ##### 发送消息JSON格式
 
 [挂机关卡不同]()
 
-> key: the key of the invitation or request mail
+> key: the key of the invitation or request mail（ 邀请或请求邮件的密钥 ）
 
 ```json
 {
@@ -259,6 +287,8 @@ Calling this function adds the user to the family.
 
 Gets all information regarding your family.
 
+获取有关您家庭的所有信息。 
+
 ##### 发送消息JSON格式
 
 ```json
@@ -283,7 +313,7 @@ Gets all information regarding your family.
 >
 > board：家族简介
 >
-> members：家族成员，`gn`家族名字，`role`使用角色，`exp`经验值，`icon`使用icon
+> members：家族成员，`gn`家族名字，`role`使用角色(0，4，8，10)，`exp`经验值，`icon`使用icon
 >
 > news: 家族消息，主要是谁离开，谁加入等信息
 >
@@ -322,6 +352,8 @@ Gets all information regarding your family.
 
 Retrieves the items listed on the family store, configuration depends on `family.json`
 
+检索家庭存储中列出的项，配置取决于 `family.json`
+
 ##### 发送消息JSON格式
 
 ```json
@@ -343,8 +375,8 @@ Retrieves the items listed on the family store, configuration depends on `family
 	"message": "success",
 	"data": {
 		"merchandise" : [
-			{"item" : "3:5:10,  "cost" : "3:2:200"},
-			{"item" : "3:1:100, "cost" : "3:4:20"},
+			{"item" : "3:5:10",  "cost" : "3:2:200"},
+			{"item" : "3:1:100", "cost" : "3:4:20"},
 		]
 	}
 }
@@ -355,9 +387,13 @@ Retrieves the items listed on the family store, configuration depends on `family
 
 Purchase an item from the family store.
 
+ 从家庭商店购买一件物品。 
+
 ##### 发送消息JSON格式
 
 > Example purchasing item 3:5:10 which costs 3:2:200
+>
+>  购买项目3:5:10花费3:2:200 
 
 ```json
 {
@@ -375,6 +411,9 @@ Purchase an item from the family store.
 > The outer dictionary key is equal to enums.Group.ITEM.value
 >
 > Before purchase, user has 3:5:100 and 3:2:1000
+>
+> 外部字典键等于enums.Group.ITEM.value
+> 购买前，用户有3:5:100和3:2:1000
 
 ```json
 {
@@ -402,6 +441,9 @@ Purchase an item from the family store.
 
 Update the family notice.
 Only the family Owner and Admins may update the family notice.
+
+更新家庭通知。
+只有家庭所有者和管理员可以更新家庭通知。
 
 ##### 发送消息JSON格式
 
@@ -441,6 +483,9 @@ Only the family Owner and Admins may update the family notice.
 
 Update the family blackboard.
 Only the family Owner and Admins may update the family blackboard.
+
+更新家庭黑板。
+只有家庭所有者和管理员可以更新家庭黑板。
 
 ##### 发送消息JSON格式
 
@@ -482,6 +527,13 @@ Modify the family role of the target user.
 The family Owner can set the permissions of any users to any role that is not Owner to Admin or below.
 The family Admins can set the permissions of any users whose role is Elite or lower to Elite or below.
 
+修改目标用户的家庭角色。
+家族所有者可以将任何用户的权限设置为不属于所有者的任何角色，并将其设置为Admin或以下。
+
+家庭管理员可以将任何角色为精英或更低的用户的权限设置为精英或更低。
+
+role级别只包括0，4，8，10
+
 ##### 发送消息JSON格式
 
 
@@ -517,6 +569,7 @@ The family Admins can set the permissions of any users whose role is Elite or lo
 * 98: not in a family
 * 97: target is not in your family
 * 96: insufficient permissions
+* 95: role  type error (级别类型错误)
 
 
 ## change_name_family
@@ -524,6 +577,12 @@ The family Admins can set the permissions of any users whose role is Elite or lo
 Change the name of the family.
 Only Admins and above can change the family name.
 The cost to change the family name is determined by `family.json` configuration file.
+
+更改家庭名称。
+
+只有管理员及以上的人才可以更改姓氏。
+
+更改家族名字的成本由`family.json`配置文件决定。
 
 ##### 发送消息JSON格式
 
@@ -567,6 +626,9 @@ The cost to change the family name is determined by `family.json` configuration 
 Starts the timer to disband the family.
 Only Admins and above can initialize the disbanding of a family.
 
+开始计时解散家庭。
+只有管理员及以上才能初始化家族的解散。
+
 ##### 发送消息JSON格式
 
 
@@ -604,6 +666,9 @@ Only Admins and above can initialize the disbanding of a family.
 
 Cancels the timer to disband the family.
 Only Admins and above can cancel the disbanding of a family.
+
+取消定时器来解散家庭。
+只有管理员以上的人才可以取消一个家庭的解散。
 
 ##### 发送消息JSON格式
 
