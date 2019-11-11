@@ -149,7 +149,7 @@ class Edge:
 			user = await self.validate_login_token(writer, nonce)
 			if user is not None:
 				await self.register_user(user)
-				await self.send(self.make_message(Command.OK, ''), writer)
+				await self.send(self.make_message(Command.OK), writer)
 				return user
 		raise ChatProtocolError
 
