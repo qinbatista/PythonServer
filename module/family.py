@@ -41,6 +41,7 @@ async def remove_user(uid, gn_target, **kwargs):
 	if not in_family: return common.mt(99, 'not in a family')
 	role = await _get_role(uid, name, **kwargs)
 	uid_target = await common.get_uid(gn_target, **kwargs)
+	if uid == uid_target: return common.mt(96, "You can't remove yourself")
 	_, name_target = await _in_family(uid_target, **kwargs)
 	if name_target != name: return common.mt(98, 'target is not in your family')
 	role_target = await _get_role(uid_target, name, **kwargs)
@@ -65,6 +66,7 @@ async def request_join(uid, name, **kwargs):
 	gn = await common.get_gn(uid, **kwargs)
 	officials = await _get_uid_officials(name, **kwargs)
 	if not officials: return common.mt(98, 'invalid family')
+	print(f'officials:{officials}')
 	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, *officials, subj = 'Family Request', body = f'{gn} requests to join your family.', name = name, uid_target = uid, **kwargs)
 	return common.mt(0, 'requested join', {'name' : name}) if sent else common.mt(97, 'mail could not be sent')
 
@@ -127,6 +129,7 @@ async def set_blackboard(uid, msg, **kwargs):
 	return common.mt(0, 'success', {'board' : msg})
 
 async def set_role(uid, gn_target, role, **kwargs):
+	if role  not in enums.FamilyRole._value2member_map_.keys(): return common.mt(95, 'role type error')
 	new_role = enums.FamilyRole(role)
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid == uid_target: return common.mt(99, 'can not modify self')
@@ -139,7 +142,7 @@ async def set_role(uid, gn_target, role, **kwargs):
 	if not _check_set_role_permissions(actors_role, targets_role, new_role): return common.mt(96, 'insufficient permissions')
 	await common.execute(f'UPDATE familyrole SET role = {new_role.value} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
-	await _record_family_change(name, f'{gn} set {gn_target} role to {role.name}.', **kwargs)
+	await _record_family_change(name, f'{gn} set {gn_target} role to {new_role.name}.', **kwargs)
 	return common.mt(0, 'success', {'gn' : gn_target, 'role' : new_role.value})
 
 async def change_name(uid, new_name, **kwargs):
@@ -159,7 +162,7 @@ async def change_name(uid, new_name, **kwargs):
 	await common.execute(f'UPDATE player SET fid = "{new_name}" WHERE fid = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyrole SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyhistory SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
-	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} changed family name to: {new_name}.', **kwargs)
+	await _record_family_change(new_name, f'{await common.get_gn(uid, **kwargs)} changed family name to: {new_name}.', **kwargs)
 	return common.mt(0, 'success', {'name' : new_name, 'iid' : iid.value, 'value' : remaining})
 
 async def disband(uid, **kwargs):
