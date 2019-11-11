@@ -3,7 +3,7 @@
 * [`get_all_skill`](##get_all_skill)
 * [`level_up_skill`](##level_up_skill)
 
-##get_all_skill
+## get_all_skill
 
 ##### 发送消息JSON格式
 
@@ -15,7 +15,7 @@
 ```json
 {
 	"world": 0,
-	"function": "get_all_weapon",
+	"function": "get_all_skill",
 	"data": {
 		"token": "my token"
 	}
@@ -122,11 +122,9 @@
 }
 ```
 
-[失败]()
 
-* 99: 盔甲不足
 
-##level_up_skill
+## level_up_skill
 
 ##### 发送消息JSON格式
 
@@ -142,8 +140,8 @@
 	"function": "level_up_weapon",
 	"data": {
 		"token": "my toekn ^_^",
-    "skill": 2,
-    "item": 5
+    	"skill": 1,
+    	"item": 6
 	}
 }
 ```
@@ -164,13 +162,13 @@
 
 ```json
 {
-	"status": 1,
-	"message": "unlucky",
+	"status": 0,
+	"message": "success",
 	"data": {
-		"sid": 13,
-		"level": 1,
+		"sid": 1,
+		"level": 2,
 		"iid": 6,
-		"value": 54
+		"value": 673
 	}
 }
 ```
