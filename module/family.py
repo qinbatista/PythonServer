@@ -129,7 +129,7 @@ async def set_blackboard(uid, msg, **kwargs):
 	return common.mt(0, 'success', {'board' : msg})
 
 async def set_role(uid, gn_target, role, **kwargs):
-	if role  not in enums.FamilyRole._value2member_map_.keys(): return common.mt(95, 'role type error')
+	if role not in enums.FamilyRole._value2member_map_.keys(): return common.mt(95, 'role type error')
 	new_role = enums.FamilyRole(role)
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid == uid_target: return common.mt(99, 'can not modify self')

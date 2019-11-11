@@ -167,7 +167,9 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'get_all_role', 'data': {'token': token, "name": '1newname'}})
 	# response = send_tcp_message({'world': 0, 'function': 'level_up_role', 'data': {'token': token, 'role': 1, "amount": '10'}})
 	# response = send_tcp_message({'world': 0, 'function': 'level_up_star_role', 'data': {'token': token, 'role': 1, "amount": '10'}})
-	response = send_tcp_message({'world': 0, 'function': 'get_config_role', 'data': {'token': token, 'role': 1, "amount": '10'}})
+	# response = send_tcp_message({'world': 0, 'function': 'get_config_role', 'data': {'token': token, 'role': 1, "amount": '10'}})
+	# response = send_tcp_message({'world': 0, 'function': 'get_task_reward', 'data': {'token': token, 'task_id': 1, "amount": '10'}})
+	response = send_tcp_message({'world': 0, 'function': 'get_all_task', 'data': {'token': token, 'task_id': 1, "amount": '10'}})
 	print(str(response).replace("'", "\""))
 
 

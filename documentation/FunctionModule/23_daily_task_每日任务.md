@@ -13,10 +13,10 @@
 ```json
 {
 	"world": 0, 
-	"function": "start_hang_up",
+	"function": "get_task_reward",
 	"data": {
 		"token": "my toekn ^_^",
-    "task_id":1
+    	"task_id":1
 	}
 }
 ```
@@ -50,6 +50,7 @@
 [失败]()
 
 * 99: no reward for this task
+* 98: task id type error
 
 
 
@@ -87,7 +88,7 @@
 			{
 				"tid": 1,
 				"task_value": 1,
-				"reward": 0,
+				"reward": 1,
 				"timer": "2019-10-28 11:17:54"
 			},
 			{
