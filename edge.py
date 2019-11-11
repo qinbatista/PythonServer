@@ -63,14 +63,15 @@ class Userlist:
 
 class Edge:
 	def __init__(self, port = 9000):
-		self.port     = port
-		self.pubsub   = nats.aio.client.Client()
-		self.channels = set()
-		self.userlist = Userlist()
+		self.port       = port
+		self.pubsub     = nats.aio.client.Client()
+		self.channels   = set()
+		self.userlist   = Userlist()
+		self.drain_lock = asyncio.Lock()
 
-		self.redis    = None
-		self.server   = None
-		self.running  = False
+		self.redis      = None
+		self.server     = None
+		self.running    = False
 
 	async def start(self):
 		try:
