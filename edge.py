@@ -23,6 +23,8 @@ class Command(enum.Enum):
 	FAMILY   = 'FAMILY'
 	PUBLIC   = 'PUBLIC'
 	REGISTER = 'REGISTER'
+	EXIT     = 'EXIT'
+	OK       = 'OK'
 
 class User:
 	def __init__(self, writer, world, gn, fn = ''):
@@ -42,11 +44,12 @@ class Userlist:
 			self.family[user.world][user.fn].add(user.writer)
 
 	def remove(self, user):
-		with contextlib.suppress(KeyError):
-			self.public[user.world].remove(user.writer)
-		if user.fn is not None:
+		if user is not None:
 			with contextlib.suppress(KeyError):
-				self.family[user.world][user.fn].remove(user.writer)
+				self.public[user.world].remove(user.writer)
+			if user.fn is not None:
+				with contextlib.suppress(KeyError):
+					self.family[user.world][user.fn].remove(user.writer)
 
 	def get_public(self, world):
 		with contextlib.suppress(KeyError):
@@ -60,14 +63,15 @@ class Userlist:
 
 class Edge:
 	def __init__(self, port = 9000):
-		self.port     = port
-		self.pubsub   = nats.aio.client.Client()
-		self.channels = set()
-		self.userlist = Userlist()
+		self.port       = port
+		self.pubsub     = nats.aio.client.Client()
+		self.channels   = set()
+		self.userlist   = Userlist()
+		self.drain_lock = asyncio.Lock()
 
-		self.redis    = None
-		self.server   = None
-		self.running  = False
+		self.redis      = None
+		self.server     = None
+		self.running    = False
 
 	async def start(self):
 		try:
@@ -140,11 +144,13 @@ class Edge:
 	# performs initial client handshake. requires client to provide a valid login token.
 	# raises ChatProtocolError if protocol is not followed, or an invalid login token was provided.
 	async def client_handshake(self, reader, writer):
+		print('new client_handshake')
 		cmd, nonce = await self.receive(reader)
 		if cmd == Command.REGISTER:
 			user = await self.validate_login_token(writer, nonce)
 			if user is not None:
 				await self.register_user(user)
+				await self.send(self.make_message(Command.OK), writer)
 				return user
 		raise ChatProtocolError
 
