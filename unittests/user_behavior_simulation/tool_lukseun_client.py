@@ -24,16 +24,16 @@ class LukseunClient:
 		self._host = host
 		self._port = port
 		self.token = ""
-	
+
 	async def send_message(self, message: str) -> dict:
 		'''
 		send_message() sends the given message to the server and
 		returns the decoded callback response
 		'''
-		path = './../../cert'
+		path = '/Users/batista/MyProject/lukseunserversys/cert/mycert.crt'
 		context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 		# 加载服务器所用证书和私钥
-		context.load_verify_locations(path + '/mycert.crt')
+		context.load_verify_locations(path)
 		context.check_hostname = False
 		reader, writer = await asyncio.open_connection(self._host, self._port, ssl=context)
 

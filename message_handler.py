@@ -602,7 +602,7 @@ class MessageHandler:
 		data['max_upload_damage'] = self._max_upload_damage
 		return await stage.check_boss_status(data['data']['unique_id'], **data)
 		# return {'status' : 0, 'message' : 'temp function success', 'data' :{'boss' :{'world_boss_enter_time':"2019/10/10 17:00:00",'world_boss_remaining_times':"20",'hp_values':["%.2f" %(int(self._boss_life_remaining[i])/int(self._boss_life[i])) for i in range(0,9)]}}}
-	
+
 	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
 	async def _get_family_config(self, data: dict) -> str:
 		return common.mt(0, 'success', {'config': self._family_config})
@@ -660,6 +660,13 @@ class MessageHandler:
 
 	async def _get_config_version(self, data: dict) -> str:
 		return common.mt(0, 'success', {'version': self._version})
+
+	async def _send_gift_mail(self, data: dict) -> str:
+		return await common._send_gift_mail(data['data']['unique_id'], data['data']['gn_target'],data['data']['group_id'],data['data']['item_id'],data['data']['quantity'], **data)
+
+	async def _send_text_mail(self, data: dict) -> str:
+		return await common._send_text_mail(data['data']['unique_id'],data['data']['gn_target'], data['data']['msg'], **data)
+
 
 ##########################################################################################################
 ##########################################################################################################
@@ -852,5 +859,11 @@ FUNCTION_LIST = {
 	'get_config_player': MessageHandler._get_config_player,
 	'get_config_factory': MessageHandler._get_config_factory,
 	'get_config_version': MessageHandler._get_config_version,
+
+
+
+	###################### private(comment before release) ######################
+	'send_gift_mail': MessageHandler._send_gift_mail,
+	'send_text_mail': MessageHandler._send_text_mail,
 }
 

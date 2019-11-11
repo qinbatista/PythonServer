@@ -5,6 +5,7 @@ Contains definitions of commonly used generic functions.
 When desinging a function, try to make it as general as possible to allow the reuse of code.
 '''
 from module import enums
+from module import mail
 import time
 from datetime import datetime, timezone, timedelta
 
@@ -260,3 +261,22 @@ async def _decrease_energy(uid, amount, **kwargs) -> dict:
 
 def mt(status, message, data = {}):
 	return {'status' : status, 'message' : message, 'data' : data}
+
+#private message
+async def _redeem_all_mail(uid, gn_target, mail_type, group_id, item_id, quantity, **kwargs):
+	return mt(0, 'success')
+
+async def _send_text_mail(uid, gn_target, msg, **kwargs):
+	fid = await get_uid(gn_target, **kwargs)
+	kwargs['msg'] = msg
+	kwargs['from_'] = await get_gn(uid, **kwargs)
+	sent = await mail.send_mail(0, fid, **kwargs)
+	return mt(0, 'success')
+
+async def _send_gift_mail(uid, gn_target, group_id, item_id, quantity, **kwargs):
+	fid = await get_uid(gn_target, **kwargs)
+	kwargs['items'] = encode_item(enums.Group(group_id), enums.Item(item_id), quantity)
+	kwargs['from_'] = await get_gn(uid, **kwargs)
+	sent = await mail.send_mail(1, fid, **kwargs)
+	return mt(0, 'success')
+
