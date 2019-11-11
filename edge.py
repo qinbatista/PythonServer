@@ -44,9 +44,9 @@ class Userlist:
 			self.family[user.world][user.fn].add(user.writer)
 
 	def remove(self, user):
-		with contextlib.suppress(KeyError):
-			self.public[user.world].remove(user.writer)
 		if user.fn is not None:
+			with contextlib.suppress(KeyError):
+				self.public[user.world].remove(user.writer)
 			with contextlib.suppress(KeyError):
 				self.family[user.world][user.fn].remove(user.writer)
 
@@ -142,6 +142,7 @@ class Edge:
 	# performs initial client handshake. requires client to provide a valid login token.
 	# raises ChatProtocolError if protocol is not followed, or an invalid login token was provided.
 	async def client_handshake(self, reader, writer):
+		print('new client_handshake')
 		cmd, nonce = await self.receive(reader)
 		if cmd == Command.REGISTER:
 			user = await self.validate_login_token(writer, nonce)
