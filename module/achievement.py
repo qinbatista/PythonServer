@@ -13,7 +13,7 @@ from module import mail
 async def get_all_achievement(uid, **kwargs):
 	achievement = await common.execute(f'SELECT aid, value, reward FROM achievement WHERE uid = "{uid}";', **kwargs)
 	if achievement == (): return common.mt(0, 'success', {'achievements': []})
-	# kwargs.update({"aid":enums.Achievement.TOTAL_LOGIN.value,"value":1})
+	# kwargs.update({"aid":enums.Achievement.TOTAL_LOGIN.value})
 	# await record_achievement(uid,**kwargs)
 	# kwargs['items'] = common.encode_item(enums.Group.ITEM, enums.Item.DIAMOND, 1)
 	# await mail.send_mail(enums.MailType.GIFT, uid, **kwargs)
@@ -23,7 +23,7 @@ async def get_all_achievement(uid, **kwargs):
 
 async def record_achievement(uid, **kwargs):  # aid->enums.Achievement,value->string
 	data = await common.execute(
-		f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {kwargs["achie_value"]},0) ON DUPLICATE KEY UPDATE `value`= `value`+{kwargs["achie_value"]}',
+		f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {1},0) ON DUPLICATE KEY UPDATE `value`= `value`+{1}',
 		**kwargs)
 	return common.mt(0, 'record:' + str(kwargs["aid"]) + " success")
 

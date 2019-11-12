@@ -28,6 +28,10 @@ async def remove(uid, gn_target, **kwargs):
 async def request(uid, gn_target, **kwargs):
 	if await _is_request_max(uid, **kwargs):
 		return common.mt(96, '6 request for 1 day, try tommorrow')
+
+	kwargs.update({"aid":enums.Achievement.FRIEND_REQUEST})
+	await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid_target == "": return common.mt(97, 'no such person')
 	if uid == uid_target: return common.mt(99, 'do not be an idiot')
@@ -65,6 +69,8 @@ async def send_gift(uid, gn_target, **kwargs):
 	kwargs['from_'] = await common.get_gn(uid, **kwargs)
 	sent = await mail.send_mail(enums.MailType.GIFT, fid, **kwargs)
 	if not sent: return common.mt(97, 'mailbox error')
+	kwargs.update({"aid":enums.Achievement.FRIEND_GIFT})
+	await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
 	await common.execute(f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
 	return common.mt(0, 'success')
 

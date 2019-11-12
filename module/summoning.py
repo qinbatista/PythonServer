@@ -34,12 +34,19 @@ async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
 	can_pay, remaining = await common.try_item(uid, item, -cost, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient materials')
 	new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
-	if enums.Tier.BASIC:
+
+	kwargs.update({"aid":enums.Achievement.SUMMON_TIMES})
+	await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+
+	if enums.Tier.BASIC == tier:
 		kwargs.update({"tid":enums.Task.BASIC_SUMMONING})
 		await task.record_task(uid,**kwargs)
-	if enums.Tier.PRO:
+	if enums.Tier.PRO == tier:
 		kwargs.update({"tid":enums.Task.PRO_SUMMONING})
 		await task.record_task(uid,**kwargs)
+		kwargs.update({"aid":enums.Achievement.PRO_SUMMON_TIMES})
+		await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+
 	return await _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)
 
 async def _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs):
@@ -49,6 +56,16 @@ async def _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs):
 	if not can_pay: return common.mt(99, 'insufficient materials')
 	response = {'remaining' : {}, 'reward' : {}}
 	for time in range(num_times):
+
+		if enums.Tier.BASIC == tier:
+			kwargs.update({"tid":enums.Task.BASIC_SUMMONING})
+			await task.record_task(uid,**kwargs)
+		if enums.Tier.PRO == tier:
+			kwargs.update({"tid":enums.Task.PRO_SUMMONING})
+			await task.record_task(uid,**kwargs)
+			kwargs.update({"aid":enums.Achievement.PRO_SUMMON_TIMES})
+			await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+
 		new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
 		result = await _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)
 		response['remaining'][time] = result['data']['remaining']

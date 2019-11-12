@@ -28,6 +28,10 @@ async def pass_stage(uid, stage, **kwargs):
 	if 0 < stage < 1000:
 		kwargs.update({"tid":enums.Task.PASS_MAIN_STAGE})
 		await task.record_task(uid,**kwargs)
+
+		kwargs.update({"aid":enums.Achievement.PASS_STAGE})
+		await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+
 		return await p_general_stage(uid, stage, **kwargs)
 	elif 1000 <= stage < 2000:
 		kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE})

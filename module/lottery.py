@@ -6,6 +6,7 @@ import random
 from module import common
 from module import summoning
 from module import enums
+from module import task
 
 STANDARD_SEG_COUNT = 30
 
@@ -48,7 +49,9 @@ async def _try_unlock_skill(uid, gift, **kwargs):
 		return (True, skill)
 	await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.SKILL_SCROLL_10.value}, 1) ON DUPLICATE KEY UPDATE value = value + 1;', **kwargs)
 	return (False, enums.Item.SKILL_SCROLL_10)
-
+role_4_star = []
+role_5_star = []
+role_6_star = []
 async def _try_unlock_role(uid, gift, **kwargs):
 	role = enums.Role(gift)
 	if not await common.exists('role', ('uid', uid), ('rid', role.value), **kwargs):

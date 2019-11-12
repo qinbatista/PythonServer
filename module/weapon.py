@@ -19,6 +19,10 @@ async def get_config(**kwargs):
 async def level_up(uid, wid, amount, **kwargs):
 	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP})
 	await task.record_task(uid,**kwargs)
+
+	kwargs.update({"aid":enums.Achievement.LEVEL_UP_WEAPON})
+	await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+
 	wid = enums.Weapon(wid)
 	exists, payload = await _get_weapon_info(uid, wid, 'star', 'level', 'skillpoint', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')

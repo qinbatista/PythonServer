@@ -4,5 +4,44 @@
 		"iron"  : 20,
 		"seg"   : 30,
 		"reset" : 100
-	}
+	},
+	"star_4":
+	[
+		"weapon0",
+		"weapon1",
+		"weapon2",
+		"weapon3",
+		"weapon4",
+		"weapon5",
+		"weapon6",
+		"weapon7",
+		"weapon8",
+		"weapon9"
+	],
+	"star_5":
+	[
+		"weapon10",
+		"weapon11",
+		"weapon12",
+		"weapon13",
+		"weapon14",
+		"weapon15",
+		"weapon16",
+		"weapon17",
+		"weapon18",
+		"weapon19"
+	],
+	"star_6":
+	[
+		"weapon20",
+		"weapon21",
+		"weapon22",
+		"weapon23",
+		"weapon24",
+		"weapon25",
+		"weapon26",
+		"weapon27",
+		"weapon28",
+		"weapon29"
+	]
 }

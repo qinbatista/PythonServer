@@ -3,5 +3,44 @@
 	{
 		"exp_pot" : 5,
 		"seg" : 25
-	}
+	},
+	"star_4":
+	[
+		"role0",
+		"role1",
+		"role2",
+		"role3",
+		"role4",
+		"role5",
+		"role6",
+		"role7",
+		"role8",
+		"role9"
+	],
+	"star_5":
+	[
+		"role10",
+		"role11",
+		"role12",
+		"role13",
+		"role14",
+		"role15",
+		"role16",
+		"role17",
+		"role18",
+		"role19"
+	],
+	"star_6":
+	[
+		"role20",
+		"role21",
+		"role22",
+		"role23",
+		"role24",
+		"role25",
+		"role26",
+		"role27",
+		"role28",
+		"role29"
+	]
 }
