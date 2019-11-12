@@ -42,14 +42,14 @@ async def accept_gift(uid, nonce, **kwargs):
 async def change_name(uid, name, **kwargs):
 	pass
 
-async def get_info(uid, player_experience, **kwargs):
+async def get_info(uid, **kwargs):
 	# data包含玩家名字和家庭名字，info包含玩家进程信息
 	data = await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs)
 	info = await common.execute(f'SELECT energy, exp, stage, towerstage, hangstage FROM progress WHERE uid = "{uid}";', **kwargs)
 	if info == ():
 		await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
 		info = await common.execute(f'SELECT energy, exp, stage, towerstage, hangstage FROM progress WHERE uid = "{uid}";', **kwargs)
-	return common.mt(0, 'success', {'gn': data[0][0], 'family_name': data[0][1], 'energy': info[0][0], 'exp': info[0][1], 'stage': info[0][2], 'towerstage': info[0][3], 'hangstage': info[0][4], 'player_experience': player_experience})
+	return common.mt(0, 'success', {'gn': data[0][0], 'family_name': data[0][1], 'energy': info[0][0], 'exp': info[0][1], 'stage': info[0][2], 'towerstage': info[0][3], 'hangstage': info[0][4]})
 
 async def get_all_resource(uid, **kwargs):
 	item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)
