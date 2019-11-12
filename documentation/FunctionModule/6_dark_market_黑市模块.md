@@ -29,33 +29,39 @@
 >
 > refreshable：剩余免费的刷新次数，一天免费可以刷新3次
 >
+> config：配置信息
+>
+> - diamond：钻石刷新需要消耗的钻石数量
 
 ```json
 {
 	"status": 1,
-	"message": "get all black market information",
+	"message": "Get all black market information",
 	"data": {
 		"dark_markets": [
 			{
 				"pid": 0,
 				"gid": 0,
-				"mid": 27,
+				"mid": 2,
+				"qty": 5,
+				"cid": 1,
+				"amt": 675
+			},
+            ...
+			{
+				"pid": 1,
+				"gid": 1,
+				"mid": 30,
 				"qty": 1,
 				"cid": 5,
-				"amt": 52
-			},
-			.....,
-			{
-				"pid": 2,
-				"gid": 0,
-				"mid": 10,
-				"qty": 3,
-				"cid": 1,
-				"amt": 913
+				"amt": 61
 			}
 		],
-		"refresh_time": 3600,
-		"refreshable": 3
+		"refresh_time": 3058,
+		"refreshable": 3,
+		"config": {
+			"refresh_diamond": 100
+		}
 	}
 }
 ```
