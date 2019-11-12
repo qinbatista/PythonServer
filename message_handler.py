@@ -393,7 +393,6 @@ class MessageHandler:
 		return await weapon.get_all(data['data']['unique_id'], **data)
 
 	async def _get_config_weapon(self, data: dict) -> str:
-		data['config'] = self._weapon_config
 		return await weapon.get_config(**data)
 
 	###################### role.py ######################
@@ -407,7 +406,6 @@ class MessageHandler:
 		return await role.level_up_star(data['data']['unique_id'], int(data['data']['role']), **data)
 
 	async def _get_config_role(self, data: dict) -> str:
-		data['config'] = self._role_config
 		return await role.get_config(**data)
 
 
