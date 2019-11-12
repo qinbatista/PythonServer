@@ -57,7 +57,11 @@ async def _send_mail(mail, **kwargs):
 		return result['status'] == 0
 
 async def _send_mail_simple(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['data'].get('from_', await common.get_gn(uid, **kwargs)), 'body' : kwargs['data'].get('body', kwargs['msg']), 'subj' : kwargs['data'].get('subj', 'TEXT_MAIL_BOX'), 'type' : enums.MailType.SIMPLE.value}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : \
+			{'from' : kwargs['data'].get('from_', kwargs['from_']), \
+			'body' : kwargs['data'].get('body'), \
+			'subj' : kwargs['data'].get('subj'), \
+			'type' : enums.MailType.SIMPLE.value}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_gift(uid, **kwargs):
