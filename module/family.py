@@ -8,6 +8,7 @@ from module import mail
 from module import enums
 from module import common
 from module import task
+from module import achievement
 
 from datetime import datetime, timezone, timedelta
 
@@ -192,7 +193,7 @@ async def check_in(uid, **kwargs):
 	await task.record_task(uid,**kwargs)
 
 	kwargs.update({"aid":enums.Achievement.CHECK_IN_FAMILY})
-	await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')

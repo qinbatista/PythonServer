@@ -6,6 +6,7 @@ from module import enums
 from module import common
 from module import lottery
 from module import task
+from module import achievement
 
 # Tier
 # basic, friend, pro, prophet
@@ -36,7 +37,7 @@ async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
 	new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
 
 	kwargs.update({"aid":enums.Achievement.SUMMON_TIMES})
-	await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 
 	if enums.Tier.BASIC == tier:
 		kwargs.update({"tid":enums.Task.BASIC_SUMMONING})
@@ -45,7 +46,7 @@ async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
 		kwargs.update({"tid":enums.Task.PRO_SUMMONING})
 		await task.record_task(uid,**kwargs)
 		kwargs.update({"aid":enums.Achievement.PRO_SUMMON_TIMES})
-		await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+		await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 
 	return await _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)
 
@@ -64,7 +65,7 @@ async def _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs):
 			kwargs.update({"tid":enums.Task.PRO_SUMMONING})
 			await task.record_task(uid,**kwargs)
 			kwargs.update({"aid":enums.Achievement.PRO_SUMMON_TIMES})
-			await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+			await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 
 		new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
 		result = await _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)

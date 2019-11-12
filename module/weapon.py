@@ -9,6 +9,7 @@ import asyncio
 from module import enums
 from module import common
 from module import task
+from module import achievement
 
 from collections import defaultdict
 
@@ -21,7 +22,7 @@ async def level_up(uid, wid, amount, **kwargs):
 	await task.record_task(uid,**kwargs)
 
 	kwargs.update({"aid":enums.Achievement.LEVEL_UP_WEAPON})
-	await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 
 	wid = enums.Weapon(wid)
 	exists, payload = await _get_weapon_info(uid, wid, 'star', 'level', 'skillpoint', **kwargs)

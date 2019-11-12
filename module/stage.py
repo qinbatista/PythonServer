@@ -5,6 +5,7 @@ stage.py
 from module import enums
 from module import common
 from module import task
+from module import achievement
 from datetime import datetime, timedelta
 import time
 import random
@@ -30,7 +31,7 @@ async def pass_stage(uid, stage, **kwargs):
 		await task.record_task(uid,**kwargs)
 
 		kwargs.update({"aid":enums.Achievement.PASS_STAGE})
-		await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+		await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 
 		return await p_general_stage(uid, stage, **kwargs)
 	elif 1000 <= stage < 2000:

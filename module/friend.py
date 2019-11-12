@@ -10,6 +10,8 @@ from module import mail
 from module import enums
 from module import common
 from module import task
+from module import achievement
+from module import family
 from datetime import datetime, timezone
 
 
@@ -30,7 +32,7 @@ async def request(uid, gn_target, **kwargs):
 		return common.mt(96, '6 request for 1 day, try tommorrow')
 
 	kwargs.update({"aid":enums.Achievement.FRIEND_REQUEST})
-	await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid_target == "": return common.mt(97, 'no such person')
@@ -70,7 +72,7 @@ async def send_gift(uid, gn_target, **kwargs):
 	sent = await mail.send_mail(enums.MailType.GIFT, fid, **kwargs)
 	if not sent: return common.mt(97, 'mailbox error')
 	kwargs.update({"aid":enums.Achievement.FRIEND_GIFT})
-	await task.record_achievement(kwargs['data']['unique_id'],**kwargs)
+	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 	await common.execute(f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
 	return common.mt(0, 'success')
 
@@ -149,13 +151,7 @@ async def _are_friends(uid, fid, **kwargs):
 async def _are_family(uid, fid, **kwargs):
 	data1 = await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}"', **kwargs)
 	data2 = await common.execute(f'SELECT fid FROM player WHERE uid = "{fid}"', **kwargs)
-	if data1 == data2:
-		if data1 == () and data2 == ():
-			return False
-		else:
-			return True
-	else:
-		return False
+	return True if (False if data1[0][0] == '' or data2[0][0] != '' else True) and family._check_invite_permissions(await family._get_role(uid, data1[0][0], **kwargs)) else False
 
 
 async def _get_friend_info(uid, **kwargs):
