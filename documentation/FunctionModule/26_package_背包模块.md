@@ -2,163 +2,154 @@
 
 * [`exchange_card`](##_exchange_card)
 
+- [`get_config_card`](##get_config_card)
 
+## exchange_card
 
-## check_in
-
-签到按照`每月当天`进行签到，签到的奖励对照`check_in.json`,签到的内容为7天一循环(`1号为第一天天`)
+卡片交换，公式为角色当前等级×卡片交换的基础数量（base num=>bnum），详见配置表`package.json`
 
 ##### 发送消息JSON格式
+
+> card_id：卡片id（属于item枚举，范围18-23）
 
 ```json
 {
 	"world": 0, 
-	"function": "start_hang_up",
+	"function": "exchange_card",
 	"data": {
-		"token": "my toekn ^_^"
+		"token": "my toekn ^_^",
+        "card_id": 18
 	}
 }
 ```
 
 ##### 接受消息JSON格式
 
-[签到成功]()
+[成功]()
 
-> remaining：物品剩余的数据 3:18:2分别表示 种类id : 商品id : 商品数量，所以3:18: 2表示金币2个
+> remaining：剩余量
 >
-> reward：变化的量
+> - sql_table：操作的数据库表名
+> - mid：物品id
+> - mnum：物品剩余数量
+> - cid：卡片id（card id）存在item表中
+> - cnum：卡片剩余数量
+>
+> reward：变化量
+>
+> - sql_table：操作的数据库表名
+> - mid：物品id
+> - mnum：物品增加数量
+> - cid：卡片id（card id）存在item表中
+> - cnum：卡片消耗数量
+>
+> exp_info：经验信息
+>
+> - exp：目前的经验
+> - level：目前的等级
+> - need：升到下级需要的经验
 
 ```json
 {
 	"status": 0,
-	"message": "Sign-in success",
+	"message": "success",
 	"data": {
-		"remaining": [
-			"3:18:2"
-		],
-		"reward": [
-			"3:18:1"
-		]
-	}
-} 
-```
-
-[签到失败]()
-
-* 99: 已签到，不会重复获得奖励
-
-
-
-
-
-## supplement_check_in
-
-##### 发送消息JSON格式
-
-补签功能，把之前没有签到的天数用钻石进行补签，`补钱一天`消耗的钻石数量在配置表`check_in.json`
-
-```json
-{
-	"world": 0, 
-	"function": "start_hang_up",
-	"data": {
-		"token": "my toekn ^_^"
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-[获取资源成功]()
-
-> cost: 表示消耗的钻石数量，消耗的内容固定为钻石，数量可变
->
-> supplement：数字1，2，3，4表示补签的日期，内部则表示获得的物品与拥有的物品
-
-```json
-{
-	"status": 0,
-	"message": "Successful signing",
-	"data": {
-		"supplement": {
-			"1": {
-				"remaining": [
-					"3:18:5"
-				],
-				"reward": [
-					"3:18:1"
-				]
-			},
-			"2": {
-				"remaining": [
-					"3:5:298180"
-				],
-				"reward": [
-					"3:5:100"
-				]
-			},
-			"3": {
-				"remaining": [
-					"3:9:2006"
-				],
-				"reward": [
-					"3:9:100"
-				]
-			},
-			"4": {
-				"remaining": [
-					"3:25:400"
-				],
-				"reward": [
-					"3:25:100"
-				]
-			},
-			"5": {
-				"remaining": [
-					"2:1:20"
-				],
-				"reward": [
-					"2:1:5"
-				]
-			}
-		},
 		"remaining": {
-			"diamond": 298080
+			"sql_table": "item",
+			"mid": 1,
+			"mnum": 204784,
+			"cid": 18,
+			"cnum": 1
 		},
 		"reward": {
-			"diamond": 480
+			"sql_table": "item",
+			"mid": 1,
+			"mnum": 2000,
+			"cid": 18,
+			"cnum": -1
+		},
+		"exp_info": {
+			"exp": 40,
+			"level": 1,
+			"need": 20
 		}
 	}
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
-* 99: 钻石不足
-* 98: 没有一天漏掉，无法补钱
+* 99：物品id错误
+* 98：卡片id错误
+* 97：配置表中数据库表名设置错误
+* 96：卡片数量不足
 
 
 
-## get_all_check_in_table
+## get_config_card
 
-获取签到表的情况，只是获取数据，`不改变`任何服务器数值
+返回卡片兑换的配置信息，详见配置表`package.json`
+
+##### 发送消息JSON格式
 
 ```json
 {
-	"world": 0,
-	"function": "get_all_check_in_table",
+	"world": 0, 
+	"function": "get_config_card",
 	"data": {
-		"token": "my token"
+		"token": "my toekn ^_^"
 	}
 }
 ```
 
 ##### 接受消息JSON格式
 
-[获取资源成功]()
+[成功]()
 
-> remaining：数字1，2，3，4表示当月的日期，reward则表示是否领取奖励(签到)
+> config：卡片兑换配置信息
 >
-> today: 当前日期
->
-> time：距离下次签到的时间（如果提示玩家还有多久可以进行下次签到，这个时间可以派上用场）
+> - sqltable：操作的数据库表
+> - mid：物品id
+> - bnum：卡片交换获得的物品基础数量（base num=>bnum）
+
+```
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"config": {
+			"COIN_CARD": {
+				"sqltable": "item",
+				"mid": 1,
+				"bnum": 2000
+			},
+			"EXP_CARD": {
+				"sqltable": "progress",
+				"mid": "exp",
+				"bnum": 1000
+			},
+			"FOOD_CARD": {
+				"sqltable": "item",
+				"mid": 3,
+				"bnum": 200
+			},
+			"MINE_CARD": {
+				"sqltable": "item",
+				"mid": 24,
+				"bnum": 100
+			},
+			"CRYSTAL_CARD": {
+				"sqltable": "item",
+				"mid": 4,
+				"bnum": 20
+			},
+			"DIAMOND_CARD": {
+				"sqltable": "item",
+				"mid": 5,
+				"bnum": 10
+			}
+		}
+	}
+}
+```
+

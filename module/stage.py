@@ -25,10 +25,20 @@ async def enter_stage(uid, stage, **kwargs):
 # 通过关卡
 async def pass_stage(uid, stage, **kwargs):
 	damage = kwargs['data'].get('damage', 0)
-	if 0 < stage < 1000: return await p_general_stage(uid, stage, **kwargs)
-	elif 1000 <= stage < 2000: return await p_tower_stage(uid, stage, **kwargs)
-	elif 2000 <= stage < 3000: return await p_general_stage(uid, stage, **kwargs)
-	elif 3000 <= stage < 4000: return await leave_world_boss_stage(uid, stage, damage, **kwargs)
+	if 0 < stage < 1000:
+		kwargs.update({"tid":enums.Task.PASS_MAIN_STAGE})
+		await task.record_task(uid,**kwargs)
+		return await p_general_stage(uid, stage, **kwargs)
+	elif 1000 <= stage < 2000:
+		kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE})
+		await task.record_task(uid,**kwargs)
+		return await p_tower_stage(uid, stage, **kwargs)
+	elif 2000 <= stage < 3000:
+		kwargs.update({"tid":enums.Task.PASS_WORLD_BOSS})
+		await task.record_task(uid,**kwargs)
+		return await p_general_stage(uid, stage, **kwargs)
+	elif 3000 <= stage < 4000:
+		return await leave_world_boss_stage(uid, stage, damage, **kwargs)
 	else: return common.mt(50, 'Abnormal parameter')
 
 
@@ -138,7 +148,7 @@ async def p_general_stage(uid, stage, **kwargs):
 		await common.execute_update(f'UPDATE progress SET stage = {stage} WHERE uid = "{uid}"', **kwargs)
 		p_stage['finally'] = stage
 		p_stage['vary'] = 1
-	kwargs.update({"tid":enums.Task.PASS_MAIN_STAGE,"task_value":1})
+	kwargs.update({"tid":enums.Task.PASS_MAIN_STAGE})
 	await task.record_task(uid, **kwargs)
 
 	return common.mt(0, 'success', data={'pass_stages': pass_stages, 'p_exp': p_exp, 'p_stage': p_stage})
@@ -281,7 +291,7 @@ async def p_tower_stage(uid, stage, **kwargs):
 					data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 				await common.execute_update(f'UPDATE item SET value = value + {value} WHERE uid = "{uid}" AND iid = "{key}";', **kwargs)
 				pass_towers.append({'iid': key, 'remaining': data[0][0] + value, 'reward': value})
-	kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE, "task_value":1})
+	kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE})
 	await task.record_task(uid, **kwargs)
 	return common.mt(0, 'success', data={'pass_stages': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
 
@@ -544,7 +554,9 @@ async def increase_exp(uid, exp, **kwargs):
 	"""
 	exp_config = kwargs['exp_config']  # self._player['player_level']['experience']
 	exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
-	if exp_data == (): return False, {'exp': 0, 'level': 0, 'need': 0}
+	if exp_data == ():
+		await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
+		return False, {'exp': 0, 'level': 0, 'need': 0}
 	exp_s = exp_data[0][0]
 	exp_list = [e for e in exp_config if e > exp_s]
 	if exp == 0: return True, {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}

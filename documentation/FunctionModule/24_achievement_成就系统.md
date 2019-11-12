@@ -2,7 +2,7 @@
 
 * [`get_achievement_reward`](##get_achievement_reward)
 * [`get_all_achievement`](##get_all_achievement)
-* 内部方法[`record_achievement`](##record_achievement)
+* 内部方法[`record_achievement`](##record_achievement（内部方法）)
 
 ## get_achievement_reward
 
@@ -16,7 +16,7 @@
 	"function": "get_achievement_reward",
 	"data": {
 		"token": "my toekn ^_^",
-    "achievement_id":1
+   		"achievement_id":1
 	}
 }
 ```
@@ -25,24 +25,26 @@
 
 [成功]()
 
-> item：物资的改变信息item_id：5表示钻石，remaining:表示剩余钻石数量，reward表示改变量
+> remaining：剩余的数量，item_id：5表示钻石，item_value表示钻石数量，aid表示任务的id，value表示成就的完成次数
 >
-> achievement：任务的的详细信息，aid表示任务的id，value表示成就的完成次数为多少，reward代表奖励次数是多少，奖励的内容来自achievement_config.json
+> reward：变化量，item_id：5表示钻石，item_value表示钻石获得的数量，aid表示任务的id，value完成这个成就需要的次数，这个次数是已经达标并领取了奖励的次数
 
 ```json
 {
 	"status": 0,
 	"message": "get reward success",
 	"data": {
-		"item": {
+		"remaining": {
 			"item_id": 5,
-			"remaining": 242460,
-			"reward": 30
+			"item_value": 241480,
+			"aid": 1,
+			"value": 999999
 		},
-		"achievement": {
-			"value": 1,
-			"reward": 1,
-			"aid": 1
+		"reward": {
+			"item_id": 5,
+			"item_value": 310,
+			"aid": 1,
+			"value": 987
 		}
 	}
 }
@@ -110,7 +112,7 @@
 
 
 
-## record_achievement
+## record_achievement（内部方法）
 
 ##### 发送消息JSON格式
 

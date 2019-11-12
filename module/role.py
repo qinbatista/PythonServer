@@ -9,6 +9,8 @@ from collections import defaultdict
 
 
 async def level_up(uid, rid, amount, **kwargs):
+	kwargs.update({"tid": enums.Task.ROLE_LEVEL_UP})
+	await task.record_task(uid,**kwargs)
 	rid = enums.Role(rid)
 	exists, payload = await _get_role_info(uid, rid, 'star', 'level', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')

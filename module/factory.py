@@ -21,6 +21,8 @@ HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, en
 
 
 async def refresh(uid, **kwargs):
+	kwargs.update({"tid":enums.Task.CHECK_FACTORY})
+	await task.record_task(uid,**kwargs)
 	now              = datetime.now(timezone.utc)
 	steps, refresh_t = await steps_since(uid, now, **kwargs)
 	rem, next_ref    = await remaining_seconds(uid, now, refresh_t, **kwargs)

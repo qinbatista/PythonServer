@@ -10,19 +10,19 @@ import time
 
 async def get_all_task(uid, **kwargs):
 	task = await common.execute(f'SELECT tid, value, reward, timer FROM task WHERE uid = "{uid}";', **kwargs)
-	kwargs.update({"tid": enums.Task.LOGIN, "task_value": 1})
+	kwargs.update({"tid": enums.Task.LOGIN})
 	await record_task(uid, **kwargs)
 
 	# 世界boss自动通关
-	kwargs.update({"tid": enums.Task.PASS_WORLD_BOSS, "task_value": 1})
+	kwargs.update({"tid": enums.Task.PASS_WORLD_BOSS})
 	await record_task(uid, **kwargs)
 
 	# 工厂领取物品
-	kwargs.update({"tid": enums.Task.CHECK_FACTORY, "task_value": 1})
+	kwargs.update({"tid": enums.Task.CHECK_FACTORY})
 	await record_task(uid, **kwargs)
 
 	# 家族签到
-	kwargs.update({"tid": enums.Task.FAMILY_CHECK_IN, "task_value": 1})
+	kwargs.update({"tid": enums.Task.FAMILY_CHECK_IN})
 	await record_task(uid, **kwargs)
 
 	return common.mt(0, 'success', {'tasks': [{'tid': t[0], 'task_value': t[1], 'reward': t[2], 'timer': t[3]} for t in task]})
@@ -30,7 +30,7 @@ async def get_all_task(uid, **kwargs):
 
 async def record_task(uid, **kwargs):
 	data = await common.execute(
-		f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["tid"]}, {kwargs["task_value"]},0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {kwargs["task_value"]}',
+		f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["tid"]},1,0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {kwargs["task_value"]}',
 		**kwargs)
 	return common.mt(0, 'record:' + str(kwargs["tid"]) + " success")
 

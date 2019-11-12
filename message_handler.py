@@ -23,6 +23,7 @@ from module import task
 from module import stage
 from module import check_in
 from module import darkmarket
+from module import package
 from datetime import datetime, timedelta
 
 
@@ -255,57 +256,82 @@ class MessageHandler:
 
 	###################### summoning.py ######################
 	async def _basic_summon(self, data: dict) -> str:
+		data.update({"tid":enums.Task.BASIC_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.WEAPON, **data)
 
 	async def _pro_summon(self, data: dict) -> str:
+		data.update({"tid":enums.Task.PRO_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.WEAPON, **data)
 
 	async def _friend_summon(self, data: dict) -> str:
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.WEAPON, **data)
 
 	async def _prophet_summon(self, data: dict) -> str:
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PROPHET, enums.Group.WEAPON, **data)
 
 	async def _basic_summon_skill(self, data: dict) -> str:
+		data.update({"tid":enums.Task.BASIC_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.SKILL, **data)
 
 	async def _pro_summon_skill(self, data: dict) -> str:
+		data.update({"tid":enums.Task.PRO_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.SKILL, **data)
 
 	async def _friend_summon_skill(self, data: dict) -> str:
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.SKILL, **data)
 
 	async def _basic_summon_role(self, data: dict) -> str:
+		data.update({"tid":enums.Task.BASIC_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.ROLE, **data)
 
 	async def _pro_summon_role(self, data: dict) -> str:
+		data.update({"tid":enums.Task.PRO_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.ROLE, **data)
 
 	async def _friend_summon_role(self, data: dict) -> str:
 		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.ROLE, **data)
 
 	async def _basic_summon_10_times(self, data: dict) -> str:
+		data.update({"tid":enums.Task.BASIC_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.WEAPON, **data)
 
 	async def _pro_summon_10_times(self, data: dict) -> str:
+		data.update({"tid":enums.Task.PRO_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.WEAPON, **data)
 
 	async def _friend_summon_10_times(self, data: dict) -> str:
 		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.WEAPON, **data)
 
 	async def _basic_summon_skill_10_times(self, data: dict) -> str:
+		data.update({"tid":enums.Task.BASIC_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.SKILL, **data)
 
 	async def _pro_summon_skill_10_times(self, data: dict) -> str:
+		data.update({"tid":enums.Task.PRO_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.SKILL, **data)
 
 	async def _friend_summon_skill_10_times(self, data: dict) -> str:
 		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.SKILL, **data)
 
 	async def _basic_summon_role_10_times(self, data: dict) -> str:
+		data.update({"tid":enums.Task.BASIC_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.ROLE, **data)
 
 	async def _pro_summon_role_10_times(self, data: dict) -> str:
+		data.update({"tid":enums.Task.PRO_SUMMONING})
+		await task.record_task(data['data']['unique_id'],**data)
 		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.ROLE, **data)
 
 	async def _friend_summon_role_10_times(self, data: dict) -> str:
@@ -474,10 +500,6 @@ class MessageHandler:
 		return common.mt(0, 'success', {'vip_config': self._vip_config})
 
 	###################### player ######################
-	# TODO
-	async def _exchange_card(self, data: dict) -> str:
-		return 'function'
-
 	async def _get_all_resource(self, data: dict) -> str:
 		return await player.get_all_resource(data['data']['unique_id'], **data)
 
@@ -487,7 +509,7 @@ class MessageHandler:
 
 	async def _get_achievement_reward(self, data: dict) -> str:
 		data.update({"config":self._acheviement})
-		return await achievement.get_achievement_reward(data['data']['unique_id'],**data)
+		return await achievement.get_achievement_reward(data['data']['unique_id'], data["data"]["achievement_id"], **data)
 
 	async def _get_achievement_config(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': self._acheviement})
@@ -651,6 +673,9 @@ class MessageHandler:
 				}
 
 	async def _get_config_player(self, data: dict) -> str:
+		data.update({"tid":enums.Task.LOGIN})
+		await task.record_task(data['data']['unique_id'],**data)
+
 		data['exp_config'] = self._player_experience['player_level']['experience']
 		energy = self._player['energy']
 		_, exp_info = await stage.increase_exp(data['data']['unique_id'], 0, **data)
@@ -660,6 +685,13 @@ class MessageHandler:
 
 	async def _get_config_version(self, data: dict) -> str:
 		return common.mt(0, 'success', {'version': self._version})
+
+	async def _exchange_card(self, data: dict) -> str:
+		data['exp_config'] = self._player_experience['player_level']['experience']
+		return await package.exchange(data['data']['unique_id'], data['data']['card_id'], **data)
+
+	async def _get_config_card(self, data: dict) -> str:
+		return await package.config(data['data']['unique_id'], **data)
 
 	async def _send_gift_mail(self, data: dict) -> str:
 		return await common._send_gift_mail(data['data']['unique_id'], data['data']['gn_target'],data['data']['group_id'],data['data']['item_id'],data['data']['quantity'], **data)
@@ -801,7 +833,6 @@ FUNCTION_LIST = {
 
 	# TODO
 	###################### player ######################
-	'exchange_card': MessageHandler._exchange_card,
 	'get_all_resource': MessageHandler._get_all_resource,
 
 	# TODO
@@ -860,7 +891,9 @@ FUNCTION_LIST = {
 	'get_config_factory': MessageHandler._get_config_factory,
 	'get_config_version': MessageHandler._get_config_version,
 
-
+	###################### package ######################
+	'exchange_card': MessageHandler._exchange_card,
+	'get_config_card': MessageHandler._get_config_card,
 
 	###################### private(comment before release) ######################
 	'send_gift_mail': MessageHandler._send_gift_mail,
