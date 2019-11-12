@@ -23,6 +23,7 @@ from module import task
 from module import stage
 from module import check_in
 from module import darkmarket
+from module import package
 from datetime import datetime, timedelta
 
 
@@ -499,10 +500,6 @@ class MessageHandler:
 		return common.mt(0, 'success', {'vip_config': self._vip_config})
 
 	###################### player ######################
-	# TODO
-	async def _exchange_card(self, data: dict) -> str:
-		return 'function'
-
 	async def _get_all_resource(self, data: dict) -> str:
 		return await player.get_all_resource(data['data']['unique_id'], **data)
 
@@ -689,6 +686,13 @@ class MessageHandler:
 	async def _get_config_version(self, data: dict) -> str:
 		return common.mt(0, 'success', {'version': self._version})
 
+	async def _exchange_card(self, data: dict) -> str:
+		data['exp_config'] = self._player_experience['player_level']['experience']
+		return await package.exchange(data['data']['unique_id'], data['data']['card_id'], **data)
+
+	async def _get_config_card(self, data: dict) -> str:
+		return await package.config(data['data']['unique_id'], **data)
+
 	async def _send_gift_mail(self, data: dict) -> str:
 		return await common._send_gift_mail(data['data']['unique_id'], data['data']['gn_target'],data['data']['group_id'],data['data']['item_id'],data['data']['quantity'], **data)
 
@@ -829,7 +833,6 @@ FUNCTION_LIST = {
 
 	# TODO
 	###################### player ######################
-	'exchange_card': MessageHandler._exchange_card,
 	'get_all_resource': MessageHandler._get_all_resource,
 
 	# TODO
@@ -888,7 +891,9 @@ FUNCTION_LIST = {
 	'get_config_factory': MessageHandler._get_config_factory,
 	'get_config_version': MessageHandler._get_config_version,
 
-
+	###################### package ######################
+	'exchange_card': MessageHandler._exchange_card,
+	'get_config_card': MessageHandler._get_config_card,
 
 	###################### private(comment before release) ######################
 	'send_gift_mail': MessageHandler._send_gift_mail,

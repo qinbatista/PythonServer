@@ -43,6 +43,7 @@ ACHIEVEMENT= loc() + '/configuration/{}/server/achievement_config.json'
 TASK = loc() + '/configuration/{}/server/task.json'
 CHECK_IN = loc() + '/configuration/{}/server/check_in.json'
 VIP_CONFIG = loc() + '/configuration/{}/server/vip_config.json'
+PACKAGE = loc() + '/configuration/{}/server/package.json'
 
 
 class ConfigurationManager:
@@ -72,6 +73,7 @@ class ConfigurationManager:
 		self._read_task_config()
 		self._read_check_in_config()
 		self._read_vip_config_config()
+		self._read_package_config()
 
 		# read this one last
 		self._read_game_manager_config()
@@ -132,6 +134,9 @@ class ConfigurationManager:
 	def _read_mall_config(self):
 		self._mall_config = json.load(open(MALL.format(self._sv), encoding='utf-8'))
 
+	def _read_package_config(self):
+		self._package = json.load(open(PACKAGE.format(self._sv), encoding='utf-8'))
+
 	def _read_game_manager_config(self):
 		# reward_list = [v for v in (json.load(open(REWARD_LIST.format(self._cv), encoding = 'utf-8'))).values()]
 		lottery = json.load(open(LOTTERY.format(self._sv), encoding = 'utf-8'))
@@ -153,7 +158,7 @@ class ConfigurationManager:
 			'acheviement': self._acheviement_config, 'task': self._task_config,
 			'check_in': self._check_in_config,
 			'vip_config': self._vip_config,
-			'world' : world, 'version': self._sv
+			'world' : world, 'version': self._sv, 'package': self._package
 		}
 
 	def _read_level_enemy_layouts_config(self):

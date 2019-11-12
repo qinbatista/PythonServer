@@ -147,7 +147,7 @@ PROGRESS = \
 CREATE TABLE `progress` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家唯一id',
 	  `energy` smallint(6) DEFAULT 10 COMMENT '玩家体力值，默认10',
-	  `exp` smallint(6) DEFAULT 0 COMMENT '玩家经验值',
+	  `exp` int(6) DEFAULT 0 COMMENT '玩家经验值',
 	  `role` smallint(6) DEFAULT 1 COMMENT '拥有的角色数',
 	  `weapon` smallint(6) DEFAULT 0 COMMENT '拥有的武器数',
 	  `stage` smallint(6) DEFAULT 0 COMMENT '最高普通关卡',
