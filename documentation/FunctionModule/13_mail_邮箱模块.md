@@ -1,0 +1,114 @@
+## 方法列表
+
+* [`upgrade_armor`](##upgrade_armor)
+* [`get_all_armor`](##get_all_armor)
+
+## upgrade_armor
+
+##### 发送消息JSON格式
+
+升级护甲, 指定`等级`，指定`种类`, 此方法会把`所有`该等级的护甲，按照3:1的比例升级为高等级护甲,
+
+> aid: 护甲的id
+>
+> level: 护甲的等级
+
+```json
+{
+	"world": 0,
+	"function": "upgrade_armor",
+	"data": {
+		"token": "my token",
+    	"aid":1,
+    	"level":1
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> armors：返回所有关于护甲的信息
+>
+> resource：消耗护甲的当前信息
+>
+> production：升级护甲的当前信息
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"armors": {
+			"resource": {
+				"aid": 1,
+				"level": 1,
+				"quantity": 1
+			},
+			"production": {
+				"aid": 1,
+				"level": 2,
+				"quantity": 3
+			}
+		}
+	}
+}
+```
+
+[失败]()
+
+* 99: 盔甲不足
+
+## get_all_armor
+
+##### 发送消息JSON格式
+
+获取所有盔甲的信息
+
+```json
+{
+	"world": 0, 
+	"function": "get_all_armor",
+	"data": {
+		"token": "my toekn ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> aid：护甲的id
+>
+> level：护甲的等级
+>
+> quantity：护甲的数量
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"armors": [
+			{
+				"aid": 1,
+				"level": 1,
+				"quantity": 1
+			},
+			{
+				"aid": 1,
+				"level": 2,
+				"quantity": 3
+			}
+		]
+	}
+}
+```
+
+[失败]()
+
+* 如果没有护甲，返回的列表为空
+
+
