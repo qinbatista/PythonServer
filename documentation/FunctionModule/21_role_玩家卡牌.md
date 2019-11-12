@@ -294,60 +294,12 @@
 	"status": 0,
 	"message": "success",
 	"data": {
-		"seg": 25,
-		"exp_pot": 5,
 		"role_config": {
-			"standard_experience_potion_count": 20,
-			"standard_segment_count": 30,
-			"standard_reset_role_skill_coin_count": 100,
-			"valid_passive_skills": [
-				"passive_skill_1_level",
-				"passive_skill_2_level",
-				"passive_skill_3_level",
-				"passive_skill_4_level"
-			],
-			"roles": [
-				"role1",
-				"role2",
-				"role3",
-				"role4",
-				"role5",
-				"role6",
-				"role7",
-				"role8",
-				"role9",
-				"role10",
-				"role11",
-				"role12",
-				"role13",
-				"role14",
-				"role15",
-				"role16",
-				"role17",
-				"role18",
-				"role19",
-				"role20",
-				"role21",
-				"role22",
-				"role23",
-				"role24",
-				"role25",
-				"role26",
-				"role27",
-				"role28",
-				"role29",
-				"role30",
-				"role31",
-				"role32",
-				"role33",
-				"role34",
-				"role35",
-				"role36",
-				"role37",
-				"role38",
-				"role39",
-				"role40"
-			]
+			"standard_costs" :
+			{
+				"exp_pot" : 5,
+				"seg" : 25
+			}
 		}
 	}
 }
