@@ -487,7 +487,7 @@ class MessageHandler:
 
 	async def _get_achievement_reward(self, data: dict) -> str:
 		data.update({"config":self._acheviement})
-		return await achievement.get_achievement_reward(data['data']['unique_id'],**data)
+		return await achievement.get_achievement_reward(data['data']['unique_id'], data["data"]["achievement_id"], **data)
 
 	async def _get_achievement_config(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': self._acheviement})

@@ -93,13 +93,13 @@ async def get_all_market(uid, **kwargs):
 			dark_markets.append({'pid': d[0], 'gid': d[1], 'mid': d[2], 'qty': d[3], 'cid': d[4], 'amt': d[5]})
 		refresh_time_s = max(3600 - int((datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - \
 				datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')).total_seconds()), 0)
-		return common.mt(1, 'Get all black market information', {'dark_markets': dark_markets, 'refresh_time': refresh_time_s, 'refreshable': refreshable})
+		return common.mt(1, 'Get all black market information', {'dark_markets': dark_markets, 'refresh_time': refresh_time_s, 'refreshable': refreshable, 'config': {'refresh_diamond': kwargs['dark_market']['diamond_refresh_store']['diamond']}})
 	await common.execute_update(f'UPDATE timer SET time = "{refresh_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}";', **kwargs)
 	await common.execute_update(f'UPDATE limits SET value = {refreshable} WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
 	refresh_time_s = max(3600 - int((datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - \
 			datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')).total_seconds()), 0)
 	return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, \
-			'refresh_time': refresh_time_s, 'refreshable': refreshable})
+			'refresh_time': refresh_time_s, 'refreshable': refreshable, 'config': {'refresh_diamond': kwargs['dark_market']['diamond_refresh_store']['diamond']}})
 
 
 async def refresh_market(uid, **kwargs):
