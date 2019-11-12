@@ -554,7 +554,9 @@ async def increase_exp(uid, exp, **kwargs):
 	"""
 	exp_config = kwargs['exp_config']  # self._player['player_level']['experience']
 	exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
-	if exp_data == (): return False, {'exp': 0, 'level': 0, 'need': 0}
+	if exp_data == ():
+		await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
+		return False, {'exp': 0, 'level': 0, 'need': 0}
 	exp_s = exp_data[0][0]
 	exp_list = [e for e in exp_config if e > exp_s]
 	if exp == 0: return True, {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}

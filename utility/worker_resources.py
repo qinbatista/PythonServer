@@ -51,6 +51,7 @@ class ModuleConfigurations:
 		self.configs['world']    = r.json()['world']
 		self.configs['weapon']   = r.json()['weapon']
 		self.configs['role']     = r.json()['role']
+		self.configs['package']  = r.json()['package']
 
 	def __getitem__(self, key):
 		return self.configs[key]
