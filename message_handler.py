@@ -168,7 +168,7 @@ class MessageHandler:
 		return await player.accept_gift(data['data']['unique_id'], data['data']['key'], **data)
 
 	async def _get_info_player(self, data: dict) -> str:
-		return await player.get_info(data['data']['unique_id'], self._player_experience, **data)
+		return await player.get_info(data['data']['unique_id'], **data)
 
 
 	###################### family.py ######################

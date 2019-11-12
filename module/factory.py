@@ -7,6 +7,7 @@ import random
 from module import enums
 from module import common
 from module import weapon
+from module import task
 from datetime import datetime, timezone, timedelta
 
 BASIC_FACTORIES      = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
