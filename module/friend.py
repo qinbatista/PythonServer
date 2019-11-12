@@ -66,8 +66,6 @@ async def send_gift(uid, gn_target, **kwargs):
 	sent = await mail.send_mail(enums.MailType.GIFT, fid, **kwargs)
 	if not sent: return common.mt(97, 'mailbox error')
 	await common.execute(f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";', **kwargs)
-	kwargs.update({"tid": enums.Task.GET_FRIEND_GIFT})
-	await task.record_task(uid, **kwargs)
 	return common.mt(0, 'success')
 
 

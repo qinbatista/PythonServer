@@ -197,6 +197,11 @@ def get_all_market():
 	print_method("[get_achievement_config]"+str(response))
 	return response
 
+def get_config_player():
+	response = send_tcp_message({'world' : world, 'function' : 'get_config_player', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+	print_method("[get_config_player]"+str(response))
+	return response
+
 def get_all_info(_token,_world):
 	print_module("[module_2_get_all_data] get_all_info")
 	global world,token
@@ -225,7 +230,7 @@ def get_all_info(_token,_world):
 			get_all_check_in_table(),
 			get_all_friend(),
 			get_all_skill(),
-			get_player_info(),
+			get_config_player(),
 			get_all_mail(),
 			automatically_refresh_store(),
 			stage_reward_config(),
