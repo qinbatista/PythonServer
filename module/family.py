@@ -66,7 +66,6 @@ async def request_join(uid, name, **kwargs):
 	gn = await common.get_gn(uid, **kwargs)
 	officials = await _get_uid_officials(name, **kwargs)
 	if not officials: return common.mt(98, 'invalid family')
-	print(f'officials:{officials}')
 	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, *officials, subj = 'Family Request', body = f'{gn} requests to join your family.', name = name, uid_target = uid, **kwargs)
 	return common.mt(0, 'requested join', {'name' : name}) if sent else common.mt(97, 'mail could not be sent')
 
@@ -317,7 +316,6 @@ async def _get_role(uid, name, **kwargs):
 
 
 async def _get_uid_officials(name, **kwargs):
-	print(f'querying: SELECT uid FROM familyrole WHERE `name` = "{name}" AND `role` >= {enums.FamilyRole.ADMIN.value};')
 	data = await common.execute(f'SELECT uid FROM familyrole WHERE `name` = "{name}" AND `role` >= {enums.FamilyRole.ADMIN.value};', **kwargs)
 	return None if data == () else [u[0] for u in data]
 
