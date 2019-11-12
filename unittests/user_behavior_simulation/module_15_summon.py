@@ -170,10 +170,12 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'get_config_role', 'data': {'token': token, 'role': 1, "amount": '10'}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_task_reward', 'data': {'token': token, 'task_id': 1, "amount": '10'}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_all_task', 'data': {'token': token, 'task_id': 1, "amount": '10'}})
-	# response = send_tcp_message({'world': 0, 'function': 'get_all_market', 'data': {'token': token, 'achievement_id': 1, "amount": '10'}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_achievement_reward', 'data': {'token': token, 'achievement_id': 1, "amount": '10'}})
 	# print(str(response).replace("'", "\""))
-	response = send_tcp_message({'world': 0, 'function': 'get_all_achievement', 'data': {'token': token, 'achievement_id': 1, "amount": '10'}})
+	# response = send_tcp_message({'world': 0, 'function': 'get_all_achievement', 'data': {'token': token, 'achievement_id': 1, "amount": '10'}})
+	# response = send_tcp_message({'world': 0, 'function': 'get_all_market', 'data': {'token': token, 'achievement_id': 1, "amount": '10'}})
+	response = send_tcp_message({'world': 0, 'function': 'darkmarket_transaction', 'data': {'token': token, 'pid': 1}})
+	# response = send_tcp_message({'world': 0, 'function': 'refresh_market', 'data': {'token': token, 'pid': 1}})
 	print(str(response).replace("'", "\""))
 
 

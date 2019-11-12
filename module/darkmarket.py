@@ -29,7 +29,7 @@ async def transaction(uid, pid, **kwargs):
 	if amt < 0:
 		return common.mt(97, 'The item has been purchased')
 
-	transactions = {'pid': pid, 'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': amt}
+	transactions = {'pid': pid, 'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': -amt}
 	amt = -amt
 	can, currency = await common.try_item(uid, enums.Item(cid), amt, **kwargs)
 	if not can:
