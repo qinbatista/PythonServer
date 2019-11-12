@@ -8,25 +8,22 @@ import asyncio
 
 from module import enums
 from module import common
-
-from collections import defaultdict
 from module import task
 
-STANDARD_IRON = 40
-STANDARD_RESET = 100
-STANDARD_SEGMENT = 25
+from collections import defaultdict
+
 
 async def get_config(**kwargs):
-	return common.mt(0, 'success', {'seg' : STANDARD_SEGMENT, 'reset' : STANDARD_RESET, 'cost' : STANDARD_IRON, 'weapon_config': kwargs['config']})
+	return common.mt(0, 'success', kwargs['config']['weapon'])
 
 async def level_up(uid, wid, amount, **kwargs):
 	wid = enums.Weapon(wid)
 	exists, payload = await _get_weapon_info(uid, wid, 'star', 'level', 'skillpoint', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')
 	star, level, sp = payload
-	upgrade_cnt = min(amount // STANDARD_IRON, 100 - level)
+	upgrade_cnt = min(amount // kwargs['config']['weapon']['standard_costs']['iron'], 100 - level)
 	if upgrade_cnt == 0: return common.mt(98, 'too few incoming materials')
-	can_pay, remaining = await common.try_item(uid, enums.Item.IRON, -upgrade_cnt * STANDARD_IRON, **kwargs)
+	can_pay, remaining = await common.try_item(uid, enums.Item.IRON, -upgrade_cnt * kwargs['config']['weapon']['standard_costs']['iron'], **kwargs)
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
 	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP})
 	await task.record_task(uid,**kwargs)
@@ -35,7 +32,8 @@ async def level_up(uid, wid, amount, **kwargs):
 			'level' : level + upgrade_cnt, 'sp' : sp + upgrade_cnt}, enums.Group.ITEM.value : \
 			{'iid' : enums.Item.IRON.value, 'value' : remaining}}, 'reward' : {enums.Group.WEAPON.value : \
 			{'wid' : wid.value, 'level' : upgrade_cnt, 'sp' : upgrade_cnt}, enums.Group.ITEM.value : \
-			{'iid' : enums.Item.IRON.value, 'value' : upgrade_cnt * STANDARD_IRON}}})
+			{'iid' : enums.Item.IRON.value, \
+			'value' : upgrade_cnt * kwargs['config']['weapon']['standard_costs']['iron']}}})
 
 async def level_up_passive(uid, wid, pid, **kwargs):
 	wid, pid = enums.Weapon(wid), enums.WeaponPassive(pid)
@@ -52,9 +50,10 @@ async def level_up_star(uid, wid, **kwargs):
 	if not exists: return common.mt(99, 'invalid target')
 	star, segment = payload
 	if star >= 10: return common.mt(97, 'max star')
-	cost = STANDARD_SEGMENT * (1 + star)
+	cost = kwargs['config']['weapon']['standard_costs']['seg'] * (1 + star)
 	if segment < cost: return common.mt(98, 'insufficient segments')
-	await common.execute(f'UPDATE weapon SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND wid = {wid.value};', **kwargs)
+	await common.execute(f'UPDATE weapon SET star = {star + 1}, segment = {segment - cost} WHERE \
+			uid = "{uid}" AND wid = {wid.value};', **kwargs)
 	return common.mt(0, 'success', {'remaining' : {'wid' : wid.value, 'star' : star + 1, \
 			'seg' : segment - cost}, 'reward' : {'wid' : wid.value, 'star' : 1, 'seg' : cost}})
 
@@ -62,14 +61,15 @@ async def reset_skill_point(uid, wid, **kwargs):
 	wid = enums.Weapon(wid)
 	exists, payload = await _get_weapon_info(uid, wid, 'skillpoint', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')
-	can_pay, remaining = await common.try_item(uid, enums.Item.COIN, -STANDARD_RESET, **kwargs)
+	can_pay, remaining = await common.try_item(uid, enums.Item.COIN, \
+			-kwargs['config']['weapon']['standard_costs']['reset'], **kwargs)
 	if not can_pay: return common.mt(98, 'insufficient coins')
 	reclaimed = await _reset_skill_point(uid, wid, **kwargs)
 	return common.mt(0, 'success', {'remaining' : {enums.Group.WEAPON.value : {'wid' : wid.value, \
 			'sp' : payload[0] + reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, \
 			'value' : remaining}}, 'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, \
 			'sp' : reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, \
-			'value' : STANDARD_RESET}}})
+			'value' : kwargs['config']['weapon']['standard_costs']['reset']}}})
 
 async def get_all(uid, **kwargs):
 	weps = await _get_all_weapon_info(uid, **kwargs)
