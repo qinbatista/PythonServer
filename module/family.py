@@ -7,6 +7,7 @@ import pymysql
 from module import mail
 from module import enums
 from module import common
+from module import task
 
 from datetime import datetime, timezone, timedelta
 
@@ -187,6 +188,8 @@ async def cancel_disband(uid, **kwargs):
 	return common.mt(0, 'success')
 
 async def check_in(uid, **kwargs):
+	kwargs.update({"tid":enums.Task.FAMILY_CHECK_IN})
+	await task.record_task(uid,**kwargs)
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
 	timer = await _get_check_in_timer(uid, **kwargs)
