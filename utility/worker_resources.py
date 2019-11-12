@@ -33,7 +33,6 @@ class WorkerResources:
 
 		await self.resources['session'].close()
 
-		self.resources['executor'].shutdown(wait = False)
 
 	def __getitem__(self, key):
 		return self.resources[key]
