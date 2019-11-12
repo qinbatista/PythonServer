@@ -81,8 +81,8 @@ class MailServer:
 		msg['time'] = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
 		msg['type'] = str(mailtype.value)
 		msg['from'] = urllib.parse.quote(kwargs['from'], safe = '')
-		msg['subj'] = kwargs['subj']
-		msg.set_payload(kwargs['body'])
+		msg['subj'] = urllib.parse.quote(kwargs['subj'], safe = '')
+		msg.set_payload(urllib.parse.quote(kwargs['body'], safe = ''))
 		msg = self._attach_extra_information(msg, mailtype, **kwargs)
 		return msg
 
@@ -94,9 +94,10 @@ class MailServer:
 	
 	def _dump_message(self, msg):
 		dump = {k : v for k, v in msg.items() if k not in {'uid_sender', 'name', 'uid_target'}}
-		dump['body'] = msg.get_payload()
+		dump['body'] = urllib.parse.unquote(msg.get_payload())
 		dump['read'] = 0 if 'S' not in msg.get_flags() else 1
 		dump['from'] = urllib.parse.unquote(dump['from'])
+		dump['subj'] = urllib.parse.unquote(dump['subj'])
 		return dump
 
 	def _open_mail_folder(self, world, uid):

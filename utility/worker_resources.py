@@ -12,7 +12,6 @@ import aiohttp
 import aioredis
 import aiomysql
 import requests
-import concurrent
 
 class WorkerResources:
 	def __init__(self, cfg):
@@ -20,7 +19,6 @@ class WorkerResources:
 		self.resources = {}
 	
 	async def init(self):
-		self.resources['executor'] = concurrent.futures.ProcessPoolExecutor(max_workers = 1)
 		self.resources['session'] = aiohttp.ClientSession()
 		self.resources['redis'] = await aioredis.create_redis(self.cfg['redis']['addr'])
 		self.resources['db'] = await aiomysql.create_pool(maxsize = 10, host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'experimental')
@@ -48,10 +46,11 @@ class ModuleConfigurations:
 	
 	def refresh(self):
 		r = requests.get(self.baseurl + '/get_game_manager_config')
-		self.configs['lottery'] = r.json()['lottery']
-		self.configs['family']  = r.json()['family']
+		self.configs['lottery']  = r.json()['lottery']
+		self.configs['family']   = r.json()['family']
 		self.configs['factory']  = r.json()['factory']
-		self.configs['world']  = r.json()['world']
+		self.configs['world']    = r.json()['world']
+		self.configs['weapon']   = r.json()['weapon']
 
 	def __getitem__(self, key):
 		return self.configs[key]
