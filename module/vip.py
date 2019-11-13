@@ -16,6 +16,20 @@ async def get_config(uid, **kwargs):
 	return common.mt(0, 'success', {'config': kwargs['config']['vip']})
 
 
+async def get_info(uid, **kwargs):
+	"""返回VIP经验相关信息，VIP过期剩余时间，VIP月卡类型"""
+	exp_info = await increase_exp(uid, 0, **kwargs)
+	min_card, max_card, perpetual_card = await check_card(uid, **kwargs)
+	min_seconds, max_seconds = 0, 0
+	if min_card:
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END_TIME.value}";', **kwargs)
+		min_seconds = int((datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc) - datetime.now(timezone.utc)).total_seconds())
+	if max_card:
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
+		max_seconds = int((datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc) - datetime.now(timezone.utc)).total_seconds())
+	return common.mt(0, 'success', {'exp_info': exp_info, 'min_card': min_card, 'max_card': max_card, 'min_seconds': min_seconds, 'max_seconds': max_seconds, 'perpetual_card': perpetual_card})
+
+
 async def get_daily_reward(uid, **kwargs):
 	"""获得VIP每日奖励
 	0 - success

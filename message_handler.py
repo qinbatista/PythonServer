@@ -446,6 +446,9 @@ class MessageHandler:
 	async def _purchase_vip_card(self, data: dict) -> str:
 		return await vip.buy_card(data['data']['unique_id'], int(data['data']['card_id']), **data)
 
+	async def _get_info_vip(self, data: dict) -> str:
+		return await vip.get_info(data['data']['unique_id'], **data)
+
 	async def _get_config_vip(self, data: dict) -> str:
 		return await vip.get_config(data['data']['unique_id'], **data)
 
@@ -773,6 +776,7 @@ FUNCTION_LIST = {
 	'get_vip_daily_reward' : MessageHandler._get_vip_daily_reward,
 	'purchase_vip_gift' : MessageHandler._purchase_vip_gift,
 	'purchase_vip_card' : MessageHandler._purchase_vip_card,
+	'get_info_vip' : MessageHandler._get_info_vip,
 
 	# TODO
 	###################### player ######################

@@ -2,6 +2,7 @@
 
 * [`get_config_vip`](##get_config_vip)
 * [`get_vip_daily_reward`](##get_vip_daily_reward)
+* [`get_info_vip`](##get_info_vip)
 
 - 后面的方法尚未完成
 
@@ -375,7 +376,7 @@
 
 ##### 接受消息JSON格式
 
-[获取资源成功]()
+[成功]()
 
 购买月卡有小月卡、大月卡、永久卡（期限分别是31天、31天、永久），每日VIP奖励根据VIP等级获取，不会根据月卡类型而变化，月卡类型加经验不同（分别是10点、15点、20点），每种月卡只可以购买一张，购买一种月卡只获得一倍的奖励，两种则两倍，三种则三倍，VIP经验获得可叠加，通过此方法可以获得VIP经验，奖励属于获得经验后的VIP等级奖品。
 
@@ -540,10 +541,63 @@
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: You're not a VIP（你不是VIP）
 * 98: The cooling time is not over（你的冷却时间未结束）
+
+
+
+## get_info_vip
+
+##### 发送消息JSON格式
+
+获取VIP信息
+
+```json
+{
+	"world": 0, 
+	"function": "get_vip_card",
+	"data": {
+		"token": "my toekn ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[获取资源成功]()
+
+> exp_info: VIP经验信息
+>
+> min_card：小月卡是否失效
+>
+> max_card：大月卡是否失效
+>
+> perpetual_card：永久月卡是否失效
+>
+> min_seconds：小月卡过期剩余时间
+>
+> max_seconds：大月卡过期剩余时间
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"exp_info": {
+			"exp": 105,
+			"level": 1,
+			"need": 195
+		},
+		"min_card": "True",
+		"max_card": "True",
+		"min_seconds": 2671833,
+		"max_seconds": 2671936,
+		"perpetual_card": "False"
+	}
+}
+```
 
 
 
