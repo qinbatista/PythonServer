@@ -156,8 +156,7 @@ class ConfigurationManager:
 			'level_enemy_layouts': self._level_enemy_layouts_config,
 			'level_enemy_layouts_tower': self._level_enemy_layouts_config_tower,
 			'acheviement': self._acheviement_config, 'task': self._task_config,
-			'check_in': self._check_in_config,
-			'vip_config': self._vip_config,
+			'check_in': self._check_in_config, 'vip': self._vip_config,
 			'world' : world, 'version': self._sv, 'package': self._package
 		}
 

@@ -6,6 +6,9 @@ import asyncio
 
 from module import enums
 from module import common
+from datetime import datetime, timezone, timedelta
+
+DAYS = 31
 
 
 async def get_config(uid, **kwargs):
@@ -13,43 +16,135 @@ async def get_config(uid, **kwargs):
 	return common.mt(0, 'success', {'config': kwargs['config']['vip']})
 
 
-async def get_daily_reward(uid, wid, amount, **kwargs):
-	"""获得VIP每日奖励"""
-	pass
+async def get_daily_reward(uid, **kwargs):
+	"""获得VIP每日奖励
+	0 - success
+	98 - You're not a VIP
+	99 - The cooling time is not over
+	"""
+	config = kwargs['config']['vip']
+	current = datetime.now(timezone.utc)
+	timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+	if timer == ():
+		await common.execute(f'INSERT INTO timer (uid, tid) VALUE ("{uid}", "{enums.Timer.VIP_COOLING_TIME.value}");', **kwargs)
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+	if timer[0][0] != '' and current < datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc) + timedelta(seconds=config['vip_daily_reward'].get('cooling_time', 86400)):
+		return common.mt(99, 'The cooling time is not over')
+
+	min_card, max_card, perpetual_card = await check_card(uid, **kwargs)
+	data = {'remaining': {'min_card': {'card': min_card}, 'max_card': {'card': max_card}, 'perpetual_card': {'card': perpetual_card}},
+			'reward': {'min_card': {}, 'max_card': {}, 'perpetual_card': {}}}
+	exp_info = {}
+	if min_card:
+		exp_info = await increase_exp(uid, config['card_increase_experience'].get('min', 10), **kwargs)
+		remaining, reward = await increase_item(uid, config['vip_daily_reward'][f'{exp_info["level"]}'], **kwargs)
+		data['remaining']['min_card']['item'] = remaining
+		data['reward']['min_card']['item'] = reward
+	if max_card:
+		exp_info = await increase_exp(uid, config['card_increase_experience'].get('max', 15), **kwargs)
+		remaining, reward = await increase_item(uid, config['vip_daily_reward'][f'{exp_info["level"]}'], **kwargs)
+		data['remaining']['max_card']['item'] = remaining
+		data['reward']['max_card']['item'] = reward
+	if perpetual_card:
+		exp_info = await increase_exp(uid, config['card_increase_experience'].get('permanent', 20), **kwargs)
+		remaining, reward = await increase_item(uid, config['vip_daily_reward'][f'{exp_info["level"]}'], **kwargs)
+		data['remaining']['perpetual_card']['item'] = remaining
+		data['reward']['perpetual_card']['item'] = reward
+	if exp_info == {}: return common.mt(98, "You're not a VIP")
+	current = (current + timedelta(seconds=config["vip_daily_reward"].get("cooling_time", 86400))).strftime("%Y-%m-%d %H:%M:%S")
+	await common.execute(f'UPDATE timer SET time="{current}" WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+	data['remaining']['exp_info'] = exp_info
+	return common.mt(0, 'success', data)
 
 
 async def buy_package(uid, wid, amount, **kwargs):
 	"""购买VIP礼包，VIP等级以下的可以购买"""
-	pass
+	return common.mt(0, '未完成')
 
 
-async def buy_card(uid, wid, amount, **kwargs):
+async def buy_card(uid, cid, **kwargs):
 	"""购买VIP卡，分为小月卡、大月卡、永久月卡
 	 小月卡：登录领取VIP每日奖励获得VIP经验10点，一个月的过期期限
 	 大月卡：登录领取VIP每日奖励获得VIP经验15点，一个月的过期期限
 	 永久月卡：登录领取VIP每日奖励获得VIP经验20点，无过期期限
+	 0 - success
+	 98 - VIP card has not expired
+	 99 - card id error
 	 TODO 人民币购买
 	 """
-	pass
+	card_kind = [enums.Item.VIP_CARD_MIN.value, enums.Item.VIP_CARD_MAX.value, enums.Item.VIP_CARD_PERPETUAL.value]
+	if cid not in enums.Item._value2member_map_.keys() or cid not in card_kind: return common.mt(99, 'card id error')
+	min_card, max_card, perpetual_card = await check_card(uid, **kwargs)
+	if min_card and cid == enums.Item.VIP_CARD_MIN.value or max_card and cid == enums.Item.VIP_CARD_MAX.value or perpetual_card and cid == enums.Item.VIP_CARD_PERPETUAL.value: return common.mt(98, 'VIP card has not expired')
+	current = (datetime.now(timezone.utc) + timedelta(days=DAYS)).strftime('%Y-%m-%d %H:%M:%S')
+	seconds = DAYS * 24 * 3600
+	await common.execute(f'UPDATE item SET value=1 WHERE uid="{uid}" AND iid={cid};', **kwargs)
+	if cid == enums.Item.VIP_CARD_PERPETUAL.value:
+		# current = ''
+		seconds = -1
+	else:
+		await common.execute(f'UPDATE timer SET time="{current}" WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END_TIME.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
+	return common.mt(0, 'success', {'cooling_time': seconds, 'card_id': cid})
 
 
 ####################################################################################
+async def check_card(uid, **kwargs):
+	"""检查月卡等级，返回是否存在VIP月卡，月卡等级信息"""
+	current = datetime.now(timezone.utc)
+	min_card = False
+	item = await common.execute(f'SELECT value FROM item WHERE uid="{uid}" AND iid="{enums.Item.VIP_CARD_MIN.value}";', **kwargs)
+	if item == ():
+		await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", "{enums.Item.VIP_CARD_MIN.value}", 0);', **kwargs)
+		await common.execute(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.VIP_MIN_END_TIME.value}");', **kwargs)
+	else:
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END_TIME.value}";', **kwargs)
+		if timer == (): await common.execute(f'DELETE FROM item WHERE uid="{uid}" AND iid="{enums.Item.VIP_CARD_MIN.value}";', **kwargs)
+		elif timer[0][0] == '': pass
+		else: min_card = datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc) > current
+
+	max_card = False
+	item = await common.execute(f'SELECT value FROM item WHERE uid="{uid}" AND iid="{enums.Item.VIP_CARD_MAX.value}";', **kwargs)
+	if item == ():
+		await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", "{enums.Item.VIP_CARD_MAX.value}", 0);', **kwargs)
+		await common.execute(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.VIP_MAX_END_TIME.value}");', **kwargs)
+	else:
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
+		if timer == (): await common.execute(f'DELETE FROM item WHERE uid="{uid}" AND iid="{enums.Item.VIP_CARD_MAX.value}";', **kwargs)
+		elif timer[0][0] == '': pass
+		else: max_card = datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc) > current
+
+	perpetual_card = False
+	item = await common.execute(f'SELECT value FROM item WHERE uid="{uid}" AND iid="{enums.Item.VIP_CARD_PERPETUAL.value}";', **kwargs)
+	if item == (): await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", "{enums.Item.VIP_CARD_PERPETUAL.value}", 0);', **kwargs)
+	elif item[0][0] == 1: perpetual_card = True
+	return min_card, max_card, perpetual_card
+
+
 async def increase_exp(uid, exp, **kwargs):
 	"""增加VIP经验
 	exp为0则获得经验，反之取绝对值增加经验，
 	并返回总经验和等级，升到下一级需要的经验
 	"""
-	exp_config = kwargs['config']['vip']
-	exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
+	exp_config = kwargs['config']['vip']['vip_level']['experience']
+	exp_data = await common.execute(f'SELECT vipexp FROM progress WHERE uid = "{uid}";', **kwargs)
 	if exp_data == ():
 		await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
-		return False, {'exp': 0, 'level': 0, 'need': 0}
 	exp_s = exp_data[0][0]
 	exp_list = [e for e in exp_config if e > exp_s]
-	if exp == 0: return True, {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
+	if exp == 0: return {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
 	exp_s += exp
-	await common.execute_update(f'UPDATE progress SET exp = {exp_s} WHERE uid = "{uid}";', **kwargs)
-	return True, {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
+	await common.execute_update(f'UPDATE progress SET vipexp = {exp_s} WHERE uid = "{uid}";', **kwargs)
+	return {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
+
+
+async def increase_item(uid, vip_config, **kwargs) -> (list, list):
+	remaining = []
+	reward = []
+	for iid in vip_config.keys():
+		_, value = await common.try_item(uid, enums.Item(int(iid)), vip_config[iid], **kwargs)
+		reward.append({'iid': iid, 'value': vip_config[iid]})
+		remaining.append({'iid': iid, 'value': value})
+	return remaining, reward
 
 
 

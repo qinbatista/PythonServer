@@ -24,7 +24,7 @@ class Item(enum.IntEnum):
 	FORTUNE_WHEEL_BASIC = 14
 	FORTUNE_WHEEL_PRO = 15
 	FRIEND_GIFT = 16
-	UNIVERSAL_SEGMENT = 17
+	UNIVERSAL_SEGMENT = 17  # 万能碎片
 	COIN_CARD = 18
 	EXP_CARD = 19
 	FOOD_CARD = 20
@@ -36,6 +36,10 @@ class Item(enum.IntEnum):
 	VIP_CARD_MIN = 26
 	VIP_CARD_MAX = 27
 	VIP_CARD_PERPETUAL = 28
+	WEAPON5_UNIVERSAL_SEGMENT = 29  # 5星武器万能碎片
+	ROLE5_UNIVERSAL_SEGMENT = 30  # 5星角色万能碎片
+	WEAPON6_UNIVERSAL_SEGMENT = 31  # 6星武器万能碎片
+	ROLE6_UNIVERSAL_SEGMENT = 32  # 6星角色万能碎片
 
 
 class FamilyRole(enum.IntEnum):
@@ -238,9 +242,11 @@ class Timer(enum.IntEnum):
 	FACTORY_ACCELERATION_START = 14
 	FACTORY_ACCELERATION_END = 15
 	FACTORY_WISHING_POOL = 16
-	VIP_END_TIME = 17
+	VIP_MIN_END_TIME = 17  # VIP小月卡结束时间
+	VIP_MAX_END_TIME = 18  # VIP大月卡结束时间
 	REQUEST_FRIEND_TIME = 19
-	CONTINUOUS_LOGIN = 20
+	VIP_COOLING_TIME = 20  # VIP礼包领取冷却结束时间
+	CONTINUOUS_LOGIN = 21
 
 
 class Limits(enum.IntEnum):
@@ -250,6 +256,8 @@ class Limits(enum.IntEnum):
 	FAMILY_REMOVE_USER_LIMITS = 4
 	FACTORY_WISHING_POOL = 5
 	REQUEST_FRIEND_LIMITS = 6
+	BUY_ENERGY_LIMITS = 7  # 购买体力上限次数键
+	BUY_STAGE_LIMITS = 8  # 购买副本上限次数键
 
 
 class Achievement(enum.IntEnum):

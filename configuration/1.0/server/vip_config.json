@@ -1,8 +1,6 @@
 {
-	"vip_level":
-	{
-		"experience":
-		[
+	"vip_level": {
+		"experience": [
 			60,
 			300,
 			940,
@@ -19,307 +17,276 @@
 			1000000
 		]
 	},
-	"vip_dialy_reward":
-	{
+	"vip_daily_reward": {
 		"cooling_time": 86400,
-		"1":
-		{
-			"diamond_card":10,
-			"coin":0,
-			"small_energy_potion":0,
-			"food_card":0,
-			"mine_card":0,
-			"crystal_card":0
+		"0": {
+			"1": 0,
+			"20": 0,
+			"21": 0,
+			"22": 0,
+			"23": 0,
+			"25": 0
 		},
-		"2":
-		{
-			"diamond_card":20,
-			"coin":10000,
-			"small_energy_potion":0,
-			"food_card":0,
-			"mine_card":0,
-			"crystal_card":0
+		"1": {
+			"1": 0,
+			"20": 0,
+			"21": 0,
+			"22": 0,
+			"23": 10,
+			"25": 0
 		},
-		"3":
-		{
-			"diamond_card":30,
-			"coin":10000,
-			"small_energy_potion":0,
-			"food_card":0,
-			"mine_card_card":0,
-			"crystal_card":0
+		"2": {
+			"1": 10000,
+			"20": 0,
+			"21": 0,
+			"22": 0,
+			"23": 20,
+			"25": 0
 		},
-		"4":
-		{
-			"diamond_card":40,
-			"coin":10000,
-			"small_energy_potion":1,
-			"food_card":0,
-			"mine_card":0,
-			"crystal_card":0
+		"3": {
+			"1": 10000,
+			"20": 0,
+			"21": 0,
+			"22": 0,
+			"23": 30,
+			"25": 0
 		},
-		"5":
-		{
-			"diamond_card":50,
-			"coin":10000,
-			"small_energy_potion":1,
-			"food_card":0,
-			"mine_card":0,
-			"crystal_card":0
+		"4": {
+			"1": 10000,
+			"20": 0,
+			"21": 0,
+			"22": 0,
+			"23": 40,
+			"25": 1
 		},
-		"6":
-		{
-			"diamond_card":60,
-			"coin":10000,
-			"small_energy_potion":1,
-			"food_card":10000,
-			"mine_card":0,
-			"crystal_card":0
+		"5": {
+			"1": 10000,
+			"20": 0,
+			"21": 0,
+			"22": 0,
+			"23": 50,
+			"25": 1
 		},
-		"7":
-		{
-			"diamond_card":70,
-			"coin":10000,
-			"small_energy_potion":1,
-			"food_card":10000,
-			"mine_card":0,
-			"crystal_card":0
+		"6": {
+			"1": 10000,
+			"20": 10000,
+			"21": 0,
+			"22": 0,
+			"23": 60,
+			"25": 1
 		},
-		"8":
-		{
-			"diamond_card":80,
-			"coin":20000,
-			"small_energy_potion":1,
-			"food_card":10000,
-			"mine_card":1000,
-			"crystal_card":0
+		"7": {
+			"1": 10000,
+			"20": 10000,
+			"21": 0,
+			"22": 0,
+			"23": 70,
+			"25": 1
 		},
-		"9":
-		{
-			"diamond_card":90,
-			"coin":20000,
-			"small_energy_potion":2,
-			"food_card":10000,
-			"mine_card":1000,
-			"crystal_card":0
+		"8": {
+			"1": 20000,
+			"20": 10000,
+			"21": 1000,
+			"22": 0,
+			"23": 80,
+			"25": 1
 		},
-		"10":
-		{
-			"diamond_card":100,
-			"coin":20000,
-			"small_energy_potion":2,
-			"food_card":20000,
-			"mine_card":1000,
-			"crystal_card":100
+		"9": {
+			"1": 20000,
+			"20": 10000,
+			"21": 1000,
+			"22": 0,
+			"23": 90,
+			"25": 2
 		},
-		"11":
-		{
-			"diamond_card":110,
-			"coin":20000,
-			"small_energy_potion":2,
-			"food_card":20000,
-			"mine_card":2000,
-			"crystal_card":100
+		"10": {
+			"1": 20000,
+			"20": 20000,
+			"21": 1000,
+			"22": 0,
+			"23": 100,
+			"25": 2
 		},
-		"12":
-		{
-			"diamond_card":120,
-			"coin":20000,
-			"small_energy_potion":2,
-			"food_card":20000,
-			"mine_card":2000,
-			"crystal_card":200
+		"11": {
+			"1": 20000,
+			"20": 20000,
+			"21": 2000,
+			"22": 100,
+			"23": 110,
+			"25": 2
 		},
-		"13":
-		{
-			"diamond_card":130,
-			"coin":20000,
-			"small_energy_potion":3,
-			"food_card":20000,
-			"mine_card":2000,
-			"crystal_card":200
+		"12": {
+			"1": 20000,
+			"20": 20000,
+			"21": 2000,
+			"22": 200,
+			"23": 120,
+			"25": 2
 		},
-		"14":
-		{
-			"diamond_card":140,
-			"coin":20000,
-			"small_energy_potion":3,
-			"food_card":30000,
-			"mine_card":3000,
-			"crystal_card":300
+		"13": {
+			"1": 20000,
+			"20": 20000,
+			"21": 2000,
+			"22": 200,
+			"23": 130,
+			"25": 3
+		},
+		"14": {
+			"1": 20000,
+			"20": 30000,
+			"21": 3000,
+			"22": 300,
+			"23": 140,
+			"25": 3
 		}
 	},
-	"vip_speical_package":
-	{
-		"1":
-		{
-			"reward":
-			{
-				"small_energy_potion":4,
-				"universal_segment":20,
-				"universal_segment_6":0
-			},
-			"diamond":300
+	"vip_special_package": {
+		"0": {
+			"package": [
+				"3:10:2"
+			],
+			"cast_diamond": 100
 		},
-		"2":
-		{
-			"reward":
-			{
-				"small_energy_potion":6,
-				"universal_segment":60,
-				"universal_segment_6":0
-			},
-			"diamond":500
+		"1": {
+			"package": [
+				"3:10:4",
+				"3:29:20"
+			],
+			"cast_diamond": 300
 		},
-		"3":
-		{
-			"reward":
-			{
-				"small_energy_potion":8,
-				"universal_segment":80,
-				"universal_segment_6":0
-			},
-			"diamond":700
+		"2": {
+			"package": [
+				"3:10:6",
+				"3:29:30",
+				"3:30:30"
+			],
+			"cast_diamond": 500
 		},
-		"4":
-		{
-			"reward":
-			{
-				"small_energy_potion":10,
-				"universal_segment":100,
-				"universal_segment_6":0
-			},
-			"diamond":900
+		"3": {
+			"package": [
+				"3:10:8",
+				"3:29:40",
+				"3:30:40"
+			],
+			"cast_diamond": 700
 		},
-		"5":
-		{
-			"reward":
-			{
-				"small_energy_potion":12,
-				"universal_segment":120,
-				"universal_segment_6":0
-			},
-			"diamond":1100
+		"4": {
+			"package": [
+				"3:10:10",
+				"3:29:50",
+				"3:30:50"
+			],
+			"cast_diamond": 900
 		},
-		"6":
-		{
-			"reward":
-			{
-				"small_energy_potion":14,
-				"universal_segment":140,
-				"universal_segment_6":20
-			},
-			"diamond":1300
+		"5": {
+			"package": [
+				"3:10:12",
+				"3:29:60",
+				"3:30:60"
+			],
+			"cast_diamond": 1100
 		},
-		"7":
-		{
-			"reward":
-			{
-				"small_energy_potion":16,
-				"universal_segment":160,
-				"universal_segment_6":60
-			},
-			"diamond":1500
+		"6": {
+			"package": [
+				"3:10:14",
+				"3:29:70",
+				"3:30:70",
+				"3:31:20"
+			],
+			"cast_diamond": 1300
 		},
-		"8":
-		{
-			"reward":
-			{
-				"small_energy_potion":18,
-				"universal_segment":180,
-				"universal_segment_6":80
-			},
-			"diamond":1700
+		"7": {
+			"package": [
+				"3:10:16",
+				"3:29:80",
+				"3:30:80",
+				"3:31:30",
+				"3:32:30"
+			],
+			"cast_diamond": 1500
 		},
-		"9":
-		{
-			"reward":
-			{
-				"small_energy_potion":20,
-				"universal_segment":200,
-				"universal_segment_6":100
-			},
-			"diamond":1900
+		"8": {
+			"package": [
+				"3:10:18",
+				"3:29:90",
+				"3:30:90",
+				"3:31:40",
+				"3:32:40"
+			],
+			"cast_diamond": 1700
 		},
-		"10":
-		{
-			"reward":
-			{
-				"small_energy_potion":22,
-				"universal_segment":220,
-				"universal_segment_6":120
-			},
-			"diamond":2100
+		"9": {
+			"package": [
+				"3:10:20",
+				"3:29:100",
+				"3:30:100",
+				"3:31:50",
+				"3:32:50"
+			],
+			"cast_diamond": 1900
 		},
-		"11":
-		{
-			"reward":
-			{
-				"small_energy_potion":24,
-				"universal_segment":240,
-				"universal_segment_6":140
-			},
-			"diamond":2300
+		"10": {
+			"package": [
+				"3:10:22",
+				"3:29:110",
+				"3:30:110",
+				"3:31:60",
+				"3:32:60"
+			],
+			"cast_diamond": 2100
 		},
-		"12":
-		{
-			"reward":
-			{
-				"small_energy_potion":26,
-				"universal_segment":260,
-				"universal_segment_6":160
-			},
-			"diamond":2500
+		"11": {
+			"package": [
+				"3:10:24",
+				"3:29:120",
+				"3:30:120",
+				"3:31:70",
+				"3:32:70"
+			],
+			"cast_diamond": 2300
 		},
-		"13":
-		{
-			"reward":
-			{
-				"small_energy_potion":28,
-				"universal_segment":280,
-				"universal_segment_6":180
-			},
-			"diamond":2700
+		"12": {
+			"package": [
+				"3:10:26",
+				"3:29:130",
+				"3:30:130",
+				"3:31:80",
+				"3:32:80"
+			],
+			"cast_diamond": 2500
 		},
-		"14":
-		{
-			"reward":
-			{
-				"small_energy_potion":30,
-				"universal_segment":300,
-				"universal_segment_6":200
-			},
-			"diamond":3000
+		"13": {
+			"package": [
+				"3:10:28",
+				"3:29:140",
+				"3:30:140",
+				"3:31:90",
+				"3:32:90"
+			],
+			"cast_diamond": 2700
+		},
+		"14": {
+			"package": [
+				"3:10:30",
+				"3:29:150",
+				"3:30:150",
+				"3:31:100",
+				"3:32:100"
+			],
+			"cast_diamond": 3000
 		}
 	},
-	"buy_energy_config":
-	{
-		"default":2,
-		"vip":[3,3,3,4,4,4,5,5,5,6,6,6,6,6]
+	"buy_energy_config": {
+		"default": 2,
+		"vip": [3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6]
 	},
-	"world_boss_challange_times":
-	{
-		"defualt":1,
-		"vip":[1,1,1,1,1,1,1,1,1,1,1,1,2,3]
-	},
-	"coin_card_base_amount":2000,
-	"exp_card_base_amount":1000,
-	"food_card_base_amount":200,
-	"mine_card_base_amount":100,
-	"crystal_card_base_amount":20,
-	"diamond_card_base_amount":10,
-	"base_month_vip_car_exp":10,
-	"pro_month_vip_car_exp":15,
-	"permanent_month_vip_car_exp":20,
-	"card_cooling_time": {
-		"base": 30,
-		"pro": 90,
-		"permanent": 36500
+	"world_boss_challenge_times": {
+		"default": 1,
+		"vip": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3]
 	},
 	"card_increase_experience": {
-		"base": 10,
-		"pro": 15,
+		"min": 10,
+		"max": 15,
 		"permanent": 20
 	}
 }
-

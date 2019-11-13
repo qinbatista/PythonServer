@@ -24,6 +24,7 @@ from module import stage
 from module import check_in
 from module import darkmarket
 from module import package
+from module import vip
 from datetime import datetime, timedelta
 
 
@@ -65,7 +66,7 @@ class MessageHandler:
 		self._acheviement = d['acheviement']
 		self._task = d['task']
 		self._check_in = d['check_in']
-		self._vip_config = d['vip_config']
+		self._vip_config = d['vip']
 		self._version = d['version']
 		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
 			self._is_first_start = True
@@ -435,45 +436,18 @@ class MessageHandler:
 		return common.mt(0, 'success', {'check_in_config': self._check_in})
 
 	###################### VIP ######################
-	# TODO
-	async def _purchase_vip_gift(self, data: dict) -> str:
-		return 'function'
 
-	async def _check_vip_daily_reward(self, data: dict) -> str:
-		return 'function'
+	async def _get_vip_daily_reward(self, data: dict) -> str:
+		return await vip.get_daily_reward(data['data']['unique_id'], **data)
+
+	async def _purchase_vip_gift(self, data: dict) -> str:
+		return await vip.buy_package(data['data']['unique_id'], **data)
 
 	async def _purchase_vip_card(self, data: dict) -> str:
-		return 'function'
-
-	async def _get_all_vip_info(self, data: dict) -> str:
-		return {'status' : 0, 'message' : 'temp function success', 'data' :{'vip' :
-					{
-						'level':"4",
-						'exp':"2000",
-						'full_exp':"1000",
-						'vip_dialy_reward':
-							{
-							"diamond_card":10,
-							"coin":0,
-							"small_energy_potion":0,
-							"food_card":0,
-							"mine_card":0,
-							"crystal_card":0
-							},
-						'vip_speical_package':
-							{
-									"price":300,
-									"item":
-									{
-										"small_energy_potion":4,
-										"universal_segment":20,
-										"universal_segment_6":0
-									},
-							}
-					}}}
+		return await vip.buy_card(data['data']['unique_id'], int(data['data']['card_id']), **data)
 
 	async def _get_config_vip(self, data: dict) -> str:
-		return common.mt(0, 'success', {'vip_config': self._vip_config})
+		return await vip.get_config(data['data']['unique_id'], **data)
 
 	###################### player ######################
 	async def _get_all_resource(self, data: dict) -> str:
@@ -795,12 +769,10 @@ FUNCTION_LIST = {
 	'supplement_check_in' : MessageHandler._supplement_check_in,
 	'get_all_check_in_table' : MessageHandler._get_all_check_in_table,
 
-	# TODO
 	###################### VIP ######################
+	'get_vip_daily_reward' : MessageHandler._get_vip_daily_reward,
 	'purchase_vip_gift' : MessageHandler._purchase_vip_gift,
-	'check_vip_daily_reward' : MessageHandler._check_vip_daily_reward,
 	'purchase_vip_card' : MessageHandler._purchase_vip_card,
-	'get_all_vip_info': MessageHandler._get_all_vip_info,
 
 	# TODO
 	###################### player ######################
