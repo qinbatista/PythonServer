@@ -236,6 +236,7 @@ class Timer(enum.IntEnum):
 	FACTORY_ACCELERATION_END = 15
 	FACTORY_WISHING_POOL = 16
 	REQUEST_FRIEND_TIME = 19
+	CONTINUOUS_LOGIN = 20
 
 
 class Limits(enum.IntEnum):
