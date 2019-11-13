@@ -217,9 +217,7 @@ class Edge:
 
 ######################################################################################################
 async def main():
-	CFG  = config_reader.wait_config()
-	edge = Edge(CFG['edge']['port'])
-	await edge.start()
+	await Edge().start()
 
 if __name__ == '__main__':
 	asyncio.run(main())
