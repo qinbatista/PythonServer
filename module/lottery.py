@@ -7,6 +7,7 @@ from module import common
 from module import summoning
 from module import enums
 from module import task
+from module import achievement
 
 STANDARD_SEG_COUNT = 30
 
@@ -36,6 +37,15 @@ async def fortune_wheel(uid, tier, item, **kwargs):
 
 async def _try_unlock_weapon(uid, gift, **kwargs):
 	weapon = enums.Weapon(gift)
+	if weapon.name in kwargs['config']['weapon']['star_4']:
+		kwargs.update({"aid": enums.Achievement.GET_4_STAR_WEAPON})
+		await achievement.record_achievement(uid,**kwargs)
+	if weapon.name in kwargs['config']['weapon']['star_5']:
+		kwargs.update({"aid": enums.Achievement.GET_5_STAR_WEAPON})
+		await achievement.record_achievement(uid,**kwargs)
+	if weapon.name in kwargs['config']['weapon']['star_6']:
+		kwargs.update({"aid": enums.Achievement.GET_6_STAR_WEAPON})
+		await achievement.record_achievement(uid,**kwargs)
 	if not await common.exists('weapon', ('uid', uid), ('wid', weapon.value), **kwargs):
 		await common.execute(f'INSERT INTO weapon(uid, wid) VALUES ("{uid}", {weapon.value});', **kwargs)
 		return (True, weapon)
@@ -49,11 +59,18 @@ async def _try_unlock_skill(uid, gift, **kwargs):
 		return (True, skill)
 	await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.SKILL_SCROLL_10.value}, 1) ON DUPLICATE KEY UPDATE value = value + 1;', **kwargs)
 	return (False, enums.Item.SKILL_SCROLL_10)
-role_4_star = []
-role_5_star = []
-role_6_star = []
+
 async def _try_unlock_role(uid, gift, **kwargs):
 	role = enums.Role(gift)
+	if role.name in kwargs['config']['role']['star_4']:
+		kwargs.update({"aid": enums.Achievement.GET_4_STAR_ROLE})
+		await achievement.record_achievement(uid,**kwargs)
+	if role.name in kwargs['config']['role']['star_5']:
+		kwargs.update({"aid": enums.Achievement.GET_5_STAR_ROLE})
+		await achievement.record_achievement(uid,**kwargs)
+	if role.name in kwargs['config']['role']['star_6']:
+		kwargs.update({"aid": enums.Achievement.GET_6_STAR_ROLE})
+		await achievement.record_achievement(uid,**kwargs)
 	if not await common.exists('role', ('uid', uid), ('rid', role.value), **kwargs):
 		await common.execute(f'INSERT INTO role(uid, rid) VALUES ("{uid}", {role.value});', **kwargs)
 		return (True, role)
