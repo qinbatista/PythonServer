@@ -13,6 +13,8 @@
 * [`get_config_vip`](##get_config_vip)
 * [`get_config_player`](##get_config_player)
 * [`get_config_factory`](##get_config_factory)
+* [`get_config_family`](##get_config_family)
+* [`get_config_card`](##get_config_card)
 
 ## get_config_version
 
@@ -3306,6 +3308,140 @@
 			"base_segment": 1,
 			"base_recover": 49,
 			"base_diamond": 50
+		}
+	}
+}
+```
+
+## get_config_family
+
+获取family.json的配置文件信息
+
+##### 发送消息JSON格式
+
+> 无
+
+```json
+{
+	"world": 0, 
+	"function": "get_config_family",
+	"data": {
+		"token": "my toekn ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+返回工厂配置信息，配置文件来自factory.json
+
+[成功]()
+
+> config：配置信息
+>
+> - general：普通配置信息
+>   - costs：消耗品
+>   - rewards：签到奖励
+>   - members：成员限制
+> - store：商店配置信息
+>   - items：商品信息（购买消耗等）
+>   - gift：礼物信息
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"config": {
+			"general": {
+				"costs": {
+					"create": "3:5:2000",
+					"change_name": "3:5:500"
+				},
+				"rewards": {
+					"check_in": "3:1:100"
+				},
+				"members": {
+					"base": 30,
+					"max": 50,
+					"inc": 2
+				}
+			},
+			"store": {
+				"items": {
+					"3:6:1": "3:1:80"
+				},
+				"gift": [
+					"3:5:10"
+				]
+			}
+		}
+	}
+}
+```
+
+## get_config_card
+
+返回卡片兑换的配置信息，详见配置表`package.json`
+
+##### 发送消息JSON格式
+
+```json
+{
+	"world": 0, 
+	"function": "get_config_card",
+	"data": {
+		"token": "my toekn ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> config：卡片兑换配置信息
+>
+> - sqltable：操作的数据库表
+> - mid：物品id
+> - bnum：卡片交换获得的物品基础数量（base num=>bnum）
+
+```
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"config": {
+			"COIN_CARD": {
+				"sqltable": "item",
+				"mid": 1,
+				"bnum": 2000
+			},
+			"EXP_CARD": {
+				"sqltable": "progress",
+				"mid": "exp",
+				"bnum": 1000
+			},
+			"FOOD_CARD": {
+				"sqltable": "item",
+				"mid": 3,
+				"bnum": 200
+			},
+			"MINE_CARD": {
+				"sqltable": "item",
+				"mid": 24,
+				"bnum": 100
+			},
+			"CRYSTAL_CARD": {
+				"sqltable": "item",
+				"mid": 4,
+				"bnum": 20
+			},
+			"DIAMOND_CARD": {
+				"sqltable": "item",
+				"mid": 5,
+				"bnum": 10
+			}
 		}
 	}
 }

@@ -178,10 +178,11 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'exchange_card', 'data': {'token': token, 'card_id': 19}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_info_player', 'data': {'token': token, 'card_id': 19}})
 	# response = send_tcp_message({'world': 0, 'function': 'find_person', 'data': {'token': token, 'gn_target': '打广告'}})
-	response = send_tcp_message({'world': 0, 'function': 'get_config_player', 'data': {'token': token, 'gn_target': '打广告'}})
+	# response = send_tcp_message({'world': 0, 'function': 'get_config_player', 'data': {'token': token, 'gn_target': '打广告'}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_config_card', 'data': {'token': token, 'card_id': 19}})
 	# response = send_tcp_message({'world': 0, 'function': 'check_in_family', 'data': {'token': token, 'card_id': 18}})
 	# response = send_tcp_message({'world': 0, 'function': 'refresh_market', 'data': {'token': token, 'pid': 1}})
+	response = send_tcp_message({'world': 0, 'function': 'get_config_family', 'data': {'token': token, 'pid': 1}})
 	print(str(response).replace("'", "\""))
 
 

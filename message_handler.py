@@ -222,7 +222,7 @@ class MessageHandler:
 		return await family.check_in(data['data']['unique_id'], **data)
 
 	async def _get_config_family(self, data: dict) -> str:
-		return common.mt(0, 'success', data={'config': self._family_config})
+		return common.mt(0, 'success', data={'config': data['config']['family']})
 
 	async def _gift_package_family(self, data: dict) -> str:
 		return await family.gift_package(data['data']['unique_id'], **data)
@@ -602,10 +602,6 @@ class MessageHandler:
 		# return {'status' : 0, 'message' : 'temp function success', 'data' :{'boss' :{'world_boss_enter_time':"2019/10/10 17:00:00",'world_boss_remaining_times':"20",'hp_values':["%.2f" %(int(self._boss_life_remaining[i])/int(self._boss_life[i])) for i in range(0,9)]}}}
 
 	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
-	async def _get_family_config(self, data: dict) -> str:
-		return common.mt(0, 'success', {'config': self._family_config})
-
-	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
 	async def _get_factory_info(self, data: dict) -> str:
 		return common.mt(0, 'success', {'config': self._factory_config})
 
@@ -721,7 +717,6 @@ FUNCTION_LIST = {
 	'market_purchase_family' : MessageHandler._market_purchase_family,
 	'check_in_family' : MessageHandler._check_in_family,
 	'gift_package_family' : MessageHandler._gift_package_family,
-	'get_config_family' : MessageHandler._get_config_family,
 	'get_random_family' : MessageHandler._get_random_family,
 
 	###################### mail.py ######################
@@ -846,7 +841,6 @@ FUNCTION_LIST = {
 	'get_lottery_config_info': MessageHandler._get_lottery_config_info,
 	# 'get_hang_up_info': MessageHandler._get_hang_up_info,
 	'check_boss_status':MessageHandler._check_boss_status,
-	'get_family_config':MessageHandler._get_family_config,
 	'get_factory_info':MessageHandler._get_factory_info,
 	'refresh_all_storage':MessageHandler._refresh_all_storage,
 	'get_all_family_info': MessageHandler._get_all_family_info,
@@ -866,10 +860,11 @@ FUNCTION_LIST = {
 	'get_config_player': MessageHandler._get_config_player,
 	'get_config_factory': MessageHandler._get_config_factory,
 	'get_config_version': MessageHandler._get_config_version,
+	'get_config_family': MessageHandler._get_config_family,
+	'get_config_card': MessageHandler._get_config_card,
 
 	###################### package ######################
 	'exchange_card': MessageHandler._exchange_card,
-	'get_config_card': MessageHandler._get_config_card,
 
 	###################### private(comment before release) ######################
 	'send_gift_mail': MessageHandler._send_gift_mail,
