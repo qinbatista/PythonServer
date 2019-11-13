@@ -30,15 +30,19 @@ async def record_achievement(uid, **kwargs):  # aid->enums.Achievement,value->st
 			if difference_day.days == 0:
 				pass
 			elif difference_day.days == 1:
+				await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {1},0) ON DUPLICATE KEY UPDATE `value`= `value`+{1}',**kwargs)
 				await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}",{enums.Achievement.KEEPING_LOGIN},{1},0) ON DUPLICATE KEY UPDATE `value`= `value`+{1}',**kwargs)
 				await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}",{enums.Timer.CONTINUOUS_LOGIN},"{current_time}") ON DUPLICATE KEY UPDATE `time`= "{current_time}"',**kwargs)
 			elif difference_day.days >=2:
+				await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {1},0) ON DUPLICATE KEY UPDATE `value`= `value`+{1}',**kwargs)
 				await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}",{enums.Achievement.KEEPING_LOGIN},{1},0) ON DUPLICATE KEY UPDATE `value`= {1}',**kwargs)
 				await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}",{enums.Timer.CONTINUOUS_LOGIN},"{current_time}") ON DUPLICATE KEY UPDATE `time`= "{current_time}"',**kwargs)
 		else:
+			await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {1},0) ON DUPLICATE KEY UPDATE `value`= `value`+{1}',**kwargs)
 			await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {enums.Achievement.KEEPING_LOGIN}, {1},0) ON DUPLICATE KEY UPDATE `value`= {1}',**kwargs)
 			await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.CONTINUOUS_LOGIN}, "{current_time}") ON DUPLICATE KEY UPDATE `time`= "{current_time}"',**kwargs)
-	await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {1},0) ON DUPLICATE KEY UPDATE `value`= `value`+{1}',**kwargs)
+	else:
+		await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {1},0) ON DUPLICATE KEY UPDATE `value`= `value`+{1}',**kwargs)
 	return common.mt(0, 'record:' + str(kwargs["aid"]) + " success")
 
 
