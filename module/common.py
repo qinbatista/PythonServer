@@ -104,11 +104,6 @@ async def set_limit(uid, lid, value, **kwargs):
 			ON DUPLICATE KEY UPDATE `value` = {value};', **kwargs)
 
 
-async def get_vip_exp(uid, **kwargs):
-	data = await execute(f'SELECT vipexp FROM progress WHERE uid = "{uid}";', **kwargs)
-	if data==():return 0
-	else:return data[0][0]
-
 async def get_db(**kwargs):
 	return kwargs['worlddb']
 

@@ -419,13 +419,11 @@ class MessageHandler:
 
 	###################### 签到系统 ######################
 	async def _check_in(self, data: dict) -> str:
-		data.update({"config":self._check_in})
-		data.update({"vip_exp":self._vip_config})
+		data.update({"check_in_config":self._check_in})
 		return await check_in.check_in(data['data']['unique_id'],**data)
 
 	async def _supplement_check_in(self, data: dict) -> str:
-		data.update({"config":self._check_in})
-		data.update({"vip_exp":self._vip_config})
+		data.update({"check_in_config":self._check_in})
 		return await check_in.supplement_check_in(data['data']['unique_id'],**data)
 
 	async def _get_all_check_in_table(self, data: dict) -> str:

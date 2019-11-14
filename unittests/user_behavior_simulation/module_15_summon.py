@@ -184,11 +184,13 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'refresh_market', 'data': {'token': token, 'pid': 1}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_config_family', 'data': {'token': token, 'pid': 1}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_vip_daily_reward', 'data': {'token': token}})
-	response = send_tcp_message({'world': 0, 'function': 'purchase_vip_card', 'data': {'token': token, 'card_id': 27}})
+	# response = send_tcp_message({'world': 0, 'function': 'purchase_vip_card', 'data': {'token': token, 'card_id': 27}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_config_vip', 'data': {'token': token, 'card_id': 27}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_info_vip', 'data': {'token': token, 'card_id': 27}})
 	# response = send_tcp_message({'world': 0, 'function': 'purchase_vip_gift', 'data': {'token': token, 'tier': 1}})
 	# response = send_tcp_message({'world': 0, 'function': 'fortune_wheel_pro', 'data': {'token': token, 'item': 5}})
+	# response = send_tcp_message({'world': 0, 'function': 'check_in', 'data': {'token': token, 'item': 5}})
+	response = send_tcp_message({'world': 0, 'function': 'supplement_check_in', 'data': {'token': token, 'item': 5}})
 	print(str(response).replace("'", "\""))
 
 
