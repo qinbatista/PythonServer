@@ -9,7 +9,6 @@ import aioredis
 import contextlib
 import nats.aio.client
 
-from utility     import config_reader
 from collections import defaultdict
 
 LINE_ENDING        = '\r\n'
@@ -62,11 +61,13 @@ class Userlist:
 		return set()
 
 class Edge:
-	def __init__(self, port = 9000):
+	def __init__(self, port = 9000, redis_addr = 'redis://redis', nats_addr = 'nats://nats'):
 		self.port       = port
 		self.pubsub     = nats.aio.client.Client()
 		self.channels   = set()
 		self.userlist   = Userlist()
+		self.nats_addr  = nats_addr
+		self.redis_addr = redis_addr
 		self.drain_lock = asyncio.Lock()
 
 		self.redis      = None
@@ -86,8 +87,8 @@ class Edge:
 	async def init(self):
 		asyncio.get_running_loop().add_signal_handler(signal.SIGINT, \
 				lambda: asyncio.create_task(self.shutdown()))
-		await self.pubsub.connect('nats://192.168.1.102', max_reconnect_attempts = 1)
-		self.redis   = await aioredis.create_redis('redis://192.168.1.102', encoding = 'utf-8')
+		await self.pubsub.connect(self.nats_addr, max_reconnect_attempts = 1)
+		self.redis   = await aioredis.create_redis(self.redis_addr, encoding = 'utf-8')
 		self.server  = await asyncio.start_server(self.client_protocol, port = self.port)
 		self.running = True
 	
@@ -217,7 +218,7 @@ class Edge:
 
 ######################################################################################################
 async def main():
-	await Edge().start()
+	await Edge(redis_addr = 'redis://192.168.1.102', nats_addr = 'nats://192.168.1.102').start()
 
 if __name__ == '__main__':
 	asyncio.run(main())

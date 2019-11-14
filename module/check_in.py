@@ -37,7 +37,7 @@ async def check_in(uid, **kwargs):
 	"""每日签到"""
 	# 0 - Sign-in success
 	# 99 - You have already signed in today
-	kwargs.update({"tid": enums.Task.CHECK_IN})
+	kwargs.update({"task_id": enums.Task.CHECK_IN})
 	await task.record_task(uid, **kwargs)
 	current_time = time.strftime('%Y-%m-' + str(kwargs["hard_day"]), time.localtime()) if kwargs.__contains__(
 		"hard_day") else time.strftime('%Y-%m-%d', time.localtime())

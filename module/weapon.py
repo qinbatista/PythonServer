@@ -18,7 +18,7 @@ async def get_config(**kwargs):
 	return common.mt(0, 'success', kwargs['config']['weapon'])
 
 async def level_up(uid, wid, amount, **kwargs):
-	kwargs.update({"tid":enums.Task.ROLE_LEVEL_UP})
+	kwargs.update({"task_id":enums.Task.WEAPON_LEVEL_UP})
 	await task.record_task(uid,**kwargs)
 
 	kwargs.update({"aid":enums.Achievement.LEVEL_UP_WEAPON})

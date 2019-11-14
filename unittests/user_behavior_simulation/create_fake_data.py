@@ -34,7 +34,7 @@ def call_login(unique_id):
 			if token!="" and world!="":break
 
 def _execute_statement(statement: str) -> tuple:
-		db = pymysql.connect('192.168.1.102', 'root', 'lukseun', 'experimental')
+		db = pymysql.connect('192.168.1.102', 'root', 'lukseun', '0')
 		cursor = db.cursor()
 		cursor.execute(statement)
 		db.commit()
@@ -45,17 +45,18 @@ def run_task(name):
 	call_login(str(name))
 	#mail_type: SIMPLE = 0,GIFT = 1, FRIEND_REQUEST = 2 FAMILY_REQUEST = 3
 	#item_id: COIN = 1,IRON = 2,FOOD = 3,CRYSTAL = 4,DIAMOND = 5
-	for i in range(0,2):
+	for i in range(0,10):
 		send_tcp_message({'function' : 'send_gift_mail', 'data' : {"token":token, "gn_target":"去污", "group_id":3, "item_id":random.randint(1,5), "quantity":random.randint(100,500)}})#送物品
 		# send_tcp_message({'function' : 'send_text_mail', 'data' : {"token":token, "gn_target":"去污","msg":"msg:"+str(random.randint(1,100000000))}})#发送文字
 		mytime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+		friend_time = time.strftime('%Y-%m-%d', time.localtime())
 		mydata = time.strftime('%Y-%m', time.localtime())
 		_execute_statement(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,1000)},{0}) ON DUPLICATE KEY UPDATE `reward`= values(`reward`)')
 		_execute_statement(f'INSERT INTO armor (uid, aid, level,quantity) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,10)},{random.randint(1,100)})  ON DUPLICATE KEY UPDATE `quantity`= values(`quantity`)')
 		_execute_statement(f'INSERT INTO item (uid, iid, value) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,1000)}) ON DUPLICATE KEY UPDATE `value`= values(`value`)')
 		_execute_statement(f'INSERT INTO weapon (uid, wid, star,level, skillpoint, segment) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,5)},{0},{random.randint(1,5000)},{random.randint(1,5000)}) ON DUPLICATE KEY UPDATE `segment`= values(`segment`)')
 		fname = f'f_unique_id_{random.randint(1,31)}'
-		_execute_statement(f'INSERT INTO friend (uid, fid, recover,since) VALUES ("{module_1_login.unique_id}", "{fname}", "{mytime}","{mytime}") ON DUPLICATE KEY UPDATE `since`= values(`since`)')
+		_execute_statement(f'INSERT INTO friend (uid, fid, recover,since) VALUES ("{module_1_login.unique_id}", "{fname}", "{friend_time}","{friend_time}") ON DUPLICATE KEY UPDATE `since`= values(`since`)')
 		_execute_statement(f'INSERT INTO player (uid, gn, fid) VALUES ("{fname}", "f_name_{random.randint(1,31)}", "") ON DUPLICATE KEY UPDATE `fid`= values(`fid`)')
 		_execute_statement(f'INSERT INTO skill (uid, sid, level) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,31)}) ON DUPLICATE KEY UPDATE `level`= values(`level`)')
 		_execute_statement(f'INSERT INTO role (uid, rid, star, level, skillpoint, segment) VALUES ("{module_1_login.unique_id}", {random.randint(1,31)}, {random.randint(1,5)},{random.randint(1,30)},{random.randint(1,5)},{random.randint(1,500)}) ON DUPLICATE KEY UPDATE `level`= values(`level`)')
@@ -65,4 +66,4 @@ def run_task(name):
 		_execute_statement(f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{module_1_login.unique_id}", {random.randint(1,13)}, {random.randint(0,1)},{0},"{mytime}") ON DUPLICATE KEY UPDATE `reward`= values(`reward`)')
 		_execute_statement(f'INSERT INTO check_in (uid, date, reward) VALUES ("{module_1_login.unique_id}", "{mydata+"-"+str(random.randint(10,31))}", {1}) ON DUPLICATE KEY UPDATE `reward`= values(`reward`)')
 if __name__ == "__main__":
-	run_task("C16045D5-3A85-45ED-897D-2883DF9C0050")
+	run_task("C2F09CC7-E5E0-5222-82C9-D4856270DAF7")

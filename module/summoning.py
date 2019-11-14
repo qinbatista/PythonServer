@@ -40,10 +40,10 @@ async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
 	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 
 	if enums.Tier.BASIC == tier:
-		kwargs.update({"tid":enums.Task.BASIC_SUMMONING})
+		kwargs.update({"task_id":enums.Task.BASIC_SUMMONING})
 		await task.record_task(uid,**kwargs)
 	if enums.Tier.PRO == tier:
-		kwargs.update({"tid":enums.Task.PRO_SUMMONING})
+		kwargs.update({"task_id":enums.Task.PRO_SUMMONING})
 		await task.record_task(uid,**kwargs)
 		kwargs.update({"aid":enums.Achievement.PRO_SUMMON_TIMES})
 		await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
@@ -59,10 +59,10 @@ async def _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs):
 	for time in range(num_times):
 
 		if enums.Tier.BASIC == tier:
-			kwargs.update({"tid":enums.Task.BASIC_SUMMONING})
+			kwargs.update({"task_id":enums.Task.BASIC_SUMMONING})
 			await task.record_task(uid,**kwargs)
 		if enums.Tier.PRO == tier:
-			kwargs.update({"tid":enums.Task.PRO_SUMMONING})
+			kwargs.update({"task_id":enums.Task.PRO_SUMMONING})
 			await task.record_task(uid,**kwargs)
 			kwargs.update({"aid":enums.Achievement.PRO_SUMMON_TIMES})
 			await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
