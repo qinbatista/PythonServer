@@ -10,7 +10,7 @@ from collections import defaultdict
 
 
 async def level_up(uid, rid, amount, **kwargs):
-	kwargs.update({"tid": enums.Task.ROLE_LEVEL_UP})
+	kwargs.update({"task_id": enums.Task.ROLE_LEVEL_UP})
 	await task.record_task(uid,**kwargs)
 
 	kwargs.update({"aid":enums.Achievement.LEVEL_UP_ROLE})

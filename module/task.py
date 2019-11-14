@@ -15,9 +15,9 @@ async def get_all_task(uid, **kwargs):
 
 async def record_task(uid, **kwargs):
 	data = await common.execute(
-		f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["tid"]},1,0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {1}',
+		f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["task_id"]},1,0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {1}',
 		**kwargs)
-	return common.mt(0, 'record:' + str(kwargs["tid"]) + " success")
+	return common.mt(0, 'record:' + str(kwargs["task_id"]) + " success")
 
 
 async def get_task_reward(uid, task_id, **kwargs):

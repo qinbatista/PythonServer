@@ -619,7 +619,7 @@ class MessageHandler:
 				}
 
 	async def _get_config_player(self, data: dict) -> str:
-		data.update({"tid":enums.Task.LOGIN})
+		data.update({"task_id":enums.Task.LOGIN})
 		await task.record_task(data['data']['unique_id'],**data)
 
 		data.update({"aid":enums.Achievement.TOTAL_LOGIN})

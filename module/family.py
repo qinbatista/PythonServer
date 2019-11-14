@@ -189,7 +189,7 @@ async def cancel_disband(uid, **kwargs):
 	return common.mt(0, 'success')
 
 async def check_in(uid, **kwargs):
-	kwargs.update({"tid":enums.Task.FAMILY_CHECK_IN})
+	kwargs.update({"task_id":enums.Task.FAMILY_CHECK_IN})
 	await task.record_task(uid,**kwargs)
 
 	kwargs.update({"aid":enums.Achievement.CHECK_IN_FAMILY})

@@ -27,7 +27,7 @@ async def enter_stage(uid, stage, **kwargs):
 async def pass_stage(uid, stage, **kwargs):
 	damage = kwargs['data'].get('damage', 0)
 	if 0 < stage < 1000:
-		kwargs.update({"tid":enums.Task.PASS_MAIN_STAGE})
+		kwargs.update({"task_id":enums.Task.PASS_MAIN_STAGE})
 		await task.record_task(uid,**kwargs)
 
 		kwargs.update({"aid":enums.Achievement.PASS_STAGE})
@@ -35,11 +35,11 @@ async def pass_stage(uid, stage, **kwargs):
 
 		return await p_general_stage(uid, stage, **kwargs)
 	elif 1000 <= stage < 2000:
-		kwargs.update({"tid":enums.Task.PASS_SPECIAL_STAGE})
+		kwargs.update({"task_id":enums.Task.PASS_SPECIAL_STAGE})
 		await task.record_task(uid,**kwargs)
 		return await p_tower_stage(uid, stage, **kwargs)
 	elif 2000 <= stage < 3000:
-		kwargs.update({"tid":enums.Task.PASS_WORLD_BOSS})
+		kwargs.update({"task_id":enums.Task.PASS_WORLD_BOSS})
 		await task.record_task(uid,**kwargs)
 		return await p_general_stage(uid, stage, **kwargs)
 	elif 3000 <= stage < 4000:
