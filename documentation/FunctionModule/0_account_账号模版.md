@@ -164,9 +164,10 @@
 {
 	"world": 0,
 	"function": "enter_stage",
+  "world": 1,
 	"data": {
 		"token": "my token",
-		"world": 1
+
 	}
 }
 ```
