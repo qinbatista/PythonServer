@@ -17,15 +17,19 @@ async def exists(table, *conditions, account = False, **kwargs):
 	return data[0][0] != 0
 
 async def execute(statement, account = False, **kwargs):
-	async with ((await get_db(**kwargs)).acquire() if not account else kwargs['accountdb'].acquire()) as conn:
-		# await conn.select_db()
+	async with ((await get_db(**kwargs)).acquire() if not account \
+			else kwargs['accountdb'].acquire()) as conn:
+		if not account:
+			await conn.select_db(str(kwargs['world']))
 		async with conn.cursor() as cursor:
 			await cursor.execute(statement)
 			return await cursor.fetchall()
 
 async def execute_update(statement, account = False, **kwargs):
-	async with ((await get_db(**kwargs)).acquire() if not account else kwargs['accountdb'].acquire()) as conn:
-		# await conn.select_db()
+	async with ((await get_db(**kwargs)).acquire() if not account \
+			else kwargs['accountdb'].acquire()) as conn:
+		if not account:
+			await conn.select_db(str(kwargs['world']))
 		async with conn.cursor() as cursor:
 			affected = await cursor.execute(statement)
 			return (affected, await cursor.fetchall())
@@ -41,7 +45,7 @@ async def get_uid(gn, **kwargs):
 
 async def try_item(uid, item, value, **kwargs):
 	async with (await get_db(**kwargs)).acquire() as conn:
-		# await conn.select_db()
+		await conn.select_db(str(kwargs['world']))
 		async with conn.cursor() as cursor:
 			await cursor.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{item.value}" FOR UPDATE;')
 			quantity = await cursor.fetchall()
@@ -53,7 +57,7 @@ async def try_item(uid, item, value, **kwargs):
 
 async def try_armor(uid, aid, level, value, **kwargs):
 	async with (await get_db(**kwargs)).acquire() as conn:
-		# await conn.select_db()
+		await conn.select_db(str(kwargs['world']))
 		async with conn.cursor() as cursor:
 			await cursor.execute(f'SELECT `quantity` FROM `armor` WHERE `uid` = "{uid}" AND \
 					`aid` = {aid.value} AND `level` = {level} FOR UPDATE;')
