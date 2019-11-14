@@ -19,7 +19,7 @@ async def random_gift(uid, tier, rewardgroup, **kwargs):
 	return await SWITCH[rewardgroup](uid, gift, **kwargs)
 
 async def fortune_wheel(uid, tier, item, **kwargs):
-	cost = kwargs['config']['lottery']['fortune_wheel']['cost'][f'{enums.Group.ITEM.value}:{item.value}']
+	cost = kwargs['config']['lottery']['fortune_wheel']['cost'][tier.name][f'{enums.Group.ITEM.value}:{item.value}']
 	can_pay, remaining = await common.try_item(uid, item, -cost, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient materials')
 	t = (random.choices(range(len(kwargs['config']['lottery']['fortune_wheel']['weights'][tier.name])), kwargs['config']['lottery']['fortune_wheel']['weights'][tier.name]))[0]

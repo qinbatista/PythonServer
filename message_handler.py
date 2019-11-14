@@ -441,7 +441,7 @@ class MessageHandler:
 		return await vip.get_daily_reward(data['data']['unique_id'], **data)
 
 	async def _purchase_vip_gift(self, data: dict) -> str:
-		return await vip.buy_package(data['data']['unique_id'], **data)
+		return await vip.buy_package(data['data']['unique_id'], data['data']['tier'], **data)
 
 	async def _purchase_vip_card(self, data: dict) -> str:
 		return await vip.buy_card(data['data']['unique_id'], int(data['data']['card_id']), **data)

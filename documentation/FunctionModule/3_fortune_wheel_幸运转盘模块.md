@@ -91,7 +91,7 @@
 	"function": "fortune_wheel_basic",
 	"data": {
 		"token": "my toekn ^_^",
-    "item": 1,
+    	"item": 1,
 	}
 }
 ```

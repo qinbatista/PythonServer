@@ -27,7 +27,15 @@ async def get_info(uid, **kwargs):
 	if max_card:
 		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
 		max_seconds = int((datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc) - datetime.now(timezone.utc)).total_seconds())
-	return common.mt(0, 'success', {'exp_info': exp_info, 'min_card': min_card, 'max_card': max_card, 'min_seconds': min_seconds, 'max_seconds': max_seconds, 'perpetual_card': perpetual_card})
+
+	timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+	if timer == ():
+		await common.execute(f'INSERT INTO timer (uid, tid) VALUE ("{uid}", "{enums.Timer.VIP_COOLING_TIME.value}");', **kwargs)
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+	cooling_time = -1
+	if timer[0][0] != '':
+		cooling_time = int((datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc) - datetime.now(timezone.utc)).total_seconds())
+	return common.mt(0, 'success', {'exp_info': exp_info, 'min_card': min_card, 'max_card': max_card, 'min_seconds': min_seconds, 'max_seconds': max_seconds, 'perpetual_card': perpetual_card, 'cooling_time': cooling_time})
 
 
 async def get_daily_reward(uid, **kwargs):
@@ -42,7 +50,7 @@ async def get_daily_reward(uid, **kwargs):
 	if timer == ():
 		await common.execute(f'INSERT INTO timer (uid, tid) VALUE ("{uid}", "{enums.Timer.VIP_COOLING_TIME.value}");', **kwargs)
 		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
-	if timer[0][0] != '' and current < datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc) + timedelta(seconds=config['vip_daily_reward'].get('cooling_time', 86400)):
+	if timer[0][0] != '' and current < datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo = timezone.utc):
 		return common.mt(99, 'The cooling time is not over')
 
 	min_card, max_card, perpetual_card = await check_card(uid, **kwargs)
@@ -71,9 +79,34 @@ async def get_daily_reward(uid, **kwargs):
 	return common.mt(0, 'success', data)
 
 
-async def buy_package(uid, wid, amount, **kwargs):
-	"""购买VIP礼包，VIP等级以下的可以购买"""
-	return common.mt(0, '未完成')
+async def buy_package(uid, tier, **kwargs):
+	"""购买VIP礼包，VIP等级以下的可以购买
+	tier: 与VIP指等级相对应
+	gift: 指对应等级下的礼物
+	98 - Diamond insufficient
+	99 - You don't have enough VIP status(VIP等级不够，无法购买那一层的礼包)
+	"""
+	exp_info = await increase_exp(uid, 0, **kwargs)
+	if tier > exp_info['level']: return common.mt(99, "You don't have enough VIP status")
+
+	config = kwargs['config']['vip']['vip_special_package'][f'{tier}']
+	cast_diamond = -config.get('cast_diamond', 0)
+	can, diamond = await common.try_item(uid, enums.Item.DIAMOND, cast_diamond, **kwargs)
+	if not can: return common.mt(98, 'Diamond insufficient')
+
+	data = {'remaining': {'diamond': diamond, 'gifts': []}, 'reward': {'diamond': cast_diamond, 'gifts': []}, 'exp_info': exp_info}
+	gift_package = common.decode_items(','.join(config['package']))
+	for gid, item, qty in gift_package:
+		value = -1
+		if gid == enums.Group.ITEM:
+			_, value = await common.try_item(uid, item, qty, **kwargs)
+		elif gid == enums.Group.WEAPON:  # 只增加武器碎片
+			_, value = await common.try_weapon(uid, item, qty, **kwargs)
+		elif gid == enums.Group.ROLE:  # 只增加角色碎片
+			_, value = await common.try_role(uid, item, qty, **kwargs)
+		data['reward']['gifts'].append({'gid': gid.value, 'mid': item.value, 'qty': qty})
+		data['remaining']['gifts'].append({'gid': gid.value, 'mid': item.value, 'qty': value})
+	return common.mt(0, 'success', data)
 
 
 async def buy_card(uid, cid, **kwargs):

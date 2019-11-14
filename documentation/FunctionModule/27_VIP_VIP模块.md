@@ -3,12 +3,14 @@
 * [`get_config_vip`](##get_config_vip)
 * [`get_vip_daily_reward`](##get_vip_daily_reward)
 * [`get_info_vip`](##get_info_vip)
+* [`purchase_vip_gift`](##purchase_vip_gift)
 
-- 后面的方法尚未完成
+- [`purchase_vip_card`](##purchase_vip_card)
+- 内部方法[`check_card`](##check_card)
 
-* 内部方法[`get_vip_card`](##get_vip_card)
-* 内部方法[`increase_vip_exp`](##increase_vip_exp)
-* 内部方法[`check_vip_daily_reward`](##check_vip_daily_reward)
+* 内部方法[`increase_exp`](##increase_exp)
+
+* 内部方法[`increase_item`](##increase_item)
 
 ## get_config_vip
 
@@ -557,7 +559,7 @@
 ```json
 {
 	"world": 0, 
-	"function": "get_vip_card",
+	"function": "get_info_vip",
 	"data": {
 		"token": "my toekn ^_^"
 	}
@@ -566,7 +568,7 @@
 
 ##### 接受消息JSON格式
 
-[获取资源成功]()
+[成功]()
 
 > exp_info: VIP经验信息
 >
@@ -579,6 +581,8 @@
 > min_seconds：小月卡过期剩余时间
 >
 > max_seconds：大月卡过期剩余时间
+>
+> cooling_time：VIP礼包领取后剩余的冷却时间
 
 ```json
 {
@@ -594,68 +598,29 @@
 		"max_card": "True",
 		"min_seconds": 2671833,
 		"max_seconds": 2671936,
-		"perpetual_card": "False"
+		"perpetual_card": "False",
+        "cooling_time": 85160
 	}
 }
 ```
 
 
 
-## get_vip_card
+## purchase_vip_gift
 
 ##### 发送消息JSON格式
 
-获得vip经验卡，因为是内部方法，调用即可直接获得，如果重复获得，则会添加日期，比如多添加一个月，购买之后会记录vip卡的购买时间和过期时间
+购买VIP特殊礼包
+
+> tier：购买VIP礼包的层数，根据VIP等级计算（tier==VIP level）
 
 ```json
 {
 	"world": 0, 
 	"function": "get_vip_card",
 	"data": {
-		"token": "my toekn ^_^"
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-[获取资源成功]()
-
-> expired_time: 过期时间，数字为到期的秒数
->
-
-```json
-{
-	"status": 0,
-	"message": "Successful signing",
-	"data": {
-		"expired_time": 25098397
-		}
-}
-```
-
-[调整关卡失败]()
-
-* 99: 钻石不足
-* 98: 没有一天漏掉，无法补钱
-
-
-
-
-
-## increase_vip_exp
-
-##### 发送消息JSON格式
-
-执行之后直接添加vip的经验值
-
-```json
-{
-	"world": 0, 
-	"function": "increase_vip_exp",
-	"data": {
 		"token": "my toekn ^_^",
-    "exp":222
+        "tier": 1
 	}
 }
 ```
@@ -664,85 +629,89 @@
 
 [成功]()
 
-> remaning: 剩余经验
+> remaining：剩余物资
 >
-> reward：获得经验
+> - diamond：钻石剩余数量
+> - gifts：物品剩余列表
+>   - gid：组id
+>   - mid：物品id
+>   - qty：物品数量quantity
+>
+> reward：改变物资
+>
+> - diamond：钻石消耗数量
+> - gifts：物品增加列表
+>   - gid：组id
+>   - mid：物品id
+>   - qty：物品数量quantity
+>
+> exp_info：VIP经验信息
+>
+> - exp：VIP总经验
+> - level：VIP等级
+> - need：升到下一级需要经验
 
 ```json
 {
 	"status": 0,
-	"message": "Successful signing",
+	"message": "success",
 	"data": {
-    "remaning":{"exp":50000},
-    "reward":{"exp":222}
-	}
-}
-```
-
-
-
-## get_vip_package
-
-##### 发送消息JSON格式
-
-用钻石获得vip礼包，玩家传入需要购买的vip礼包id即可计算礼包的数据
-
-> pid: 给予礼包的id
-
-```json
-{
-	"world": 0, 
-	"function": "get_vip_package",
-	"data": {
-		"token": "my toekn ^_^",
-    "pid": 1   
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-[获取资源成功]()
-
-> cost: 表示消耗的钻石数量，消耗的内容固定为钻石，数量可变
->
-> supplement：数字1，2，3，4表示补签的日期，内部则表示获得的物品与拥有的物品
-
-```json
-{
-	"status": 0,
-	"message": "Successful signing",
-	"data": {
-		"package": {
-			"iid":2,
-      "value":10
-		},
 		"remaining": {
-			"diamond": 298080
+			"diamond": 198400,
+			"gifts": [
+				{
+					"gid": 3,
+					"mid": 10,
+					"qty": 16
+				},
+				{
+					"gid": 3,
+					"mid": 29,
+					"qty": 20
+				}
+			]
 		},
 		"reward": {
-			"diamond": 480
+			"diamond": -300,
+			"gifts": [
+				{
+					"gid": 3,
+					"mid": 10,
+					"qty": 4
+				},
+				{
+					"gid": 3,
+					"mid": 29,
+					"qty": 20
+				}
+			]
+		},
+		"exp_info": {
+			"exp": 130,
+			"level": 1,
+			"need": 170
 		}
 	}
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
-* 99: 钻石不足
+* 98: Diamond insufficient（钻石不足）
+* 99: You don't have enough VIP status（VIP等级不够，无法购买那一层的礼包）
 
 
 
-## check_vip_daily_reward
+## purchase_vip_card
 
 ##### 发送消息JSON格式
 
-补签功能，把之前没有签到的天数用钻石进行补签，`补钱一天`消耗的钻石数量在配置表`check_in.json`
+购买VIP卡（暂时无消耗，直接获得VIP月卡），购买之后会记录vip卡的过期时间，没有过期时无法再次购买
 
 ```json
 {
 	"world": 0, 
-	"function": "check_vip_daily_reward",
+	"function": "purchase_vip_card",
 	"data": {
 		"token": "my toekn ^_^"
 	}
@@ -751,71 +720,95 @@
 
 ##### 接受消息JSON格式
 
-[获取资源成功]()
+[成功]()
 
-> cost: 表示消耗的钻石数量，消耗的内容固定为钻石，数量可变
+> cooling_time: 过期时间，数字为到期的秒数
 >
-> supplement：数字1，2，3，4表示补签的日期，内部则表示获得的物品与拥有的物品
+> card_id：月卡id
 
 ```json
 {
 	"status": 0,
-	"message": "Successful signing",
+	"message": "success",
 	"data": {
-		"supplement": {
-			"1": {
-				"remaining": [
-					"3:18:5"
-				],
-				"reward": [
-					"3:18:1"
-				]
-			},
-			"2": {
-				"remaining": [
-					"3:5:298180"
-				],
-				"reward": [
-					"3:5:100"
-				]
-			},
-			"3": {
-				"remaining": [
-					"3:9:2006"
-				],
-				"reward": [
-					"3:9:100"
-				]
-			},
-			"4": {
-				"remaining": [
-					"3:25:400"
-				],
-				"reward": [
-					"3:25:100"
-				]
-			},
-			"5": {
-				"remaining": [
-					"2:1:20"
-				],
-				"reward": [
-					"2:1:5"
-				]
-			}
-		},
-		"remaining": {
-			"diamond": 298080
-		},
-		"reward": {
-			"diamond": 480
-		}
+		"cooling_time": 2678400,
+		"card_id": 27
 	}
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
-* 99: 钻石不足
-* 98: 没有一天漏掉，无法补钱
+* 99: card id error（卡id错误）
+* 98: VIP card has not expired（VIP卡未过期）
+
+
+
+## check_card
+
+检查月卡等级，返回是否存在VIP月卡，月卡等级信息
+
+##### 发送消息JSON格式
+
+```python
+await check_card(uid, **kwargs)
+```
+
+##### 接受消息JSON格式
+
+```python
+min_card, max_card, perpetual_card = True, True, True
+```
+
+
+
+## increase_exp
+
+##### 发送消息JSON格式
+
+增加VIP经验exp为0则获得经验，反之取绝对值增加经验，并返回总经验和等级，升到下一级需要的经验
+
+```python
+await increase_exp(uid, exp, **kwargs)
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> exp: VIP总经验
+>
+> level：VIP等级
+>
+> need：升到下一级需要经验
+
+```json
+{
+    "exp": 130,
+    "level": 1,
+    "need": 170
+}
+```
+
+
+
+## increase_item
+
+##### 发送消息JSON格式
+
+增加物品
+
+> uid：用户id
+>
+> config：对应等级下的物品奖励信息
+
+```python
+await increase_item(uid, config, **kwargs)
+```
+
+##### 接受消息JSON格式
+
+```python
+remaining, reward = [], []
+```
 
