@@ -25,18 +25,18 @@ async def config(uid, **kwargs):
 
 ########################################## 私有 ##########################################
 async def update_item(uid, mid, bnum, **kwargs):
-	_, exp_info = await stage.increase_exp(uid, 0, **kwargs)
+	exp_info = await stage.increase_exp(uid, 0, **kwargs)
 	vnum = exp_info['level'] * bnum
 	_, rnum = await common.try_item(uid, enums.Item(mid), vnum, **kwargs)
 	return exp_info, rnum, vnum
 
 
 async def update_progress(uid, mid, bnum, **kwargs):
-	_, exp_info = await stage.increase_exp(uid, 0, **kwargs)
+	exp_info = await stage.increase_exp(uid, 0, **kwargs)
 	vnum = exp_info['level'] * bnum
 	await common.execute(f'UPDATE progress SET exp = exp + {vnum} WHERE uid = "{uid}";', **kwargs)
 	data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
-	_, exp_info = await stage.increase_exp(uid, 0, **kwargs)
+	exp_info = await stage.increase_exp(uid, 0, **kwargs)
 	return exp_info, data[0][0], vnum
 
 

@@ -5,6 +5,7 @@ player.py
 from module import mail
 from module import enums
 from module import common
+from module import stage
 
 async def create(uid, gn, **kwargs):
 	added, _ = await common.execute_update(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
@@ -24,8 +25,9 @@ async def get_account_world_info(uid, **kwargs):
 		data = await common.execute(f'SELECT `gn`, `exp` FROM `player` JOIN `progress` ON \
 				`player`.`uid` = `progress`.`uid` WHERE `player`.`uid` = "{uid}";', **kwargs)
 		if data != ():
+			exp_info = await stage.increase_exp(uid, 0, **kwargs)
 			worlds.append({'server_status' : world['status'], 'world' : world['id'], \
-					'world_name' : world['name'], 'gn' : data[0][0], 'exp' : data[0][1]})
+					'world_name' : world['name'], 'gn' : data[0][0], 'exp' : data[0][1], 'level': exp_info['level']})
 		else:
 			worlds.append({'server_status' : world['status'], 'world' : world['id'], \
 					'world_name' : world['name'], 'gn' : '', 'exp' : 0})

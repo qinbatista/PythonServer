@@ -148,7 +148,7 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'update_worker_factory', 'data': {'token': token, "worker": {"0": 0, "1": 1, "2": 0}}})
 	# response = send_tcp_message({'world': 0, 'function': 'check_boss_status', 'data': {'token': token, 'page': 1, 'item': 6}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_top_damage', 'data': {'token': token, "page": 1}})
-	# response = send_tcp_message({'world': 0, 'function': 'enter_stage', 'data': {'token': token, "stage": 3000, "damage": 110000}})
+	# response = send_tcp_message({'world': 0, 'function': 'enter_stage', 'data': {'token': token, "stage": 1, "damage": 110000}})
 	# response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, "stage": 3000, "damage": 110001}})
 	# response = send_tcp_message({'world': 0, 'function': 'invite_user_family', 'data': {'token': token, "gn_target": 'matthewtesting'}})
 	# response = send_tcp_message({'world': 0, 'function': 'respond_family', 'data': {'token': token, "key": '1573454081.M824901P5352Q255.debian'}})
@@ -190,7 +190,8 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'purchase_vip_gift', 'data': {'token': token, 'tier': 1}})
 	# response = send_tcp_message({'world': 0, 'function': 'fortune_wheel_pro', 'data': {'token': token, 'item': 5}})
 	# response = send_tcp_message({'world': 0, 'function': 'check_in', 'data': {'token': token, 'item': 5}})
-	response = send_tcp_message({'world': 0, 'function': 'supplement_check_in', 'data': {'token': token, 'item': 5}})
+	# response = send_tcp_message({'world': 0, 'function': 'supplement_check_in', 'data': {'token': token, 'item': 5}})
+	response = send_tcp_message({'world': 0, 'function': 'get_account_world_info', 'data': {'token': token, 'item': 5}})
 	print(str(response).replace("'", "\""))
 
 

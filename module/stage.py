@@ -106,7 +106,7 @@ async def e_general_stage(uid, stage, **kwargs):
 		await common.execute_update(f'UPDATE item set value = {values[i]} WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		enter_stages.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
-	_, exp_info = await increase_exp(uid, 0, **kwargs)
+	exp_info = await increase_exp(uid, 0, **kwargs)
 	seconds = energy_data['data']['cooling_time']
 	energy = {'time': get_time_format(seconds), 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
 	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'world_boss': {}, 'energy': energy, 'enemy_layout': enemy_layout, 'monster': enemy_list})
@@ -217,7 +217,7 @@ async def e_tower_stage(uid, stage, **kwargs):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		enter_stages.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
 
-	_, exp_info = await increase_exp(uid, 0, **kwargs)
+	exp_info = await increase_exp(uid, 0, **kwargs)
 	seconds = energy_data['data']['cooling_time']
 	energy = {'time': get_time_format(seconds), 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
 	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'world_boss': {}, 'energy': energy, 'enemy_layout': enemy_layout, 'monster': enemy_list})
@@ -552,17 +552,17 @@ async def increase_exp(uid, exp, **kwargs):
 	exp_config:Level configuration information
 	exp_config = self._player['player_level']['experience']
 	"""
-	exp_config = kwargs['exp_config']  # self._player['player_level']['experience']
+	exp_config = kwargs['config']['exp']['player_level']['experience']
 	exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
 	if exp_data == ():
 		await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
-		return False, {'exp': 0, 'level': 0, 'need': 0}
+		exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
 	exp_s = exp_data[0][0]
 	exp_list = [e for e in exp_config if e > exp_s]
-	if exp == 0: return True, {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
+	if exp == 0: return {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
 	exp_s += exp
 	await common.execute_update(f'UPDATE progress SET exp = {exp_s} WHERE uid = "{uid}";', **kwargs)
-	return True, {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
+	return {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
 
 
 async def increase_weapon_segment(uid, wid, segment, **kwargs):

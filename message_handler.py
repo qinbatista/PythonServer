@@ -480,7 +480,7 @@ class MessageHandler:
 
 	async def _enter_stage(self, data: dict) -> str:
 		data.update({'player_energy': self._player['energy']})  # try_energy
-		data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
+		data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts['enemyLayouts']})
 		data['monster_config'] = self._monster_config
 		data['boss_life_remaining'] = self._boss_life_remaining
 		data['boss_life'] = self._boss_life
@@ -633,7 +633,6 @@ class MessageHandler:
 		return common.mt(0, 'success', {'version': self._version})
 
 	async def _exchange_card(self, data: dict) -> str:
-		data['exp_config'] = self._player_experience['player_level']['experience']
 		return await package.exchange(data['data']['unique_id'], data['data']['card_id'], **data)
 
 	async def _get_config_card(self, data: dict) -> str:
