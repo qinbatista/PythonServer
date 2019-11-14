@@ -24,29 +24,17 @@ HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, en
 async def refresh(uid, **kwargs):
 	# kwargs.update({"tid":enums.Task.CHECK_FACTORY})
 	# await task.record_task(uid,**kwargs)
-	print(f'进入')
 	now              = datetime.now(timezone.utc)
-	print(f'测试')
 	steps, refresh_t = await steps_since(uid, now, **kwargs)
-	print(f'测试1')
 	rem, next_ref    = await remaining_seconds(uid, now, refresh_t, **kwargs)
-	print(f'测试11')
 	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds = rem), **kwargs)
-	print(f'测试111')
 	level, worker, storage = await get_state(uid, **kwargs)
-	print(f'测试1111')
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)
-	print(f'测试11111')
 	await record_resources(uid, storage, **kwargs)
-	print(f'测试2')
 	aid    = await get_armor(uid, **kwargs)
-	print(f'测试1')
 	_, aq  = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
-	print(f'测试11')
 	pool   = await remaining_pool_time(uid, now, **kwargs)
-	print(f'测试111')
 	ua, mw = await get_unassigned_workers(uid, **kwargs)
-	print(f'测试2')
 	return common.mt(0, 'success', {'steps' : steps, 'resource' : \
 			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES}, \
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}}, \
@@ -289,19 +277,18 @@ async def set_worker(uid, fid, val, **kwargs):
 			("{uid}", {fid.value}, {val}) ON DUPLICATE KEY UPDATE `workers` = {val};', **kwargs)
 
 async def get_state(uid, **kwargs):
-	data = await common.execute(f'SELECT `fid`, `level`, `workers`, `storage` FROM `factory` WHERE \
-			uid = "{uid}";', **kwargs)
-	l, w, s = {e:1 for e in enums.Factory}, {e:0 for e in enums.Factory}, {e:0 for e in enums.Factory}
+	data = await common.execute(f'SELECT `fid`, `level`, `workers`, `storage` FROM `factory` WHERE uid = "{uid}";', **kwargs)
+	l, w, s = {e: 1 for e in enums.Factory}, {e: 0 for e in enums.Factory}, {e: 0 for e in enums.Factory}
 	for f in data:
 		l[enums.Factory(f[0])] = f[1]
 		w[enums.Factory(f[0])] = f[2]
 		s[enums.Factory(f[0])] = f[3]
-	return (l, w, s)
+	return l, w, s
 
 async def get_unassigned_workers(uid, **kwargs):
 	data = await common.execute(f'SELECT `workers`, `storage` FROM `factory` WHERE uid = "{uid}" \
 			AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
-	return (data[0][0], data[0][1])
+	return data[0][0], data[0][1]
 
 
 async def record_resources(uid, storage, **kwargs):
