@@ -94,7 +94,7 @@ def login_account():#账户登陆
 
 def enter_world(token,target_world):
 	print_module("[enter_world]")
-	response = send_tcp_message({'function' : 'enter_world', 'data' : {"token":token,"target_world":target_world}})
+	response = send_tcp_message({'function' : 'enter_world','world':str(target_world), 'data' : {"token":token,"target_world":target_world}})
 	print(str(response))
 	if response["status"]==0:#已有角色，正常进入
 		return target_world
