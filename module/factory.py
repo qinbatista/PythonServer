@@ -127,7 +127,7 @@ async def buy_worker(uid, **kwargs):
 			'total' : max_worker + 1}, 'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, \
 			'reward' : -upgrade_cost}})
 
-async def upgrade(uid, fid, **kwargs):  # 测试返回98
+async def upgrade(uid, fid, **kwargs):
 	if fid not in HAS_LEVEL_FACTORIES: return common.mt(99, 'invalid fid')
 	r = await refresh(uid, **kwargs)
 	l = r['data']['level'][fid.value]
@@ -214,7 +214,7 @@ def update_state(steps, level, worker, storage, **kwargs):
 	for _ in range(steps):
 		storage = step(level, worker, storage, **kwargs)
 	delta = {k : storage[k] - initial_storage[k] for k in storage}
-	return (storage, delta)
+	return storage, delta
 
 def step(level, worker, current, **kwargs):
 	for factory in BASIC_FACTORIES:
@@ -256,16 +256,18 @@ async def steps_since(uid, now, **kwargs):
 	accel_end_t   = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)  # type => datetime or None
 	refresh_t     = await common.get_timer(uid, enums.Timer.FACTORY_REFRESH,            **kwargs)  # type => datetime or None
 	if refresh_t is None:
-		return (0, now)
+		return 0, now
 	if accel_end_t is None or now >= accel_end_t:  # 现在时间和工厂加速结束时间比较，如果加速卡结束了
 		accel_start_t, accel_end_t = refresh_t, refresh_t  # 加速卡的开始时间和结束时间都设置为刷新时间
 	def sb(b, s, step):
 		return int((b - s).total_seconds()) // step
 	delta = kwargs['config']['factory']['general']['step']  # 跳跃步
-	steps = int(sb(max(accel_start_t, refresh_t), refresh_t, delta) + \
-			sb(min(accel_end_t, now), max(accel_start_t, refresh_t), delta / 2) + \
-			sb(now, min(accel_end_t, now), delta))
-	return (steps, refresh_t)
+	steps = int(
+		sb(max(accel_start_t, refresh_t), refresh_t, delta) + \
+		sb(min(accel_end_t, now), max(accel_start_t, refresh_t), delta / 2) + \
+		sb(now, min(accel_end_t, now), delta)
+	)
+	return steps, refresh_t
 
 async def get_armor(uid, **kwargs):
 	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND \

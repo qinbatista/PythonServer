@@ -28,7 +28,7 @@
 
 ##### 接受消息JSON格式
 
-> `steps`: the number of steps since the last refresh（自上次刷新后剩余的次数）
+> `steps`: the number of steps since the last refresh（ 上次刷新的步骤数 ）
 >
 > `resource`: contains FOOD, IRON, CRYSTAL factories.（含有食品、铁、水晶的工厂）
 >
@@ -56,51 +56,48 @@
 > - `Factory ID` : `level`
 >
 > `pool` : number of seconds remaining until the wishing pool refreshes（许愿池刷新之前剩余的秒数）
+>
+> next_refresh：更新剩余时间（秒）
 
 ```json
 {
-	"status" : 0, 
-	"message": "factory refreshed",
-	"data"   :
-	{
-		"steps"    : 28,
-		"resource" :
-		{
-			"remaining" :
-			{
-				"0" : 253,
-				"1" :   2,
-				"2" : 182
+	"status": 0,
+	"message": "success",
+	"data": {
+		"steps": 0,
+		"resource": {
+			"remaining": {
+				"0": 0,
+				"1": 0,
+				"2": 0
 			},
-			"reward" :
-			{
-				"0" : -53,
-				"1" :   1,
-				"2" :  10
+			"reward": {
+				"0": 0,
+				"1": 0,
+				"2": 0
 			}
 		},
-		"armor" :
-		{
-			"aid"       : 2,
-			"remaining" : 5,
-			"reward"    : 1
+		"armor": {
+			"aid": 1,
+			"remaining": 0,
+			"reward": 0
 		},
-		"worker" :
-		{
-			"total"      : 5,
-			"-1"         : 1,
-			"0"          : 1,
-			"1"          : 1,
-			"2"          : 1,
+		"pool": 0,
+		"next_refresh": 10,
+		"worker": {
+			"-1": 5,
+			"total": 5,
+			"2": 0,
+			"3": 0,
+			"1": 0,
+			"0": 0
 		},
-		"level" :
-		{
-			"0"  : 3,
-			"1"  : 1,
-			"2"  : 2,
-			"-2" : 1
-		},
-		"pool" : 15530
+		"level": {
+			"0": 1,
+			"1": 1,
+			"2": 1,
+			"-2": 1
+		}
 	}
 }
 ```
@@ -126,6 +123,17 @@
 ```
 
 ##### 接受消息JSON格式
+
+> refresh：刷新的数据
+>
+> - resource：资源变化情况
+> - armor：盔甲变化情况
+>
+> upgrade：升级工厂的部分信息
+>
+> - cost：消耗品消耗数量
+> - fid：工厂id
+> - level：工厂现在的等级
 
 ```json
 {
@@ -248,7 +256,7 @@
 
 ##### 发送消息JSON格式
 
-> aid: 护甲的id值
+> aid: 盔甲id
 
 ```json
 {
@@ -264,7 +272,18 @@
 
 ##### 接受消息JSON格式
 
-> aid: 护甲的id值
+> refresh: 更新获得的数据信息
+>
+> - resource：资源最后结果
+> - reward：资源改变信息
+>
+> armor：盔甲信息
+>
+> - aid：基础盔甲id
+> - remaining：盔甲剩余量
+> - reward：盔甲改变量
+>
+> aid：转换成的盔甲id
 
 ```json
 {
@@ -305,7 +324,7 @@
 
 返回工厂的配置信息，主要内容为工厂的等级信息和消耗详情, 返回的配置文件来自factory.json
 
-#####发送消息JSON格式
+##### 发送消息JSON格式
 
 > 无
 
@@ -355,7 +374,7 @@
 
 ##### 接受消息JSON格式
 
-> worker：工人的详细内容，`unassigned`没有工作的工人，`total`工人总数
+> worker：工人的详细内容，`unassigned`（`-1`）没有工作的工人，`total`工人总数
 >
 > food: 食物的详细信息，`remaining`剩余食物，`reward`食物改变量
 
@@ -692,10 +711,10 @@
 
 ##### 接受消息JSON格式
 
->
-> `count`   : the number of times the non-free wishing pool has been used
-> `diamond` : the cost of the next non-free wishing pool
+>`count`   : the number of times the non-free wishing pool has been used（ 使用免费许愿池的次数 ）
+> `diamond` : the cost of the next non-free wishing pool（下一个非免费许愿池的消耗数量）
 > 
+> pool：许愿池剩余冷却时间
 
 ```json
 {
