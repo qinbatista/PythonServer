@@ -111,7 +111,6 @@ class MessageHandler:
 		message['accountdb'] = resource['accountdb']
 		message['tokenserverbaseurl'] = TOKEN_BASE_URL
 		message['mailserverbaseurl'] = MAIL_BASE_URL
-		message['world'] = '0'
 		message['config'] = configs  ############configs#################
 		return json.dumps(await fn(self, message))
 
