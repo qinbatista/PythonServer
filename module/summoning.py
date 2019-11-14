@@ -30,7 +30,7 @@ async def summon_multi(uid, item, tier, rewardgroup, num_times = 10, **kwargs):
 ##############################################################
 
 async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
-	if f'{enums.Group.ITEM.value}:{item.value}' not in kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'].keys(): return common.mt(98, f'error item:{item}')
+	if f'{enums.Group.ITEM.value}:{item.value}' not in kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'][tier.name].keys(): return common.mt(98, f'error item:{item}')
 	cost = kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'][tier.name][f'{enums.Group.ITEM.value}:{item.value}']
 	can_pay, remaining = await common.try_item(uid, item, -cost, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient materials')
@@ -51,7 +51,7 @@ async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
 	return await _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)
 
 async def _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs):
-	if f'{enums.Group.ITEM.value}:{item.value}' not in kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'].keys(): return common.mt(98, f'error item:{item}')
+	if f'{enums.Group.ITEM.value}:{item.value}' not in kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'][tier.name].keys(): return common.mt(98, f'error item:{item}')
 	cost = kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'][tier.name][f'{enums.Group.ITEM.value}:{item.value}']
 	can_pay, remaining = await common.try_item(uid, item, -cost * num_times, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient materials')
