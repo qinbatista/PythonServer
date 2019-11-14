@@ -21,7 +21,7 @@ class WorkerResources:
 	async def init(self):
 		self.resources['session'] = aiohttp.ClientSession()
 		self.resources['redis'] = await aioredis.create_redis(self.cfg['redis']['addr'])
-		self.resources['db'] = await aiomysql.create_pool(maxsize = 10, host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'experimental')
+		self.resources['db'] = await aiomysql.create_pool(maxsize = 10, host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True)
 		self.resources['accountdb'] = await aiomysql.create_pool(maxsize = 4, host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'user')
 
 	async def shutdown(self):
