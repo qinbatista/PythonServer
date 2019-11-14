@@ -40,11 +40,17 @@ async def _try_unlock_weapon(uid, gift, **kwargs):
 	if weapon.name in kwargs['config']['weapon']['star_4']:
 		kwargs.update({"aid": enums.Achievement.GET_4_STAR_WEAPON})
 		await achievement.record_achievement(uid,**kwargs)
+		kwargs.update({"aid": enums.Achievement.SUMMON_4_STAR_WEAPON_TIMES})
+		await achievement.record_achievement(uid,**kwargs)
 	if weapon.name in kwargs['config']['weapon']['star_5']:
 		kwargs.update({"aid": enums.Achievement.GET_5_STAR_WEAPON})
 		await achievement.record_achievement(uid,**kwargs)
+		kwargs.update({"aid": enums.Achievement.SUMMON_5_STAR_WEAPON_TIMES})
+		await achievement.record_achievement(uid,**kwargs)
 	if weapon.name in kwargs['config']['weapon']['star_6']:
 		kwargs.update({"aid": enums.Achievement.GET_6_STAR_WEAPON})
+		await achievement.record_achievement(uid,**kwargs)
+		kwargs.update({"aid": enums.Achievement.SUMMON_6_STAR_WEAPON_TIMES})
 		await achievement.record_achievement(uid,**kwargs)
 	if not await common.exists('weapon', ('uid', uid), ('wid', weapon.value), **kwargs):
 		await common.execute(f'INSERT INTO weapon(uid, wid) VALUES ("{uid}", {weapon.value});', **kwargs)
@@ -65,11 +71,17 @@ async def _try_unlock_role(uid, gift, **kwargs):
 	if role.name in kwargs['config']['role']['star_4']:
 		kwargs.update({"aid": enums.Achievement.GET_4_STAR_ROLE})
 		await achievement.record_achievement(uid,**kwargs)
+		kwargs.update({"aid": enums.Achievement.SUMMON_4_STAR_ROLE_TIMES})
+		await achievement.record_achievement(uid,**kwargs)
 	if role.name in kwargs['config']['role']['star_5']:
 		kwargs.update({"aid": enums.Achievement.GET_5_STAR_ROLE})
 		await achievement.record_achievement(uid,**kwargs)
+		kwargs.update({"aid": enums.Achievement.SUMMON_5_STAR_ROLE_TIMES})
+		await achievement.record_achievement(uid,**kwargs)
 	if role.name in kwargs['config']['role']['star_6']:
 		kwargs.update({"aid": enums.Achievement.GET_6_STAR_ROLE})
+		await achievement.record_achievement(uid,**kwargs)
+		kwargs.update({"aid": enums.Achievement.SUMMON_6_STAR_ROLE_TIMES})
 		await achievement.record_achievement(uid,**kwargs)
 	if not await common.exists('role', ('uid', uid), ('rid', role.value), **kwargs):
 		await common.execute(f'INSERT INTO role(uid, rid) VALUES ("{uid}", {role.value});', **kwargs)

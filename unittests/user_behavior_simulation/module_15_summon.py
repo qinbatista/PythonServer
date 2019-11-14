@@ -27,7 +27,7 @@ def basic_summon(**kwargs):
 
 @login_decoration
 def pro_summon(**kwargs):
-	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,12])}})
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon', 'data' : {'token' : kwargs['token'],"item":random.choice([5,5,5])}})
 	logger.debug(response)
 
 @login_decoration
@@ -57,7 +57,7 @@ def basic_summon_role(**kwargs):
 
 @login_decoration
 def pro_summon_role(**kwargs):
-	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon_role', 'data' : {'token' : kwargs['token'],"item":random.choice([1,5,12])}})
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon_role', 'data' : {'token' : kwargs['token'],"item":random.choice([5,5,5])}})
 	logger.debug(response)
 
 @login_decoration
@@ -102,7 +102,7 @@ def basic_summon_role_10_times(**kwargs):
 
 @login_decoration
 def pro_summon_role_10_times(**kwargs):
-	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon_role_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([1,3,12])}})#能量包，1是1张， 2是3张，3是10张
+	response = send_tcp_message({'world' : kwargs['world'], 'function' : 'pro_summon_role_10_times', 'data' : {'token' : kwargs['token'],"item":random.choice([5,5,5])}})#能量包，1是1张， 2是3张，3是10张
 	logger.debug(response)
 
 @login_decoration
@@ -111,29 +111,29 @@ def friend_summon_role_10_times(**kwargs):
 	logger.debug(response)
 
 def summon_dialog(**kwargs):
-	basic_summon(**kwargs)
-	pro_summon(**kwargs)
-	friend_summon(**kwargs)
+	# basic_summon(**kwargs)
+	# pro_summon(**kwargs)
+	# friend_summon(**kwargs)
 
-	basic_summon_skill(**kwargs)
-	pro_summon_skill(**kwargs)
-	friend_summon_skill(**kwargs)
+	# basic_summon_skill(**kwargs)
+	# pro_summon_skill(**kwargs)
+	# friend_summon_skill(**kwargs)
 
-	basic_summon_role(**kwargs)
-	pro_summon_role(**kwargs)
-	friend_summon_role(**kwargs)
+	# basic_summon_role(**kwargs)
+	# pro_summon_role(**kwargs)
+	# friend_summon_role(**kwargs)
 
-	basic_summon_10_times(**kwargs)
-	pro_summon_10_times(**kwargs)
-	friend_summon_10_times(**kwargs)
+	# basic_summon_10_times(**kwargs)
+	# pro_summon_10_times(**kwargs)
+	# friend_summon_10_times(**kwargs)
 
-	basic_summon_skill_10_times(**kwargs)
-	pro_summon_skill_10_times(**kwargs)
-	friend_summon_skill_10_times(**kwargs)
+	# basic_summon_skill_10_times(**kwargs)
+	# pro_summon_skill_10_times(**kwargs)
+	# friend_summon_skill_10_times(**kwargs)
 
-	basic_summon_role_10_times(**kwargs)
+	# basic_summon_role_10_times(**kwargs)
 	pro_summon_role_10_times(**kwargs)
-	friend_summon_role_10_times(**kwargs)
+	# friend_summon_role_10_times(**kwargs)
 
 
 
