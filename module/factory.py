@@ -22,8 +22,8 @@ HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, en
 
 
 async def refresh(uid, **kwargs):
-	kwargs.update({"tid":enums.Task.CHECK_FACTORY})
-	await task.record_task(uid,**kwargs)
+	# kwargs.update({"tid":enums.Task.CHECK_FACTORY})
+	# await task.record_task(uid,**kwargs)
 	now              = datetime.now(timezone.utc)
 	steps, refresh_t = await steps_since(uid, now, **kwargs)
 	rem, next_ref    = await remaining_seconds(uid, now, refresh_t, **kwargs)
@@ -34,7 +34,9 @@ async def refresh(uid, **kwargs):
 	aid    = await get_armor(uid, **kwargs)
 	_, aq  = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
 	pool   = await remaining_pool_time(uid, now, **kwargs)
+	print(f'测试1')
 	ua, mw = await get_unassigned_workers(uid, **kwargs)
+	print(f'测试2')
 	return common.mt(0, 'success', {'steps' : steps, 'resource' : \
 			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES}, \
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}}, \
@@ -252,16 +254,16 @@ async def remaining_seconds(uid, now, refresh_t, **kwargs):
 	return (remainder, next_ref)
 
 async def steps_since(uid, now, **kwargs):
-	accel_start_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)
-	accel_end_t   = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
-	refresh_t     = await common.get_timer(uid, enums.Timer.FACTORY_REFRESH,            **kwargs)
+	accel_start_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)  # type => datetime or None
+	accel_end_t   = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)  # type => datetime or None
+	refresh_t     = await common.get_timer(uid, enums.Timer.FACTORY_REFRESH,            **kwargs)  # type => datetime or None
 	if refresh_t is None:
 		return (0, now)
-	if accel_end_t is None or now >= accel_end_t:  # 时间比较
-		accel_start_t, accel_end_t = refresh_t, refresh_t
+	if accel_end_t is None or now >= accel_end_t:  # 现在时间和工厂加速结束时间比较，如果加速卡结束了
+		accel_start_t, accel_end_t = refresh_t, refresh_t  # 加速卡的开始时间和结束时间都设置为刷新时间
 	def sb(b, s, step):
 		return int((b - s).total_seconds()) // step
-	delta = kwargs['config']['factory']['general']['step']
+	delta = kwargs['config']['factory']['general']['step']  # 跳跃步
 	steps = int(sb(max(accel_start_t, refresh_t), refresh_t, delta) + \
 			sb(min(accel_end_t, now), max(accel_start_t, refresh_t), delta / 2) + \
 			sb(now, min(accel_end_t, now), delta))
