@@ -55,9 +55,11 @@
 >
 > - `Factory ID` : `level`
 >
-> `pool` : number of seconds remaining until the wishing pool refreshes（许愿池刷新之前剩余的秒数）
+> `pool` : number of seconds remaining until the wishing pool refreshes（许愿池下次刷新时间）
 >
 > next_refresh：更新剩余时间（秒）
+>
+> next_refresh： 整个工厂下次刷新的剩余时间
 
 ```json
 {
