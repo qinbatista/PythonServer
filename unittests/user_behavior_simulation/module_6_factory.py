@@ -63,7 +63,7 @@ def factory_dialog(token,world,get_all_weapon):
 			new_response = send_tcp_message({'world' : world, 'function' : 'get_config_factory', 'data' : {'token' : token}})
 			logger.debug(str(new_response))
 		elif int_number=="9":# 更新工厂工人
-			new_response = send_tcp_message({'world' : world, 'function' : 'update_worker_factory', 'data' : {'token' : token, "worker": {"0": 0, "1": 1, "2": 0}}})
+			new_response = send_tcp_message({'world' : world, 'function' : 'update_worker_factory', 'data' : {'token' : token, "worker": {"0": 3, "1": 1, "2": 1}}})
 			logger.debug(str(new_response))
 		else:
 			logger.debug("输入错误")

@@ -557,12 +557,17 @@ async def increase_exp(uid, exp, **kwargs):
 	if exp_data == ():
 		await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
 		exp_data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
+
 	exp_s = exp_data[0][0]
 	exp_list = [e for e in exp_config if e > exp_s]
-	if exp == 0: return {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
+	level, need = exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), exp_list[0] - exp_s if exp_list != [] else 0
+	if exp == 0: return {'exp': exp_s, 'level': level, 'need': need}
+
 	exp_s += exp
+	exp_list = [e for e in exp_config if e > exp_s]
+	level, need = exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), exp_list[0] - exp_s if exp_list != [] else 0
 	await common.execute_update(f'UPDATE progress SET exp = {exp_s} WHERE uid = "{uid}";', **kwargs)
-	return {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
+	return {'exp': exp_s, 'level': level, 'need': need}
 
 
 async def increase_weapon_segment(uid, wid, segment, **kwargs):

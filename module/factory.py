@@ -8,6 +8,7 @@ from module import enums
 from module import common
 from module import weapon
 from module import task
+from module import achievement
 from datetime import datetime, timezone, timedelta
 
 BASIC_FACTORIES      = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
@@ -35,6 +36,15 @@ async def refresh(uid, **kwargs):
 	_, aq  = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
 	pool   = await remaining_pool_time(uid, now, **kwargs)
 	ua, mw = await get_unassigned_workers(uid, **kwargs)
+
+	for k in RESOURCE_FACTORIES:
+		if delta[k] == 0: continue
+		if k == enums.Factory.FOOD: kwargs.update({"aid": enums.Achievement.COLLECT_FOOD})
+		elif k == enums.Factory.IRON: kwargs.update({"aid": enums.Achievement.COLLECT_MINE})
+		elif k == enums.Factory.CRYSTAL: kwargs.update({"aid": enums.Achievement.COLLECT_CRYSTAL})
+		else: continue
+		await achievement.record_achievement(kwargs['data']['unique_id'], achievement_value=delta[k], **kwargs)
+
 	return common.mt(0, 'success', {'steps' : steps, 'resource' : \
 			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES}, \
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}}, \
@@ -140,6 +150,14 @@ async def upgrade(uid, fid, **kwargs):
 	if crystal < upgrade_cost:
 		return common.mt(98, 'insufficient funds', {'refresh' : {'resource' : r['data']['resource'], \
 				'armor' : r['data']['armor']}})
+	if fid == enums.Factory.FOOD.value:
+		kwargs["aid"] = enums.Achievement.COLLECT_FOOD
+	elif fid == enums.Factory.IRON.value:
+		kwargs["aid"] = enums.Achievement.COLLECT_MINE
+	elif fid == enums.Factory.CRYSTAL.value:
+		kwargs["aid"] = enums.Achievement.COLLECT_CRYSTAL
+	else: kwargs["aid"] = 0
+	if kwargs["aid"]: await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
 	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `level`) VALUES ("{uid}", {fid.value}, \
 			{l + 1}) ON DUPLICATE KEY UPDATE `level` = {l + 1};', **kwargs)
 	await common.execute(f'UPDATE `factory` SET `storage` = {crystal - upgrade_cost} WHERE `uid` = "{uid}" \
