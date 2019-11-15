@@ -2,12 +2,12 @@
 
 * [`refresh_factory`](#refresh_factory)
 * [`upgrade_factory`](#upgrade_factory)
-* [`set_armor_factory`](#set_armor_factory)
+* [`^set_armor_factory`](#set_armor_factory)
 * [`get_config_factory`](#get_config_factory)
 * [`buy_worker_factory`](#buy_worker_factory)
-* [`update_worker_factory`](#update_worker_factory)
+* [`^update_worker_factory`](#update_worker_factory)
 * [`buy_acceleration_factory`](#buy_acceleration_factory)
-* [`activate_wishing_pool_factory`](#activate_wishing_pool_factory)
+* [`^activate_wishing_pool_factory`](#activate_wishing_pool_factory)
 
 ## refresh_factory
 
