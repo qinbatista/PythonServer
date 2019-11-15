@@ -192,7 +192,8 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'check_in', 'data': {'token': token, 'item': 5}})
 	# response = send_tcp_message({'world': 0, 'function': 'supplement_check_in', 'data': {'token': token, 'item': 5}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_account_world_info', 'data': {'token': token, 'item': 5}})
-	response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, 'item': 1}})
+	# response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, 'item': 1}})
+	response = send_tcp_message({'world': 0, 'function': 'get_account_world_info', 'data': {'token': token, 'item': 1}})
 	print(str(response).replace("'", "\""))
 
 

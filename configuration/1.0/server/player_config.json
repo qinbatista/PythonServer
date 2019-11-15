@@ -168,31 +168,5 @@
 		"diamond_refresh_store":{
 			"diamond": 100
 		}
-	},
-	"card": {
-		"coin_card": {
-			"material": "coin",
-			"quantity": 2000
-		},
-		"exp_card": {
-			"material": "experience",
-			"quantity": 1000
-		},
-		"food_card": {
-			"material": "food",
-			"quantity": 200
-		},
-		"mine_card": {
-			"material": "iron",
-			"quantity": 100
-		},
-		"crystal_card": {
-			"material": "crystal",
-			"quantity": 20
-		},
-		"diamond_card": {
-			"material": "diamond",
-			"quantity": 10
-		}
 	}
 }
