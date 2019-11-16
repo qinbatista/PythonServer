@@ -178,11 +178,11 @@ async def increase_exp(uid, exp, **kwargs):
 		await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
 	exp_s = exp_data[0][0]
 	exp_list = [e for e in exp_config if e > exp_s]
-
-	achievement_value = await common.execute(f'SELECT value FROM achievement WHERE uid="{uid}" and aid = "{enums.Achievement.VIP_LEVEL}"',**kwargs)
-	if achievement_value==():exp_data = await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {0},0) ON DUPLICATE KEY UPDATE `value`= {0}',**kwargs)
+	achievement_value = await common.execute(f'SELECT value FROM achievement WHERE uid="{uid}" and aid = "{enums.Achievement.VIP_LEVEL.value}"',**kwargs)
+	if achievement_value==():
+		exp_data = await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {enums.Achievement.VIP_LEVEL.value}, {0},0) ON DUPLICATE KEY UPDATE `value`= {0}',**kwargs)
 	else:
-		if achievement_value[0][0]< exp_config.index(exp_list[0]):exp_data = await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {exp_config.index(exp_list[0])},0) ON DUPLICATE KEY UPDATE `value`= {exp_config.index(exp_list[0])}',**kwargs)
+		if achievement_value[0][0]< exp_config.index(exp_list[0]):exp_data = await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {enums.Achievement.VIP_LEVEL.value}, {exp_config.index(exp_list[0])},0) ON DUPLICATE KEY UPDATE `value`= {exp_config.index(exp_list[0])}',**kwargs)
 
 	if exp == 0: return {'exp': exp_s, 'level': exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), 'need': exp_list[0] - exp_s if exp_list != [] else 0}
 	exp_s += exp
