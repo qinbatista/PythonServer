@@ -6,7 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
-import module_1_login
+
 import random
 import pymysql
 lukseun = tool_lukseun_client.LukseunClient('aliya',port = 8880)

@@ -21,12 +21,12 @@ def send_tcp_message(msg):
 def enter_stage(**kwargs):
 	print("stage:"+str(kwargs['stage']))
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
-	print_method("[enter_stage]"+str(response))
+	print("[enter_stage]"+str(response))
 
 def pass_stage(**kwargs):
 	print("stage:"+str(kwargs['stage']))
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'pass_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
-	print_method("[pass_stage]"+str(response))
+	print("[pass_stage]"+str(response))
 
 def start_hang_up(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'start_hang_up', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
@@ -44,18 +44,24 @@ def enter_stage(**kwargs):
 	response = send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
 	print("[enter_stage]"+str(response))
 
+def get_top_damage(**kwargs):
+	response = send_tcp_message({'world': 0, 'function': 'get_top_damage', 'data': {'token': token, "page": 1}})
+	print("[get_top_damage]"+str(response))
+
 def stage_dialog(token,world,info_list):
 	# while True:
-	my_choice =  random.randint(7,7)
-	opeation_stage = random.randint(0,2)
-	if my_choice==0: enter_stage(**{"world":world,"token":token,"stage":opeation_stage})
-	if my_choice==1: pass_stage(**{"world":world,"token":token,"stage":opeation_stage})
-	if my_choice==2: start_hang_up(**{"world":world,"token":token,"stage":opeation_stage})
-	if my_choice==3: get_hang_up_reward(**{"world":world,"token":token,"stage":opeation_stage})
+	my_choice =  random.randint(1,1)
+	normal_stage = random.randint(1,1)
+	boss_stage = 3000
+	if my_choice==0: enter_stage(**{"world":world,"token":token,"stage":normal_stage})
+	if my_choice==1: pass_stage(**{"world":world,"token":token,"stage":normal_stage})
+	if my_choice==2: start_hang_up(**{"world":world,"token":token,"stage":normal_stage})
+	if my_choice==3: get_hang_up_reward(**{"world":world,"token":token,"stage":normal_stage})
 	if my_choice==4: pass#break
 	if my_choice==5: check_boss_status(**{"world":world,"token":token})
-	if my_choice==6: enter_stage(**{"world":world,"token":token,"stage":3000})
-	if my_choice==7: pass_stage(**{"world":world,"token":token,"stage":3000,"damage":30000})
+	if my_choice==6: enter_stage(**{"world":world,"token":token,"stage":boss_stage})
+	if my_choice==7: pass_stage(**{"world":world,"token":token,"stage":boss_stage,"damage":random.randint(0,10000)})
+	if my_choice==8: get_top_damage(**{"world":world,"token":token})
 
 if __name__ == '__main__':
 	unique_id = '1'

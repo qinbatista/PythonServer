@@ -131,7 +131,7 @@ async def p_general_stage(uid, stage, **kwargs):
 			stage = i
 			break
 	if stage not in stages: return common.mt(96, 'No stage config file')
-	pass_reward = pass_rewards[str(max(stage))]
+	pass_reward = pass_rewards[str(stage)]
 
 	p_exp = {'remaining': -1, 'reward': -1}
 	for key, value in pass_reward.items():
