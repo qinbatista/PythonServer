@@ -101,7 +101,7 @@ async def update_worker(uid, workers, **kwargs):
 	l, w, _ = await get_state(uid, **kwargs)
 	ua, mw = await get_unassigned_workers(uid, **kwargs)
 	r_ret = {'resource' : r['data']['resource'], 'armor' : r['data']['armor'], \
-			'next_refresh' : r['data']['next_refresh']}
+			'next_refresh' : r['data']['next_refresh'], 'time': r['data']['time']}
 
 	# sum workers <= max_worker else: return refresh + current workers
 	uw = sum(w for w in workers.values())
