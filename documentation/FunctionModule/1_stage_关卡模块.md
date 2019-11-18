@@ -5,6 +5,7 @@
 * [`get_hang_up_info`](##get_hang_up_info)
 * [`enter_stage`](##enter_stage)
 * [`pass_stage`](##pass_stage)
+* [`get_top_damage`](##get_top_damage)
 
 ## start_hang_up
 

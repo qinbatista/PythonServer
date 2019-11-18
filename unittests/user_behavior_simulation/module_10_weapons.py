@@ -6,7 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client as tc
 import random
-import module_12_store
+
 lukseun = tc.LukseunClient('aliya',  port = 8880)
 logger = tc.logger
 
@@ -51,11 +51,6 @@ def get_random_weapon():
 				else:
 					break
 
-def purchase_item_success(item_id):
-	if item_id =="coin":
-		module_12_store.purchase_coin()
-	else:
-		module_12_store.purchase_basic_summon_scroll()
 def weapon_dialog(_token,_world,get_all_skill_info):
 	global token, world
 	token = _token

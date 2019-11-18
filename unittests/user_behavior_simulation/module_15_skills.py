@@ -6,7 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client as tc
 import random
-import module_12_store
+
 
 lukseun = tc.LukseunClient('aliya',  port = 8880)
 world = "0"
