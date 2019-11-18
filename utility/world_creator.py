@@ -5,6 +5,7 @@ world_creator.py
 import os
 import mailbox
 import pymysql
+import json
 
 
 ACHIEVEMENT = \
@@ -154,6 +155,7 @@ CREATE TABLE `progress` (
 	  `towerstage` smallint(6) DEFAULT 1000 COMMENT '冲塔最高关卡',
 	  `hangstage` smallint(6) DEFAULT 0 COMMENT '当前挂机的关卡',
 	  `vipexp` smallint(6) DEFAULT 0 COMMENT 'vip经验',
+	  `unstage` smallint(6) DEFAULT 0 COMMENT '正在进行的关卡',
 	  PRIMARY KEY (`uid`),
 	  CONSTRAINT `fk_progress_t1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -326,8 +328,28 @@ def create_world(world):
 	create_mailbox(world)
 
 
+def loc():
+	return os.path.dirname(os.path.realpath(__file__))
+
+
+def save_world_config(world, path):
+	data = json.load(open(path, encoding='utf-8'))
+	data['worlds'].append({
+		"status" : 0,
+		"id"     : world,
+		"name"   : f"world {world}"
+	})
+	with open(path, 'w', encoding='utf-8') as f:
+		f.write(json.dumps(data))
+
 
 if __name__ == '__main__':
-	create_world(input('Enter world name: '))
+	path = os.path.join(loc(), '../configuration/1.0/server/world.json')
+	# path = loc() + '/../configuration/1.0/server/world.json'
+	for i in range(1, 10):
+		world = f's{i}'
+		create_world(world)
+		save_world_config(world, path)
+	# create_world(input('Enter world name: '))
 
 
