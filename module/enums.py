@@ -247,6 +247,7 @@ class Timer(enum.IntEnum):
 	REQUEST_FRIEND_TIME = 19
 	VIP_COOLING_TIME = 20  # VIP礼包领取冷却结束时间
 	CONTINUOUS_LOGIN = 21
+	MAIL_LAST_SENT = 22 # last time user sent SIMPLE mail to another player
 
 
 class Limits(enum.IntEnum):
@@ -258,6 +259,7 @@ class Limits(enum.IntEnum):
 	REQUEST_FRIEND_LIMITS = 6
 	BUY_ENERGY_LIMITS = 7  # 购买体力上限次数键
 	BUY_STAGE_LIMITS = 8  # 购买副本上限次数键
+	MAIL_DAILY_SEND = 9
 
 
 class Achievement(enum.IntEnum):

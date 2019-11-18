@@ -48,8 +48,18 @@ async def delete_read(uid, **kwargs):
 	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/delete_read', data = {'world' : kwargs['world'], 'uid' : uid}) as resp:
 		return await resp.json(content_type = 'text/json')
 
+async def send_mail_public(uid, gn_target, **kwargs):
+	res = await send_mail(enums.MailType.SIMPLE, await common.get_uid(gn_target, **kwargs), \
+			from_ = await common.get_gn(uid, **kwargs), **kwargs)
+	return common.mt(0 if res else 99, 'success' if res else 'error')
+
 
 #################################################################################################
+
+async def get_daily_send_limit(uid, **kwargs):
+	limit = await common.get_limit(uid, enums.Limits.MAIL_DAILY_SEND, **kwargs)
+	return limit if limit is not None else 0
+
 
 async def _send_mail(mail, **kwargs):
 	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/send', json = mail) as resp:
