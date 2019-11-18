@@ -247,6 +247,7 @@ class Timer(enum.IntEnum):
 	REQUEST_FRIEND_TIME = 19
 	VIP_COOLING_TIME = 20  # VIP礼包领取冷却结束时间
 	CONTINUOUS_LOGIN = 21
+	MAIL_LAST_SENT = 22 # last time user sent SIMPLE mail to another player
 
 
 class Limits(enum.IntEnum):
