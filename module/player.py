@@ -33,13 +33,21 @@ async def get_account_world_info(uid, **kwargs):
 					'world_name' : world['name'], 'gn' : '', 'exp' : 0})
 	return common.mt(0, 'success', {'worlds' : worlds})
 
+async def accept_gifts(uid, keys, **kwargs):
+	error, success = [], {}
+	for key in keys:
+		valid, resp = await accept_gift(uid, key, **kwargs)
+		if valid: success[key] = {k : v for k, v in resp.items()}
+		else: error.append(key)
+	return common.mt(0, 'success', {'error' : error, 'success' : success})
+
 async def accept_gift(uid, nonce, **kwargs):
+	await mail.mark_read(uid, nonce, **kwargs)
 	gift = await _lookup_nonce(nonce, **kwargs)
-	if not gift: return common.mt(99, 'invalid nonce')
+	if not gift: return (False, None) 
 	item = common.decode_items(gift)
 	_, remaining = await common.try_item(uid, item[0][1], item[0][2], **kwargs)
-	await mail.mark_read(uid, nonce, **kwargs)
-	return common.mt(0, 'success', {'items' : [{'iid' : item[0][1].value, 'value' : remaining}]})
+	return (True, {'gid' : item[0][0], 'id' : item[0][1], 'remaining' : remaining, 'reward' : item[0][2]})
 
 async def change_name(uid, name, **kwargs):
 	pass
