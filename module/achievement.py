@@ -21,7 +21,7 @@ async def get_all_achievement(uid, **kwargs):
 					 {'achievements': [{'aid': a[0], 'value': a[1], 'reward': a[2]} for a in achievement]})
 
 
-async def record_achievement(uid, **kwargs):  # aid->enums.Achievement,value->string
+async def record_achievement(uid, achievement_value=1, **kwargs):  # aid->enums.Achievement,value->string
 	if kwargs["aid"] == enums.Achievement.TOTAL_LOGIN:
 		timer_data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.CONTINUOUS_LOGIN}";', **kwargs)
 		current_time = datetime.now().strftime("%Y-%m-%d")
@@ -42,7 +42,7 @@ async def record_achievement(uid, **kwargs):  # aid->enums.Achievement,value->st
 			await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {enums.Achievement.KEEPING_LOGIN}, {1},0) ON DUPLICATE KEY UPDATE `value`= {1}',**kwargs)
 			await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.CONTINUOUS_LOGIN}, "{current_time}") ON DUPLICATE KEY UPDATE `time`= "{current_time}"',**kwargs)
 	else:
-		await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {1},0) ON DUPLICATE KEY UPDATE `value`= `value`+{1}',**kwargs)
+		await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {achievement_value},0) ON DUPLICATE KEY UPDATE `value`= `value`+{achievement_value}',**kwargs)
 	return common.mt(0, 'record:' + str(kwargs["aid"]) + " success")
 
 

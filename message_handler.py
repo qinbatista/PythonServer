@@ -136,9 +136,6 @@ class MessageHandler:
 	async def _verify_email_code(self, data: dict) -> str:
 		return await account.verify_email_code(data['data']['unique_id'], data['data']['code'], **data)
 
-	# TODO
-
-
 
 	async def _get_player_config(self, data: dict) -> str:
 		return common.mt(0, 'success', {'player_config': self._player})
@@ -618,7 +615,7 @@ class MessageHandler:
 
 	async def _get_config_player(self, data: dict) -> str:
 		data.update({"task_id":enums.Task.LOGIN})
-		await task.record_task(data['data']['unique_id'],**data)
+		await task.record_task(data['data']['unique_id'], **data)
 
 		data.update({"aid":enums.Achievement.TOTAL_LOGIN})
 		await achievement.record_achievement(data['data']['unique_id'],**data)
