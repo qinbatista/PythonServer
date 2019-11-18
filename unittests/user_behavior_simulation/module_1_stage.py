@@ -68,14 +68,15 @@ if __name__ == '__main__':
 	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': unique_id}})
 	print(response)
 	token = response['data']['token']
-	response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, 'stage': 3000, 'damage': 30000}})
+	# response = send_tcp_message({'world': 0, 'function': 'enter_stage', 'data': {'token': token, 'stage': 3, 'damage': 30000}})
+	# response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, 'stage': 3, 'damage': 30000}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_config_stage', 'data': {'token': token, 'stage': 2}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_config_player', 'data': {'token': token}})
-	print(str(response))
-	# response = send_tcp_message({'world': 0, 'function': 'start_hang_up', 'data': {'token': token, 'stage': 1}})
+	response = send_tcp_message({'world': 0, 'function': 'start_hang_up', 'data': {'token': token, 'stage': 1}})
 	# print(str(response))
-	# response = send_tcp_message({'world': 0, 'function': 'start_hang_up', 'data': {'token': token, 'stage': 1}})
+	# response = send_tcp_message({'world': 0, 'function': 'get_hang_up_reward', 'data': {'token': token, 'stage': 1}})
 	# print(str(response))
+	print(str(response).replace("'", "\""))
 
 
 

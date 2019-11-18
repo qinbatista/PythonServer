@@ -115,5 +115,5 @@ def run_all_task():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("test9000")
+	run_task("1")
 	# run_all_task()
