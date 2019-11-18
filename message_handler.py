@@ -229,9 +229,7 @@ class MessageHandler:
 
 	###################### mail.py ######################
 	async def _send_mail(self, data: dict) -> str:
-		res = await mail.send_mail(enums.MailType.SIMPLE, await common.get_uid(data['data']['gn_target'], \
-				**data), from_ = await common.get_gn(data['data']['unique_id'], **data), **data)
-		return common.mt(0 if res else 99, 'success' if res else 'error')
+		return await mail.send_mail_public(data['data']['unique_id'], data['data']['gn_target'], **data)
 
 	async def _get_new_mail(self, data: dict) -> str:
 		return await mail.get_new_mail(data['data']['unique_id'], **data)
