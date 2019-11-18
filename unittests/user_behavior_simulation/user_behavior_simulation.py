@@ -83,9 +83,9 @@ def run_task(name):
 	call_login(str(name))
 	kwargs = {"world": world, "token": token}
 	info_list =  module_16_get_all_data.get_all_info(token,world)#加载所有参数信息
-	module_1_stage.stage_dialog(token,world,info_list[5])##战役
+	# module_1_stage.stage_dialog(token,world,info_list[5])##战役
 	# module_2_summon.summon_dialog(**kwargs)#召唤法政
-	# module_3_lottery.get_random_item(token,world)#转盘
+	module_3_lottery.get_random_item(token,world)#转盘
 	# module_6_darkmarket.darkmarket_dialog(token,world,info_list[5])#市场
 	# module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
 	# module_11_friends.freind_dialog(token,world,info_list[7])#朋友
