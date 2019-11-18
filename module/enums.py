@@ -258,6 +258,7 @@ class Limits(enum.IntEnum):
 	REQUEST_FRIEND_LIMITS = 6
 	BUY_ENERGY_LIMITS = 7  # 购买体力上限次数键
 	BUY_STAGE_LIMITS = 8  # 购买副本上限次数键
+	MAIL_DAILY_SEND = 9
 
 
 class Achievement(enum.IntEnum):
