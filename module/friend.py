@@ -41,7 +41,8 @@ async def request(uid, gn_target, **kwargs):
 	if friends: return common.mt(95, 'already friends')
 	await common.execute(f'INSERT INTO friend (uid, fid) VALUES ("{uid}", "{uid_target}") ON DUPLICATE KEY UPDATE uid = uid;', **kwargs)
 	sender = await common.get_gn(uid, **kwargs)
-	if not await mail.send_mail(enums.MailType.FRIEND_REQUEST, uid_target, from_=sender, sender=sender, uid_sender=uid, **kwargs):
+	if not await mail.send_mail(enums.MailType.FRIEND_REQUEST, uid_target, from_=sender, \
+			uid_sender=uid, **kwargs):
 		return common.mt(98, 'could not send mail')
 	await common.execute(f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, value+1) ON DUPLICATE KEY UPDATE value = value+1;', **kwargs)
 	return common.mt(0, 'request sent', {'gn': gn_target})
@@ -69,7 +70,8 @@ async def send_gift(uid, gn_target, **kwargs):
 	if not _can_send_gift(now, recover): return common.mt(98, 'gift cooldown')
 	kwargs['items'] = common.encode_item(enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1)
 	kwargs['from_'] = await common.get_gn(uid, **kwargs)
-	sent = await mail.send_mail(enums.MailType.GIFT, fid, **kwargs)
+	sent = await mail.send_mail(enums.MailType.GIFT, fid, \
+			subj = enums.MailTemplate.FRIEND_GIFT.name, body = '', **kwargs)
 	if not sent: return common.mt(97, 'mailbox error')
 	kwargs.update({"aid":enums.Achievement.FRIEND_GIFT})
 	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
