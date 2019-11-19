@@ -57,6 +57,8 @@
 >
 > `pool` : number of seconds remaining until the wishing pool refreshes（许愿池下次刷新的冷却时间）
 >
+> pool_diamond：下次许愿许愿消耗的钻石数
+>
 > next_refresh：更新剩余时间（秒）
 >
 > next_refresh： 整个工厂下次刷新的剩余时间
@@ -87,6 +89,7 @@
 			"reward": 0
 		},
 		"pool": 0,
+		"pool_diamond": 0,
 		"next_refresh": 8,
 		"worker": {
 			"-1": 0,
@@ -1229,7 +1232,7 @@
 	{
 		"pool" : 3130,
 		"count" : 0,
-		"diamond" : 50,
+		"pool_diamond" : 50,
 		"remaining" :
 		{
 			"wid" : 5,
@@ -1248,5 +1251,5 @@
 
 [获得失败]()
 >
-> * 99: insufficient funds
+> * 99: insufficient diamonds
 >

@@ -49,11 +49,14 @@ async def refresh(uid, **kwargs):
 	accel_end_t         = accel_end_t   if accel_end_t   is not None else now
 	accel_time = max(int((accel_end_t - now).total_seconds()), 0)
 	# if accel_time == 0: await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, now, **kwargs)
+	count = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
+	count = 1 if count is None else count
+	diamond = 0 if pool == 0 else count * kwargs['config']['factory']['wishing_pool']['base_diamond']
 	return common.mt(0, 'success', {'steps' : steps, 'resource' :
 			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES},
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}},
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]},
-			'pool' : pool,
+			'pool' : pool, 'pool_diamond': diamond,
 			'next_refresh' : next_ref,
 			'worker' : {enums.Factory.UNASSIGNED.value : ua, 'total' : mw,
 					**{k.value: worker[k] for k in BASIC_FACTORIES}},
@@ -191,7 +194,7 @@ async def wishing_pool(uid, wid, **kwargs):
 	seg_reward     = roll_segment_value(**kwargs)
 	seg_remain     = await weapon._update_segment(uid, wid, seg_reward, **kwargs)
 	return common.mt(0, 'success', {'pool' : pool, 'count' : 0 if pool == 0 else count, \
-			'diamond' : (count + 1) * kwargs['config']['factory']['wishing_pool']['base_diamond'], \
+			'pool_diamond' : (count + 1) * kwargs['config']['factory']['wishing_pool']['base_diamond'], \
 			'remaining' : {'wid' : wid.value, 'seg' : seg_remain, 'diamond' : dia_remain}, \
 			'reward'    : {'wid' : wid.value, 'seg' : seg_reward, 'diamond' : dia_cost}})
 

@@ -87,12 +87,12 @@ def run_task(name):
 	# module_2_summon.summon_dialog(**kwargs)#召唤法政
 	# module_3_lottery.get_random_item(token,world)#转盘
 	# module_6_darkmarket.darkmarket_dialog(token,world)#市场
-	module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
+	# module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
 	# module_11_friends.freind_dialog(token,world,info_list[7])#朋友
 	# module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
 	# module_15_skills.skill_dialog(token,world,info_list[5],**kwargs)#技能天赋
 	# module_18_family.family_dialog(token,world,get_all_family_info, player_info)#家族系统
-	# module_19_factory.factory_dialog(token,world,info_list[5])#建造
+	module_19_factory.factory_dialog(token,world,info_list[5])#建造
 	# module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
 	# module_21_roles.role_dialog(token,world)#玩家卡牌
 	# module_22_announcement.announcement_dialog(token,world)#公告
@@ -115,5 +115,5 @@ def run_all_task():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("1")
+	run_task("t1")
 	# run_all_task()
