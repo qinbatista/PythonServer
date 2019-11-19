@@ -50,6 +50,7 @@ class ModuleConfigurations:
 		self.configs['factory']  = r.json()['factory']
 		self.configs['world']    = r.json()['world']
 		self.configs['weapon']   = r.json()['weapon']
+		self.configs['skill']   = r.json()['skill']
 		self.configs['role']     = r.json()['role']
 		self.configs['package']  = r.json()['package']
 		self.configs['vip']      = r.json()['vip']
