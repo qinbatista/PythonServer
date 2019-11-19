@@ -55,6 +55,16 @@ class MailType(enum.IntEnum):
 	FRIEND_REQUEST = 2
 	FAMILY_REQUEST = 3
 
+class MailTemplates(enum.Enum):
+	FAMILY_REQUEST = enum.auto()
+	FAMILY_INVITATION = enum.auto()
+	SYSTEM_REWARD = enum.auto()
+	FRIEND_GIFT = enum.auto()
+	COMPENSATE = enum.auto()
+	SETTLEMENT = enum.auto()
+	GIFT_1 = enum.auto()
+	GIFT_2 = enum.auto()
+
 
 class Tier(enum.IntEnum):
 	BASIC = 0
