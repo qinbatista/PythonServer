@@ -153,7 +153,14 @@ async def _are_friends(uid, fid, **kwargs):
 async def _are_family(uid, fid, **kwargs):
 	data1 = await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}"', **kwargs)
 	data2 = await common.execute(f'SELECT fid FROM player WHERE uid = "{fid}"', **kwargs)
-	return True if (False if data1[0][0] == '' or data2[0][0] != '' else True) and family._check_invite_permissions(await family._get_role(uid, data1[0][0], **kwargs)) else False
+	if data1[0][0] == '' and data2[0][0] == '':
+		return False
+	else:
+		if data1[0][0] == data2[0][0] and family._check_invite_permissions(await family._get_role(uid, data1[0][0], **kwargs))==True:
+			return True
+		else:
+			return False
+# return True if (False if data1[0][0] == '' or data2[0][0] != '' else True) and family._check_invite_permissions(await family._get_role(uid, data1[0][0], **kwargs)) else False
 
 
 async def _get_friend_info(uid, **kwargs):
