@@ -30,7 +30,7 @@ async def get_account_world_info(uid, **kwargs):
 					'world_name' : world['name'], 'gn' : data[0][0], 'exp' : data[0][1], 'level': exp_info['level']})
 		else:
 			worlds.append({'server_status' : world['status'], 'world' : world['id'], \
-					'world_name' : world['name'], 'gn' : '', 'exp' : 0})
+					'world_name' : world['name'], 'gn' : '', 'exp' : 0, 'level' : 0})
 	return common.mt(0, 'success', {'worlds' : worlds})
 
 async def accept_gifts(uid, keys, **kwargs):
