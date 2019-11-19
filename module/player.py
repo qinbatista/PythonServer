@@ -37,7 +37,7 @@ async def accept_gifts(uid, keys, **kwargs):
 	error, success = [], {}
 	for key in keys:
 		valid, resp = await accept_gift(uid, key, **kwargs)
-		if valid: success[key] = {k : v for k, v in resp.items()}
+		if valid: success[key] = [dict(r) for r in resp]
 		else: error.append(key)
 	return common.mt(0, 'success', {'error' : error, 'success' : success})
 
@@ -45,9 +45,11 @@ async def accept_gift(uid, nonce, **kwargs):
 	await mail.mark_read(uid, nonce, **kwargs)
 	gift = await _lookup_nonce(nonce, **kwargs)
 	if not gift: return (False, None) 
-	item = common.decode_items(gift)
-	_, remaining = await common.try_item(uid, item[0][1], item[0][2], **kwargs)
-	return (True, {'gid' : item[0][0], 'id' : item[0][1], 'remaining' : remaining, 'reward' : item[0][2]})
+	items, r = common.decode_items(gift), []
+	for item in items:
+		_, remaining = await common.try_item(uid, item[1], item[2], **kwargs)
+		r.append({'gid' : item[0], 'id' : item[1], 'remaining' : remaining, 'reward' : item[2]})
+	return (True, r)
 
 async def change_name(uid, name, **kwargs):
 	pass
