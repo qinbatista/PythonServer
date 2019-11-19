@@ -219,8 +219,8 @@ async def buy_acceleration(uid, **kwargs):
 
 async def set_armor(uid, aid, **kwargs):
 	r = await refresh(uid, **kwargs)
-	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `storage`) VALUES \
-			("{uid}", {enums.Factory.ARMOR.value}, {aid.value}) ON DUPLICATE KEY UPDATE \
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `storage`) VALUES \
+			("{uid}", {enums.Factory.ARMOR.value}, 1, {aid.value}) ON DUPLICATE KEY UPDATE \
 			`storage` = {aid.value};', **kwargs)
 	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
 			'armor' : r['data']['armor']}, 'aid' : aid.value})
