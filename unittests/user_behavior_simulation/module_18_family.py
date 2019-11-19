@@ -71,7 +71,7 @@ def set_role_family(_token,_world):
 def family_dialog(_token,_world,info):
 	create_family(_token,_world)
 	# leave_family(_token,_world)
-	invite_user_family(_token,_world)
+	# invite_user_family(_token,_world)
 	# remove_user_family(_token,_world)
 	# request_join_family(_token,_world)
 	# get_all_family(_token,_world)
@@ -101,8 +101,8 @@ def family_dialog(_token,_world,info):
 	response = send_tcp_message({'world' : 0, 'function' : 'invite_user_family', 'data' : {'token': token, 'target': 'name_unique_id'+user_behavior_simulation.unique_id}})
 	print_method(str(response))
 
-	# response = send_tcp_message({'world' : 0, 'function' : 'respond_family', 'data' : {'token': token, 'nonce': '234567899'}})#玩家接受加入家族的邀请
-	# print(response)
+	response = send_tcp_message({'world' : 0, 'function' : 'respond_family', 'data' : {'token': token, 'nonce': '234567899'}})#玩家接受加入家族的邀请
+	print(response)
 
 	response = send_tcp_message({'world' : 0, 'function' : 'family_officer', 'data' : {'token': token, 'target': 'game name', 'position': random.randint(0,3)}})
 	print_method(str(response))
