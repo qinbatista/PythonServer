@@ -51,7 +51,6 @@ class MessageHandler:
 		d = r.json()
 		self._mall_config = d['mall']
 		self._stage_reward = d['reward']
-		self._skill = d['skill']
 		self._weapon_config = d['weapon']
 		self._role_config = d['role']
 		self._lottery = d['lottery']
@@ -320,13 +319,13 @@ class MessageHandler:
 
 	###################### skill.py ######################
 	async def _get_all_skill(self, data: dict) -> str:
-		return await skill.get_all(data['data']['unique_id'], self._skill, **data)
+		return await skill.get_all(data['data']['unique_id'], **data)
 
 	async def _level_up_skill(self, data: dict) -> str:
-		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']), self._skill, **data)
+		return await skill.level_up(data['data']['unique_id'], int(data['data']['skill']), int(data['data']['item']), **data)
 
 	async def _get_config_skill(self, data: dict) -> str:
-		return common.mt(0, 'success', {'skill_config': self._skill})
+		return await skill.config(**data)
 
 	###################### friend.py ######################
 	async def _get_all_friend(self, data: dict) -> str:

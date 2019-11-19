@@ -28,8 +28,6 @@
 
 > skills：返回所有技能的信息以及技能的等级
 >
-> config：返回升级卷轴的概率和卷轴id
->
 
 ```json
 {
@@ -105,19 +103,7 @@
 				"sid": 35,
 				"level": 1
 			}
-		],
-		"config": {
-			"skill_scroll_id": [
-				"6",
-				"7",
-				"8"
-			],
-			"upgrade_chance": {
-				"6": 0.1,
-				"7": 0.3,
-				"8": 1
-			}
-		}
+		]
 	}
 }
 ```
@@ -137,7 +123,7 @@
 ```json
 {
 	"world": 0, 
-	"function": "level_up_weapon",
+	"function": "level_up_skill",
 	"data": {
 		"token": "my toekn ^_^",
     	"skill": 1,
@@ -148,7 +134,7 @@
 
 ##### 接受消息JSON格式
 
-升级护甲返回的结果。
+升级技能返回的结果。
 
 [成功]()
 
@@ -169,6 +155,19 @@
 		"level": 2,
 		"iid": 6,
 		"value": 673
+	}
+}
+```
+
+```
+{
+	"status": 1,
+	"message": "unlucky",
+	"data": {
+		"sid": 0,
+		"level": 1,
+		"iid": 6,
+		"value": 199
 	}
 }
 ```
