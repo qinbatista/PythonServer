@@ -92,15 +92,23 @@ async def _send_mail_simple(uid, **kwargs):
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_gift(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', await common.get_gn(uid, **kwargs)), 'body' : kwargs.get('body', 'GIFT_DESCRIPTION'), 'subj' : kwargs.get('subj', 'GIFT_MAIL_BOX'), 'type' : enums.MailType.GIFT.value, 'items' : kwargs['items']}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : \
+			{'from' : kwargs.get('from_', await common.get_gn(uid, **kwargs)), \
+			'body' : kwargs.get('body', enums.MailTemplate.SYSTEM_REWARD.name), \
+			'subj' : kwargs.get('subj', enums.MailTemplate.GIFT_1.name), \
+			'type' : enums.MailType.GIFT.value, 'items' : kwargs['items']}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_friend_request(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), 'body' : kwargs.get('body', 'FRIEND_DESCRIPTION'), 'subj' : kwargs.get('subj', 'FREIEND_MAIL_BOX'), 'type' : enums.MailType.FRIEND_REQUEST.value, 'uid_sender' : kwargs['uid_sender']}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), \
+			'body' : '', 'subj' : '', 'type' : enums.MailType.FRIEND_REQUEST.value, \
+			'uid_sender' : kwargs['uid_sender']}}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_family_request(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['name'], 'body' : kwargs.get('body', 'FAMILY_DESCRIPTION'), 'subj' : kwargs.get('subj', 'FAMILY_MAIL_BOX'), 'type' : enums.MailType.FAMILY_REQUEST.value, 'name' : kwargs['name'], 'uid_target' : kwargs['uid_target']}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['name'], 'body' : '', \
+			'subj' : kwargs['subj'], 'type' : enums.MailType.FAMILY_REQUEST.value, \
+			'name' : kwargs['name'], 'uid_target' : kwargs['uid_target']}}
 	return await _send_mail(mail, **kwargs)
 
 SWITCH[enums.MailType.SIMPLE] = _send_mail_simple
