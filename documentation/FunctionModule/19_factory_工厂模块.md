@@ -60,23 +60,25 @@
 > next_refresh：更新剩余时间（秒）
 >
 > next_refresh： 整个工厂下次刷新的剩余时间
+>
+> time：工厂加速剩余时间，例time：59，工厂加速59秒后结束
 
 ```json
 {
 	"status": 0,
 	"message": "success",
 	"data": {
-		"steps": 0,
+		"steps": 27526,
 		"resource": {
 			"remaining": {
-				"0": 0,
-				"1": 0,
-				"2": 0
+				"0": 4,
+				"1": 1,
+				"2": 8264
 			},
 			"reward": {
-				"0": 0,
-				"1": 0,
-				"2": 0
+				"0": 1,
+				"1": -1,
+				"2": 8258
 			}
 		},
 		"armor": {
@@ -85,21 +87,22 @@
 			"reward": 0
 		},
 		"pool": 0,
-		"next_refresh": 10,
+		"next_refresh": 8,
 		"worker": {
-			"-1": 5,
+			"-1": 0,
 			"total": 5,
-			"2": 0,
+			"2": 1,
 			"3": 0,
-			"1": 0,
-			"0": 0
+			"1": 1,
+			"0": 3
 		},
 		"level": {
 			"0": 1,
 			"1": 1,
 			"2": 1,
 			"-2": 1
-		}
+		},
+		"time": 0
 	}
 }
 ```
@@ -946,44 +949,40 @@
 > Even if there is an error, the server will return the number of workers the SERVER says the client has.
 >
 > 服务器计算下一步之前剩余的秒数，即使出现错误，服务器也会返回客户机所拥有的worker的数量。
+>
+> `time`：工厂加速剩余时间，例time：59，工厂加速59秒后结束
 
 ```json
 {
-	"status" : 0, 
+	"status": 0,
 	"message": "success",
-	"data"   :
-	{
-		"refresh" :
-		{
-			"resource" :
-			{
-				"remaining" :
-				{
-					"0" : 253,
-					"1" :   2,
-					"2" : 182
+	"data": {
+		"refresh": {
+			"resource": {
+				"remaining": {
+					"0": 5,
+					"1": 0,
+					"2": 8302
 				},
-				"reward" :
-				{
-					"0" : -53,
-					"1" :   1,
-					"2" :  10
+				"reward": {
+					"0": 1,
+					"1": -1,
+					"2": 38
 				}
 			},
-			"armor" :
-			{
-				"aid"       : 2,
-				"remaining" : 5,
-				"reward"    : 1
-			}
+			"armor": {
+				"aid": 1,
+				"remaining": 0,
+				"reward": 0
+			},
+			"next_refresh": 7,
+			"time": 0
 		},
-		"next_refresh" : 4,
-		"worker" :
-		{
-			"-1" : 5,
-			"0"  : 4,
-			"1"  : 2,
-			"2"  : 1
+		"worker": {
+			"-1": 0,
+			"0": 3,
+			"1": 1,
+			"2": 1
 		}
 	}
 }
@@ -1017,9 +1016,9 @@
 				"aid"       : 2,
 				"remaining" : 5,
 				"reward"    : 1
-			}
+			},
+			"next_refresh" : 4
 		},
-		"next_refresh" : 4,
 		"worker" :
 		{
 			"-1" : 5,
@@ -1059,9 +1058,9 @@
 				"aid"       : 2,
 				"remaining" : 5,
 				"reward"    : 1
-			}
+			},
+			"next_refresh" : 4
 		},
-		"next_refresh" : 4,
 		"worker" :
 		{
 			"-1" : 5,
@@ -1101,9 +1100,9 @@
 				"aid"       : 2,
 				"remaining" : 5,
 				"reward"    : 1
-			}
+			},
+			"next_refresh" : 4
 		},
-		"next_refresh" : 4,
 		"worker" :
 		{
 			"-1" : 5,

@@ -1,55 +1,54 @@
 {
-	"worlds" :
-	[
+	"worlds": [
 		{
-			"status" : 0,
-			"id"     : "0",
-			"name"   : "default world"
+			"status": 0,
+			"id": "0",
+			"name": "default world"
 		},
 		{
-			"status" : 0,
-			"id"     : "1",
-			"name"   : "world 1"
+			"status": 0,
+			"id": "s1",
+			"name": "world s1"
 		},
 		{
-			"status" : 0,
-			"id"     : "2",
-			"name"   : "world 2"
+			"status": 0,
+			"id": "s2",
+			"name": "world s2"
 		},
 		{
-			"status" : 0,
-			"id"     : "3",
-			"name"   : "world 3"
+			"status": 0,
+			"id": "s3",
+			"name": "world s3"
 		},
 		{
-			"status" : 0,
-			"id"     : "4",
-			"name"   : "world 4"
+			"status": 0,
+			"id": "s4",
+			"name": "world s4"
 		},
 		{
-			"status" : 0,
-			"id"     : "5",
-			"name"   : "world 5"
+			"status": 0,
+			"id": "s5",
+			"name": "world s5"
 		},
 		{
-			"status" : 0,
-			"id"     : "6",
-			"name"   : "world 6"
+			"status": 0,
+			"id": "s6",
+			"name": "world s6"
 		},
 		{
-			"status" : 0,
-			"id"     : "7",
-			"name"   : "world 7"
+			"status": 0,
+			"id": "s7",
+			"name": "world s7"
 		},
 		{
-			"status" : 0,
-			"id"     : "8",
-			"name"   : "world 8"
+			"status": 0,
+			"id": "s8",
+			"name": "world s8"
 		},
 		{
-			"status" : 0,
-			"id"     : "9",
-			"name"   : "world 9"
+			"status": 0,
+			"id": "s9",
+			"name": "world s9"
 		}
 	]
 }

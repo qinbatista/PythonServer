@@ -37,7 +37,7 @@ def darkmarket_transaction( token, world, pid, **kwargs):
 	logger.debug(response)
 
 def darkmarket_dialog(token, world,**kwargs):
-	# refresh_market(token, world, **kwargs)
+	refresh_market(token, world, **kwargs)
 	darkmarket_transaction(token, world, random.randint(0,7), **kwargs)
 
 if __name__ == '__main__':

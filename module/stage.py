@@ -107,8 +107,8 @@ async def e_general_stage(uid, stage, **kwargs):
 		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		enter_stages.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
 	exp_info = await increase_exp(uid, 0, **kwargs)
-	seconds = energy_data['data']['cooling_time']
-	energy = {'time': get_time_format(seconds), 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
+	energy = {'time': energy_data['data']['cooling_time'], 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
+	await set_progress(uid, 'unstage', stage, **kwargs)
 	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'world_boss': {}, 'energy': energy, 'enemy_layout': enemy_layout, 'monster': enemy_list})
 
 
@@ -116,9 +116,14 @@ async def e_general_stage(uid, stage, **kwargs):
 async def p_general_stage(uid, stage, **kwargs):
 	# success ===> 0
 	# 0 : success
+	# 96 : No stage config file
+	# 98 : stage error
 	# 99 : Parameter error
 	# print(f'stage:{stage}, type:{type(stage)}')
 
+	unstage = await get_progress(uid, 'unstage', **kwargs)
+	if unstage != stage: return common.mt(98, 'stage error')
+	await set_progress(uid, 'unstage', 0, **kwargs)
 	stage_s = await get_progress(uid, 'stage', **kwargs)
 	if stage <= 0 or stage_s + 1 < stage:
 		return common.mt(99, 'stage level is not correct, cant be '+str(stage))
@@ -131,7 +136,7 @@ async def p_general_stage(uid, stage, **kwargs):
 			stage = i
 			break
 	if stage not in stages: return common.mt(96, 'No stage config file')
-	pass_reward = pass_rewards[str(max(stage))]
+	pass_reward = pass_rewards[str(stage)]
 
 	p_exp = {'remaining': -1, 'reward': -1}
 	for key, value in pass_reward.items():
@@ -218,8 +223,8 @@ async def e_tower_stage(uid, stage, **kwargs):
 		enter_stages.append({'iid': int(iid), 'remaining': data[0][0], 'reward': -entry_consume[stage][iid]})
 
 	exp_info = await increase_exp(uid, 0, **kwargs)
-	seconds = energy_data['data']['cooling_time']
-	energy = {'time': get_time_format(seconds), 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
+	energy = {'time': energy_data['data']['cooling_time'], 'remaining': energy_data['data']['energy'], 'reward': -energy_consume}
+	await set_progress(uid, 'unstage', stage, **kwargs)
 	return common.mt(0, 'success', {'enter_stages': enter_stages, 'exp_info': exp_info, 'world_boss': {}, 'energy': energy, 'enemy_layout': enemy_layout, 'monster': enemy_list})
 
 
@@ -227,8 +232,13 @@ async def e_tower_stage(uid, stage, **kwargs):
 async def p_tower_stage(uid, stage, **kwargs):
 	# success ===> 0
 	# 0 : success
+	# 96 : No stage config file
+	# 98 : stage error
 	# 99 : Parameter error
 	# print(f'stage:{stage}, type:{type(stage)}')
+	unstage = await get_progress(uid, 'unstage', **kwargs)
+	if unstage != stage: return common.mt(98, 'stage error')
+	await set_progress(uid, 'unstage', 0, **kwargs)
 	stage_s = await get_progress(uid, 'towerstage', **kwargs)
 	if stage <= TOWER_BASE_STAGE or stage_s + 1 < stage:
 		return common.mt(99, 'Parameter error')
@@ -336,10 +346,10 @@ async def start_hang_up(uid, stage, **kwargs):
 			increment = value * minute if iid not in probability_reward else sum(random.choices(value[1]*[value[0]] + (value[2] - value[1])*[0], k=minute))  # 耗内存，省时间
 			# increment = value * minute if iid not in probability_reward else sum([value[0] * int(random.randint(0, value[2]) - value[1] < 0) for i in range(minute)])  # 耗时间，省内存
 			_, value = await common.try_item(uid, enums.Item(int(iid)), increment, **kwargs)
-			start_hang_up_reward.append({'iid': iid, 'value': value, 'increment': increment})
+			start_hang_up_reward.append({'iid': iid, 'remaining': value, 'reward': increment})
 		await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
 		await common.execute_update(f'UPDATE progress SET hangstage = "{stage}" WHERE uid = "{uid}";', **kwargs)
-		return common.mt(1, 'Repeated hang up successfully', {'start_hang_up_reward': start_hang_up_reward, 'hang_up_info': {'hang_stage': stage, 'time': get_time_format(int(delta_time.total_seconds()))}})
+		return common.mt(1, 'Repeated hang up successfully', {'start_hang_up_reward': start_hang_up_reward, 'hang_up_info': {'hang_stage': stage, 'time': int(delta_time.total_seconds())}})
 
 
 # 获取挂机奖励
@@ -378,9 +388,9 @@ async def get_hang_up_reward(uid, **kwargs):
 		increment = value * minute if iid not in probability_reward else sum(random.choices(value[1] * [value[0]] + (value[2] - value[1]) * [0], k=minute))  # 耗内存，省时间
 		# increment = value * minute if iid not in probability_reward else sum([value[0] * int(random.randint(0, value[2]) - value[1] < 0) for i in range(minute)])  # 耗时间，省内存
 		_, value = await common.try_item(uid, enums.Item(int(iid)), increment, **kwargs)
-		get_hang_up_rewards.append({'iid': iid, 'value': value, 'increment': increment})
+		get_hang_up_rewards.append({'iid': iid, 'remaining': value, 'reward': increment})
 	await common.execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.HANG_UP_TIME.value}";', **kwargs)
-	return common.mt(0, 'Settlement reward success', {'get_hang_up_rewards': get_hang_up_rewards, 'hang_up_info': {'hang_stage': hang_stage, 'time': get_time_format(int(delta_time.total_seconds()))}})
+	return common.mt(0, 'Settlement reward success', {'get_hang_up_rewards': get_hang_up_rewards, 'hang_up_info': {'hang_stage': hang_stage, 'time': int(delta_time.total_seconds())}})
 
 
 # 获取挂机信息
@@ -420,7 +430,7 @@ async def get_hang_up_info(uid, **kwargs):
 		# increment = value * minute if iid not in probability_reward else sum([value[0] * int(random.randint(0, value[2]) - value[1] < 0) for i in range(minute)])  # 耗时间，省内存
 		_, value = await common.try_item(uid, enums.Item(int(iid)), 0, **kwargs)
 		get_hang_up_infos.append({'iid': iid, 'value': value, 'increment': increment})
-	return common.mt(0, 'Successfully get hook information', {'get_hang_up_info': get_hang_up_infos, 'hang_up_info': {'hang_stage': hang_stage, 'time': get_time_format(int(delta_time.total_seconds()))}})
+	return common.mt(0, 'Successfully get hook information', {'get_hang_up_info': get_hang_up_infos, 'hang_up_info': {'hang_stage': hang_stage, 'time': int(delta_time.total_seconds())}})
 
 
 
@@ -450,12 +460,13 @@ async def check_boss_status(uid,**kwargs):
 	return common.mt(0, 'Successfully get hook information', {'world_boss': world_boss, 'boss_life_ratio': boss_life_ratio})
 
 async def enter_world_boss_stage(uid, stage,**kwargs):
-	if kwargs["boss_life_remaining"][9]<=0:return common.mt(99, "boss all died")
+	if kwargs["boss_life_remaining"][9] <=0 : return common.mt(99, "boss all died")
 	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 	if limits[0][0] >= 1:
 		status = await try_stage(uid, stage, BOSS_BASE_STAGE, **kwargs)
 		if status == 0:
 			await common.execute(f'UPDATE limits SET value = value - 1 WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
+			await set_progress(uid, 'unstage', stage, **kwargs)
 			return common.mt(0, "enter world boss success", {'times': limits[0][0] - 1})
 		elif status == 97:
 			return common.mt(97, "no more energy")
@@ -491,6 +502,14 @@ async def get_top_damage(uid, page, **kwargs):
 	return common.mt(0, 'success', {'damage': damage, 'ranking': ranking, 'rank': rank})
 
 async def leave_world_boss_stage(uid, stage, damage, **kwargs):
+	"""
+	0 - success
+	98 - stage error
+	99 - abnormal data
+	"""
+	unstage = await get_progress(uid, 'unstage', **kwargs)
+	if unstage != stage: return common.mt(98, 'stage error')
+	await set_progress(uid, 'unstage', 0, **kwargs)
 	max_upload_damage = kwargs['max_upload_damage']
 	if damage < 0 or damage >= max_upload_damage: return common.mt(status=99, message="abnormal data")
 
@@ -542,6 +561,9 @@ async def get_progress(uid, pid, **kwargs):
 		data = await common.execute(f'SELECT {pid} FROM progress WHERE uid = "{uid}";', **kwargs)
 	return data[0][0]
 
+
+async def set_progress(uid, pid, value, **kwargs):
+	await common.execute(f'UPDATE progress SET {pid}="{value}" WHERE uid = "{uid}";', **kwargs)
 
 async def increase_exp(uid, exp, **kwargs):
 	"""

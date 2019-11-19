@@ -5,6 +5,7 @@
 * [`get_hang_up_info`](##get_hang_up_info)
 * [`enter_stage`](##enter_stage)
 * [`pass_stage`](##pass_stage)
+* [`get_top_damage`](##get_top_damage)
 
 ## start_hang_up
 
@@ -71,7 +72,7 @@
 		],
 		"hang_up_info": {
 			"hang_stage": 1,
-			"time": "17:14:17"
+			"time": 32
 		}
 	}
 }
@@ -136,18 +137,23 @@
 		"get_hang_up_rewards": [
 			{
 				"iid": "2",
-				"remaining": 4290,
-				"reward": 1460
+				"remaining": 2195,
+				"reward": 620
 			},
 			{
 				"iid": "1",
-				"remaining": 12870,
-				"reward": 4380
+				"remaining": 162047,
+				"reward": 1860
+			},
+			{
+				"iid": "11",
+				"remaining": 41,
+				"reward": 3
 			}
 		],
 		"hang_up_info": {
-			"hang_stage": 1,
-			"time": "17:14:17"
+			"hang_stage": 2,
+			"time": 1893
 		}
 	}
 }
@@ -297,7 +303,7 @@
             'remaining' : 2,
     	},
 		"energy": {
-			"time": "0:20:00",
+			"time": 20000,
 			"remaining": 9998,
 			"reward": -2
 		},
@@ -377,7 +383,7 @@
 * 99: 关卡数量不对
 * 96: 没有该关卡的配置文件信息
 
-
+- 98: 关卡错误（stage error）
 
 
 
@@ -617,7 +623,8 @@
 }
 ```
 
-
+- 98：stage error（关卡错误）
+- 99：abnormal data（数据错误）
 
 
 

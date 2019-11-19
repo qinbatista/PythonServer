@@ -45,15 +45,20 @@ async def refresh(uid, **kwargs):
 		else: continue
 		await achievement.record_achievement(kwargs['data']['unique_id'], achievement_value=delta[k], **kwargs)
 
-	return common.mt(0, 'success', {'steps' : steps, 'resource' : \
-			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES}, \
-			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}}, \
-			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]}, \
-			'pool' : pool, \
-			'next_refresh' : next_ref, \
-			'worker' : {enums.Factory.UNASSIGNED.value : ua, 'total' : mw, \
-			**{k.value: worker[k] for k in BASIC_FACTORIES}}, \
-			'level' : {k.value : level[k] for k in HAS_LEVEL_FACTORIES}})
+	accel_end_t         = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
+	accel_end_t         = accel_end_t   if accel_end_t   is not None else now
+	accel_time = max(int((accel_end_t - now).total_seconds()), 0)
+	# if accel_time == 0: await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, now, **kwargs)
+	return common.mt(0, 'success', {'steps' : steps, 'resource' :
+			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES},
+			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}},
+			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]},
+			'pool' : pool,
+			'next_refresh' : next_ref,
+			'worker' : {enums.Factory.UNASSIGNED.value : ua, 'total' : mw,
+					**{k.value: worker[k] for k in BASIC_FACTORIES}},
+			'level' : {k.value : level[k] for k in HAS_LEVEL_FACTORIES},
+			'time': accel_time})
 
 async def increase_worker(uid, fid, n, **kwargs):
 	if n <= 0: return common.mt(96, 'number must be positive')
@@ -96,7 +101,7 @@ async def update_worker(uid, workers, **kwargs):
 	l, w, _ = await get_state(uid, **kwargs)
 	ua, mw = await get_unassigned_workers(uid, **kwargs)
 	r_ret = {'resource' : r['data']['resource'], 'armor' : r['data']['armor'], \
-			'next_refresh' : r['data']['next_refresh']}
+			'next_refresh' : r['data']['next_refresh'], 'time': r['data']['time']}
 
 	# sum workers <= max_worker else: return refresh + current workers
 	uw = sum(w for w in workers.values())
