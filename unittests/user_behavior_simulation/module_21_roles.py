@@ -11,7 +11,7 @@ import random
 lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
 world = "0"
 token = ""
-role_list=[i for i in range(1,40)]
+role_list=[i for i in range(1,2)]
 def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
@@ -32,16 +32,12 @@ def role_dialog(_token,_world):
 	global token,world
 	token = _token
 	world = _world
-	while True:
-		random_int = random.randint(1,1)
-		if random_int ==0:#升级角色
-			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_role', 'data' : {'token' : token, "role":random.choice(role_list),"amount":random.randint(40000000000,300000000000)}})#升级请求
-			print("[level_up_role] level up role:"+str(new_response))
-		elif random_int ==1:#突破角色
-			new_response = send_tcp_message({'world' : world, 'function' : 'level_up_star_role', 'data' : {'token' : token, "role":random.choice(role_list)}})#升级请求
-			print("[level_up_star_role] level up role star:"+str(new_response))
-		elif random_int ==2:#退出
-			print("[role_dialog] quit role_dialog")
-			break
+
+	new_response = send_tcp_message({'world' : world, 'function' : 'level_up_role', 'data' : {'token' : token, "role":random.choice(role_list),"amount":random.randint(0,30000)}})#升级请求
+	print("[level_up_role] level up role:"+str(new_response))
+
+	new_response = send_tcp_message({'world' : world, 'function' : 'level_up_star_role', 'data' : {'token' : token, "role":random.choice(role_list)}})#升级请求
+	print("[level_up_star_role] level up role star:"+str(new_response))
+
 if __name__ == "__main__":
 	pass
