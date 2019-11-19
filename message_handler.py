@@ -218,7 +218,7 @@ class MessageHandler:
 		return await family.check_in(data['data']['unique_id'], **data)
 
 	async def _get_config_family(self, data: dict) -> str:
-		return common.mt(0, 'success', data={'config': data['config']['family']})
+		return await family.config(**data)
 
 	async def _gift_package_family(self, data: dict) -> str:
 		return await family.gift_package(data['data']['unique_id'], **data)
