@@ -71,10 +71,12 @@ def stage_dialog(token,world,info_list):
 
 if __name__ == '__main__':
 	unique_id = '1'
-	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': unique_id}})
-	print(response)
-	token = response['data']['token']
-	response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, 'stage': 3000, 'damage': 11000}})
+	# response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': unique_id}})
+	# print(response)
+	# token = response['data']['token']
+	token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzY4MTQ5NzUsInVuaXF1ZV9pZCI6IjAwMCJ9.v2svpl5arsWR5DKo12TFoxuMBGfcQUpiCO6x3yuE6K8'
+	response = send_tcp_message({'world': 0, 'function': 'enter_stage', 'data': {'token': token, 'stage': 3000, 'damage': 11000}})
+	# response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, 'stage': 3000, 'damage': 11000}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_config_stage', 'data': {'token': token, 'stage': 2}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_config_player', 'data': {'token': token}})
 	print(str(response))

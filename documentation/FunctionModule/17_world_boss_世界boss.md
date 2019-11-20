@@ -79,7 +79,7 @@
 
 [成功消息]()
 
-> damange: 玩家造成的最高伤害
+> damage: 玩家造成的最高伤害
 >
 > ranking: 玩家的排名，不存在则返回-1
 >
@@ -90,48 +90,48 @@
 	"status": 0,
 	"message": "success",
 	"data": {
-        "damange": 100, 
-        "ranking": 1,
+		"damage": 0,
+		"ranking": -1,
 		"rank": [
 			{
-				"name": "大哥大",
-				"damange": 200000
+				"name": "keepo",
+				"damage": 8373
 			},
 			{
-				"name": "a",
-				"damange": 199999
+				"name": "name_0",
+				"damage": 7919
 			},
 			{
-				"name": "ljs",
-				"damange": 2222222
+				"name": "name_test9000",
+				"damage": 7416
 			},
 			{
-				"name": "waaaa",
-				"damange": 111111
+				"name": "name_q99",
+				"damage": 7258
 			},
 			{
-				"name": "是否",
-				"damange": 9
+				"name": "name_1",
+				"damage": 6325
 			},
 			{
-				"name": "个呃呃",
-				"damange": 8
+				"name": "name_9",
+				"damage": 6222
 			},
 			{
-				"name": "呜呜呜",
-				"damange": 7
+				"name": "name_q1",
+				"damage": 4606
 			},
 			{
-				"name": "啊啊啊啊",
-				"damange": 6
+				"name": "name_2",
+				"damage": 4290
 			},
 			{
-				"name": "大肉肉肉",
-				"damange": 5
+				"name": "name_5",
+				"damage": 2638
 			},
 			{
-				"name": "特恶",
-				"damange": 4
+				"name": "name_7",
+				"damage": 1645
 			}
 		]
 	}
@@ -168,13 +168,22 @@
 [成功消息]()
 
 > times: 剩余挑战boss次数
+>
+> energy：剩余能量点数
+>
+> cooling_time：能量恢复时间剩余秒数（-1代表满能量状态不需要恢复）
+>
+> consume：本次消耗的能量
 
 ```json
 {
 	"status": 0,
 	"message": "enter world boss success",
 	"data": {
-		"times": 0
+		"energy": 9960,
+		"cooling_time": -1,
+		"consume": -10,
+		"times": 1
 	}
 }
 ```
@@ -199,7 +208,7 @@
 	"data": {
 		"token": "my token",
         "stage": 3000, 
-        "damange": 110000
+        "damage": 110000
 	}
 }
 ```

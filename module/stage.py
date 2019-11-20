@@ -463,11 +463,14 @@ async def enter_world_boss_stage(uid, stage,**kwargs):
 	if kwargs["boss_life_remaining"][9] <=0 : return common.mt(99, "boss all died")
 	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 	if limits[0][0] >= 1:
-		status = await try_stage(uid, stage, BOSS_BASE_STAGE, **kwargs)
+		status, data, consume = await try_stage(uid, stage, BOSS_BASE_STAGE, **kwargs)
 		if status == 0:
+			data.pop('recover_time')
+			data['times'] = limits[0][0] - 1
+			data['consume'] = consume
 			await common.execute(f'UPDATE limits SET value = value - 1 WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 			await set_progress(uid, 'unstage', stage, **kwargs)
-			return common.mt(0, "enter world boss success", {'times': limits[0][0] - 1})
+			return common.mt(0, "enter world boss success", data)
 		elif status == 97:
 			return common.mt(97, "no more energy")
 		else:
@@ -618,11 +621,11 @@ async def try_stage(uid, stage, stage_type, **kwargs):
 		if i in stages:
 			stage = i
 			break
-	if stage not in stages: return 96
+	if stage not in stages: return 96, None, None
 	energy_consume = entry_consume[str(stage)]['cost']  # 消耗能量数
 	# try_energy 扣体力看是否足够
 	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
-	return 97 if energy_data["status"] >= 97 else 0
+	return (97, energy_data['data'], -energy_consume) if energy_data["status"] >= 97 else (0, energy_data['data'], -energy_consume)
 
 def get_time_format(seconds):
 	return '' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}'
