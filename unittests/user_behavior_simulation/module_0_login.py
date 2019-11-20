@@ -41,12 +41,12 @@ def login_unique():#游客登陆
 		world_list = get_account_world_info(token)
 		if len(world_list) != 0:
 			max = len(world_list)-1
-			world = enter_world(token, world_list[random.randint(0,0)]["world"])#选择世界,游客登陆需要返回一个用户不是很忙的服务器,目前只有世界0,未完成
+			world = enter_world(token, world_list[random.randint(1,1)]["world"])#选择世界,游客登陆需要返回一个用户不是很忙的服务器,目前只有世界0,未完成
 		else:
 			return "",""
 		int_number = random.choice([0,0])#登陆成功是否绑定账户0账号绑定，1手机绑定，2邮箱绑定，目前手机和邮箱未完成
 		if int_number==0:
-			response = send_tcp_message({'function' : 'bind_account', 'data' : {"token":token, "password":"123456","account":my_unique_id+"account","email":"","phone_number":""}})
+			response = send_tcp_message({'function' : 'bind_account', 'data' : {"token":token, "password":"123456","account":"account_"+my_unique_id,"email":"","phone_number":""}})
 			print(str(response))
 		return token,world
 	elif response["status"]==2:#账户已经被绑定
@@ -64,6 +64,7 @@ def login_unique():#游客登陆
 			return "",""
 
 def login_account():#账户登陆
+	global world
 	my_unique_id = unique_id
 	print_module("[login_account] unique_id="+my_unique_id)
 	num = random.choice(["account","account","account"])
@@ -115,7 +116,7 @@ def create_player(token,target_world,game_name):
 		return target_world#已经创建过角色，返回用户信息直接开始进入游戏流程
 
 def get_account_world_info(token):
-	print_module("[get_account_world_info]")
+	print_module("[get_account_world_info]="+token)
 	response = send_tcp_message({'function' : 'get_account_world_info', 'data' : {"token":token}})
 	print(str(response))
 	# response = {"status":0,"data":{"remaining": [{"word1":{"game_name":"","level":"2222","server_status":"0"}}]}}

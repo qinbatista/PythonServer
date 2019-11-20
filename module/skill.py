@@ -10,7 +10,7 @@ from module import enums
 from module import common
 
 
-async def level_up(uid, sid, iid, skill_config, **kwargs):
+async def level_up(uid, sid, iid, **kwargs):
 	"""
 	0 - success
 	1 - unlucky
@@ -19,22 +19,27 @@ async def level_up(uid, sid, iid, skill_config, **kwargs):
 	98 - insufficient materials
 	99 - already max level
 	"""
-	skill_scroll_id = skill_config['skill_scroll_id']
+	skill_scroll_id = kwargs['config']['skill']['skill_scroll_id']
 	level = await _get_skill(uid, sid, **kwargs)
 	if level['status'] != 0: return common.mt(96, 'skill not yet unlocked')
 	elif level['data']['level'] >= 10: return common.mt(99, 'already max level')
 	if str(iid) not in skill_scroll_id: return common.mt(97, 'invalid scroll id')
 	can_pay, remaining = await common.try_item(uid, enums.Item(iid), -1, **kwargs)
 	if not can_pay: return common.mt(98, 'insufficient materials')
-	if not _roll_for_upgrade(iid, skill_config['upgrade_chance']): return common.mt(1, 'unlucky', {'sid': sid, 'level': level['data']['level'], 'iid': iid, 'value': remaining})
+	if not _roll_for_upgrade(iid, kwargs['config']['skill']['upgrade_chance']): return common.mt(1, 'unlucky', {'sid': sid, 'level': level['data']['level'], 'iid': iid, 'value': remaining})
 	await common.execute(f'UPDATE skill SET level = level + 1 WHERE uid = "{uid}" AND sid = {sid};', **kwargs)
 	return common.mt(0, 'success', {'sid': sid, 'level': level['data']['level'] + 1, 'iid': iid, 'value': remaining})
 
 
-async def get_all(uid, skill_config, **kwargs):
+async def get_all(uid, **kwargs):
 	# 0 - success
 	skills = await common.execute(f'SELECT sid, level FROM skill WHERE uid = "{uid}";', **kwargs)
-	return common.mt(0, 'success', {'skills' : [{'sid' : s[0], 'level' : s[1]} for s in skills], 'config': skill_config})
+	return common.mt(0, 'success', {'skills' : [{'sid' : s[0], 'level' : s[1]} for s in skills]})
+
+
+async def config(**kwargs):
+	return common.mt(0, 'success', {'skill_config': kwargs['config']['skill']})
+
 
 ######################################################################################################
 

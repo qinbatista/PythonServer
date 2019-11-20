@@ -30,13 +30,13 @@ async def refresh(uid, **kwargs):
 	rem, next_ref    = await remaining_seconds(uid, now, refresh_t, **kwargs)
 	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds = rem), **kwargs)
 	level, worker, storage = await get_state(uid, **kwargs)
-	storage, delta         = update_state(steps, level, worker, storage, **kwargs)
-	await record_resources(uid, storage, **kwargs)
+	storage, delta         = update_state(steps, level, worker, storage, **kwargs)  # storage真实剩余数据，delta变化数据
+	await record_resources(uid, storage, **kwargs)  # 数据创建和更新操作
 	aid    = await get_armor(uid, **kwargs)
 	_, aq  = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
 	pool   = await remaining_pool_time(uid, now, **kwargs)
-	ua, mw = await get_unassigned_workers(uid, **kwargs)
-
+	ua, mw = await get_unassigned_workers(uid, **kwargs)  # ua未分配的工人数，mw总工人数
+	# 记录成就的代码片段
 	for k in RESOURCE_FACTORIES:
 		if delta[k] == 0: continue
 		if k == enums.Factory.FOOD: kwargs.update({"aid": enums.Achievement.COLLECT_FOOD})
@@ -46,14 +46,17 @@ async def refresh(uid, **kwargs):
 		await achievement.record_achievement(kwargs['data']['unique_id'], achievement_value=delta[k], **kwargs)
 
 	accel_end_t         = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
-	accel_end_t         = accel_end_t   if accel_end_t   is not None else now
+	accel_end_t         = now   if accel_end_t   is None else accel_end_t
 	accel_time = max(int((accel_end_t - now).total_seconds()), 0)
 	# if accel_time == 0: await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, now, **kwargs)
+	count = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
+	count = 1 if count is None else count
+	diamond = 0 if pool == 0 else count * kwargs['config']['factory']['wishing_pool']['base_diamond']
 	return common.mt(0, 'success', {'steps' : steps, 'resource' :
 			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES},
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}},
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]},
-			'pool' : pool,
+			'pool' : pool, 'pool_diamond': diamond,
 			'next_refresh' : next_ref,
 			'worker' : {enums.Factory.UNASSIGNED.value : ua, 'total' : mw,
 					**{k.value: worker[k] for k in BASIC_FACTORIES}},
@@ -191,7 +194,7 @@ async def wishing_pool(uid, wid, **kwargs):
 	seg_reward     = roll_segment_value(**kwargs)
 	seg_remain     = await weapon._update_segment(uid, wid, seg_reward, **kwargs)
 	return common.mt(0, 'success', {'pool' : pool, 'count' : 0 if pool == 0 else count, \
-			'diamond' : (count + 1) * kwargs['config']['factory']['wishing_pool']['base_diamond'], \
+			'pool_diamond' : (count + 1) * kwargs['config']['factory']['wishing_pool']['base_diamond'], \
 			'remaining' : {'wid' : wid.value, 'seg' : seg_remain, 'diamond' : dia_remain}, \
 			'reward'    : {'wid' : wid.value, 'seg' : seg_reward, 'diamond' : dia_cost}})
 
@@ -216,8 +219,8 @@ async def buy_acceleration(uid, **kwargs):
 
 async def set_armor(uid, aid, **kwargs):
 	r = await refresh(uid, **kwargs)
-	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `storage`) VALUES \
-			("{uid}", {enums.Factory.ARMOR.value}, {aid.value}) ON DUPLICATE KEY UPDATE \
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `storage`) VALUES \
+			("{uid}", {enums.Factory.ARMOR.value}, 1, {aid.value}) ON DUPLICATE KEY UPDATE \
 			`storage` = {aid.value};', **kwargs)
 	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
 			'armor' : r['data']['armor']}, 'aid' : aid.value})
@@ -272,7 +275,7 @@ async def remaining_seconds(uid, now, refresh_t, **kwargs):
 				kwargs['config']['factory']['general']['step']
 	remainder = int((now - refresh_t).total_seconds()) % delta
 	next_ref  = delta - remainder
-	return (remainder, next_ref)
+	return remainder, next_ref
 
 async def steps_since(uid, now, **kwargs):
 	accel_start_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)  # type => datetime or None
