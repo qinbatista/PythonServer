@@ -31,6 +31,7 @@ class Worker:
 		self.mh      = message_handler.MessageHandler()
 		self.gates   = {}
 		self.ujobs   = 0
+		self.debug   = False
 		self.running = False
 
 		self.configs = worker_resources.ModuleConfigurations()
@@ -41,7 +42,8 @@ class Worker:
 	'''
 	Starts the worker. Should only be called once.
 	'''
-	async def start(self):
+	async def start(self, *, debug = False):
+		self.debug = debug
 		await self.init()
 		print(f'this worker is operating on channel: {channel}')
 		self.sid = await self.nats.subscribe(channel, 'workers', self.process_job)
@@ -56,20 +58,20 @@ class Worker:
 	async def process_job(self, job):
 		self.ujobs += 1
 		cid, work = job.data.decode().split('~', maxsplit = 1)
-		#print(f'worker: received new job {work} with id {cid}')
+		if self.debug: print(f'worker: received new job {work} with id {cid}')
 		try:
-			#print(f'worker: calling messagehandler with args: {work}')
+			if self.debug: print(f'worker: calling messagehandler with args: {work}')
 			resp = await asyncio.wait_for(self.mh.resolve(json.loads(work), self.resource, self.configs), 3)
 		except asyncio.TimeoutError:
-			print(f'worker: message handler call with args: {work} timed out...')
+			if self.debug: print(f'worker: message handler call with args: {work} timed out...')
 			resp = '{"status" : -2, "message" : "request timed out"}'
 		except Exception as e:
 			print(f'worker: message handler call with args: {work} had an error...')
 			print(e)
 			resp = '{"status" : -1, "message" : "programming error, this should not happen"}'
-		#print(f'worker: returning response {cid} back to correct gate...')
+		if self.debug: print(f'worker: returning response {cid} back to correct gate...')
 		await self._return_response(cid, resp, await self._get_gid(cid))
-		#print(f'worker: returned {cid} back to correct gate!')
+		if self.debug: print(f'worker: returned {cid} back to correct gate!')
 		self.ujobs -= 1
 
 	'''
@@ -116,7 +118,7 @@ class Worker:
 	async def _get_gid(self, cid):
 		gid = (await self.resource['redis'].get(cid)).decode()
 		if gid not in self.gates or self.gates[gid][1].is_closing() or self.gates[gid][0].at_eof():
-			print(f'adding a new gate connection for gate: {gid}')
+			if self.debug: print(f'adding a new gate connection for gate: {gid}')
 			ip, port = (await self.resource['redis'].get('gates.id.' + gid)).decode().split(':')
 			self.gates[gid] = await asyncio.open_connection(ip, int(port))
 		return gid
