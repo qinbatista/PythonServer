@@ -11,7 +11,7 @@ import timeit
 import threading
 
 class Collector:
-	send_buffer = 1
+	send_buffer = 5
 	def __init__(self, *, path = 'world.{world}.function.{fn}', \
 			host = '192.168.1.165', port = 2004):
 		self.host      = host
