@@ -33,18 +33,15 @@ def send_gift_all():
 def request_friend():
 	print_method("[request_friend]")
 	new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"gn_target":"name_"+str(random.randint(0,user_behavior_simulation.get_number()))}})#发送好友信息
-	# new_response = send_tcp_message({'world' : world, 'function' : 'request_friend', 'data' : {'token' : token,"gn_target":"哲帅蛰引瞩锑"}})#发送好友信息
 	print_method("[request_friend] requst_friend:"+str(new_response))
 
 def remove_friend():
 	print_method("[remove_friend]")
 	new_response = send_tcp_message({'world' : world, 'function' : 'remove_friend', 'data' : {'token' : token,"gn_target":"name_"+str(random.randint(0,user_behavior_simulation.get_number()))}})#发送好友信息
-	# new_response = send_tcp_message({'world' : world, 'function' : 'remove_friend', 'data' : {'token' : token,"gn_target":"哲帅蛰引瞩锑"}})#发送好友信息
 	print_method("[remove_friend] remove_friend:"+str(new_response))
 
 def find_person():
 	print_method("[find_person]")
-	# new_response = send_tcp_message({'world' : world, 'function' : 'find_person', 'data' : {'token' : token,"gn_target":"name_"+str(random.randint(0,user_behavior_simulation.get_number()))}})#发送好友信息
 	new_response = send_tcp_message({'world' : world, 'function' : 'find_person', 'data' : {'token' : token,"gn_target":"name_"+str(random.randint(0,user_behavior_simulation.get_number()))}})#发送好友信息
 	print_method("[find_person]:"+str(new_response))
 

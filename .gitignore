@@ -11,3 +11,4 @@ obj
 *.ide-wal
 .vs
 chatlogs
+unittests/user_behavior_simulation/log_history

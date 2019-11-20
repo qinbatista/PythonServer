@@ -6,10 +6,10 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
-
+import user_behavior_simulation
 
 lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
-
+COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m','ylw' : '\033[1;33;40m'}
 def print_method(my_string):
 	print("\033[0;37;44m\t"+my_string+"\033[0m")
 def print_module(my_string):
@@ -19,35 +19,26 @@ def send_tcp_message(msg):
 	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
 def enter_stage(**kwargs):
-	print("stage:"+str(kwargs['stage']))
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
-	print("[enter_stage]"+str(response))
+	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
 	return response["status"]
 
 def pass_stage(**kwargs):
-	print("stage:"+str(kwargs['stage']))
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'pass_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage'],'damage':kwargs['damage']}})
-	print("[pass_stage]"+str(response))
+	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'pass_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage'],'damage':kwargs['damage']}})
 
 def start_hang_up(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'start_hang_up', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
-	print("[start_hang_up]"+str(response)+" stage:"+str(kwargs['stage']))
+	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'start_hang_up', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
 
 def get_hang_up_reward(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'get_hang_up_reward', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
-	print("[get_hang_up_reward]"+str(response)+" stage:"+str(kwargs['stage']))
+	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'get_hang_up_reward', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
 
 def check_boss_status(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'check_boss_status', 'data': {'token': kwargs['token']}})
-	print("[check_boss_status]"+str(response))
+	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'check_boss_status', 'data': {'token': kwargs['token']}})
 
 def enter_stage(**kwargs):
-	response = send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
-	print("[enter_stage]"+str(response))
+	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
 
 def get_top_damage(**kwargs):
-	response = send_tcp_message({'world': 0, 'function': 'get_top_damage', 'data': {'token': kwargs['token'], "page": 1}})
-	print("[get_top_damage]"+str(response))
+	response = user_behavior_simulation.send_tcp_message({'world': 0, 'function': 'get_top_damage', 'data': {'token': kwargs['token'], "page": 1}})
 
 def stage_dialog(token,world,info_list):
 	# while True:

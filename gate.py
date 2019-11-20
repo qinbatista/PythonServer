@@ -40,6 +40,7 @@ class Gate:
 		self.ip       = self._read_ip()
 		self.cport    = cport
 		self.wport    = wport
+		self.debug    = False
 		self.cwriters = {}
 
 		self.cs       = None
@@ -53,7 +54,8 @@ class Gate:
 	'''
 	Starts the gate server. Should only be called once.
 	'''
-	async def start(self):
+	async def start(self, *, debug = False):
+		self.debug = debug
 		try:
 			await self.init()
 			asyncio.create_task(self.cs.serve_forever())
@@ -176,8 +178,8 @@ class Gate:
 		self.cwriters[cid] = writer
 		await self.redis.set(cid, self.gid, expire = 10)
 		await self.nats.publish(channel, (cid + '~' + job).encode())
-		print(f'gate: submitted new job with id {cid} and args {job}')
-		print(f'gate: waiting for job {cid} to complete')
+		if self.debug: print(f'gate: submitted new job with id {cid} and args {job}')
+		if self.debug: print(f'gate: waiting for job {cid} to complete')
 
 	async def _receive(self, reader):
 		raw = await reader.readuntil(b'\r\n')

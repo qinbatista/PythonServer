@@ -6,7 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client as tc
 import random
-
+import user_behavior_simulation
 
 lukseun = tc.LukseunClient('aliya', port = 8880)
 logger = tc.logger
@@ -20,95 +20,95 @@ def send_tcp_message(msg):
 # 		func(token,world) if kwargs.__contains__("world") else (lambda response=send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}}): func(**{'token': response['data['token, 'world': 0}))()
 # 	return wrapper
 
-# 
+#
 def basic_summon(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'basic_summon', 'data' : {'token' : token,"item":random.choice([1,5])}})
 
-# 
+
+#
 def pro_summon(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'pro_summon', 'data' : {'token' : token,"item":random.choice([1,5])}})
 
-# 
+
+#
 def friend_summon(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'friend_summon', 'data' : {'token' : token,"item":random.choice([1,5])}})
 
-# 
+
+#
 def basic_summon_skill(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_skill', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'basic_summon_skill', 'data' : {'token' : token,"item":random.choice([1,5])}})
 
-# 
+
+#
 def pro_summon_skill(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon_skill', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'pro_summon_skill', 'data' : {'token' : token,"item":random.choice([1,5])}})
 
-# 
+
+#
 def friend_summon_skill(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_skill', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'friend_summon_skill', 'data' : {'token' : token,"item":random.choice([1,5])}})
 
-# 
+
+#
 def basic_summon_role(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_role', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'basic_summon_role', 'data' : {'token' : token,"item":random.choice([1,5])}})
 
-# 
+
+#
 def pro_summon_role(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon_role', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'pro_summon_role', 'data' : {'token' : token,"item":random.choice([1,5])}})
 
-# 
+
+#
 def friend_summon_role(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_role', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'friend_summon_role', 'data' : {'token' : token,"item":random.choice([1,5])}})
 
-# 
+
+#
 def basic_summon_10_times(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'basic_summon_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})
+
 
 
 def pro_summon_10_times(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'basic_summon_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})
+
 
 
 def friend_summon_10_times(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'friend_summon_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
+
 
 
 def basic_summon_skill_10_times(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_skill_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'basic_summon_skill_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
+
 
 
 def pro_summon_skill_10_times(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon_skill_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'pro_summon_skill_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
+
 
 
 def friend_summon_skill_10_times(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_skill_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'friend_summon_skill_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
+
 
 
 def basic_summon_role_10_times(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'basic_summon_role_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'basic_summon_role_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
+
 
 
 def pro_summon_role_10_times(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'pro_summon_role_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'pro_summon_role_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
+
 
 
 def friend_summon_role_10_times(token,world):
-	response = send_tcp_message({'world' : world, 'function' : 'friend_summon_role_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'friend_summon_role_10_times', 'data' : {'token' : token,"item":random.choice([1,5])}})#能量包，1是1张， 2是3张，3是10张
+
 
 def summon_dialog(token,world):
 	basic_summon(token,world)
