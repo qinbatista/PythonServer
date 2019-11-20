@@ -631,7 +631,7 @@ class MessageHandler:
 		return common.mt(0, 'success', {'version': self._version})
 
 	async def _exchange_card(self, data: dict) -> str:
-		return await package.exchange(data['data']['unique_id'], data['data']['card_id'], **data)
+		return await package.exchange(data['data']['unique_id'], int(data['data']['card_id']), **data)
 
 	async def _get_config_card(self, data: dict) -> str:
 		return await package.config(data['data']['unique_id'], **data)
