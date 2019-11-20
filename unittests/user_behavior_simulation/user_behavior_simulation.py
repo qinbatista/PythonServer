@@ -31,12 +31,18 @@ import random
 import asyncio
 import pymysql
 from datetime import datetime, timedelta
-
+import os
 logger = tool_lukseun_client.logger
-
+lukseun = tool_lukseun_client.LukseunClient('aliya',host="192.168.1.165", port = 8880)
 world = "0"
 token = ""
-testing_people_number = 1
+unique_id=""
+testing_people_number = 1000
+DEBUG_LOG = True
+DEBUG_LOG_DETAIL=False
+
+
+
 def call_login(unique_id):
 	global world,token
 	while True:
@@ -47,52 +53,25 @@ def call_login(unique_id):
 def get_number():
 	return testing_people_number
 
-def call_friend_dialog(get_all_friend_info):
-	module_3_friends.freind_dialog(token,world,get_all_friend_info)
-
-def weapon_dialog(get_all_weapon):
-	module_5_weapons.weapon_dialog(token,world,get_all_weapon)
-
-def factory_dialog(refresh_all_storage):
-	module_6_factory.factory_dialog(token,world,refresh_all_storage)
-
-def get_random_item():
-	module_7_lottery.get_random_item(token,world)
-
-def role_dialog():
-	module_8_roles.role_dialog(token,world)
-
-def family_dialog(get_all_family_info,player_info):
-	module_9_family.family_dialog(token,world,get_all_family_info, player_info)
-
-def stage_dialog(get_level_info):
-	module_10_stage.enter_stage(token,world,get_level_info)
-
-def mail_dialog(get_all_mail,name):
-	module_11_mail.mail_dialog(token,world,get_all_mail,name)
-
-def announcement():
-	pass
-
-def dark_market():
-	pass
-
-def vip_system():
-	module_14_vip.vip_dialog(token,world)
-unique_id=""
-
-
-lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
+def debug_log(time,method_name,string,level=1):
+	if DEBUG_LOG == False:
+		return
+	print(f"\033[1;9{1 if level!=1 else 2}m\t{format(time, '0.4f')} S\033[0m\033[1;93m\t[{method_name}]\033[0m\033[1;\t{string if DEBUG_LOG_DETAIL==True else ''}\033[0m")
+	with open(os.path.dirname(os.path.realpath(__file__))+"/log_history/"+method_name+".txt","a") as f:
+		f.writelines(f"{time} { '' if string=='' else string['status']} {datetime.strptime(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')}\r\n")
 def send_tcp_message(msg):
-	return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
-
+	start = time.time()
+	msg_resutl= asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
+	end = time.time()
+	debug_log(end-start,msg['function'],msg_resutl)
+	return msg_resutl
 
 def _execute_statement(statement: str) -> tuple:
 		db = pymysql.connect('192.168.1.102', 'root', 'lukseun', '0')
 		cursor = db.cursor()
 		cursor.execute(statement)
 		db.commit()
-unique_id=""
+
 def create_data(name):
 	global unique_id,token
 	unique_id = name
@@ -121,32 +100,33 @@ def run_task(name):
 	global unique_id
 	unique_id = name
 	call_login(str(name))
-	create_data(name)
+	# create_data(name)
+	start = time.time()
 	info_list =  module_16_get_all_data.get_all_info(token,world)#加载所有参数信息
-	module_1_stage.stage_dialog(token,world,info_list[5])##战役
-	module_2_summon.summon_dialog(token,world)#召唤法政
+	# module_1_stage.stage_dialog(token,world,info_list[5])##战役
+	# module_2_summon.summon_dialog(token,world)#召唤法政
 	module_3_lottery.get_random_item(token,world)#转盘
-	module_6_darkmarket.darkmarket_dialog(token,world)#市场
-	module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
-	module_11_friends.freind_dialog(token,world,info_list[7])#朋友
-	module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
-	module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
-	# module_18_family.family_dialog(token,world,get_all_family_info, player_info)#家族系统（后测试）
-	module_19_factory.factory_dialog(token,world,info_list[5])#建造
-	# module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
-	module_21_roles.role_dialog(token,world)#玩家卡牌
-	# module_22_announcement.announcement_dialog(token,world)#公告系统（后测试）
-	module_23_daily_task.task_dialog(token,world,info_list[5])#每日任务
-	module_24_achievement.achievement_dialog(token,world)#成就系统
-	# module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
-	# module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
-	# module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
-
+	# module_6_darkmarket.darkmarket_dialog(token,world)#市场
+	# module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
+	# module_11_friends.freind_dialog(token,world,info_list[7])#朋友
+	# module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
+	# module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
+	# # module_18_family.family_dialog(token,world,get_all_family_info, player_info)#家族系统（后测试）
+	# module_19_factory.factory_dialog(token,world,info_list[5])#建造
+	# # module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
+	# module_21_roles.role_dialog(token,world)#玩家卡牌
+	# # module_22_announcement.announcement_dialog(token,world)#公告系统（后测试）
+	# module_23_daily_task.task_dialog(token,world,info_list[5])#每日任务
+	# module_24_achievement.achievement_dialog(token,world)#成就系统
+	# # module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
+	# # module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
+	# # module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
+	end = time.time()
+	debug_log(end-start,"user_"+str(unique_id),"",level=2)
 
 
 def run_all_task():
 	starttime = datetime.now()
-	print("cpu:"+str(multiprocessing.cpu_count()))
 	p = multiprocessing.Pool()
 	for i in range(0,testing_people_number):
 		p.apply_async(run_task, args=(str(i),))
@@ -155,5 +135,5 @@ def run_all_task():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	# run_task("q98")
+	# run_task("1")
 	run_all_task()

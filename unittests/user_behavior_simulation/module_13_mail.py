@@ -71,7 +71,10 @@ def send_gift(**kwargs):
 	# print("[request_friend] requst_friend:"+str(new_response))
 	new_response = send_tcp_message({'world': world, 'function': 'request_friend', 'data': {'token': module_1_login.get_token("unique_id19"), "friend_name": "name_unique_id" + str(10)}})  # 发送好友信息
 	print_method("[request_friend] requst_friend:"+str(new_response))
-
+def get_all_mail():#获取所有邮件
+	response = send_tcp_message({'world' : world, 'function' : 'get_all_mail', 'data' : {'token' : token}})#升级请求
+	print("[get_all_mail]"+str(response))
+	return response
 def mail_dialog(_token,_world,_all_info,_name):
 	name = _name
 	token = _token
