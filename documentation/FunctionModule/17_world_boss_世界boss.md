@@ -237,7 +237,8 @@
 }
 ```
 
-
+- 98：stage error（关卡错误）
+- 99：abnormal data（数据异常）
 
 
 

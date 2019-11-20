@@ -44,22 +44,22 @@ async def refresh(uid, **kwargs):
 		elif k == enums.Factory.CRYSTAL: kwargs.update({"aid": enums.Achievement.COLLECT_CRYSTAL})
 		else: continue
 		await achievement.record_achievement(kwargs['data']['unique_id'], achievement_value=delta[k], **kwargs)
-
+	# 计算加速剩余时间做后面的返回
 	accel_end_t         = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
-	accel_end_t         = now   if accel_end_t   is None else accel_end_t
-	accel_time = max(int((accel_end_t - now).total_seconds()), 0)
-	# if accel_time == 0: await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, now, **kwargs)
-	count = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
-	count = 1 if count is None else count
-	diamond = 0 if pool == 0 else count * kwargs['config']['factory']['wishing_pool']['base_diamond']
-	return common.mt(0, 'success', {'steps' : steps, 'resource' :
-			{'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES},
+	accel_time          = 0   if accel_end_t   is None else int((accel_end_t - now).total_seconds())
+	# 计算许愿池下次许愿许愿消耗的钻石数
+	count   = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
+	diamond = 0 if count is None or pool == 0 else count * kwargs['config']['factory']['wishing_pool']['base_diamond']
+	return common.mt(0, 'success', {'steps' : steps, 'resource' : {
+			'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES},
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}},
 			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]},
 			'pool' : pool, 'pool_diamond': diamond,
 			'next_refresh' : next_ref,
-			'worker' : {enums.Factory.UNASSIGNED.value : ua, 'total' : mw,
-					**{k.value: worker[k] for k in BASIC_FACTORIES}},
+			'worker' : {
+				enums.Factory.UNASSIGNED.value : ua, 'total' : mw,
+				**{k.value: worker[k] for k in BASIC_FACTORIES}
+			},
 			'level' : {k.value : level[k] for k in HAS_LEVEL_FACTORIES},
 			'time': accel_time})
 
@@ -148,16 +148,22 @@ async def buy_worker(uid, **kwargs):
 async def upgrade(uid, fid, **kwargs):
 	if fid not in HAS_LEVEL_FACTORIES: return common.mt(99, 'invalid fid')
 	r = await refresh(uid, **kwargs)
-	l = r['data']['level'][fid.value]
+	l = r['data']['level'][fid.value]  # 获取工厂等级
 	crystal = r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value]
 	try:
 		upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(l + 1)]
 	except KeyError:
-		return common.mt(97, 'max level', {'refresh' : {'resource' : r['data']['resource'], \
+		return common.mt(97, 'max level', {'refresh' : {'resource' : r['data']['resource'],
 				'armor' : r['data']['armor']}})
 	if crystal < upgrade_cost:
-		return common.mt(98, 'insufficient funds', {'refresh' : {'resource' : r['data']['resource'], \
+		return common.mt(98, 'insufficient funds', {'refresh' : {'resource' : r['data']['resource'],
 				'armor' : r['data']['armor']}})
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `level`) VALUES ("{uid}", {fid.value}, \
+			{l + 1}) ON DUPLICATE KEY UPDATE `level` = {l + 1};', **kwargs)
+	await common.execute(f'UPDATE `factory` SET `storage` = {crystal - upgrade_cost} WHERE `uid` = "{uid}" \
+			AND `fid` = {enums.Factory.CRYSTAL.value};', **kwargs)
+	r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value] = crystal - upgrade_cost
+	# 记录成就的代码片段
 	if fid == enums.Factory.FOOD.value:
 		kwargs["aid"] = enums.Achievement.COLLECT_FOOD
 	elif fid == enums.Factory.IRON.value:
@@ -166,13 +172,8 @@ async def upgrade(uid, fid, **kwargs):
 		kwargs["aid"] = enums.Achievement.COLLECT_CRYSTAL
 	else: kwargs["aid"] = 0
 	if kwargs["aid"]: await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
-	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `level`) VALUES ("{uid}", {fid.value}, \
-			{l + 1}) ON DUPLICATE KEY UPDATE `level` = {l + 1};', **kwargs)
-	await common.execute(f'UPDATE `factory` SET `storage` = {crystal - upgrade_cost} WHERE `uid` = "{uid}" \
-			AND `fid` = {enums.Factory.CRYSTAL.value};', **kwargs)
-	r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value] = crystal - upgrade_cost
-	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
-			'armor' : r['data']['armor']}, 'upgrade' : {'cost' : upgrade_cost, 'fid' : fid.value, \
+	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'],
+			'armor' : r['data']['armor']}, 'upgrade' : {'cost' : upgrade_cost, 'fid' : fid.value,
 			'level' : l + 1}})
 
 async def wishing_pool(uid, wid, **kwargs):
@@ -210,11 +211,10 @@ async def buy_acceleration(uid, **kwargs):
 	r                   = await refresh(uid, **kwargs)
 	if now >= accel_start_t:
 		await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, now, **kwargs)
-	await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, \
-			max(now + timedelta(days = 1), accel_end_t + timedelta(days = 1)), **kwargs)
-	pool = max(int((accel_end_t - now).total_seconds()), 0)
-	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
-			'armor' : r['data']['armor']}, 'time' : pool, \
+	accel_end_t = max(now + timedelta(days=1), accel_end_t + timedelta(days=1))
+	await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, accel_end_t, **kwargs)
+	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'],
+			'armor' : r['data']['armor']}, 'time' : int((accel_end_t - now).total_seconds()),
 			'remaining' : {'diamond' : dia_remain}, 'reward' : {'diamond' : -dia_cost}})
 
 async def set_armor(uid, aid, **kwargs):
