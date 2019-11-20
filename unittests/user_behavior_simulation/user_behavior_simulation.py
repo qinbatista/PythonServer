@@ -1,3 +1,4 @@
+
 import tool_lukseun_client
 import module_0_login
 import module_1_stage
@@ -32,8 +33,10 @@ import asyncio
 import pymysql
 from datetime import datetime, timedelta
 import os
+import gevent
+# from gevent import monkey; monkey.patch_all()
 logger = tool_lukseun_client.logger
-lukseun = tool_lukseun_client.LukseunClient('aliya',host="192.168.1.136", port = 8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya',host="192.168.1.165", port = 8880)
 world = "0"
 token = ""
 unique_id=""
@@ -103,29 +106,30 @@ def run_task(name):
 	# create_data(name)
 	start = time.time()
 	info_list =  module_16_get_all_data.get_all_info(token,world)#加载所有参数信息
-	module_1_stage.stage_dialog(token,world,info_list[5])##战役
-	module_2_summon.summon_dialog(token,world)#召唤法政
-	module_3_lottery.get_random_item(token,world)#转盘
-	module_6_darkmarket.darkmarket_dialog(token,world)#市场
-	module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
-	module_11_friends.freind_dialog(token,world)#朋友
-	module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
-	module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
-	# module_18_family.family_dialog(token,world,get_all_family_info, player_info)#家族系统（后测试）
-	module_19_factory.factory_dialog(token,world,info_list[5])#建造
-	# module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
-	module_21_roles.role_dialog(token,world)#玩家卡牌
-	# module_22_announcement.announcement_dialog(token,world)#公告系统（后测试）
-	module_23_daily_task.task_dialog(token,world,info_list[5])#每日任务
-	module_24_achievement.achievement_dialog(token,world)#成就系统
-	module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
-	module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
-	module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
+	# module_1_stage.stage_dialog(token,world,info_list[5])##战役
+	# module_2_summon.summon_dialog(token,world)#召唤法政
+	# module_3_lottery.get_random_item(token,world)#转盘
+	# module_6_darkmarket.darkmarket_dialog(token,world)#市场
+	# module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
+	# module_11_friends.freind_dialog(token,world)#朋友
+	# module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
+	# module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
+	# # module_18_family.family_dialog(token,world,get_all_family_info, player_info)#家族系统（后测试）
+	# module_19_factory.factory_dialog(token,world,info_list[5])#建造
+	# # module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
+	# module_21_roles.role_dialog(token,world)#玩家卡牌
+	# # module_22_announcement.announcement_dialog(token,world)#公告系统（后测试）
+	# module_23_daily_task.task_dialog(token,world,info_list[5])#每日任务
+	# module_24_achievement.achievement_dialog(token,world)#成就系统
+	# module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
+	# module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
+	# module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
 	end = time.time()
 	debug_log(end-start,"user_"+str(unique_id),"",level=2)
+	gevent.sleep(0)
 
 
-def run_all_task():
+def run_all_task_multiprocessing():
 	starttime = datetime.now()
 	p = multiprocessing.Pool(processes=12)
 	for i in range(0,testing_people_number):
@@ -134,6 +138,13 @@ def run_all_task():
 	p.join()
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
+
+def run_all_task_gevent():
+	starttime = datetime.now()
+	gevent.joinall([gevent.spawn(run_task, i) for i in range(0, testing_people_number)])
+	endtime = datetime.now()
+	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("1")
-	# run_all_task()
+	# run_task("1")
+	run_all_task_multiprocessing()
+
