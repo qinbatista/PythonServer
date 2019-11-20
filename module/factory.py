@@ -211,11 +211,10 @@ async def buy_acceleration(uid, **kwargs):
 	r                   = await refresh(uid, **kwargs)
 	if now >= accel_start_t:
 		await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, now, **kwargs)
-	await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, \
-			max(now + timedelta(days = 1), accel_end_t + timedelta(days = 1)), **kwargs)
-	pool = max(int((accel_end_t - now).total_seconds()), 0)
-	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
-			'armor' : r['data']['armor']}, 'time' : pool, \
+	accel_end_t = max(now + timedelta(days=1), accel_end_t + timedelta(days=1))
+	await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, accel_end_t, **kwargs)
+	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'],
+			'armor' : r['data']['armor']}, 'time' : int((accel_end_t - now).total_seconds()),
 			'remaining' : {'diamond' : dia_remain}, 'reward' : {'diamond' : -dia_cost}})
 
 async def set_armor(uid, aid, **kwargs):
