@@ -98,7 +98,7 @@ async def get_all(uid, **kwargs):
 	_, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
 	members = await _get_member_info(name, **kwargs)
 	news = await _get_family_changes(name, **kwargs)
-	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news, 'timer' : '' if timer is None else timer.strftime('%Y-%d-%d %H:%M:%S')})
+	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news, 'timer' : -1 if timer is None else int((timer-datetime.now(timezone.utc)).total_seconds())})
 
 async def get_store(**kwargs):
 	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k,v in kwargs['config']['family']['store']['items'].items()]})
@@ -288,9 +288,10 @@ async def _get_disband_timer(name, **kwargs):
 
 async def _set_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
-	time = (datetime.now(timezone.utc) + timedelta(days = 1)).strftime('%Y-%m-%d %H:%M:%S')
+	seconds = 3600 * 24
+	time = (datetime.now(timezone.utc) + timedelta(seconds=seconds)).strftime('%Y-%m-%d %H:%M:%S')
 	await common.execute(f'INSERT INTO `timer` VALUES ("{owner_uid[0][0]}", {enums.Timer.FAMILY_DISBAND.value}, "{time}");', **kwargs)
-	return time
+	return seconds
 
 async def _delete_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
