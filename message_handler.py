@@ -88,11 +88,10 @@ class MessageHandler:
 		pass
 
 	# json.decoder.JSONDecodeError
-	async def resolve(self, message: str, resource, configs) -> str:
+	async def resolve(self, message: dict, resource, configs) -> str:
 		'''
 		Resolves the message included in the request. If required, ensures that a valid token is present.
 		'''
-		message = json.loads(message)
 		try:
 			fn = self._functions[message['function']]
 		except KeyError:
