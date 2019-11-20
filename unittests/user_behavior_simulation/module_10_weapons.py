@@ -6,7 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client as tc
 import random
-
+import user_behavior_simulation
 lukseun = tc.LukseunClient('aliya',  port = 8880)
 logger = tc.logger
 
@@ -58,20 +58,16 @@ def weapon_dialog(_token,_world,get_all_skill_info):
 	weapon_list = [i for i in range(1,30)]
 
 	weapon_id = random.randint(1,30)
-	new_response = send_tcp_message({'world' : world, 'function' : 'level_up_weapon', 'data' : {'token' : token, "weapon":weapon_id,"amount":random.randint(30,400)}})#升级请求
-	logger.debug("[get_random_weapon] coin to get weapon="+str(new_response))
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'level_up_weapon', 'data' : {'token' : token, "weapon":weapon_id,"amount":random.randint(30,400)}})#升级请求
 
-	new_response = send_tcp_message({'world' : world, 'function' : 'level_up_star_weapon', 'data' : {'token' : token, "weapon":weapon_id}})#升级请求
-	logger.debug("[level_up_star_weapon] level up weapon star:"+str(new_response))
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'level_up_star_weapon', 'data' : {'token' : token, "weapon":weapon_id}})#升级请求
 
-	new_response = send_tcp_message({'world' : world, 'function' : 'level_up_passive_weapon', 'data' : {'token' : token, "weapon":weapon_id,"passive":random.choice(passive_list)}})#升级请求
-	logger.debug("[level_up_passive_weapon] level up weapon skill"+str(new_response))
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'level_up_passive_weapon', 'data' : {'token' : token, "weapon":weapon_id,"passive":random.choice(passive_list)}})#升级请求
 
-	new_response = send_tcp_message({'world' : world, 'function' : 'reset_skill_point_weapon', 'data' : {'token' : token, "weapon":weapon_id}})#升级请求
-	logger.debug("[reset_skill_point_weapon] reset weapon skill"+str(new_response))
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'reset_skill_point_weapon', 'data' : {'token' : token, "weapon":weapon_id}})#升级请求
 
-	new_response = send_tcp_message({'world' : world, 'function' : 'upgrade_armor', 'data' : {'token' : token, "aid":random.randint(1,4),"level":random.randint(1,9)}})#升级请求
-	logger.debug("[weapon_dialog] level up armor star:"+str(new_response))
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'upgrade_armor', 'data' : {'token' : token, "aid":random.randint(1,4),"level":random.randint(1,9)}})#升级请求
+
 
 
 if __name__ == '__main__':

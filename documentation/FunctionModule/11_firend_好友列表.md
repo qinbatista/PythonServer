@@ -16,7 +16,7 @@
 ```json
 {
 	"world": 0,
-	"function": "get_all_weapon",
+	"function": "get_all_friend",
 	"data": {
 		"token": "my token"
 	}

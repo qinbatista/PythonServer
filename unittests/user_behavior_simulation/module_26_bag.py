@@ -6,6 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
+import user_behavior_simulation
 
 
 lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
@@ -38,7 +39,8 @@ def check_in_dialog(token,world,respons):
 	get_all_check_in_table(token,world)
 	check_in(token,world)
 	supplement_check_in(token,world)
-
+def bag_dialog(token,world,respons):
+	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token' : token,'card_id':18}})
 
 if __name__ == '__main__':
 	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})

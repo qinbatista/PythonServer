@@ -6,6 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
+import user_behavior_simulation
 
 
 lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
@@ -40,18 +41,17 @@ def print_method(my_string):
 def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
-def vip_dialog(token,world):
+def vip_dialog(token,world,info):
 	# while True:
-	response = send_tcp_message({'world' : world, 'function' : 'increase_vip_exp', 'data' : {'token' : token,"quanitiy":random.randint(0,10)}})
-	print_method("[increase_vip_exp]"+str(response))
-	# response = send_tcp_message({'world' : world, 'function' : 'purchase_vip_gift', 'data' : {'token' : token,"kind":random.randint(3,3)}})
-	# print_method("[purchase_vip_gift]"+str(response))
-	# response = send_tcp_message({'world' : world, 'function' : 'check_vip_daily_reward', 'data' : {'token' : token}})
-	# print_method("[purchase_vip_gift]"+str(response))
-	# response = send_tcp_message({'world' : world, 'function' : 'get_all_vip_info', 'data' : {'token' : token}})
-	# print_method("[purchase_vip_gift]"+str(response))
-	# response = send_tcp_message({'world' : world, 'function' : 'purchase_vip_card', 'data' : {'token' : token,"type":random.randint(0,10)}})
-	# print_method("[purchase_vip_gift]"+str(response))
+	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_vip_daily_reward', 'data' : {'token' : token}})
+
+	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_info_vip', 'data' : {'token' : token}})
+
+	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'purchase_vip_gift', 'data' : {'token' : token, "tier": 1}})
+
+	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'purchase_vip_card', 'data' : {'token' : token, "card_id": 18}})
+
+
 
 	return ""
 

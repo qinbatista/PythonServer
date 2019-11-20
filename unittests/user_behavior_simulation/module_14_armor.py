@@ -10,7 +10,7 @@ import configparser
 import asyncio
 import tool_lukseun_client as tc
 import random
-
+import user_behavior_simulation
 
 lukseun = tc.LukseunClient('aliya', port = 8880)
 logger = tc.logger
@@ -26,17 +26,15 @@ def login_decoration(func):
 
 # @login_decoration
 def get_all_armor(token, world, **kwargs):
-	response = send_tcp_message({'world': world, 'function': 'get_all_armor', 'data': {'token': token}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_armor', 'data': {'token': token}})
 
 # @login_decoration
 def upgrade_armor(token, world, aid=1, level=2, **kwargs):
-	response = send_tcp_message({'world': world, 'function': 'upgrade_armor', 'data': {'token': token, 'aid': aid, 'level': level}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'upgrade_armor', 'data': {'token': token, 'aid': aid, 'level': level}})
 
 
 def armor_dialog(token, world, aid, **kwargs):
-	# get_all_armor(token, world, **kwargs)
+	get_all_armor(token, world, **kwargs)
 	for i in range(1,10):
 		upgrade_armor(token, world, 1, i, **kwargs)
 

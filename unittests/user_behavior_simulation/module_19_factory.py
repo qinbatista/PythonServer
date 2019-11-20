@@ -6,6 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client as tc
 import random
+import user_behavior_simulation
 logger = tc.logger
 lukseun = tc.LukseunClient('aliya', port = 8880)
 world = "0"
@@ -17,24 +18,22 @@ def send_tcp_message(msg):
 def purchase_item_success(item_id):
 	pass
 def factory_dialog(token,world,get_all_weapon):
-	logger.debug("[factory_dialog]")
 	new_response = get_all_weapon
-
 	operat_factory = random.randint(0,3)
-	new_response = send_tcp_message({'world' : world, 'function' : 'refresh_factory', 'data' : {'token' : token}})
-	print("	[refresh_factory]"+str(new_response))
-	new_response = send_tcp_message({'world' : world, 'function' : 'upgrade_factory', 'data' : {'token':token, "fid":operat_factory}})
-	print("	[upgrade_factory]"+str(new_response))
-	new_response = send_tcp_message({'world' : world, 'function' : 'buy_worker_factory', 'data' : {'token':token, "fid":operat_factory, "num":1}})
-	print("	[buy_worker_factory]"+str(new_response))
-	new_response = send_tcp_message({'world' : world, 'function' : 'activate_wishing_pool_factory', 'data' : {'token':token, "wid":5}})
-	print("	[activate_wishing_pool_factory]"+str(new_response))
-	new_response = send_tcp_message({'world' : world, 'function' : 'buy_acceleration_factory', 'data' : {'token' : token}})
-	print("	[buy_acceleration_factory]"+str(new_response))
-	new_response = send_tcp_message({'world' : world, 'function' : 'set_armor_factory', 'data' : {'token' : token,'aid':1}})
-	print("	[set_armor_factory]"+str(new_response))
-	new_response = send_tcp_message({'world' : world, 'function' : 'update_worker_factory', 'data' : {'token' : token, "worker": {"0": 1, "1": 1, "2": 1}}})
-	print("	[update_worker_factory]"+str(new_response))
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'refresh_factory', 'data' : {'token' : token}})
+
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'upgrade_factory', 'data' : {'token':token, "fid":operat_factory}})
+
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'buy_worker_factory', 'data' : {'token':token, "fid":operat_factory, "num":1}})
+
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'activate_wishing_pool_factory', 'data' : {'token':token, "wid":5}})
+
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'buy_acceleration_factory', 'data' : {'token' : token}})
+
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_armor_factory', 'data' : {'token' : token,'aid':1}})
+
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'update_worker_factory', 'data' : {'token' : token, "worker": {"0": 1, "1": 1, "2": 1}}})
+
 
 	# while True:
 	# 	print("_________________________")

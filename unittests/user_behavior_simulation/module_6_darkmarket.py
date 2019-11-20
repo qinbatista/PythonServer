@@ -6,7 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client as tc
 import random
-import user_behavior_simulation as user
+import user_behavior_simulation
 
 lukseun = tc.LukseunClient('aliya', port = 8880)
 logger = tc.logger
@@ -28,13 +28,11 @@ def login_decoration(func):
 
 # @login_decoration
 def refresh_market(token,world, **kwargs):
-	response = send_tcp_message({'world': world, 'function': 'refresh_market', 'data': {'token' : token}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_market', 'data': {'token' : token}})
 
 # @login_decoration
 def darkmarket_transaction( token, world, pid, **kwargs):
-	response = send_tcp_message({'world': world, 'function': 'darkmarket_transaction', 'data': {'token' : token, 'pid': pid}})
-	logger.debug(response)
+	response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'darkmarket_transaction', 'data': {'token' : token, 'pid': pid}})
 
 def darkmarket_dialog(token, world,**kwargs):
 	refresh_market(token, world, **kwargs)

@@ -5,7 +5,7 @@
 * [`get_info_vip`](##get_info_vip)
 * [`purchase_vip_gift`](##purchase_vip_gift)
 
-- [`purchase_vip_card`](##purchase_vip_card)
+- 内部方法[`purchase_vip_card`](##purchase_vip_card)
 - 内部方法[`check_card`](##check_card)
 
 * 内部方法[`increase_exp`](##increase_exp)
@@ -620,7 +620,7 @@
 	"function": "get_vip_card",
 	"data": {
 		"token": "my toekn ^_^",
-        "tier": 1
+        "card_id": 1
 	}
 }
 ```
@@ -713,7 +713,8 @@
 	"world": 0, 
 	"function": "purchase_vip_card",
 	"data": {
-		"token": "my toekn ^_^"
+		"token": "my toekn ^_^",
+    "card_id":1
 	}
 }
 ```
