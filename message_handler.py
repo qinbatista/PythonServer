@@ -27,6 +27,7 @@ from module import package
 from module import vip
 from datetime import datetime, timedelta
 
+from utility import metrics
 
 CFG = config_reader.wait_config()
 
@@ -34,8 +35,11 @@ TOKEN_BASE_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
 MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
 #MAIL_BASE_URL = 'http://127.0.0.1:8020'
 
+C = metrics.Collector()
+
 class MessageHandler:
 	def __init__(self):
+
 		self._functions = FUNCTION_LIST
 		self._is_first_start = True
 		self.is_first_month = False
@@ -88,6 +92,7 @@ class MessageHandler:
 		pass
 
 	# json.decoder.JSONDecodeError
+	@C.collect_async
 	async def resolve(self, message: dict, resource, configs) -> str:
 		'''
 		Resolves the message included in the request. If required, ensures that a valid token is present.
