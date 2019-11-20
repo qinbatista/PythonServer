@@ -274,7 +274,7 @@ async def remaining_seconds(uid, now, refresh_t, **kwargs):
 	delta     = kwargs['config']['factory']['general']['step'] / 2 if has_accel else \
 				kwargs['config']['factory']['general']['step']
 	remainder = int((now - refresh_t).total_seconds()) % delta
-	next_ref  = delta - remainder
+	next_ref  = int(delta - remainder)
 	return remainder, next_ref
 
 async def steps_since(uid, now, **kwargs):
