@@ -28,7 +28,7 @@ class Command(enum.Enum):
 class User:
 	def __init__(self, writer, world, gn, fn = ''):
 		self.gn     = gn
-		self.fn     = fn if fn != '' else None
+		self.fn     = fn
 		self.world  = world
 		self.writer = writer
 
@@ -39,14 +39,14 @@ class Userlist:
 	
 	def add(self, user):
 		self.public[user.world].add(user.writer)
-		if user.fn is not None:
+		if user.fn != '':
 			self.family[user.world][user.fn].add(user.writer)
 
 	def remove(self, user):
 		if user is not None:
 			with contextlib.suppress(KeyError):
 				self.public[user.world].remove(user.writer)
-			if user.fn is not None:
+			if user.fn != '':
 				with contextlib.suppress(KeyError):
 					self.family[user.world][user.fn].remove(user.writer)
 
@@ -121,7 +121,7 @@ class Edge:
 				else:
 					break
 		except (ValueError, ChatProtocolError, ConnectionResetError, \
-				asyncio.streams.IncompleteReadError):
+				asyncio.IncompleteReadError):
 			pass
 		finally:
 			self.userlist.remove(user)
@@ -145,7 +145,6 @@ class Edge:
 	# performs initial client handshake. requires client to provide a valid login token.
 	# raises ChatProtocolError if protocol is not followed, or an invalid login token was provided.
 	async def client_handshake(self, reader, writer):
-		print('new client_handshake')
 		cmd, nonce = await self.receive(reader)
 		if cmd == Command.REGISTER:
 			user = await self.validate_login_token(writer, nonce)
@@ -161,7 +160,7 @@ class Edge:
 		self.userlist.add(user)
 		public_channel = self.encode_channel_public(user.world)
 		await self.subscribe_once(public_channel)
-		if user.fn is not None:
+		if user.fn != '':
 			family_channel = self.encode_channel_family(user.world, user.fn)
 			await self.subscribe_once(family_channel)
 
@@ -202,13 +201,13 @@ class Edge:
 		return cmd.value.zfill(COMMAND_MAX_LENGTH).encode() + encodedmsg + LINE_ENDING_B
 
 	def encode_channel_public(self, world):
-		return f'chat~{world}~public'
+		return f'chat.{world}.public'
 
 	def encode_channel_family(self, world, fn):
-		return f'chat~{world}~family~{fn}'
+		return f'chat.{world}.family.{fn}'
 
 	def decode_channel(self, channel):
-		decoded = channel.split('~')
+		decoded = channel.split('.')
 		return (decoded[1], None) if len(decoded) < 4 else (decoded[1], decoded[3])
 
 
