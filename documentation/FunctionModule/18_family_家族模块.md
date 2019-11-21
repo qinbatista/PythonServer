@@ -338,7 +338,7 @@ Gets all information regarding your family.
 			["2019-10-30 06:30:24", "matthew added children."],
 			["2019-10-31 07:24:31", "children purchased gift."]
 		],
-		"timer" : "2019-10-29 19:43:27"
+		"timer" : 85647
 	}
 }
 ```
@@ -650,7 +650,7 @@ Only Admins and above can initialize the disbanding of a family.
 	"status": 0,
 	"message": "success",
 	"data": {
-		"timer" : "2019-10-30 06:30:24"
+		"timer" : 86400
 	}
 }
 ```

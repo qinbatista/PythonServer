@@ -5,16 +5,19 @@ task.py
 from module import enums
 from module import common
 from module import achievement
+from datetime import datetime
 import time
 
 
 async def get_all_task(uid, **kwargs):
+	await common.execute(f'DELETE FROM task WHERE uid="{uid}" AND timer<"{datetime.now().strftime("%Y-%m-%d")}";', **kwargs)
 	task = await common.execute(f'SELECT tid, value, reward, timer FROM task WHERE uid = "{uid}";', **kwargs)
 	return common.mt(0, 'success', {'tasks': [{'tid': t[0], 'task_value': t[1], 'reward': t[2], 'timer': t[3]} for t in task]})
 
 
 async def record_task(uid, **kwargs):
-	data = await common.execute(
+	await common.execute(f'DELETE FROM task WHERE uid="{uid}" AND timer<"{datetime.now().strftime("%Y-%m-%d")}";', **kwargs)
+	await common.execute(
 		f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["task_id"]},1,0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {1}',
 		**kwargs)
 	return common.mt(0, 'record:' + str(kwargs["task_id"]) + " success")
