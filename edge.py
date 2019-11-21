@@ -158,11 +158,9 @@ class Edge:
 	# subscribes the chat server to the channels required by the client if not already subscribed.
 	async def register_user(self, user):
 		self.userlist.add(user)
-		public_channel = self.encode_channel_public(user.world)
-		await self.subscribe_once(public_channel)
+		await self.subscribe_once(self.encode_channel_public(user.world))
 		if user.fn != '':
-			family_channel = self.encode_channel_family(user.world, user.fn)
-			await self.subscribe_once(family_channel)
+			await self.subscribe_once(self.encode_channel_family(user.world, user.fn))
 
 	# checks if the login token provided by the client is valid.
 	# returns a User object on valid token, None otherwise.
