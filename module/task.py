@@ -7,12 +7,15 @@ from module import common
 from module import achievement
 from datetime import datetime
 import time
+from module import task
 
 
 async def get_all_task(uid, **kwargs):
+	kwargs.update({"task_id":enums.Task.LOGIN})
+	await task.record_task(uid, **kwargs)
 	await common.execute(f'DELETE FROM task WHERE uid="{uid}" AND timer<"{datetime.now().strftime("%Y-%m-%d")}";', **kwargs)
-	task = await common.execute(f'SELECT tid, value, reward, timer FROM task WHERE uid = "{uid}";', **kwargs)
-	return common.mt(0, 'success', {'tasks': [{'tid': t[0], 'task_value': t[1], 'reward': t[2], 'timer': t[3]} for t in task]})
+	task_sql = await common.execute(f'SELECT tid, value, reward, timer FROM task WHERE uid = "{uid}";', **kwargs)
+	return common.mt(0, 'success', {'tasks': [{'tid': t[0], 'task_value': t[1], 'reward': t[2], 'timer': t[3]} for t in task_sql]})
 
 
 async def record_task(uid, **kwargs):

@@ -40,9 +40,6 @@ async def check_in(uid, **kwargs):
 	kwargs.update({"task_id": enums.Task.CHECK_IN})
 	await task.record_task(uid, **kwargs)
 
-	kwargs.update({"task_id":enums.Task.LOGIN})
-	await task.record_task(uid, **kwargs)
-
 	kwargs.update({"aid":enums.Achievement.TOTAL_LOGIN})
 	await achievement.record_achievement(uid,**kwargs)
 
