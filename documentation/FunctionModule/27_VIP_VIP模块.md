@@ -617,10 +617,10 @@
 ```json
 {
 	"world": 0, 
-	"function": "get_vip_card",
+	"function": "purchase_vip_gift",
 	"data": {
 		"token": "my toekn ^_^",
-        "card_id": 1
+        "tier": 1
 	}
 }
 ```
