@@ -501,7 +501,7 @@ async def get_top_damage(uid, page, **kwargs):
 	rank = []
 	for d in data:
 		rank.append({'name': d[0], 'damage': d[1]})
-	return common.mt(0, 'success', {'damage': damage, 'ranking': ranking, 'rank': rank})
+	return common.mt(0, 'success', {'page': page, 'damage': damage, 'ranking': ranking, 'rank': rank})
 
 async def leave_world_boss_stage(uid, stage, damage, **kwargs):
 	"""

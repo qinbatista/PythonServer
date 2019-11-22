@@ -77,6 +77,8 @@
 
 [成功消息]()
 
+> page: 查询的页码
+>
 > damage: 玩家造成的最高伤害
 >
 > ranking: 玩家的排名，不存在则返回-1
@@ -88,6 +90,7 @@
 	"status": 0,
 	"message": "success",
 	"data": {
+        "page": 1,
 		"damage": 0,
 		"ranking": -1,
 		"rank": [
