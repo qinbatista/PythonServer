@@ -2,7 +2,7 @@
 vip.py
 '''
 
-from worker.module import (enums, common)
+from module import (enums, common)
 from datetime import datetime, timezone, timedelta
 
 DAYS = 31

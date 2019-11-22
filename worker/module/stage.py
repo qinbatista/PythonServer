@@ -2,10 +2,10 @@
 stage.py
 '''
 
-from worker.module import enums
-from worker.module import common
-from worker.module import task
-from worker.module import achievement
+from module import enums
+from module import common
+from module import task
+from module import achievement
 from datetime import datetime, timedelta
 import time
 import random

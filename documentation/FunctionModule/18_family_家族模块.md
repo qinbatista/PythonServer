@@ -301,6 +301,8 @@ Gets all information regarding your family.
 
 获取有关您家庭的所有信息。 
 
+返回家族经验、等级、升下级需要多少经验
+
 ##### 发送消息JSON格式
 
 ```json
