@@ -40,7 +40,7 @@ lukseun = tool_lukseun_client.LukseunClient('aliya',host="192.168.1.136", port =
 world = "0"
 token = ""
 unique_id=""
-testing_people_number = 1
+testing_people_number = 1000
 DEBUG_LOG = True
 DEBUG_LOG_DETAIL=False
 
@@ -146,6 +146,6 @@ def run_all_task_gevent():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("1")
-	# run_all_task_multiprocessing()
+	# run_task("1")
+	run_all_task_multiprocessing()
 

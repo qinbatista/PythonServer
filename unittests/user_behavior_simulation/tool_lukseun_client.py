@@ -33,7 +33,7 @@ class LukseunClient:
 		'''
 		context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 		# 加载服务器所用证书和私钥
-		context.load_verify_locations(os.path.join(loc() + '/../../cert/mycert.crt'))
+		context.load_verify_locations(os.path.join(loc() + '/../../gate/cert/mycert.crt'))
 		context.check_hostname = False
 		reader, writer = await asyncio.open_connection(self._host, self._port, ssl=context)
 
