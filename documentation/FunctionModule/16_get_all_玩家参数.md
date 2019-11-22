@@ -2,6 +2,7 @@
 
 * [`get_config_version`](##get_config_version)
 * [`get_config_stage`](##get_config_stage)
+* [`get_config_boss`](##get_config_boss)
 * [`get_config_lottery`](##get_config_lottery)
 * [`get_config_weapon`](##get_config_weapon)
 * [`get_config_skill`](##get_config_skill)
@@ -527,6 +528,77 @@
 	}
 }
 ```
+
+
+
+
+
+## get_config_boss
+
+获取world_boss_config.json的配置文件信息
+
+##### 发送消息JSON格式
+
+> 无
+
+```json
+{
+	"world": 0, 
+	"function": "get_config_boss",
+	"data": {
+		"token": "my toekn ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"config": {
+			"max_enter_time": 3,
+			"max_upload_damage": 200000,
+			"boss1": {
+				"life_value": 10000
+			},
+			"boss2": {
+				"life_value": 100000
+			},
+			"boss3": {
+				"life_value": 100000
+			},
+			"boss4": {
+				"life_value": 100000
+			},
+			"boss5": {
+				"life_value": 100000
+			},
+			"boss6": {
+				"life_value": 100000
+			},
+			"boss7": {
+				"life_value": 100000
+			},
+			"boss8": {
+				"life_value": 100000
+			},
+			"boss9": {
+				"life_value": 100000
+			},
+			"boss10": {
+				"life_value": 100000
+			}
+		}
+	}
+}
+```
+
+
 
 ## get_config_lottery
 

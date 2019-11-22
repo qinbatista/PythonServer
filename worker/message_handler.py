@@ -83,7 +83,7 @@ class MessageHandler:
 			self._world_boss = d['world_boss']
 			self._max_enter_time = self._world_boss['max_enter_time']
 			self._max_upload_damage = self._world_boss['max_upload_damage']
-			for i in range(0,10):
+			for i in range(0, 10):
 				self._boss_life_remaining.append(self._world_boss["boss"+str(i+1)]["life_value"])
 				self._boss_life.append(self._world_boss["boss"+str(i+1)]["life_value"])
 
@@ -498,15 +498,9 @@ class MessageHandler:
 
 	async def _get_top_damage(self, data: dict) -> str:
 		return await stage.get_top_damage(data['data']['unique_id'], data['data']['page'], **data)
-	# async def _enter_tower(self, data: dict) -> str:
-	# 	data.update({'player_energy': self._player['energy']})  # try_energy
-	# 	data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts_tower['enemyLayouts'], 'exp_config': self._player_experience['player_level']['experience']})
-	# 	data['monster_config'] = self._monster_config
-	# 	return await stage.e_tower_stage(data['data']['unique_id'], data['data']['stage'], **data)
-	#
-	# async def _pass_tower(self, data: dict) -> str:
-	# 	data.update({'pass_rewards': self._stage_reward["tower"]})
-	# 	return await stage.pass_tower(data['data']['unique_id'], data['data']['stage'], **data)
+
+	async def _get_config_boss(self, data: dict):
+		return common.mt(0, 'success', {'config': self._world_boss})
 
 	async def _start_hang_up(self, data: dict) -> str:
 		data.update({'hang_rewards': self._hang_reward})
@@ -812,6 +806,7 @@ FUNCTION_LIST = {
 
 	###################### get_config ######################
 	'get_config_stage': MessageHandler._get_config_stage,
+	'get_config_boss': MessageHandler._get_config_boss,
 	'get_config_lottery': MessageHandler._get_config_lottery,
 	'get_config_weapon': MessageHandler._get_config_weapon,
 	'get_config_skill': MessageHandler._get_config_skill,
