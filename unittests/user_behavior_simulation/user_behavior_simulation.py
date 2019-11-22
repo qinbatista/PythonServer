@@ -36,11 +36,11 @@ import os
 import gevent
 # from gevent import monkey; monkey.patch_all()
 logger = tool_lukseun_client.logger
-lukseun = tool_lukseun_client.LukseunClient('aliya',host="192.168.1.165", port = 8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya',host="192.168.1.136", port = 8880)
 world = "0"
 token = ""
 unique_id=""
-testing_people_number = 1000
+testing_people_number = 1
 DEBUG_LOG = True
 DEBUG_LOG_DETAIL=False
 
@@ -124,6 +124,7 @@ def run_task(name):
 	# module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
 	# module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
 	# module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
+	module_12_chat.chat_dialog(token,world,info_list[5])#vip系统
 	end = time.time()
 	debug_log(end-start,"user_"+str(unique_id),"",level=2)
 	gevent.sleep(0)
@@ -145,6 +146,6 @@ def run_all_task_gevent():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	# run_task("1")
-	run_all_task_multiprocessing()
+	run_task("1")
+	# run_all_task_multiprocessing()
 
