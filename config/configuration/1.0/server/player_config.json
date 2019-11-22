@@ -1,0 +1,172 @@
+{
+	"energy":
+	{
+		"cooling_time":20,
+		"max_energy":10
+	},
+	"disintegrate_weapon":
+	{
+		"cost":{
+			"diamond":"100"
+		},
+		"reward":
+		{
+			"coin":"10",
+			"segment":"10"
+		},
+		"weapontier1" : ["weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10"],
+		"weapontier2" : ["weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20"],
+		"weapontier3" : ["weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30"],
+		"weapontier4" : ["weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"]
+	},
+	"dark_market":
+	{
+		"weights":[0.40, 0.30, 0.20, 0.10],
+		"names": ["tier1", "tier2", "tier3", "tier4"],
+		"tier1" : ["6", "9", "25", "weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10"],
+		"tier2" : ["7", "2", "weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20", "skill_M0", "skill_P0", "skill_G0"],
+		"tier3" : ["8", "weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30",
+			"skill_M1", "skill_M2", "skill_M3", "skill_P1", "skill_P2", "skill_P3", "skill_G1", "skill_G2", "skill_G3"],
+		"tier4" : ["weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40",
+			"skill_M4", "skill_M5", "skill_M6", "skill_M7", "skill_M8", "skill_M9", "skill_M10", "skill_M11", "skill_M12",
+			"skill_P4", "skill_P5", "skill_P6", "skill_P7", "skill_P8", "skill_P9", "skill_P10", "skill_P11", "skill_P12",
+			"skill_G4", "skill_G5", "skill_G6", "skill_G7", "skill_G8", "skill_G9", "skill_G10", "skill_G11", "skill_G12"],
+		"skill_MPG" : {"M": 0, "P": 13, "G": 26},
+		"skill": [
+			"skill_M0", "skill_M1", "skill_M2", "skill_M3", "skill_M4", "skill_M5", "skill_M6", "skill_M7", "skill_M8", "skill_M9", "skill_M10", "skill_M11", "skill_M12",
+			"skill_P0", "skill_P1", "skill_P2", "skill_P3", "skill_P4", "skill_P5", "skill_P6", "skill_P7", "skill_P8", "skill_P9", "skill_P10", "skill_P11", "skill_P12",
+			"skill_G0", "skill_G1", "skill_G2", "skill_G3", "skill_G4", "skill_G5", "skill_G6", "skill_G7", "skill_G8", "skill_G9", "skill_G10", "skill_G11", "skill_G12"
+		],
+		"weapon": [
+			"weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10",
+			"weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20",
+			"weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30",
+			"weapon31", "weapon32", "weapon33", "weapon34", "weapon35", "weapon36", "weapon37", "weapon38", "weapon39", "weapon40"
+		],
+		"reward_skill":
+		{
+			"diamond":{
+				"cost_range_min":50,
+				"cost_range_max":100
+			},
+			"coin":{
+				"cost_range_min":500,
+				"cost_range_max":1000
+			}
+		},
+		"cid":{
+			"diamond": 5,
+			"coin": 1
+		},
+		"segment":
+		{
+			"diamond":{
+				"cost_range_min":50,
+				"cost_range_max":100,
+				"quantity_min":1,
+				"quantity_max":10
+			},
+			"coin":{
+				"cost_range_min":500,
+				"cost_range_max":1000,
+				"quantity_min":1,
+				"quantity_max":10
+			}
+		},
+		"items": {
+			"2":
+			{
+				"diamond":{
+					"cost_range_min":50,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":10
+				},
+				"coin":{
+					"cost_range_min":500,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
+			},
+			"9":
+			{
+				"diamond":{
+					"cost_range_min":50,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":10
+				},
+				"coin":{
+					"cost_range_min":500,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
+			},
+			"25":
+			{
+				"diamond":{
+					"cost_range_min":50,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":10
+				},
+				"coin":{
+					"cost_range_min":500,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
+			},
+			"6":
+			{
+				"diamond":{
+					"cost_range_min":10,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":20
+				},
+				"coin":{
+					"cost_range_min":100,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
+			},
+			"7":
+			{
+				"diamond":{
+					"cost_range_min":90,
+					"cost_range_max":100,
+					"quantity_min":1,
+					"quantity_max":15
+				},
+				"coin":{
+					"cost_range_min":900,
+					"cost_range_max":1000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
+			},
+			"8":
+			{
+				"diamond":{
+					"cost_range_min":100,
+					"cost_range_max":200,
+					"quantity_min":1,
+					"quantity_max":15
+				},
+				"coin":{
+					"cost_range_min":1000,
+					"cost_range_max":2000,
+					"quantity_min":1,
+					"quantity_max":10
+				}
+			}
+		},
+		"diamond_refresh_store":{
+			"diamond": 100
+		}
+	}
+}
