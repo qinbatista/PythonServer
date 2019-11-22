@@ -24,7 +24,7 @@ class LukseunClient:
 		returns the decoded callback response
 		'''
 		context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-		path = './cert'
+		path = './gate/cert'
 		context.load_verify_locations(path + '/mycert.crt')
 		context.check_hostname = False
 		#context.verify_mode = ssl.CERT_NONE

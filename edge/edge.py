@@ -6,6 +6,7 @@ import enum
 import signal
 import asyncio
 import aioredis
+import argparse
 import contextlib
 import nats.aio.client
 
@@ -215,7 +216,12 @@ class Edge:
 
 ######################################################################################################
 async def main():
-	await Edge(redis_addr = 'redis://192.168.1.102', nats_addr = 'nats://192.168.1.102').start()
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-p', '--port', type = int, default = 9000)
+	parser.add_argument('--redis-addr', type = str, default = 'redis://192.168.1.102')
+	parser.add_argument('--nats-addr' , type = str, default = 'nats://192.168.1.102' )
+	args = parser.parse_args()
+	await Edge(port = args.port, redis_addr = args.redis_addr, nats_addr = args.nats_addr).start()
 
 if __name__ == '__main__':
 	asyncio.run(main())
