@@ -2,9 +2,9 @@
 task.py
 '''
 
-from worker.module import enums
-from worker.module import common
-from worker.module import vip
+from module import enums
+from module import common
+from module import vip
 from datetime import datetime
 import time
 
