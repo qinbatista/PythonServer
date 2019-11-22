@@ -14,4 +14,4 @@ STOPSIGNAL SIGINT
 
 EXPOSE 9000
 
-CMD [ "python", "-u", "./edge.py" ]
+CMD [ "python", "-u", "./edge.py", "--redis-addr", "redis://redis", "--nats-addr", "nats://nats" ]
