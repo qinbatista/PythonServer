@@ -15,6 +15,7 @@
 * [`change_name_family`](##change_name_family)
 * [`disband_family`](##disband_family)
 * [`cancel_disband_family`](##cancel_disband_family)
+* *[`family_check_in`](##family_check_in)
 
 ## create_family
 
@@ -22,7 +23,7 @@ Creates a new family with the given name.
 The cost to create a family is determined by `family.json` configuration file.
 
 用给定的名称创建一个新的家庭。
-创建一个家庭的成本由' `family.json`'配置文件决定。 
+创建一个家庭的成本由' `family.json`'配置文件决定, 创建公会需要传入`图标`与`工会名字`，创建公会必须满足`1: 玩家大于18级`，`2:有2000钻石`
 
 ##### 发送消息JSON格式
 
@@ -32,7 +33,8 @@ The cost to create a family is determined by `family.json` configuration file.
 	"function": "start_hang_up",
 	"data": {
 		"token": "my token ^_^",
-		"name": "family name" 
+		"name": "family name",
+    "icon": 1
 	}
 }
 ```
@@ -47,8 +49,14 @@ The cost to create a family is determined by `family.json` configuration file.
 	"message": "created family",
 	"data": {
 		"name" : "family name",
+    "remaining":{
 		"iid"  : 4,
 		"value": 230
+    },
+    "reward":{
+		"iid"  : 4,
+		"value": 230
+    },
 	}
 }
 ```
@@ -109,6 +117,8 @@ Admins can remove anyone with a role lower than Admin.
 
 管理员可以删除任何角色低于管理员的人。
 
+一天之内移除5个成员
+
 ##### 发送消息JSON格式
 
 ```json
@@ -153,6 +163,8 @@ An invitation will be sent the the user's mailbox.
 只有所有者和管理员可以邀请用户。
 
 一个邀请将被发送到用户的邮箱。
+
+一天之内加入5个成员。
 
 ##### 发送消息JSON格式
 
@@ -669,6 +681,43 @@ Only Admins and above can cancel the disbanding of a family.
 
 取消定时器来解散家庭。
 只有管理员以上的人才可以取消一个家庭的解散。
+
+##### 发送消息JSON格式
+
+
+```json
+{
+	"world": 0,
+	"function": "cancel_disband_family",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+	}
+}
+```
+
+[调整关卡失败]()
+
+* 99: not in a family
+* 98: insufficient permissions
+* 97: family is not disbanded
+
+
+
+## family_check_in
+
+家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级
 
 ##### 发送消息JSON格式
 
