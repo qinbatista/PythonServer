@@ -2,10 +2,10 @@
 stage.py
 '''
 
-from module import enums
-from module import common
-from module import task
-from module import achievement
+from worker.module import enums
+from worker.module import common
+from worker.module import task
+from worker.module import achievement
 from datetime import datetime, timedelta
 import time
 import random
@@ -452,8 +452,7 @@ async def check_boss_status(uid,**kwargs):
 			enter_times = limits[0][0]
 	d1 = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
 	d2 = datetime.strptime((datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d 00:00:00"), '%Y-%m-%d %H:%M:%S')
-	seconds = int((d2 - d1).total_seconds())
-	world_boss = {'remaining': enter_times, 'time': f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}'}
+	world_boss = {'remaining': enter_times, 'time': int((d2 - d1).total_seconds())}
 	boss_life_ratio = {}
 	for i in range(0, len(kwargs["boss_life_remaining"])):
 		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))
