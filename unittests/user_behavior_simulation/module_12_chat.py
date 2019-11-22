@@ -35,31 +35,18 @@ class LukseunClient:
 
 def get_login_token_chat(token,world):
 	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_login_token_chat', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
-	print(response)
 	return response['data']['token']
 
-def send_message_loop(lc):
-	loop = asyncio.new_event_loop()
-	while True:
-		loop.run_until_complete(lc.send_message("0000PUBLICaaaaaa"))
-		time.sleep(2)
-def receive_message_loop(lc):
-	loop = asyncio.new_event_loop()
-	while True:
-		result = loop.run_until_complete(lc.receive_message())
-		print(result)
-		time.sleep(2)
-
 async def send_loop(lc):
-	while True:
-		await lc.send_message("0000PUBLIC"+datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+	# while True:
+	await lc.send_message("0000PUBLIC"+datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 async def recv_loop(lc):
 	while True:
 		print(await lc.receive_message())
 
 async def wrapper(nonce):
-	client = LukseunClient(nonce, '192.168.1.165', 9000)
+	client = LukseunClient(nonce, 'remote1.magicwandai.com', 9000)
 	await client.create()
 	await client.send_message('00REGISTER' + nonce)
 	asyncio.create_task(send_loop(client))
@@ -70,18 +57,7 @@ async def wrapper(nonce):
 def chat_dialog(token,world,info):
 	nonce = get_login_token_chat(token, world)
 	asyncio.get_event_loop().run_until_complete(wrapper(nonce))
-	# threads = list()
-	# lc = LukseunClient(get_login_token_chat(token,world),'192.168.1.165',9000)
-	# asyncio.get_event_loop().run_until_complete(lc.create())
-	# asyncio.get_event_loop().run_until_complete(lc.send_message("00REGISTER"+get_login_token_chat(token,world)))
-	# x = threading.Thread(target=send_message_loop, args=(lc,))
-	# threads.append(x)
-	# x.start()
-	# y = threading.Thread(target=receive_message_loop, args=(lc,))
-	# threads.append(y)
-	# y.start()
-	# for thread in threads:
-	# 	thread.join()
+
 
 
 

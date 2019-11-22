@@ -146,6 +146,6 @@ def run_all_task_gevent():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	# run_task("1")
-	run_all_task_multiprocessing()
+	run_task("1")
+	# run_all_task_multiprocessing()
 
