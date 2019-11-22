@@ -31,9 +31,27 @@
 
 
 - **购买小VIP卡**：小月卡 VIP_CARD_MIN
+  - `key="uid_card_26_1_3"`：uid用户获得三个月的小月卡
+  - `key="uid_card_26_1_6"`：uid用户获得六个月的卡片物品中的26号物品中的礼包1
+    - uid：用户id
+    - card：购买物品属于卡片物品
+    - 26：item id物品id
+    - 1：物品中的礼包1
+    - 3：三个这样的物品礼包
 - **购买大VIP卡**：大月卡 VIP_CARD_MAX
+  - `key="uid_card_27_1_4"`：uid用户获得四个月的大月卡
+  - `key="uid_card_27_1_6"`：uid用户获得六个月的卡片物品中的27号物品中的礼包1
 - **购买永久VIP卡**：永久月卡 VIP_CARD_PERPETUAL
+  - `key="uid_card_28_1_4"`：uid用户获得永久月卡（永久月卡后面的 ）
+  - `key="uid_card_28_1_12"`：uid用户获得卡片物品中的28号物品中的礼包1
 - **购买钻石礼包**：礼包中含有100颗钻石 DIAMOND
+  - `key="uid_consume_5_30_2"`：uid用户获得两个钻石礼包30
+  - `key="uid_consume_5_10_1"`：uid用户获得一个消耗品物品中的5号物品中的礼包10
+    - uid：用户id
+    - consume：购买物品属于消耗品物品
+    - 5：item id物品id
+    - 10：物品中的礼包10
+    - 1：一个这样的物品礼包
 - **购买角色经验包**：包含一个角色经验包 EXPERIENCE_POTION
 - **购买小能量瓶**：包含一瓶小能量瓶 ENERGY_POTION_S_MIN
 - **购买中能量瓶**：包含一瓶中能量瓶 ENERGY_POTION_S
