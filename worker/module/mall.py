@@ -33,7 +33,7 @@ async def rmb_mall(key, **kwargs):
 	98 - 没有出售此物品{iid}
 	99 - 物品类型错误{ity}
 	"""
-	uid, ity, iid, gty, qty = decode_key(key)  # str, str, str, int
+	uid, ity, iid, gty, qty = decode_key(key)  # str, str, str, str, int
 	config = kwargs['config']['mall']['rmb']['merchandise'].get(ity, False)
 	if not config: return common.mt(99, f'物品类型错误{ity}')
 	merchandise = config.get(iid, False)
