@@ -274,6 +274,20 @@ CREATE TABLE `leaderboard` (
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
+MALL = \
+"""
+CREATE TABLE `mall` (
+	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+	  `time` varchar(128) NOT NULL COMMENT '兑换的时间',
+	  `key` varchar(128) NOT NULL COMMENT '商城兑换码值',
+	  `old` varchar(128) NOT NULL DEFAULT '' COMMENT '购买之前的数据',
+	  `new` varchar(128) NOT NULL DEFAULT '' COMMENT '购买之后的数据',
+	  `status` int(11) NOT NULL DEFAULT -1 COMMENT '购买之后返回的状态码',
+	  PRIMARY KEY (`uid`,`time`),
+	  CONSTRAINT `mall_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+"""
+
 TABLES = [PLAYER, PLAYERAFTERINSERT, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET, \
 		FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LEADERBOARD, LIMITS, \
 		PROGRESS, ROLE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE]

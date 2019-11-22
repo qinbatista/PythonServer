@@ -2,10 +2,7 @@
 vip.py
 '''
 
-import asyncio
-
-from module import enums
-from module import common
+from worker.module import (enums, common)
 from datetime import datetime, timezone, timedelta
 
 DAYS = 31
@@ -110,54 +107,34 @@ async def buy_package(uid, tier, **kwargs):
 
 
 async def buy_card(uid, cid, **kwargs):
-	"""购买VIP卡，分为小月卡、大月卡、永久月卡
-	 小月卡：登录领取VIP每日奖励获得VIP经验10点，一个月的过期期限
-	 大月卡：登录领取VIP每日奖励获得VIP经验15点，一个月的过期期限
-	 永久月卡：登录领取VIP每日奖励获得VIP经验20点，无过期期限
-	 0 - success
-	 98 - VIP card has not expired
-	 99 - card id error
-	 TODO 人民币购买
-	 """
+	"""
+	购买VIP卡，分为小月卡、大月卡、永久月卡
+	小月卡：登录领取VIP每日奖励获得VIP经验10点，一个月的过期期限
+	大月卡：登录领取VIP每日奖励获得VIP经验15点，一个月的过期期限
+	永久月卡：登录领取VIP每日奖励获得VIP经验20点，无过期期限
+	0 - success
+	99 - card id error
+	TODO 人民币购买
+	"""
 	card_kind = [enums.Item.VIP_CARD_MIN.value, enums.Item.VIP_CARD_MAX.value, enums.Item.VIP_CARD_PERPETUAL.value]
-	if cid not in enums.Item._value2member_map_.keys() or cid not in card_kind: return common.mt(99, 'card id error')
-	min_card, max_card, perpetual_card = await check_card(uid, **kwargs)
-	if min_card and cid == enums.Item.VIP_CARD_MIN.value or max_card and cid == enums.Item.VIP_CARD_MAX.value or perpetual_card and cid == enums.Item.VIP_CARD_PERPETUAL.value: return common.mt(98, 'VIP card has not expired')
-	current = (datetime.now(timezone.utc) + timedelta(days=DAYS)).strftime('%Y-%m-%d %H:%M:%S')
-	seconds = DAYS * 24 * 3600
-	await common.execute(f'UPDATE item SET value=1 WHERE uid="{uid}" AND iid={cid};', **kwargs)
-	if cid == enums.Item.VIP_CARD_PERPETUAL.value:
-		# current = ''
-		seconds = -1
-	else:
-		await common.execute(f'UPDATE timer SET time="{current}" WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END_TIME.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
-	return common.mt(0, 'success', {'cooling_time': seconds, 'card_id': cid})
+	if cid not in card_kind: return common.mt(99, 'card id error')
+	min_card, max_card, _ = await check_card(uid, **kwargs)
 
-# async def buy_card(uid, cid, **kwargs):
-# 	"""购买VIP卡，分为小月卡、大月卡、永久月卡
-# 	 小月卡：登录领取VIP每日奖励获得VIP经验10点，一个月的过期期限
-# 	 大月卡：登录领取VIP每日奖励获得VIP经验15点，一个月的过期期限
-# 	 永久月卡：登录领取VIP每日奖励获得VIP经验20点，无过期期限
-# 	 0 - success
-# 	 98 - VIP card has not expired
-# 	 99 - card id error
-# 	 TODO 人民币购买
-# 	 """
-# 	card_kind = [enums.Item.VIP_CARD_MIN.value, enums.Item.VIP_CARD_MAX.value, enums.Item.VIP_CARD_PERPETUAL.value]
-# 	if cid not in card_kind: return common.mt(99, 'card id error')
-# 	await check_card(uid, **kwargs)
-#
-# 	# if min_card and cid == enums.Item.VIP_CARD_MIN.value or max_card and cid == enums.Item.VIP_CARD_MAX.value or perpetual_card and cid == enums.Item.VIP_CARD_PERPETUAL.value: return common.mt(98, 'VIP card has not expired')
-# 	seconds = -1
-# 	await common.execute(f'UPDATE item SET value=1 WHERE uid="{uid}" AND iid={cid};', **kwargs)
-# 	if cid != enums.Item.VIP_CARD_PERPETUAL.value:
-# 		tid = enums.Timer.VIP_MIN_END_TIME.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END_TIME.value
-# 		timer = (await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{tid}";', **kwargs))[0][0]
-# 		if timer == ''
-# 		current = (datetime.now(timezone.utc) + timedelta(days=DAYS)).strftime('%Y-%m-%d %H:%M:%S')
-# 	else:
-# 		await common.execute(f'UPDATE timer SET time="{current}" WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END_TIME.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
-# 	return common.mt(0, 'success', {'cooling_time': seconds, 'card_id': cid})
+	seconds = -1
+	await common.execute(f'UPDATE item SET value=1 WHERE uid="{uid}" AND iid={cid};', **kwargs)
+	if cid != enums.Item.VIP_CARD_PERPETUAL.value:
+		tid = enums.Timer.VIP_MIN_END_TIME.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END_TIME.value
+		current = datetime.now(timezone.utc)
+		if min_card and cid == enums.Item.VIP_CARD_MIN.value or max_card and cid == enums.Item.VIP_CARD_MAX.value:
+			timer = (await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{tid}";', **kwargs))[0][0]
+			timer = datetime.strptime(timer, '%Y-%m-%d %H:%M:%S').replace(tzinfo=timezone.utc) + timedelta(days=DAYS)
+			seconds = int((timer - current).total_seconds())
+			current = timer.strftime('%Y-%m-%d %H:%M:%S')
+		else:
+			seconds = DAYS * 24 * 3600
+			current = (current + timedelta(days=DAYS)).strftime('%Y-%m-%d %H:%M:%S')
+		await common.execute(f'UPDATE timer SET time="{current}" WHERE uid="{uid}" AND tid="{tid}";', **kwargs)
+	return common.mt(0, 'success', {'cooling_time': seconds, 'card_id': cid})
 
 
 ####################################################################################
