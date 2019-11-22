@@ -108,5 +108,5 @@ def decode_key(key):
 	"""
 	key = 'uid:consume:5:1:1'
 	"""
-	uid, ity, iid, gty, qty = [v if i < 4 else int(v) for i, v in enumerate(key.split(':'))]
+	uid, ity, iid, gty, qty = [v if i < 4 else int(v) for i, v in enumerate(key.split('_'))]
 	return uid, ity, iid, gty, qty
