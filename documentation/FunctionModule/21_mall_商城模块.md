@@ -35,7 +35,6 @@
 - **购买永久VIP卡**：永久月卡 VIP_CARD_PERPETUAL
 - **购买钻石礼包**：礼包中含有100颗钻石 DIAMOND
 - **购买角色经验包**：包含一个角色经验包 EXPERIENCE_POTION
-- **购买体力礼包**：礼包中含有100点体力（能量） energy
 - **购买小能量瓶**：包含一瓶小能量瓶 ENERGY_POTION_S_MIN
 - **购买中能量瓶**：包含一瓶中能量瓶 ENERGY_POTION_S
 - **购买大能量瓶**：包含一瓶大能量瓶 ENERGY_POTION_S_MAX

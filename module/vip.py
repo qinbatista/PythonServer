@@ -133,6 +133,32 @@ async def buy_card(uid, cid, **kwargs):
 		await common.execute(f'UPDATE timer SET time="{current}" WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END_TIME.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
 	return common.mt(0, 'success', {'cooling_time': seconds, 'card_id': cid})
 
+# async def buy_card(uid, cid, **kwargs):
+# 	"""购买VIP卡，分为小月卡、大月卡、永久月卡
+# 	 小月卡：登录领取VIP每日奖励获得VIP经验10点，一个月的过期期限
+# 	 大月卡：登录领取VIP每日奖励获得VIP经验15点，一个月的过期期限
+# 	 永久月卡：登录领取VIP每日奖励获得VIP经验20点，无过期期限
+# 	 0 - success
+# 	 98 - VIP card has not expired
+# 	 99 - card id error
+# 	 TODO 人民币购买
+# 	 """
+# 	card_kind = [enums.Item.VIP_CARD_MIN.value, enums.Item.VIP_CARD_MAX.value, enums.Item.VIP_CARD_PERPETUAL.value]
+# 	if cid not in card_kind: return common.mt(99, 'card id error')
+# 	await check_card(uid, **kwargs)
+#
+# 	# if min_card and cid == enums.Item.VIP_CARD_MIN.value or max_card and cid == enums.Item.VIP_CARD_MAX.value or perpetual_card and cid == enums.Item.VIP_CARD_PERPETUAL.value: return common.mt(98, 'VIP card has not expired')
+# 	seconds = -1
+# 	await common.execute(f'UPDATE item SET value=1 WHERE uid="{uid}" AND iid={cid};', **kwargs)
+# 	if cid != enums.Item.VIP_CARD_PERPETUAL.value:
+# 		tid = enums.Timer.VIP_MIN_END_TIME.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END_TIME.value
+# 		timer = (await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{tid}";', **kwargs))[0][0]
+# 		if timer == ''
+# 		current = (datetime.now(timezone.utc) + timedelta(days=DAYS)).strftime('%Y-%m-%d %H:%M:%S')
+# 	else:
+# 		await common.execute(f'UPDATE timer SET time="{current}" WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END_TIME.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
+# 	return common.mt(0, 'success', {'cooling_time': seconds, 'card_id': cid})
+
 
 ####################################################################################
 async def check_card(uid, **kwargs):
