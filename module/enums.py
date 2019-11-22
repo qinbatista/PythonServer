@@ -17,7 +17,7 @@ class Item(enum.IntEnum):
 	SKILL_SCROLL_30 = 7
 	SKILL_SCROLL_100 = 8
 	EXPERIENCE_POTION = 9
-	ENERGY_POTION_S = 10
+	ENERGY_POTION_S = 10  # 能量瓶
 	SUMMON_SCROLL_BASIC = 11
 	SUMMON_SCROLL_PRO = 12
 	SUMMON_SCROLL_PROPHET = 13
@@ -40,6 +40,8 @@ class Item(enum.IntEnum):
 	ROLE5_UNIVERSAL_SEGMENT = 30  # 5星角色万能碎片
 	WEAPON6_UNIVERSAL_SEGMENT = 31  # 6星武器万能碎片
 	ROLE6_UNIVERSAL_SEGMENT = 32  # 6星角色万能碎片
+	ENERGY_POTION_S_MIN = 33  # 小能量瓶
+	ENERGY_POTION_S_MAX = 34  # 大能量瓶
 
 
 class FamilyRole(enum.IntEnum):
@@ -54,6 +56,7 @@ class MailType(enum.IntEnum):
 	GIFT = 1
 	FRIEND_REQUEST = 2
 	FAMILY_REQUEST = 3
+
 
 class MailTemplate(enum.Enum):
 	FAMILY_REQUEST = enum.auto()
@@ -215,6 +218,7 @@ class Role(enum.IntEnum):
 	R39 = 39
 	R40 = 40
 
+
 class Armor(enum.IntEnum):
 	A1 = 1
 	A2 = 2
@@ -257,7 +261,7 @@ class Timer(enum.IntEnum):
 	REQUEST_FRIEND_TIME = 19
 	VIP_COOLING_TIME = 20  # VIP礼包领取冷却结束时间
 	CONTINUOUS_LOGIN = 21
-	MAIL_LAST_SENT = 22 # last time user sent SIMPLE mail to another player
+	MAIL_LAST_SENT = 22  # last time user sent SIMPLE mail to another player
 
 
 class Limits(enum.IntEnum):
@@ -304,13 +308,6 @@ class Achievement(enum.IntEnum):
 	CHECK_IN_FAMILY = 29
 
 
-class Progress(enum.IntEnum):
-	STAGE = 0
-	HANG_STAGE = 1
-	TOWER_STAGE = 2
-	ENERGY = 3
-
-
 class Task(enum.IntEnum):
 	LOGIN = 1
 	CHECK_IN = 2
@@ -338,4 +335,3 @@ class Factory(enum.IntEnum):
 
 class LeaderBoard(enum.IntEnum):
 	WORLD_BOSS = 1
-
