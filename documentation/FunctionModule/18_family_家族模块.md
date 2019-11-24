@@ -9,6 +9,7 @@
 * [`get_all_family`](##get_all_family)
 * [`get_store_family`](##get_store_family)
 * [`market_purchase_family`](##market_purchase_family)
+* *[`welfare_purchase_family`](##welfare_purchase_family)
 * [`set_notice_family`](##set_notice_family)
 * [`set_blackboard_family`](##set_blackboard_family)
 * [`set_role_family`](##set_role_family)
@@ -16,6 +17,9 @@
 * [`disband_family`](##disband_family)
 * [`cancel_disband_family`](##cancel_disband_family)
 * *[`family_check_in`](##family_check_in)
+* *[`abdicate_family`](##abdicate_family)
+* *[`modify_icon_family`](##modify_icon_family)
+* *[`chat_report_family`](##chat_report_family)
 
 ## create_family
 
@@ -75,6 +79,10 @@ The family owner can not leave.
 
 离开你现在的家庭。
 这家族族长不能离开。
+
+玩家退出工会之后24小时才能再次加入工会
+
+玩家离开工会累计贡献清0，贡献数值保留，可以在其他工会兑换。
 
 ##### 发送消息JSON格式
 
@@ -210,6 +218,8 @@ If any of them accept the invitation, user will be added to the family.
 
 如果他们中的任何一个接受邀请，用户将被添加到家庭。
 
+发送世界入会邀请，长cd。
+
 ##### 发送消息JSON格式
 
 
@@ -302,6 +312,8 @@ Gets all information regarding your family.
 获取有关您家庭的所有信息。 
 
 返回家族经验、等级、升下级需要多少经验
+
+需要显示玩家的职务；最后登录的时间：在线显示在线，超过1天按天计，不超过1天按小时记；显示玩家累计贡献。
 
 ##### 发送消息JSON格式
 
@@ -396,12 +408,17 @@ Retrieves the items listed on the family store, configuration depends on `family
 }
 ```
 
-
 ## market_purchase_family
+
+ welfare_purchase_family
 
 Purchase an item from the family store.
 
  从家庭商店购买一件物品。 
+
+> 工会贡献可以在工会商店兑换资源
+>
+> 
 
 ##### 发送消息JSON格式
 
@@ -451,6 +468,57 @@ Purchase an item from the family store.
 
 
 
+##  welfare_purchase_family
+
+> 工会福利
+>
+> 有大佬玩家购买后，全工会人员都可以获得少量奖励，只有两种，一种是钻石购买，一种是RMB购买。每人每种每天限购1次。
+>
+> 钻石购买的可以获取金币和工会贡献，其他玩家可以领取少量金币和工会贡献。
+>
+> RMB购买的可以获取金币和钻石和工会贡献。
+
+##### 发送消息JSON格式
+
+> Example purchasing item 3:5:10 which costs 3:2:200
+>
+> 购买项目3:5:10花费3:2:200 
+
+```json
+{
+	"world": 0,
+	"function": "welfare_purchase_family",
+	"data": {
+		"token": "my token",
+		"item" : "3:5:10"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+> The outer dictionary key is equal to enums.Group.ITEM.value
+>
+> Before purchase, user has 3:5:100 and 3:2:1000
+>
+> 外部字典键等于enums.Group.ITEM.value
+> 购买前，用户有3:5:100和3:2:1000
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"3" : [
+			{"iid" : 5, "value" : 110},
+			{"iid" : 2, "value" : 800}
+		]
+	}
+}
+```
+
+
+
 ## set_notice_family
 
 Update the family notice.
@@ -458,6 +526,8 @@ Only the family Owner and Admins may update the family notice.
 
 更新家庭通知。
 只有家庭所有者和管理员可以更新家庭通知。
+
+需要有cd
 
 ##### 发送消息JSON格式
 
@@ -684,6 +754,8 @@ Only Admins and above can cancel the disbanding of a family.
 取消定时器来解散家庭。
 只有管理员以上的人才可以取消一个家庭的解散。
 
+取消后3天内不能解散
+
 ##### 发送消息JSON格式
 
 
@@ -719,7 +791,7 @@ Only Admins and above can cancel the disbanding of a family.
 
 ## family_check_in
 
-家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级
+家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级，签到获取贡献值和金币奖励，工会等级的提高，奖励也会随着提高
 
 ##### 发送消息JSON格式
 
@@ -753,4 +825,106 @@ Only Admins and above can cancel the disbanding of a family.
 * 97: family is not disbanded
 
 
+
+## abdicate_family
+
+> 会长让位
+>
+> 会长转让会长位置给其他成员
+
+##### 发送消息JSON格式
+
+> 
+
+```json
+{
+	"world": 0,
+	"function": "abdicate_family",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+> 
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+	}
+}
+```
+
+
+
+##  modify_icon_family
+
+> 族长和管理员才能修改工会图标
+
+##### 发送消息JSON格式
+
+> 
+
+```json
+{
+	"world": 0,
+	"function": "modify_icon_family",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+> 
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+	}
+}
+```
+
+
+
+##  chat_report_family
+
+> 聊天举报，警告，下次封号，可以举报辱骂和广告两种。
+>
+> 要验证真实性，所以后台要有查询聊天记录的功能
+
+##### 发送消息JSON格式
+
+> 
+
+```json
+{
+	"world": 0,
+	"function": "chat_report_family",
+	"data": {
+		"token": "my token",
+        "msg": "内容"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+> 
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+	}
+}
+```
 
