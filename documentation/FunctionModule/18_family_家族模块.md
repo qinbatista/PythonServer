@@ -20,7 +20,7 @@
 * *[`family_check_in`](##family_check_in)
 * *[`abdicate_family`](##abdicate_family)
 * *[`modify_icon_family`](##modify_icon_family)
-* *[`chat_report_family`](##chat_report_family)
+* *聊天系统下的方法[`chat_report`](##chat_report)
 
 ## create_family
 
@@ -947,7 +947,7 @@ Only Admins and above can cancel the disbanding of a family.
 
 
 
-##  chat_report_family
+##  chat_report
 
 > 聊天举报，警告，下次封号，可以举报辱骂和广告两种。
 >
