@@ -4,6 +4,7 @@
 * [`leave_family`](##leave_family)
 * [`remove_user_family`](##remove_user_family)
 * [`invite_user_family`](##invite_user_family)
+* *[`invite_link_family`](##invite_link_family)
 * [`request_join_family`](##request_join_family)
 * [`respond_family`](##respond_family)
 * [`get_all_family`](##get_all_family)
@@ -72,6 +73,8 @@ The cost to create a family is determined by `family.json` configuration file.
 * 97: insufficient materials
 
 
+
+
 ## leave_family
 
 Leave your current family.
@@ -111,6 +114,8 @@ The family owner can not leave.
 
 * 99: not in a family
 * 98: family owner can not leave
+
+
 
 
 ## remove_user_family
@@ -160,6 +165,8 @@ Admins can remove anyone with a role lower than Admin.
 * 96: You can't remove yourself
 
 
+
+
 ## invite_user_family
 
 Invite a user to your family.
@@ -171,8 +178,6 @@ An invitation will be sent the the user's mailbox.
 只有所有者和管理员可以邀请用户。
 
 一个邀请将被发送到用户的邮箱。
-
-一天之内加入5个成员。
 
 ##### 发送消息JSON格式
 
@@ -206,6 +211,45 @@ An invitation will be sent the the user's mailbox.
 * 98: insufficient permissions
 * 97: invitation could not be sent to mailbox
 
+
+
+##  invite_link_family
+
+> 发送世界入会邀请，长cd。
+>
+> 向聊天窗发送入会邀请链接
+>
+> 会长和官员有这个权限
+
+##### 发送消息JSON格式
+
+> 
+
+```json
+{
+	"world": 0,
+	"function": "invite_link_family",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+> data包含家族信息
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+	}
+}
+```
+
+
+
 ## request_join_family
 
 Request to join a family.
@@ -217,8 +261,6 @@ If any of them accept the invitation, user will be added to the family.
 请求将被发送到家庭所有者和所有管理员。
 
 如果他们中的任何一个接受邀请，用户将被添加到家庭。
-
-发送世界入会邀请，长cd。
 
 ##### 发送消息JSON格式
 
@@ -305,6 +347,8 @@ Calling this function adds the user to the family.
 * 96: family is full
 
 
+
+
 ## get_all_family
 
 Gets all information regarding your family.
@@ -374,6 +418,8 @@ Gets all information regarding your family.
 * 99: not in a family
 
 
+
+
 ## get_store_family
 
 Retrieves the items listed on the family store, configuration depends on `family.json`
@@ -407,6 +453,8 @@ Retrieves the items listed on the family store, configuration depends on `family
 	}
 }
 ```
+
+
 
 ## market_purchase_family
 
@@ -563,6 +611,7 @@ Only the family Owner and Admins may update the family notice.
 * 98: insufficient permissions
 
 
+
 ## set_blackboard_family
 
 Update the family blackboard.
@@ -603,6 +652,7 @@ Only the family Owner and Admins may update the family blackboard.
 
 * 99: not in a family
 * 98: insufficient permissions
+
 
 
 ## set_role_family
@@ -656,6 +706,7 @@ role级别只包括0，4，8，10
 * 95: role  type error (级别类型错误)
 
 
+
 ## change_name_family
 
 Change the name of the family.
@@ -705,6 +756,7 @@ The cost to change the family name is determined by `family.json` configuration 
 * 96: insufficient funds
 
 
+
 ## disband_family
 
 Starts the timer to disband the family.
@@ -744,6 +796,7 @@ Only Admins and above can initialize the disbanding of a family.
 * 99: not in a family
 * 98: insufficient permissions
 * 97: family already disbanded
+
 
 
 ## cancel_disband_family
