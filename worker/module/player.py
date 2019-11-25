@@ -11,6 +11,9 @@ async def create(uid, gn, **kwargs):
 	added, _ = await common.execute_update(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
 	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `storage`) VALUES \
 			("{uid}", {enums.Factory.UNASSIGNED.value}, 5, 5);', **kwargs)
+	await common.execute(f'INSERT INTO role  (uid, star, rid) VALUES ("{uid}", 1, {enums.Role.R1.value});', **kwargs)
+	await common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W1.value});', **kwargs)
+	await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.COIN.value}, 1000), ("{uid}", {enums.Item.DIAMOND.value}, 1000);', **kwargs)
 	return common.mt(0, 'success', {'gn' : gn}) if added != 0 else common.mt(99, 'gamename or uid already exists')
 
 async def enter_world(uid, **kwargs):
