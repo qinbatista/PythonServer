@@ -28,6 +28,7 @@ async def level_up(uid, wid, amount, **kwargs):
 	exists, payload = await _get_weapon_info(uid, wid, 'star', 'level', 'skillpoint', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')
 	star, level, sp = payload
+	if star == 0: return common.mt(96, "You don't have the weapon")
 	upgrade_cnt = min(amount // kwargs['config']['weapon']['standard_costs']['iron'], 100 - level)
 	if upgrade_cnt == 0: return common.mt(98, 'too few incoming materials')
 	can_pay, remaining = await common.try_item(uid, enums.Item.IRON, -upgrade_cnt * kwargs['config']['weapon']['standard_costs']['iron'], **kwargs)
