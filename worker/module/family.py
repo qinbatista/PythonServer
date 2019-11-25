@@ -9,6 +9,7 @@ from module import enums
 from module import common
 from module import task
 from module import achievement
+from module import stage
 
 from datetime import datetime, timezone, timedelta
 
@@ -16,6 +17,7 @@ from datetime import datetime, timezone, timedelta
 
 
 async def create(uid, name, **kwargs):
+	exp_info = await stage.increase_exp(uid, 0, **kwargs)
 	if not _valid_family_name(name): return common.mt(99, 'invalid family name')
 	in_family, _ = await _in_family(uid, **kwargs)
 	if in_family: return common.mt(98, 'already in a family')
