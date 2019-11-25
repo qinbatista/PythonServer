@@ -25,22 +25,16 @@ import uuid
 import signal
 import asyncio
 import aioredis
+import argparse
 import contextlib
 import nats.aio.client
 
 import platform
 
-from utility import config_reader
-
-channel = 'jobs'
-
-CFG = config_reader.wait_config()
-
 class Gate:
-	def __init__(self, cport = 8880, wport = 8201):
+	def __init__(self, args):
+		self.args     = args
 		self.ip       = self._read_ip()
-		self.cport    = cport
-		self.wport    = wport
 		self.debug    = False
 		self.cwriters = {}
 
@@ -114,17 +108,17 @@ class Gate:
 		if platform.system() != 'Windows':
 			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 		self.nats = nats.aio.client.Client()
-		self.redis = await aioredis.create_redis(CFG['redis']['addr'])
-		await self.nats.connect(CFG['nats']['addr'], max_reconnect_attempts = 1)
+		self.redis = await aioredis.create_redis(self.args.redis_addr)
+		await self.nats.connect(self.args.nats_addr, max_reconnect_attempts = 1)
 		await self._next_avail_gid()
-		await self.redis.set('gates.id.' + self.gid, self.ip + ':' + str(self.wport), expire = 600)
-		self.ws = await asyncio.start_server(self.worker_protocol, port = self.wport)
+		await self.redis.set('gates.id.' + self.gid, self.ip + ':' + str(self.args.wport), expire = 600)
+		self.ws = await asyncio.start_server(self.worker_protocol, port = self.args.wport)
 		# initialize SSL
 		context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 		path = os.path.dirname(os.path.realpath(__file__))
 		context.load_cert_chain(certfile = path + '/cert/mycert.crt', keyfile = path + '/cert/rsa_private.key', password = 'lukseun1')
-		self.cs = await asyncio.start_server(self.client_protocol, port = self.cport, ssl = context)
-		print(f'gate {self.gid}: find me at {self.ip} on ports client: {self.cport}  worker: {self.wport}')
+		self.cs = await asyncio.start_server(self.client_protocol, port = self.args.cport, ssl = context)
+		print(f'gate {self.gid}: find me at {self.ip} on ports client: {self.args.cport}  worker: {self.args.wport}')
 		self.running = True
 
 	'''
@@ -179,7 +173,7 @@ class Gate:
 		cid = uuid.uuid4().hex
 		self.cwriters[cid] = writer
 		await self.redis.set(cid, self.gid, expire = 10)
-		await self.nats.publish(channel, (cid + '~' + job).encode())
+		await self.nats.publish(self.args.channel, (cid + '~' + job).encode())
 		if self.debug: print(f'gate: submitted new job with id {cid} and args {job}')
 		if self.debug: print(f'gate: waiting for job {cid} to complete')
 
@@ -197,6 +191,8 @@ class Gate:
 	# TODO possibly move to another module
 	def _read_ip(self):
 		import socket
+		if not self.args.testing:
+			return socket.gethostname()
 		try:
 			s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 			s.connect(('10.255.255.255', 1))
@@ -204,7 +200,15 @@ class Gate:
 		finally:
 			s.close()
 
+async def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--testing'   , action = 'store_true')
+	parser.add_argument('--cport'     , type = int, default = 8880)
+	parser.add_argument('--wport'     , type = int, default = 8201)
+	parser.add_argument('--channel'   , type = str, default = 'jobs')
+	parser.add_argument('--nats-addr' , type = str, default = 'nats://nats')
+	parser.add_argument('--redis-addr', type = str, default = 'redis://redis')
+	await Gate(parser.parse_args()).start()
+
 if __name__ == '__main__':
-	if len(sys.argv) >= 2:
-		channel = sys.argv[1]
-	asyncio.run(Gate().start())
+	asyncio.run(main())
