@@ -14,20 +14,17 @@ import sys
 import json
 import signal
 import asyncio
+import argparse
 import message_handler
 import nats.aio.client
 
-import platform
-
-from utility import config_reader
 from utility import worker_resources
 
-channel = 'jobs'
-
-CFG = config_reader.wait_config()
+import platform
 
 class Worker:
-	def __init__(self):
+	def __init__(self, args):
+		self.args    = args
 		self.mh      = message_handler.MessageHandler()
 		self.gates   = {}
 		self.ujobs   = 0
@@ -35,7 +32,7 @@ class Worker:
 		self.running = False
 
 		self.configs = worker_resources.ModuleConfigurations()
-		self.resource= worker_resources.WorkerResources(CFG)
+		self.resource= worker_resources.WorkerResources(self.args.redis_addr)
 		self.sid     = None
 		self.nats    = None
 
@@ -45,8 +42,8 @@ class Worker:
 	async def start(self, *, debug = False):
 		self.debug = debug
 		await self.init()
-		print(f'this worker is operating on channel: {channel}')
-		self.sid = await self.nats.subscribe(channel, 'workers', self.process_job)
+		print(f'this worker is operating on channel: {self.args.channel}')
+		self.sid = await self.nats.subscribe(self.args.channel, 'workers', self.process_job)
 		while self.running:
 			await asyncio.sleep(1)
 			await self.nats.flush()
@@ -81,7 +78,7 @@ class Worker:
 		self.running = True
 		self.nats = nats.aio.client.Client()
 		await self.resource.init()
-		await self.nats.connect(CFG['nats']['addr'], max_reconnect_attempts = 1)
+		await self.nats.connect(self.args.nats_addr, max_reconnect_attempts = 1)
 		if platform.system() != 'Windows':
 			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 
@@ -130,9 +127,12 @@ class Worker:
 		self.gates[gid][1].write((cid + '~' + response + '\r\n').encode())
 		await self.gates[gid][1].drain()
 
+async def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--channel'  , type = str, default = 'jobs')
+	parser.add_argument('--nats-addr', type = str, default = 'nats://nats')
+	parser.add_argument('--redis-addr', type = str, default = 'redis://redis')
+	await Worker(parser.parse_args()).start()
 
 if __name__ == '__main__':
-	if len(sys.argv) >= 2:
-		channel = sys.argv[1]
-	worker = Worker()
-	asyncio.run(worker.start())
+	asyncio.run(main())

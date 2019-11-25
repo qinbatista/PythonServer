@@ -78,7 +78,8 @@ def main():
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/config/configuration_manager.py'], shell=False))
 		time.sleep(1)
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', \
-				'--channel', get_host_ip(), '--nats-addr', 'nats://192.168.1.102'], shell=False))
+				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
+				'--nats-addr', 'nats://192.168.1.102'], shell=False))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', \
 				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
 				'--nats-addr', 'nats://192.168.1.102', '--testing'], shell=False))
