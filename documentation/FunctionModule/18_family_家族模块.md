@@ -5,7 +5,7 @@
 * √[`remove_user_family`](##remove_user_family)
 * √[`invite_user_family`](##invite_user_family)
 * *[`invite_link_family`](##invite_link_family)
-* [`request_join_family`](##request_join_family)
+* √[`request_join_family`](##request_join_family)
 * [`respond_family`](##respond_family)
 * [`get_all_family`](##get_all_family)
 * [`get_store_family`](##get_store_family)
@@ -299,7 +299,7 @@ If any of them accept the invitation, user will be added to the family.
 ```json
 {
 	"status": 0,
-	"message": "request sent",
+	"message": "requested join",
 	"data": {
 		"name" : "family name"
 	}
@@ -310,7 +310,7 @@ If any of them accept the invitation, user will be added to the family.
 
 * 99: already in a family
 * 98: invalid family
-* 97: request could not be sent to mailbox
+* 97: mail could not be sent
 
 
 
