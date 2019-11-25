@@ -1,5 +1,6 @@
 {
 	"general": {
+		"player_level": 18,
 		"costs": {
 			"create": "3:5:2000",
 			"change_name": "3:5:500"

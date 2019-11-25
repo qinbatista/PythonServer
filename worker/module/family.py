@@ -14,10 +14,10 @@ from module import stage
 from datetime import datetime, timezone, timedelta
 
 
-
-
-async def create(uid, name, **kwargs):
+async def create(uid, name, icon, **kwargs):
+	"""icon必须为整型或者数字字符串"""
 	exp_info = await stage.increase_exp(uid, 0, **kwargs)
+	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "玩家等级未满开启等级")
 	if not _valid_family_name(name): return common.mt(99, 'invalid family name')
 	in_family, _ = await _in_family(uid, **kwargs)
 	if in_family: return common.mt(98, 'already in a family')
@@ -25,10 +25,10 @@ async def create(uid, name, **kwargs):
 	enough, remaining = await common.try_item(uid, iid, -cost, **kwargs)
 	if not enough: return common.mt(97, 'insufficient materials')
 	if await common.exists('family', ('name', name), **kwargs): return common.mt(96, 'name already exists!')
-	await asyncio.gather(common.execute(f'INSERT INTO family(name) VALUES("{name}");', **kwargs),
+	await asyncio.gather(common.execute(f'INSERT INTO family(name, icon) VALUES("{name}", {icon});', **kwargs),
 						common.execute(f'INSERT INTO familyrole(uid, name, role) VALUES("{uid}", "{name}", "{enums.FamilyRole.OWNER.value}");', **kwargs),
 						common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs))
-	return common.mt(0, 'created family', {'name' : name, 'iid' : iid.value, 'value' : remaining})
+	return common.mt(0, 'created family', {'name' : name, 'icon': icon, 'iid' : iid.value, 'value' : remaining})
 
 async def leave(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)

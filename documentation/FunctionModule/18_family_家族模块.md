@@ -1,6 +1,6 @@
 ## 方法列表
 
-* [`create_family`](##create_family)
+* √[`create_family`](##create_family)
 * [`leave_family`](##leave_family)
 * [`remove_user_family`](##remove_user_family)
 * [`invite_user_family`](##invite_user_family)
@@ -40,7 +40,7 @@ The cost to create a family is determined by `family.json` configuration file.
 	"data": {
 		"token": "my token ^_^",
 		"name": "family name",
-    "icon": 1
+    	"icon": 1
 	}
 }
 ```
@@ -55,14 +55,15 @@ The cost to create a family is determined by `family.json` configuration file.
 	"message": "created family",
 	"data": {
 		"name" : "family name",
-    "remaining":{
-		"iid"  : 4,
-		"value": 230
-    },
-    "reward":{
-		"iid"  : 4,
-		"value": 230
-    },
+        "icon" : "icon",
+        "remaining":{
+            "iid"  : 4,
+            "value": 230
+        },
+        "reward":{
+            "iid"  : 4,
+            "value": 230
+        },
 	}
 }
 ```
@@ -72,6 +73,8 @@ The cost to create a family is determined by `family.json` configuration file.
 * 99: invalid family name
 * 98: already in a family
 * 97: insufficient materials
+* 96: name already exists!
+* 95: 玩家等级未满开启等级
 
 
 
