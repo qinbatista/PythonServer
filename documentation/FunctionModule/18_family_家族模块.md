@@ -1,7 +1,7 @@
 ## 方法列表
 
 * √[`create_family`](##create_family)
-* [`leave_family`](##leave_family)
+* √[`leave_family`](##leave_family)
 * [`remove_user_family`](##remove_user_family)
 * [`invite_user_family`](##invite_user_family)
 * *[`invite_link_family`](##invite_link_family)
@@ -105,11 +105,14 @@ The family owner can not leave.
 
 ##### 接受消息JSON格式
 
+> cd_time：玩家离开家族后的冷却时间，冷却时间结束才能再次加入其他家族
+
 ```json
 {
 	"status": 0,
 	"message": "left family",
 	"data": {
+        "cd_time": 2313
 	}
 }
 ```

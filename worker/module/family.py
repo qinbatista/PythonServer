@@ -35,10 +35,12 @@ async def leave(uid, **kwargs):
 	if not in_family: return common.mt(99, 'not in a family')
 	role = await _get_role(uid, name, **kwargs)
 	if role == enums.FamilyRole.OWNER: return common.mt(98, 'owner can not leave family')
+	days = kwargs['config']['family']['general']['leave_days']
+	await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.FAMILY_JOIN_END.value}, "{(datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
 	await _remove_from_family(uid, name, **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
 	await _record_family_change(name, f'{gn} has left.', **kwargs)
-	return common.mt(0, 'left family')
+	return common.mt(0, 'left family', {"cd_time": days * 24 * 3600})
 
 async def remove_user(uid, gn_target, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -324,8 +326,8 @@ async def _add_to_family(uid, name, **kwargs):
 
 async def _in_family(uid, **kwargs):
 	data = await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}";', **kwargs)
-	if data == () or ('',) in data: return (False, '')
-	return (True, data[0][0])
+	if data == () or ('',) in data: return False, ''
+	return True, data[0][0]
 
 async def _get_role(uid, name, **kwargs):
 	data = await common.execute(f'SELECT role FROM familyrole WHERE uid = "{uid}" AND `name` = "{name}";', **kwargs)

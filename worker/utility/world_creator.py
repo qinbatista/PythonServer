@@ -84,6 +84,7 @@ CREATE TABLE `familyrole` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `name` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `role` int(11) NOT NULL,
+	  `contribute` int(11) NOT NULL DEFAULT 0,
 	  PRIMARY KEY (`uid`,`name`),
 	  CONSTRAINT `familyrole_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
