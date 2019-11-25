@@ -47,12 +47,12 @@ async def accept_gifts(uid, keys, **kwargs):
 async def accept_gift(uid, nonce, **kwargs):
 	await mail.mark_read(uid, nonce, **kwargs)
 	gift = await _lookup_nonce(nonce, **kwargs)
-	if not gift: return (False, None) 
+	if not gift: return False, None
 	items, r = common.decode_items(gift), []
 	for item in items:
 		_, remaining = await common.try_item(uid, item[1], item[2], **kwargs)
 		r.append({'gid' : item[0], 'id' : item[1], 'remaining' : remaining, 'reward' : item[2]})
-	return (True, r)
+	return True, r
 
 async def change_name(uid, name, **kwargs):
 	pass
