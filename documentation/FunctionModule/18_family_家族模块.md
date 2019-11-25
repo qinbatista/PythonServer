@@ -20,7 +20,8 @@
 * *[`family_check_in`](##family_check_in)
 * *[`abdicate_family`](##abdicate_family)
 * *[`modify_icon_family`](##modify_icon_family)
-* *聊天系统下的方法[`chat_report`](##chat_report)
+
+
 
 ## create_family
 
@@ -945,39 +946,4 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
-
-
-##  chat_report
-
-> 聊天举报，警告，下次封号，可以举报辱骂和广告两种。
->
-> 要验证真实性，所以后台要有查询聊天记录的功能
-
-##### 发送消息JSON格式
-
-> 
-
-```json
-{
-	"world": 0,
-	"function": "chat_report_family",
-	"data": {
-		"token": "my token",
-        "msg": "内容"
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-> 
-
-```json
-{
-	"status": 0,
-	"message": "success",
-	"data": {
-	}
-}
-```
 
