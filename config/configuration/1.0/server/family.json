@@ -2,6 +2,7 @@
 	"general": {
 		"player_level": 18,
 		"leave_days": 1,
+		"rmtimes": 5,
 		"costs": {
 			"create": "3:5:2000",
 			"change_name": "3:5:500"

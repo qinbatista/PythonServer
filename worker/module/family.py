@@ -48,14 +48,19 @@ async def remove_user(uid, gn_target, **kwargs):
 	role = await _get_role(uid, name, **kwargs)
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid == uid_target: return common.mt(96, "You can't remove yourself")
-	_, name_target = await _in_family(uid_target, **kwargs)
+	rmtimes, rmtimer = await _rmtimes_timer(name, **kwargs)
+	if rmtimes == 0: return common.mt(94, "今天移除成员的次数已用完", {"cd_time": common.remaining_cd()})
+	rmtimes -= 1
+	in_family, name_target = await _in_family(uid_target, **kwargs)
+	if not in_family: return common.mt(95, "target doesn't have a family")
 	if name_target != name: return common.mt(98, 'target is not in your family')
 	role_target = await _get_role(uid_target, name, **kwargs)
 	if not _check_remove_permissions(role, role_target): return common.mt(97, 'insufficient permissions')
 	await _remove_from_family(uid_target, name, **kwargs)
+	await common.execute(f'UPDATE family SET rmtimes={rmtimes} WHERE name = "{name}";', **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
 	await _record_family_change(name, f'{gn_target} was removed by {gn}.', **kwargs)
-	return common.mt(0, 'removed user', {'gn' : gn_target})
+	return common.mt(0, 'removed user', {'gn' : gn_target, 'rmtimes': rmtimes, "cd_time": common.remaining_cd()})
 
 async def invite_user(uid, gn_target, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -346,3 +351,15 @@ async def _lookup_nonce(nonce, **kwargs):
 async def _remove_from_family(uid, name, **kwargs):
 	await asyncio.gather(common.execute(f'UPDATE player SET fid = "" WHERE uid = "{uid}";', **kwargs),
 			common.execute(f'DELETE FROM familyrole WHERE uid = "{uid}" AND name = "{name}";', **kwargs))
+
+async def _rmtimes_timer(name, **kwargs):
+	data = await common.execute(f'SELECT rmtimes, rmtimer FROM family WHERE name = "{name}";', **kwargs)
+	rmtimes, rmtimer = data[0]
+	if rmtimer == '' or rmtimer != datetime.now().strftime("%Y-%m-%d"):
+		await common.execute(f'UPDATE family SET rmtimes={kwargs["config"]["family"]["general"]["rmtimes"]}, rmtimer="{datetime.now().strftime("%Y-%m-%d")}" WHERE name = "{name}";', **kwargs)
+		data = await common.execute(f'SELECT rmtimes, rmtimer FROM family WHERE name = "{name}";', **kwargs)
+		rmtimes, rmtimer = data[0]
+	return rmtimes, rmtimer
+
+
+
