@@ -1,11 +1,11 @@
 ## 方法列表
 
-* [`create_family`](##create_family)
-* [`leave_family`](##leave_family)
-* [`remove_user_family`](##remove_user_family)
-* [`invite_user_family`](##invite_user_family)
+* √[`create_family`](##create_family)
+* √[`leave_family`](##leave_family)
+* √[`remove_user_family`](##remove_user_family)
+* √[`invite_user_family`](##invite_user_family)
 * *[`invite_link_family`](##invite_link_family)
-* [`request_join_family`](##request_join_family)
+* √[`request_join_family`](##request_join_family)
 * [`respond_family`](##respond_family)
 * [`get_all_family`](##get_all_family)
 * [`get_store_family`](##get_store_family)
@@ -40,7 +40,7 @@ The cost to create a family is determined by `family.json` configuration file.
 	"data": {
 		"token": "my token ^_^",
 		"name": "family name",
-    "icon": 1
+    	"icon": 1
 	}
 }
 ```
@@ -55,14 +55,15 @@ The cost to create a family is determined by `family.json` configuration file.
 	"message": "created family",
 	"data": {
 		"name" : "family name",
-    "remaining":{
-		"iid"  : 4,
-		"value": 230
-    },
-    "reward":{
-		"iid"  : 4,
-		"value": 230
-    },
+        "icon" : "icon",
+        "remaining":{
+            "iid"  : 4,
+            "value": 230
+        },
+        "reward":{
+            "iid"  : 4,
+            "value": 230
+        },
 	}
 }
 ```
@@ -72,6 +73,8 @@ The cost to create a family is determined by `family.json` configuration file.
 * 99: invalid family name
 * 98: already in a family
 * 97: insufficient materials
+* 96: name already exists!
+* 95: 玩家等级未满开启等级
 
 
 
@@ -102,11 +105,14 @@ The family owner can not leave.
 
 ##### 接受消息JSON格式
 
+> cd_time：玩家离开家族后的冷却时间，冷却时间结束才能再次加入其他家族
+
 ```json
 {
 	"status": 0,
 	"message": "left family",
 	"data": {
+        "cd_time": 2313
 	}
 }
 ```
@@ -148,12 +154,20 @@ Admins can remove anyone with a role lower than Admin.
 
 ##### 接受消息JSON格式
 
+> gn：移除的成员游戏名
+>
+> rmtimes：剩余可移除成员的次数
+>
+> cd_time：剩余恢复移除次数的冷却时间
+
 ```json
 {
 	"status": 0,
 	"message": "removed user",
 	"data": {
-		"gn" : "matthew"
+		"gn" : "matthew",
+        "rmtimes": 4,
+        "cd_time": 68900
 	}
 }
 ```
@@ -164,6 +178,8 @@ Admins can remove anyone with a role lower than Admin.
 * 98: target is not in your family
 * 97: insufficient permissions
 * 96: You can't remove yourself
+* 95: target doesn't have a family(对方没有家族)
+* 94: 今天移除成员的次数已用完  cd_time: 剩余恢复移除次数的冷却时间
 
 
 
@@ -210,7 +226,7 @@ An invitation will be sent the the user's mailbox.
 
 * 99: not in a family
 * 98: insufficient permissions
-* 97: invitation could not be sent to mailbox
+* 97: mail could not be sent
 
 
 
@@ -283,7 +299,7 @@ If any of them accept the invitation, user will be added to the family.
 ```json
 {
 	"status": 0,
-	"message": "request sent",
+	"message": "requested join",
 	"data": {
 		"name" : "family name"
 	}
@@ -294,7 +310,7 @@ If any of them accept the invitation, user will be added to the family.
 
 * 99: already in a family
 * 98: invalid family
-* 97: request could not be sent to mailbox
+* 97: mail could not be sent
 
 
 

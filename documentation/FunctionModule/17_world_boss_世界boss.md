@@ -24,7 +24,7 @@
 
 [成功]()
 
-> world_boss：刷新挑战次数的时间，剩余挑战boss的次数，
+> world_boss：刷新挑战次数的冷却剩余时间，剩余挑战boss的次数，
 >
 > boss_life_ratio: 各个boss的生命值
 
@@ -169,13 +169,15 @@
 
 [成功消息]()
 
-> times: 剩余挑战boss次数
->
 > energy：剩余能量点数
 >
 > cooling_time：能量恢复时间剩余秒数（-1代表满能量状态不需要恢复）
 >
 > consume：本次消耗的能量
+>
+> times: 剩余挑战boss次数
+>
+> cd_time：刷新挑战次数的冷却剩余时间
 
 ```json
 {
@@ -185,7 +187,8 @@
 		"energy": 9960,
 		"cooling_time": -1,
 		"consume": -10,
-		"times": 1
+		"times": 1,
+        "cd_time": 5565
 	}
 }
 ```

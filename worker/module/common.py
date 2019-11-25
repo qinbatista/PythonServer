@@ -40,8 +40,12 @@ async def get_gn(uid, **kwargs):
 
 async def get_uid(gn, **kwargs):
 	data = await execute(f'SELECT uid FROM player WHERE gn = "{gn}";', **kwargs)
-	if data==():return ""
+	if data == ():return ""
 	else:return data[0][0]
+
+def remaining_cd():
+	cd_time = datetime.strptime((datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d') - datetime.now()
+	return int(cd_time.total_seconds())
 
 async def try_item(uid, item, value, **kwargs):
 	async with (await get_db(**kwargs)).acquire() as conn:

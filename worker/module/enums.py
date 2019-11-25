@@ -42,6 +42,7 @@ class Item(enum.IntEnum):
 	ROLE6_UNIVERSAL_SEGMENT = 32  # 6星角色万能碎片
 	ENERGY_POTION_S_MIN = 33  # 小能量瓶
 	ENERGY_POTION_S_MAX = 34  # 大能量瓶
+	FAMILY_CONTRIBUTE = 35  # 玩家家族贡献值
 
 
 class FamilyRole(enum.IntEnum):
@@ -262,6 +263,7 @@ class Timer(enum.IntEnum):
 	VIP_COOLING_TIME = 20  # VIP礼包领取冷却结束时间
 	CONTINUOUS_LOGIN = 21
 	MAIL_LAST_SENT = 22  # last time user sent SIMPLE mail to another player
+	FAMILY_JOIN_END = 23  # 玩家退出工会后可以再次加入工会的结束时间
 
 
 class Limits(enum.IntEnum):
