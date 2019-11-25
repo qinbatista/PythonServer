@@ -3,7 +3,7 @@
 * √[`create_family`](##create_family)
 * √[`leave_family`](##leave_family)
 * √[`remove_user_family`](##remove_user_family)
-* [`invite_user_family`](##invite_user_family)
+* √[`invite_user_family`](##invite_user_family)
 * *[`invite_link_family`](##invite_link_family)
 * [`request_join_family`](##request_join_family)
 * [`respond_family`](##respond_family)
@@ -226,7 +226,7 @@ An invitation will be sent the the user's mailbox.
 
 * 99: not in a family
 * 98: insufficient permissions
-* 97: invitation could not be sent to mailbox
+* 97: mail could not be sent
 
 
 
