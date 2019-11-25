@@ -62,13 +62,11 @@ class Userlist:
 		return set()
 
 class Edge:
-	def __init__(self, port = 9000, redis_addr = 'redis://redis', nats_addr = 'nats://nats'):
-		self.port       = port
+	def __init__(self, args): #port = 9000, redis_addr = 'redis://redis', nats_addr = 'nats://nats'):
+		self.args     = args
 		self.pubsub     = nats.aio.client.Client()
 		self.channels   = set()
 		self.userlist   = Userlist()
-		self.nats_addr  = nats_addr
-		self.redis_addr = redis_addr
 		self.drain_lock = asyncio.Lock()
 
 		self.redis      = None
@@ -79,7 +77,7 @@ class Edge:
 		try:
 			await self.init()
 			asyncio.create_task(self.server.serve_forever())
-			print(f'Starting edge server on port {self.port}')
+			print(f'Starting edge server on port {self.args.port}')
 			while self.running:
 				await asyncio.sleep(300)
 		except:
@@ -88,9 +86,9 @@ class Edge:
 	async def init(self):
 		asyncio.get_running_loop().add_signal_handler(signal.SIGINT, \
 				lambda: asyncio.create_task(self.shutdown()))
-		await self.pubsub.connect(self.nats_addr, max_reconnect_attempts = 1)
-		self.redis   = await aioredis.create_redis(self.redis_addr, encoding = 'utf-8')
-		self.server  = await asyncio.start_server(self.client_protocol, port = self.port)
+		await self.pubsub.connect(self.args.nats_addr, max_reconnect_attempts = 1)
+		self.redis   = await aioredis.create_redis(self.args.redis_addr, encoding = 'utf-8')
+		self.server  = await asyncio.start_server(self.client_protocol, port = self.args.port)
 		self.running = True
 	
 	async def shutdown(self):
@@ -218,10 +216,9 @@ class Edge:
 async def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-p', '--port', type = int, default = 9000)
-	parser.add_argument('--redis-addr', type = str, default = 'redis://192.168.1.102')
-	parser.add_argument('--nats-addr' , type = str, default = 'nats://192.168.1.102' )
-	args = parser.parse_args()
-	await Edge(port = args.port, redis_addr = args.redis_addr, nats_addr = args.nats_addr).start()
+	parser.add_argument('--redis-addr', type = str, default = 'redis://redis')
+	parser.add_argument('--nats-addr' , type = str, default = 'nats://nats' )
+	await Edge(parser.parse_args()).start()
 
 if __name__ == '__main__':
 	asyncio.run(main())

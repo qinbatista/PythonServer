@@ -69,7 +69,8 @@ def main():
 		time.sleep(1)
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/mail_server.py']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/token_server.py']))
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/edge/edge.py']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/edge/edge.py', \
+				'--redis-addr', 'redis://192.168.1.102', '--nats-addr', 'nats://192.168.1.102']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', get_host_ip()]))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', get_host_ip()]))
 		time.sleep(0.2)
