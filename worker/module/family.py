@@ -87,7 +87,7 @@ async def respond(uid, nonce, **kwargs):
 	name, uid_target = await _lookup_nonce(nonce, **kwargs)
 	if not name: return common.mt(99, 'invalid nonce')
 	in_family, _ = await _in_family(uid_target, **kwargs)
-	if in_family: return common.mt(98, 'already in a family')
+	if in_family: return common.mt(98, 'target user is already in family')
 	exists, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
 	if not exists: return common.mt(97, 'family no longer exists')
 	member_count = await _count_members(name, **kwargs)
