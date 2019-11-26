@@ -1,3 +1,7 @@
+'''
+message_handler.py
+'''
+
 import json
 
 from module import mail
@@ -23,13 +27,13 @@ from module import darkmarket
 from module import package
 from module import vip
 
-from utility import metrics
 
+from utility import metrics
 C = metrics.Collector()
 
 class MessageHandler:
 	def __init__(self, *, token_addr, token_port, mail_addr, mail_port):
-		self._functions     = FUNCTION_LIST
+		self.functions      = FUNCTION_LIST
 		self.mail_base_url  = mail_addr  + ':' + str(mail_port)
 		self.token_base_url = token_addr + ':' + str(token_port)
 
@@ -43,7 +47,7 @@ class MessageHandler:
 		Resolves the message included in the request. If required, ensures that a valid token is present.
 		'''
 		try:
-			fn = self._functions[message['function']]
+			fn = self.functions[message['function']]
 		except KeyError:
 			return '{"status" : 10, "message" : "function is not in function list"}'
 		if message['function'] not in DOES_NOT_NEED_TOKEN:
