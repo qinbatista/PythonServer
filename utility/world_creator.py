@@ -63,6 +63,8 @@ CREATE TABLE `family` (
 	  `exp` int(11) NOT NULL DEFAULT 0,
 	  `notice` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 	  `board` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+	  `rmtimes` int(11) NOT NULL DEFAULT 5 COMMENT '可移除家族成员的剩余次数',
+	  `rmtimer` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '移除家族成员的日期，用于重置移除成员次数',
 	  PRIMARY KEY (`name`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
@@ -84,6 +86,7 @@ CREATE TABLE `familyrole` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `name` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `role` int(11) NOT NULL,
+	  `contribute` int(11) NOT NULL DEFAULT 0,
 	  PRIMARY KEY (`uid`,`name`),
 	  CONSTRAINT `familyrole_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -271,6 +274,20 @@ CREATE TABLE `leaderboard` (
 	  `value` int(11) NOT NULL  DEFAULT 0,
 	  PRIMARY KEY (`uid`,`lid`),
 	  CONSTRAINT `leaderboard_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+"""
+
+MALL = \
+"""
+CREATE TABLE `mall` (
+	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+	  `time` varchar(128) NOT NULL COMMENT '兑换的时间',
+	  `key` varchar(128) NOT NULL COMMENT '商城兑换码值',
+	  `old` varchar(128) NOT NULL DEFAULT '' COMMENT '购买之前的数据',
+	  `new` varchar(128) NOT NULL DEFAULT '' COMMENT '购买之后的数据',
+	  `status` int(11) NOT NULL DEFAULT -1 COMMENT '购买之后返回的状态码',
+	  PRIMARY KEY (`uid`,`time`),
+	  CONSTRAINT `mall_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
