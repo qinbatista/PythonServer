@@ -280,14 +280,19 @@ CREATE TABLE `leaderboard` (
 MALL = \
 """
 CREATE TABLE `mall` (
-	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-	  `time` varchar(128) NOT NULL COMMENT '兑换的时间',
-	  `key` varchar(128) NOT NULL COMMENT '商城兑换码值',
-	  `old` varchar(128) NOT NULL DEFAULT '' COMMENT '购买之前的数据',
-	  `new` varchar(128) NOT NULL DEFAULT '' COMMENT '购买之后的数据',
-	  `status` int(11) NOT NULL DEFAULT -1 COMMENT '购买之后返回的状态码',
-	  PRIMARY KEY (`uid`,`time`),
-	  CONSTRAINT `mall_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  `oid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '订单号',
+	  `world` varchar(128) NOT NULL COMMENT '用户所在的世界',
+	  `uid` varchar(128) NOT NULL COMMENT '用户uid',
+	  `username` varchar(128) NOT NULL COMMENT '用户游戏名',
+	  `currency` varchar(128) NOT NULL COMMENT '购买币种',
+	  `cqty` int(11) NOT NULL COMMENT '购买金额',
+	  `mid` varchar(128) NOT NULL COMMENT '商品id',
+	  `mqty` int(11) NOT NULL COMMENT '商品数量',
+	  `channel` varchar(128) NOT NULL COMMENT '渠道名字',
+	  `time` varchar(128) NOT NULL COMMENT '购买时间',
+	  `repeatable` varchar(128) NOT NULL COMMENT '是否为永久性物品',
+	  `receive` int(11) NOT NULL DEFAULT 0 COMMENT '道具是否已领取道具',
+	  PRIMARY KEY (`oid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -314,6 +319,7 @@ def create_db(world):
 				password = 'lukseun', charset = 'utf8mb4', autocommit = True)
 		connection.cursor().execute(f'CREATE DATABASE `{world}`;')
 		connection.select_db(world)
+		# connection.cursor().execute(MALL)
 		for table in TABLES:
 			connection.cursor().execute(table)
 		print(f'created new database for world {world}..')
@@ -362,7 +368,7 @@ def save_world_config(world, path):
 
 if __name__ == '__main__':
 	path = os.path.join(loc(), '../configuration/1.0/server/world.json')
-	# path = loc() + '/../configuration/1.0/server/world.json'
+	# create_db("mall")
 	for i in range(1, 10):
 		world = f's{i}'
 		create_world(world)
