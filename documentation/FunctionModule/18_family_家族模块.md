@@ -6,7 +6,7 @@
 * √[`invite_user_family`](##invite_user_family)
 * √[`request_join_family`](##request_join_family)
 * √[`respond_family`](##respond_family)
-* X[`get_all_family`](##get_all_family)
+* √[`get_all_family`](##get_all_family)
 * √[`get_store_family`](##get_store_family)
 * √[`market_purchase_family`](##market_purchase_family)
 * √内部[`welfare_purchase_family`](##welfare_purchase_family)
