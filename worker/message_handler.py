@@ -26,6 +26,7 @@ from module import check_in
 from module import darkmarket
 from module import package
 from module import vip
+from module import mall
 
 
 from utility import metrics
@@ -575,6 +576,9 @@ class MessageHandler:
 	async def _send_text_mail(self, data: dict) -> str:
 		return await common._send_text_mail(data['data']['unique_id'],data['data']['gn_target'], data['data']['msg'], **data)
 
+	async def _rmb_mall(self, data: dict) -> str:
+		return await mall.rmb_mall(data['data']['pid'], data['data']['order_id'], data['data']['channel'], data['data']['user_name'], data['data']['currency'], **data)
+
 
 ##########################################################################################################
 ##########################################################################################################
@@ -772,5 +776,6 @@ FUNCTION_LIST = {
 	###################### private(comment before release) ######################
 	'send_gift_mail': MessageHandler._send_gift_mail,
 	'send_text_mail': MessageHandler._send_text_mail,
+	'rmb_mall': MessageHandler._rmb_mall,
 }
 
