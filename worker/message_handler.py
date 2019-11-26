@@ -2,7 +2,6 @@ import json
 import requests
 
 from utility import config_reader
-from utility import repeating_timer
 from module import mail
 from module import chat
 from module import enums
