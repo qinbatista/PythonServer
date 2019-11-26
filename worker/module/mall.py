@@ -7,6 +7,8 @@ from module import common
 from module import vip
 from datetime import datetime
 import time
+# import random
+# random.getrandbits
 
 
 async def rmb_mall(key, **kwargs):
