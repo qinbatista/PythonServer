@@ -1,7 +1,7 @@
 ## 方法列表
 
 * √[`create_family`](##create_family)
-* X[`leave_family`](##leave_family)
+* √[`leave_family`](##leave_family)
 * √[`remove_user_family`](##remove_user_family)
 * √[`invite_user_family`](##invite_user_family)
 * √[`request_join_family`](##request_join_family)
@@ -20,7 +20,7 @@
 * ?[`family_check_in`](##family_check_in)
 * ?[`abdicate_family`](##abdicate_family)
 * ?[`modify_icon_family`](##modify_icon_family)
-* ?[`check_in_family`](##check_in_family)
+* √[`check_in_family`](##check_in_family)
 * ?[`get_family_info`](##get_family_info)
 
 
@@ -402,7 +402,7 @@ Gets all information regarding your family.
 >
 > board：家族简介
 >
-> members：家族成员，`gn`家族名字，`role`使用角色(0，4，8，10)，`exp`经验值，`icon`使用icon.  (需要添加玩家的最后登录时间，玩家的`家族记录金币(FAMILY_COIN_RECORD)`)
+> members：家族成员，`gn`家族名字，`role`使用角色(0，4，8，10)，`exp`经验值，`icon`使用icon.  (需要添加玩家的最后登录时间(秒)，玩家的`家族记录金币(FAMILY_COIN_RECORD)`)
 >
 > news: 家族消息，主要是谁离开，谁加入等信息
 >
@@ -420,8 +420,10 @@ Gets all information regarding your family.
 		"notice": "New members should buy family gift package",
 		"board" : "Blackboard",
 		"members" : [
-			{"gn" : "matthew",  "role" : 10, "exp" : 420, "icon" : 0},
-			{"gn" : "children", "role" :  8, "exp" : 240, "icon" : 1}
+			{"gn" : "matthew",  "role" : 10, "exp" : 420, 
+       "icon" : 0,"online_time":3222,"family_coin_record":233},
+			{"gn" : "children", "role" :  8, "exp" : 240, 
+       "icon" : 1,"online_time":123, "family_coin_record":1223}
 		],
 		"news" : [
 			["2019-10-30 06:30:24", "matthew added children."],
@@ -865,7 +867,7 @@ Only Admins and above can cancel the disbanding of a family.
 
 ## family_check_in
 
-家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级，签到获取贡献值和金币奖励，工会等级的提高，奖励也会随着提高
+家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级，签到获取`公会金币`和`金币`，工会等级的提高，奖励也会随着提高
 
 ##### 发送消息JSON格式
 

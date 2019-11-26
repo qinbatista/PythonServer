@@ -36,6 +36,7 @@ async def leave(uid, **kwargs):
 	role = await _get_role(uid, name, **kwargs)
 	if role == enums.FamilyRole.OWNER: return common.mt(98, 'owner can not leave family')
 	days = kwargs['config']['family']['general']['leave_days']
+	await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", "{enums.Item.FAMILY_COIN_RECORD.value}", 0) ON DUPLICATE KEY UPDATE `value`= 0', **kwargs)
 	await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.FAMILY_JOIN_END.value}, "{(datetime.now() + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")}");', **kwargs)
 	await _remove_from_family(uid, name, **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
@@ -213,11 +214,14 @@ async def check_in(uid, **kwargs):
 	now = datetime.now(timezone.utc)
 	if timer is not None and now < timer: return common.mt(98, 'already checked in today')
 	time = (now + timedelta(days = 1)).strftime('%Y-%m-%d')
+
 	await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FAMILY_CHECK_IN.value}, "{time}") ON DUPLICATE KEY UPDATE `time` = "{time}";', **kwargs)
 	await common.execute(f'UPDATE family SET exp = exp + 1 WHERE name = "{name}";', **kwargs)
 	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['rewards']['check_in']))[0]
+	_, iid_fc, cost_fc = (common.decode_items(kwargs['config']['family']['general']['rewards']['family_coin']))[0]
 	_, remaining = await common.try_item(uid, iid, cost, **kwargs)
-	return common.mt(0, 'success', {'iid' : iid.value, 'value' : remaining})
+	_, remaining_fc = await common.try_item(uid, iid_fc, cost_fc, **kwargs)
+	return common.mt(0, 'success', {'remaining' : [{"iid":iid.value,"value":remaining},{"iid":iid_fc.value,"value":remaining_fc}], 'reward' : [{"iid":iid.value,"value":cost},{"iid":iid_fc.value,"value":cost_fc}]})
 
 async def gift_package(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -318,8 +322,8 @@ async def _record_family_change(name, msg, **kwargs):
 	await common.execute(f'INSERT INTO familyhistory(name, date, msg) VALUES("{name}", "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}", "{msg}");', **kwargs)
 
 async def _get_member_info(name, **kwargs):
-	data = await common.execute(f'SELECT player.gn, familyrole.role, progress.exp FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid WHERE familyrole.name = "{name}";', **kwargs)
-	return [{'gn' : m[0], 'role' : m[1], 'exp' : m[2], 'icon' : 0} for m in data]
+	data = await common.execute(f'SELECT player.gn, progress.role, familyrole.role, progress.exp, timer.time, item.`value` FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid join timer on timer.uid = familyrole.uid and timer.tid={enums.Item.LOGIN_TIME} join item on item.uid = familyrole.uid and item.iid ={enums.Item.FAMILY_COIN_RECORD} WHERE familyrole.name = "{name}";', **kwargs)
+	return [{'gn' : m[0], 'player_role' : m[1],'family_role' : m[2], 'exp' : m[3], 'last_login' : m[4], 'family_coin' : m[5]} for m in data]
 
 async def _get_family_info(name, *args, **kwargs):
 	data = await common.execute(f'SELECT {",".join(args)} FROM family WHERE name = "{name}";', **kwargs)

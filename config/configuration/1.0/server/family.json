@@ -8,7 +8,8 @@
 			"change_name": "3:5:500"
 		},
 		"rewards": {
-			"check_in": "3:1:100"
+			"check_in": "3:1:100",
+			"family_coin": "3:37:100"
 		},
 		"members": {
 			"base": 30,
