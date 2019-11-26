@@ -11,6 +11,8 @@
 ##### 发送消息JSON格式
 
 > card_id：卡片id（属于item枚举，范围18-23）
+>
+> qty：兑换的卡片数
 
 ```json
 {
@@ -18,7 +20,8 @@
 	"function": "exchange_card",
 	"data": {
 		"token": "my toekn ^_^",
-        "card_id": 18
+        "card_id": 18,
+        "qty": 1
 	}
 }
 ```

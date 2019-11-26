@@ -468,6 +468,10 @@ class MessageHandler:
 		data.update({'hang_rewards': data['config']['hang_reward']})
 		return await stage.get_hang_up_reward(data['data']['unique_id'], **data)
 
+	# async def _get_hang_up_info(self, data: dict) -> str:
+	# 	data.update({'hang_rewards': data['config']['hang_reward']})
+	# 	return await stage.get_hang_up_info(data['data']['unique_id'], **data)
+
 
 	###################### tasks ######################
 	async def _get_all_task(self, data: dict) -> str:

@@ -37,6 +37,6 @@ def print_method(my_string):
 
 
 def mall_dialog(token, world, info):
-    rmb_mall(world, token, "VIP_CARD_NORMAL", f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
+    rmb_mall(world, token, "DIAMOND_MIN", f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
 
     return ""
