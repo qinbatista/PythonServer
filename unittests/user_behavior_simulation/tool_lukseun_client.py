@@ -47,6 +47,7 @@ class LukseunClient:
 			data = json.loads(resp, encoding = 'utf-8')
 			if 'data' in data and 'token' in data['data']:
 				self.token = data['data']['token']
+			print(f"data:{data}")
 			return data
 		return {}
 
