@@ -43,6 +43,8 @@ class Item(enum.IntEnum):
 	ENERGY_POTION_S_MIN = 33  # 小能量瓶
 	ENERGY_POTION_S_MAX = 34  # 大能量瓶
 	FAMILY_CONTRIBUTE = 35  # 玩家家族贡献值
+	FAMILY_COIN = 36
+	FAMILY_COIN_RECORD = 37
 
 
 class FamilyRole(enum.IntEnum):

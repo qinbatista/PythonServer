@@ -1,25 +1,28 @@
 ## 方法列表
 
 * √[`create_family`](##create_family)
-* √[`leave_family`](##leave_family)
+* X[`leave_family`](##leave_family)
 * √[`remove_user_family`](##remove_user_family)
 * √[`invite_user_family`](##invite_user_family)
-* *[`invite_link_family`](##invite_link_family)
+* ?[`invite_link_family`](##invite_link_family)
 * √[`request_join_family`](##request_join_family)
 * √[`respond_family`](##respond_family)
-* [`get_all_family`](##get_all_family)
-* [`get_store_family`](##get_store_family)
-* [`market_purchase_family`](##market_purchase_family)
-* *[`welfare_purchase_family`](##welfare_purchase_family)
-* [`set_notice_family`](##set_notice_family)
-* [`set_blackboard_family`](##set_blackboard_family)
-* [`set_role_family`](##set_role_family)
-* [`change_name_family`](##change_name_family)
-* [`disband_family`](##disband_family)
-* [`cancel_disband_family`](##cancel_disband_family)
-* *[`family_check_in`](##family_check_in)
-* *[`abdicate_family`](##abdicate_family)
-* *[`modify_icon_family`](##modify_icon_family)
+* X[`get_all_family`](##get_all_family)
+* √[`get_store_family`](##get_store_family)
+* √[`market_purchase_family`](##market_purchase_family)
+* √内部[`welfare_purchase_family`](##welfare_purchase_family)
+* X[`set_notice_family`](##set_notice_family)
+* √[`set_blackboard_family`](##set_blackboard_family)
+* X[`set_icon_family`](##set_icon_family)
+* √[`set_role_family`](##set_role_family)
+* √[`change_name_family`](##change_name_family)
+* √[`disband_family`](##disband_family)
+* √[`cancel_disband_family`](##cancel_disband_family)
+* ?[`family_check_in`](##family_check_in)
+* ?[`abdicate_family`](##abdicate_family)
+* ?[`modify_icon_family`](##modify_icon_family)
+* ?[`check_in_family`](##check_in_family)
+* ?[`get_family_info`](##get_family_info)
 
 
 
@@ -89,7 +92,7 @@ The family owner can not leave.
 
 玩家退出工会之后24小时才能再次加入工会
 
-玩家离开工会累计贡献清0，贡献数值保留，可以在其他工会兑换。
+玩家离开工会累计贡献清0，贡献数值保留，可以在其他工会兑换。`FAMILY_COIN_RECORD`清除，但是`FAMILY_COIN`保留
 
 ##### 发送消息JSON格式
 
@@ -400,7 +403,7 @@ Gets all information regarding your family.
 >
 > board：家族简介
 >
-> members：家族成员，`gn`家族名字，`role`使用角色(0，4，8，10)，`exp`经验值，`icon`使用icon
+> members：家族成员，`gn`家族名字，`role`使用角色(0，4，8，10)，`exp`经验值，`icon`使用icon.  (需要添加玩家的最后登录时间，玩家的`家族记录金币(FAMILY_COIN_RECORD)`)
 >
 > news: 家族消息，主要是谁离开，谁加入等信息
 >
@@ -542,6 +545,8 @@ Purchase an item from the family store.
 > 钻石购买的可以获取金币和工会贡献，其他玩家可以领取少量钻石和工会贡献。
 >
 > RMB购买的可以获取金币和钻石和工会贡献。
+>
+> 购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次`
 
 ##### 发送消息JSON格式
 
@@ -592,7 +597,7 @@ Only the family Owner and Admins may update the family notice.
 更新家庭通知。
 只有家庭所有者和管理员可以更新家庭通知。
 
-需要有cd
+X 需要有cd
 
 ##### 发送消息JSON格式
 
@@ -869,7 +874,7 @@ Only Admins and above can cancel the disbanding of a family.
 ```json
 {
 	"world": 0,
-	"function": "cancel_disband_family",
+	"function": "family_check_in",
 	"data": {
 		"token": "my token"
 	}
@@ -884,6 +889,14 @@ Only Admins and above can cancel the disbanding of a family.
 	"status": 0,
 	"message": "success",
 	"data": {
+    		"remaining":[
+           {"iid"  : 1,"value": 230},
+           {"iid"  : 36,"value": 230}
+				],
+        "reward":[
+           {"iid"  : 1,"value": 230},
+           {"iid"  : 36,"value": 230}
+				],
 	}
 }
 ```
@@ -962,4 +975,136 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
+
+
+
+
+## check_in_family
+
+家族签到会得到`金币`和`家族金币`, 金币的和家族金币的数量根据家族等级来，奖励的基础数据在, 奖励公式为 基础数据*等级，比如一级公会签到奖励100金币和100家族金币，等级到达2级时，可以奖励200金币和200家族金币。
+
+##### 发送消息JSON格式
+
+```json
+{
+	"world": 0, 
+	"function": "check_in_family",
+	"data": {
+		"token": "my token ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+
+```json
+{
+	"status": 0,
+	"message": "created family",
+	"data": {
+		"name" : "family name",
+        "remaining":[
+           {"iid"  : 1,"value": 230},
+           {"iid"  : 36,"value": 230}
+				],
+        "reward":[
+           {"iid"  : 1,"value": 230},
+           {"iid"  : 36,"value": 230}
+				],
+	}
+}
+```
+
+[挂机关卡失败]()
+
+* 99: 已签到过
+
+
+
+## gift_package
+
+购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次`
+
+##### 发送消息JSON格式
+
+```json
+{
+	"world": 0, 
+	"function": "gift_package",
+	"data": {
+		"token": "my token ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+
+```json
+{
+	"status": 0,
+	"message": "created family",
+	"data": {
+		"name" : "family name",
+        "remaining":[
+           {"iid"  : 1,"value": 230},
+           {"iid"  : 36,"value": 230}
+				],
+        "reward":[
+           {"iid"  : 1,"value": 230},
+           {"iid"  : 36,"value": 230}
+				],
+	}
+}
+```
+
+[挂机关卡失败]()
+
+* 99: 已签到过
+
+  
+
+
+
+## get_family_info
+
+购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次`
+
+##### 发送消息JSON格式
+
+```json
+{
+	"world": 0, 
+	"function": "gift_package",
+	"data": {
+		"token": "my token ^_^",
+    "family_name":"大家族"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"name"  : "family name",
+		"icon"  : 0,
+		"exp"   : 1337,
+		"notice": "New members should buy family gift package",
+		"board" : "Blackboard",
+		"timer" : 85647
+	}
+}
+```
+
+[挂机关卡失败]()
+
+* 99: 没有此家族
+
+  
 

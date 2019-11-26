@@ -1,8 +1,5 @@
 import json
-import requests
 
-from utility import config_reader
-from utility import repeating_timer
 from module import mail
 from module import chat
 from module import enums
@@ -30,17 +27,13 @@ from datetime import datetime, timedelta
 
 from utility import metrics
 
-CFG = config_reader.wait_config()
-
-TOKEN_BASE_URL = CFG['token_server']['addr'] + ':' + CFG['token_server']['port']
-MAIL_BASE_URL = CFG['mail_server']['addr'] + ':' + CFG['mail_server']['port']
-#MAIL_BASE_URL = 'http://127.0.0.1:8020'
-
 C = metrics.Collector()
 
 class MessageHandler:
-	def __init__(self):
-		self._functions = FUNCTION_LIST
+	def __init__(self, *, token_addr, token_port, mail_addr, mail_port):
+		self._functions     = FUNCTION_LIST
+		self.mail_base_url  = mail_addr  + ':' + str(mail_port)
+		self.token_base_url = token_addr + ':' + str(token_port)
 
 	async def shutdown(self):
 		pass
@@ -66,13 +59,13 @@ class MessageHandler:
 		message['redis'] = resource['redis']
 		message['worlddb'] = resource['db']
 		message['accountdb'] = resource['accountdb']
-		message['tokenserverbaseurl'] = TOKEN_BASE_URL
-		message['mailserverbaseurl'] = MAIL_BASE_URL
+		message['mailserverbaseurl']  = self.mail_base_url
+		message['tokenserverbaseurl'] = self.token_base_url
 		message['config'] = configs  ############configs#################
 		return json.dumps(await fn(self, message))
 
 	async def validate_token(self, msg, session):
-		async with session.post(TOKEN_BASE_URL + '/validate', data = {'token' : msg['data']['token']}) as r:
+		async with session.post(self.token_base_url+'/validate',data={'token' : msg['data']['token']}) as r:
 			validated = await r.json(content_type = 'text/json')
 			return (False, None) if validated['status'] != 0 else (True, validated['data']['unique_id'])
 
