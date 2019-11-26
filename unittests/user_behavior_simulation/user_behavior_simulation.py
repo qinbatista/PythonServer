@@ -25,6 +25,7 @@ import module_24_achievement
 import module_25_check_in
 import module_26_bag
 import module_27_vip
+import module_28_mall
 
 import multiprocessing
 import time
@@ -36,7 +37,7 @@ import os
 import gevent
 # from gevent import monkey; monkey.patch_all()
 logger = tool_lukseun_client.logger
-lukseun = tool_lukseun_client.LukseunClient('aliya',host="192.168.1.136", port = 8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya',host="127.0.0.1", port = 8880)
 world = "0"
 token = ""
 unique_id=""
@@ -66,7 +67,7 @@ def send_tcp_message(msg):
 	start = time.time()
 	msg_resutl= asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 	end = time.time()
-	debug_log(end-start,msg['function'],msg_resutl)
+	# debug_log(end-start,msg['function'],msg_resutl)
 	return msg_resutl
 
 def _execute_statement(statement: str) -> tuple:
@@ -124,9 +125,10 @@ def run_task(name):
 	# module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
 	# module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
 	# module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
-	module_12_chat.chat_dialog(token,world,info_list[5])#vip系统
+	# module_12_chat.chat_dialog(token,world,info_list[5])#vip系统
+	module_28_mall.mall_dialog(token,world,info_list[5])#mall系统
 	end = time.time()
-	debug_log(end-start,"user_"+str(unique_id),"",level=2)
+	# debug_log(end-start,"user_"+str(unique_id),"",level=2)
 	gevent.sleep(0)
 
 
