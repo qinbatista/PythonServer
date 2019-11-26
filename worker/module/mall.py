@@ -139,13 +139,10 @@ async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):
 		resp = await vip.buy_card(uid, RMB_LIMIT[pid], **kwargs)
 	else:
 		resp = await common.try_item(uid, enums.Item(RMB_LIMIT[pid]), config["quantity"], **kwargs)
-	print(f"pid:{pid}")
-	print(f"order_id:{order_id}")
-	print(f"channel:{channel}")
-	print(f"user_name:{user_name}")
-	print(f"uid:{uid}")
-	print(f"currency:{currency}")
-	print(f"resp:{resp}")
+	await common.execute(f'INSERT INTO mall(oid, world, uid, username, currency, cqty, mid, mqty, channel, time, repeatable, receive) \
+							VALUES ("{order_id}", "{kwargs["world"]}", "{uid}", "{user_name}", "{currency}", "{config["price"][currency]}", \
+							"{RMB_LIMIT[pid]}", "{config["quantity"]}", "{channel}", "{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}", \
+							"{config["repeatable"]}", 1);', mall=True, **kwargs)
 	return common.mt(0, 'success')
 
 

@@ -30,6 +30,9 @@ class WorkerResources:
 				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True)
 		self.resources['accountdb'] = await aiomysql.create_pool(maxsize =  4, host = '192.168.1.102',  \
 				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'user')
+		self.resources['malldb'] = await aiomysql.create_pool(maxsize = 4, host = '192.168.1.102', \
+				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'mall')
+
 
 	async def shutdown(self):
 		self.resources['db'].close()
@@ -37,6 +40,9 @@ class WorkerResources:
 
 		self.resources['accountdb'].close()
 		await self.resources['accountdb'].wait_closed()
+
+		self.resources['malldb'].close()
+		await self.resources['malldb'].wait_closed()
 
 		await self.resources['session'].close()
 

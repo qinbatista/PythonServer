@@ -62,6 +62,7 @@ class MessageHandler:
 		message['redis'] = resource['redis']
 		message['worlddb'] = resource['db']
 		message['accountdb'] = resource['accountdb']
+		message['malldb'] = resource['malldb']
 		message['mailserverbaseurl']  = self.mail_base_url
 		message['tokenserverbaseurl'] = self.token_base_url
 		message['config'] = configs  ############configs#################
@@ -565,7 +566,7 @@ class MessageHandler:
 		return common.mt(0, 'success', {'version': data['config']['version']})
 
 	async def _exchange_card(self, data: dict) -> str:
-		return await package.exchange(data['data']['unique_id'], int(data['data']['card_id']), **data)
+		return await package.exchange(data['data']['unique_id'], int(data['data']['card_id']), int(data['data']['quantity']), **data)
 
 	async def _get_config_card(self, data: dict) -> str:
 		return await package.config(data['data']['unique_id'], **data)

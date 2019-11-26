@@ -16,19 +16,21 @@ async def exists(table, *conditions, account = False, **kwargs):
 	if data == () or () in data: return False
 	return data[0][0] != 0
 
-async def execute(statement, account = False, **kwargs):
-	async with ((await get_db(**kwargs)).acquire() if not account \
-			else kwargs['accountdb'].acquire()) as conn:
-		if not account:
+async def execute(statement, account = False, mall = False, **kwargs):
+	async with (((await get_db(**kwargs)).acquire() if not account
+			else kwargs['accountdb'].acquire()) if not mall
+			else kwargs['malldb'].acquire()) as conn:
+		if not account and not mall:
 			await conn.select_db(str(kwargs['world']))
 		async with conn.cursor() as cursor:
 			await cursor.execute(statement)
 			return await cursor.fetchall()
 
-async def execute_update(statement, account = False, **kwargs):
-	async with ((await get_db(**kwargs)).acquire() if not account \
-			else kwargs['accountdb'].acquire()) as conn:
-		if not account:
+async def execute_update(statement, account = False, mall = False, **kwargs):
+	async with (((await get_db(**kwargs)).acquire() if not account
+			else kwargs['accountdb'].acquire()) if not mall
+			else kwargs['malldb'].acquire()) as conn:
+		if not account and not mall:
 			await conn.select_db(str(kwargs['world']))
 		async with conn.cursor() as cursor:
 			affected = await cursor.execute(statement)

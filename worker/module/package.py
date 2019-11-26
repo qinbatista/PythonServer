@@ -7,17 +7,18 @@ from module import common
 from module import stage
 
 
-async def exchange(uid, cid, **kwargs):
+async def exchange(uid, cid, qty, **kwargs):
 	if cid not in enums.Item._value2member_map_.keys(): return common.mt(99, 'iid error')
 	config = kwargs['config']['package']['exchange_card']
 	cname = enums.Item(cid).name  # iid是卡片id
 	if cname not in config.keys(): return common.mt(98, 'card kind error (kind:18-23)')
 	sql_table = config[cname]['sqltable']
 	if sql_table not in SQL_TABLE.keys(): return common.mt(97, 'config sql table kind error')
-	can, card_num = await common.try_item(uid, enums.Item(cid), -1, **kwargs)  # 卡片的剩余数量
-	if not can: return common.mt(96, 'Insufficient card')
-	exp_info, rnum, vnum = await SQL_TABLE[sql_table](uid, config[cname]['mid'], config[cname]['bnum'], **kwargs)
-	return common.mt(0, 'success', {'remaining': {'sql_table': sql_table, 'mid': config[cname]['mid'], 'mnum': rnum, 'cid': cid, 'cnum': card_num}, 'reward': {'sql_table': sql_table, 'mid': config[cname]['mid'], 'mnum': vnum, 'cid': cid, 'cnum': -1}, 'exp_info': exp_info})
+	if qty <= 0: return common.mt(96, 'The quantity can only be positive')
+	can, card_num = await common.try_item(uid, enums.Item(cid), -qty, **kwargs)  # 卡片的剩余数量
+	if not can: return common.mt(95, 'Insufficient card')
+	exp_info, rnum, vnum = await SQL_TABLE[sql_table](uid, config[cname]['mid'], qty * config[cname]['bnum'], **kwargs)
+	return common.mt(0, 'success', {'remaining': {'sql_table': sql_table, 'mid': config[cname]['mid'], 'mnum': rnum, 'cid': cid, 'cnum': card_num}, 'reward': {'sql_table': sql_table, 'mid': config[cname]['mid'], 'mnum': vnum, 'cid': cid, 'cnum': -qty}, 'exp_info': exp_info})
 
 
 async def config(uid, **kwargs):

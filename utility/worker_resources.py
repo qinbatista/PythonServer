@@ -31,6 +31,9 @@ class WorkerResources:
 		self.resources['accountdb'].close()
 		await self.resources['accountdb'].wait_closed()
 
+		self.resources['malldb'].close()
+		await self.resources['malldb'].wait_closed()
+
 		await self.resources['session'].close()
 
 
