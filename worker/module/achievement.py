@@ -23,8 +23,9 @@ async def get_all_achievement(uid, **kwargs):
 
 async def record_achievement(uid, achievement_value=1, **kwargs):  # aid->enums.Achievement,value->string
 	if kwargs["aid"] == enums.Achievement.TOTAL_LOGIN:
-		timer_data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.CONTINUOUS_LOGIN}";', **kwargs)
 		current_time = datetime.now().strftime("%Y-%m-%d")
+		await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}",{enums.Timer.LOGIN_TIME},"{current_time}") ON DUPLICATE KEY UPDATE `time`= "{current_time}"',**kwargs)
+		timer_data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.CONTINUOUS_LOGIN}";', **kwargs)
 		if timer_data!=():
 			difference_day = datetime.now() - datetime.strptime(timer_data[0][0], '%Y-%m-%d')
 			if difference_day.days == 0:
