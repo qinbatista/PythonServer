@@ -4,7 +4,6 @@
 * X[`leave_family`](##leave_family)
 * √[`remove_user_family`](##remove_user_family)
 * √[`invite_user_family`](##invite_user_family)
-* ?[`invite_link_family`](##invite_link_family)
 * √[`request_join_family`](##request_join_family)
 * √[`respond_family`](##respond_family)
 * X[`get_all_family`](##get_all_family)
