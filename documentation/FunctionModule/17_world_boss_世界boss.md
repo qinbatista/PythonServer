@@ -2,6 +2,7 @@
 - [`get_top_damage`](##get_top_damage)
 - [`enter_stage`](##enter_world_boss_stage(enter_stage))
 - [`pass_stage`](##leave_world_boss_stage(pass_stage))
+- [`get_config_boss`](##get_config_boss)
 
 ## check_boss_status
 
@@ -23,7 +24,7 @@
 
 [成功]()
 
-> world_boss：刷新挑战次数的时间，剩余挑战boss的次数，
+> world_boss：刷新挑战次数的冷却剩余时间，剩余挑战boss的次数，
 >
 > boss_life_ratio: 各个boss的生命值
 
@@ -168,13 +169,15 @@
 
 [成功消息]()
 
-> times: 剩余挑战boss次数
->
 > energy：剩余能量点数
 >
 > cooling_time：能量恢复时间剩余秒数（-1代表满能量状态不需要恢复）
 >
 > consume：本次消耗的能量
+>
+> times: 剩余挑战boss次数
+>
+> cd_time：刷新挑战次数的冷却剩余时间
 
 ```json
 {
@@ -184,7 +187,8 @@
 		"energy": 9960,
 		"cooling_time": -1,
 		"consume": -10,
-		"times": 1
+		"times": 1,
+        "cd_time": 5565
 	}
 }
 ```
@@ -249,6 +253,73 @@
 
 - 98：stage error（关卡错误）
 - 99：abnormal data（数据异常）
+
+
+
+## get_config_boss
+
+获取world_boss_config.json的配置文件信息
+
+##### 发送消息JSON格式
+
+> 无
+
+```json
+{
+	"world": 0, 
+	"function": "get_config_boss",
+	"data": {
+		"token": "my toekn ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"config": {
+			"max_enter_time": 3,
+			"max_upload_damage": 200000,
+			"boss1": {
+				"life_value": 10000
+			},
+			"boss2": {
+				"life_value": 100000
+			},
+			"boss3": {
+				"life_value": 100000
+			},
+			"boss4": {
+				"life_value": 100000
+			},
+			"boss5": {
+				"life_value": 100000
+			},
+			"boss6": {
+				"life_value": 100000
+			},
+			"boss7": {
+				"life_value": 100000
+			},
+			"boss8": {
+				"life_value": 100000
+			},
+			"boss9": {
+				"life_value": 100000
+			},
+			"boss10": {
+				"life_value": 100000
+			}
+		}
+	}
+}
+```
 
 
 

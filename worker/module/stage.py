@@ -450,9 +450,8 @@ async def check_boss_status(uid,**kwargs):
 		else:
 			limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" and lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 			enter_times = limits[0][0]
-	d1 = datetime.strptime(datetime.now().strftime("%Y-%m-%d %H:%M:%S"), '%Y-%m-%d %H:%M:%S')
-	d2 = datetime.strptime((datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d 00:00:00"), '%Y-%m-%d %H:%M:%S')
-	world_boss = {'remaining': enter_times, 'time': int((d2 - d1).total_seconds())}
+	cd_time = datetime.strptime((datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d') - datetime.now()
+	world_boss = {'remaining': enter_times, 'time': int(cd_time.total_seconds())}
 	boss_life_ratio = {}
 	for i in range(0, len(kwargs["boss_life_remaining"])):
 		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))
@@ -467,6 +466,8 @@ async def enter_world_boss_stage(uid, stage,**kwargs):
 			data.pop('recover_time')
 			data['times'] = limits[0][0] - 1
 			data['consume'] = consume
+			cd_time = datetime.strptime((datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d') - datetime.now()
+			data['cd_time'] = int(cd_time.total_seconds())
 			await common.execute(f'UPDATE limits SET value = value - 1 WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 			await set_progress(uid, 'unstage', stage, **kwargs)
 			return common.mt(0, "enter world boss success", data)

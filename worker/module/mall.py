@@ -84,25 +84,6 @@ async def mall(uid, cty, ity, iid, gty, qty, **kwargs):
 	# 以下是钻石商城和金币商城通用代码
 	return common.mt(0, '暂未完成')
 
-	# scroll_config = self._mall_config["scroll"]
-	# if quantity <= 0:
-	# 	return self._message_typesetting(status=99, message="The quantity purchased must be a positive integer")
-	# mall_scroll_type = scroll_config["scroll_type"]
-	# if scroll_type not in mall_scroll_type:
-	# 	return self._message_typesetting(status=98, message="This scroll cannot be purchased")
-	# mall_purchase_type = scroll_config[scroll_type]["purchase_type"]
-	# if purchase_type not in mall_purchase_type:
-	# 	return self._message_typesetting(status=97, message="No such purchase type")
-	# mall_consume = scroll_config[scroll_type][purchase_type]["consume"]
-	# mall_quantity = -1 * scroll_config[scroll_type][purchase_type]["quantity"] * quantity
-	# mall_scroll_quantity = scroll_config[scroll_type][purchase_type]["scroll_quantity"] * quantity
-	# consume_data = await eval(f"self.try_{mall_consume}({world}, {unique_id}, {mall_quantity})")
-	# if consume_data["status"] == 1:
-	# 	return self._message_typesetting(status=96, message=f"Insufficient {mall_consume}")
-	# await self._execute_statement_update(world=world, statement=f"update player set {scroll_type}={scroll_type}+{mall_scroll_quantity} where unique_id='{unique_id}'")
-	# scroll_quantity = await self._get_material(world=world, unique_id=unique_id, material=scroll_type)
-	# return self._message_typesetting(status=0, message="Purchase success", data={"remaining": {mall_consume: consume_data["remaining"], scroll_type: scroll_quantity}, "reward": {scroll_type: mall_scroll_quantity}})
-
 
 def decode_key(key):
 	"""

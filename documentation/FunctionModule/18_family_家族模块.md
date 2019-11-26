@@ -1,14 +1,16 @@
 ## 方法列表
 
-* [`create_family`](##create_family)
-* [`leave_family`](##leave_family)
-* [`remove_user_family`](##remove_user_family)
-* [`invite_user_family`](##invite_user_family)
-* [`request_join_family`](##request_join_family)
-* [`respond_family`](##respond_family)
+* √[`create_family`](##create_family)
+* √[`leave_family`](##leave_family)
+* √[`remove_user_family`](##remove_user_family)
+* √[`invite_user_family`](##invite_user_family)
+* *[`invite_link_family`](##invite_link_family)
+* √[`request_join_family`](##request_join_family)
+* √[`respond_family`](##respond_family)
 * [`get_all_family`](##get_all_family)
 * [`get_store_family`](##get_store_family)
 * [`market_purchase_family`](##market_purchase_family)
+* *[`welfare_purchase_family`](##welfare_purchase_family)
 * [`set_notice_family`](##set_notice_family)
 * [`set_blackboard_family`](##set_blackboard_family)
 * [`set_role_family`](##set_role_family)
@@ -16,6 +18,10 @@
 * [`disband_family`](##disband_family)
 * [`cancel_disband_family`](##cancel_disband_family)
 * *[`family_check_in`](##family_check_in)
+* *[`abdicate_family`](##abdicate_family)
+* *[`modify_icon_family`](##modify_icon_family)
+
+
 
 ## create_family
 
@@ -34,7 +40,7 @@ The cost to create a family is determined by `family.json` configuration file.
 	"data": {
 		"token": "my token ^_^",
 		"name": "family name",
-    "icon": 1
+    	"icon": 1
 	}
 }
 ```
@@ -49,14 +55,15 @@ The cost to create a family is determined by `family.json` configuration file.
 	"message": "created family",
 	"data": {
 		"name" : "family name",
-    "remaining":{
-		"iid"  : 4,
-		"value": 230
-    },
-    "reward":{
-		"iid"  : 4,
-		"value": 230
-    },
+        "icon" : "icon",
+        "remaining":{
+            "iid"  : 4,
+            "value": 230
+        },
+        "reward":{
+            "iid"  : 4,
+            "value": 230
+        },
 	}
 }
 ```
@@ -66,6 +73,10 @@ The cost to create a family is determined by `family.json` configuration file.
 * 99: invalid family name
 * 98: already in a family
 * 97: insufficient materials
+* 96: name already exists!
+* 95: 玩家等级未满开启等级
+
+
 
 
 ## leave_family
@@ -75,6 +86,10 @@ The family owner can not leave.
 
 离开你现在的家庭。
 这家族族长不能离开。
+
+玩家退出工会之后24小时才能再次加入工会
+
+玩家离开工会累计贡献清0，贡献数值保留，可以在其他工会兑换。
 
 ##### 发送消息JSON格式
 
@@ -90,11 +105,14 @@ The family owner can not leave.
 
 ##### 接受消息JSON格式
 
+> cd_time：玩家离开家族后的冷却时间，冷却时间结束才能再次加入其他家族
+
 ```json
 {
 	"status": 0,
 	"message": "left family",
 	"data": {
+        "cd_time": 2313
 	}
 }
 ```
@@ -103,6 +121,8 @@ The family owner can not leave.
 
 * 99: not in a family
 * 98: family owner can not leave
+
+
 
 
 ## remove_user_family
@@ -134,12 +154,20 @@ Admins can remove anyone with a role lower than Admin.
 
 ##### 接受消息JSON格式
 
+> gn：移除的成员游戏名
+>
+> rmtimes：剩余可移除成员的次数
+>
+> cd_time：剩余恢复移除次数的冷却时间
+
 ```json
 {
 	"status": 0,
 	"message": "removed user",
 	"data": {
-		"gn" : "matthew"
+		"gn" : "matthew",
+        "rmtimes": 4,
+        "cd_time": 68900
 	}
 }
 ```
@@ -150,6 +178,10 @@ Admins can remove anyone with a role lower than Admin.
 * 98: target is not in your family
 * 97: insufficient permissions
 * 96: You can't remove yourself
+* 95: target doesn't have a family(对方没有家族)
+* 94: 今天移除成员的次数已用完  cd_time: 剩余恢复移除次数的冷却时间
+
+
 
 
 ## invite_user_family
@@ -163,8 +195,6 @@ An invitation will be sent the the user's mailbox.
 只有所有者和管理员可以邀请用户。
 
 一个邀请将被发送到用户的邮箱。
-
-一天之内加入5个成员。
 
 ##### 发送消息JSON格式
 
@@ -196,7 +226,46 @@ An invitation will be sent the the user's mailbox.
 
 * 99: not in a family
 * 98: insufficient permissions
-* 97: invitation could not be sent to mailbox
+* 97: mail could not be sent
+
+
+
+##  invite_link_family
+
+> 发送世界入会邀请，长cd。
+>
+> 向聊天窗发送入会邀请链接
+>
+> 会长和官员有这个权限
+
+##### 发送消息JSON格式
+
+> 
+
+```json
+{
+	"world": 0,
+	"function": "invite_link_family",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+> data包含家族信息
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+	}
+}
+```
+
+
 
 ## request_join_family
 
@@ -230,7 +299,7 @@ If any of them accept the invitation, user will be added to the family.
 ```json
 {
 	"status": 0,
-	"message": "request sent",
+	"message": "requested join",
 	"data": {
 		"name" : "family name"
 	}
@@ -241,7 +310,7 @@ If any of them accept the invitation, user will be added to the family.
 
 * 99: already in a family
 * 98: invalid family
-* 97: request could not be sent to mailbox
+* 97: mail could not be sent
 
 
 
@@ -295,6 +364,8 @@ Calling this function adds the user to the family.
 * 96: family is full
 
 
+
+
 ## get_all_family
 
 Gets all information regarding your family.
@@ -302,6 +373,8 @@ Gets all information regarding your family.
 获取有关您家庭的所有信息。 
 
 返回家族经验、等级、升下级需要多少经验
+
+需要显示玩家的职务；最后登录的时间：在线显示在线，超过1天按天计，不超过1天按小时记；显示玩家累计贡献。
 
 ##### 发送消息JSON格式
 
@@ -362,6 +435,8 @@ Gets all information regarding your family.
 * 99: not in a family
 
 
+
+
 ## get_store_family
 
 Retrieves the items listed on the family store, configuration depends on `family.json`
@@ -397,11 +472,18 @@ Retrieves the items listed on the family store, configuration depends on `family
 ```
 
 
+
 ## market_purchase_family
+
+ welfare_purchase_family
 
 Purchase an item from the family store.
 
  从家庭商店购买一件物品。 
+
+> 工会贡献可以在工会商店兑换资源
+>
+> 
 
 ##### 发送消息JSON格式
 
@@ -451,6 +533,57 @@ Purchase an item from the family store.
 
 
 
+##  welfare_purchase_family
+
+> 工会福利
+>
+> 有大佬玩家购买后，全工会人员都可以获得少量奖励，只有两种，一种是钻石购买，一种是RMB购买。每人每种每天限购1次。
+>
+> 钻石购买的可以获取金币和工会贡献，其他玩家可以领取少量钻石和工会贡献。
+>
+> RMB购买的可以获取金币和钻石和工会贡献。
+
+##### 发送消息JSON格式
+
+> Example purchasing item 3:5:10 which costs 3:2:200
+>
+> 购买项目3:5:10花费3:2:200 
+
+```json
+{
+	"world": 0,
+	"function": "welfare_purchase_family",
+	"data": {
+		"token": "my token",
+		"item" : "3:5:10"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+> The outer dictionary key is equal to enums.Group.ITEM.value
+>
+> Before purchase, user has 3:5:100 and 3:2:1000
+>
+> 外部字典键等于enums.Group.ITEM.value
+> 购买前，用户有3:5:100和3:2:1000
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"3" : [
+			{"iid" : 5, "value" : 110},
+			{"iid" : 2, "value" : 800}
+		]
+	}
+}
+```
+
+
+
 ## set_notice_family
 
 Update the family notice.
@@ -458,6 +591,8 @@ Only the family Owner and Admins may update the family notice.
 
 更新家庭通知。
 只有家庭所有者和管理员可以更新家庭通知。
+
+需要有cd
 
 ##### 发送消息JSON格式
 
@@ -491,6 +626,7 @@ Only the family Owner and Admins may update the family notice.
 
 * 99: not in a family
 * 98: insufficient permissions
+
 
 
 ## set_blackboard_family
@@ -533,6 +669,7 @@ Only the family Owner and Admins may update the family blackboard.
 
 * 99: not in a family
 * 98: insufficient permissions
+
 
 
 ## set_role_family
@@ -586,6 +723,7 @@ role级别只包括0，4，8，10
 * 95: role  type error (级别类型错误)
 
 
+
 ## change_name_family
 
 Change the name of the family.
@@ -635,6 +773,7 @@ The cost to change the family name is determined by `family.json` configuration 
 * 96: insufficient funds
 
 
+
 ## disband_family
 
 Starts the timer to disband the family.
@@ -676,6 +815,7 @@ Only Admins and above can initialize the disbanding of a family.
 * 97: family already disbanded
 
 
+
 ## cancel_disband_family
 
 Cancels the timer to disband the family.
@@ -683,6 +823,8 @@ Only Admins and above can cancel the disbanding of a family.
 
 取消定时器来解散家庭。
 只有管理员以上的人才可以取消一个家庭的解散。
+
+取消后3天内不能解散
 
 ##### 发送消息JSON格式
 
@@ -719,7 +861,7 @@ Only Admins and above can cancel the disbanding of a family.
 
 ## family_check_in
 
-家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级
+家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级，签到获取贡献值和金币奖励，工会等级的提高，奖励也会随着提高
 
 ##### 发送消息JSON格式
 
@@ -752,5 +894,72 @@ Only Admins and above can cancel the disbanding of a family.
 * 98: insufficient permissions
 * 97: family is not disbanded
 
+
+
+## abdicate_family
+
+> 会长让位
+>
+> 会长转让会长位置给其他成员
+
+##### 发送消息JSON格式
+
+> 
+
+```json
+{
+	"world": 0,
+	"function": "abdicate_family",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+> 
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+	}
+}
+```
+
+
+
+##  modify_icon_family
+
+> 族长和管理员才能修改工会图标
+
+##### 发送消息JSON格式
+
+> 
+
+```json
+{
+	"world": 0,
+	"function": "modify_icon_family",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+> 
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+	}
+}
+```
 
 

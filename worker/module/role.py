@@ -20,6 +20,7 @@ async def level_up(uid, rid, amount, **kwargs):
 	exists, payload = await _get_role_info(uid, rid, 'star', 'level', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')
 	star, level = payload
+	if star == 0: return common.mt(96, "You don't have the role")
 	upgrade_cnt = min(amount // kwargs['config']['role']['standard_costs']['exp_pot'], 100 - level)
 	if upgrade_cnt == 0: return common.mt(98, 'too few incoming materials or max level')
 	can_pay, remaining = await common.try_item(uid, enums.Item.EXPERIENCE_POTION, -upgrade_cnt * kwargs['config']['role']['standard_costs']['exp_pot'], **kwargs)
