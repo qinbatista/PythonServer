@@ -26,8 +26,8 @@ def GetPythonCommand():
 		version1 = os.popen("python3.7 --version")
 		if version1.read()!="":
 			PythonVersion="python3.7"
-		print("Your are using python command:"+PythonVersion)
-		return PythonVersion
+			print("Your are using python command:"+PythonVersion)
+			return PythonVersion
 	except Exception as e:
 		print(str(e))
 
@@ -35,8 +35,8 @@ def GetPythonCommand():
 		version2 = os.popen("python.exe --version")
 		if version2.read()!="":
 			PythonVersion="python.exe"
-		print("Your are using python command:"+PythonVersion)
-		return PythonVersion
+			print("Your are using python command:"+PythonVersion)
+			return PythonVersion
 	except Exception as e:
 		print(str(e))
 
@@ -44,8 +44,8 @@ def GetPythonCommand():
 		version3 = os.popen("python3 --version")
 		if version3.read()!="":
 			PythonVersion="python3"
-		print("Your are using python command:"+PythonVersion)
-		return PythonVersion
+			print("Your are using python command:"+PythonVersion)
+			return PythonVersion
 	except Exception as e:
 		print(str(e))
 
@@ -53,8 +53,8 @@ def GetPythonCommand():
 		version4 = os.popen("python --version")
 		if version4.read()!="":
 			PythonVersion="python"
-		print("Your are using python command:"+PythonVersion)
-		return PythonVersion
+			print("Your are using python command:"+PythonVersion)
+			return PythonVersion
 	except Exception as e:
 		print(str(e))
 	# print("Version:"+version1.read())
@@ -71,8 +71,13 @@ def main():
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/token_server.py']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/edge/edge.py', \
 				'--redis-addr', 'redis://192.168.1.102', '--nats-addr', 'nats://192.168.1.102']))
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', get_host_ip()]))
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', get_host_ip()]))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', \
+				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
+				'--nats-addr', 'nats://192.168.1.102', '--token-addr', 'http://localhost', \
+				'--mail-addr', 'http://localhost']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', \
+				'--channel' , get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
+				'--nats-addr', 'nats://192.168.1.102', '--testing']))
 		time.sleep(0.2)
 		print('Done spawning servers...')
 		while (len(processes) > 0):
