@@ -25,7 +25,9 @@ import platform
 class Worker:
 	def __init__(self, args):
 		self.args    = args
-		self.mh      = message_handler.MessageHandler()
+		self.mh      = message_handler.MessageHandler(token_addr = self.args.token_addr, \
+				token_port = self.args.token_port, mail_addr = self.args.mail_addr, \
+				mail_port  = self.args.mail_port)
 		self.gates   = {}
 		self.ujobs   = 0
 		self.debug   = False
@@ -132,6 +134,10 @@ async def main():
 	parser.add_argument('--channel'  , type = str, default = 'jobs')
 	parser.add_argument('--nats-addr', type = str, default = 'nats://nats')
 	parser.add_argument('--redis-addr', type = str, default = 'redis://redis')
+	parser.add_argument('--mail-addr' , type = str, default = 'http://mail')
+	parser.add_argument('--token-addr', type = str, default = 'http://token')
+	parser.add_argument('--mail-port' , type = int, default = 8020)
+	parser.add_argument('--token-port', type = int, default = 8001)
 	await Worker(parser.parse_args()).start()
 
 if __name__ == '__main__':
