@@ -96,35 +96,6 @@ class ConfigurationManager:
 	async def get_world_map(self):
 		return self._world_map or {'status' : 'no one has registered yet'}
 
-	async def register_game_manager(self, ip):
-		try:
-			sid = self._unregistered_game_managers.get(block = False)
-		except queue.Empty: return {'status' : 1, 'message' : 'no new work'}
-		for world in self._world_distribution_config['gamemanager']['servers'][sid]['worlds']:
-			self._world_map[world]['gamemanagers'][sid] = {'ip' : ip, 'port' : self._world_distribution_config['gamemanager']['base_port']}
-		if len(self._world_distribution_config['gamemanager']['servers'][sid]['worlds']) == 0:
-			self._world_map['test']['gamemanagers'][sid] = {'ip' : ip, 'port' : self._world_distribution_config['gamemanager']['base_port']}
-		self._world_distribution_config['gamemanager']['base_port'] += 1
-		return {'status' : 0, 'sid' : sid, 'worlds' : self._world_distribution_config['gamemanager']['servers'][sid]['worlds'], 'port' : self._world_distribution_config['gamemanager']['base_port'] - 1}
-
-	async def register_chat_server(self, ip):
-		try:
-			world = self._unregistered_chat_servers.get(block = False)
-		except queue.Empty: return {'status' : 1, 'message' : 'no new chat servers needed'}
-		if 'chatserver' in self._world_map[world]: return {'status' : 1, 'message' : 'no new chat servers needed'}
-		self._world_map[world]['chatserver'] = {'ip' : ip, 'port' : self._world_distribution_config['chatserver']['base_port']}
-		self._world_distribution_config['chatserver']['base_port'] += 1
-		return {'status' : 0, 'world' : world, 'port' : self._world_map[world]['chatserver']['port']}
-
-	async def need_server(self, servertype):
-		if servertype == 'gamemanager':
-			return {'status' : 1} if self._unregistered_game_managers.empty() else {'status' : 0}
-		elif servertype == 'chat':
-			return {'status' : 1} if self._unregistered_chat_servers.empty() else {'status' : 0}
-		else:
-			return {'status' : 1, 'message' : 'invalid server type'}
-
-
 	def _read_factory_config(self):
 		self._factory_config = json.load(open(FACTORY.format(self._sv), encoding='utf-8'))
 
@@ -296,25 +267,6 @@ async def __get_server_config_location(request: web.Request) -> web.Response:
 @ROUTES.get('/get_world_map')
 async def __get_world_map(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_world_map())
-
-@ROUTES.get('/register_game_manager')
-async def __register_game_manager(request):
-	peername = request.transport.get_extra_info('peername')
-	if peername is None:
-		return _json_response({'status' : 99, 'message' : 'can not resolve ip addr'})
-	return _json_response(await MANAGER.register_game_manager(peername[0]))
-
-@ROUTES.get('/register_chat_server')
-async def __register_chat_server(request):
-	peername = request.transport.get_extra_info('peername')
-	if peername is None:
-		return _json_response({'status' : 99, 'message' : 'can not resolve ip addr'})
-	return _json_response(await MANAGER.register_chat_server(peername[0]))
-
-@ROUTES.post('/need_server')
-async def __need_server(request):
-	post = await request.post()
-	return _json_response(await MANAGER.need_server(post['type']))
 
 
 def run():

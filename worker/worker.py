@@ -131,8 +131,8 @@ class Worker:
 
 async def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--channel'  , type = str, default = 'jobs')
-	parser.add_argument('--nats-addr', type = str, default = 'nats://nats')
+	parser.add_argument('--channel'   , type = str, default = 'jobs')
+	parser.add_argument('--nats-addr' , type = str, default = 'nats://nats')
 	parser.add_argument('--redis-addr', type = str, default = 'redis://redis')
 	parser.add_argument('--mail-addr' , type = str, default = 'http://mail')
 	parser.add_argument('--token-addr', type = str, default = 'http://token')
