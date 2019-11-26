@@ -20,7 +20,7 @@ def send_tcp_message(msg):
     return asyncio.get_event_loop().run_until_complete(lukseun.send_message(str(msg).replace("'", "\"")))
 
 
-def rmb_mall(world, token, pid, order_id, channel, user_name, currency):
+def purchase_success(world, token, pid, order_id, channel, user_name, currency):
     print_module("[rmb_mall]")
     response = send_tcp_message({'world': world, 'function': 'rmb_mall',
                                  'data': {'token': token, "pid": pid, "order_id": order_id, "channel": channel,
@@ -37,6 +37,7 @@ def print_method(my_string):
 
 
 def mall_dialog(token, world, info):
-    rmb_mall(world, token, "VIP_CARD_NORMAL", f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
+    purchase_success(world, token, "VIP_CARD_NORMAL", f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
+    # rmb_mall(world, token, "DIAMOND_MIN", f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
 
     return ""

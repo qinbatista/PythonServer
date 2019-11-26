@@ -11,7 +11,6 @@ import secrets
 # secrets.randbits
 
 RMB_LIMIT = {
-	"DEFAULT": 1,
 	"VIP_CARD_NORMAL": 26,
 	"VIP_CARD_ULTIMATE": 27,
 	"VIP_CARD_PERMANENT": 28,
@@ -106,14 +105,6 @@ RMB_LIMIT = {
 	"DIAMOND_CARD_PLENTY": 23,
 	"DIAMOND_CARD_BAG": 23,
 }
-DEFAULT_CONFIG = {
-	"quantity": "10000",
-	"price": {
-		"RMB": "7",
-		"USDollar": "1"
-	},
-	"repeatable": "y"
-}
 
 async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):
 	"""
@@ -130,20 +121,21 @@ async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):
 	98 - 没有出售此物品{iid}
 	99 - 物品类型错误{ity}
 	"""
-	if pid not in RMB_LIMIT.keys(): pid = "DEFAULT"
-		# return common.mt(98, "pid error")
-	config = kwargs['config']['mall'].get(pid, DEFAULT_CONFIG)
+	if pid not in RMB_LIMIT.keys(): return common.mt(98, "pid error")
+	config = kwargs['config']['mall'].get(pid, False)
+	if not config: return common.mt(97, "config error")
 	uid = await common.get_uid(user_name, **kwargs)
 	if uid == "": return common.mt(99, "username error")
 	if config["repeatable"] == "n":
-		resp = await vip.buy_card(uid, RMB_LIMIT[pid], **kwargs)
+		data = (await vip.buy_card(uid, RMB_LIMIT[pid], **kwargs))["data"]
 	else:
-		resp = await common.try_item(uid, enums.Item(RMB_LIMIT[pid]), config["quantity"], **kwargs)
+		_, qty = await common.try_item(uid, enums.Item(RMB_LIMIT[pid]), int(config["quantity"]), **kwargs)
+		data = {'remaining': {'iid': RMB_LIMIT[pid], 'qty': qty}, 'reward': {'iid': RMB_LIMIT[pid], 'qty': config["quantity"]}}
 	await common.execute(f'INSERT INTO mall(oid, world, uid, username, currency, cqty, mid, mqty, channel, time, repeatable, receive) \
 							VALUES ("{order_id}", "{kwargs["world"]}", "{uid}", "{user_name}", "{currency}", "{config["price"][currency]}", \
 							"{RMB_LIMIT[pid]}", "{config["quantity"]}", "{channel}", "{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}", \
 							"{config["repeatable"]}", 1);', mall=True, **kwargs)
-	return common.mt(0, 'success')
+	return common.mt(0, 'success', data)
 
 
 ######################################################### 私有 #########################################################

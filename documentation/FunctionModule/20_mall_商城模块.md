@@ -24,13 +24,16 @@
 
 ```json
 {
-  .....
-  "pid":"VIP_CARD_NORMAL",
-  "order_id":"9282909831001123",
-  "channel":"apple",
-  "user_name":"小郡肝",
-  "currency":"RMB" 
-  ....
+	"world": 0,
+	"function": "purchase_success",
+	"data": {
+		"token": "my token",
+		"pid": "VIP_CARD_NORMAL",
+		"order_id": "9282909831001123",
+		"channel": "apple",
+		"user_name": "小郡肝",
+		"currency": "RMB"
+	}
 }
 ```
 
@@ -48,39 +51,39 @@
 
 ```json
 {
-  "status": 0,
-	"message": "purchase success",
-  "remaining": {
-			"0": {
-				"wid": 1,
-				"level": 3,
-				"sp": 3
-			},
-			"3": {
-				"iid": 2,
-				"value": 4176
-			}
+	"status": 0,
+	"message": "success",
+	"data": {
+		"remaining": {
+			"iid": 5,
+			"qty": 460
 		},
-  "reward": {
-			"0": {
-				"wid": 1,
-				"level": 1,
-				"sp": 1
-			},
-			"3": {
-				"iid": 2,
-				"value": 60
-			}
-		},
-  "pid":"VIP_CARD_NORMAL"
+		"reward": {
+			"iid": 5,
+			"qty": 100
+		}
+	}
+}
+```
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"cooling_time": 10693361,
+		"card_id": 26
+	}
 }
 ```
 
 [失败]()
 
-99: 第三方服务器错误
+99: username error
 
-98: 第三方武器没响应 
+98: pid error
+
+97: config error
 
 
 
@@ -96,7 +99,7 @@
 ```json
 {
 	"world": 0,
-	"function": "get_all_weapon",
+	"function": "get_merchandise",
 	"data": {
 		"token": "my token"
 	}
