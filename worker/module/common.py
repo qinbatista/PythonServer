@@ -155,7 +155,7 @@ async def try_energy(uid, amount, **kwargs):
 	# - 97 - 参数错误 === Parameter error
 	# - 98 - 无足够能量消耗 === Not enough energy consumption
 	# - 99 - 数据库操作错误 === Database operation error
-	max_energy = kwargs["player_energy"]['max_energy']  # self._player["energy"]["max_energy"]
+	max_energy = kwargs['config']['player']['energy']['max_energy']
 	data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
 	if data == ():
 		await execute_update(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
@@ -191,8 +191,8 @@ async def try_energy(uid, amount, **kwargs):
 
 
 async def _decrease_energy(uid, amount, **kwargs) -> dict:
-	max_energy = kwargs['player_energy']['max_energy']  # self._player["energy"]
-	_cooling_time = kwargs['player_energy']['cooling_time']  # self._player["energy"]
+	max_energy = kwargs['config']['player']['energy']['max_energy']
+	_cooling_time = kwargs['config']['player']['energy']['cooling_time']
 	data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
 	if data == ():
 		await execute_update(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)

@@ -106,6 +106,18 @@ RMB_LIMIT = {
 	"DIAMOND_CARD_BAG": 23,
 }
 
+
+async def purchase_vip_card(pid, order_id, channel, user_name, currency, **kwargs):
+	if pid not in RMB_LIMIT.keys(): return common.mt(99, "pid error")
+	if RMB_LIMIT[pid] not in []: return common.mt(99, "pid error")
+
+
+async def exchange(uid, eid, **kwargs):
+	data = await common.execute(f'SELECT uid FROM mall WHERE oid="{eid}";', mall=True, **kwargs)
+	if data == (): return common.mt(99, '')
+	if data[0][0] != uid: return common.mt(98, '')
+
+######################################################### 私有 #########################################################
 async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):
 	"""
 	参数详解：
@@ -137,8 +149,6 @@ async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):
 							"{config["repeatable"]}", 1);', mall=True, **kwargs)
 	return common.mt(0, 'success', data)
 
-
-######################################################### 私有 #########################################################
 
 async def mall(uid, cty, ity, iid, gty, qty, **kwargs):
 	"""

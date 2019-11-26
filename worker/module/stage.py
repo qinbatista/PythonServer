@@ -54,9 +54,9 @@ async def e_general_stage(uid, stage, **kwargs):
 	# 98 - key insufficient
 	# 99 - parameter error
 	enter_stages = []
-	entry_consume = kwargs['entry_consume']  # self._entry_consumables["stage"]
-	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
-	monster_config = kwargs['monster_config']  # self._monster_config
+	entry_consume = kwargs['config']['entry_consumables']
+	enemy_layouts = kwargs['config']['enemy_layouts']['enemyLayouts']
+	monster_config = kwargs['config']['monster']
 	enemy_layout = enemy_layouts[-1]['enemyLayout'] if stage > len(enemy_layouts) else enemy_layouts[stage - 1]['enemyLayout']
 	enemy_list = []
 	key_words = []
@@ -129,7 +129,7 @@ async def p_general_stage(uid, stage, **kwargs):
 		return common.mt(99, 'stage level is not correct, cant be '+str(stage))
 
 	pass_stages = []
-	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["stage"]
+	pass_rewards = kwargs['config']['stage_reward']
 	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x) and int(x) < 1000]
 	for i in range(stage, GENERAL_BASE_STAGE, -1):
 		if i in stages:
@@ -168,9 +168,9 @@ async def e_tower_stage(uid, stage, **kwargs):
 	# 98 - key insufficient
 	# 99 - parameter error
 	enter_stages = []
-	entry_consume = kwargs['entry_consume']
-	enemy_layouts = kwargs['enemy_layouts']  # self._level_enemy_layouts['enemyLayouts']
-	monster_config = kwargs['monster_config']  # self._monster_config
+	entry_consume = kwargs['config']['entry_consumables']
+	enemy_layouts = kwargs['config']['enemy_layouts']['enemyLayouts']
+	monster_config = kwargs['config']['monster']
 	enemy_layout = enemy_layouts[-1]['enemyLayout'] if stage > len(enemy_layouts) else enemy_layouts[stage - 1]['enemyLayout']
 	enemy_list = []
 	key_words = []
@@ -250,7 +250,7 @@ async def p_tower_stage(uid, stage, **kwargs):
 		p_stage['vary'] = 1
 
 	pass_towers = []
-	pass_rewards = kwargs['pass_rewards']  # self._stage_reward["tower"]
+	pass_rewards = kwargs['config']['stage_reward']
 	stages = [int(x) for x in pass_rewards.keys() if str.isdigit(x)]
 
 	for i in range(stage, TOWER_BASE_STAGE, -1):
@@ -370,8 +370,8 @@ async def get_hang_up_reward(uid, **kwargs):
 	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 	get_hang_up_rewards = []
 	hang_stage = await get_progress(uid, 'hangstage', **kwargs)
-	probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
-	stages = [int(s) for s in kwargs['hang_rewards'].keys() if s.isdigit()]
+	probability_reward = kwargs['config']['hang_reward']['probability_reward']
+	stages = [int(s) for s in kwargs['config']['hang_reward'].keys() if s.isdigit()]
 
 	for i in range(hang_stage, GENERAL_BASE_STAGE, -1):
 		if i in stages:
@@ -379,7 +379,7 @@ async def get_hang_up_reward(uid, **kwargs):
 			break
 	if hang_stage not in stages: return common.mt(96, 'No stage config file')
 
-	hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
+	hang_stage_rewards = kwargs['config']['hang_reward'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 	delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 	minute = int(delta_time.total_seconds()) // 60
 	# current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
@@ -411,8 +411,8 @@ async def get_hang_up_info(uid, **kwargs):
 	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 	get_hang_up_infos = []
 	hang_stage = await get_progress(uid, 'hangstage', **kwargs)
-	probability_reward = kwargs['hang_rewards']['probability_reward']  # self._hang_reward["probability_reward"]
-	stages = [int(s) for s in kwargs['hang_rewards'].keys() if s.isdigit()]
+	probability_reward = kwargs['config']['hang_reward']['probability_reward']  # self._hang_reward["probability_reward"]
+	stages = [int(s) for s in kwargs['config']['hang_reward'].keys() if s.isdigit()]
 
 	for i in range(hang_stage, GENERAL_BASE_STAGE, -1):
 		if i in stages:
@@ -420,7 +420,7 @@ async def get_hang_up_info(uid, **kwargs):
 			break
 	if hang_stage not in stages: return common.mt(96, 'No stage config file')
 
-	hang_stage_rewards = kwargs['hang_rewards'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
+	hang_stage_rewards = kwargs['config']['hang_reward'][str(hang_stage)]  # self._hang_reward[str(hang_stage)]
 	delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S')
 	minute = int(delta_time.total_seconds()) // 60
 	# current_time = (datetime.strptime(hang_up_time, '%Y-%m-%d %H:%M:%S') + timedelta(minutes=minute)).strftime("%Y-%m-%d %H:%M:%S")
