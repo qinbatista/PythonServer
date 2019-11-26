@@ -77,8 +77,12 @@ def main():
 	try:
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/config/configuration_manager.py'], shell=False))
 		time.sleep(1)
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', get_host_ip()], shell=False))
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', get_host_ip()], shell=False))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', \
+				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
+				'--nats-addr', 'nats://192.168.1.102'], shell=False))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', \
+				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
+				'--nats-addr', 'nats://192.168.1.102', '--testing'], shell=False))
 		time.sleep(0.2)
 		print('Done spawning servers...')
 		while len(processes) > 0:
