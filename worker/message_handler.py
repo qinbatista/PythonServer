@@ -39,54 +39,7 @@ C = metrics.Collector()
 
 class MessageHandler:
 	def __init__(self):
-
 		self._functions = FUNCTION_LIST
-		self._is_first_start = True
-		self.is_first_month = False
-		self._boss_life=[]
-		self._boss_life_remaining=[]
-		self._timer = repeating_timer.RepeatingTimer(5, self._refresh_configuration)
-		self._timer.start()
-
-	def firstDayOfMonth(self, dt):
-		return (dt + timedelta(days= -dt.day + 1)).replace(hour=0, minute=0, second=0, microsecond=0)
-	def _refresh_configuration(self):
-		r = requests.get('http://localhost:8000/get_game_manager_config')
-		d = r.json()
-		self._mall_config = d['mall']
-		self._stage_reward = d['reward']
-		self._weapon_config = d['weapon']
-		self._role_config = d['role']
-		self._lottery = d['lottery']
-		self._player = d['player']
-		self._hang_reward = d['hang_reward']
-		self._entry_consumables = d['entry_consumables']
-		self._announcement = d['announcement']
-		self._player_experience = d['player_experience']
-		self._monster_config = d['monster_config']
-		self._level_enemy_layouts = d['level_enemy_layouts']
-		self._level_enemy_layouts_tower = d['level_enemy_layouts_tower']
-		self._acheviement = d['acheviement']
-		self._task = d['task']
-		self._check_in = d['check_in']
-		self._vip_config = d['vip']
-		self._version = d['version']
-		if self.firstDayOfMonth(datetime.today()).day == datetime.today().day and self.is_first_month==False:
-			self._is_first_start = True
-			self.is_first_month=True
-		if self.firstDayOfMonth(datetime.today()).day != datetime.today().day and self.is_first_month==True:
-			self.is_first_month=False
-		if self._is_first_start:
-			self._boss_life=[]
-			self._boss_life_remaining=[]
-			self._is_first_start = False
-			self._world_boss = d['world_boss']
-			self._max_enter_time = self._world_boss['max_enter_time']
-			self._max_upload_damage = self._world_boss['max_upload_damage']
-			for i in range(0, 10):
-				self._boss_life_remaining.append(self._world_boss["boss"+str(i+1)]["life_value"])
-				self._boss_life.append(self._world_boss["boss"+str(i+1)]["life_value"])
-
 
 	async def shutdown(self):
 		pass
@@ -141,7 +94,7 @@ class MessageHandler:
 
 
 	async def _get_player_config(self, data: dict) -> str:
-		return common.mt(0, 'success', {'player_config': self._player})
+		return common.mt(0, 'success', {'player_config': data['config']['player']})
 
 	async def _create_account(self, data: dict) -> str:
 		return 'function'
@@ -168,7 +121,7 @@ class MessageHandler:
 		return await player.accept_gifts(data['data']['unique_id'], data['data']['keys'], **data)
 
 	async def _get_info_player(self, data: dict) -> str:
-		data['player_energy'] = self._player['energy']
+		data['player_energy'] = data['config']['player']['energy']
 		return await player.get_info(data['data']['unique_id'], **data)
 
 
@@ -319,7 +272,11 @@ class MessageHandler:
 		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.PRO, enums.Item(int(data['data']['item'])), **data)
 
 	async def _get_config_lottery(self, data: dict) -> str:
-		return common.mt(0, 'success', {'config': {'skills': self._lottery['random_gift']['SKILL']['cost'], 'weapons': self._lottery['random_gift']['WEAPON']['cost'], 'roles': self._lottery['random_gift']['ROLE']['cost'], 'fortune_wheel': self._lottery['fortune_wheel']['cost']}})
+		return common.mt(0, 'success', {'config': \
+				{'skills': data['config']['lottery']['random_gift']['SKILL']['cost'], \
+				'weapons': data['config']['lottery']['random_gift']['WEAPON']['cost'], \
+				'roles': data['config']['lottery']['random_gift']['ROLE']['cost'], \
+				'fortune_wheel': data['config']['lottery']['fortune_wheel']['cost']}})
 
 	###################### skill.py ######################
 	async def _get_all_skill(self, data: dict) -> str:
@@ -416,19 +373,19 @@ class MessageHandler:
 
 	###################### 签到系统 ######################
 	async def _check_in(self, data: dict) -> str:
-		data.update({"check_in_config":self._check_in})
+		data.update({"check_in_config": data['config']['check_in']})
 		return await check_in.check_in(data['data']['unique_id'],**data)
 
 	async def _supplement_check_in(self, data: dict) -> str:
-		data.update({"check_in_config":self._check_in})
+		data.update({"check_in_config": data['config']['check_in']})
 		return await check_in.supplement_check_in(data['data']['unique_id'],**data)
 
 	async def _get_all_check_in_table(self, data: dict) -> str:
-		data.update({"config":self._check_in})
+		data.update({"config": data['config']['check_in']})
 		return await check_in.get_all_check_in_table(data['data']['unique_id'],**data)
 
 	async def _get_config_check_in(self, data: dict) -> str:
-		return common.mt(0, 'success', {'check_in_config': self._check_in})
+		return common.mt(0, 'success', {'check_in_config': data['config']['check_in']})
 
 	###################### VIP ######################
 
@@ -474,68 +431,68 @@ class MessageHandler:
 
 	###################### stage ######################
 	async def _get_all_tower(self, data: dict) -> str:
-		return common.mt(0, 'success', {'tower_config': self._entry_consumables})
+		return common.mt(0, 'success', {'tower_config': data['config']['entry_consumables']})
 
 	async def _enter_stage(self, data: dict) -> str:
-		data.update({'player_energy': self._player['energy']})  # try_energy
-		data.update({'entry_consume': self._entry_consumables, 'enemy_layouts': self._level_enemy_layouts['enemyLayouts']})
-		data['monster_config'] = self._monster_config
-		data['boss_life_remaining'] = self._boss_life_remaining
-		data['boss_life'] = self._boss_life
-		data['max_enter_time'] = self._max_enter_time
-		data['max_upload_damage'] = self._max_upload_damage
+		data.update({'player_energy': data['config']['player']['energy']})  # try_energy
+		data.update({'entry_consume': data['config']['entry_consumables'], \
+				'enemy_layouts': data['config']['enemy_layouts']})
+		data['monster_config'] = data['config']['monster']
+		data['boss_life_remaining'] = data['config']['world_boss']['boss_life_remaining']
+		data['boss_life'] = data['config']['world_boss']['boss_life']
+		data['max_enter_time'] = data['config']['world_boss']['max_enter_time']
+		data['max_upload_damage'] = data['config']['world_boss']['max_upload_damage']
 		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_stage(self, data: dict) -> str:
-		data['boss_life_remaining'] = self._boss_life_remaining
-		data['boss_life'] = self._boss_life
-		data['pass_rewards'] = self._stage_reward
-		data['max_upload_damage'] = self._max_upload_damage
+		data['boss_life_remaining'] = data['config']['world_boss']['boss_life_remaining']
+		data['boss_life'] = data['config']['world_boss']['boss_life']
+		data['pass_rewards'] = data['config']['stage_reward'] 
+		data['max_upload_damage'] = data['config']['world_boss']['max_upload_damage']
 		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _get_config_stage(self, data: dict) -> str:
-		return common.mt(0, 'success', {'entry_consumables_config': self._entry_consumables, 'stage_reward_config': self._stage_reward, 'hang_reward_config': self._hang_reward})
+		return common.mt(0, 'success', {'entry_consumables_config': data['config']['entry_consumables'], \
+				'stage_reward_config': data['config']['stage_reward'], \
+				'hang_reward_config': data['config']['hang_reward']})
 
 	async def _get_top_damage(self, data: dict) -> str:
 		return await stage.get_top_damage(data['data']['unique_id'], data['data']['page'], **data)
 
 	async def _get_config_boss(self, data: dict):
-		return common.mt(0, 'success', {'config': self._world_boss})
+		return common.mt(0, 'success', {'config': data['config']['world_boss']})
 
 	async def _start_hang_up(self, data: dict) -> str:
-		data.update({'hang_rewards': self._hang_reward})
+		data.update({'hang_rewards': data['config']['hang_reward']})
 		return await stage.start_hang_up(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _get_hang_up_reward(self, data: dict) -> str:
-		data.update({'hang_rewards': self._hang_reward})
+		data.update({'hang_rewards': data['config']['hang_reward']})
 		return await stage.get_hang_up_reward(data['data']['unique_id'], **data)
 
-	# async def _get_hang_up_info(self, data: dict) -> str:
-	# 	data.update({'hang_rewards': self._hang_reward})
-	# 	return await stage.get_hang_up_info(data['data']['unique_id'], **data)
 
 	###################### tasks ######################
 	async def _get_all_task(self, data: dict) -> str:
-		data.update({"config":self._task})
+		data.update({"config": data['config']['task']})
 		return await task.get_all_task(data['data']['unique_id'],**data)
 
 	async def _get_task_config(self, data: dict) -> str:
-		return common.mt(0, 'success', data={'config': self._task})
+		return common.mt(0, 'success', data={'config': data['config']['task']})
 
 	async def _get_task_reward(self, data: dict) -> str:
-		data.update({"config":self._task},)
+		data.update({"config": data['config']['task']},)
 		return await task.get_task_reward(data['data']['unique_id'],data['data']['task_id'], **data)
 
 	async def _get_config_task(self, data: dict) -> str:
-		return common.mt(0, 'success', {'task_config': self._task})
+		return common.mt(0, 'success', {'task_config': data['config']['task']})
 
 	###################### darkmarket ######################
 	async def _get_all_market(self, data: dict) -> str:
-		data['dark_market'] = self._player['dark_market']
+		data['dark_market'] = data['config']['player']['dark_market']
 		return await darkmarket.get_all_market(data['data']['unique_id'], **data)
 
 	async def _refresh_market(self, data: dict) -> str:
-		data['dark_market'] = self._player['dark_market']
+		data['dark_market'] = data['config']['player']['dark_market']
 		return await darkmarket.refresh_market(data['data']['unique_id'], **data)
 
 	async def _darkmarket_transaction(self, data: dict) -> str:
@@ -543,27 +500,18 @@ class MessageHandler:
 
 	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
 	async def _stage_reward_config(self, data: dict) -> str:
-		return common.mt(0, 'success', {'config': self._stage_reward})
+		return common.mt(0, 'success', {'config': data['config']['stage_reward']})
 
-	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
-	async def _get_lottery_config_info(self, data: dict) -> str:
-		cost = {
-			"skills": self._lottery["random_gift"]["SKILL"]["cost"],
-			"weapons": self._lottery["random_gift"]["WEAPON"]["cost"],
-			"roles": self._lottery["random_gift"]["ROLE"]["cost"],
-			"fortune_wheel": self._lottery["fortune_wheel"]["cost"]
-		}
-		return common.mt(0, 'success', {'config': cost})
 
 	async def _get_config_mall(self, data: dict) -> str:
-		return common.mt(0, 'success', {'mall_config': self._mall_config})
+		return common.mt(0, 'success', {'mall_config': data['config']['mall']})
 
 	# TODO
 	async def _check_boss_status(self, data: dict) -> str:
-		data['boss_life_remaining'] = self._boss_life_remaining
-		data['boss_life'] = self._boss_life
-		data['max_enter_time'] = self._max_enter_time
-		data['max_upload_damage'] = self._max_upload_damage
+		data['boss_life_remaining'] = data['config']['world_boss']['boss_life_remaining']
+		data['boss_life'] = data['config']['world_boss']['boss_life']
+		data['max_enter_time'] = data['config']['world_boss']['max_enter_time']
+		data['max_upload_damage'] = data['config']['world_boss']['max_upload_damage']
 		return await stage.check_boss_status(data['data']['unique_id'], **data)
 		# return {'status' : 0, 'message' : 'temp function success', 'data' :{'boss' :{'world_boss_enter_time':"2019/10/10 17:00:00",'world_boss_remaining_times':"20",'hp_values':["%.2f" %(int(self._boss_life_remaining[i])/int(self._boss_life[i])) for i in range(0,9)]}}}
 
@@ -611,12 +559,13 @@ class MessageHandler:
 				}
 
 	async def _get_config_player(self, data: dict) -> str:
-		data['exp_config'] = self._player_experience['player_level']['experience']
-		energy = self._player['energy']
-		return common.mt(0, 'success', {'player_config': self._player_experience, 'energy': {'time': energy["cooling_time"] * 60, 'max_energy': energy['max_energy']}})
+		data['exp_config'] = data['config']['exp']['player_level']['experience']
+		energy = data['config']['player']['energy']
+		return common.mt(0, 'success', {'player_config': data['config']['exp'], \
+				'energy': {'time': energy["cooling_time"] * 60, 'max_energy': energy['max_energy']}})
 
 	async def _get_config_version(self, data: dict) -> str:
-		return common.mt(0, 'success', {'version': self._version})
+		return common.mt(0, 'success', {'version': data['config']['version']})
 
 	async def _exchange_card(self, data: dict) -> str:
 		return await package.exchange(data['data']['unique_id'], int(data['data']['card_id']), **data)
@@ -796,7 +745,6 @@ FUNCTION_LIST = {
 
 	# TODO 新增
 	'stage_reward_config': MessageHandler._stage_reward_config,
-	'get_lottery_config_info': MessageHandler._get_lottery_config_info,
 	# 'get_hang_up_info': MessageHandler._get_hang_up_info,
 	'check_boss_status':MessageHandler._check_boss_status,
 	'get_factory_info':MessageHandler._get_factory_info,
