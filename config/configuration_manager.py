@@ -69,7 +69,7 @@ class ConfigurationManager:
 		self._read_mall_config()
 		self._read_announcement_info()
 		self._read_player_experience()
-		self._read_acheviement_config()
+		self._read_achievement_config()
 		self._read_task_config()
 		self._read_check_in_config()
 		self._read_vip_config_config()
@@ -126,7 +126,7 @@ class ConfigurationManager:
 			'player_experience': self._player_experience, 'monster_config': self._monster_config,
 			'level_enemy_layouts': self._level_enemy_layouts_config,
 			'level_enemy_layouts_tower': self._level_enemy_layouts_config_tower,
-			'acheviement': self._acheviement_config, 'task': self._task_config,
+			'achievement': self._achievement_config, 'task': self._task_config,
 			'check_in': self._check_in_config, 'vip': self._vip_config,
 			'world' : world, 'version': self._sv, 'package': self._package
 		}
@@ -149,8 +149,8 @@ class ConfigurationManager:
 	def _read_monster_config(self):
 		self._monster_config = json.load(open(MONSTER.format(self._cv), encoding = 'utf-8'))
 
-	def _read_acheviement_config(self):
-		self._acheviement_config = json.load(open(ACHIEVEMENT.format(self._cv), encoding = 'utf-8'))
+	def _read_achievement_config(self):
+		self._achievement_config = json.load(open(ACHIEVEMENT.format(self._cv), encoding = 'utf-8'))
 
 	def _read_task_config(self):
 		self._task_config = json.load(open(TASK.format(self._sv), encoding = 'utf-8'))

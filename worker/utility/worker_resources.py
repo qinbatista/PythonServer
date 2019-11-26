@@ -93,6 +93,7 @@ class ModuleConfigurations:
 		self.configs['entry_consumables'] = r.json()['entry_consumables']
 		self.configs['monster']           = r.json()['monster_config']
 		self.configs['enemy_layouts']     = r.json()['level_enemy_layouts']
+		self.configs['achievement']       = r.json()['achievement']
 		self.configs['task']              = r.json()['task']
 		self.configs['check_in']          = r.json()['check_in']
 		self.configs['version']           = r.json()['version']
