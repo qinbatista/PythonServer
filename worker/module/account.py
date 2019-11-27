@@ -25,7 +25,8 @@ EM_RE = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
 
 
 async def login_unique(uid, **kwargs):
-	exists, bound = await asyncio.gather(common.exists('info', ('unique_id', uid), account = True, **kwargs), _account_bound(uid, **kwargs))
+	exists, bound = await asyncio.gather(common.exists('info', ('unique_id', uid), \
+			account = True, **kwargs), _account_bound(uid, **kwargs))
 	if not exists:
 		await _create_new_user(uid, **kwargs)
 		status, message, prev_token = 1, 'new account created', ''
@@ -43,7 +44,8 @@ async def login(identifier, value, password, **kwargs):
 		return common.mt(1, 'invalid credentials')
 	uid = await _get_unique_id(identifier, value, **kwargs)
 	data = await _request_new_token(uid, await _get_prev_token(identifier, value, **kwargs), **kwargs)
-	_, aep = await asyncio.gather(_record_token(uid, data['token'], **kwargs), _get_account_email_phone(uid, **kwargs))
+	_, aep = await asyncio.gather(_record_token(uid, data['token'], **kwargs), \
+			_get_account_email_phone(uid, **kwargs))
 	data['account'], data['email'], data['phone_number'] = aep
 	return common.mt(0, 'success', data)
 
@@ -84,14 +86,16 @@ async def verify_email_code(uid, code, **kwargs):
 #######################################################################
 
 async def _account_bound(uid, **kwargs):
-	data = await common.execute(f'SELECT account FROM info WHERE unique_id = "{uid}";', account = True, **kwargs)
+	data = await common.execute(f'SELECT account FROM info WHERE unique_id = "{uid}";', \
+			account = True, **kwargs)
 	return not (data == () or (None,) in data or ('',) in data)
 
 async def _create_new_user(uid, **kwargs):
 	await common.execute(f'INSERT INTO info (unique_id) VALUES("{uid}");', account = True, **kwargs)
 
 async def _email_bound(uid, **kwargs):
-	data = await common.execute(f'SELECT email FROM info WHERE unique_id = "{uid}";', account = True, **kwargs)
+	data = await common.execute(f'SELECT email FROM info WHERE unique_id = "{uid}";', \
+			account = True, **kwargs)
 	return not (data == () or (None,) in data or ('',) in data)
 
 async def _gen_email_code(email, **kwargs):
@@ -123,8 +127,9 @@ async def _record_token(uid, token, **kwargs):
 	await common.execute(f'UPDATE info SET token = "{token}" WHERE unique_id = "{uid}";', account = True, **kwargs)
 
 async def _request_new_token(uid, prev_token = '', **kwargs):
-	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/issue_token', data = {'unique_id' : uid, 'prev_token' : prev_token}) as resp:
-		return await resp.json(content_type = 'text/json')
+	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/issue_token', \
+			data = {'uid' : uid, 'prev_token' : prev_token}) as resp:
+		return await resp.json()
 
 async def _set_credentials(uid, account, hashed_pw, salt, **kwargs):
 	await common.execute(f'UPDATE info SET account = "{account}", password = "{hashed_pw}", salt = "{salt}" WHERE unique_id = "{uid}";', account = True, **kwargs)

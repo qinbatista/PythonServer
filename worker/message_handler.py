@@ -69,9 +69,10 @@ class MessageHandler:
 		return json.dumps(await fn(self, message))
 
 	async def validate_token(self, msg, session):
-		async with session.post(self.token_base_url+'/validate',data={'token' : msg['data']['token']}) as r:
-			validated = await r.json(content_type = 'text/json')
-			return (False, None) if validated['status'] != 0 else (True, validated['data']['unique_id'])
+		async with session.post(self.token_base_url+'/validate_token', \
+				data={'token' : msg['data']['token']}) as r:
+			validated = await r.json()
+			return (False, None) if validated['status'] != 0 else (True, validated['data']['uid'])
 
 
 	###################### account.py ######################
