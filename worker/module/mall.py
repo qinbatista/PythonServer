@@ -164,22 +164,6 @@ async def exchange(uid, gid, eid, **kwargs):
 	return common.mt(0, 'success', data)
 
 
-class Parser:
-	def __init__(self):
-		self._parser = [
-			self.parser1,
-		]
-	def parser1(self, soup):
-		title = soup.find("h1", {"id": "news_title_text_id"})
-		context = soup.find("div", {"id": "news_body_id"})
-		return title, context
-	def each(self, soup):
-		for parser in self._parser:
-			title, context = parser(soup)
-			if title is not None and context is not None:
-				return title, context
-		return
-
 # ######################################################## 私有 #########################################################
 async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):
 	"""

@@ -528,6 +528,7 @@ async def leave_world_boss_stage(uid, stage, damage, **kwargs):
 		highest_damage = data[0][0]
 
 	remain_life = kwargs['config']['world_boss']["boss_life_remaining"]
+	boss_life = kwargs['config']['world_boss']["boss_life"]
 	boss_life_ratio = {}
 	for i in range(0, len(remain_life)):
 		if remain_life[i] > 0 and damage > 0:
@@ -537,7 +538,7 @@ async def leave_world_boss_stage(uid, stage, damage, **kwargs):
 			else:
 				remain_life[i] -= damage
 				damage = 0
-		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(remain_life[i])/int(kwargs['config']['world_boss']["boss_life"][i]))
+		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(remain_life[i])/int(boss_life[i]))
 	return common.mt(0, 'success', {'new_record': new_record, 'highest_damage': highest_damage, 'boss_life_ratio': boss_life_ratio})
 
 
