@@ -138,7 +138,7 @@ async def main():
 	parser.add_argument('--token-addr', type = str, default = 'http://token')
 	parser.add_argument('--mail-port' , type = int, default = 8020)
 	parser.add_argument('--token-port', type = int, default = 8001)
-	await Worker(parser.parse_args()).start()
+	await Worker(parser.parse_args()).start(debug=True)
 
 if __name__ == '__main__':
 	asyncio.run(main())

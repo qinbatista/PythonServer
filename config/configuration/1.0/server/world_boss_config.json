@@ -1,9 +1,13 @@
 {
 	"max_enter_time":3,
 	"max_upload_damage":200000,
-	"boss1" :
+	"boss0" :
 	{
 		"life_value":10000
+	},
+	"boss1" :
+	{
+		"life_value":100000
 	},
 	"boss2" :
 	{
@@ -34,10 +38,6 @@
 		"life_value":100000
 	},
 	"boss9" :
-	{
-		"life_value":100000
-	},
-	"boss10" :
 	{
 		"life_value":100000
 	}

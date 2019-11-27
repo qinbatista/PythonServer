@@ -146,7 +146,8 @@
 	"function": "exchange",
 	"data": {
 		"token": "my token",
-    "exchange_id":"IOJwlawOIWBMzjJw"
+    	"game_id":"game id",
+    	"exchange_id":"IOJwlawOIWBMzjJw"
 	}
 }
 ```

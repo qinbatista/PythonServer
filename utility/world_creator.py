@@ -296,6 +296,18 @@ CREATE TABLE `mall` (
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
+EXCHANGE = \
+"""
+CREATE TABLE `exchange` (
+	  `gid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '游戏id',
+	  `eid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '兑换码',
+	  `pid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '物品id',
+	  `etime` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '兑换码结束时间',
+	  `receive` int(11) NOT NULL DEFAULT 0 COMMENT '道具可领取次数，非0为可兑换',
+	  PRIMARY KEY (`gid`, `eid`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+"""
+
 TABLES = [PLAYER, PLAYERAFTERINSERT, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET, \
 		FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LEADERBOARD, LIMITS, \
 		PROGRESS, ROLE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE]

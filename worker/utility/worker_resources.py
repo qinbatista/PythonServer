@@ -22,7 +22,7 @@ class WorkerResources:
 		self.redis_addr = redis_addr
 
 		self.resources = {}
-	
+
 	async def init(self):
 		self.resources['session']   = aiohttp.ClientSession()
 		self.resources['redis']     = await aioredis.create_redis(self.redis_addr)
@@ -32,6 +32,8 @@ class WorkerResources:
 				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'user')
 		self.resources['malldb'] = await aiomysql.create_pool(maxsize = 4, host = '192.168.1.102', \
 				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'mall')
+		self.resources['exchangedb'] = await aiomysql.create_pool(maxsize = 4, host = '192.168.1.102', \
+				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'exchange')
 
 
 	async def shutdown(self):
@@ -43,6 +45,9 @@ class WorkerResources:
 
 		self.resources['malldb'].close()
 		await self.resources['malldb'].wait_closed()
+
+		self.resources['exchangedb'].close()
+		await self.resources['exchangedb'].wait_closed()
 
 		await self.resources['session'].close()
 
@@ -102,9 +107,9 @@ class ModuleConfigurations:
 			refresh_world_boss, already_refreshed_world_boss = False, True
 			self.configs['world_boss'] = r.json()['world_boss']
 			self.configs['world_boss']['boss_life_remaining'] = \
-					[self.configs['world_boss'][f'boss{i + 1}']['life_value'] for i in range(10)]
+					[self.configs['world_boss'][f'boss{i}']['life_value'] for i in range(10)]
 			self.configs['world_boss']['boss_life'] = \
-					[self.configs['world_boss'][f'boss{i + 1}']['life_value'] for i in range(10)]
+					[self.configs['world_boss'][f'boss{i}']['life_value'] for i in range(10)]
 
 		if datetime.now(timezone.utc).day == 1 and not already_refreshed_world_boss:
 			refreshed_world_boss = True

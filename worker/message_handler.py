@@ -63,6 +63,7 @@ class MessageHandler:
 		message['worlddb'] = resource['db']
 		message['accountdb'] = resource['accountdb']
 		message['malldb'] = resource['malldb']
+		message['exchangedb'] = resource['exchangedb']
 		message['mailserverbaseurl']  = self.mail_base_url
 		message['tokenserverbaseurl'] = self.token_base_url
 		message['config'] = configs  ############configs#################
@@ -584,6 +585,9 @@ class MessageHandler:
 
 	async def _purchase_success(self, data: dict) -> str:
 		return await mall.rmb_mall(data['data']['pid'], data['data']['order_id'], data['data']['channel'], data['data']['user_name'], data['data']['currency'], **data)
+
+	async def _exchange_prop(self, data: dict) -> str:
+		return await mall.exchange(data['data']['unique_id'], data['data']['game_id'], data['data']['exchange_id'], **data)
 
 
 ##########################################################################################################
