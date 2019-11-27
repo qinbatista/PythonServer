@@ -1,5 +1,6 @@
 import jwt
 import time
+import enum
 import json
 import random
 import secrets
@@ -7,13 +8,19 @@ import requests
 import configparser
 
 
-from module import enums
 from aiohttp import web
 from collections import defaultdict
 from datetime import datetime, timedelta
 
 # NOTE THIS IS NOT PRODUCTION READY
 # SECRET SHOULD BE READ FROM ENVIRONMENT VARIABLE
+
+
+class MailType(enum.IntEnum):
+	SIMPLE = 0
+	GIFT = 1
+	FRIEND_REQUEST = 2
+	FAMILY_REQUEST = 3
 
 class TokenServer:
 	def __init__(self):
@@ -62,11 +69,11 @@ class TokenServer:
 
 	async def register_nonce(self, nonce, mtype: str, **kwargs) -> dict:
 		try:
-			if enums.MailType(int(mtype)) == enums.MailType.GIFT:
+			if MailType(int(mtype)) == MailType.GIFT:
 				self._nonce_table[nonce]['items'] = kwargs['items']
-			elif enums.MailType(int(mtype)) == enums.MailType.FRIEND_REQUEST:
+			elif MailType(int(mtype)) == MailType.FRIEND_REQUEST:
 				self._nonce_table[nonce]['uid_sender'] = kwargs['uid_sender']
-			elif enums.MailType(int(mtype)) == enums.MailType.FAMILY_REQUEST:
+			elif MailType(int(mtype)) == MailType.FAMILY_REQUEST:
 				self._nonce_table[nonce]['name'] = kwargs['name']
 				self._nonce_table[nonce]['uid_target'] = kwargs['uid_target']
 			self._nonce_table[nonce]['type'] = mtype
