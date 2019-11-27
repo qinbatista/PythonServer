@@ -21,46 +21,15 @@ def GetPythonCommand():
 	global PythonVersion
 	if PythonVersion!="":
 		return PythonVersion
-
-	try:
-		version1 = os.popen("python3.7 --version")
-		if version1.read()!="":
-			PythonVersion="python3.7"
-			print("Your are using python command:"+PythonVersion)
-			return PythonVersion
-	except Exception as e:
-		print(str(e))
-
-	try:
-		version2 = os.popen("python.exe --version")
-		if version2.read()!="":
-			PythonVersion="python.exe"
-			print("Your are using python command:"+PythonVersion)
-			return PythonVersion
-	except Exception as e:
-		print(str(e))
-
-	try:
-		version3 = os.popen("python3 --version")
-		if version3.read()!="":
-			PythonVersion="python3"
-			print("Your are using python command:"+PythonVersion)
-			return PythonVersion
-	except Exception as e:
-		print(str(e))
-
-	try:
-		version4 = os.popen("python --version")
-		if version4.read()!="":
-			PythonVersion="python"
-			print("Your are using python command:"+PythonVersion)
-			return PythonVersion
-	except Exception as e:
-		print(str(e))
-	# print("Version:"+version1.read())
-	# print("show:"+version2.read())
-	# print("show:"+version3.read())
-
+	for cmd in {'python3.7', 'python.exe', 'python3', 'python'}:
+		try:
+			version = os.popen(f'{cmd} --version')
+			if version.read() != '':
+				PythonVersion = cmd
+				print(f'You are using python command: {cmd}')
+				return PythonVersion
+		except Exception as e:
+			print(e)
 
 def main():
 	processes = []
@@ -69,12 +38,14 @@ def main():
 		time.sleep(1)
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/mail_server.py']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/token_server.py']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/auth/auth.py', \
+				'lukseunsecret', '--redis-addr', 'redis://192.168.1.102', '-p', '8002']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/edge/edge.py', \
 				'--redis-addr', 'redis://192.168.1.102', '--nats-addr', 'nats://192.168.1.102']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', \
 				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
 				'--nats-addr', 'nats://192.168.1.102', '--token-addr', 'http://localhost', \
-				'--mail-addr', 'http://localhost']))
+				'--mail-addr', 'http://localhost', '--token-port', '8002']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', \
 				'--channel' , get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
 				'--nats-addr', 'nats://192.168.1.102', '--testing']))
