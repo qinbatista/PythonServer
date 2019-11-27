@@ -21,11 +21,9 @@ def send_tcp_message(msg):
 
 
 def purchase_success(world, token, pid, order_id, channel, user_name, currency):
-    print_module("[purchase_success]")
     response = send_tcp_message({'world': world, 'function': 'purchase_success',
                                  'data': {'token': token, "pid": pid, "order_id": order_id, "channel": channel,
                                           "user_name": user_name, "currency": currency}})
-    print_method(f"[purchase_success]{response}")
 
 
 def print_module(my_string):
