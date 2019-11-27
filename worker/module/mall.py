@@ -8,108 +8,139 @@ from module import vip
 from datetime import datetime
 import time
 import secrets
+
 # secrets.randbits
 
 RMB_LIMIT = {
-	"VIP_CARD_NORMAL": 26,
-	"VIP_CARD_ULTIMATE": 27,
-	"VIP_CARD_PERMANENT": 28,
-	"DIAMOND_MIN": 5,
-	"DIAMOND_SMALL": 5,
-	"DIAMOND_LARGE": 5,
-	"DIAMOND_PLENTY": 5,
-	"DIAMOND_BAG": 5,
-	"EXPERIENCE_POTION_MIN": 9,
-	"EXPERIENCE_POTION_SMALL": 9,
-	"EXPERIENCE_POTION_LARGE": 9,
-	"EXPERIENCE_POTION_PLENTY": 9,
-	"EXPERIENCE_POTION_BAG": 9,
-	"ENERGY_POTION_MIN": 10,
-	"ENERGY_POTION_SMALL": 10,
-	"ENERGY_POTION_LARGE": 10,
-	"ENERGY_POTION_PLENTY": 10,
-	"ENERGY_POTION_BAG": 10,
-	"IRON_MIN": 2,
-	"IRON_SMALL": 2,
-	"IRON_LARGE": 2,
-	"IRON_PLENTY": 2,
-	"IRON_BAG": 2,
-	"SKILL_SCROLL_10_MIN": 6,
-	"SKILL_SCROLL_10_SMALL": 6,
-	"SKILL_SCROLL_10_LARGE": 6,
-	"SKILL_SCROLL_10_PLENTY": 6,
-	"SKILL_SCROLL_10_BAG": 6,
-	"SKILL_SCROLL_30_MIN": 7,
-	"SKILL_SCROLL_30_SMALL": 7,
-	"SKILL_SCROLL_30_LARGE": 7,
-	"SKILL_SCROLL_30_PLENTY": 7,
-	"SKILL_SCROLL_30_BAG": 7,
-	"SKILL_SCROLL_100_MIN": 8,
-	"SKILL_SCROLL_100_SMALL": 8,
-	"SKILL_SCROLL_100_LARGE": 8,
-	"SKILL_SCROLL_100_PLENTY": 8,
-	"SKILL_SCROLL_100_BAG": 8,
-	"SUMMON_SCROLL_BASIC_MIN": 11,
-	"SUMMON_SCROLL_BASIC_SMALL": 11,
-	"SUMMON_SCROLL_BASIC_LARGE": 11,
-	"SUMMON_SCROLL_BASIC_PLENTY": 11,
-	"SUMMON_SCROLL_BASIC_BAG": 11,
-	"SUMMON_SCROLL_PRO_MIN": 12,
-	"SUMMON_SCROLL_PRO_SMALL": 12,
-	"SUMMON_SCROLL_PRO_LARGE": 12,
-	"SUMMON_SCROLL_PRO_PLENTY": 12,
-	"SUMMON_SCROLL_PRO_BAG": 12,
-	"SUMMON_SCROLL_PROPHET_MIN": 13,
-	"SUMMON_SCROLL_PROPHET_SMALL": 13,
-	"SUMMON_SCROLL_PROPHET_LARGE": 13,
-	"SUMMON_SCROLL_PROPHET_PLENTY": 13,
-	"SUMMON_SCROLL_PROPHET_BAG": 13,
-	"FORTUNE_WHEEL_BASIC_MIN": 14,
-	"FORTUNE_WHEEL_BASIC_SMALL": 14,
-	"FORTUNE_WHEEL_BASIC_LARGE": 14,
-	"FORTUNE_WHEEL_BASIC_PLENTY": 14,
-	"FORTUNE_WHEEL_BASIC_BAG": 14,
-	"FORTUNE_WHEEL_PRO_MIN": 15,
-	"FORTUNE_WHEEL_PRO_SMALL": 15,
-	"FORTUNE_WHEEL_PRO_LARGE": 15,
-	"FORTUNE_WHEEL_PRO_PLENTY": 15,
-	"FORTUNE_WHEEL_PRO_BAG": 15,
-	"COIN_CARD_MIN": 18,
-	"COIN_CARD_SMALL": 18,
-	"COIN_CARD_LARGE": 18,
-	"COIN_CARD_PLENTY": 18,
-	"COIN_CARD_BAG": 18,
-	"EXP_CARD_MIN": 19,
-	"EXP_CARD_SMALL": 19,
-	"EXP_CARD_LARGE": 19,
-	"EXP_CARD_PLENTY": 19,
-	"EXP_CARD_BAG": 19,
-	"FOOD_CARD_MIN": 20,
-	"FOOD_CARD_SMALL": 20,
-	"FOOD_CARD_LARGE": 20,
-	"FOOD_CARD_PLENTY": 20,
-	"FOOD_CARD_BAG": 20,
-	"MINE_CARD_MIN": 21,
-	"MINE_CARD_SMALL": 21,
-	"MINE_CARD_LARGE": 21,
-	"MINE_CARD_PLENTY": 21,
-	"MINE_CARD_BAG": 21,
-	"CRYSTAL_CARD_MIN": 22,
-	"CRYSTAL_CARD_SMALL": 22,
-	"CRYSTAL_CARD_LARGE": 22,
-	"CRYSTAL_CARD_PLENTY": 22,
-	"CRYSTAL_CARD_BAG": 22,
-	"DIAMOND_CARD_MIN": 23,
-	"DIAMOND_CARD_SMALL": 23,
-	"DIAMOND_CARD_LARGE": 23,
-	"DIAMOND_CARD_PLENTY": 23,
-	"DIAMOND_CARD_BAG": 23,
+	"VIP_CARD_NORMAL": enums.Item.VIP_CARD_MIN,
+	"VIP_CARD_ULTIMATE": enums.Item.VIP_CARD_MAX,
+	"VIP_CARD_PERMANENT": enums.Item.VIP_CARD_PERPETUAL,
+	"DIAMOND_MIN": enums.Item.DIAMOND,
+	"DIAMOND_SMALL": enums.Item.DIAMOND,
+	"DIAMOND_LARGE": enums.Item.DIAMOND,
+	"DIAMOND_PLENTY": enums.Item.DIAMOND,
+	"DIAMOND_BAG": enums.Item.DIAMOND,
+	"EXPERIENCE_POTION_MIN": enums.Item.EXPERIENCE_POTION,
+	"EXPERIENCE_POTION_SMALL": enums.Item.EXPERIENCE_POTION,
+	"EXPERIENCE_POTION_LARGE": enums.Item.EXPERIENCE_POTION,
+	"EXPERIENCE_POTION_PLENTY": enums.Item.EXPERIENCE_POTION,
+	"EXPERIENCE_POTION_BAG": enums.Item.EXPERIENCE_POTION,
+	"ENERGY_POTION_MIN": enums.Item.ENERGY_POTION_S,
+	"ENERGY_POTION_SMALL": enums.Item.ENERGY_POTION_S,
+	"ENERGY_POTION_LARGE": enums.Item.ENERGY_POTION_S,
+	"ENERGY_POTION_PLENTY": enums.Item.ENERGY_POTION_S,
+	"ENERGY_POTION_BAG": enums.Item.ENERGY_POTION_S,
+	"IRON_MIN": enums.Item.IRON,
+	"IRON_SMALL": enums.Item.IRON,
+	"IRON_LARGE": enums.Item.IRON,
+	"IRON_PLENTY": enums.Item.IRON,
+	"IRON_BAG": enums.Item.IRON,
+	"SKILL_SCROLL_10_MIN": enums.Item.SKILL_SCROLL_10,
+	"SKILL_SCROLL_10_SMALL": enums.Item.SKILL_SCROLL_10,
+	"SKILL_SCROLL_10_LARGE": enums.Item.SKILL_SCROLL_10,
+	"SKILL_SCROLL_10_PLENTY": enums.Item.SKILL_SCROLL_10,
+	"SKILL_SCROLL_10_BAG": enums.Item.SKILL_SCROLL_10,
+	"SKILL_SCROLL_30_MIN": enums.Item.SKILL_SCROLL_30,
+	"SKILL_SCROLL_30_SMALL": enums.Item.SKILL_SCROLL_30,
+	"SKILL_SCROLL_30_LARGE": enums.Item.SKILL_SCROLL_30,
+	"SKILL_SCROLL_30_PLENTY": enums.Item.SKILL_SCROLL_30,
+	"SKILL_SCROLL_30_BAG": enums.Item.SKILL_SCROLL_30,
+	"SKILL_SCROLL_100_MIN": enums.Item.SKILL_SCROLL_100,
+	"SKILL_SCROLL_100_SMALL": enums.Item.SKILL_SCROLL_100,
+	"SKILL_SCROLL_100_LARGE": enums.Item.SKILL_SCROLL_100,
+	"SKILL_SCROLL_100_PLENTY": enums.Item.SKILL_SCROLL_100,
+	"SKILL_SCROLL_100_BAG": enums.Item.SKILL_SCROLL_100,
+	"SUMMON_SCROLL_BASIC_MIN": enums.Item.SUMMON_SCROLL_BASIC,
+	"SUMMON_SCROLL_BASIC_SMALL": enums.Item.SUMMON_SCROLL_BASIC,
+	"SUMMON_SCROLL_BASIC_LARGE": enums.Item.SUMMON_SCROLL_BASIC,
+	"SUMMON_SCROLL_BASIC_PLENTY": enums.Item.SUMMON_SCROLL_BASIC,
+	"SUMMON_SCROLL_BASIC_BAG": enums.Item.SUMMON_SCROLL_BASIC,
+	"SUMMON_SCROLL_PRO_MIN": enums.Item.SUMMON_SCROLL_PRO,
+	"SUMMON_SCROLL_PRO_SMALL": enums.Item.SUMMON_SCROLL_PRO,
+	"SUMMON_SCROLL_PRO_LARGE": enums.Item.SUMMON_SCROLL_PRO,
+	"SUMMON_SCROLL_PRO_PLENTY": enums.Item.SUMMON_SCROLL_PRO,
+	"SUMMON_SCROLL_PRO_BAG": enums.Item.SUMMON_SCROLL_PRO,
+	"SUMMON_SCROLL_PROPHET_MIN": enums.Item.SUMMON_SCROLL_PROPHET,
+	"SUMMON_SCROLL_PROPHET_SMALL": enums.Item.SUMMON_SCROLL_PROPHET,
+	"SUMMON_SCROLL_PROPHET_LARGE": enums.Item.SUMMON_SCROLL_PROPHET,
+	"SUMMON_SCROLL_PROPHET_PLENTY": enums.Item.SUMMON_SCROLL_PROPHET,
+	"SUMMON_SCROLL_PROPHET_BAG": enums.Item.SUMMON_SCROLL_PROPHET,
+	"FORTUNE_WHEEL_BASIC_MIN": enums.Item.FORTUNE_WHEEL_BASIC,
+	"FORTUNE_WHEEL_BASIC_SMALL": enums.Item.FORTUNE_WHEEL_BASIC,
+	"FORTUNE_WHEEL_BASIC_LARGE": enums.Item.FORTUNE_WHEEL_BASIC,
+	"FORTUNE_WHEEL_BASIC_PLENTY": enums.Item.FORTUNE_WHEEL_BASIC,
+	"FORTUNE_WHEEL_BASIC_BAG": enums.Item.FORTUNE_WHEEL_BASIC,
+	"FORTUNE_WHEEL_PRO_MIN": enums.Item.FORTUNE_WHEEL_PRO,
+	"FORTUNE_WHEEL_PRO_SMALL": enums.Item.FORTUNE_WHEEL_PRO,
+	"FORTUNE_WHEEL_PRO_LARGE": enums.Item.FORTUNE_WHEEL_PRO,
+	"FORTUNE_WHEEL_PRO_PLENTY": enums.Item.FORTUNE_WHEEL_PRO,
+	"FORTUNE_WHEEL_PRO_BAG": enums.Item.FORTUNE_WHEEL_PRO,
+	"COIN_CARD_MIN": enums.Item.COIN_CARD,
+	"COIN_CARD_SMALL": enums.Item.COIN_CARD,
+	"COIN_CARD_LARGE": enums.Item.COIN_CARD,
+	"COIN_CARD_PLENTY": enums.Item.COIN_CARD,
+	"COIN_CARD_BAG": enums.Item.COIN_CARD,
+	"EXP_CARD_MIN": enums.Item.EXP_CARD,
+	"EXP_CARD_SMALL": enums.Item.EXP_CARD,
+	"EXP_CARD_LARGE": enums.Item.EXP_CARD,
+	"EXP_CARD_PLENTY": enums.Item.EXP_CARD,
+	"EXP_CARD_BAG": enums.Item.EXP_CARD,
+	"FOOD_CARD_MIN": enums.Item.FOOD_CARD,
+	"FOOD_CARD_SMALL": enums.Item.FOOD_CARD,
+	"FOOD_CARD_LARGE": enums.Item.FOOD_CARD,
+	"FOOD_CARD_PLENTY": enums.Item.FOOD_CARD,
+	"FOOD_CARD_BAG": enums.Item.FOOD_CARD,
+	"MINE_CARD_MIN": enums.Item.MINE_CARD,
+	"MINE_CARD_SMALL": enums.Item.MINE_CARD,
+	"MINE_CARD_LARGE": enums.Item.MINE_CARD,
+	"MINE_CARD_PLENTY": enums.Item.MINE_CARD,
+	"MINE_CARD_BAG": enums.Item.MINE_CARD,
+	"CRYSTAL_CARD_MIN": enums.Item.CRYSTAL_CARD,
+	"CRYSTAL_CARD_SMALL": enums.Item.CRYSTAL_CARD,
+	"CRYSTAL_CARD_LARGE": enums.Item.CRYSTAL_CARD,
+	"CRYSTAL_CARD_PLENTY": enums.Item.CRYSTAL_CARD,
+	"CRYSTAL_CARD_BAG": enums.Item.CRYSTAL_CARD,
+	"DIAMOND_CARD_MIN": enums.Item.DIAMOND_CARD,
+	"DIAMOND_CARD_SMALL": enums.Item.DIAMOND_CARD,
+	"DIAMOND_CARD_LARGE": enums.Item.DIAMOND_CARD,
+	"DIAMOND_CARD_PLENTY": enums.Item.DIAMOND_CARD,
+	"DIAMOND_CARD_BAG": enums.Item.DIAMOND_CARD,
 }
 
 
 async def purchase_vip_card(pid, order_id, channel, user_name, currency, **kwargs):
-	if pid not in RMB_LIMIT.keys(): return common.mt(99, "pid error")
-	if RMB_LIMIT[pid] not in []: return common.mt(99, "pid error")
+	if pid not in RMB_LIMIT.keys(): return common.mt(98, "pid error")
+	if RMB_LIMIT[pid] not in [enums.Item.VIP_CARD_MIN, enums.Item.VIP_CARD_MAX,
+	                          enums.Item.VIP_CARD_PERPETUAL]: return common.mt(96, "你购买的不是月卡")
+	return await rmb_mall(pid, order_id, channel, user_name, currency, **kwargs)
+
+
+async def purchase_diamond(pid, order_id, channel, user_name, currency, **kwargs):
+	if pid not in RMB_LIMIT.keys(): return common.mt(98, "pid error")
+	if RMB_LIMIT[pid] != enums.Item.DIAMOND: return common.mt(96, "你购买的不是钻石")
+	return await rmb_mall(pid, order_id, channel, user_name, currency, **kwargs)
+
+
+async def purchase_skill_scroll(pid, order_id, channel, user_name, currency, **kwargs):
+	if pid not in RMB_LIMIT.keys(): return common.mt(98, "pid error")
+	if RMB_LIMIT[pid] not in [enums.Item.SKILL_SCROLL_10, enums.Item.SKILL_SCROLL_30,
+	                          enums.Item.SKILL_SCROLL_100]: return common.mt(96, "你购买的不是技能卷轴")
+	return await rmb_mall(pid, order_id, channel, user_name, currency, **kwargs)
+
+
+async def purchase_summon_scroll(pid, order_id, channel, user_name, currency, **kwargs):
+	if pid not in RMB_LIMIT.keys(): return common.mt(98, "pid error")
+	if RMB_LIMIT[pid] not in [enums.Item.SUMMON_SCROLL_BASIC, enums.Item.SUMMON_SCROLL_PRO,
+	                          enums.Item.SUMMON_SCROLL_PROPHET]: return common.mt(96, "你购买的不是召唤卷轴")
+	return await rmb_mall(pid, order_id, channel, user_name, currency, **kwargs)
+
+
+async def purchase_resource_card(pid, order_id, channel, user_name, currency, **kwargs):
+	if pid not in RMB_LIMIT.keys(): return common.mt(98, "pid error")
+	if RMB_LIMIT[pid] not in [enums.Item.COIN_CARD, enums.Item.EXP_CARD, enums.Item.FOOD_CARD,
+	                          enums.Item.MINE_CARD, enums.Item.CRYSTAL_CARD,
+	                          enums.Item.DIAMOND_CARD]: return common.mt(96, "你购买的不是资源卡")
+	return await rmb_mall(pid, order_id, channel, user_name, currency, **kwargs)
 
 
 async def exchange(uid, eid, **kwargs):
@@ -117,7 +148,8 @@ async def exchange(uid, eid, **kwargs):
 	if data == (): return common.mt(99, '')
 	if data[0][0] != uid: return common.mt(98, '')
 
-######################################################### 私有 #########################################################
+
+# ######################################################## 私有 #########################################################
 async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):
 	"""
 	参数详解：
@@ -139,10 +171,11 @@ async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):
 	uid = await common.get_uid(user_name, **kwargs)
 	if uid == "": return common.mt(99, "username error")
 	if config["repeatable"] == "n":
-		data = (await vip.buy_card(uid, RMB_LIMIT[pid], **kwargs))["data"]
+		data = (await vip.buy_card(uid, RMB_LIMIT[pid].value, **kwargs))["data"]
 	else:
-		_, qty = await common.try_item(uid, enums.Item(RMB_LIMIT[pid]), int(config["quantity"]), **kwargs)
-		data = {'remaining': {'iid': RMB_LIMIT[pid], 'qty': qty}, 'reward': {'iid': RMB_LIMIT[pid], 'qty': config["quantity"]}}
+		_, qty = await common.try_item(uid, RMB_LIMIT[pid], int(config["quantity"]), **kwargs)
+		data = {'remaining': {'iid': RMB_LIMIT[pid], 'qty': qty},
+		        'reward': {'iid': RMB_LIMIT[pid], 'qty': config["quantity"]}}
 	await common.execute(f'INSERT INTO mall(oid, world, uid, username, currency, cqty, mid, mqty, channel, time, repeatable, receive) \
 							VALUES ("{order_id}", "{kwargs["world"]}", "{uid}", "{user_name}", "{currency}", "{config["price"][currency]}", \
 							"{RMB_LIMIT[pid]}", "{config["quantity"]}", "{channel}", "{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}", \
