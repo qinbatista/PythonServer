@@ -9,11 +9,12 @@ Additionally, one-time-use keys (nonces) can be generated and redeemed.
 
 import jwt
 import asyncio
-import aiohttp
 import aioredis
 import argparse
-import datetime
 import concurrent.futures
+
+from aiohttp import web
+from datetime import datetime, timedelta
 
 
 class Auth:
@@ -39,7 +40,7 @@ class Auth:
 				self.secret, self.validity))
 		if post['prev_token'] != '':
 			await self.redis.set(f'auth.tokens.invalidated.{post["prev_token"]}', '',expire = self.validity)
-		return aiohttp.web.json_response({'token' : token})
+		return web.json_response({'token' : token})
 
 	async def validate_token(self, request):
 		post = await request.post()
@@ -47,15 +48,15 @@ class Auth:
 			uid = await asyncio.wrap_future(self.executor.submit(Auth.decode_token, post['token'], \
 					self.secret))
 			if await self.redis.exists(f'auth.tokens.invalidated.{post["token"]}') == 0:
-				return aiohttp.web.json_response({'status' : 0, 'data' : {'uid' : uid}})
+				return web.json_response({'status' : 0, 'data' : {'uid' : uid}})
 		except (jwt.DecodeError, jwt.ExpiredSignatureError):
 			pass
-		return aiohttp.web.json_response({'status' : 1})
+		return web.json_response({'status' : 1})
 
 	async def register_nonce(self, request):
 		post = await request.json()
 		await self.redis.hmset_dict(f'auth.nonces.{post["nonce"]}', post['payload'])
-		return aiohttp.web.json_response({'status' : 0})
+		return web.json_response({'status' : 0})
 
 	async def redeem_nonce(self, request):
 		results = {}
@@ -63,11 +64,11 @@ class Auth:
 			payload = await self.redis.hgetall(f'auth.nonces.{nonce}')
 			results[nonce] = {'status' : 0, **payload} if len(payload) != 0 else {'status' : 1}
 			await self.redis.delete(f'auth.nonces.{nonce}')
-		return aiohttp.web.json_response(results)
+		return web.json_response(results)
 
 	@staticmethod
 	def generate_token(uid, secret, validity):
-		tkn = jwt.encode({'exp' : datetime.datetime.utcnow() + datetime.timedelta(seconds = validity),\
+		tkn = jwt.encode({'exp' : datetime.utcnow() + timedelta(seconds = validity),\
 				'uid' : uid}, secret, Auth.algorithm)
 		return tkn.decode('utf-8')
 
@@ -86,7 +87,7 @@ def main():
 	parser.add_argument('--validity'   , type = int, default = 30 * 24 * 3600)
 	parser.add_argument('--redis-addr' , type = str, default = 'redis://redis')
 	args = parser.parse_args()
-	aiohttp.web.run_app(Auth(args.secret, args.validity).init(aiohttp.web.Application(), args.redis_addr), \
+	web.run_app(Auth(args.secret, args.validity).init(web.Application(), args.redis_addr), \
 			port = args.port)
 
 if __name__ == '__main__':
