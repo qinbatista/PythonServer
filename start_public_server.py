@@ -21,7 +21,7 @@ def GetPythonCommand():
 	global PythonVersion
 	if PythonVersion!="":
 		return PythonVersion
-	for cmd in {'python3.7', 'python.exe', 'python3', 'python'}:
+	for cmd in ['python3.7', 'python.exe', 'python3']:
 		try:
 			version = os.popen(f'{cmd} --version')
 			if version.read() != '':
