@@ -5,7 +5,7 @@ task.py
 from module import enums
 from module import common
 from module import vip
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 import secrets
 
@@ -143,11 +143,42 @@ async def purchase_resource_card(pid, order_id, channel, user_name, currency, **
 	return await rmb_mall(pid, order_id, channel, user_name, currency, **kwargs)
 
 
-async def exchange(uid, eid, **kwargs):
-	data = await common.execute(f'SELECT uid FROM mall WHERE oid="{eid}";', mall=True, **kwargs)
-	if data == (): return common.mt(99, '')
-	if data[0][0] != uid: return common.mt(98, '')
+async def exchange(uid, gid, eid, **kwargs):
+	edata = await common.execute(f'SELECT pid, etime, receive FROM exchange WHERE gid="{gid}" AND eid="{eid}";', exchange=True, **kwargs)
+	if edata == (): return common.mt(99, '兑换码不存在')
+	pid, etime, receive = edata[0]
+	if receive <= 0: return common.mt(98, '兑换码已兑换完')
+	if datetime.strptime(etime, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc) < datetime.now(timezone.utc): return common.mt(97, '兑换码已过期')
+	if pid not in RMB_LIMIT.keys(): return common.mt(96, "pid error")
+	config = kwargs['config']['mall'].get(pid, False)
+	if not config: return common.mt(95, "config error")
+	if config["repeatable"] == "n":
+		data = (await vip.buy_card(uid, RMB_LIMIT[pid].value, **kwargs))["data"]
+	else:
+		_, qty = await common.try_item(uid, RMB_LIMIT[pid], int(config["quantity"]), **kwargs)
+		data = {'remaining': {'iid': RMB_LIMIT[pid], 'qty': qty},
+		        'reward': {'iid': RMB_LIMIT[pid], 'qty': config["quantity"]}}
+	data["etime"] = etime
+	data["receive"] = receive - 1
+	await common.execute(f'UPDATE exchange SET receive="{receive-1}" WHERE gid="{gid}" AND eid="{eid}";', exchange=True, **kwargs)
+	return common.mt(0, 'success', data)
 
+
+class Parser:
+	def __init__(self):
+		self._parser = [
+			self.parser1,
+		]
+	def parser1(self, soup):
+		title = soup.find("h1", {"id": "news_title_text_id"})
+		context = soup.find("div", {"id": "news_body_id"})
+		return title, context
+	def each(self, soup):
+		for parser in self._parser:
+			title, context = parser(soup)
+			if title is not None and context is not None:
+				return title, context
+		return
 
 # ######################################################## 私有 #########################################################
 async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):

@@ -513,7 +513,7 @@ async def leave_world_boss_stage(uid, stage, damage, **kwargs):
 	unstage = await get_progress(uid, 'unstage', **kwargs)
 	if unstage != stage: return common.mt(98, 'stage error')
 	await set_progress(uid, 'unstage', 0, **kwargs)
-	max_upload_damage = kwargs['max_upload_damage']
+	max_upload_damage = kwargs['config']['world_boss']['max_upload_damage']
 	if damage < 0 or damage >= max_upload_damage: return common.mt(status=99, message="abnormal data")
 
 	new_record = 0  # 0代表不是最新记录，1代表是最新记录
@@ -527,16 +527,17 @@ async def leave_world_boss_stage(uid, stage, damage, **kwargs):
 	else:
 		highest_damage = data[0][0]
 
+	remain_life = kwargs['config']['world_boss']["boss_life_remaining"]
 	boss_life_ratio = {}
-	for i in range(0, len(kwargs["boss_life_remaining"])):
-		if kwargs["boss_life_remaining"][i] > 0 and damage > 0:
-			if kwargs["boss_life_remaining"][i] - damage <= 0:
-				damage -= kwargs["boss_life_remaining"][i]
-				kwargs["boss_life_remaining"][i] = 0
+	for i in range(0, len(remain_life)):
+		if remain_life[i] > 0 and damage > 0:
+			if remain_life[i] - damage <= 0:
+				damage -= remain_life[i]
+				remain_life[i] = 0
 			else:
-				kwargs["boss_life_remaining"][i] -= damage
+				remain_life[i] -= damage
 				damage = 0
-		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))
+		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(remain_life[i])/int(kwargs['config']['world_boss']["boss_life"][i]))
 	return common.mt(0, 'success', {'new_record': new_record, 'highest_damage': highest_damage, 'boss_life_ratio': boss_life_ratio})
 
 
