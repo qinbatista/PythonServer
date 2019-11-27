@@ -26,16 +26,14 @@ def purchase_success(world, token, pid, order_id, channel, user_name, currency):
                                           "user_name": user_name, "currency": currency}})
 
 
-def print_module(my_string):
-    print(f"\033[0;37;41m\t{my_string}\033[0m")
-
-
-def print_method(my_string):
-    print(f"\033[0;37;44m\t{my_string}\033[0m")
-
+def exchange_prop(world, token, game_id, exchange_id):
+    response = send_tcp_message({'world': world, 'function': 'exchange_prop',
+                                 'data': {'token': token, "game_id": game_id, "exchange_id": exchange_id}})
+    print(f"response:{response}")
 
 def mall_dialog(token, world, info):
-    purchase_success(world, token, "VIP_CARD_NORMAL", f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
+    # purchase_success(world, token, "VIP_CARD_NORMAL", f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
+    exchange_prop(world, token, "aliya", "11111")
     # rmb_mall(world, token, "DIAMOND_MIN", f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
 
     return ""

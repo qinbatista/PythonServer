@@ -68,7 +68,7 @@
 
 ```json
 {
-	"status": 0,
+	"status": 1,
 	"message": "success",
 	"data": {
 		"cooling_time": 10693361,
@@ -158,24 +158,61 @@
 
 [成功]()
 
-> remaining: 兑换之后，购买物品的剩余量
+> vip_card: vip卡购买信息
 >
-> reward: 兑换之后，购买物品的变化量
+> item: 物品购买信息
 >
-> pid：兑换的商品id
+> etime：兑换结束时间
+>
+> receive：剩余可兑换次数
 
 ```json
 {
-  "status": 0,
-	"message": "purchase success",
-  "remaining": "3:2:2990",
-	"reward": "3:2:1000"
+	"status": 0,
+	"message": "success",
+	"data": {
+		"vip_card": {},
+		"item": {
+			"remaining": {
+				"iid": 5,
+				"qty": 250
+			},
+			"reward": {
+				"iid": 5,
+				"qty": 100
+			}
+		},
+		"etime": "2019-12-25 18:56:12",
+		"receive": 1
+	}
+}
+```
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"vip_card": {
+			"cooling_time": 2678400,
+			"card_id": 26
+		},
+		"item": {},
+		"etime": "2019-12-25 18:56:12",
+		"receive": 0
+	}
 }
 ```
 
 [失败]()
 
-99: 验证码错误
+99: 兑换码不存在
 
-98: 验证码已经被用过
+98: 兑换码已兑换完
+
+97: 兑换码已过期
+
+96: pid error
+
+95: config error
 

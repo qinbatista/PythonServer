@@ -787,5 +787,6 @@ FUNCTION_LIST = {
 	'send_gift_mail': MessageHandler._send_gift_mail,
 	'send_text_mail': MessageHandler._send_text_mail,
 	'purchase_success': MessageHandler._purchase_success,
+	'exchange_prop': MessageHandler._exchange_prop,
 }
 

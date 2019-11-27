@@ -152,11 +152,12 @@ async def exchange(uid, gid, eid, **kwargs):
 	if pid not in RMB_LIMIT.keys(): return common.mt(96, "pid error")
 	config = kwargs['config']['mall'].get(pid, False)
 	if not config: return common.mt(95, "config error")
+	data = {"vip_card": {}, "item": {}}
 	if config["repeatable"] == "n":
-		data = (await vip.buy_card(uid, RMB_LIMIT[pid].value, **kwargs))["data"]
+		data["vip_card"] = (await vip.buy_card(uid, RMB_LIMIT[pid].value, **kwargs))["data"]
 	else:
 		_, qty = await common.try_item(uid, RMB_LIMIT[pid], int(config["quantity"]), **kwargs)
-		data = {'remaining': {'iid': RMB_LIMIT[pid], 'qty': qty},
+		data["item"] = {'remaining': {'iid': RMB_LIMIT[pid], 'qty': qty},
 		        'reward': {'iid': RMB_LIMIT[pid], 'qty': config["quantity"]}}
 	data["etime"] = etime
 	data["receive"] = receive - 1
@@ -185,17 +186,18 @@ async def rmb_mall(pid, order_id, channel, user_name, currency, **kwargs):
 	if not config: return common.mt(97, "config error")
 	uid = await common.get_uid(user_name, **kwargs)
 	if uid == "": return common.mt(99, "username error")
-	if config["repeatable"] == "n":
-		data = (await vip.buy_card(uid, RMB_LIMIT[pid].value, **kwargs))["data"]
-	else:
-		_, qty = await common.try_item(uid, RMB_LIMIT[pid], int(config["quantity"]), **kwargs)
-		data = {'remaining': {'iid': RMB_LIMIT[pid], 'qty': qty},
-		        'reward': {'iid': RMB_LIMIT[pid], 'qty': config["quantity"]}}
 	await common.execute(f'INSERT INTO mall(oid, world, uid, username, currency, cqty, mid, mqty, channel, time, repeatable, receive) \
 							VALUES ("{order_id}", "{kwargs["world"]}", "{uid}", "{user_name}", "{currency}", "{config["price"][currency]}", \
 							"{RMB_LIMIT[pid]}", "{config["quantity"]}", "{channel}", "{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}", \
 							"{config["repeatable"]}", 1);', mall=True, **kwargs)
-	return common.mt(0, 'success', data)
+	if config["repeatable"] == "n":
+		data = (await vip.buy_card(uid, RMB_LIMIT[pid].value, **kwargs))["data"]
+		return common.mt(1, 'success', data)
+	else:
+		_, qty = await common.try_item(uid, RMB_LIMIT[pid], int(config["quantity"]), **kwargs)
+		data = {'remaining': {'iid': RMB_LIMIT[pid], 'qty': qty},
+		        'reward': {'iid': RMB_LIMIT[pid], 'qty': config["quantity"]}}
+		return common.mt(0, 'success', data)
 
 
 async def mall(uid, cty, ity, iid, gty, qty, **kwargs):
