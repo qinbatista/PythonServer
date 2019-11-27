@@ -3,6 +3,7 @@
 - [`purchase_success`](##purchase_success)
 - [`get_merchandise`](##`get_merchandise)
 - [`exchange`](##`exchange)
+- [`get_config_mall`](##get_config_mall)
 
 ## purchase_success
 
@@ -215,4 +216,51 @@
 96: pid error
 
 95: config error
+
+
+
+## get_config_mall
+
+##### 发送消息JSON格式
+
+> token: 用户的token
+
+```json
+{
+	"world": 0,
+	"function": "get_config_mall",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"mall_config": {
+			"VIP_CARD_NORMAL": {
+				"quantity": 1,
+				"price": {
+					"RMB": 7,
+					"USDollar": 1
+				},
+				"repeatable": "n"
+			},
+			"VIP_CARD_ULTIMATE": {
+				"quantity": 1,
+				"price": {
+					"RMB": 7,
+					"USDollar": 1
+				},
+				"repeatable": "n"
+			}
+		}
+	}
+}
+```
 
