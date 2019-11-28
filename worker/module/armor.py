@@ -41,7 +41,8 @@ async def _get_armor(uid, aid, **kwargs) -> (list, list):
 		("{uid}", {aid}, {enums.ArmorTier.T2.value}), ("{uid}", {aid}, {enums.ArmorTier.T3.value}), \
 		("{uid}", {aid}, {enums.ArmorTier.T4.value}), ("{uid}", {aid}, {enums.ArmorTier.T5.value}), \
 		("{uid}", {aid}, {enums.ArmorTier.T6.value}), ("{uid}", {aid}, {enums.ArmorTier.T7.value}), \
-		("{uid}", {aid}, {enums.ArmorTier.T8.value}), ("{uid}", {aid}, {enums.ArmorTier.T9.value});', **kwargs)
+		("{uid}", {aid}, {enums.ArmorTier.T8.value}), ("{uid}", {aid}, {enums.ArmorTier.T9.value}), \
+		("{uid}", {aid}, {enums.ArmorTier.T10.value});', **kwargs)
 		tier = await common.execute(f'SELECT quantity FROM armor WHERE uid = "{uid}" AND aid = {aid};', **kwargs)
 	return [t[0] for t in tier], [t[0] for t in tier]
 
