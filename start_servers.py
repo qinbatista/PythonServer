@@ -80,7 +80,7 @@ def main():
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', \
 				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
 				'--nats-addr', 'nats://192.168.1.102', '--token-addr', 'http://192.168.1.165', \
-				'--mail-addr', 'http://192.168.1.165', '--token-port', '8002'], shell=False))
+				'--mail-addr', 'http://192.168.1.165'], shell=False))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', \
 				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
 				'--nats-addr', 'nats://192.168.1.102', '--testing'], shell=False))
