@@ -57,6 +57,9 @@ def call_login(unique_id):
 def get_number():
 	return testing_people_number
 
+def get_unique_id():
+	return unique_id
+
 def debug_log(time,method_name,string,level=1):
 	if DEBUG_LOG == False:
 		return
@@ -106,6 +109,7 @@ def run_task(name):
 	call_login(str(name))
 	# create_data(name)
 	start = time.time()
+	print(str(unique_id))
 	info_list =  module_16_get_all_data.get_all_info(token,world)#加载所有参数信息
 	# module_1_stage.stage_dialog(token,world,info_list[5])##战役
 	# module_2_summon.summon_dialog(token,world)#召唤法政
@@ -115,7 +119,7 @@ def run_task(name):
 	# module_11_friends.freind_dialog(token,world)#朋友
 	# module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
 	# module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
-	module_18_family.family_dialog(token,world,info_list[13])#家族系统（后测试）
+	module_18_family.family_dialog(token,world,info_list[13],unique_id)#家族系统（后测试）
 	# module_19_factory.factory_dialog(token,world,info_list[5])#建造
 	# # module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
 	# module_21_roles.role_dialog(token,world)#玩家卡牌
@@ -147,7 +151,7 @@ def run_all_task_gevent():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task(input("your unique id:"))
-	# run_task("wtf1")
+	# run_task(input("your unique id:"))
+	run_task("q1")
 	# run_all_task_multiprocessing()
 

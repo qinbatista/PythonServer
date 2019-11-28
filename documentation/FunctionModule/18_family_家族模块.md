@@ -1,7 +1,7 @@
 ## 方法列表
 
 * √[`create_family`](##create_family)
-* √[`leave_family`](##leave_family)
+* x[`leave_family`](##leave_family)
 * √[`remove_user_family`](##remove_user_family)
 * √[`invite_user_family`](##invite_user_family)
 * √[`request_join_family`](##request_join_family)
@@ -86,6 +86,8 @@ The cost to create a family is determined by `family.json` configuration file.
 
 
 ## leave_family
+
+> > > > > 现在第二次离开家族会报错，因为离开家族插入的数据没有检查是否重复
 
 Leave your current family.
 The family owner can not leave.
@@ -282,6 +284,8 @@ If any of them accept the invitation, user will be added to the family.
 请求将被发送到家庭所有者和所有管理员。
 
 如果他们中的任何一个接受邀请，用户将被添加到家庭。
+
+加入家族的时候，必须查看是否离开家族超过24小时
 
 ##### 发送消息JSON格式
 
