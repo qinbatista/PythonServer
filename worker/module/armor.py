@@ -6,22 +6,23 @@ from module import enums
 from module import common
 
 
-async def upgrade(uid, aid, level, **kwargs):
+async def upgrade(uid, aid, level, n=1, **kwargs):
 	"""盔甲等级限制1-10，level限制2-10"""
 	# 0 - success
 	# 97 - Insufficient basic armor
 	# 98 - invalid aid
 	# 99 - invalid level
-	if level <= 0 or level >= 10: return common.mt(99, 'invalid level')  # 最高合成10级盔甲
+	if level < 2 or level > 10: return common.mt(99, 'invalid level')  # 最高合成10级盔甲
 	if int(aid) not in enums.Armor._value2member_map_: return common.mt(98, 'invalid aid')
-	basic_quantity = await _get_armor(uid, aid, level, **kwargs)
-	pro_quantity = await _get_armor(uid, aid, level+1, **kwargs)
-	if basic_quantity < 3: return common.mt(99, 'Insufficient basic armor')
-	remaining_basic_quantity = basic_quantity%3
-	remaining_pro_quantity =pro_quantity + basic_quantity//3
-	await common.execute(f'UPDATE armor SET quantity = {remaining_basic_quantity} WHERE uid = "{uid}" AND aid = {aid} AND level = {level};', **kwargs)
-	await common.execute(f'UPDATE armor SET quantity = {remaining_pro_quantity} WHERE uid = "{uid}" AND aid = {aid} AND level = {level+1};', **kwargs)
-	return common.mt(0, 'success', {'armors': {"resource":{'aid': aid, 'level': level, 'quantity': remaining_basic_quantity}, "production":{'aid': aid, 'level': level+1, 'quantity': remaining_pro_quantity}}})
+	index = level - 1
+	s_tier, e_tier = await _get_armor(uid, aid, **kwargs)
+	_upgrade(e_tier, index-1, index, n)
+	if s_tier == e_tier: return common.mt(97, 'Insufficient basic armor')
+	e_tier[index] += n
+	for i, qty in enumerate(e_tier): await _set_armor(uid, aid, i + 1, qty, **kwargs)
+	remaining = {i + 1: qty for i, qty in enumerate(e_tier)}
+	reward = {i + 1: qty - s_tier[i] for i, qty in enumerate(e_tier)}
+	return common.mt(0, 'success', {'aid': aid, 'remaining': remaining, 'reward': reward})
 
 
 async def get_all(uid, **kwargs):
@@ -33,9 +34,31 @@ async def get_all(uid, **kwargs):
 ############################################# PRIVATE #############################################
 
 
-async def _get_armor(uid, aid, level, **kwargs):
-	quantity = await common.execute(f'SELECT quantity FROM armor WHERE uid = "{uid}" AND aid = {aid} AND level = {level};', **kwargs)
-	if quantity == ():
-		await common.execute(f'INSERT INTO armor (uid, aid, level) VALUES ("{uid}", {aid}, {level});', **kwargs)
-		quantity = await common.execute(f'SELECT quantity FROM armor WHERE uid = "{uid}" AND aid = {aid} AND level = {level};', **kwargs)
-	return quantity[0][0]
+async def _get_armor(uid, aid, **kwargs) -> list:
+	tier = await common.execute(f'SELECT quantity FROM armor WHERE uid = "{uid}" AND aid = {aid} ORDER BY level ASC;', **kwargs)
+	if tier == ():
+		await common.execute(f'INSERT INTO armor (uid, aid, level) VALUES ("{uid}", {aid}, {enums.ArmorTier.T1.value}), \
+		("{uid}", {aid}, {enums.ArmorTier.T2.value}), ("{uid}", {aid}, {enums.ArmorTier.T3.value}), \
+		("{uid}", {aid}, {enums.ArmorTier.T4.value}), ("{uid}", {aid}, {enums.ArmorTier.T5.value}), \
+		("{uid}", {aid}, {enums.ArmorTier.T6.value}), ("{uid}", {aid}, {enums.ArmorTier.T7.value}), \
+		("{uid}", {aid}, {enums.ArmorTier.T8.value}), ("{uid}", {aid}, {enums.ArmorTier.T9.value});', **kwargs)
+		tier = await common.execute(f'SELECT quantity FROM armor WHERE uid = "{uid}" AND aid = {aid};', **kwargs)
+	return [t[0] for t in tier], [t[0] for t in tier]
+
+
+async def _set_armor(uid, aid, level, qty, **kwargs):
+	await common.execute(f'UPDATE armor SET quantity = {qty} WHERE uid = "{uid}" AND aid = {aid} AND level = {level};', **kwargs)
+
+
+def _upgrade(tier, i, j, n):
+	"""
+	tier: 需要升级转化的列表
+	i: j-1
+	j: 需要升级成的盔甲位置索引，不能大于数组列表数量
+	n: 需要升级完成的数量
+	"""
+	if tier[i] > 3 * n:
+		for k in range(i+1, j): tier[k] = 0
+		tier[i] -= 3 * n
+	elif i == 0: pass
+	else: _upgrade(tier, i - 1, j, 3 * n - tier[i])

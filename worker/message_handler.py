@@ -424,7 +424,7 @@ class MessageHandler:
 
 	###################### armor ######################
 	async def _upgrade_armor(self, data: dict) -> str:
-		return await armor.upgrade(data['data']['unique_id'], data['data']['aid'], data['data']['level'], **data)
+		return await armor.upgrade(data['data']['unique_id'], data['data']['aid'], data['data']['level'], int(data['data'].get('num', 1)), **data)
 
 	async def _get_all_armor(self, data: dict) -> str:
 		return await armor.get_all(data['data']['unique_id'], **data)
