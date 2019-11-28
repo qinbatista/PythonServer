@@ -34,7 +34,7 @@ async def get_all(uid, **kwargs):
 ############################################# PRIVATE #############################################
 
 
-async def _get_armor(uid, aid, **kwargs) -> list:
+async def _get_armor(uid, aid, **kwargs) -> (list, list):
 	tier = await common.execute(f'SELECT quantity FROM armor WHERE uid = "{uid}" AND aid = {aid} ORDER BY level ASC;', **kwargs)
 	if tier == ():
 		await common.execute(f'INSERT INTO armor (uid, aid, level) VALUES ("{uid}", {aid}, {enums.ArmorTier.T1.value}), \
