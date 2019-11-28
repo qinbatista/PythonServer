@@ -184,7 +184,7 @@ async def _get_person_info(uid, **kwargs):
 
 
 async def _lookup_nonce(nonce, **kwargs):
-	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce_new',
-									  json={'nonce': [nonce]}) as resp:
-		data = await resp.json(content_type='text/json')
+	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce',
+									  json={'keys': [nonce]}) as resp:
+		data = await resp.json()
 		return None if data[nonce]['status'] != 0 else data[nonce]['uid_sender']
