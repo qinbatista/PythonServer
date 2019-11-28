@@ -33,24 +33,29 @@ async def send_mail(mailtype, *args, **kwargs):
 		return False
 
 async def get_new_mail(uid, **kwargs):
-	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/new', data = {'world' : kwargs['world'], 'uid' : uid}) as resp:
-		return await resp.json(content_type = 'text/json')
+	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/new', \
+			data = {'world' : kwargs['world'], 'uid' : uid}) as resp:
+		return common.mt(0, 'success', await resp.json())
 
 async def get_all_mail(uid, **kwargs):
-	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/all', data = {'world' : kwargs['world'], 'uid' : uid}) as resp:
-		return await resp.json(content_type = 'text/json')
+	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/all', \
+			data = {'world' : kwargs['world'], 'uid' : uid}) as resp:
+		return common.mt(0, 'success', await resp.json())
 
 async def delete_mail(uid, key, **kwargs):
-	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/delete', data = {'world' : kwargs['world'], 'uid' : uid, 'key' : key}) as resp:
-		return await resp.json(content_type = 'text/json')
+	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/delete', \
+			data = {'world' : kwargs['world'], 'uid' : uid, 'key' : key}) as resp:
+		return common.mt(0, 'success', await resp.json())
 
 async def mark_read(uid, key, **kwargs):
-	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/mark_read', data = {'world' : kwargs['world'], 'uid' : uid, 'key' : key}) as resp:
-		return await resp.json(content_type = 'text/json')
+	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/mark_read', \
+			data = {'world' : kwargs['world'], 'uid' : uid, 'key' : key}) as resp:
+		return common.mt(0, 'success', await resp.json())
 
 async def delete_read(uid, **kwargs):
-	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/delete_read', data = {'world' : kwargs['world'], 'uid' : uid}) as resp:
-		return await resp.json(content_type = 'text/json')
+	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/delete_read', \
+			data = {'world' : kwargs['world'], 'uid' : uid}) as resp:
+		return common.mt(0, 'success', await resp.json())
 
 async def send_mail_public(uid, gn_target, **kwargs):
 	now          = datetime.now(timezone.utc)
@@ -80,36 +85,69 @@ async def get_daily_send_limit(uid, **kwargs):
 
 async def _send_mail(mail, **kwargs):
 	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/send', json = mail) as resp:
-		result = await resp.json(content_type = 'text/json')
-		return result['status'] == 0
+		return (await resp.json())['key']
 
 async def _send_mail_simple(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : \
-			{'from' : kwargs['data'].get('from_', kwargs['from_']), \
-			'body' : kwargs['data'].get('body'), \
-			'subj' : kwargs['data'].get('subj'), \
-			'type' : enums.MailType.SIMPLE.value}}
+	mail = {'world' : kwargs['world'], 'uid' : uid, \
+			'mail'  : { \
+				'type' : enums.MailType.SIMPLE.value, \
+				'from' : kwargs['data'].get('from_', kwargs['from_']), \
+				'subj' : kwargs['data'].get('subj'), \
+				'body' : kwargs['data'].get('body')}
+			}
 	return await _send_mail(mail, **kwargs)
 
 async def _send_mail_gift(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : \
-			{'from' : kwargs.get('from_', await common.get_gn(uid, **kwargs)), \
-			'body' : kwargs.get('body', enums.MailTemplate.SYSTEM_REWARD.name), \
-			'subj' : kwargs.get('subj', enums.MailTemplate.GIFT_1.name), \
-			'type' : enums.MailType.GIFT.value, 'items' : kwargs['items']}}
-	return await _send_mail(mail, **kwargs)
+	mail = {'world' : kwargs['world'], 'uid' : uid, \
+			'mail'  : { \
+				'type' : enums.MailType.GIFT.value, \
+				'from' : kwargs.get('from_', await common.get_gn(uid, **kwargs)), \
+				'subj' : kwargs.get('subj', enums.MailTemplate.SYSTEM_REWARD.name), \
+				'body' : kwargs.get('body', enums.MailTemplate.GIFT_1.name), \
+				'items': kwargs['items']}}
+	key = await _send_mail(mail, **kwargs)
+	registered = await register_nonce(key, \
+			{'type' : enums.MailType.GIFT.value, 'items' : kwargs['items']}, **kwargs)
+	if not registered:
+		await delete_mail(uid, key, **kwargs)
+		return ''
+	return key
 
 async def _send_mail_friend_request(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs.get('from_', 'server'), \
-			'body' : '', 'subj' : '', 'type' : enums.MailType.FRIEND_REQUEST.value, \
-			'uid_sender' : kwargs['uid_sender']}}
-	return await _send_mail(mail, **kwargs)
+	mail = {'world' : kwargs['world'], 'uid' : uid, \
+			'mail'  : { \
+				'type' : enums.MailType.FRIEND_REQUEST.value, \
+				'from' : kwargs.get('from_', 'server'), \
+				'subj' : '',
+				'body' : ''}}
+	key = await _send_mail(mail, **kwargs)
+	registered = await register_nonce(key, {'type' : enums.MailType.FRIEND_REQUEST.value, \
+			'uid_sender' : kwargs['uid_sender']}, **kwargs)
+	if not registered:
+		await delete_mail(uid, key, **kwargs)
+		return ''
+	return key
 
 async def _send_mail_family_request(uid, **kwargs):
-	mail = {'world' : kwargs['world'], 'uid' : uid, 'kwargs' : {'from' : kwargs['name'], 'body' : '', \
-			'subj' : kwargs['subj'], 'type' : enums.MailType.FAMILY_REQUEST.value, \
-			'name' : kwargs['name'], 'uid_target' : kwargs['uid_target']}}
-	return await _send_mail(mail, **kwargs)
+	mail = {'world' : kwargs['world'], 'uid' : uid, \
+			'mail'  : { \
+				'type' : enums.MailType.FAMILY_REQUEST.value, \
+				'from' : kwargs['name'], \
+				'subj' : kwargs['subj'], \
+				'body' : ''}}
+	
+	key = await _send_mail(mail, **kwargs)
+	registered = await register_nonce(key, {'type' : enums.MailType.FAMILY_REQUEST.value, \
+			'uid_target' : kwargs['uid_target'], 'name' : kwargs['name']}, **kwargs)
+	if not registered:
+		await delete_mail(uid, key, **kwargs)
+		return ''
+	return key
+
+async def register_nonce(nonce, payload, **kwargs):
+	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/register_nonce', \
+			json = {'nonce' : nonce, 'payload' : payload}) as resp:
+		return (await resp.json())['status'] == 0
 
 SWITCH[enums.MailType.SIMPLE] = _send_mail_simple
 SWITCH[enums.MailType.GIFT] = _send_mail_gift

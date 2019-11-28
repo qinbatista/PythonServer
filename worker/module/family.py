@@ -348,8 +348,9 @@ async def _get_uid_officials(name, **kwargs):
 	return None if data == () else [u[0] for u in data]
 
 async def _lookup_nonce(nonce, **kwargs):
-	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce_new', json = {'nonce' : [nonce]}) as resp:
-		data = await resp.json(content_type = 'text/json')
+	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce', \
+			json = {'keys' : [nonce]}) as resp:
+		data = await resp.json()
 		return (None, None) if data[nonce]['status'] != 0 else (data[nonce]['name'], data[nonce]['uid_target'])
 
 async def _remove_from_family(uid, name, **kwargs):

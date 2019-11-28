@@ -36,16 +36,16 @@ def main():
 	try:
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/config/configuration_manager.py']))
 		time.sleep(1)
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/mail_server.py']))
-		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/token_server.py']))
+		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/mail/mail.py', \
+				'/home/matthew/lukseunserversys/mail/box']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/auth/auth.py', \
-				'lukseunsecret', '--redis-addr', 'redis://192.168.1.102', '-p', '8002']))
+				'lukseunsecret', '--redis-addr', 'redis://192.168.1.102']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/edge/edge.py', \
 				'--redis-addr', 'redis://192.168.1.102', '--nats-addr', 'nats://192.168.1.102']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', \
 				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
 				'--nats-addr', 'nats://192.168.1.102', '--token-addr', 'http://localhost', \
-				'--mail-addr', 'http://localhost', '--token-port', '8002']))
+				'--mail-addr', 'http://localhost']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', \
 				'--channel' , get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
 				'--nats-addr', 'nats://192.168.1.102', '--testing']))
