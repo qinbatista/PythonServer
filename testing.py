@@ -1,7 +1,59 @@
 # testing.py
+MESSAGE_LIST = [
+		#{'world' : '0', 'function': 'request_friend', 'data':{'gn_target' : '123456'}}
+		{'world' : '0', 'function': 'get_all_mail', 'data':{}}
+				]
 #
 # Contains test cases for the lukseun client and server.
 # TODO More test cases will be added.
+
+# lukseun_client.py
+#
+# A simple proof of concept client for internal use only.
+# Uses asyncio to handle the sending and receipt of messages to the server.
+#
+import sys
+sys.path.insert(0, '..')
+
+import ssl
+import asyncio
+import json
+
+
+class LukseunClient:
+	def __init__(self, client_type: str = 'workingcat', host: str = '127.0.0.1', port: int = 8880):
+		self._host = host
+		self._port = port
+		self.token = ""
+		self.response = None
+
+	async def send_message(self, message: str) -> dict:
+		'''
+		send_message() sends the given message to the server and
+		returns the decoded callback response
+		'''
+		context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+		path = './gate/cert'
+		context.load_verify_locations(path + '/mycert.crt')
+		context.check_hostname = False
+		#context.verify_mode = ssl.CERT_NONE
+		reader, writer = await asyncio.open_connection(self._host, self._port, ssl = context)
+		writer.write((message + '\r\n').encode())
+		await writer.drain()
+		raw = await reader.readuntil(b'\r\n')
+		resp = raw.decode().strip()
+		writer.close()
+		await writer.wait_closed()
+		if resp != '':
+			data = json.loads(resp)
+			print(f'received: {data}')
+			self.response = data
+			return data
+		return {}
+
+
+
+
 
 import time
 import asyncio
@@ -9,7 +61,6 @@ import multiprocessing
 import statistics
 import random
 import requests
-from lukseun_client import LukseunClient
 
 COLORS = {'pass' : '\033[92m', 'fail' : '\033[91m', 'end' : '\033[0m',
 		'ylw' : '\033[1;33;40m'}
@@ -17,15 +68,6 @@ client_type="aliya"
 # host="192.168.1.183"
 host="127.0.0.1"
 token =""
-MESSAGE_LIST = [
-		#{'function': 'level_up_weapon', 'data':{'unique_id' : '1', 'weapon' : '1', 'amount' : 40}}
-		#{'function': 'level_up_passive_weapon', 'data':{'unique_id' : '1', 'weapon' : '1', 'passive' : '2'}}
-		#{'function': 'level_up_star_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}}
-		#{'function': 'reset_skill_point_weapon', 'data':{'unique_id' : '1', 'weapon' : '1'}},
-		#{'function': 'send_gift_friend', 'data':{'unique_id' : '1', 'gn_target' : 'バカ'}},
-		#{'function' : 'request_friend', 'data' : {'gn_target' : 'placeholder'}}
-		{'function': 'get_all_info_friend', 'data':{}}
-				]
 
 
 def send_single_message(message_id: int):
@@ -40,7 +82,7 @@ def send_single_message(message_id: int):
 	return client.response
 
 def get_token():
-	m = {'function': 'login_unique', 'data':{'unique_id' : '1'}}
+	m = {'function': 'login_unique', 'data':{'unique_id' : 'matthewtest'}}
 	client = LukseunClient(client_type)
 	newstring  =  str(m).replace("'","\"")
 	asyncio.run(client.send_message(newstring))
