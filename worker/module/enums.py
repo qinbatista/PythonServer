@@ -240,6 +240,7 @@ class ArmorTier(enum.IntEnum):
 	T8 = 8
 	T9 = 9
 	T10 = 10
+	T11 = 11
 
 
 class Timer(enum.IntEnum):

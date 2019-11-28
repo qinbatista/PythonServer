@@ -86,7 +86,6 @@ CREATE TABLE `familyrole` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `name` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `role` int(11) NOT NULL,
-	  `contribute` int(11) NOT NULL DEFAULT 0,
 	  PRIMARY KEY (`uid`,`name`),
 	  CONSTRAINT `familyrole_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -379,7 +378,7 @@ def save_world_config(world, path):
 
 
 if __name__ == '__main__':
-	path = os.path.join(loc(), '../configuration/1.0/server/world.json')
+	path = os.path.join(loc(), '../config/configuration/1.0/server/world.json')
 	# create_db("mall")
 	for i in range(1, 10):
 		world = f's{i}'

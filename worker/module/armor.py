@@ -7,12 +7,12 @@ from module import common
 
 
 async def upgrade(uid, aid, level, n=1, **kwargs):
-	"""盔甲等级限制1-10，level限制2-10"""
+	"""盔甲等级限制1-10，level限制2-11"""
 	# 0 - success
 	# 97 - Insufficient basic armor
 	# 98 - invalid aid
 	# 99 - invalid level
-	if level < 2 or level > 10: return common.mt(99, 'invalid level')  # 最高合成10级盔甲
+	if level < 2 or level > 11: return common.mt(99, 'invalid level')  # 最高合成10级盔甲
 	if int(aid) not in enums.Armor._value2member_map_: return common.mt(98, 'invalid aid')
 	index = level - 1
 	s_tier, e_tier = await _get_armor(uid, aid, **kwargs)
@@ -36,13 +36,13 @@ async def get_all(uid, **kwargs):
 
 async def _get_armor(uid, aid, **kwargs) -> (list, list):
 	tier = await common.execute(f'SELECT quantity FROM armor WHERE uid = "{uid}" AND aid = {aid} ORDER BY level ASC;', **kwargs)
-	if tier == ():
+	if len(tier) < enums.ArmorTier.__len__():
 		await common.execute(f'INSERT INTO armor (uid, aid, level) VALUES ("{uid}", {aid}, {enums.ArmorTier.T1.value}), \
 		("{uid}", {aid}, {enums.ArmorTier.T2.value}), ("{uid}", {aid}, {enums.ArmorTier.T3.value}), \
 		("{uid}", {aid}, {enums.ArmorTier.T4.value}), ("{uid}", {aid}, {enums.ArmorTier.T5.value}), \
 		("{uid}", {aid}, {enums.ArmorTier.T6.value}), ("{uid}", {aid}, {enums.ArmorTier.T7.value}), \
 		("{uid}", {aid}, {enums.ArmorTier.T8.value}), ("{uid}", {aid}, {enums.ArmorTier.T9.value}), \
-		("{uid}", {aid}, {enums.ArmorTier.T10.value});', **kwargs)
+		("{uid}", {aid}, {enums.ArmorTier.T10.value}), ("{uid}", {aid}, {enums.ArmorTier.T11.value}) ON DUPLICATE KEY UPDATE aid=`aid`;', **kwargs)
 		tier = await common.execute(f'SELECT quantity FROM armor WHERE uid = "{uid}" AND aid = {aid};', **kwargs)
 	return [t[0] for t in tier], [t[0] for t in tier]
 
