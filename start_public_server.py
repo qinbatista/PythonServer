@@ -37,7 +37,7 @@ def main():
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/config/configuration_manager.py']))
 		time.sleep(1)
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/mail/mail.py', \
-				'/home/matthew/lukseunserversys/mail/box']))
+				loc() + '/mail/box']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/auth/auth.py', \
 				'lukseunsecret', '--redis-addr', 'redis://192.168.1.102']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/edge/edge.py', \
