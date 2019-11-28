@@ -57,7 +57,7 @@ def _upgrade(tier, i, j, n):
 	j: 需要升级成的盔甲位置索引，不能大于数组列表数量
 	n: 需要升级完成的数量
 	"""
-	if tier[i] > 3 * n:
+	if tier[i] >= 3 * n:
 		for k in range(i+1, j): tier[k] = 0
 		tier[i] -= 3 * n
 	elif i == 0: pass
