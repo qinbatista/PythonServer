@@ -5,7 +5,7 @@
 * √[`remove_user_family`](##remove_user_family)
 * √[`invite_user_family`](##invite_user_family)
 * √[`request_join_family`](##request_join_family)
-* √[`respond_family`](##respond_family)
+* √邮件[`respond_family`](##respond_family)
 * √[`get_all_family`](##get_all_family)
 * √[`get_store_family`](##get_store_family)
 * √[`market_purchase_family`](##market_purchase_family)
@@ -17,11 +17,11 @@
 * √[`change_name_family`](##change_name_family)
 * √[`disband_family`](##disband_family)
 * √[`cancel_disband_family`](##cancel_disband_family)
-* ?[`family_check_in`](##family_check_in)
 * ?[`abdicate_family`](##abdicate_family)
-* ?[`modify_icon_family`](##modify_icon_family)
 * √[`check_in_family`](##check_in_family)
-* ?[`get_family_info`](##get_family_info)
+* ?[`search_family`](##search_family)
+* ?[`get_random_family`](##get_random_family)
+* ?[`get_config_family`](##get_config_family)
 
 
 
@@ -33,6 +33,10 @@ The cost to create a family is determined by `family.json` configuration file.
 用给定的名称创建一个新的家庭。
 创建一个家庭的成本由' `family.json`'配置文件决定, 创建公会需要传入`图标`与`工会名字`，创建公会必须满足`1: 玩家大于18级`，`2:有2000钻石`
 
+> name：家族名字
+>
+> icon：家族icon的id
+
 ##### 发送消息JSON格式
 
 ```json
@@ -42,7 +46,7 @@ The cost to create a family is determined by `family.json` configuration file.
 	"data": {
 		"token": "my token ^_^",
 		"name": "family name",
-    	"icon": 1
+    "icon": 1
 	}
 }
 ```
@@ -76,7 +80,7 @@ The cost to create a family is determined by `family.json` configuration file.
 * 98: already in a family
 * 97: insufficient materials
 * 96: name already exists!
-* 95: 玩家等级未满开启等级
+* 95: you are not arrive level 18
 
 
 
@@ -118,8 +122,6 @@ The family owner can not leave.
 	}
 }
 ```
-
-[调整关卡失败]()
 
 * 99: not in a family
 * 98: family owner can not leave
@@ -678,6 +680,57 @@ Only the family Owner and Admins may update the family blackboard.
 
 
 
+## set_icon_family
+
+Modify the family role of the target user.
+The family Owner can set the permissions of any users to any role that is not Owner to Admin or below.
+The family Admins can set the permissions of any users whose role is Elite or lower to Elite or below.
+
+修改目标用户的家庭角色。
+家族所有者可以将任何用户的权限设置为不属于所有者的任何角色，并将其设置为Admin或以下。
+
+家庭管理员可以将任何角色为精英或更低的用户的权限设置为精英或更低。
+
+role级别只包括0，4，8，10
+
+##### 发送消息JSON格式
+
+
+```json
+{
+	"world": 0,
+	"function": "set_role_family",
+	"data": {
+		"token": "my token",
+		"icon"  : 2
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"gn" : "children",
+		"role" : 8
+	}
+}
+```
+
+* 99: can not modify self permissions
+* 98: not in a family
+* 97: target is not in your family
+* 96: insufficient permissions
+* 95: role  type error (级别类型错误)
+
+
+
+## 
+
 ## set_role_family
 
 Modify the family role of the target user.
@@ -1068,7 +1121,7 @@ Only Admins and above can cancel the disbanding of a family.
 
 
 
-## get_family_info
+## search_family
 
 购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次`
 
@@ -1097,13 +1150,114 @@ Only Admins and above can cancel the disbanding of a family.
 		"icon"  : 0,
 		"exp"   : 1337,
 		"notice": "New members should buy family gift package",
-		"board" : "Blackboard",
-		"timer" : 85647
+		"people" : 32
 	}
 }
 ```
 
 [挂机关卡失败]()
+
+* 99: 没有此家族
+
+  
+
+## get_random_family
+
+使用之后获得部分家族名字，获取到方式为随机获取
+
+##### 发送消息JSON格式
+
+```json
+{
+	"world": 0, 
+	"function": "gift_package",
+	"data": {
+		"token": "my token ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		family_name:[
+      {
+        "name"  : "family name1",
+        "icon"  : 0,
+        "exp"   : 1337,
+        "notice": "New members should buy family gift package",
+        "people" : 32
+      },
+      {
+        "name"  : "family name2",
+        "icon"  : 0,
+        "exp"   : 1337,
+        "notice": "New members should buy family gift package",
+        "people" : 32
+      },
+      {
+        "name"  : "family name3",
+        "icon"  : 0,
+        "exp"   : 1337,
+        "notice": "New members should buy family gift package",
+        "people" : 32
+      },
+      {
+        "name"  : "family name4",
+        "icon"  : 0,
+        "exp"   : 1337,
+        "notice": "New members should buy family gift package",
+        "people" : 32
+      },
+      {
+        "name"  : "family name5",
+        "icon"  : 0,
+        "exp"   : 1337,
+        "notice": "New members should buy family gift package",
+        "people" : 32
+      },
+                ]
+	}
+}
+```
+
+* 99: 没有此家族
+
+  
+
+## get_config_family
+
+获取家族的配置信息，每次登陆的时候直接获取
+
+##### 发送消息JSON格式
+
+```json
+{
+	"world": 0, 
+	"function": "gift_package",
+	"data": {
+		"token": "my token ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		cofig:{.....}
+	}
+}
+```
 
 * 99: 没有此家族
 

@@ -17,7 +17,7 @@ from datetime import datetime, timezone, timedelta
 async def create(uid, name, icon, **kwargs):
 	"""icon必须为整型或者数字字符串"""
 	exp_info = await stage.increase_exp(uid, 0, **kwargs)
-	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "玩家等级未满开启等级")
+	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "you must over level 18")
 	if not _valid_family_name(name): return common.mt(99, 'invalid family name')
 	in_family, _ = await _in_family(uid, **kwargs)
 	if in_family: return common.mt(98, 'already in a family')

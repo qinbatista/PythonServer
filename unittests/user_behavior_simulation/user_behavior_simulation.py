@@ -115,7 +115,7 @@ def run_task(name):
 	# module_11_friends.freind_dialog(token,world)#朋友
 	# module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
 	# module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
-	# # module_18_family.family_dialog(token,world,get_all_family_info, player_info)#家族系统（后测试）
+	module_18_family.family_dialog(token,world,info_list[13])#家族系统（后测试）
 	# module_19_factory.factory_dialog(token,world,info_list[5])#建造
 	# # module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
 	# module_21_roles.role_dialog(token,world)#玩家卡牌
@@ -129,7 +129,6 @@ def run_task(name):
 	# module_28_mall.mall_dialog(token,world,info_list[5])#mall系统
 	end = time.time()
 	# debug_log(end-start,"user_"+str(unique_id),"",level=2)
-	gevent.sleep(0)
 
 
 def run_all_task_multiprocessing():
@@ -148,6 +147,7 @@ def run_all_task_gevent():
 	endtime = datetime.now()
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
-	run_task("1")
+	run_task(input("your unique id:"))
+	# run_task("wtf1")
 	# run_all_task_multiprocessing()
 

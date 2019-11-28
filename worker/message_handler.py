@@ -127,7 +127,7 @@ class MessageHandler:
 
 	###################### family.py ######################
 	async def _create_family(self, data: dict) -> str:
-		return await family.create(data['data']['unique_id'], data['data']['name'], **data)
+		return await family.create(data['data']['unique_id'], data['data']['name'],data['data']['icon'],**data)
 
 	async def _leave_family(self, data: dict) -> str:
 		return await family.leave(data['data']['unique_id'], **data)

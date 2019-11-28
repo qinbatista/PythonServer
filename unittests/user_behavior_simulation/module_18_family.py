@@ -68,9 +68,59 @@ def set_role_family(_token,_world):
 	response = send_tcp_message({'world' : 0, 'function' : 'set_role_family', 'data' : {'token': _token, 'gn_target':"去污","role":4}})
 	print_method(str(response))
 
-def family_dialog(_token,_world,info):
-	create_family(_token,_world)
+def family_dialog(token,world,info):
+	print(token)
+	print(world)
+	while True:
+		print("1: 创建家族")
+		print("2: 离开家族")
+		print("3: 删除成员家族")
+		print("4: 邀请某人到家族")
+		print("5: 申请加入家族")
+		print("6: 同意到家族中")
+		print("7: 获取家族所有信息")
+		print("8: 获取家族商店")
+		print("9: 购买家族商店物品")
+		print("10:发放家族红包")
+		print("11:设置家族公告")
+		print("12:设置家族黑板")
+		print("13:设置家族ICON")
+		print("14:更改成员位置")
+		print("15:更改家族名字")
+		print("16:解散家族")
+		print("17:取消解散家族")
+		print("18:更改家族族长")
+		print("19:家族签到")
+		print("20:查询家族信息")
+		print("21:随机5个获取家族信息")
+		print("22:获取家族配置文件")
+		choice = input("你的输入：")
+		if choice=="1": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'create_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id+"_family", "icon":1}})
+		if choice=="2": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'leave_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="3": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'remove_user_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="4": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'invite_user_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="5": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'request_join_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="6": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'respond_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="7": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_all_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="8": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_store_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="9": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'market_purchase_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="10":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'welfare_purchase_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="11":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_notice_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="12":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_blackboard_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="13":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_icon_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="14":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_role_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="15":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'change_name_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="16":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'disband_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="17":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'cancel_disband_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="18":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'abdicate_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="19":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'check_in_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="20":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'search_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="21":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_random_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+		if choice=="22":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_config_family', 'data' : {'token' : token, "name":user_behavior_simulation.unique_id, "icon":1}})
+
+	# create_family(_token,_world)
 	# leave_family(_token,_world)
+	# remove_user_family(_token,_world)
 	# invite_user_family(_token,_world)
 	# remove_user_family(_token,_world)
 	# request_join_family(_token,_world)
@@ -80,68 +130,6 @@ def family_dialog(_token,_world,info):
 	# set_blackboard_family(_token,_world)
 	# set_role_family(_token,_world)
 
-	return
-	print_module("player_info="+str(info))
-	print_module("get_all_family_info="+str(info))
-	myLevel = info["data"]["remaining"]["level"]
-
-	if myLevel<18:
-		response = send_tcp_message({'world' : 0, 'function' : 'request_join_family', 'data' : {'token': token, 'fname': 'family_name_'+str(random.randint(0,user_behavior_simulation.testing_people_number))}})
-		print_method(str(response))
-	else:
-		response = send_tcp_message({'world' : 0, 'function' : 'create_family', 'data' : {'token': token, 'fname': 'family_name_'+user_behavior_simulation.unique_id}})
-		print_method(str(response))
-
-
-
-	response = send_tcp_message({'world' : 0, 'function' : 'family_sign_in', 'data' : {'token': token}})
-	print_method(str(response))
-
-
-	response = send_tcp_message({'world' : 0, 'function' : 'invite_user_family', 'data' : {'token': token, 'target': 'name_unique_id'+user_behavior_simulation.unique_id}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'respond_family', 'data' : {'token': token, 'nonce': '234567899'}})#玩家接受加入家族的邀请
-	print(response)
-
-	response = send_tcp_message({'world' : 0, 'function' : 'family_officer', 'data' : {'token': token, 'target': 'game name', 'position': random.randint(0,3)}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'dismissal_family_officer', 'data' : {'token': token, 'target': '123'}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'family_change_name', 'data' : {'token': token, 'family_name': 'name_unique_id_rename_'+user_behavior_simulation.unique_id}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'family_blackboard', 'data' : {'token': token}})#刷新工会信息
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'family_announcement', 'data' : {'token': token}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'get_family_store', 'data' : {'token': token}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'family_market_purchase', 'data' : {'token': token, 'merchandise': 'merchandise'}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'family_gift_package', 'data' : {'token': token}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'get_family_config', 'data' : {'token': token}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'remove_user_family', 'data' : {'token': token, 'user': 'game name'}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'disbanded_family', 'data' : {'token': token}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'cancel_disbanded_family', 'data' : {'token': token}})
-	print_method(str(response))
-
-	response = send_tcp_message({'world' : 0, 'function' : 'leave_family', 'data' : {'token': token}})
-	print_method(str(response))
 
 
 

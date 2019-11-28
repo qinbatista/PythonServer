@@ -33,7 +33,7 @@ def login_unique():#游客登陆
 		world_list = get_account_world_info(token)
 		if len(world_list) != 0:
 			max = len(world_list)-1
-			world = enter_world(token, world_list[random.randint(1,1)]["world"])#选择世界,游客登陆需要返回一个用户不是很忙的服务器,目前只有世界0,未完成
+			world = enter_world(token, world_list[random.randint(0,0)]["world"])#选择世界,游客登陆需要返回一个用户不是很忙的服务器,目前只有世界0,未完成
 		else:
 			return "",""
 		int_number = random.choice([0,0])#登陆成功是否绑定账户0账号绑定，1手机绑定，2邮箱绑定，目前手机和邮箱未完成
@@ -47,11 +47,7 @@ def login_unique():#游客登陆
 		else:
 			return "",""
 	else:
-		int_number = random.choice([0,1])
-		if int_number==0:
-			login_unique()
-		else:
-			return "",""
+		return "",""
 
 def login_account():#账户登陆
 	global world
