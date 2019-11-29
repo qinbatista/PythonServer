@@ -85,7 +85,7 @@ def main():
 	parser.add_argument('secret'       , type = str)
 	parser.add_argument('-p', '--port' , type = int, default = 8001)
 	parser.add_argument('--validity'   , type = int, default = 30 * 24 * 3600)
-	parser.add_argument('--redis-addr' , type = str, default = 'redis://redis')
+	parser.add_argument('--redis-addr' , type = str, default = 'redis')
 	args = parser.parse_args()
 	web.run_app(Auth(args.secret, args.validity).init(web.Application(), args.redis_addr), \
 			port = args.port)
