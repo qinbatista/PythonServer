@@ -27,7 +27,7 @@ class Auth:
 		self.executor = concurrent.futures.ProcessPoolExecutor(1)
 
 	async def init(self, aiohttp_app, redis_addr):
-		self.redis = await aioredis.create_redis(redis_addr, encoding = 'utf-8')
+		self.redis = await aioredis.create_redis(f'redis://{redis_addr}', encoding = 'utf-8')
 		aiohttp_app.router.add_post('/issue_token'   , self.issue_token)
 		aiohttp_app.router.add_post('/redeem_nonce'  , self.redeem_nonce)
 		aiohttp_app.router.add_post('/register_nonce', self.register_nonce)

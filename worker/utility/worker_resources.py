@@ -18,22 +18,25 @@ import threading
 from datetime import datetime, timezone
 
 class WorkerResources:
-	def __init__(self, redis_addr):
+	def __init__(self, redis_addr, db_addr, db_user, db_pw):
 		self.redis_addr = redis_addr
+		self.db_addr = db_addr
+		self.db_user = db_user
+		self.db_pw = db_pw
 
 		self.resources = {}
 
 	async def init(self):
 		self.resources['session']   = aiohttp.ClientSession()
-		self.resources['redis']     = await aioredis.create_redis(self.redis_addr)
-		self.resources['db']        = await aiomysql.create_pool(maxsize = 10, host = '192.168.1.102', \
-				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True)
-		self.resources['accountdb'] = await aiomysql.create_pool(maxsize =  4, host = '192.168.1.102',  \
-				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'user')
-		self.resources['malldb'] = await aiomysql.create_pool(maxsize = 4, host = '192.168.1.102', \
-				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'mall')
-		self.resources['exchangedb'] = await aiomysql.create_pool(maxsize = 4, host = '192.168.1.102', \
-				user = 'root', password = 'lukseun', charset = 'utf8', autocommit = True, db = 'exchange')
+		self.resources['redis']     = await aioredis.create_redis(f'redis://{self.redis_addr}')
+		self.resources['db']        = await aiomysql.create_pool(maxsize = 10, host = self.db_addr, \
+				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True)
+		self.resources['accountdb'] = await aiomysql.create_pool(maxsize =  4, host = self.db_addr,  \
+				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True, db = 'user')
+		self.resources['malldb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, \
+				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True, db = 'mall')
+		self.resources['exchangedb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, \
+				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True, db = 'exchange')
 
 
 	async def shutdown(self):
@@ -72,9 +75,9 @@ class RepeatingTimer(threading.Thread):
 
 
 class ModuleConfigurations:
-	def __init__(self, baseurl = 'http://localhost:8000'):
+	def __init__(self, config_addr, config_port):
 		self.configs = {}
-		self.baseurl = baseurl
+		self.baseurl = f'http://{config_addr}:{config_port}'
 		self.repeat  = RepeatingTimer(600, self.refresh, refresh_world_boss = False)
 		self.repeat.start()
 		self.refresh()

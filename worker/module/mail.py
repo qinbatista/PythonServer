@@ -80,7 +80,7 @@ async def set_daily_send_limit(uid, limit, now, **kwargs):
 async def get_daily_send_limit(uid, **kwargs):
 	limit = await common.get_limit(uid, enums.Limits.MAIL_DAILY_SEND, **kwargs)
 	timer = await common.get_timer(uid, enums.Timer.MAIL_LAST_SENT,   **kwargs)
-	return (limit if limit is not None else 0, timer)
+	return (limit, timer) if limit is not None else (0, timer)
 
 
 async def _send_mail(mail, **kwargs):

@@ -108,8 +108,8 @@ class Gate:
 		if platform.system() != 'Windows':
 			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 		self.nats = nats.aio.client.Client()
-		self.redis = await aioredis.create_redis(self.args.redis_addr)
-		await self.nats.connect(self.args.nats_addr, max_reconnect_attempts = 1)
+		self.redis = await aioredis.create_redis(f'redis://{self.args.redis_addr}')
+		await self.nats.connect(f'nats://{self.args.nats_addr}', max_reconnect_attempts = 1)
 		await self._next_avail_gid()
 		await self.redis.set('gates.id.' + self.gid, self.ip + ':' + str(self.args.wport), expire = 600)
 		self.ws = await asyncio.start_server(self.worker_protocol, port = self.args.wport)

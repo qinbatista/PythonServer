@@ -39,16 +39,16 @@ def main():
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/mail/mail.py', \
 				loc() + '/mail/box']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/auth/auth.py', \
-				'lukseunsecret', '--redis-addr', 'redis://192.168.1.102']))
+				'lukseunsecret', '--redis-addr', '192.168.1.102']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/edge/edge.py', \
-				'--redis-addr', 'redis://192.168.1.102', '--nats-addr', 'nats://192.168.1.102']))
+				'--redis-addr', '192.168.1.102', '--nats-addr', '192.168.1.102']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', \
-				'--channel', get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
-				'--nats-addr', 'nats://192.168.1.102', '--token-addr', 'http://localhost', \
-				'--mail-addr', 'http://localhost']))
+				'--channel', get_host_ip(), '--redis-addr', '192.168.1.102', \
+				'--nats-addr', '192.168.1.102', '--token-addr', 'localhost', \
+				'--mail-addr', 'localhost']))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', \
-				'--channel' , get_host_ip(), '--redis-addr', 'redis://192.168.1.102', \
-				'--nats-addr', 'nats://192.168.1.102', '--testing']))
+				'--channel' , get_host_ip(), '--redis-addr', '192.168.1.102', \
+				'--nats-addr', '192.168.1.102', '--testing']))
 		time.sleep(0.2)
 		print('Done spawning servers...')
 		while (len(processes) > 0):
