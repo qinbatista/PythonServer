@@ -179,6 +179,18 @@ async def set_blackboard(uid, msg, **kwargs):
 	await common.execute(f'UPDATE family SET board = "{msg}" WHERE `name` = "{name}";', **kwargs)
 	return common.mt(0, 'success', {'board' : msg})
 
+async def set_icon(uid, icon, **kwargs):
+	if icon < 0: return common.mt(99, '图标序号错误')
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(98, '你没有家族')
+	role = await _get_role(uid, name, **kwargs)
+	if not _check_blackboard_permissions(role): return common.mt(98, '你没有权限')
+	_, ic = await _get_family_info(name, 'icon', **kwargs)
+	if ic[0] == icon: return common.mt(97, '不能设置为原图标')
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} CHANGED_FAMILY_ICON_TO: {icon}.', **kwargs)
+	await common.execute(f'UPDATE family SET icon={icon} WHERE name="{name}";', **kwargs)
+	return common.mt(0, 'success', {'icon': icon})
+
 async def set_role(uid, gn_target, role, **kwargs):
 	if role not in enums.FamilyRole._value2member_map_.keys(): return common.mt(95, 'role type error')
 	new_role = enums.FamilyRole(role)

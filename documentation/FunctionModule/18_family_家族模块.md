@@ -12,7 +12,7 @@
 * √内部[`welfare_purchase_family`](##welfare_purchase_family)
 * √[`set_notice_family`](##set_notice_family)
 * √[`set_blackboard_family`](##set_blackboard_family)
-* X[`set_icon_family`](##set_icon_family)
+* √[`set_icon_family`](##set_icon_family)
 * √[`set_role_family`](##set_role_family)
 * √[`change_name_family`](##change_name_family)
 * √[`disband_family`](##disband_family)
@@ -700,18 +700,11 @@ Only the family Owner and Admins may update the family blackboard.
 
 ## set_icon_family
 
-Modify the family role of the target user.
-The family Owner can set the permissions of any users to any role that is not Owner to Admin or below.
-The family Admins can set the permissions of any users whose role is Elite or lower to Elite or below.
-
-修改目标用户的家庭角色。
-家族所有者可以将任何用户的权限设置为不属于所有者的任何角色，并将其设置为Admin或以下。
-
-家庭管理员可以将任何角色为精英或更低的用户的权限设置为精英或更低。
-
-role级别只包括0，4，8，10
+修改家庭图标。家族管理员及以上人员可以修改家族的图标
 
 ##### 发送消息JSON格式
+
+icon：图标序号，只要非负即可
 
 
 ```json
@@ -733,21 +726,17 @@ role级别只包括0，4，8，10
 	"status": 0,
 	"message": "success",
 	"data": {
-		"gn" : "children",
-		"role" : 8
+		"icon" : 2
 	}
 }
 ```
 
-* 99: can not modify self permissions
-* 98: not in a family
-* 97: target is not in your family
-* 96: insufficient permissions
-* 95: role  type error (级别类型错误)
+* 99：图标序号错误
+* 98：你没有家族
+* 97：你没有权限
+* 96：不能设置为原图标
 
 
-
-## 
 
 ## set_role_family
 

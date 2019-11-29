@@ -150,6 +150,9 @@ class MessageHandler:
 	async def _set_blackboard_family(self, data: dict) -> str:
 		return await family.set_blackboard(data['data']['unique_id'], data['data']['msg'], **data)
 
+	async def _set_icon_family(self, data: dict) -> str:
+		return await family.set_icon(data['data']['unique_id'], int(data['data']['icon']), **data)
+
 	async def _set_role_family(self, data: dict) -> str:
 		return await family.set_role(data['data']['unique_id'], data['data']['gn_target'], int(data['data']['role']), **data)
 
@@ -626,6 +629,7 @@ FUNCTION_LIST = {
 	'respond_family' : MessageHandler._respond_family,
 	'set_notice_family' : MessageHandler._set_notice_family,
 	'set_blackboard_family' : MessageHandler._set_blackboard_family,
+	'set_icon_family' : MessageHandler._set_icon_family,
 	'set_role_family' : MessageHandler._set_role_family,
 	'change_name_family' : MessageHandler._change_name_family,
 	'get_all_family' : MessageHandler._get_all_family,
