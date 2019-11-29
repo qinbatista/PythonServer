@@ -73,6 +73,10 @@ async def invite_user(uid, gn_target, **kwargs):
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(timezone.utc) > datetime.now(timezone.utc):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(timezone.utc) - datetime.now(timezone.utc)).total_seconds())
 		return common.mt(96, '邀请对象离开家族冷却时间未结束', {'seconds': seconds})
+	exp_info = await stage.increase_exp(uid_target, 0, **kwargs)
+	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "邀请对象等级不满18级")
+	in_family_target, _ = await _in_family(uid_target, **kwargs)
+	if in_family_target: return common.mt(94, '邀请对象已经加入了家族')
 	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, uid_target, \
 			subj = enums.MailTemplate.FAMILY_INVITATION.name, \
 			name = name, uid_target = uid_target, **kwargs)
@@ -88,6 +92,8 @@ async def request_join(uid, name, **kwargs):
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(timezone.utc) > datetime.now(timezone.utc):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(timezone.utc) - datetime.now(timezone.utc)).total_seconds())
 		return common.mt(96, '离开家族冷却时间未结束', {'seconds': seconds})
+	exp_info = await stage.increase_exp(uid, 0, **kwargs)
+	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "你的等级不满18级", {'exp_info': exp_info})
 	sent = await mail.send_mail(enums.MailType.FAMILY_REQUEST, *officials, \
 			subj = enums.MailTemplate.FAMILY_REQUEST.name, name = name, uid_target = uid, **kwargs)
 	return common.mt(0, 'requested join', {'name' : name}) if sent else common.mt(97, 'mail could not be sent')
