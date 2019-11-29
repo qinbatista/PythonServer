@@ -33,7 +33,7 @@ class Worker:
 		self.debug   = False
 		self.running = False
 
-		self.configs = worker_resources.ModuleConfigurations()
+		self.configs = worker_resources.ModuleConfigurations(self.args.config_addr, self.args.config_port)
 		self.resource= worker_resources.WorkerResources(self.args.redis_addr, self.args.db_addr, \
 				self.args.db_user, self.args.db_pw)
 		self.sid     = None
@@ -81,7 +81,7 @@ class Worker:
 		self.running = True
 		self.nats = nats.aio.client.Client()
 		await self.resource.init()
-		await self.nats.connect(self.args.nats_addr, max_reconnect_attempts = 1)
+		await self.nats.connect(f'nats://{self.args.nats_addr}', max_reconnect_attempts = 1)
 		if platform.system() != 'Windows':
 			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
 
@@ -133,15 +133,17 @@ class Worker:
 async def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--channel'   , type = str, default = 'jobs')
-	parser.add_argument('--nats-addr' , type = str, default = 'nats://nats')
-	parser.add_argument('--redis-addr', type = str, default = 'redis://redis')
-	parser.add_argument('--mail-addr' , type = str, default = 'http://mail')
-	parser.add_argument('--token-addr', type = str, default = 'http://token')
+	parser.add_argument('--nats-addr' , type = str, default = 'nats')
+	parser.add_argument('--redis-addr', type = str, default = 'redis')
+	parser.add_argument('--mail-addr' , type = str, default = 'mail')
+	parser.add_argument('--token-addr', type = str, default = 'token')
 	parser.add_argument('--mail-port' , type = int, default = 8020)
 	parser.add_argument('--token-port', type = int, default = 8001)
 	parser.add_argument('--db-addr'   , type = str, default = '192.168.1.102')
 	parser.add_argument('--db-user'   , type = str, default = 'root')
 	parser.add_argument('--db-pw'     , type = str, default = 'lukseun')
+	parser.add_argument('--config-addr', type = str, default = 'localhost')
+	parser.add_argument('--config-port', type = int, default = 8000)
 	await Worker(parser.parse_args()).start(debug=True)
 
 if __name__ == '__main__':

@@ -35,8 +35,8 @@ C = metrics.Collector()
 class MessageHandler:
 	def __init__(self, *, token_addr, token_port, mail_addr, mail_port):
 		self.functions      = FUNCTION_LIST
-		self.mail_base_url  = mail_addr  + ':' + str(mail_port)
-		self.token_base_url = token_addr + ':' + str(token_port)
+		self.mail_base_url  = f'http://{mail_addr}:{mail_port}'
+		self.token_base_url = f'http://{token_addr}:{token_port}'
 
 	async def shutdown(self):
 		pass

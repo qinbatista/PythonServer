@@ -62,7 +62,7 @@ class Userlist:
 		return set()
 
 class Edge:
-	def __init__(self, args): #port = 9000, redis_addr = 'redis://redis', nats_addr = 'nats://nats'):
+	def __init__(self, args):
 		self.args     = args
 		self.pubsub     = nats.aio.client.Client()
 		self.channels   = set()
@@ -86,8 +86,8 @@ class Edge:
 	async def init(self):
 		asyncio.get_running_loop().add_signal_handler(signal.SIGINT, \
 				lambda: asyncio.create_task(self.shutdown()))
-		await self.pubsub.connect(self.args.nats_addr, max_reconnect_attempts = 1)
-		self.redis   = await aioredis.create_redis(self.args.redis_addr, encoding = 'utf-8')
+		await self.pubsub.connect(f'nats://{self.args.nats_addr}', max_reconnect_attempts = 1)
+		self.redis   = await aioredis.create_redis(f'redis://{self.args.redis_addr}', encoding = 'utf-8')
 		self.server  = await asyncio.start_server(self.client_protocol, port = self.args.port)
 		self.running = True
 	

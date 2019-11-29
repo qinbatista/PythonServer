@@ -28,7 +28,7 @@ class WorkerResources:
 
 	async def init(self):
 		self.resources['session']   = aiohttp.ClientSession()
-		self.resources['redis']     = await aioredis.create_redis(self.redis_addr)
+		self.resources['redis']     = await aioredis.create_redis(f'redis://{self.redis_addr}')
 		self.resources['db']        = await aiomysql.create_pool(maxsize = 10, host = self.db_addr, \
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True)
 		self.resources['accountdb'] = await aiomysql.create_pool(maxsize =  4, host = self.db_addr,  \
@@ -75,9 +75,9 @@ class RepeatingTimer(threading.Thread):
 
 
 class ModuleConfigurations:
-	def __init__(self, baseurl = 'http://localhost:8000'):
+	def __init__(self, config_addr, config_port):
 		self.configs = {}
-		self.baseurl = baseurl
+		self.baseurl = f'http://{config_addr}:{config_port}'
 		self.repeat  = RepeatingTimer(600, self.refresh, refresh_world_boss = False)
 		self.repeat.start()
 		self.refresh()
