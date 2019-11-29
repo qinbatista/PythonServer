@@ -359,13 +359,12 @@ async def _record_family_change(name, msg, **kwargs):
 	await common.execute(f'INSERT INTO familyhistory(name, date, msg) VALUES("{name}", "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}", "{msg}");', **kwargs)
 
 async def _get_member_info(name, **kwargs):
-	role = await common.execute(f'SELECT uid FROM familyrole WHERE name="{name}";', **kwargs)
-	for r in role:
-		# 没有这个登录时间，返回数据会报错
-		await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{r[0]}", {12}, "{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}") ON DUPLICATE KEY UPDATE tid=`tid`;', **kwargs)
-		await common.execute(f'INSERT INTO item (uid, iid) VALUES ("{r[0]}", {enums.Item.FAMILY_COIN_RECORD.value}) ON DUPLICATE KEY UPDATE iid=`iid`;', **kwargs)
-	data = await common.execute(f'SELECT player.gn, progress.role, familyrole.role, progress.exp, timer.time, item.`value` FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid join timer on timer.uid = familyrole.uid and timer.tid={12} join item on item.uid = familyrole.uid and item.iid ={enums.Item.FAMILY_COIN_RECORD} WHERE familyrole.name = "{name}";', **kwargs)
-	# data = await common.execute(f'SELECT player.gn, progress.role, familyrole.role, progress.exp, timer.time, item.`value` FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid join timer on timer.uid = familyrole.uid and timer.tid={enums.Item.LOGIN_TIME.value} join item on item.uid = familyrole.uid and item.iid ={enums.Item.FAMILY_COIN_RECORD} WHERE familyrole.name = "{name}";', **kwargs)
+	# 没有这个登录时间和贡献记录，返回的数据不全数据
+	await asyncio.gather(
+		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.LOGIN_TIME}, "{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}" FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE timer.tid=`tid`;', **kwargs),
+		common.execute(f'INSERT INTO item (uid, iid) SELECT familyrole.uid, {enums.Item.FAMILY_COIN_RECORD} FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE iid=`iid`;', **kwargs)
+	)
+	data = await common.execute(f'SELECT player.gn, progress.role, familyrole.role, progress.exp, timer.time, item.`value` FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid join timer on timer.uid = familyrole.uid and timer.tid={enums.Timer.LOGIN_TIME} join item on item.uid = familyrole.uid and item.iid ={enums.Item.FAMILY_COIN_RECORD} WHERE familyrole.name = "{name}";', **kwargs)
 	return [{'gn' : m[0], 'player_role' : m[1],'family_role' : m[2], 'exp' : m[3], 'last_login' : m[4], 'family_coin' : m[5]} for m in data]
 
 async def _get_family_info(name, *args, **kwargs):
