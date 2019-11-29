@@ -1,7 +1,7 @@
 ## 方法列表
 
 * √[`create_family`](##create_family)
-* x[`leave_family`](##leave_family)
+* √[`leave_family`](##leave_family)
 * √[`remove_user_family`](##remove_user_family)
 * √[`invite_user_family`](##invite_user_family)
 * √[`request_join_family`](##request_join_family)
