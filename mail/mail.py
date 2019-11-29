@@ -73,9 +73,9 @@ class MailServer:
 	def construct_mail(mail_dict):
 		mail         = mailbox.MaildirMessage()
 		mail['time'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-		mail.set_payload(mail_dict.pop('body', ''))
+		mail.set_payload(urllib.parse.quote(mail_dict.pop('body', ''), safe = ''))
 		for k, v in mail_dict.items():
-			mail[k] = urllib.parse.quote(str(v), safe = '') if v in {'from', 'subj'} else str(v)
+			mail[k] = urllib.parse.quote(str(v), safe = '') if k in {'from', 'subj'} else str(v)
 		return mail
 
 	@staticmethod
