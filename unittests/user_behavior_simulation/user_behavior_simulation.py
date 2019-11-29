@@ -152,6 +152,6 @@ def run_all_task_gevent():
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
 	# run_task(input("your unique id:"))
-	run_task("q1")
+	run_task("q2")
 	# run_all_task_multiprocessing()
 
