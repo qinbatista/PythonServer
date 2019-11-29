@@ -10,7 +10,7 @@
 * √[`get_store_family`](##get_store_family)
 * √[`market_purchase_family`](##market_purchase_family)
 * √内部[`welfare_purchase_family`](##welfare_purchase_family)
-* X[`set_notice_family`](##set_notice_family)
+* √[`set_notice_family`](##set_notice_family)
 * √[`set_blackboard_family`](##set_blackboard_family)
 * X[`set_icon_family`](##set_icon_family)
 * √[`set_role_family`](##set_role_family)
@@ -609,7 +609,7 @@ Only the family Owner and Admins may update the family notice.
 更新家庭通知。
 只有家庭所有者和管理员可以更新家庭通知。
 
-X 需要有cd
+√需要有cd
 
 ##### 发送消息JSON格式
 
@@ -627,13 +627,21 @@ X 需要有cd
 
 ##### 接受消息JSON格式
 
+notice：公告内容
+
+limit：剩余可发布的次数
+
+seconds：离刷新发布次数剩余秒钟数
+
 
 ```json
 {
 	"status": 0,
 	"message": "success",
 	"data": {
-		"notice" : "This is my updated notice"
+		"notice" : "This is my updated notice",
+        "limit" : 4,
+        "seconds": 6898
 	}
 }
 ```
@@ -643,6 +651,7 @@ X 需要有cd
 
 * 99: not in a family
 * 98: insufficient permissions
+* 97: 今天公告次数已用完
 
 
 
