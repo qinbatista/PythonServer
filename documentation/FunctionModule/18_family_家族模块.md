@@ -233,6 +233,7 @@ An invitation will be sent the the user's mailbox.
 * 99: not in a family
 * 98: insufficient permissions
 * 97: mail could not be sent
+* 96: 邀请对象离开家族冷却时间未结束
 
 
 
@@ -319,6 +320,7 @@ If any of them accept the invitation, user will be added to the family.
 * 99: already in a family
 * 98: invalid family
 * 97: mail could not be sent
+* 96: 离开家族冷却时间未结束
 
 
 
