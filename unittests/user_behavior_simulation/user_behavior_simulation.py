@@ -63,7 +63,13 @@ def get_unique_id():
 def debug_log(time,method_name,string,level=1):
 	if DEBUG_LOG == False:
 		return
-	print(f"\033[1;9{1 if (level!=1) else 2}m\t{format(time, '0.3f')} S\033[0m\033[1;93m\t[{method_name}]\033[0m\033[1;\t{string if (DEBUG_LOG_DETAIL==True) else ''}\033[0m")
+	if string == "":
+		string={'status':-1,'message':'empty'}
+	if string['status']==-1:
+		level=2
+		print(f"\033[1;9{1 if (level!=1) else 2}m\t{format(time, '0.3f')} S\033[0m\033[1;93m\t[{method_name}]\033[0m\033[1;\t{string if (DEBUG_LOG_DETAIL==True) else ''}\033[0m")
+	else:
+		print(f"\033[1;9{1 if (level!=1) else 2}m\t{format(time, '0.3f')} S\033[0m\033[1;93m\t[{method_name}]\033[0m\033[1;\t{string if (DEBUG_LOG_DETAIL==True) else ''}\033[0m")
 	with open(os.path.dirname(os.path.realpath(__file__))+"/log_history/"+method_name+".txt","a") as f:
 		f.writelines(f"{time} { '' if (string=='') else string['status']} {datetime.strptime(datetime.now().strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')}\r\n")
 def send_tcp_message(msg):
@@ -119,20 +125,20 @@ def run_task(name):
 	# module_11_friends.freind_dialog(token,world)#朋友
 	# module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
 	# module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
-	module_18_family.family_dialog(token,world,info_list[13],unique_id)#家族系统（后测试）
+	# # module_18_family.family_dialog(token,world,info_list[13],unique_id)#家族系统（后测试）
 	# module_19_factory.factory_dialog(token,world,info_list[5])#建造
 	# # module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
 	# module_21_roles.role_dialog(token,world)#玩家卡牌
-	## module_22_announcement.announcement_dialog(token,world)#公告系统（后测试）
+	# # module_22_announcement.announcement_dialog(token,world)#公告系统（后测试）
 	# module_23_daily_task.task_dialog(token,world,info_list[5])#每日任务
 	# module_24_achievement.achievement_dialog(token,world)#成就系统
 	# module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
-	# module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
+	module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
 	# module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
-	# module_12_chat.chat_dialog(token,world,info_list[5])#vip系统
-	# module_28_mall.mall_dialog(token,world,info_list[5])#mall系统
+	# # module_12_chat.chat_dialog(token,world,info_list[5])#vip系统
+	# module_28_mall.mall_dialog(token,world,info_list[5],unique_id)#mall系统
 	end = time.time()
-	# debug_log(end-start,"user_"+str(unique_id),"",level=2)
+	debug_log(end-start,"user_"+str(unique_id),"",level=2)
 
 
 def run_all_task_multiprocessing():
