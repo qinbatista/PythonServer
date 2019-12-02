@@ -7,7 +7,9 @@ When desinging a function, try to make it as general as possible to allow the re
 from module import enums
 from module import mail
 import time
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
+from dateutil import tz
+TZ_SH = tz.gettz('Asia/Shanghai')
 
 
 async def exists(table, *conditions, account = False, **kwargs):
@@ -28,10 +30,11 @@ async def execute(statement, account=False, mall=False, exchange=False, **kwargs
 			return await cursor.fetchall()
 
 async def execute_update(statement, account=False, mall=False, exchange=False, **kwargs):
-	async with (((await get_db(**kwargs)).acquire() if not account
+	async with ((((await get_db(**kwargs)).acquire() if not account
 			else kwargs['accountdb'].acquire()) if not mall
-			else kwargs['malldb'].acquire()) as conn:
-		if not account and not mall:
+			else kwargs['malldb'].acquire()) if not exchange
+			else kwargs['exchangedb'].acquire()) as conn:
+		if not account and not mall and not exchange:
 			await conn.select_db(str(kwargs['world']))
 		async with conn.cursor() as cursor:
 			affected = await cursor.execute(statement)
@@ -47,7 +50,7 @@ async def get_uid(gn, **kwargs):
 	else:return data[0][0]
 
 def remaining_cd():
-	cd_time = datetime.strptime((datetime.now(timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d').replace(tzinfo=timezone.utc) - datetime.now(timezone.utc)
+	cd_time = datetime.strptime((datetime.now(tz=TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d').replace(tzinfo=TZ_SH) - datetime.now(tz=TZ_SH)
 	return int(cd_time.total_seconds())
 
 async def try_item(uid, item, value, **kwargs):
@@ -98,7 +101,7 @@ async def try_role(uid, role, quantity, **kwargs):
 async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
 	data = await execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
 			`tid` = {tid.value};', **kwargs)
-	return datetime.strptime(data[0][0], timeformat).replace(tzinfo = timezone.utc) if data != () else None
+	return datetime.strptime(data[0][0], timeformat).replace(tzinfo=TZ_SH) if data != () else None
 
 async def set_timer(uid, tid, time, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
 	await execute(f'INSERT INTO `timer` VALUES ("{uid}", {tid.value}, \
