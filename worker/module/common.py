@@ -47,7 +47,7 @@ async def get_uid(gn, **kwargs):
 	else:return data[0][0]
 
 def remaining_cd():
-	cd_time = datetime.strptime((datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d') - datetime.now()
+	cd_time = datetime.strptime((datetime.now(timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d').replace(tzinfo=timezone.utc) - datetime.now(timezone.utc)
 	return int(cd_time.total_seconds())
 
 async def try_item(uid, item, value, **kwargs):

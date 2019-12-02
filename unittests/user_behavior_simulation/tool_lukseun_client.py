@@ -16,6 +16,8 @@ logging.basicConfig(
 	datefmt='%Y-%m-%d %H:%M:%S',
 )
 logger = logging.getLogger(__name__)
+print = logging.getLogger(__name__).debug
+
 
 def loc():
 	return os.path.dirname(os.path.realpath(__file__))
@@ -25,7 +27,7 @@ class LukseunClient:
 		self._host = host
 		self._port = port
 		self.token = ""
-	
+
 	async def send_message(self, message: str) -> dict:
 		'''
 		send_message() sends the given message to the server and
