@@ -12,4 +12,4 @@ COPY . .
 
 STOPSIGNAL SIGINT
 
-CMD [ "python", "-u", "./auth.py", "lukseunsecret" ]
+#CMD [ "python", "-u", "./auth.py", "lukseunsecret" ]

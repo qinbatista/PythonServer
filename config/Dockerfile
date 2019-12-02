@@ -14,4 +14,4 @@ STOPSIGNAL SIGINT
 
 EXPOSE 8000
 
-CMD [ "python", "-u", "./configuration_manager.py" ]
+#CMD [ "python", "-u", "./configuration_manager.py" ]

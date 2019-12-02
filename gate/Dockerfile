@@ -15,4 +15,4 @@ STOPSIGNAL SIGINT
 EXPOSE 8201
 EXPOSE 8880
 
-CMD [ "python", "-u", "./gate.py" ]
+#CMD [ "python", "-u", "./gate.py" ]
