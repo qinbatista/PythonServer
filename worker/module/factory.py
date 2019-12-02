@@ -9,7 +9,7 @@ from module import common
 from module import weapon
 from module import task
 from module import achievement
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 
 BASIC_FACTORIES      = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
 				        enums.Factory.IRON    : None, enums.Factory.FOOD  : None}
@@ -25,7 +25,7 @@ HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, en
 async def refresh(uid, **kwargs):
 	kwargs.update({"task_id": enums.Task.CHECK_FACTORY})
 	await task.record_task(uid,**kwargs)
-	now              = datetime.now(timezone.utc)
+	now              = datetime.now(tz=common.TZ_SH)
 	steps, refresh_t = await steps_since(uid, now, **kwargs)
 	rem, next_ref    = await remaining_seconds(uid, now, refresh_t, **kwargs)
 	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds = rem), **kwargs)
@@ -177,7 +177,7 @@ async def upgrade(uid, fid, **kwargs):
 			'level' : l + 1}})
 
 async def wishing_pool(uid, wid, **kwargs):
-	now, dia_cost, count = datetime.now(timezone.utc), 0, 0
+	now, dia_cost, count = datetime.now(tz=common.TZ_SH), 0, 0
 	pool                 = await remaining_pool_time(uid, now, **kwargs)
 	level, _, _          = await get_state(uid, **kwargs)
 	if pool == 0:
@@ -200,7 +200,7 @@ async def wishing_pool(uid, wid, **kwargs):
 			'reward'    : {'wid' : wid.value, 'seg' : seg_reward, 'diamond' : dia_cost}})
 
 async def buy_acceleration(uid, **kwargs):
-	now                 = datetime.now(timezone.utc)
+	now                 = datetime.now(tz=common.TZ_SH)
 	dia_cost            = kwargs['config']['factory']['general']['acceleration_cost']
 	can_pay, dia_remain = await common.try_item(uid, enums.Item.DIAMOND, -dia_cost, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient funds')

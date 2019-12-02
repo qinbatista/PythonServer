@@ -12,7 +12,7 @@ from module import common
 from module import task
 from module import achievement
 from module import family
-from datetime import datetime, timezone
+from datetime import datetime
 
 
 async def get_all(uid, **kwargs):
@@ -66,7 +66,7 @@ async def send_gift(uid, gn_target, **kwargs):
 	fid = await common.get_uid(gn_target, **kwargs)
 	friends, recover, since = await _are_friends(uid, fid, **kwargs)
 	if not friends or since == '': return common.mt(99, 'not friends')
-	now = datetime.now(timezone.utc)
+	now = datetime.now(tz=common.TZ_SH)
 	if not _can_send_gift(now, recover): return common.mt(98, 'gift cooldown')
 	kwargs['items'] = common.encode_item(enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1)
 	kwargs['from_'] = await common.get_gn(uid, **kwargs)
@@ -103,12 +103,12 @@ async def find_person(uid, gn_target, **kwargs):
 
 def _can_send_gift(now, recover):
 	if recover == '': return True
-	delta_time = now - datetime.strptime(recover, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+	delta_time = now - datetime.strptime(recover, '%Y-%m-%d').replace(tzinfo=common.TZ_SH)
 	return delta_time.days >= 1
 
 
 async def _is_request_max(uid, **kwargs):
-	now = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+	now = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d')
 	data = await common.execute(
 		f"SELECT limits.value, timer.time FROM limits JOIN timer ON limits.uid = timer.uid WHERE limits.uid='{uid}' and limits.lid={enums.Limits.REQUEST_FRIEND_LIMITS} and timer.tid={enums.Timer.REQUEST_FRIEND_TIME}",
 		**kwargs)
@@ -122,7 +122,7 @@ async def _is_request_max(uid, **kwargs):
 		count, record_time = 0, now
 	else:
 		count, record_time = data[0][0], data[0][1]
-	delta_time = datetime.now(timezone.utc) - datetime.strptime(record_time, '%Y-%m-%d').replace(tzinfo=timezone.utc)
+	delta_time = datetime.now(tz=common.TZ_SH) - datetime.strptime(record_time, '%Y-%m-%d').replace(tzinfo=common.TZ_SH)
 	if delta_time.days >= 1:
 		await common.execute(
 			f'INSERT INTO timer(uid, tid, time) VALUES ("{uid}", {enums.Timer.REQUEST_FRIEND_TIME}, "{now}") ON DUPLICATE KEY UPDATE time = "{now}";',
@@ -137,7 +137,7 @@ async def _is_request_max(uid, **kwargs):
 
 
 async def _add_friend(uid, fid, **kwargs):
-	now = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+	now = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d')
 	await asyncio.gather(common.execute(
 		f'INSERT INTO friend(uid, fid, since) VALUES ("{uid}", "{fid}", "{now}") ON DUPLICATE KEY UPDATE since = "{now}";',
 		**kwargs), common.execute(

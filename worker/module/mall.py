@@ -5,8 +5,7 @@ task.py
 from module import enums
 from module import common
 from module import vip
-from datetime import datetime, timezone
-import time
+from datetime import datetime
 import secrets
 
 # secrets.randbits
@@ -148,7 +147,7 @@ async def exchange(uid, gid, eid, **kwargs):
 	if edata == (): return common.mt(99, '兑换码不存在')
 	pid, etime, receive = edata[0]
 	if receive <= 0: return common.mt(98, '兑换码已兑换完')
-	if datetime.strptime(etime, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc) < datetime.now(timezone.utc): return common.mt(97, '兑换码已过期')
+	if datetime.strptime(etime, "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) < datetime.now(tz=common.TZ_SH): return common.mt(97, '兑换码已过期')
 	if pid not in RMB_LIMIT.keys(): return common.mt(96, "pid error")
 	config = kwargs['config']['mall'].get(pid, False)
 	if not config: return common.mt(95, "config error")
