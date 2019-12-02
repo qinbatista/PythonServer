@@ -12,4 +12,4 @@ COPY . .
 
 STOPSIGNAL SIGINT
 
-CMD [ "python", "-u", "./mail.py", "/box" ]
+#CMD [ "python", "-u", "./mail.py", "/box" ]

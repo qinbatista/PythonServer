@@ -12,4 +12,4 @@ COPY . .
 
 STOPSIGNAL SIGINT
 
-CMD [ "python", "-u", "./worker.py" ]
+#CMD [ "python", "-u", "./worker.py" ]
