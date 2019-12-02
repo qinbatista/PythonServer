@@ -115,9 +115,9 @@ def exchange_prop(world, token, game_id, exchange_id):
     response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'exchange_prop',
                                  'data': {'token': token, "game_id": game_id, "exchange_id": exchange_id}})
 
-def mall_dialog(token, world, info):
+def mall_dialog(token, world, info,unique_id):
     for pid in PID:
-        purchase_success(world, token, pid, f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
+        purchase_success(world, token, pid, f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_"+unique_id, "RMB")
     exchange_prop(world, token, "aliya", "11111")
 
     return ""
