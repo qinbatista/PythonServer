@@ -285,6 +285,7 @@ async def _send_text_mail(uid, gn_target, msg, **kwargs):
 
 async def _send_gift_mail(uid, gn_target, group_id, item_id, quantity, **kwargs):
 	fid = await get_uid(gn_target, **kwargs)
+	if fid=="": return mt(99, '')
 	kwargs['items'] = encode_item(enums.Group(group_id), enums.Item(item_id), quantity)
 	kwargs['from_'] = await get_gn(uid, **kwargs)
 	sent = await mail.send_mail(1, fid, **kwargs)
