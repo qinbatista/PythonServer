@@ -487,7 +487,6 @@ class MessageHandler:
 		return common.mt(0, 'success', data={'config': data['config']['task']})
 
 	async def _get_task_reward(self, data: dict) -> str:
-		data.update({"config": data['config']['task']},)
 		return await task.get_task_reward(data['data']['unique_id'],data['data']['task_id'], **data)
 
 	async def _get_config_task(self, data: dict) -> str:
@@ -575,7 +574,7 @@ class MessageHandler:
 		return common.mt(0, 'success', {'version': data['config']['version']})
 
 	async def _exchange_card(self, data: dict) -> str:
-		return await package.exchange(data['data']['unique_id'], int(data['data']['card_id']), int(data['data']['quantity']), **data)
+		return await package.exchange(data['data']['unique_id'], int(data['data']['card_id']), int(data['data'].get('quantity', 1)), **data)
 
 	async def _get_config_card(self, data: dict) -> str:
 		return await package.config(data['data']['unique_id'], **data)

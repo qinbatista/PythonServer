@@ -7,7 +7,7 @@ from module import common
 from module import stage
 
 
-async def exchange(uid, cid, qty, **kwargs):
+async def exchange(uid, cid, qty=1, **kwargs):
 	if cid not in enums.Item._value2member_map_.keys(): return common.mt(99, 'iid error')
 	config = kwargs['config']['package']['exchange_card']
 	cname = enums.Item(cid).name  # iid是卡片id

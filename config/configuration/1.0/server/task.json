@@ -52,8 +52,7 @@
 		"item_id":5,
 		"quantity":30
 	},
-
-	"get_friend_gift" :
+	"send_friend_gift" :
 	{
 		"item_id":5,
 		"quantity":30

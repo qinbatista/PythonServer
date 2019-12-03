@@ -42,11 +42,11 @@ def get_top_damage(**kwargs):
 
 def stage_dialog(token,world,info_list):
 	# while True:
-	normal_stage = random.randint(1,3)
+	normal_stage = random.randint(1,1)
 	boss_stage = 3000
 	status=-1
 	while status!=0:
-		normal_stage = random.randint(1,3)
+		normal_stage = random.randint(1,1)
 		status = enter_stage(**{"world":world,"token":token,"stage":normal_stage})
 		if status==97:
 			break

@@ -12,6 +12,8 @@ import concurrent.futures
 
 from aiohttp  import web
 from datetime import datetime
+from dateutil import tz
+TZ_SH = tz.gettz('Asia/Shanghai')
 
 class MailServer:
 	def __init__(self, path):
@@ -72,7 +74,7 @@ class MailServer:
 	@staticmethod
 	def construct_mail(mail_dict):
 		mail         = mailbox.MaildirMessage()
-		mail['time'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+		mail['time'] = datetime.now(tz=TZ_SH).strftime('%Y-%m-%d %H:%M:%S')
 		mail.set_payload(urllib.parse.quote(mail_dict.pop('body', ''), safe = ''))
 		for k, v in mail_dict.items():
 			mail[k] = urllib.parse.quote(str(v), safe = '') if k in {'from', 'subj'} else str(v)

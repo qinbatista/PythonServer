@@ -5,7 +5,7 @@ mail.py
 from module import common
 from module import enums
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 
 SWITCH = {}
@@ -58,7 +58,7 @@ async def delete_read(uid, **kwargs):
 		return common.mt(0, 'success', await resp.json())
 
 async def send_mail_public(uid, gn_target, **kwargs):
-	now          = datetime.now(timezone.utc)
+	now          = datetime.now(tz=common.TZ_SH)
 	limit, timer = await get_daily_send_limit(uid, **kwargs)
 	if timer is not None and timer.date() == now.date():
 		if limit >= DAILY_SEND_LIMIT:

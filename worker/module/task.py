@@ -29,8 +29,8 @@ async def record_task(uid, **kwargs):
 async def get_task_reward(uid, task_id, **kwargs):
 	if task_id not in enums.Task._value2member_map_.keys(): return common.mt(98, 'task id type error')
 	my_task = enums.Task(task_id).name.lower()
-	item = kwargs["config"][my_task]["item_id"]
-	quantity = kwargs["config"][my_task]["quantity"]
+	item = kwargs["config"]["task"][my_task]["item_id"]
+	quantity = kwargs["config"]["task"][my_task]["quantity"]
 	data = await common.execute(f'SELECT value, reward FROM task WHERE uid = "{uid}" AND tid = "{task_id}"', **kwargs)
 	if data[0][0] == 1 and data[0][1] == 0:
 		_, remaining = await common.try_item(uid, enums.Item(item), quantity, **kwargs)

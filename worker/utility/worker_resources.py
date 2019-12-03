@@ -15,7 +15,10 @@ import aiomysql
 import requests
 import threading
 
-from datetime import datetime, timezone
+from datetime import datetime
+from dateutil import tz
+TZ_SH = tz.gettz('Asia/Shanghai')
+
 
 class WorkerResources:
 	def __init__(self, redis_addr, db_addr, db_user, db_pw):
@@ -114,9 +117,9 @@ class ModuleConfigurations:
 			self.configs['world_boss']['boss_life'] = \
 					[self.configs['world_boss'][f'boss{i}']['life_value'] for i in range(10)]
 
-		if datetime.now(timezone.utc).day == 1 and not already_refreshed_world_boss:
+		if datetime.now(tz=TZ_SH).day == 1 and not already_refreshed_world_boss:
 			refreshed_world_boss = True
-		if datetime.now(timezone.utc).day != 1 and already_refreshed_world_boss:
+		if datetime.now(tz=TZ_SH).day != 1 and already_refreshed_world_boss:
 			already_refreshed_world_boss = False
 
 

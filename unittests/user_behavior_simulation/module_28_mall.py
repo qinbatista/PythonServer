@@ -7,7 +7,7 @@ import asyncio
 import tool_lukseun_client
 import secrets
 import user_behavior_simulation
-
+import random
 PID = [
     "VIP_CARD_NORMAL",
     "VIP_CARD_ULTIMATE",
@@ -106,18 +106,19 @@ PID = [
 
 
 def purchase_success(world, token, pid, order_id, channel, user_name, currency):
-    response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'purchase_success',
-                                 'data': {'token': token, "pid": pid, "order_id": order_id, "channel": channel,
-                                          "user_name": user_name, "currency": currency}})
+    response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'purchase_success','data': {'token': token, "pid": pid, "order_id": order_id, "channel": channel,"user_name": user_name, "currency": currency}})
 
 
 def exchange_prop(world, token, game_id, exchange_id):
-    response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'exchange_prop',
-                                 'data': {'token': token, "game_id": game_id, "exchange_id": exchange_id}})
+    response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'exchange_prop','data': {'token': token, "game_id": game_id, "exchange_id": exchange_id}})
 
-def mall_dialog(token, world, info):
+def send_gift_mail(token, world, info,unique_id):
+    for i in range(5):
+        user_behavior_simulation.send_tcp_message({'world': world, 'function' : 'send_gift_mail', 'data' : {"token":token, "gn_target":"贴苔皂肿肘函", "group_id":3, "item_id":random.randint(1,5), "quantity":random.randint(100,500)}})
+
+def mall_dialog(token, world, info,unique_id):
+    send_gift_mail(token, world, info,unique_id)
     for pid in PID:
-        purchase_success(world, token, pid, f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_0", "RMB")
+        purchase_success(world, token, pid, f"{int(time.time())}{secrets.randbits(256)}"[:80], "apple", "name_"+unique_id, "RMB")
     exchange_prop(world, token, "aliya", "11111")
-
     return ""
