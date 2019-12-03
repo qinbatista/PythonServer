@@ -3,9 +3,10 @@ world_creator.py
 '''
 
 import os
+import json
 import mailbox
 import pymysql
-import json
+import argparse
 
 
 ACHIEVEMENT = \
@@ -316,18 +317,18 @@ TABLES = [PLAYER, PLAYERAFTERINSERT, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET, \
 
 #########################################################################################
 
-def database_exists(db):
+def database_exists(db, mysql_addr, mysql_user, mysql_pw):
 	try:
-		pymysql.connect(host = '192.168.1.102', user = 'root', password = 'lukseun',
+		pymysql.connect(host = mysql_addr, user = mysql_user, password = mysql_pw,
 				charset = 'utf8mb4', db = db)
 	except pymysql.err.InternalError as e:
 		if e.args[0] == 1049: return False
 	return True
 
-def create_db(world):
-	if not database_exists(world):
-		connection = pymysql.connect(host = '192.168.1.102', user = 'root',
-				password = 'lukseun', charset = 'utf8mb4', autocommit = True)
+def create_db(world, mysql_addr, mysql_user, mysql_pw):
+	if not database_exists(world, mysql_addr, mysql_user, mysql_pw):
+		connection = pymysql.connect(host = mysql_addr, user = mysql_user,
+				password = mysql_pw, charset = 'utf8mb4', autocommit = True)
 		connection.cursor().execute(f'CREATE DATABASE `{world}`;')
 		connection.select_db(world)
 		# connection.cursor().execute(MALL)
@@ -336,8 +337,8 @@ def create_db(world):
 		print(f'created new database for world {world}..')
 	else:
 		print(f'database for world {world} already exists, skipping..')
-		connection = pymysql.connect(host = '192.168.1.102', user = 'root',
-				password = 'lukseun', charset = 'utf8mb4', autocommit = True)
+		connection = pymysql.connect(host = mysql_addr, user = mysql_user,
+				password = mysql_pw, charset = 'utf8mb4', autocommit = True)
 		connection.select_db(world)
 		for table in TABLES:
 			try:
@@ -357,9 +358,10 @@ def create_mailbox(world):
 		box.add_folder(str(world))
 		print(f'added mailbox for world {world}..')
 
-def create_world(world):
-	create_db(world)
+def create_world(world, mysql_addr, mysql_user, mysql_pw):
+	create_db(world, mysql_addr, mysql_user, mysql_pw)
 	create_mailbox(world)
+	# TODO update path / make this compatible with aliyun mounted NAS
 
 
 def loc():
@@ -377,13 +379,21 @@ def save_world_config(world, path):
 		f.write(json.dumps(data))
 
 
-if __name__ == '__main__':
+
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--addr', type = str, default = '192.168.1.102')
+	parser.add_argument('--pwrd', type = str, default = 'lukseun')
+	parser.add_argument('--user', type = str, default = 'root')
+	args = parser.parse_args()
+
 	path = os.path.join(loc(), '../config/configuration/1.0/server/world.json')
-	# create_db("mall")
 	for i in range(1, 10):
 		world = f's{i}'
-		create_world(world)
+		create_world(world, args.addr, args.user, args.pwrd)
 		save_world_config(world, path)
-	# create_world(input('Enter world name: '))
 
 
+
+if __name__ == '__main__':
+	main()
