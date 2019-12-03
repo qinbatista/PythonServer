@@ -62,7 +62,7 @@ async def respond(uid, nonce, **kwargs):
 async def send_gift(uid, gn_target, **kwargs):
 	# 发送朋友礼物
 	kwargs.update({"task_id": enums.Task.SEND_FRIEND_GIFT})
-	await task.record_task(uid,**kwargs)
+	await task.record_task(uid, **kwargs)
 	fid = await common.get_uid(gn_target, **kwargs)
 	friends, recover, since = await _are_friends(uid, fid, **kwargs)
 	if not friends or since == '': return common.mt(99, 'not friends')

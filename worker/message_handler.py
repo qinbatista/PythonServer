@@ -487,7 +487,6 @@ class MessageHandler:
 		return common.mt(0, 'success', data={'config': data['config']['task']})
 
 	async def _get_task_reward(self, data: dict) -> str:
-		data.update({"config": data['config']['task']},)
 		return await task.get_task_reward(data['data']['unique_id'],data['data']['task_id'], **data)
 
 	async def _get_config_task(self, data: dict) -> str:
