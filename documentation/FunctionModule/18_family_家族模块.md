@@ -178,7 +178,7 @@ Admins can remove anyone with a role lower than Admin.
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: not in a family
 * 98: target is not in your family
@@ -317,7 +317,7 @@ If any of them accept the invitation, user will be added to the family.
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: already in a family
 * 98: invalid family
@@ -369,7 +369,7 @@ Calling this function adds the user to the family.
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: invalid nonce
 * 98: target user is already in family
@@ -445,7 +445,7 @@ Gets all information regarding your family.
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: not in a family
 
@@ -540,7 +540,7 @@ Purchase an item from the family store.
 ```
 
 
-[调整关卡失败]()
+[失败]()
 
 * 99: not in a family
 * 98: invalid item
@@ -647,7 +647,7 @@ seconds：离刷新发布次数剩余秒钟数
 ```
 
 
-[调整关卡失败]()
+[失败]()
 
 * 99: not in a family
 * 98: insufficient permissions
@@ -691,7 +691,7 @@ Only the family Owner and Admins may update the family blackboard.
 ```
 
 
-[调整关卡失败]()
+[失败]()
 
 * 99: not in a family
 * 98: insufficient permissions
@@ -780,7 +780,7 @@ role级别只包括0，4，8，10
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: can not modify self permissions
 * 98: not in a family
@@ -832,12 +832,14 @@ The cost to change the family name is determined by `family.json` configuration 
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: invalid family name
 * 98: not in a family
 * 97: insufficient permissions
 * 96: insufficient funds
+* 95: family name already exists
+* 94: 这是原来的家族名字
 
 
 
@@ -875,7 +877,7 @@ Only Admins and above can initialize the disbanding of a family.
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: not in a family
 * 98: insufficient permissions
@@ -918,7 +920,7 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: not in a family
 * 98: insufficient permissions
@@ -963,7 +965,7 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
-[调整关卡失败]()
+[失败]()
 
 * 99: not in a family
 * 98: insufficient permissions

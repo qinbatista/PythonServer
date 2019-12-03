@@ -213,6 +213,7 @@ async def change_name(uid, new_name, **kwargs):
 	if not _valid_family_name(new_name): return common.mt(99, 'invalid family name')
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(98, 'not in family')
+	if new_name == name: return common.mt(94, '这是原来的家族名字')
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_change_name_permissions(role): return common.mt(97, 'insufficient permissions')
 	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['costs']['change_name']))[0]
