@@ -202,6 +202,7 @@ async def set_role(uid, gn_target, role, **kwargs):
 	if not target_in_family or target_name != name: return common.mt(97, 'target not in your family')
 	actors_role = await _get_role(uid, name, **kwargs)
 	targets_role = await _get_role(uid_target, name, **kwargs)
+	if targets_role == new_role: return common.mt(94, '成员一直是这个身份')
 	if not _check_set_role_permissions(actors_role, targets_role, new_role): return common.mt(96, 'insufficient permissions')
 	await common.execute(f'UPDATE familyrole SET role = {new_role.value} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
@@ -293,10 +294,10 @@ async def config(**kwargs):
 
 
 ########################################################################
-SET_ROLE_PERMISSIONS = {\
-		enums.FamilyRole.OWNER : {'target' : {enums.FamilyRole.ADMIN, enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}, 'new' : {enums.FamilyRole.ADMIN, enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}},
-		enums.FamilyRole.ADMIN : {'target' : {enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}, 'new' : {enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}}
-		}
+SET_ROLE_PERMISSIONS = {
+	enums.FamilyRole.OWNER : {'target' : {enums.FamilyRole.ADMIN, enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}, 'new' : {enums.FamilyRole.ADMIN, enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}},
+	enums.FamilyRole.ADMIN : {'target' : {enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}, 'new' : {enums.FamilyRole.ELITE, enums.FamilyRole.BASIC}}
+}
 
 def _valid_family_name(name):
 	return bool(name)

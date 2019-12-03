@@ -787,6 +787,7 @@ role级别只包括0，4，8，10
 * 97: target is not in your family
 * 96: insufficient permissions
 * 95: role  type error (级别类型错误)
+* 94: 成员一直是这个身份
 
 
 

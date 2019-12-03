@@ -107,7 +107,7 @@ def family_dialog(token,world,info,unique_id):
 		if choice=="11":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_notice_family', 'data' : {'token' : token, "msg":"这是一个公告测试"}})
 		if choice=="12":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_blackboard_family', 'data' : {'token' : token, "msg":"这是一个黑板测试"}})
 		if choice=="13":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_icon_family', 'data' : {'token' : token, "icon":11}})
-		if choice=="14":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_role_family', 'data' : {'token' : token, "name":"", "icon":1}})
+		if choice=="14":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'set_role_family', 'data' : {'token' : token, "gn_target": "name_q2", "role":8}})
 		if choice=="15":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'change_name_family', 'data' : {'token' : token, "name":"", "icon":1}})
 		if choice=="16":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'disband_family', 'data' : {'token' : token, "name":"", "icon":1}})
 		if choice=="17":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'cancel_disband_family', 'data' : {'token' : token, "name":"", "icon":1}})
