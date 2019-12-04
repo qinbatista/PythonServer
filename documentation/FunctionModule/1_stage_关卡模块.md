@@ -473,55 +473,50 @@
 >
 > ranking: 玩家的排名，不存在则返回-1
 >
-> rank：排名玩家的名字和伤害
+> rank：排名玩家的信息
+>
+> - NO：名次
+> - name：游戏名字
+> - damage：最高伤害
+> - fid：家族名字
+> - level：玩家等级
 
 ```json
 {
 	"status": 0,
 	"message": "success",
 	"data": {
-        "damange": 100, 
-        "ranking": 1,
+		"page": 2,
+		"damage": 4872,
+		"ranking": 5,
 		"rank": [
 			{
-				"name": "大哥大",
-				"damange": 200000
+				"NO": 11,
+				"name": "name_1",
+				"damage": 112,
+				"fid": "",
+				"level": 1
 			},
 			{
-				"name": "a",
-				"damange": 199999
+				"NO": 12,
+				"name": "name_17",
+				"damage": 17,
+				"fid": "",
+				"level": 1
 			},
 			{
-				"name": "ljs",
-				"damange": 2222222
+				"NO": 13,
+				"name": "name_12",
+				"damage": 12,
+				"fid": "",
+				"level": 1
 			},
 			{
-				"name": "waaaa",
-				"damange": 111111
-			},
-			{
-				"name": "是否",
-				"damange": 9
-			},
-			{
-				"name": "个呃呃",
-				"damange": 8
-			},
-			{
-				"name": "呜呜呜",
-				"damange": 7
-			},
-			{
-				"name": "啊啊啊啊",
-				"damange": 6
-			},
-			{
-				"name": "大肉肉肉",
-				"damange": 5
-			},
-			{
-				"name": "特恶",
-				"damange": 4
+				"NO": 14,
+				"name": "name_10",
+				"damage": 10,
+				"fid": "",
+				"level": 1
 			}
 		]
 	}

@@ -34,9 +34,6 @@ def get_hang_up_reward(**kwargs):
 def check_boss_status(**kwargs):
 	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'check_boss_status', 'data': {'token': kwargs['token']}})
 
-def enter_stage(**kwargs):
-	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'enter_stage', 'data': {'token': kwargs['token'], 'stage': kwargs['stage']}})
-
 def get_top_damage(**kwargs):
 	response = user_behavior_simulation.send_tcp_message({'world': 0, 'function': 'get_top_damage', 'data': {'token': kwargs['token'], "page": 1}})
 

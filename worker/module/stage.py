@@ -497,11 +497,11 @@ async def get_top_damage(uid, page, **kwargs):
 		damage = uid_data[0][0]
 		if uid_data[0][1] is None: uid_data = await common.execute(uid_str, **kwargs)
 		ranking = int(uid_data[0][1])
-	data = await common.execute( f'SELECT p.gn, l.value FROM player p, leaderboard l WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS.value} ORDER BY l.value DESC LIMIT {(page - 1)*10},10;', **kwargs)
+	data = await common.execute( f'SELECT p.gn, l.value, p.fid, p.uid FROM player p, leaderboard l WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS.value} ORDER BY l.value DESC LIMIT {(page - 1)*10},10;', **kwargs)
 	if data == (): return common.mt(98, 'No data for this page')
 	rank = []
-	for d in data:
-		rank.append({'name': d[0], 'damage': d[1]})
+	for i, d in enumerate(data):
+		rank.append({'NO': (page - 1)*10 + 1 + i, 'name': d[0], 'damage': d[1], 'fid': d[2], 'level': (await increase_exp(d[3], 0, **kwargs))['level']})
 	return common.mt(0, 'success', {'page': page, 'damage': damage, 'ranking': ranking, 'rank': rank})
 
 async def leave_world_boss_stage(uid, stage, damage, **kwargs):
