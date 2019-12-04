@@ -388,7 +388,7 @@ def main():
 	args = parser.parse_args()
 
 	path = os.path.join(loc(), '../config/configuration/1.0/server/world.json')
-	for i in range(1, 10):
+	for i in range(0, 10):
 		world = f's{i}'
 		create_world(world, args.addr, args.user, args.pwrd)
 		save_world_config(world, path)
