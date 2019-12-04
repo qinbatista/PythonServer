@@ -40,7 +40,13 @@ def check_in_dialog(token,world,respons):
 	check_in(token,world)
 	supplement_check_in(token,world)
 def bag_dialog(token,world,respons):
-	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token' : token,'card_id':18}})
+	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_config_exchange', 'data' : {'token' : token,'':18}})
+	# user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token' : token,'card_id':18}})
+	# user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'use_item', 'data' : {'token' : token,'item_id': '3:33:1', 'exchange_id': ''}})
+	# user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'use_item', 'data' : {'token' : token,'item_id': '3:34:1', 'exchange_id': ''}})
+	# user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'use_item', 'data' : {'token' : token,'item_id': '3:38:1', 'exchange_id': ''}})
+	# user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'use_item', 'data' : {'token' : token,'item_id': '3:39:1', 'exchange_id': ''}})
+	# user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'use_item', 'data' : {'token' : token,'item_id': '3:41:1', 'exchange_id': '2:21:1'}})
 
 if __name__ == '__main__':
 	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})

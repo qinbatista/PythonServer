@@ -47,6 +47,9 @@ class Item(enum.IntEnum):
 	FAMILY_COIN_RECORD = 37
 	WEAPON4_UNIVERSAL_SEGMENT = 38  # 4星武器万能碎片
 	ROLE4_UNIVERSAL_SEGMENT = 39  # 4星角色万能碎片
+	UNIVERSAL4_SEGMENT = 40  # 4星万能碎片
+	UNIVERSAL5_SEGMENT = 41  # 5星万能碎片
+	UNIVERSAL6_SEGMENT = 42  # 6星万能碎片
 
 
 class FamilyRole(enum.IntEnum):

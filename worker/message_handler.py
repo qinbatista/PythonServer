@@ -576,7 +576,10 @@ class MessageHandler:
 	async def _exchange_card(self, data: dict) -> str:
 		return await package.exchange(data['data']['unique_id'], int(data['data']['card_id']), int(data['data'].get('quantity', 1)), **data)
 
-	async def _get_config_card(self, data: dict) -> str:
+	async def _use_item(self, data: dict) -> str:
+		return await package.use_item(data['data']['unique_id'], data['data']['item_id'], data['data'].get('exchange_id', ''), **data)
+
+	async def _get_config_exchange(self, data: dict) -> str:
 		return await package.config(data['data']['unique_id'], **data)
 
 	async def _send_gift_mail(self, data: dict) -> str:
@@ -781,10 +784,11 @@ FUNCTION_LIST = {
 	'get_config_factory': MessageHandler._get_config_factory,
 	'get_config_version': MessageHandler._get_config_version,
 	'get_config_family': MessageHandler._get_config_family,
-	'get_config_card': MessageHandler._get_config_card,
+	'get_config_exchange': MessageHandler._get_config_exchange,
 
 	###################### package ######################
 	'exchange_card': MessageHandler._exchange_card,
+	'use_item': MessageHandler._use_item,
 
 	###################### private(comment before release) ######################
 	'send_gift_mail': MessageHandler._send_gift_mail,

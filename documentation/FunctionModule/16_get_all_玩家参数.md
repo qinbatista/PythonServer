@@ -15,7 +15,7 @@
 * [`get_config_player`](##get_config_player)
 * [`get_config_factory`](##get_config_factory)
 * [`get_config_family`](##get_config_family)
-* [`get_config_card`](##get_config_card)
+* [`get_config_exchange`](##get_config_exchange)
 
 ## get_config_version
 
@@ -3575,7 +3575,7 @@
 }
 ```
 
-## get_config_card
+## get_config_exchange
 
 返回卡片兑换的配置信息，详见配置表`package.json`
 
@@ -3584,7 +3584,7 @@
 ```json
 {
 	"world": 0, 
-	"function": "get_config_card",
+	"function": "get_config_exchange",
 	"data": {
 		"token": "my toekn ^_^"
 	}
@@ -3595,11 +3595,13 @@
 
 [成功]()
 
-> config：卡片兑换配置信息
+> exchange_card：卡片兑换配置信息
 >
 > - sqltable：操作的数据库表
 > - mid：物品id
 > - bnum：卡片交换获得的物品基础数量（base num=>bnum）
+>
+> exchange_item：兑换其他物品配置信息
 
 ```
 {
@@ -3607,35 +3609,48 @@
 	"message": "success",
 	"data": {
 		"config": {
-			"COIN_CARD": {
-				"sqltable": "item",
-				"mid": 1,
-				"bnum": 2000
+			"exchange_card": {
+				"COIN_CARD": {
+					"sqltable": "item",
+					"mid": 1,
+					"bnum": 2000
+				},
+				"EXP_CARD": {
+					"sqltable": "progress",
+					"mid": "exp",
+					"bnum": 1000
+				},
+				"FOOD_CARD": {
+					"sqltable": "item",
+					"mid": 3,
+					"bnum": 200
+				},
+				"MINE_CARD": {
+					"sqltable": "item",
+					"mid": 24,
+					"bnum": 100
+				},
+				"CRYSTAL_CARD": {
+					"sqltable": "item",
+					"mid": 4,
+					"bnum": 20
+				},
+				"DIAMOND_CARD": {
+					"sqltable": "item",
+					"mid": 5,
+					"bnum": 10
+				}
 			},
-			"EXP_CARD": {
-				"sqltable": "progress",
-				"mid": "exp",
-				"bnum": 1000
-			},
-			"FOOD_CARD": {
-				"sqltable": "item",
-				"mid": 3,
-				"bnum": 200
-			},
-			"MINE_CARD": {
-				"sqltable": "item",
-				"mid": 24,
-				"bnum": 100
-			},
-			"CRYSTAL_CARD": {
-				"sqltable": "item",
-				"mid": 4,
-				"bnum": 20
-			},
-			"DIAMOND_CARD": {
-				"sqltable": "item",
-				"mid": 5,
-				"bnum": 10
+			"exchange_item": {
+				"energy_potion_s_min": 50,
+				"energy_potion_s_max": 100,
+				"role4_universal_segment": 30,
+				"role5_universal_segment": 15,
+				"weapon4_universal_segment": 20,
+				"weapon5_universal_segment": 10,
+				"universal4_segment": 30,
+				"universal5_segment": 20,
+				"universal6_segment": 10
 			}
 		}
 	}

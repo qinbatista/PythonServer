@@ -47,8 +47,8 @@ def get_config_player():
 def get_config_factory():
 	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_config_factory', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
 
-def get_config_card():
-	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_config_card', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
+def get_config_exchange():
+	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_config_exchange', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
 
 def get_config_family():
 	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_config_family', 'data' : {'token' : token}})#能量包，1是1张， 2是3张，3是10张
@@ -70,7 +70,7 @@ def get_all_info(_token,_world):
 			get_config_vip(),# 获取vip_config.json 获得vip系统
 			get_config_player(),# 获取player_config.json（卡片兑换，体力上限，恢复时间）和player_experience.json, 玩家当前体力信息，金币数量，
 			get_config_factory(),#   获取get_factory_config.json 获取工厂配置信息
-			get_config_card(),
+			get_config_exchange(),
 			get_config_family(),
 			]
 
