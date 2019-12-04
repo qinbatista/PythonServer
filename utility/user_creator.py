@@ -1,6 +1,9 @@
-# world_creator.py
+'''
+user_creator.py
+'''
 
 import pymysql
+import argparse
 
 
 def create_table_info(cursor):
@@ -19,26 +22,36 @@ def create_table_info(cursor):
 	"""
 	cursor.execute(statement)
 
-
-
-def create_user():
-	c = pymysql.connect(host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8mb4', autocommit=True)
+def create_user(mysql_addr, mysql_user, mysql_pw):
+	c = pymysql.connect(host = mysql_addr, user = mysql_user, password = mysql_pw, \
+			charset = 'utf8mb4', autocommit=True)
 	cursor = c.cursor()
 	cursor.execute(f'CREATE DATABASE `user`;')
 	c.select_db('user')
 	cursor = c.cursor()
 	create_table_info(cursor)
 
-def already_exists():
+def already_exists(mysql_addr, mysql_user, mysql_pw):
 	try:
-		pymysql.connect(host = '192.168.1.102', user = 'root', password = 'lukseun', charset = 'utf8mb4', db = 'user')
+		pymysql.connect(host = mysql_addr, user = mysql_user, password = mysql_pw, \
+				charset = 'utf8mb4', db = 'user')
 	except pymysql.err.InternalError as e:
 		code, msg = e.args
 		if code == 1049: return False
 	return True
 
-if __name__ == '__main__':
-	if not already_exists():
-		create_user()
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--addr', type = str, default = '192.168.1.102')
+	parser.add_argument('--pwrd', type = str, default = 'lukseun')
+	parser.add_argument('--user', type = str, default = 'root')
+	args = parser.parse_args()
+
+	if not already_exists(args.addr, args.user, args.pwrd):
+		create_user(args.addr, args.user, args.pwrd)
 	else:
 		print('User table already exists')
+
+
+if __name__ == '__main__':
+	main()
