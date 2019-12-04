@@ -169,7 +169,7 @@ ROLE = \
 CREATE TABLE `role` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `rid` int(11) NOT NULL,
-	  `star` int(11) NOT NULL DEFAULT 1,
+	  `star` int(11) NOT NULL DEFAULT 0,
 	  `level` int(11) NOT NULL DEFAULT 0,
 	  `skillpoint` int(11) NOT NULL DEFAULT 0,
 	  `segment` int(11) NOT NULL DEFAULT 0,
@@ -230,7 +230,7 @@ WEAPON = \
 CREATE TABLE `weapon` (
 	  `uid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 	  `wid` int(11) NOT NULL,
-	  `star` int(11) NOT NULL DEFAULT 1,
+	  `star` int(11) NOT NULL DEFAULT 0,
 	  `level` int(11) NOT NULL DEFAULT 0,
 	  `skillpoint` int(11) NOT NULL DEFAULT 0,
 	  `segment` int(11) NOT NULL DEFAULT 0,
