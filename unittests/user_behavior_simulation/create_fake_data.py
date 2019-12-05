@@ -48,7 +48,7 @@ def call_login(unique_id):
 			if token!="" and world!="":break
 
 def _execute_statement(statement: str) -> tuple:
-		db = pymysql.connect('192.168.1.102', 'root', 'lukseun', '0')
+		db = pymysql.connect('192.168.1.102', 'root', 'lukseun', 's0')
 		cursor = db.cursor()
 		cursor.execute(statement)
 		db.commit()
@@ -60,13 +60,13 @@ def run_task(name):
 	#mail_type: SIMPLE = 0,GIFT = 1, FRIEND_REQUEST = 2 FAMILY_REQUEST = 3
 	#item_id: COIN = 1,IRON = 2,FOOD = 3,CRYSTAL = 4,DIAMOND = 5
 	for i in range(0,10):
-		print(send_tcp_message({'function' : 'send_gift_mail', 'data' : {"token":token, "gn_target":"去污", "group_id":3, "item_id":random.randint(1,5), "quantity":random.randint(100,500)}}))#送物品
+		# print(send_tcp_message({'function' : 'send_gift_mail', 'data' : {"token":token, "gn_target":"去污", "group_id":3, "item_id":random.randint(1,5), "quantity":random.randint(100,500)}}))#送物品
 		# send_tcp_message({'function' : 'send_text_mail', 'data' : {"token":token, "gn_target":"去污","msg":"msg:"+str(random.randint(1,100000000))}})#发送文字
 		mytime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		friend_time = time.strftime('%Y-%m-%d', time.localtime())
 		mydata = time.strftime('%Y-%m', time.localtime())
 		_execute_statement(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{module_0_login.unique_id}", {random.randint(1,31)}, {random.randint(1,1000)},{0}) ON DUPLICATE KEY UPDATE `reward`= values(`reward`)')
-		_execute_statement(f'INSERT INTO armor (uid, aid, level,quantity) VALUES ("{module_0_login.unique_id}", {random.randint(1,31)}, {random.randint(1,10)},{random.randint(1,100)})  ON DUPLICATE KEY UPDATE `quantity`= values(`quantity`)')
+		_execute_statement(f'INSERT INTO armor (uid, aid, level,quantity) VALUES ("{module_0_login.unique_id}", {random.randint(1,4)}, {random.randint(1,10)},{random.randint(1,100)})  ON DUPLICATE KEY UPDATE `quantity`= values(`quantity`)')
 		_execute_statement(f'INSERT INTO item (uid, iid, value) VALUES ("{module_0_login.unique_id}", {random.randint(1,31)}, {random.randint(1,1000)}) ON DUPLICATE KEY UPDATE `value`= values(`value`)')
 		_execute_statement(f'INSERT INTO weapon (uid, wid, star,level, skillpoint, segment) VALUES ("{module_0_login.unique_id}", {random.randint(1,31)}, {random.randint(1,5)},{0},{random.randint(1,5000)},{random.randint(1,5000)}) ON DUPLICATE KEY UPDATE `segment`= values(`segment`)')
 		fname = f'f_unique_id_{random.randint(1,31)}'
