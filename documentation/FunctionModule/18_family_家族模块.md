@@ -17,7 +17,7 @@
 * √[`change_name_family`](##change_name_family)
 * √[`disband_family`](##disband_family)
 * √[`cancel_disband_family`](##cancel_disband_family)
-* ?[`abdicate_family`](##abdicate_family)
+* √[`abdicate_family`](##abdicate_family)
 * √[`check_in_family`](##check_in_family)
 * ?[`search_family`](##search_family)
 * ?[`get_random_family`](##get_random_family)
@@ -981,27 +981,30 @@ Only Admins and above can cancel the disbanding of a family.
 
 ##### 发送消息JSON格式
 
-> 
+> target：对象的游戏名字
 
 ```json
 {
 	"world": 0,
 	"function": "abdicate_family",
 	"data": {
-		"token": "my token"
+		"token": "my token",
+        "target": "game name"
 	}
 }
 ```
 
 ##### 接受消息JSON格式
 
-> 
+> gn_name：role
 
 ```json
 {
 	"status": 0,
 	"message": "success",
 	"data": {
+		"name_q1": 0,
+		"KKK": 10
 	}
 }
 ```
