@@ -178,24 +178,22 @@ async def increase_exp(uid, exp, **kwargs):
 	# 取配置和数据
 	exp_config = kwargs['config']['vip']['vip_level']['experience']
 	exp_data = await common.execute(f'SELECT vipexp FROM progress WHERE uid = "{uid}";', **kwargs)
-	if exp_data == ():
-		await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
-		exp_data = await common.execute(f'SELECT vipexp FROM progress WHERE uid = "{uid}";', **kwargs)
+
 	# 计算等级和需要的经验
-	exp_s = exp_data[0][0]
-	exp_list = [e for e in exp_config if e > exp_s]
-	level, need = exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), exp_list[0] - exp_s if exp_list != [] else 0
-	if exp == 0: return {'exp': exp_s, 'level': level, 'need': need}
-	# 重新计算等级和需要的经验
-	exp_s += exp
-	exp_list = [e for e in exp_config if e > exp_s]
-	level, need = exp_config.index(exp_list[0]) if exp_list != [] else len(exp_config), exp_list[0] - exp_s if exp_list != [] else 0
-	await common.execute_update(f'UPDATE progress SET vipexp = {exp_s} WHERE uid = "{uid}";', **kwargs)
+	sql_exp = 0 if exp_data == () else exp_data[0][0]
+	level, need = common.__calculate(exp_config, sql_exp)
+	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need}
+
+	# 返回总经验、等级、需要经验
+	sql_exp += exp
+	level, need = common.__calculate(exp_config, sql_exp)
+	await common.execute(f'INSERT INTO progress (uid, vipexp) VALUE ("{uid}", {sql_exp}) ON DUPLICATE KEY UPDATE exp = {sql_exp};', **kwargs)
+
 	# 成就刷新判断
 	achievement_data = await common.execute(f'SELECT value FROM achievement WHERE uid="{uid}" and aid = "{enums.Achievement.VIP_LEVEL.value}"', **kwargs)
 	if achievement_data == () or achievement_data[0][0] < level: await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {enums.Achievement.VIP_LEVEL.value}, {level},0) ON DUPLICATE KEY UPDATE `value`= {level}', **kwargs)
 	# 返回总经验、等级、需要经验
-	return {'exp': exp_s, 'level': level, 'need': need}
+	return {'exp': sql_exp, 'level': level, 'need': need}
 
 
 async def increase_item(uid, vip_config, **kwargs) -> (list, list):

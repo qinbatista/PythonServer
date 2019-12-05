@@ -69,6 +69,7 @@ async def invite_user(uid, gn_target, **kwargs):
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_invite_permissions(role): return common.mt(98, 'insufficient permissions')
 	uid_target = await common.get_uid(gn_target, **kwargs)
+	if uid_target == "": return common.mt(93, '邀请的用户不存在')
 	join_data = await common.execute(f'SELECT time FROM timer WHERE uid="{uid_target}" AND tid="{enums.Timer.FAMILY_JOIN_END.value}";', **kwargs)
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) > datetime.now(tz=common.TZ_SH):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
@@ -185,8 +186,8 @@ async def set_icon(uid, icon, **kwargs):
 	if not _check_blackboard_permissions(role): return common.mt(98, '你没有权限')
 	_, ic = await _get_family_info(name, 'icon', **kwargs)
 	if ic[0] == icon: return common.mt(97, '不能设置为原图标')
-	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_CHANGED_FAMILY_ICON_TO>: {icon}.', **kwargs)
 	await common.execute(f'UPDATE family SET icon={icon} WHERE name="{name}";', **kwargs)
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_CHANGED_FAMILY_ICON_TO>: {icon}.', **kwargs)
 	return common.mt(0, 'success', {'icon': icon})
 
 async def set_role(uid, gn_target, role, **kwargs):
@@ -262,15 +263,23 @@ async def check_in(uid, **kwargs):
 	timer = await _get_check_in_timer(uid, **kwargs)
 	now = datetime.now(tz=common.TZ_SH)
 	if timer is not None and now < timer: return common.mt(98, 'already checked in today')
-	time = (now + timedelta(days = 1)).strftime('%Y-%m-%d')
+	time = (now + timedelta(days=1)).strftime('%Y-%m-%d')
 
 	await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FAMILY_CHECK_IN.value}, "{time}") ON DUPLICATE KEY UPDATE `time` = "{time}";', **kwargs)
-	await common.execute(f'UPDATE family SET exp = exp + 1 WHERE name = "{name}";', **kwargs)
-	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['rewards']['check_in']))[0]
+	exp_data = await increase_exp(name, 1, **kwargs)
+	# 增加家族金币和记录金币
 	_, iid_fc, cost_fc = (common.decode_items(kwargs['config']['family']['general']['rewards']['family_coin']))[0]
-	_, remaining = await common.try_item(uid, iid, cost, **kwargs)
-	_, remaining_fc = await common.try_item(uid, iid_fc, cost_fc, **kwargs)
-	return common.mt(0, 'success', {'remaining' : [{"iid":iid.value,"value":remaining},{"iid":iid_fc.value,"value":remaining_fc}], 'reward' : [{"iid":iid.value,"value":cost},{"iid":iid_fc.value,"value":cost_fc}]})
+	_, remain_fc  = await common.try_item(uid, iid_fc, cost_fc, **kwargs)
+	_, remain_fcr = await common.try_item(uid, enums.Item.FAMILY_COIN_RECORD, cost_fc, **kwargs)
+	data = {'remaining': [{"iid": iid_fc.value, "value": remain_fc}, {"iid": enums.Item.FAMILY_COIN_RECORD.value, "value": remain_fcr}],
+			'reward':    [{"iid": iid_fc.value, "value": cost_fc},   {"iid": enums.Item.FAMILY_COIN_RECORD.value, "value": cost_fc}],
+			'exp_data':  exp_data}
+	items = common.decode_items(','.join(kwargs['config']['family']['general']['rewards']['special']))
+	for _, iid, cost in items:
+		_, remain = await common.try_item(uid, iid, cost, **kwargs)
+		data['remaining'].append({"iid": iid.value, "value": remain})
+		data['reward'].append({"iid": iid.value, "value": cost})
+	return common.mt(0, 'success', data)
 
 async def abdicate(uid, target, **kwargs):
 	"""族长让位给族员"""
@@ -446,5 +455,23 @@ async def _rmtimes_timer(name, **kwargs):
 		rmtimes, rmtimer = data[0]
 	return rmtimes, rmtimer
 
+async def increase_exp(name, exp, **kwargs):
+	"""增加家族经验
+	exp为0则获得经验，反之取绝对值增加经验，
+	并返回总经验和等级，升到下一级需要的经验
+	"""
+	# 取配置和数据
+	exp_config = kwargs['config']['family']['level']['exp']
+	exp_data = await common.execute(f'SELECT exp FROM family WHERE name = "{name}";', **kwargs)
 
+	# 计算等级和需要的经验
+	sql_exp = 0 if exp_data == () else exp_data[0][0]
+	level, need = common.__calculate(exp_config, sql_exp)
+	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need}
 
+	# 重新计算等级和需要的经验
+	sql_exp += exp
+	level, need = common.__calculate(exp_config, sql_exp)
+	await common.execute(f'INSERT INTO family (name, exp) VALUE ("{name}", {sql_exp}) ON DUPLICATE KEY UPDATE exp = {sql_exp};', **kwargs)
+	# 返回总经验、等级、需要经验
+	return {'exp': sql_exp, 'level': level, 'need': need}

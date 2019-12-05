@@ -236,6 +236,7 @@ An invitation will be sent the the user's mailbox.
 * 96: 邀请对象离开家族冷却时间未结束
 * 95: 邀请对象等级不满18级
 * 94: 邀请对象已经加入了家族
+* 93: 邀请的用户不存在
 
 
 
@@ -928,9 +929,9 @@ Only Admins and above can cancel the disbanding of a family.
 
 
 
-## family_check_in
+## check_in_family
 
-家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级，签到获取`公会金币`和`金币`，工会等级的提高，奖励也会随着提高
+家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级，签到获取`公会金币`和`金币`，工会等级的提高，奖励也会随着提高。家族签到会得到`金币`和`家族金币`, 金币的和家族金币的数量根据家族等级来，奖励的基础数据在, 奖励公式为 基础数据*等级，比如一级公会签到奖励100金币和100家族金币，等级到达2级时，可以奖励200金币和200家族金币。
 
 ##### 发送消息JSON格式
 
@@ -938,7 +939,7 @@ Only Admins and above can cancel the disbanding of a family.
 ```json
 {
 	"world": 0,
-	"function": "family_check_in",
+	"function": "check_in_family",
 	"data": {
 		"token": "my token"
 	}
@@ -953,14 +954,34 @@ Only Admins and above can cancel the disbanding of a family.
 	"status": 0,
 	"message": "success",
 	"data": {
-    		"remaining":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
-        "reward":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
+		"remaining": [
+			{
+				"iid": 36,
+				"value": 100
+			},
+			{
+				"iid": 37,
+				"value": 200
+			},
+			{
+				"iid": 1,
+				"value": 1000200
+			}
+		],
+		"reward": [
+			{
+				"iid": 36,
+				"value": 100
+			},
+			{
+				"iid": 37,
+				"value": 100
+			},
+			{
+				"iid": 1,
+				"value": 100
+			}
+		]
 	}
 }
 ```
@@ -968,8 +989,7 @@ Only Admins and above can cancel the disbanding of a family.
 [失败]()
 
 * 99: not in a family
-* 98: insufficient permissions
-* 97: family is not disbanded
+* 98: already checked in today
 
 
 
@@ -1008,84 +1028,6 @@ Only Admins and above can cancel the disbanding of a family.
 	}
 }
 ```
-
-
-
-##  modify_icon_family
-
-> 族长和管理员才能修改工会图标
-
-##### 发送消息JSON格式
-
-> 
-
-```json
-{
-	"world": 0,
-	"function": "modify_icon_family",
-	"data": {
-		"token": "my token"
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-> 
-
-```json
-{
-	"status": 0,
-	"message": "success",
-	"data": {
-	}
-}
-```
-
-
-
-
-
-## check_in_family
-
-家族签到会得到`金币`和`家族金币`, 金币的和家族金币的数量根据家族等级来，奖励的基础数据在, 奖励公式为 基础数据*等级，比如一级公会签到奖励100金币和100家族金币，等级到达2级时，可以奖励200金币和200家族金币。
-
-##### 发送消息JSON格式
-
-```json
-{
-	"world": 0, 
-	"function": "check_in_family",
-	"data": {
-		"token": "my token ^_^"
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-
-```json
-{
-	"status": 0,
-	"message": "created family",
-	"data": {
-		"name" : "family name",
-        "remaining":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
-        "reward":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
-	}
-}
-```
-
-[挂机关卡失败]()
-
-* 99: 已签到过
 
 
 
