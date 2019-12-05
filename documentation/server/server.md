@@ -7,6 +7,7 @@ This guide will attempt to cover everything from code design to Kubernetes admin
 
 **Table of Contents**
 * [Introduction](#Introduction)
+* [A Trip Through the Server](#Trip-Through-the-Server)
 * [Technology](#Technology)
 * [General Code Guidelines](#General-Code-Guidelines)
 * [Services](#Services)
@@ -37,6 +38,27 @@ This separation of responsibilities is exactly what gives micro-services their s
 To deploy our micro-services, we rely on the power of **Docker** and **Kubernetes**.
 Docker provides a convenient way to package and run our programs.
 Kubernetes provides the orchestration, deployment, and automatic scaling functions of our Docker images.
+
+## Trip Through the Server
+
+Take a look at the diagram up above.
+Let's pretend we are a non-chat message being sent from the client's phone to our system.
+
+After being sent, the first thing we will hit is the load balancer attached to `game.aliya.lukseun.com`.
+The load balancer will then send us off to a random gate.
+The gate will, after performing some basic accounting operations, push us into the message queue.
+We will stay in the message queue until an available worker is able to accept us.
+The worker will then perform the actual work required to complete the request.
+This might involve querying the MySQL database for information, or requesting mail from the mail servers.
+After the operation is complete, we will be sent back to the original gate we entered through.
+The gate will then tidy up, and forward us back to the client.
+All of this typically happens within the span of `10 ms`.
+
+Again, lets pretend we are a message, except this time, we are a chat message.
+The client app will send a special message to `edge.aliya.lukseun.com`, attempting to join the chat server.
+The load balancer at `edge.aliya.lukseun.com` will route our message to one of the edge nodes.
+This establishes a persistent TCP connection between client and edge node that will not change for the duration the client is connected.
+Messages flow freely back and forth between the edge node and the client.
 
 ## Technology
 
