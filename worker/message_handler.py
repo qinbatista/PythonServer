@@ -177,6 +177,9 @@ class MessageHandler:
 	async def _check_in_family(self, data: dict) -> str:
 		return await family.check_in(data['data']['unique_id'], **data)
 
+	async def _abdicate_family(self, data: dict) -> str:
+		return await family.abdicate(data['data']['unique_id'], data['data']['gn_target'], **data)
+
 	async def _get_config_family(self, data: dict) -> str:
 		return await family.config(**data)
 
@@ -640,6 +643,7 @@ FUNCTION_LIST = {
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
 	'check_in_family' : MessageHandler._check_in_family,
+	'abdicate_family' : MessageHandler._abdicate_family,
 	'gift_package_family' : MessageHandler._gift_package_family,
 	'get_random_family' : MessageHandler._get_random_family,
 

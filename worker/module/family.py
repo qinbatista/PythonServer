@@ -40,7 +40,7 @@ async def leave(uid, **kwargs):
 	await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.FAMILY_JOIN_END.value}, "{(datetime.now(tz=common.TZ_SH) + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")}") ON DUPLICATE KEY UPDATE `time`= "{(datetime.now(tz=common.TZ_SH) + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")}";', **kwargs)
 	await _remove_from_family(uid, name, **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
-	await _record_family_change(name, f'{gn} HAS_LEFT', **kwargs)
+	await _record_family_change(name, f'{gn} <FAMILY_HAS_LEFT>', **kwargs)
 	return common.mt(0, 'left family', {"cd_time": days * 24 * 3600})
 
 async def remove_user(uid, gn_target, **kwargs):
@@ -60,7 +60,7 @@ async def remove_user(uid, gn_target, **kwargs):
 	await _remove_from_family(uid_target, name, **kwargs)
 	await common.execute(f'UPDATE family SET rmtimes={rmtimes} WHERE name = "{name}";', **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
-	await _record_family_change(name, f'{gn_target} WAS_REMOVED_BY {gn}.', **kwargs)
+	await _record_family_change(name, f'{gn_target} <FAMILY_WAS_REMOVED_BY> {gn}.', **kwargs)
 	return common.mt(0, 'removed user', {'gn' : gn_target, 'rmtimes': rmtimes, "cd_time": common.remaining_cd()})
 
 async def invite_user(uid, gn_target, **kwargs):
@@ -109,7 +109,7 @@ async def respond(uid, nonce, **kwargs):
 	if member_count >= kwargs['config']['family']['general']['members']['max']: return common.mt(96, 'family is full')
 	await _add_to_family(uid_target, name, **kwargs)
 	gn_target = await common.get_gn(uid_target, **kwargs)
-	await _record_family_change(name, f'{gn_target} HAS_JOINED.', **kwargs)
+	await _record_family_change(name, f'{gn_target} <FAMILY_HAS_JOINED>.', **kwargs)
 	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3]})
 
 async def get_all(uid, **kwargs):
@@ -135,7 +135,7 @@ async def purchase(uid, item, **kwargs):
 	if not can_pay: return common.mt(97, 'insufficient funds')
 	_, item_remaining = await common.try_item(uid, i[1], i[2], **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
-	await _record_family_change(name, f'{gn} PURCHASED {item}.', **kwargs)
+	await _record_family_change(name, f'{gn} <FAMILY_PURCHASED> {item}.', **kwargs)
 	return common.mt(0, 'success', { enums.Group.ITEM.value : [ {'iid' : i[1], 'value' : item_remaining}, {'iid' : c[1], 'value' : cost_remaining}]})
 
 async def set_notice(uid, msg, **kwargs):
@@ -185,7 +185,7 @@ async def set_icon(uid, icon, **kwargs):
 	if not _check_blackboard_permissions(role): return common.mt(98, '你没有权限')
 	_, ic = await _get_family_info(name, 'icon', **kwargs)
 	if ic[0] == icon: return common.mt(97, '不能设置为原图标')
-	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} CHANGED_FAMILY_ICON_TO: {icon}.', **kwargs)
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_CHANGED_FAMILY_ICON_TO>: {icon}.', **kwargs)
 	await common.execute(f'UPDATE family SET icon={icon} WHERE name="{name}";', **kwargs)
 	return common.mt(0, 'success', {'icon': icon})
 
@@ -204,7 +204,7 @@ async def set_role(uid, gn_target, role, **kwargs):
 	if not _check_set_role_permissions(actors_role, targets_role, new_role): return common.mt(96, 'insufficient permissions')
 	await common.execute(f'UPDATE familyrole SET role = {new_role.value} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
-	await _record_family_change(name, f'{gn} SET {gn_target} ROLE_TO {new_role.name}.', **kwargs)
+	await _record_family_change(name, f'{gn} <FAMILY_SET> {gn_target} <FAMILY_ROLE_TO> {new_role.name}.', **kwargs)
 	return common.mt(0, 'success', {'gn' : gn_target, 'role' : new_role.value})
 
 async def change_name(uid, new_name, **kwargs):
@@ -225,7 +225,7 @@ async def change_name(uid, new_name, **kwargs):
 	await common.execute(f'UPDATE player SET fid = "{new_name}" WHERE fid = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyrole SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyhistory SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
-	await _record_family_change(new_name, f'{await common.get_gn(uid, **kwargs)} CHANGED_FAMILY_NAME_TO: {new_name}.', **kwargs)
+	await _record_family_change(new_name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_CHANGED_FAMILY_NAME>： {new_name}.', **kwargs)
 	return common.mt(0, 'success', {'name' : new_name, 'iid' : iid.value, 'value' : remaining})
 
 async def disband(uid, **kwargs):
@@ -236,7 +236,7 @@ async def disband(uid, **kwargs):
 	timer = await _get_disband_timer(name, **kwargs)
 	if timer is not None: return common.mt(97, 'family already disbanded')
 	timer = await _set_disband_timer(name, **kwargs)
-	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} DISBANDED_FAMILY.', **kwargs)
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_DISBANDED_FAMILY>.', **kwargs)
 	return common.mt(0, 'success', {'timer' : timer})
 
 async def cancel_disband(uid, **kwargs):
@@ -247,7 +247,7 @@ async def cancel_disband(uid, **kwargs):
 	timer = await _get_disband_timer(name, **kwargs)
 	if timer is None: return common.mt(97, 'family is not disbanded')
 	await _delete_disband_timer(name, **kwargs)
-	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} CANCELED_FAMILY_DISBAND.', **kwargs)
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_CANCELED_FAMILY_DISBAND>.', **kwargs)
 	return common.mt(0, 'success')
 
 async def check_in(uid, **kwargs):
@@ -272,6 +272,24 @@ async def check_in(uid, **kwargs):
 	_, remaining_fc = await common.try_item(uid, iid_fc, cost_fc, **kwargs)
 	return common.mt(0, 'success', {'remaining' : [{"iid":iid.value,"value":remaining},{"iid":iid_fc.value,"value":remaining_fc}], 'reward' : [{"iid":iid.value,"value":cost},{"iid":iid_fc.value,"value":cost_fc}]})
 
+async def abdicate(uid, target, **kwargs):
+	"""族长让位给族员"""
+	in_family, name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(99, '你没有家族')
+	target_uid = await common.get_uid(target, **kwargs)
+	if target_uid == "": return common.mt(98, '目标对象不存在')
+	in_family, target_name = await _in_family(uid, **kwargs)
+	if not in_family: return common.mt(97, '对象没有家族')
+	if name != target_name: return common.mt(96, '你和对象不在同一个家族')
+	actors_role = await _get_role(uid, name, **kwargs)
+	if actors_role != enums.FamilyRole.OWNER: return common.mt(95, '你不是族长')
+	gn = await common.get_gn(uid, **kwargs)
+	await common.execute(f'UPDATE familyrole SET role = {enums.FamilyRole.BASIC} WHERE uid = "{uid}" AND `name` = "{name}";', **kwargs)
+	await common.execute(f'UPDATE familyrole SET role = {enums.FamilyRole.OWNER} WHERE uid = "{target_uid}" AND `name` = "{name}";', **kwargs)
+	await _record_family_change(name, f'{gn} <FAMILY_ABDICATE> {target}.', **kwargs)
+	return common.mt(0, 'success', {gn: enums.FamilyRole.BASIC.value, target: enums.FamilyRole.OWNER.value})
+
+# TODO 内部方法
 async def gift_package(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
@@ -281,7 +299,7 @@ async def gift_package(uid, **kwargs):
 		for item in kwargs['config']['family']['store']['gift']:
 			_, iid, cost = (common.decode_items(item))[0]
 			await common.try_item(member, iid, cost, **kwargs)
-	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} PURCHASED_FAMILY_GIFT_PACKAGE.', **kwargs)
+	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_PURCHASED_FAMILY_GIFT_PACKAGE>.', **kwargs)
 	return common.mt(0, 'success')
 
 async def get_random(**kwargs):
