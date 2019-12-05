@@ -315,6 +315,6 @@ Each of our micro-services should reference the Kubernetes Service address if th
 
 Additionally, we will want to create externally load-balanced Kubernetes Services for the `edge` and `gate` deployments, as these are the only client facing servers.
 
-We should assign public domain names (such as edge.aliya.lukseun.com) to each client facing load-balanced service.
+We should assign public domain names (such as `edge.aliya.lukseun.com`) to each client facing load-balanced service.
 The client app should use these domain names when connecting to our server.
 
