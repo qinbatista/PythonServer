@@ -59,7 +59,7 @@ CREATE TABLE `factory` (
 FAMILY = \
 """
 CREATE TABLE `family` (
-	  `name` VARCHAR(8) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族id(名字)',
+	  `name` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族id(名字)',
 	  `icon` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '家族图标',
 	  `exp` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '家族经验',
 	  `notice` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '家族公告',
@@ -74,7 +74,7 @@ FAMILYHISTORY = \
 """
 CREATE TABLE `familyhistory` (
 	  `hid` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '家族历史id',
-	  `name` VARCHAR(8) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族id(名字)',
+	  `name` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族id(名字)',
 	  `date` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族历史操作发生时间',
 	  `msg` VARCHAR(256) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族历史操作信息',
 	  PRIMARY KEY (`hid`, `name`),
@@ -86,7 +86,7 @@ FAMILYROLE = \
 """
 CREATE TABLE `familyrole` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
-	  `name` VARCHAR(8) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族id(名字)',
+	  `name` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族id(名字)',
 	  `role` SMALLINT UNSIGNED NOT NULL COMMENT '家族成员等级',
 	  PRIMARY KEY (`uid`,`name`),
 	  CONSTRAINT `familyrole_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE,
@@ -132,8 +132,8 @@ PLAYER = \
 """
 CREATE TABLE `player` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
-	  `gn` VARCHAR(8) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家游戏名',
-	  `fid` VARCHAR(8) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '家族id(名字)',
+	  `gn` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家游戏名',
+	  `fid` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '家族id(名字)',
 	  `intro` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '玩家自我介绍',
 	  PRIMARY KEY (`uid`),
 	  UNIQUE KEY `u_gn` (`gn`)
@@ -285,7 +285,7 @@ MALL = \
 """
 CREATE TABLE `mall` (
 	  `oid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '订单号',
-	  `world` VARCHAR(8) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户所在的世界',
+	  `world` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户所在的世界',
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
 	  `username` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户游戏名',
 	  `currency` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '购买币种',
@@ -294,7 +294,7 @@ CREATE TABLE `mall` (
 	  `mqty` INT UNSIGNED NOT NULL COMMENT '商品数量',
 	  `channel` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '渠道名字',
 	  `time` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '购买时间',
-	  `repeatable` VARCHAR(8) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '是否为永久性物品',
+	  `repeatable` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '是否为永久性物品',
 	  `receive` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '道具是否已领取道具',
 	  PRIMARY KEY (`oid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
