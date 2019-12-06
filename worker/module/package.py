@@ -87,9 +87,6 @@ async def use_item(uid, iid, eid, **kwargs):
 async def config(uid, **kwargs):
 	return common.mt(0, 'success', {'config': kwargs['config']['package']})
 
-async def config(uid, **kwargs):
-	return common.mt(0, 'success', {'config': kwargs['config']['package']})
-
 ########################################## 私有 ##########################################
 async def update_item(uid, mid, bnum, **kwargs):
 	exp_info = await stage.increase_exp(uid, 0, **kwargs)
