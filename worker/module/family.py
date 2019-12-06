@@ -311,6 +311,12 @@ async def gift_package(uid, **kwargs):
 	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_PURCHASED_FAMILY_GIFT_PACKAGE>.', **kwargs)
 	return common.mt(0, 'success')
 
+async def search(name, **kwargs):
+	can, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
+	if not can: return common.mt(99, f'没有<{name}>家族')
+	people = (await common.execute(f'SELECT COUNT(*) FROM player WHERE fid="{name}";', **kwargs))[0][0]
+	return common.mt(0, 'success', {'info': {'name': name, 'icon': info[0], 'exp': info[1], 'notice': info[2], 'board': info[3], 'people': people}})
+
 async def get_random(**kwargs):
 	data = await common.execute(f'SELECT `name`, `icon`, `exp`, `notice` FROM `family` ORDER BY RAND() LIMIT 10;', **kwargs)
 	return common.mt(0, 'success', {'families' : [{'name' : f[0], 'icon' : f[1], 'exp' : f[2], 'notice' : f[3]} for f in data]})
@@ -373,8 +379,8 @@ async def _delete_family(name, **kwargs):
 	for member in members:
 		await common.execute(f'UPDATE `player` SET fid = "" WHERE uid = "{member}";', **kwargs)
 	await asyncio.gather(
-		common.execute(f'DELETE FROM `familyrole` WHERE `name` = "{name}";', **kwargs),
-		common.execute(f'DELETE FROM `familyhistory` WHERE `name` = "{name}";', **kwargs),
+		# common.execute(f'DELETE FROM `familyrole` WHERE `name` = "{name}";', **kwargs),
+		# common.execute(f'DELETE FROM `familyhistory` WHERE `name` = "{name}";', **kwargs),
 		common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
 	)
 

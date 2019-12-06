@@ -186,6 +186,9 @@ class MessageHandler:
 	async def _gift_package_family(self, data: dict) -> str:
 		return await family.gift_package(data['data']['unique_id'], **data)
 
+	async def _search_family(self, data: dict) -> str:
+		return await family.search(data['data']['family_name'], **data)
+
 	async def _get_random_family(self, data: dict) -> str:
 		return await family.get_random(**data)
 
@@ -645,6 +648,7 @@ FUNCTION_LIST = {
 	'check_in_family' : MessageHandler._check_in_family,
 	'abdicate_family' : MessageHandler._abdicate_family,
 	'gift_package_family' : MessageHandler._gift_package_family,
+	'search_family' : MessageHandler._search_family,
 	'get_random_family' : MessageHandler._get_random_family,
 
 	###################### mail.py ######################

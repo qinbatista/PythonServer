@@ -69,6 +69,7 @@ CREATE TABLE `family` (
 	  PRIMARY KEY (`name`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
+# CONSTRAINT `familyrole_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 
 FAMILYHISTORY = \
 """
@@ -139,6 +140,7 @@ CREATE TABLE `player` (
 	  UNIQUE KEY `u_gn` (`gn`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
+# INDEX KEY (`fid`)
 # ALTER TABLE player ADD CONSTRAINT `fid`
 # FOREIGN KEY(<列名>) REFERENCES `player` (`fid`);
 
