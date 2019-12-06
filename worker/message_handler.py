@@ -29,8 +29,8 @@ from module import vip
 from module import mall
 
 
-from utility import metrics
-C = metrics.Collector()
+#from utility import metrics
+#C = metrics.Collector()
 
 class MessageHandler:
 	def __init__(self, *, token_addr, token_port, mail_addr, mail_port):
@@ -42,7 +42,7 @@ class MessageHandler:
 		pass
 
 	# json.decoder.JSONDecodeError
-	@C.collect_async
+#	@C.collect_async
 	async def resolve(self, message: dict, resource, configs) -> str:
 		'''
 		Resolves the message included in the request. If required, ensures that a valid token is present.
