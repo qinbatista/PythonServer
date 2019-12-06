@@ -190,7 +190,7 @@ class MessageHandler:
 		return await family.search(data['data']['family_name'], **data)
 
 	async def _get_random_family(self, data: dict) -> str:
-		return await family.get_random(**data)
+		return await family.get_random(int(data['data'].get('number', 5)), **data)
 
 	###################### mail.py ######################
 	async def _send_mail(self, data: dict) -> str:

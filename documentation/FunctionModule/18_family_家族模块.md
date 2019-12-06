@@ -1068,7 +1068,7 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
-[挂机关卡失败]()
+[失败]()
 
 * 99: 已签到过
 
@@ -1115,7 +1115,7 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
-[挂机关卡失败]()
+[失败]()
 
 * 99: 没有<name>家族
 
@@ -1125,12 +1125,14 @@ Only Admins and above can cancel the disbanding of a family.
 
 使用之后获得部分家族名字，获取到方式为随机获取
 
+>  number：此关键字可以不传，默认随机5个家族返回，当随机的家族数不足时会返回所有的家族信息
+
 ##### 发送消息JSON格式
 
 ```json
 {
 	"world": 0, 
-	"function": "gift_package",
+	"function": "get_random_family",
 	"data": {
 		"token": "my token ^_^"
 	}
@@ -1145,50 +1147,48 @@ Only Admins and above can cancel the disbanding of a family.
 	"status": 0,
 	"message": "success",
 	"data": {
-		family_name:[
-      {
-        "name"  : "family name1",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-      {
-        "name"  : "family name2",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-      {
-        "name"  : "family name3",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-      {
-        "name"  : "family name4",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-      {
-        "name"  : "family name5",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-                ]
+		"families": [
+			{
+				"name": "family_q8",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			},
+			{
+				"name": "family_q4",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			},
+			{
+				"name": "family_q2",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			},
+			{
+				"name": "family_q5",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			},
+			{
+				"name": "family_q3",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			}
+		]
 	}
 }
 ```
 
-* 99: 没有此家族
 
-  
 
 ## get_config_family
 
