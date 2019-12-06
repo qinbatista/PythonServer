@@ -9,8 +9,8 @@
 			"change_name": "3:5:500"
 		},
 		"rewards": {
-			"check_in": "3:1:100",
-			"family_coin": "3:37:100"
+			"family_coin": "3:36:100",
+			"special": ["3:1:100"]
 		},
 		"members": {
 			"base": 30,
@@ -31,7 +31,6 @@
 		]
 	},
 	"level": {
-		"max": 10,
 		"exp": [
 			0,
 			20,

@@ -19,9 +19,9 @@
 * √[`cancel_disband_family`](##cancel_disband_family)
 * √[`abdicate_family`](##abdicate_family)
 * √[`check_in_family`](##check_in_family)
-* ?[`search_family`](##search_family)
-* ?[`get_random_family`](##get_random_family)
-* ?[`get_config_family`](##get_config_family)
+* √[`search_family`](##search_family)
+* √[`get_random_family`](##get_random_family)
+* √[`get_config_family`](##get_config_family)
 
 
 
@@ -236,6 +236,7 @@ An invitation will be sent the the user's mailbox.
 * 96: 邀请对象离开家族冷却时间未结束
 * 95: 邀请对象等级不满18级
 * 94: 邀请对象已经加入了家族
+* 93: 邀请的用户不存在
 
 
 
@@ -928,9 +929,9 @@ Only Admins and above can cancel the disbanding of a family.
 
 
 
-## family_check_in
+## check_in_family
 
-家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级，签到获取`公会金币`和`金币`，工会等级的提高，奖励也会随着提高
+家族签到，一人签到一次加一点经验家族经验，经验表对照family.json, 公会等级，签到获取`公会金币`和`金币`，工会等级的提高，奖励也会随着提高。家族签到会得到`金币`和`家族金币`, 金币的和家族金币的数量根据家族等级来，奖励的基础数据在, 奖励公式为 基础数据*等级，比如一级公会签到奖励100金币和100家族金币，等级到达2级时，可以奖励200金币和200家族金币。
 
 ##### 发送消息JSON格式
 
@@ -938,7 +939,7 @@ Only Admins and above can cancel the disbanding of a family.
 ```json
 {
 	"world": 0,
-	"function": "family_check_in",
+	"function": "check_in_family",
 	"data": {
 		"token": "my token"
 	}
@@ -953,14 +954,34 @@ Only Admins and above can cancel the disbanding of a family.
 	"status": 0,
 	"message": "success",
 	"data": {
-    		"remaining":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
-        "reward":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
+		"remaining": [
+			{
+				"iid": 36,
+				"value": 100
+			},
+			{
+				"iid": 37,
+				"value": 200
+			},
+			{
+				"iid": 1,
+				"value": 1000200
+			}
+		],
+		"reward": [
+			{
+				"iid": 36,
+				"value": 100
+			},
+			{
+				"iid": 37,
+				"value": 100
+			},
+			{
+				"iid": 1,
+				"value": 100
+			}
+		]
 	}
 }
 ```
@@ -968,8 +989,7 @@ Only Admins and above can cancel the disbanding of a family.
 [失败]()
 
 * 99: not in a family
-* 98: insufficient permissions
-* 97: family is not disbanded
+* 98: already checked in today
 
 
 
@@ -1011,84 +1031,6 @@ Only Admins and above can cancel the disbanding of a family.
 
 
 
-##  modify_icon_family
-
-> 族长和管理员才能修改工会图标
-
-##### 发送消息JSON格式
-
-> 
-
-```json
-{
-	"world": 0,
-	"function": "modify_icon_family",
-	"data": {
-		"token": "my token"
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-> 
-
-```json
-{
-	"status": 0,
-	"message": "success",
-	"data": {
-	}
-}
-```
-
-
-
-
-
-## check_in_family
-
-家族签到会得到`金币`和`家族金币`, 金币的和家族金币的数量根据家族等级来，奖励的基础数据在, 奖励公式为 基础数据*等级，比如一级公会签到奖励100金币和100家族金币，等级到达2级时，可以奖励200金币和200家族金币。
-
-##### 发送消息JSON格式
-
-```json
-{
-	"world": 0, 
-	"function": "check_in_family",
-	"data": {
-		"token": "my token ^_^"
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-
-```json
-{
-	"status": 0,
-	"message": "created family",
-	"data": {
-		"name" : "family name",
-        "remaining":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
-        "reward":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
-	}
-}
-```
-
-[挂机关卡失败]()
-
-* 99: 已签到过
-
-
-
 ## gift_package
 
 购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次`
@@ -1126,17 +1068,15 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
-[挂机关卡失败]()
-
-* 99: 已签到过
-
-  
+[失败]()
 
 
 
 ## search_family
 
-购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次`
+根据家族名字查询家族信息
+
+>  family_name：家族名字
 
 ##### 发送消息JSON格式
 
@@ -1146,7 +1086,7 @@ Only Admins and above can cancel the disbanding of a family.
 	"function": "gift_package",
 	"data": {
 		"token": "my token ^_^",
-    "family_name":"大家族"
+    	"family_name":"大家族"
 	}
 }
 ```
@@ -1159,18 +1099,21 @@ Only Admins and above can cancel the disbanding of a family.
 	"status": 0,
 	"message": "success",
 	"data": {
-		"name"  : "family name",
-		"icon"  : 0,
-		"exp"   : 1337,
-		"notice": "New members should buy family gift package",
-		"people" : 32
+		"info": {
+			"name": "family_q1",
+			"icon": 1,
+			"exp": 3,
+			"notice": "这是一个公告测试",
+			"board": "这是一个黑板测试",
+			"people": 3
+		}
 	}
 }
 ```
 
-[挂机关卡失败]()
+[失败]()
 
-* 99: 没有此家族
+* 99: 没有<name>家族
 
   
 
@@ -1178,12 +1121,14 @@ Only Admins and above can cancel the disbanding of a family.
 
 使用之后获得部分家族名字，获取到方式为随机获取
 
+>  number：此关键字可以不传，默认随机5个家族返回，当随机的家族数不足时会返回所有的家族信息
+
 ##### 发送消息JSON格式
 
 ```json
 {
 	"world": 0, 
-	"function": "gift_package",
+	"function": "get_random_family",
 	"data": {
 		"token": "my token ^_^"
 	}
@@ -1198,50 +1143,48 @@ Only Admins and above can cancel the disbanding of a family.
 	"status": 0,
 	"message": "success",
 	"data": {
-		family_name:[
-      {
-        "name"  : "family name1",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-      {
-        "name"  : "family name2",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-      {
-        "name"  : "family name3",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-      {
-        "name"  : "family name4",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-      {
-        "name"  : "family name5",
-        "icon"  : 0,
-        "exp"   : 1337,
-        "notice": "New members should buy family gift package",
-        "people" : 32
-      },
-                ]
+		"families": [
+			{
+				"name": "family_q8",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			},
+			{
+				"name": "family_q4",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			},
+			{
+				"name": "family_q2",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			},
+			{
+				"name": "family_q5",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			},
+			{
+				"name": "family_q3",
+				"icon": 1,
+				"exp": 3,
+				"notice": "这是一个公告测试",
+				"board": "这是一个黑板测试"
+			}
+		]
 	}
 }
 ```
 
-* 99: 没有此家族
 
-  
 
 ## get_config_family
 
@@ -1252,7 +1195,7 @@ Only Admins and above can cancel the disbanding of a family.
 ```json
 {
 	"world": 0, 
-	"function": "gift_package",
+	"function": "get_config_family",
 	"data": {
 		"token": "my token ^_^"
 	}
@@ -1272,7 +1215,5 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
-* 99: 没有此家族
 
-  
 

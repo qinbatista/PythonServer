@@ -113,7 +113,7 @@ def family_dialog(token,world,info,unique_id):
 		if choice=="17":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'cancel_disband_family', 'data' : {'token' : token, "name":"", "icon":1}})
 		if choice=="18":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'abdicate_family', 'data' : {'token' : token, "gn_target": "KKK"}})
 		if choice=="19":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'check_in_family', 'data' : {'token' : token, "name":"", "icon":1}})
-		if choice=="20":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'search_family', 'data' : {'token' : token, "name":"", "icon":1}})
+		if choice=="20":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'search_family', 'data' : {'token' : token, "family_name": "family_q1"}})
 		if choice=="21":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_random_family', 'data' : {'token' : token, "name":"", "icon":1}})
 		if choice=="22":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_config_family', 'data' : {'token' : token, "name":"", "icon":1}})
 

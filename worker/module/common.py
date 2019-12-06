@@ -291,3 +291,8 @@ async def _send_gift_mail(uid, gn_target, group_id, item_id, quantity, **kwargs)
 	sent = await mail.send_mail(1, fid, **kwargs)
 	return mt(0, 'success')
 
+
+def __calculate(config: list, sql_exp: int) -> (int, int):
+	expl = [e for e in config if e > sql_exp]
+	level, need = config.index(expl[0]) if expl != [] else len(config), expl[0] - sql_exp if expl != [] else 0
+	return level, need
