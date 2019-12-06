@@ -69,7 +69,6 @@ CREATE TABLE `family` (
 	  PRIMARY KEY (`name`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
-# CONSTRAINT `familyrole_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
 
 FAMILYHISTORY = \
 """
@@ -134,15 +133,15 @@ PLAYER = \
 CREATE TABLE `player` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
 	  `gn` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家游戏名',
-	  `fid` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '家族id(名字)',
+	  `fid` VARCHAR(32) COLLATE utf8mb4_unicode_ci COMMENT '家族id(名字)',
 	  `intro` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '玩家自我介绍',
 	  PRIMARY KEY (`uid`),
 	  UNIQUE KEY `u_gn` (`gn`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
-# INDEX KEY (`fid`)
-# ALTER TABLE player ADD CONSTRAINT `fid`
-# FOREIGN KEY(<列名>) REFERENCES `player` (`fid`);
+# CONSTRAINT `clear_fid` FOREIGN KEY (`fid`) REFERENCES `family` (`name`) ON DELETE SET ''
+# ALTER TABLE player ADD CONSTRAINT `clear_fid`
+# FOREIGN KEY(`fid`) REFERENCES `family` (`name`) ON DELETE SET NULL;
 
 PLAYERAFTERINSERT = \
 """
@@ -314,9 +313,15 @@ CREATE TABLE `exchange` (
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
+CONSTRAINT = \
+"""
+	ALTER TABLE player ADD CONSTRAINT `clear_fid`
+	FOREIGN KEY(`fid`) REFERENCES `family` (`name`) ON DELETE SET NULL;
+"""
+
 TABLES = [PLAYER, PLAYERAFTERINSERT, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET, \
 		FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LEADERBOARD, LIMITS, \
-		PROGRESS, ROLE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE]
+		PROGRESS, ROLE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE, CONSTRAINT]
 
 
 
@@ -400,6 +405,22 @@ def main():
 		save_world_config(world, path)
 
 
+def test(world, mysql_addr, mysql_user, mysql_pw):
+	connection = pymysql.connect(host=mysql_addr, user=mysql_user, password=mysql_pw, charset='utf8mb4', autocommit=True)
+	# connection.cursor().execute(f'CREATE DATABASE `{world}`;')
+	connection.select_db(world)
+	# for table in TABLES:
+	# 	connection.cursor().execute(table)
+	cursor = connection.cursor()
+	cursor.execute(f"SELECT * FROM player;")
+	data = cursor.fetchall()
+	for d in data:
+		if d[2] is None:
+			print(f'{d} is None')
+		else:
+			print(f'{d}')
+
 
 if __name__ == '__main__':
 	main()
+	# test("w1", "192.168.1.102", "root", "lukseun")
