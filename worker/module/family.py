@@ -373,8 +373,8 @@ async def _delete_family(name, **kwargs):
 	for member in members:
 		await common.execute(f'UPDATE `player` SET fid = "" WHERE uid = "{member}";', **kwargs)
 	await asyncio.gather(
-		common.execute(f'DELETE FROM `familyrole` WHERE `name` = "{name}";', **kwargs),
-		common.execute(f'DELETE FROM `familyhistory` WHERE `name` = "{name}";', **kwargs),
+		# common.execute(f'DELETE FROM `familyrole` WHERE `name` = "{name}";', **kwargs),
+		# common.execute(f'DELETE FROM `familyhistory` WHERE `name` = "{name}";', **kwargs),
 		common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
 	)
 
