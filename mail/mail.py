@@ -13,7 +13,6 @@ import concurrent.futures
 from aiohttp  import web
 from datetime import datetime
 from dateutil import tz
-TZ_SH = tz.gettz('Asia/Shanghai')
 
 class MailServer:
 	def __init__(self, path):
@@ -74,7 +73,7 @@ class MailServer:
 	@staticmethod
 	def construct_mail(mail_dict):
 		mail         = mailbox.MaildirMessage()
-		mail['time'] = datetime.now(tz=TZ_SH).strftime('%Y-%m-%d %H:%M:%S')
+		mail['time'] = datetime.now(tz = tz.gettz('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
 		mail.set_payload(urllib.parse.quote(mail_dict.pop('body', ''), safe = ''))
 		for k, v in mail_dict.items():
 			mail[k] = urllib.parse.quote(str(v), safe = '') if k in {'from', 'subj'} else str(v)
@@ -98,10 +97,7 @@ class MailServer:
 
 	@staticmethod
 	def get_mail_folder(mbox, world, uid):
-		try:
-			return mbox.get_folder(str(world)).get_folder(uid)
-		except mailbox.NoSuchMailboxError:
-			return mbox.get_folder(str(world)).add_folder(uid)
+		return mbox.add_folder(str(world)).add_folder(uid)
 
 	@staticmethod
 	def read_subfolders(root, subfolders):
