@@ -19,7 +19,7 @@
 * √[`cancel_disband_family`](##cancel_disband_family)
 * √[`abdicate_family`](##abdicate_family)
 * √[`check_in_family`](##check_in_family)
-* ?[`search_family`](##search_family)
+* √[`search_family`](##search_family)
 * ?[`get_random_family`](##get_random_family)
 * ?[`get_config_family`](##get_config_family)
 
@@ -1078,7 +1078,9 @@ Only Admins and above can cancel the disbanding of a family.
 
 ## search_family
 
-购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次`
+根据家族名字查询家族信息
+
+>  family_name：家族名字
 
 ##### 发送消息JSON格式
 
@@ -1088,7 +1090,7 @@ Only Admins and above can cancel the disbanding of a family.
 	"function": "gift_package",
 	"data": {
 		"token": "my token ^_^",
-    "family_name":"大家族"
+    	"family_name":"大家族"
 	}
 }
 ```
@@ -1101,18 +1103,21 @@ Only Admins and above can cancel the disbanding of a family.
 	"status": 0,
 	"message": "success",
 	"data": {
-		"name"  : "family name",
-		"icon"  : 0,
-		"exp"   : 1337,
-		"notice": "New members should buy family gift package",
-		"people" : 32
+		"info": {
+			"name": "family_q1",
+			"icon": 1,
+			"exp": 3,
+			"notice": "这是一个公告测试",
+			"board": "这是一个黑板测试",
+			"people": 3
+		}
 	}
 }
 ```
 
 [挂机关卡失败]()
 
-* 99: 没有此家族
+* 99: 没有<name>家族
 
   
 
