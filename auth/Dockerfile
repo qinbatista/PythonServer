@@ -11,5 +11,3 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 STOPSIGNAL SIGINT
-
-#CMD [ "python", "-u", "./auth.py", "lukseunsecret" ]

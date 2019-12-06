@@ -16,7 +16,6 @@ import concurrent.futures
 from aiohttp import web
 from datetime import datetime, timedelta
 from dateutil import tz
-TZ_SH = tz.gettz('Asia/Shanghai')
 
 
 class Auth:
@@ -70,13 +69,12 @@ class Auth:
 
 	@staticmethod
 	def generate_token(uid, secret, validity):
-		tkn = jwt.encode({'exp' : datetime.now(tz=TZ_SH) + timedelta(seconds = validity),\
-				'uid' : uid}, secret, Auth.algorithm)
+		tkn = jwt.encode({'exp' : datetime.now(tz = tz.gettz('Asia/Shanghai')) + \
+				timedelta(seconds = validity), 'uid' : uid}, secret, Auth.algorithm)
 		return tkn.decode('utf-8')
 
 	@staticmethod
 	def decode_token(token, secret):
-		# raises jwt.DecodeError, jwt.ExpiredSignatureError
 		payload = jwt.decode(token, secret, algorithms = [Auth.algorithm])
 		return payload['uid']
 
