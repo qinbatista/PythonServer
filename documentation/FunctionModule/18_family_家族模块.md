@@ -20,8 +20,8 @@
 * √[`abdicate_family`](##abdicate_family)
 * √[`check_in_family`](##check_in_family)
 * √[`search_family`](##search_family)
-* ?[`get_random_family`](##get_random_family)
-* ?[`get_config_family`](##get_config_family)
+* √[`get_random_family`](##get_random_family)
+* √[`get_config_family`](##get_config_family)
 
 
 
@@ -1070,10 +1070,6 @@ Only Admins and above can cancel the disbanding of a family.
 
 [失败]()
 
-* 99: 已签到过
-
-  
-
 
 
 ## search_family
@@ -1199,7 +1195,7 @@ Only Admins and above can cancel the disbanding of a family.
 ```json
 {
 	"world": 0, 
-	"function": "gift_package",
+	"function": "get_config_family",
 	"data": {
 		"token": "my token ^_^"
 	}
@@ -1219,7 +1215,5 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
-* 99: 没有此家族
 
-  
 
