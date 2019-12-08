@@ -17,7 +17,7 @@ CREATE TABLE `achievement` (
 	 `value` SMALLINT UNSIGNED DEFAULT 0 COMMENT '成就完成的次数',
 	 `reward` SMALLINT UNSIGNED DEFAULT 0 COMMENT '完成成就领奖的次数',
 	 PRIMARY KEY (`uid`,`aid`),
-	 CONSTRAINT `achievement_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	 CONSTRAINT `achievement_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -29,7 +29,7 @@ CREATE TABLE `armor` (
 	  `level` SMALLINT UNSIGNED NOT NULL COMMENT '盔甲等级1-10级',
 	  `quantity` INT UNSIGNED DEFAULT 0 COMMENT '盔甲数量',
 	  PRIMARY KEY (`uid`, `aid`, `level`),
-	  CONSTRAINT `armor_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `armor_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -40,7 +40,7 @@ CREATE TABLE `check_in` (
 	 `date` VARCHAR(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '签到日期',
 	 `reward` SMALLINT UNSIGNED DEFAULT 1 COMMENT '0：未领奖，1：已领奖',
 	 PRIMARY KEY (`uid`, `date`),
-	 CONSTRAINT `checkin_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	 CONSTRAINT `checkin_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 FACTORY = \
@@ -52,7 +52,7 @@ CREATE TABLE `factory` (
 	  `workers` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '工厂工人',
 	  `storage` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '工厂仓库',
 	  PRIMARY KEY (`uid`,`fid`),
-	  CONSTRAINT `factory_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `factory_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -78,7 +78,7 @@ CREATE TABLE `familyhistory` (
 	  `date` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族历史操作发生时间',
 	  `msg` VARCHAR(256) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族历史操作信息',
 	  PRIMARY KEY (`hid`, `name`),
-	  CONSTRAINT `familyhistory_ibfk_1` FOREIGN KEY (`name`) REFERENCES `family` (`name`) ON DELETE CASCADE
+	  CONSTRAINT `familyhistory_family_1` FOREIGN KEY (`name`) REFERENCES `family` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -89,8 +89,8 @@ CREATE TABLE `familyrole` (
 	  `name` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '家族id(名字)',
 	  `role` SMALLINT UNSIGNED NOT NULL COMMENT '家族成员等级',
 	  PRIMARY KEY (`uid`,`name`),
-	  CONSTRAINT `familyrole_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE,
-	  CONSTRAINT `familyrole_ibfk_2` FOREIGN KEY (`name`) REFERENCES `family` (`name`) ON DELETE CASCADE
+	  CONSTRAINT `familyrole_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE,
+	  CONSTRAINT `familyrole_family_1` FOREIGN KEY (`name`) REFERENCES `family` (`name`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -102,7 +102,7 @@ CREATE TABLE `friend` (
 	  `recover` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '发生礼物当天日期',
 	  `since` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '成为好友的当天日期',
 	  PRIMARY KEY (`uid`,`fid`),
-	  CONSTRAINT `friend_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `friend_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -113,7 +113,7 @@ CREATE TABLE `item` (
 	  `iid` INT UNSIGNED NOT NULL COMMENT '物品id',
 	  `value` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '物品数量',
 	  PRIMARY KEY (`uid`,`iid`),
-	  CONSTRAINT `item_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `item_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -124,7 +124,7 @@ CREATE TABLE `limits` (
 	  `lid` SMALLINT UNSIGNED NOT NULL COMMENT '次数限制id',
 	  `value` INT UNSIGNED DEFAULT 0 COMMENT '次数',
 	  PRIMARY KEY (`uid`, `lid`),
-	  CONSTRAINT `limits_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `limits_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -165,7 +165,7 @@ CREATE TABLE `progress` (
 	  `vipexp` INT UNSIGNED DEFAULT 0 COMMENT 'vip经验',
 	  `unstage` SMALLINT UNSIGNED DEFAULT 0 COMMENT '正在进行的关卡',
 	  PRIMARY KEY (`uid`),
-	  CONSTRAINT `progress_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `progress_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -179,7 +179,7 @@ CREATE TABLE `role` (
 	  `skillpoint` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '角色技能剩余点数',
 	  `segment` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '碎片数',
 	  PRIMARY KEY (`uid`,`rid`),
-	  CONSTRAINT `role_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `role_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -191,7 +191,7 @@ CREATE TABLE `rolepassive` (
 	  `pid` SMALLINT UNSIGNED NOT NULL COMMENT '角色技能id',
 	  `level` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '技能等级',
 	  PRIMARY KEY (`uid`,`rid`,`pid`),
-	  CONSTRAINT `rolepassive_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `rolepassive_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -202,7 +202,7 @@ CREATE TABLE `skill` (
 	  `sid` SMALLINT UNSIGNED NOT NULL COMMENT '玩家技能id',
 	  `level` SMALLINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '玩家技能等级',
 	  PRIMARY KEY (`uid`,`sid`),
-	  CONSTRAINT `skill_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `skill_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -215,7 +215,7 @@ CREATE TABLE `task` (
 	  `reward` SMALLINT UNSIGNED DEFAULT 0 COMMENT '表示奖励是否已经领取0:false,1:true',
 	  `timer` VARCHAR(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '完成时间',
 	  PRIMARY KEY (`uid`,`tid`),
-	  CONSTRAINT `task_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `task_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -226,7 +226,7 @@ CREATE TABLE `timer` (
 	  `tid` SMALLINT UNSIGNED NOT NULL COMMENT '时间id',
 	  `time` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '时间',
 	  PRIMARY KEY (`uid`,`tid`),
-	  CONSTRAINT `timer_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `timer_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -240,7 +240,7 @@ CREATE TABLE `weapon` (
 	  `skillpoint` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '武器剩余技能点数',
 	  `segment` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '碎片',
 	  PRIMARY KEY (`uid`,`wid`),
-	  CONSTRAINT `weapon_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `weapon_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -252,7 +252,7 @@ CREATE TABLE `weaponpassive` (
 	  `pid` SMALLINT UNSIGNED NOT NULL COMMENT '武器技能id',
 	  `level` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '武器技能等级',
 	  PRIMARY KEY (`uid`,`wid`,`pid`),
-	  CONSTRAINT `weaponpassive_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `weaponpassive_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -267,7 +267,7 @@ DARKMARKET = \
 	  `cid` SMALLINT UNSIGNED NOT NULL COMMENT '消耗品id',
 	  `amt` SMALLINT UNSIGNED NOT NULL COMMENT '消耗品数量',
 	  PRIMARY KEY (`uid`, `pid`),
-	  CONSTRAINT `darkmarket_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `darkmarket_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 
@@ -278,7 +278,7 @@ CREATE TABLE `leaderboard` (
 	  `lid` SMALLINT UNSIGNED NOT NULL COMMENT '排行id',
 	  `value` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '伤害',
 	  PRIMARY KEY (`uid`,`lid`),
-	  CONSTRAINT `leaderboard_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE
+	  CONSTRAINT `leaderboard_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -315,12 +315,12 @@ CREATE TABLE `exchange` (
 
 CONSTRAINT = \
 """
-	ALTER TABLE player ADD CONSTRAINT `clear_fid`
-	FOREIGN KEY(`fid`) REFERENCES `family` (`name`) ON DELETE SET NULL;
+	ALTER TABLE player ADD CONSTRAINT `player_family_1`
+	FOREIGN KEY(`fid`) REFERENCES `family` (`name`) ON DELETE SET NULL ON UPDATE CASCADE;
 """
 
-TABLES = [PLAYER, PLAYERAFTERINSERT, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET, \
-		FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LEADERBOARD, LIMITS, \
+TABLES = [PLAYER, PLAYERAFTERINSERT, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET,
+		FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LEADERBOARD, LIMITS,
 		PROGRESS, ROLE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE, CONSTRAINT]
 
 
@@ -407,10 +407,11 @@ def main():
 
 def test(world, mysql_addr, mysql_user, mysql_pw):
 	connection = pymysql.connect(host=mysql_addr, user=mysql_user, password=mysql_pw, charset='utf8mb4', autocommit=True)
-	# connection.cursor().execute(f'CREATE DATABASE `{world}`;')
+	connection.cursor().execute(f'CREATE DATABASE `{world}`;')
 	connection.select_db(world)
-	# for table in TABLES:
-	# 	connection.cursor().execute(table)
+	for table in TABLES:
+		connection.cursor().execute(table)
+	"""
 	cursor = connection.cursor()
 	cursor.execute(f"SELECT * FROM player;")
 	data = cursor.fetchall()
@@ -419,6 +420,7 @@ def test(world, mysql_addr, mysql_user, mysql_pw):
 			print(f'{d} is None')
 		else:
 			print(f'{d}')
+	"""
 
 
 if __name__ == '__main__':
