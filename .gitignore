@@ -13,3 +13,4 @@ obj
 chatlogs
 unittests/user_behavior_simulation/log_history
 testing.py
+config(k8s)
