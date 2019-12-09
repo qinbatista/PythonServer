@@ -65,7 +65,7 @@ async def get_info(uid, **kwargs):
 		await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
 		info = await common.execute(f'SELECT energy, exp, stage, towerstage, hangstage FROM progress WHERE uid = "{uid}";', **kwargs)
 	energy_info = await common.try_energy(uid, 0, **kwargs)
-	return common.mt(0, 'success', {'gn': data[0][0], 'family_name': data[0][1], 'energy_info': energy_info['data'], 'exp': info[0][1], 'stage': info[0][2], 'towerstage': info[0][3], 'hangstage': info[0][4]})
+	return common.mt(0, 'success', {'gn': data[0][0], 'family_name': '' if data[0][1] is None else data[0][1], 'energy_info': energy_info['data'], 'exp': info[0][1], 'stage': info[0][2], 'towerstage': info[0][3], 'hangstage': info[0][4]})
 
 async def get_all_resource(uid, **kwargs):
 	item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)

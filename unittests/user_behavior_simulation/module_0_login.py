@@ -64,7 +64,7 @@ def login_account():#账户登陆
 	world_list = get_account_world_info(token)
 	if len(world_list) != 0:
 		# world = enter_world(token, random.randint(0,0))#选择世界,游客登陆需要返回一个用户不是很忙的服务器,目前只有世界0,未完成
-		world = enter_world(token, "s0")#选择世界,游客登陆需要返回一个用户不是很忙的服务器,目前只有世界0,未完成
+		world = enter_world(token, "w1")#选择世界,游客登陆需要返回一个用户不是很忙的服务器,目前只有世界0,未完成
 
 	if response["status"]==0:#登陆成功返回数据
 		return token,world
