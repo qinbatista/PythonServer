@@ -220,9 +220,6 @@ async def change_name(uid, new_name, **kwargs):
 	can_pay, remaining = await common.try_item(uid, iid, -cost, **kwargs)
 	if not can_pay: return common.mt(96, 'insufficient funds')
 	await common.execute(f'UPDATE family SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
-	# await common.execute(f'UPDATE player SET fid = "{new_name}" WHERE fid = "{name}";', **kwargs)
-	# await common.execute(f'UPDATE familyrole SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
-	# await common.execute(f'UPDATE familyhistory SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	await _record_family_change(new_name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_CHANGED_FAMILY_NAME>： {new_name}.', **kwargs)
 	return common.mt(0, 'success', {'name' : new_name, 'iid' : iid.value, 'value' : remaining})
 
@@ -367,19 +364,6 @@ async def _check_delete_family(timer, name, **kwargs):
 		await common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
 		return True
 	return False
-
-# TODO parallelize with asyncio.gather and asyncio tasks
-# async def _delete_family(name, **kwargs):
-# 	await _delete_disband_timer(name, **kwargs)
-# 	data = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
-# 	members = [m[0] for m in data]
-# 	for member in members:
-# 		await common.execute(f'UPDATE `player` SET fid = "" WHERE uid = "{member}";', **kwargs)
-# 	await asyncio.gather(
-# 		# common.execute(f'DELETE FROM `familyrole` WHERE `name` = "{name}";', **kwargs),
-# 		# common.execute(f'DELETE FROM `familyhistory` WHERE `name` = "{name}";', **kwargs),
-# 		common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
-# 	)
 
 async def _get_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
