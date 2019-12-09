@@ -31,6 +31,7 @@ async def get_task_reward(uid, task_id, **kwargs):
 	item = kwargs["config"]["task"][my_task]["item_id"]
 	quantity = kwargs["config"]["task"][my_task]["quantity"]
 	data = await common.execute(f'SELECT value, reward FROM task WHERE uid = "{uid}" AND tid = "{task_id}"', **kwargs)
+	if data==():common.mt(99, f'no reward for this task:{task_id}')
 	if data[0][0] == 1 and data[0][1] == 0:
 		_, remaining = await common.try_item(uid, enums.Item(item), quantity, **kwargs)
 		await common.execute_update(f'UPDATE task set reward = 1 WHERE uid = "{uid}" AND tid = "{task_id}";', **kwargs)

@@ -17,8 +17,7 @@ async def get_all_achievement(uid, **kwargs):
 	# await record_achievement(uid,**kwargs)
 	# kwargs['items'] = common.encode_item(enums.Group.ITEM, enums.Item.DIAMOND, 1)
 	# await mail.send_mail(enums.MailType.GIFT, uid, **kwargs)
-	return common.mt(0, 'success',
-					 {'achievements': [{'aid': a[0], 'value': a[1], 'reward': a[2]} for a in achievement]})
+	return common.mt(0, 'success',{'achievements': [{'aid': a[0], 'value': a[1], 'reward': a[2]} for a in achievement]})
 
 
 async def record_achievement(uid, achievement_value=1, **kwargs):  # aid->enums.Achievement,value->string
@@ -52,15 +51,12 @@ async def get_achievement_reward(uid, aid, **kwargs):
 	config = kwargs["config"][str.lower(enums.Achievement(aid).name)]
 	quantity = config["quantity"]
 	amount = config["diamond"]
-	data = await common.execute(f'SELECT value, reward FROM achievement WHERE uid = "{uid}" AND aid = "{aid}"',
-								**kwargs)
+	data = await common.execute(f'SELECT value, reward FROM achievement WHERE uid = "{uid}" AND aid = "{aid}"',**kwargs)
+	if data == (): return common.mt(98, f'no reward for this achievement:{enums.Achievement(aid).name}')
 	if len(quantity) != len(amount): return common.mt(98, 'data base problem, achievement configuration is not match')
 	for index, my_quantity in enumerate(quantity):
 		if data[0][1] < my_quantity <= data[0][0]:  # reward是领奖时的成就次数，value是完成成就的次数
 			_, remaining = await common.try_item(uid, enums.Item.DIAMOND, amount[index], **kwargs)
-			await common.execute_update(
-				f'UPDATE achievement set reward = {my_quantity} WHERE uid = "{uid}" AND aid = "{aid}";', **kwargs)
-			return common.mt(0, 'get reward success',
-							 {"remaining": {"item_id": 5, "item_value": remaining, "aid": aid, "value": data[0][0]},
-							  "reward": {"item_id": 5, "item_value": amount[index], "aid": aid, "value": quantity[index]}})
+			await common.execute_update(f'UPDATE achievement set reward = {my_quantity} WHERE uid = "{uid}" AND aid = "{aid}";', **kwargs)
+			return common.mt(0, 'get reward success',{"remaining": {"item_id": 5, "item_value": remaining, "aid": aid, "value": data[0][0]},"reward": {"item_id": 5, "item_value": amount[index], "aid": aid, "value": quantity[index]}})
 	return common.mt(99, f'no reward for this achievement:{enums.Achievement(aid).name}')
