@@ -7,6 +7,7 @@ When desinging a function, try to make it as general as possible to allow the re
 from module import enums
 from module import mail
 import time
+import calendar
 from datetime import datetime, timedelta
 from dateutil import tz
 TZ_SH = tz.gettz('Asia/Shanghai')
@@ -50,7 +51,12 @@ async def get_uid(gn, **kwargs):
 	else:return data[0][0]
 
 def remaining_cd():
-	cd_time = datetime.strptime((datetime.now(tz=TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d').replace(tzinfo=TZ_SH) - datetime.now(tz=TZ_SH)
+	cd_time = datetime.strptime((datetime.now(tz=TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d"), "%Y-%m-%d").replace(tzinfo=TZ_SH) - datetime.now(tz=TZ_SH)
+	return int(cd_time.total_seconds())
+
+def remaining_month_cd():
+	month_days = calendar.monthrange(datetime.today().year, datetime.today().month)[1]
+	cd_time = datetime.strptime(datetime.now(tz=TZ_SH).strftime("%Y-%m"), "%Y-%m").replace(tzinfo=TZ_SH) + timedelta(days=month_days) - datetime.now(tz=TZ_SH)
 	return int(cd_time.total_seconds())
 
 async def try_item(uid, item, value, **kwargs):
