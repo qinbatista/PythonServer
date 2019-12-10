@@ -66,13 +66,17 @@ class MailServer:
 		post = await request.post()
 		mail = await asyncio.wrap_future(self.executor.submit(MailServer.get_mail, self.mailbox, \
 				post['world'], post['uid'], ['new', 'cur']))
-		return web.json_response({'mail' : mail})
+		return web.json_response({'mail' : mail, 'count' : \
+				{'cur' : len(MailServer.get_mail_folder(self.mailbox, post['world'], post['uid'])), \
+				'max' : MailServer.MAILBOX_LIMIT}})
 
 	async def get_new(self, request):
 		post = await request.post()
 		mail = await asyncio.wrap_future(self.executor.submit(MailServer.get_mail, self.mailbox, \
 				post['world'], post['uid'], ['new']))
-		return web.json_response({'mail' : mail})
+		return web.json_response({'mail' : mail, 'count' : \
+				{'cur' : len(MailServer.get_mail_folder(self.mailbox, post['world'], post['uid'])), \
+				'max' : MailServer.MAILBOX_LIMIT}})
 
 	@staticmethod
 	def send_mail(mbox, world, uid, mail_dict):
