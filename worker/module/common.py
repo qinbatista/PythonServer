@@ -278,17 +278,30 @@ async def _redeem_all_mail(uid, gn_target, mail_type, group_id, item_id, quantit
 
 async def _send_text_mail(uid, gn_target, msg, **kwargs):
 	fid = await get_uid(gn_target, **kwargs)
-	kwargs['msg'] = msg
-	kwargs['from_'] = await get_gn(uid, **kwargs)
-	sent = await mail.send_mail(0, fid, **kwargs)
+	#kwargs['msg'] = msg
+	#kwargs['from_'] = await get_gn(uid, **kwargs)
+	#sent = await mail.send_mail(0, fid, **kwargs)
+	await mail.send_mail({'type' : enums.MailType.SIMPLE.value, 'from' : await get_gn(uid, **kwargs), \
+			'subj' : kwargs['data']['subj'], 'body' : kwargs['data']['body']}, fid, **kwargs)
+
+
+
 	return mt(0, 'success')
 
 async def _send_gift_mail(uid, gn_target, group_id, item_id, quantity, **kwargs):
 	fid = await get_uid(gn_target, **kwargs)
 	if fid=="": return mt(99, '')
-	kwargs['items'] = encode_item(enums.Group(group_id), enums.Item(item_id), quantity)
-	kwargs['from_'] = await get_gn(uid, **kwargs)
-	sent = await mail.send_mail(1, fid, **kwargs)
+	#kwargs['items'] = encode_item(enums.Group(group_id), enums.Item(item_id), quantity)
+	#kwargs['from_'] = await get_gn(uid, **kwargs)
+	#sent = await mail.send_mail(1, fid, **kwargs)
+
+	await mail.send_mail({'type' : enums.MailType.GIFT.value, 'from' : await gn_gn(uid, **kwargs), \
+			'subj' : enums.MailTemplate.SYSTEM_REWARD.name, 'body' : enums.MailTemplate.GIFT_1.name, \
+			'items' : encode_item(enums.Group(group_id), enums.Item(item_id), quantity)}, \
+			fid, **kwargs)
+
+
+
 	return mt(0, 'success')
 
 
