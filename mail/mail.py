@@ -15,6 +15,11 @@ from datetime import datetime
 from dateutil import tz
 
 class MailServer:
+	MAILBOX_LIMIT = 100
+
+	class MailboxFullError(Exception):
+		pass
+
 	def __init__(self, path):
 		self.mailbox  = mailbox.Maildir(path)
 		self.executor = concurrent.futures.ThreadPoolExecutor()
@@ -31,20 +36,24 @@ class MailServer:
 	async def send(self, request):
 		post = await request.json()
 		try:
-			key  = await asyncio.wrap_future(self.executor.submit(MailServer.send_mail, self.mailbox, \
+			key = await asyncio.wrap_future(self.executor.submit(MailServer.send_mail, self.mailbox, \
 							post['world'], post['uid'], post['mail']))
 		except KeyError:
-			key = ''
-		return web.json_response({'key' : key})
+			return web.json_response({'status' : -1, 'uid' : post['uid'], 'key' : ''})
+		except MailServer.MailboxFullError:
+			return web.json_response({'status' :  1, 'uid' : post['uid'], 'key' : ''})
+		return web.json_response({    'status' :  0, 'uid' : post['uid'], 'key' : key})
 
 	async def delete(self, request):
 		post = await request.post()
-		deleted = await asyncio.wrap_future(self.executor.submit(MailServer.delete_mail, self.mailbox, post['world'], post['uid'], lambda mid, m: mid == post['key']))
+		deleted = await asyncio.wrap_future(self.executor.submit(MailServer.delete_mail, self.mailbox, \
+				post['world'], post['uid'], lambda mid, m: mid == post['key']))
 		return web.json_response({'keys' : deleted})
 
 	async def delete_read(self, request):
 		post = await request.post()
-		deleted = await asyncio.wrap_future(self.executor.submit(MailServer.delete_mail, self.mailbox, post['world'], post['uid'], lambda mid, m: 'S' in m.get_flags()))
+		deleted = await asyncio.wrap_future(self.executor.submit(MailServer.delete_mail, self.mailbox, \
+				post['world'], post['uid'], lambda mid, m: 'S' in m.get_flags()))
 		return web.json_response({'keys' : deleted})
 
 	async def mark(self, request):
@@ -57,13 +66,17 @@ class MailServer:
 		post = await request.post()
 		mail = await asyncio.wrap_future(self.executor.submit(MailServer.get_mail, self.mailbox, \
 				post['world'], post['uid'], ['new', 'cur']))
-		return web.json_response({'mail' : mail})
+		return web.json_response({'mail' : mail, 'count' : \
+				{'cur' : len(MailServer.get_mail_folder(self.mailbox, post['world'], post['uid'])), \
+				'max' : MailServer.MAILBOX_LIMIT}})
 
 	async def get_new(self, request):
 		post = await request.post()
 		mail = await asyncio.wrap_future(self.executor.submit(MailServer.get_mail, self.mailbox, \
 				post['world'], post['uid'], ['new']))
-		return web.json_response({'mail' : mail})
+		return web.json_response({'mail' : mail, 'count' : \
+				{'cur' : len(MailServer.get_mail_folder(self.mailbox, post['world'], post['uid'])), \
+				'max' : MailServer.MAILBOX_LIMIT}})
 
 	@staticmethod
 	def send_mail(mbox, world, uid, mail_dict):
@@ -89,6 +102,8 @@ class MailServer:
 
 	@staticmethod
 	def deliver_mail(folder, mail):
+		if len(folder) >= MailServer.MAILBOX_LIMIT:
+			raise MailServer.MailboxFullError
 		key = folder.add(mail)
 		msg = folder[key]
 		msg['key']  = key
