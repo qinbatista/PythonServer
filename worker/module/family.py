@@ -324,7 +324,8 @@ async def search(name, **kwargs):
 
 async def get_random(number=5, **kwargs):
 	data = await common.execute(f'SELECT `name`, `icon`, `exp`, `notice`, `board` FROM `family` ORDER BY RAND() LIMIT {number};', **kwargs)
-	return common.mt(0, 'success', {'families' : [{'name' : f[0], 'icon' : f[1], 'exp' : f[2], 'notice' : f[3], 'board': f[4]} for f in data]})
+	return common.mt(0, 'success', {'families': [{'name': f[0], 'icon': f[1], 'exp': f[2], 'notice': f[3], 'board': f[4],
+			'people': (await common.execute(f'SELECT COUNT(*) FROM player WHERE fid="{f[0]}";', **kwargs))[0][0]} for f in data]})
 
 async def config(**kwargs):
 	return common.mt(0, 'success', data={'config': kwargs['config']['family']})
