@@ -25,9 +25,10 @@ async def create(uid, name, icon, **kwargs):
 	if await common.exists('family', ('name', name), **kwargs): return common.mt(96, 'name already exists!')
 	enough, remaining = await common.try_item(uid, iid, -cost, **kwargs)
 	if not enough: return common.mt(97, 'insufficient materials')
+	# 以下语句必须顺序执行
 	await common.execute(f'INSERT INTO family(name, icon) VALUES("{name}", {icon});', **kwargs)
-	await asyncio.gather(common.execute(f'INSERT INTO familyrole(uid, name, role) VALUES("{uid}", "{name}", "{enums.FamilyRole.OWNER.value}");', **kwargs),
-						common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs))
+	await common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs)
+	await common.execute(f'UPDATE familyrole SET role = "{enums.FamilyRole.OWNER.value}" WHERE uid = "{uid}" AND name = "{name}";', **kwargs)
 	return common.mt(0, 'created family', {'name' : name, 'icon': icon, 'iid' : iid.value, 'value' : remaining})
 
 async def leave(uid, **kwargs):
@@ -406,8 +407,7 @@ async def _get_family_info(name, *args, **kwargs):
 	return (True, data[0]) if data != () else (False, ())
 
 async def _add_to_family(uid, name, **kwargs):
-	await asyncio.gather(common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs),
-			common.execute(f'INSERT INTO familyrole VALUES("{uid}", "{name}", {enums.FamilyRole.BASIC.value});', **kwargs))
+	await common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs)
 
 async def _in_family(uid, **kwargs):
 	data = await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}";', **kwargs)
