@@ -42,6 +42,7 @@ async def record_achievement(uid, achievement_value=1, **kwargs):  # aid->enums.
 			await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {enums.Achievement.KEEPING_LOGIN}, {1},0) ON DUPLICATE KEY UPDATE `value`= {1}',**kwargs)
 			await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.CONTINUOUS_LOGIN}, "{current_time}") ON DUPLICATE KEY UPDATE `time`= "{current_time}"',**kwargs)
 	else:
+		if achievement_value <= 0: return common.mt(0, 'record:' + str(kwargs["aid"]) + " failure, 记录值不能为负数")
 		await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {kwargs["aid"]}, {achievement_value},0) ON DUPLICATE KEY UPDATE `value`= `value`+{achievement_value}',**kwargs)
 	return common.mt(0, 'record:' + str(kwargs["aid"]) + " success")
 
