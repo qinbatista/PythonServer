@@ -38,7 +38,7 @@ async def refresh(uid, **kwargs):
 	ua, mw = await get_unassigned_workers(uid, **kwargs)  # ua未分配的工人数，mw总工人数
 	# 记录成就的代码片段
 	for k in RESOURCE_FACTORIES:
-		if delta[k] == 0: continue
+		if delta[k] <= 0: continue
 		if k == enums.Factory.FOOD: kwargs.update({"aid": enums.Achievement.COLLECT_FOOD})
 		elif k == enums.Factory.IRON: kwargs.update({"aid": enums.Achievement.COLLECT_MINE})
 		elif k == enums.Factory.CRYSTAL: kwargs.update({"aid": enums.Achievement.COLLECT_CRYSTAL})
