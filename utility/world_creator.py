@@ -143,14 +143,6 @@ CREATE TABLE `player` (
 # ALTER TABLE player ADD CONSTRAINT `clear_fid`
 # FOREIGN KEY(`fid`) REFERENCES `family` (`name`) ON DELETE SET NULL;
 
-PLAYERAFTERINSERT = \
-"""
-CREATE TRIGGER `player_AFTER_INSERT` AFTER INSERT ON `player` FOR EACH ROW
-BEGIN
-INSERT INTO progress(uid) VALUES (new.uid);
-END
-"""
-
 PROGRESS = \
 """
 CREATE TABLE `progress` (
@@ -319,9 +311,28 @@ CONSTRAINT = \
 	FOREIGN KEY(`fid`) REFERENCES `family` (`name`) ON DELETE SET NULL ON UPDATE CASCADE;
 """
 
-TABLES = [PLAYER, PLAYERAFTERINSERT, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET,
+TRIGGER1 = \
+"""
+CREATE TRIGGER `player_AFTER_INSERT1` AFTER INSERT ON `player` FOR EACH ROW
+BEGIN
+	INSERT INTO progress(uid) VALUES (new.uid);
+END;
+"""
+
+TRIGGER2 = \
+"""
+CREATE TRIGGER `player_BEFORE_INSERT1` BEFORE UPDATE ON `player` FOR EACH ROW
+BEGIN
+	IF (old.fid IS NULL) AND (new.fid IS NOT NULL)
+	THEN
+		INSERT INTO familyrole(uid, name, role) VALUES (new.uid, new.fid, 0);
+	END IF;
+END;
+"""
+
+TABLES = [PLAYER, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET,
 		FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LEADERBOARD, LIMITS,
-		PROGRESS, ROLE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE, CONSTRAINT]
+		PROGRESS, ROLE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE, CONSTRAINT, TRIGGER1, TRIGGER2]
 
 
 
@@ -409,6 +420,7 @@ def test(world, mysql_addr, mysql_user, mysql_pw):
 	connection = pymysql.connect(host=mysql_addr, user=mysql_user, password=mysql_pw, charset='utf8mb4', autocommit=True)
 	connection.cursor().execute(f'CREATE DATABASE `{world}`;')
 	connection.select_db(world)
+
 	for table in TABLES:
 		connection.cursor().execute(table)
 	"""
