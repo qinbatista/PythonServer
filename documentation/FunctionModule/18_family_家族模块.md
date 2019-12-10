@@ -232,11 +232,12 @@ An invitation will be sent the the user's mailbox.
 
 * 99: not in a family
 * 98: insufficient permissions
-* 97: mail could not be sent
+* 97: mail could not be sent (internal mail error)
 * 96: 邀请对象离开家族冷却时间未结束
 * 95: 邀请对象等级不满18级
 * 94: 邀请对象已经加入了家族
 * 93: 邀请的用户不存在
+* 92: target's mailbox is full
 
 
 
@@ -322,7 +323,7 @@ If any of them accept the invitation, user will be added to the family.
 
 * 99: already in a family
 * 98: invalid family
-* 97: mail could not be sent
+* 97: mail could not be sent (all mailboxes are full, or internal mail error)
 * 96: 离开家族冷却时间未结束
 * 95: 你的等级不满18级
 
