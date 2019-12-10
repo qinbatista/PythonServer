@@ -11,6 +11,6 @@ async def get_login_token(uid, **kwargs):
 	gn, fn = data[0][0], data[0][1]
 	token = str(secrets.randbits(128))
 	await kwargs['redis'].hmset_dict(f'chat.logintokens.{token}', \
-			{'world' : kwargs['world'], 'gn' : gn, 'fn' : fn})
+			{'world' : kwargs['world'], 'gn' : gn, 'fn' : fn if fn is not None else ''})
 	await kwargs['redis'].expire(f'chat.logintokens.{token}', 120)
 	return common.mt(0, 'success', {'token' : token})
