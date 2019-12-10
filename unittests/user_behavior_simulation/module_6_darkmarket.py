@@ -22,8 +22,8 @@ def login_decoration(func):
 	return wrapper
 
 # @login_decoration 此方法不再使用
-# def get_all_market(token,world, **kwargs):
-# 	response = send_tcp_message({'world': world, 'function': 'get_all_market', 'data': {'token' : token}})
+def get_all_market(token,world, **kwargs):
+	response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_market', 'data': {'token' : token}})
 # 	logger.debug(response)
 
 # @login_decoration
@@ -35,7 +35,8 @@ def darkmarket_transaction( token, world, pid, **kwargs):
 	response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'darkmarket_transaction', 'data': {'token' : token, 'pid': pid}})
 
 def darkmarket_dialog(token, world,**kwargs):
-	refresh_market(token, world, **kwargs)
+	# get_all_market(token, world, **kwargs)
+	# refresh_market(token, world, **kwargs)
 	darkmarket_transaction(token, world, random.randint(0,7), **kwargs)
 
 if __name__ == '__main__':
