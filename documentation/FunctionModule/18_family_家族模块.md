@@ -840,8 +840,7 @@ The cost to change the family name is determined by `family.json` configuration 
 * 98: not in a family
 * 97: insufficient permissions
 * 96: insufficient funds
-* 95: family name already exists
-* 94: 这是原来的家族名字
+* 95: 家族名字已经被使用过
 
 
 

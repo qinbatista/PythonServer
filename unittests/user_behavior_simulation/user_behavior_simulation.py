@@ -43,7 +43,7 @@ token = ""
 unique_id=""
 testing_people_number = 1000
 DEBUG_LOG = True
-DEBUG_LOG_DETAIL=True
+DEBUG_LOG_DETAIL=False
 
 
 
@@ -115,28 +115,27 @@ def run_task(name):
 	call_login(str(name))
 	# create_data(name)
 	start = time.time()
-	print(str(unique_id))
 	info_list =  module_16_get_all_data.get_all_info(token,world)#加载所有参数信息
-	# module_1_stage.stage_dialog(token,world,info_list[5])##战役
-	# module_2_summon.summon_dialog(token,world)#召唤法政
-	# module_3_lottery.get_random_item(token,world)#转盘
-	# module_6_darkmarket.darkmarket_dialog(token,world)#市场
-	# module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
-	# module_11_friends.freind_dialog(token,world)#朋友
-	# module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
-	# module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
-	# # module_18_family.family_dialog(token,world,info_list[13],unique_id)#家族系统（后测试）
-	# module_19_factory.factory_dialog(token,world,info_list[5])#建造
-	# # module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
-	# module_21_roles.role_dialog(token,world)#玩家卡牌
-	# # module_22_announcement.announcement_dialog(token,world)#公告系统（后测试）
-	# module_23_daily_task.task_dialog(token,world,info_list[5])#每日任务
-	# module_24_achievement.achievement_dialog(token,world)#成就系统
-	# module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
+	module_1_stage.stage_dialog(token,world,info_list[5])##战役
+	module_2_summon.summon_dialog(token,world)#召唤法政
+	module_3_lottery.get_random_item(token,world)#转盘
+	module_6_darkmarket.darkmarket_dialog(token,world)#市场
+	module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
+	module_11_friends.freind_dialog(token,world)#朋友
+	module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
+	module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
+	# module_18_family.family_dialog(token,world,info_list[13],unique_id)#家族系统（后测试）
+	module_19_factory.factory_dialog(token,world,info_list[5])#建造
+	# module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
+	module_21_roles.role_dialog(token,world)#玩家卡牌
+	# module_22_announcement.announcement_dialog(token,world)#公告系统（后测试）
+	module_23_daily_task.task_dialog(token,world,info_list[5])#每日任务
+	module_24_achievement.achievement_dialog(token,world)#成就系统
+	module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
 	module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
-	# module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
-	# # module_12_chat.chat_dialog(token,world,info_list[5])#vip系统
-	# module_28_mall.mall_dialog(token,world,info_list[5],unique_id)#mall系统
+	module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
+	# module_12_chat.chat_dialog(token,world,info_list[5])#vip系统
+	module_28_mall.mall_dialog(token,world,info_list[5],unique_id)#mall系统
 	end = time.time()
 	debug_log(end-start,"user_"+str(unique_id),"",level=2)
 
@@ -158,6 +157,6 @@ def run_all_task_gevent():
 	print("cost time:["+str((endtime - starttime).seconds)+"]s")
 if __name__ == "__main__":
 	# run_task(input("your unique id:"))
-	run_task("q1")
-	# run_all_task_multiprocessing()
+	# run_task("wtfdocker")
+	run_all_task_multiprocessing()
 

@@ -25,8 +25,8 @@ async def create(uid, name, icon, **kwargs):
 	if await common.exists('family', ('name', name), **kwargs): return common.mt(96, 'name already exists!')
 	enough, remaining = await common.try_item(uid, iid, -cost, **kwargs)
 	if not enough: return common.mt(97, 'insufficient materials')
-	await asyncio.gather(common.execute(f'INSERT INTO family(name, icon) VALUES("{name}", {icon});', **kwargs),
-						common.execute(f'INSERT INTO familyrole(uid, name, role) VALUES("{uid}", "{name}", "{enums.FamilyRole.OWNER.value}");', **kwargs),
+	await common.execute(f'INSERT INTO family(name, icon) VALUES("{name}", {icon});', **kwargs)
+	await asyncio.gather(common.execute(f'INSERT INTO familyrole(uid, name, role) VALUES("{uid}", "{name}", "{enums.FamilyRole.OWNER.value}");', **kwargs),
 						common.execute(f'UPDATE player SET fid = "{name}" WHERE uid = "{uid}";', **kwargs))
 	return common.mt(0, 'created family', {'name' : name, 'icon': icon, 'iid' : iid.value, 'value' : remaining})
 
@@ -220,22 +220,16 @@ async def set_role(uid, gn_target, role, **kwargs):
 
 async def change_name(uid, new_name, **kwargs):
 	if not _valid_family_name(new_name): return common.mt(99, 'invalid family name')
+	can_change, _ = await _get_family_info(new_name, 'icon', **kwargs)
+	if can_change: return common.mt(95, '家族名字已经被使用过')
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(98, 'not in family')
-	if new_name == name: return common.mt(94, '这是原来的家族名字')
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_change_name_permissions(role): return common.mt(97, 'insufficient permissions')
 	_, iid, cost = (common.decode_items(kwargs['config']['family']['general']['costs']['change_name']))[0]
 	can_pay, remaining = await common.try_item(uid, iid, -cost, **kwargs)
 	if not can_pay: return common.mt(96, 'insufficient funds')
-	try:
-		await common.execute(f'UPDATE family SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
-	except pymysql.err.IntegrityError:
-		await common.try_item(uid, iid, cost, **kwargs)
-		return common.mt(95, 'family name already exists')
-	await common.execute(f'UPDATE player SET fid = "{new_name}" WHERE fid = "{name}";', **kwargs)
-	await common.execute(f'UPDATE familyrole SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
-	await common.execute(f'UPDATE familyhistory SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
+	await common.execute(f'UPDATE family SET name = "{new_name}" WHERE name = "{name}";', **kwargs)
 	await _record_family_change(new_name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_CHANGED_FAMILY_NAME>： {new_name}.', **kwargs)
 	return common.mt(0, 'success', {'name' : new_name, 'iid' : iid.value, 'value' : remaining})
 
@@ -377,22 +371,9 @@ async def _get_check_in_timer(uid, **kwargs):
 
 async def _check_delete_family(timer, name, **kwargs):
 	if timer is not None and datetime.now(tz=common.TZ_SH) > timer:
-		await _delete_family(name, **kwargs)
+		await common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
 		return True
 	return False
-
-# TODO parallelize with asyncio.gather and asyncio tasks
-async def _delete_family(name, **kwargs):
-	await _delete_disband_timer(name, **kwargs)
-	data = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
-	members = [m[0] for m in data]
-	for member in members:
-		await common.execute(f'UPDATE `player` SET fid = "" WHERE uid = "{member}";', **kwargs)
-	await asyncio.gather(
-		# common.execute(f'DELETE FROM `familyrole` WHERE `name` = "{name}";', **kwargs),
-		# common.execute(f'DELETE FROM `familyhistory` WHERE `name` = "{name}";', **kwargs),
-		common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
-	)
 
 async def _get_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
@@ -440,7 +421,7 @@ async def _add_to_family(uid, name, **kwargs):
 
 async def _in_family(uid, **kwargs):
 	data = await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}";', **kwargs)
-	if data == () or ('',) in data: return False, ''
+	if data == () or (None,) in data: return False, None
 	return True, data[0][0]
 
 async def _get_role(uid, name, **kwargs):
@@ -459,7 +440,7 @@ async def _lookup_nonce(nonce, **kwargs):
 		return (None, None) if data[nonce]['status'] != 0 else (data[nonce]['name'], data[nonce]['uid_target'])
 
 async def _remove_from_family(uid, name, **kwargs):
-	await asyncio.gather(common.execute(f'UPDATE player SET fid = "" WHERE uid = "{uid}";', **kwargs),
+	await asyncio.gather(common.execute(f'UPDATE player SET fid = NULL WHERE uid = "{uid}";', **kwargs),
 			common.execute(f'DELETE FROM familyrole WHERE uid = "{uid}" AND name = "{name}";', **kwargs))
 
 async def _rmtimes_timer(name, **kwargs):

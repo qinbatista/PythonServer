@@ -35,7 +35,7 @@ def check_boss_status(**kwargs):
 	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'check_boss_status', 'data': {'token': kwargs['token']}})
 
 def get_top_damage(**kwargs):
-	response = user_behavior_simulation.send_tcp_message({'world': 0, 'function': 'get_top_damage', 'data': {'token': kwargs['token'], "page": 1}})
+	response = user_behavior_simulation.send_tcp_message({'world': kwargs['world'], 'function': 'get_top_damage', 'data': {'token': kwargs['token'], "page": 1}})
 
 def stage_dialog(token,world,info_list):
 	# while True:

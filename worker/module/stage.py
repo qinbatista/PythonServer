@@ -443,7 +443,7 @@ async def check_boss_status(uid,**kwargs):
 		await common.execute(f'INSERT INTO limits (uid, lid, value) VALUES ("{uid}", {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS},"3") ON DUPLICATE KEY UPDATE `value`= {3}',**kwargs)
 	else:
 		delta_time = datetime.strptime(current_this_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S')
-		if delta_time.days>=1:
+		if delta_time.days >= 1:
 			enter_times = 3
 			await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.WORLD_BOSS_CHALLENGE_TIME},"{current_this_time}") ON DUPLICATE KEY UPDATE `time`= "{current_this_time}"',**kwargs)
 			await common.execute(f'INSERT INTO limits (uid, lid, value) VALUES ("{uid}", {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS},"3") ON DUPLICATE KEY UPDATE `value`= {3}',**kwargs)
@@ -451,7 +451,7 @@ async def check_boss_status(uid,**kwargs):
 			limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" and lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 			enter_times = limits[0][0]
 	cd_time = datetime.strptime((datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d') - datetime.now()
-	world_boss = {'remaining': enter_times, 'time': int(cd_time.total_seconds())}
+	world_boss = {'remaining': enter_times, 'time': int(cd_time.total_seconds()), 'month_time': common.remaining_month_cd()}
 	boss_life_ratio = {}
 	for i in range(0, len(kwargs["boss_life_remaining"])):
 		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))
@@ -628,7 +628,4 @@ async def try_stage(uid, stage, stage_type, **kwargs):
 	# try_energy 扣体力看是否足够
 	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
 	return (97, energy_data['data'], -energy_consume) if energy_data["status"] >= 97 else (0, energy_data['data'], -energy_consume)
-
-def get_time_format(seconds):
-	return '' if seconds < 0 else f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}'
 

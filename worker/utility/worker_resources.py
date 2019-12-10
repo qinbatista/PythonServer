@@ -69,7 +69,7 @@ class RepeatingTimer(threading.Thread):
 		self.fn     = fn
 		self.args   = args
 		self.kwargs = kwargs
-	
+
 	def run(self):
 		while True:
 			print(f'sleeping for {self.dt} seconds...')
@@ -84,7 +84,7 @@ class ModuleConfigurations:
 		self.repeat  = RepeatingTimer(600, self.refresh, refresh_world_boss = False)
 		self.repeat.start()
 		self.refresh()
-	
+
 	def refresh(self, *, refresh_world_boss = True, already_refreshed_world_boss = False):
 		r = requests.get(self.baseurl + '/get_game_manager_config')
 		self.configs['lottery']           = r.json()['lottery']
@@ -125,7 +125,7 @@ class ModuleConfigurations:
 
 	def __getitem__(self, key):
 		return self.configs[key]
-	
+
 
 
 
