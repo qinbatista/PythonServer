@@ -101,10 +101,11 @@
 [失败]()
 
 * 99: 自己给自己发邮件
-* 98: 邮箱有问题
+* 98: 邮箱有问题 (internal mail error)
 * 97: 没有此人
 * 96: 一天只能申请6个人
 * 95: 已经成为朋友或已经申请过这个人为朋友
+* 94: target's mailbox is full
 
 
 
@@ -188,7 +189,8 @@
 
 * 99: 不是朋友
 * 98: 礼物冷却中
-* 97: 邮箱错误
+* 97: 邮箱错误 (internal mailbox error)
+* 96: target's mailbox full
 
 
 
