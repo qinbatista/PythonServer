@@ -301,7 +301,7 @@ async def _send_gift_mail(uid, gn_target, group_id, item_id, quantity, **kwargs)
 	#kwargs['from_'] = await get_gn(uid, **kwargs)
 	#sent = await mail.send_mail(1, fid, **kwargs)
 
-	await mail.send_mail({'type' : enums.MailType.GIFT.value, 'from' : await gn_gn(uid, **kwargs), \
+	await mail.send_mail({'type' : enums.MailType.GIFT.value, 'from' : await get_gn(uid, **kwargs), \
 			'subj' : enums.MailTemplate.SYSTEM_REWARD.name, 'body' : enums.MailTemplate.GIFT_1.name, \
 			'items' : encode_item(enums.Group(group_id), enums.Item(item_id), quantity)}, \
 			fid, **kwargs)
