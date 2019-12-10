@@ -107,7 +107,7 @@ async def find_person(uid, gn_target, **kwargs):
 	if data == (): return common.mt(99, 'no such person')
 	isfriends, _, _ = await _are_friends(uid, uid_target, **kwargs)
 	isfamily = await _are_family(uid, uid_target, **kwargs)
-	return common.mt(0, 'find person success', {'gn': data[0][0], 'intro': data[0][1], 'fid': data[0][2], 'exp': data[0][3], 'stage': data[0][4], 'role': data[0][5], "isfriend": str(isfriends), "isfamily": str(isfamily)})
+	return common.mt(0, 'find person success', {'gn': data[0][0], 'intro': data[0][1], 'fid': '' if data[0][2] is None else data[0][2], 'exp': data[0][3], 'stage': data[0][4], 'role': data[0][5], "isfriend": str(isfriends), "isfamily": str(isfamily)})
 
 
 ###########################################################################################################
