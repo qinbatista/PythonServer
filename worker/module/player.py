@@ -6,16 +6,18 @@ from module import mail
 from module import enums
 from module import common
 from module import stage
+import asyncio
 
 async def create(uid, gn, **kwargs):
 	if uid == "" or gn == "": return common.mt(98, '玩家uid或者名字为空')
 	if await common.get_gn(uid, **kwargs) != "" or await common.get_uid(gn, **kwargs) != "": return common.mt(99, '玩家uid或名字已存在')
-	await common.execute_update(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
-	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `storage`) VALUES \
-			("{uid}", {enums.Factory.UNASSIGNED.value}, 5, 5);', **kwargs)
-	await common.execute(f'INSERT INTO role  (uid, star, rid) VALUES ("{uid}", 1, {enums.Role.R101.value});', **kwargs)
-	await common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W101.value});', **kwargs)
-	await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.COIN.value}, 1000000), ("{uid}", {enums.Item.DIAMOND.value}, 1000000);', **kwargs)
+	await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
+	await asyncio.gather(
+		common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `storage`) VALUES ("{uid}", {enums.Factory.UNASSIGNED.value}, 5, 5);', **kwargs),
+		common.execute(f'INSERT INTO role  (uid, star, rid) VALUES ("{uid}", 1, {enums.Role.R101.value});', **kwargs),
+		common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W101.value});', **kwargs),
+		common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.COIN.value}, 1000000), ("{uid}", {enums.Item.DIAMOND.value}, 1000000);', **kwargs)
+	)
 	return common.mt(0, 'success', {'gn' : gn})
 
 async def enter_world(uid, **kwargs):
