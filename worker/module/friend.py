@@ -42,7 +42,7 @@ async def request(uid, gn_target, **kwargs):
 	await common.execute(f'INSERT INTO friend (uid, fid) VALUES ("{uid}", "{uid_target}") ON DUPLICATE KEY UPDATE uid = uid;', **kwargs)
 
 	sent = await mail.send_mail({'type' : enums.MailType.FRIEND_REQUEST.value, \
-			'from' : await common.gn_gn(uid, **kwargs), 'subj' : '', 'body' : '', 'uid_sender' : uid}, \
+			'from' : await common.get_gn(uid, **kwargs), 'subj' : '', 'body' : '', 'uid_sender' : uid}, \
 			uid_target, **kwargs)
 	if sent[uid_target]['status'] == 1:
 		return common.mt(94, 'target mailbox full')
