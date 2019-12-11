@@ -121,7 +121,7 @@ def create_data(name):
 	unique_id = name
 	#mail_type: SIMPLE = 0,GIFT = 1, FRIEND_REQUEST = 2 FAMILY_REQUEST = 3
 	#item_id: COIN = 1,IRON = 2,FOOD = 3,CRYSTAL = 4,DIAMOND = 5
-	for i in range(0,5):
+	for i in range(0, 5):
 		send_tcp_message({'function' : 'send_gift_mail', 'data' : {"token":token, "gn_target":"去污", "group_id":3, "item_id":random.randint(1,5), "quantity":random.randint(100,500)}})#送物品
 		mytime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		friend_time = time.strftime('%Y-%m-%d', time.localtime())
@@ -149,26 +149,26 @@ def run_task(name):
 	# create_data(name)
 	start = time.time()
 	info_list = module_16_get_all_data.get_all_info(token, world)  # 加载所有参数信息
-	module_1_stage.stage_dialog(token,world,info_list[5])##战役
-	module_2_summon.summon_dialog(token,world)#召唤法政
-	module_3_lottery.get_random_item(token,world)#转盘
-	module_6_darkmarket.darkmarket_dialog(token,world)#市场
-	module_10_weapons.weapon_dialog(token,world,info_list[5])#铁匠铺
-	module_11_friends.freind_dialog(token,world)#朋友
-	module_14_armor.armor_dialog(token,world,info_list[1])#盔甲合成
-	module_15_skills.skill_dialog(token,world,info_list[5])#技能天赋
-	# module_18_family.family_dialog(token,world,info_list[13],unique_id)#家族系统（后测试）
-	module_19_factory.factory_dialog(token,world,info_list[5])#建造
-	# module_20_shoping.shoping_dialog(token,world,info_list[5])#商场(内部方法)
-	module_21_roles.role_dialog(token,world)#玩家卡牌
-	# module_22_announcement.announcement_dialog(token,world)#公告系统（后测试）
-	module_23_daily_task.task_dialog(token,world,info_list[5])#每日任务
-	module_24_achievement.achievement_dialog(token,world)#成就系统
-	module_25_check_in.check_in_dialog(token,world,info_list[5])#签到系统
-	module_26_bag.bag_dialog(token,world,info_list[5])#玩家背包
-	module_27_vip.vip_dialog(token,world,info_list[5])#vip系统
-	# module_12_chat.chat_dialog(token,world,info_list[5])#vip系统
-	module_28_mall.mall_dialog(token,world,info_list[5],unique_id)#mall系统
+	module_1_stage.stage_dialog(token, world, info_list[5])  ##战役
+	module_2_summon.summon_dialog(token, world)  # 召唤法政
+	module_3_lottery.get_random_item(token, world)  # 转盘
+	module_6_darkmarket.darkmarket_dialog(token, world)  # 市场
+	module_10_weapons.weapon_dialog(token, world, info_list[5])  # 铁匠铺
+	module_11_friends.freind_dialog(token, world)  # 朋友
+	module_14_armor.armor_dialog(token, world, info_list[1])  # 盔甲合成
+	module_15_skills.skill_dialog(token, world, info_list[5])  # 技能天赋
+	# module_18_family.family_dialog(token, world, info_list[13], unique_id)  # 家族系统（后测试）
+	module_19_factory.factory_dialog(token, world, info_list[5])  # 建造
+	# module_20_store.shoping_dialog(token, world, info_list[5])  # 商场(内部方法)
+	module_21_roles.role_dialog(token, world)  # 玩家卡牌
+	# module_22_announcement.announcement_dialog(token, world)  # 公告系统（后测试）
+	module_23_daily_task.task_dialog(token, world, info_list[5])  # 每日任务
+	module_24_achievement.achievement_dialog(token, world)  # 成就系统
+	module_25_check_in.check_in_dialog(token, world, info_list[5])  # 签到系统
+	module_26_bag.bag_dialog(token, world, info_list[5])  # 玩家背包
+	module_27_vip.vip_dialog(token, world, info_list[5])  # vip系统
+	# module_12_chat.chat_dialog(token, world, info_list[5])  # vip系统
+	module_28_mall.mall_dialog(token, world, info_list[5], unique_id)  # mall系统
 	end = time.time()
 	debug_log(end - start, "user_" + str(unique_id), "", level=2)
 
