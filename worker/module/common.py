@@ -43,12 +43,11 @@ async def execute_update(statement, account=False, mall=False, exchange=False, *
 
 async def get_gn(uid, **kwargs):
 	data = await execute(f'SELECT gn FROM player WHERE uid = "{uid}";', **kwargs)
-	return data[0][0]
+	return "" if data == () else data[0][0]
 
 async def get_uid(gn, **kwargs):
 	data = await execute(f'SELECT uid FROM player WHERE gn = "{gn}";', **kwargs)
-	if data == ():return ""
-	else:return data[0][0]
+	return "" if data == () else data[0][0]
 
 def remaining_cd():
 	cd_time = datetime.strptime((datetime.now(tz=TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d"), "%Y-%m-%d").replace(tzinfo=TZ_SH) - datetime.now(tz=TZ_SH)

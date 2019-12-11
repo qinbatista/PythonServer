@@ -123,10 +123,10 @@
 ```json
 {
 	"world": 0,
-	"function": "get_hang_up_reward",
+	"function": "create_player",
 	"data": {
 		"token": "my token",
-    "gn":"game name",
+		"gn":"game name",
 	}
 }
 ```
@@ -150,7 +150,8 @@
 
 [调整关卡失败]()
 
-* 99: 玩家名字已经存在
+* 99: 玩家uid或名字已存在
+* 98: 玩家uid或者名字为空
 
 
 
