@@ -268,7 +268,7 @@ LEADERBOARD = \
 CREATE TABLE `leaderboard` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
 	  `lid` SMALLINT UNSIGNED NOT NULL COMMENT '排行id',
-	  `value` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '伤害',
+	  `value` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '伤害',
 	  PRIMARY KEY (`uid`,`lid`),
 	  CONSTRAINT `leaderboard_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
