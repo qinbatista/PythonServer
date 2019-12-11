@@ -288,7 +288,7 @@ async def _send_text_mail(uid, gn_target, msg, **kwargs):
 	#kwargs['from_'] = await get_gn(uid, **kwargs)
 	#sent = await mail.send_mail(0, fid, **kwargs)
 	await mail.send_mail({'type' : enums.MailType.SIMPLE.value, 'from' : await get_gn(uid, **kwargs), \
-			'subj' : kwargs['data']['subj'], 'body' : kwargs['data']['body']}, fid, **kwargs)
+			'subj' : 'subj', 'body' : msg}, fid, **kwargs)
 
 
 
