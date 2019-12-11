@@ -17,7 +17,7 @@ from datetime import datetime
 
 async def get_all(uid, **kwargs):
 	info = await _get_friend_info(uid, **kwargs)
-	return common.mt(0, 'got all friends', {'friends': [{'gn': i[0], 'exp': i[1], 'recover': i[2], 'since': i[3], 'fid': i[4], 'intro': i[5], 'icon': 0} for i in info]})
+	return common.mt(0, 'got all friends', {'friends': [{'gn': i[0], 'exp': i[1], 'recover': i[2], 'since': i[3], 'fid': '' if i[4] is None else i[4], 'intro': i[5], 'icon': 0} for i in info]})
 
 
 async def remove(uid, gn_target, **kwargs):
