@@ -217,13 +217,16 @@ An invitation will be sent the the user's mailbox.
 
 ##### 接受消息JSON格式
 
+times：家族今天可以邀请玩家的次数
+
 
 ```json
 {
 	"status": 0,
 	"message": "invitation sent",
 	"data": {
-		"gn" : "matthew"
+		"gn" : "matthew",
+        "times": "times"
 	}
 }
 ```
@@ -433,10 +436,22 @@ Gets all information regarding your family.
 		"notice": "New members should buy family gift package",
 		"board" : "Blackboard",
 		"members" : [
-			{"gn" : "matthew",  "role" : 10, "exp" : 420, 
-       "icon" : 0,"online_time":3222,"family_coin_record":233},
-			{"gn" : "children", "role" :  8, "exp" : 240, 
-       "icon" : 1,"online_time":123, "family_coin_record":1223}
+			{
+				"gn": "matthew",
+				"role": 10,
+				"exp": 420,
+				"icon": 0,
+				"online_time": 3222,
+				"family_coin_record": 233
+			},
+			{
+				"gn": "children",
+				"role": 8,
+				"exp": 240,
+				"icon": 1,
+				"online_time": 123,
+				"family_coin_record": 1223
+			}
 		],
 		"news" : [
 			["2019-10-30 06:30:24", "matthew added children."],

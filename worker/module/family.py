@@ -100,7 +100,7 @@ async def invite_user(uid, gn_target, **kwargs):
 		common.execute(f'INSERT INTO limits (uid, lid, value) SELECT familyrole.uid, {enums.Limits.FAMILY_INVITE}, {limit} FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE limits.value={limit};', **kwargs),
 		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.FAMILY_INVITE_END}, "{itime}" FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE timer.time = "{itime}";', **kwargs)
 	)
-	return common.mt(0, 'invited user', {'gn' : gn_target})
+	return common.mt(0, 'invited user', {'gn' : gn_target, 'times': limit})
 
 async def request_join(uid, name, **kwargs):
 	in_family, _ = await _in_family(uid, **kwargs)
