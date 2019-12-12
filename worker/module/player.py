@@ -10,7 +10,7 @@ import asyncio
 
 async def create(uid, gn, **kwargs):
 	if uid == "" or gn == "": return common.mt(98, '玩家uid或者名字为空')
-	if await common.get_gn(uid, **kwargs) != "" or await common.get_uid(gn, **kwargs) != "": return common.mt(99, '玩家uid或名字已存在')
+	if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, '玩家uid或名字已存在')
 	await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
 	await asyncio.gather(
 		common.execute(f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED}, 5, 5);', **kwargs),
