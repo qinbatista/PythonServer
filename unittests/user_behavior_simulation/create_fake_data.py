@@ -59,9 +59,9 @@ def run_task(name):
 	call_login(str(name))
 	#mail_type: SIMPLE = 0,GIFT = 1, FRIEND_REQUEST = 2 FAMILY_REQUEST = 3
 	#item_id: COIN = 1,IRON = 2,FOOD = 3,CRYSTAL = 4,DIAMOND = 5
-	for i in range(0,10):
-		# print(send_tcp_message({'function' : 'send_gift_mail', 'data' : {"token":token, "gn_target":"去污", "group_id":3, "item_id":random.randint(1,5), "quantity":random.randint(100,500)}}))#送物品
-		# send_tcp_message({'function' : 'send_text_mail', 'data' : {"token":token, "gn_target":"去污","msg":"msg:"+str(random.randint(1,100000000))}})#发送文字
+	for i in range(0,50):
+		print(send_tcp_message({'world' : 's0', 'function' : 'send_gift_mail', 'data' : {"token":token, "gn_target":"任骋寿哆予蒸", "group_id":3, "item_id":random.randint(1,5), "quantity":random.randint(100,500)}}))#送物品
+		print(send_tcp_message({'world' : 's0', 'function' : 'send_text_mail', 'data' : {"token":token, "gn_target":"肉肉肉肉","msg":"msg:"+str(random.randint(1,100000000))}}))#发送文字
 		mytime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		friend_time = time.strftime('%Y-%m-%d', time.localtime())
 		mydata = time.strftime('%Y-%m', time.localtime())
@@ -71,12 +71,9 @@ def run_task(name):
 		_execute_statement(f'INSERT INTO weapon (uid, wid, star,level, skillpoint, segment) VALUES ("{module_0_login.unique_id}", {random.randint(1,31)}, {random.randint(1,5)},{0},{random.randint(1,5000)},{random.randint(1,5000)}) ON DUPLICATE KEY UPDATE `segment`= values(`segment`)')
 		fname = f'f_unique_id_{random.randint(1,31)}'
 		_execute_statement(f'INSERT INTO friend (uid, fid, recover,since) VALUES ("{module_0_login.unique_id}", "{fname}", "{friend_time}","{friend_time}") ON DUPLICATE KEY UPDATE `since`= values(`since`)')
-		_execute_statement(f'INSERT INTO player (uid, gn, fid) VALUES ("{fname}", "f_name_{random.randint(1,31)}", "") ON DUPLICATE KEY UPDATE `fid`= values(`fid`)')
 		_execute_statement(f'INSERT INTO skill (uid, sid, level) VALUES ("{module_0_login.unique_id}", {random.randint(1,31)}, {random.randint(1,31)}) ON DUPLICATE KEY UPDATE `level`= values(`level`)')
 		_execute_statement(f'INSERT INTO role (uid, rid, star, level, skillpoint, segment) VALUES ("{module_0_login.unique_id}", {random.randint(1,31)}, {random.randint(1,5)},{random.randint(1,30)},{random.randint(1,5)},{random.randint(1,500)}) ON DUPLICATE KEY UPDATE `level`= values(`level`)')
 		_execute_statement(f'INSERT INTO darkmarket (pid,uid, mid, gid, qty, cid, amt) VALUES ({random.randint(0,7)},"{module_0_login.unique_id}", {random.randint(1,5)}, {random.randint(1,5)},{random.randint(1,30)},{random.randint(1,5)},{random.randint(1,500)}) ON DUPLICATE KEY UPDATE `amt`= values(`amt`)')
-		_execute_statement(f'INSERT INTO family (name, icon, exp) VALUES ("{module_0_login.unique_id}", {random.randint(1,5)}, {random.randint(1,500)}) ON DUPLICATE KEY UPDATE `exp`= values(`exp`)')
-		_execute_statement(f'INSERT INTO familyrole (uid, name, role) VALUES ("{module_0_login.unique_id}", "{"lol"+str(random.randint(1,5))}", "{random.randint(1,500)}") ON DUPLICATE KEY UPDATE `role`= values(`role`)')
 		_execute_statement(f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{module_0_login.unique_id}", {random.randint(1,13)}, {random.randint(0,1)},{0},"{mytime}") ON DUPLICATE KEY UPDATE `reward`= values(`reward`)')
 		_execute_statement(f'INSERT INTO check_in (uid, date, reward) VALUES ("{module_0_login.unique_id}", "{mydata+"-"+str(random.randint(10,31))}", {1}) ON DUPLICATE KEY UPDATE `reward`= values(`reward`)')
 if __name__ == "__main__":
