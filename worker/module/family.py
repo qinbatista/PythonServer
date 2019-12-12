@@ -79,6 +79,16 @@ async def invite_user(uid, gn_target, **kwargs):
 	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "邀请对象等级不满18级")
 	in_family_target, _ = await _in_family(uid_target, **kwargs)
 	if in_family_target: return common.mt(94, '邀请对象已经加入了家族')
+	# 以下是邀请成员限制的代码
+	owner_data = await common.execute(f'SELECT limits.value, timer.time FROM familyrole JOIN (limits, timer) ON (familyrole.uid=limits.uid AND limits.lid={enums.Limits.FAMILY_INVITE} AND familyrole.uid=timer.uid AND timer.tid={enums.Timer.FAMILY_INVITE_END}) WHERE familyrole.name="{name}" AND familyrole.role={enums.FamilyRole.OWNER};', **kwargs)
+	limit, itime = owner_data[0] if owner_data != () else (kwargs["config"]["family"]["general"]["itimes"], (datetime.now(tz=common.TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d"))
+	if datetime.strptime(itime, "%Y-%m-%d").replace(tzinfo=common.TZ_SH) <= datetime.now(tz=common.TZ_SH):
+		limit = kwargs["config"]["family"]["general"]["itimes"] - 1
+		itime = (datetime.now(tz=common.TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d")
+	elif limit == 0:
+		return common.mt(91, '今天邀请次数已用完')
+	else:
+		limit -= 1
 	sent = await mail.send_mail({'type' : enums.MailType.FAMILY_REQUEST.value, 'from' : name, \
 			'subj' : enums.MailTemplate.FAMILY_INVITATION.name, 'body' : '', 'uid_target' : uid_target, \
 			'name' : name}, uid_target, **kwargs)
@@ -86,6 +96,10 @@ async def invite_user(uid, gn_target, **kwargs):
 		return common.mt(92, 'target mailbox full')
 	if sent[uid_target]['status'] != 0:
 		return common.mt(97, 'internal mail error')
+	await asyncio.gather(
+		common.execute(f'INSERT INTO limits (uid, lid, value) SELECT familyrole.uid, {enums.Limits.FAMILY_INVITE}, {limit} FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE limits.value={limit};', **kwargs),
+		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.FAMILY_INVITE_END}, "{itime}" FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE timer.time = "{itime}";', **kwargs)
+	)
 	return common.mt(0, 'invited user', {'gn' : gn_target})
 
 async def request_join(uid, name, **kwargs):
