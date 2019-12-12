@@ -50,7 +50,7 @@ class Gate:
 	Starts the gate server. Should only be called once.
 	'''
 	async def start(self, *, debug = False):
-		self.debug = debug
+		self.debug = debug or self.args.debug
 		try:
 			await self.init()
 			asyncio.create_task(self.cs.serve_forever())
@@ -202,6 +202,7 @@ class Gate:
 
 async def main():
 	parser = argparse.ArgumentParser()
+	parser.add_argument('--debug'     , action = 'store_true')
 	parser.add_argument('--testing'   , action = 'store_true')
 	parser.add_argument('--cport'     , type = int, default = 8880)
 	parser.add_argument('--wport'     , type = int, default = 8201)
