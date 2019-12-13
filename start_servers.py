@@ -83,7 +83,7 @@ def main():
 				'--mail-addr', '192.168.1.165'], shell=False))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', \
 				'--channel', get_host_ip(), '--redis-addr', '192.168.1.102', \
-				'--nats-addr', '192.168.1.102', '--testing'], shell=False))
+				'--nats-addr', '192.168.1.102', '--debug'], shell=False))
 		time.sleep(0.2)
 		print('Done spawning servers...')
 		while len(processes) > 0:
