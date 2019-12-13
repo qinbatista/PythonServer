@@ -78,7 +78,7 @@ async def bind_phone(uid, phone, **kwargs):
 	if bound: return common.mt(98, 'phone has already been bound')
 	if exists: return common.mt(97, 'phone already exists')
 	code = await _gen_phone_code(phone, **kwargs)
-	r = verify_phone.send_verification(phone, code)
+	r = verify_phone.send_verification(phone, code, common.datetime.now(tz=common.TZ_SH).strftime("%Y%m%d"))
 	if r != 'OK': return common.mt(96, 'phone could not be sent', {'message' : r})
 	return common.mt(0, 'success')
 

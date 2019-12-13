@@ -11,7 +11,7 @@ client = AcsClient(ACCESS_KEY_ID, ACCESS_KEY_SECRET, 'cn-hangzhou')
 request = CommonRequest()
 
 
-def send_verification(to, code):
+def send_verification(to, code, send_date):
 	"""
 	:param to: send phone
 	:param code: verification code
@@ -27,11 +27,12 @@ def send_verification(to, code):
 	request.add_query_param('PhoneNumbers', to)
 	request.add_query_param('SignName', "陆逊互娱")
 	request.add_query_param('TemplateCode', "SMS_180049475")
+	request.add_query_param('SendDate', send_date)
 	request.add_query_param('TemplateParam', "{\"code\":\"%s\"}" % code)
-	response = client.do_action(request)
+	response = client.do_action_with_exception(request)
 	res = json.loads(response)
 	return res["Code"]
 
 
 if __name__ == '__main__':
-	send_verification("18323019610", "123456")
+	send_verification("18323019610", "123456", "20190909")
