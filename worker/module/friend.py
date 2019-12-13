@@ -17,7 +17,7 @@ from datetime import datetime
 
 async def get_all(uid, **kwargs):
 	info = await _get_friend_info(uid, **kwargs)
-	return common.mt(0, 'got all friends', {'friends': [{'gn': i[0], 'exp': i[1], 'recover': i[2], 'since': i[3], 'fid': i[4], 'intro': i[5], 'icon': 0} for i in info]})
+	return common.mt(0, 'got all friends', {'friends': [{'gn': i[0], 'exp': i[1], 'recover': i[2], 'since': i[3], 'fid': '' if i[4] is None else i[4], 'intro': i[5], 'icon': 0} for i in info]})
 
 
 async def remove(uid, gn_target, **kwargs):
@@ -42,7 +42,7 @@ async def request(uid, gn_target, **kwargs):
 	await common.execute(f'INSERT INTO friend (uid, fid) VALUES ("{uid}", "{uid_target}") ON DUPLICATE KEY UPDATE uid = uid;', **kwargs)
 
 	sent = await mail.send_mail({'type' : enums.MailType.FRIEND_REQUEST.value, \
-			'from' : await common.gn_gn(uid, **kwargs), 'subj' : '', 'body' : '', 'uid_sender' : uid}, \
+			'from' : await common.get_gn(uid, **kwargs), 'subj' : '', 'body' : '', 'uid_sender' : uid}, \
 			uid_target, **kwargs)
 	if sent[uid_target]['status'] == 1:
 		return common.mt(94, 'target mailbox full')

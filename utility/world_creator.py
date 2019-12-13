@@ -99,8 +99,8 @@ FRIEND = \
 CREATE TABLE `friend` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
 	  `fid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '朋友唯一id',
-	  `recover` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '发生礼物当天日期',
-	  `since` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '成为好友的当天日期',
+	  `recover` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '发生礼物当天日期',
+	  `since` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '成为好友的当天日期',
 	  PRIMARY KEY (`uid`,`fid`),
 	  CONSTRAINT `friend_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -151,7 +151,7 @@ CREATE TABLE `progress` (
 	  `exp` INT UNSIGNED DEFAULT 0 COMMENT '玩家经验',
 	  `role` SMALLINT UNSIGNED DEFAULT 1 COMMENT '拥有的角色数',
 	  `weapon` SMALLINT UNSIGNED DEFAULT 0 COMMENT '拥有的武器数',
-	  `stage` SMALLINT UNSIGNED DEFAULT 0 COMMENT '最高普通关卡',
+	  `stage` SMALLINT UNSIGNED DEFAULT 1 COMMENT '最高普通关卡',
 	  `towerstage` SMALLINT UNSIGNED DEFAULT 1000 COMMENT '冲塔最高关卡',
 	  `hangstage`  SMALLINT UNSIGNED DEFAULT 0 COMMENT '当前挂机的关卡',
 	  `vipexp` INT UNSIGNED DEFAULT 0 COMMENT 'vip经验',
@@ -268,7 +268,7 @@ LEADERBOARD = \
 CREATE TABLE `leaderboard` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
 	  `lid` SMALLINT UNSIGNED NOT NULL COMMENT '排行id',
-	  `value` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '伤害',
+	  `value` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '伤害',
 	  PRIMARY KEY (`uid`,`lid`),
 	  CONSTRAINT `leaderboard_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

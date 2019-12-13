@@ -121,7 +121,7 @@ async def _send_mail_friend_request(mail, uid, **kwargs):
 		await _safe_register(uid, resp['key'], mail, {'type', 'uid_sender'}, **kwargs)
 	return resp
 
-async def _send_mail_family_request():
+async def _send_mail_family_request(mail, uid, **kwargs):
 	resp = await _send({'world' : kwargs['world'], 'uid' : uid, 'mail' : \
 			{k : mail[k] for k in {'type', 'from', 'subj', 'body'}}}, **kwargs)
 	if resp['status'] == 0:
