@@ -14,6 +14,7 @@ import secrets
 from module import common
 from module import enums
 from utility import direct_mail
+from utility import verify_phone
 from module import achievement
 N = 2**10
 R = 8
@@ -72,6 +73,16 @@ async def bind_email(uid, email, **kwargs):
 	if r != 'OK': return common.mt(96, 'email could not be sent', {'message' : r})
 	return common.mt(0, 'success')
 
+async def bind_phone(uid, phone, **kwargs):
+	if not await _account_bound(uid, **kwargs): return common.mt(99, 'account is not bound')
+	bound, exists = await asyncio.gather(_phone_bound(uid, **kwargs), common.exists('info', ('phone_number', phone), account = True, **kwargs))
+	if bound: return common.mt(98, 'phone has already been bound')
+	if exists: return common.mt(97, 'phone already exists')
+	code = await _gen_phone_code(phone, **kwargs)
+	r = verify_phone.send_verification(phone, code)
+	if r != 'OK': return common.mt(96, 'phone could not be sent', {'message' : r})
+	return common.mt(0, 'success')
+
 async def verify_email_code(uid, code, **kwargs):
 	email = await kwargs['redis'].get('nonce.verify.email.' + code)
 	if not email: return common.mt(99, 'invalid code')
@@ -82,6 +93,17 @@ async def verify_email_code(uid, code, **kwargs):
 	if exists: return common.mt(97, 'email already exists')
 	await _set_email(uid, email, **kwargs)
 	return common.mt(0, 'success, email verified', {'email' : email})
+
+async def verify_phone_code(uid, code, **kwargs):
+	phone = await kwargs['redis'].get('nonce.verify.phone.' + code)
+	if not phone: return common.mt(99, 'invalid code')
+	phone = phone.decode()
+	await kwargs['redis'].delete('nonce.verify.phone.' + code)
+	bound, exists = await asyncio.gather(_phone_bound(uid, **kwargs), common.exists('info', ('phone_number', phone), account = True, **kwargs))
+	if bound: return common.mt(98, 'account already bound phone')
+	if exists: return common.mt(97, 'phone already exists')
+	await _set_phone(uid, phone, **kwargs)
+	return common.mt(0, 'success, phone verified', {'phone' : phone})
 
 #######################################################################
 
@@ -98,11 +120,23 @@ async def _email_bound(uid, **kwargs):
 			account = True, **kwargs)
 	return not (data == () or (None,) in data or ('',) in data)
 
+async def _phone_bound(uid, **kwargs):
+	data = await common.execute(f'SELECT phone_number FROM info WHERE unique_id = "{uid}";', \
+			account = True, **kwargs)
+	return not (data == () or (None,) in data or ('',) in data)
+
 async def _gen_email_code(email, **kwargs):
 	code = ''.join(random.choice(string.digits) for i in range(6))
 	while await kwargs['redis'].setnx('nonce.verify.email.' + code, email) == 0:
 		code = ''.join(random.choice(string.digits) for i in range(6))
 	await kwargs['redis'].expire('nonce.verify.email.' + code, 300)
+	return code
+
+async def _gen_phone_code(phone, **kwargs):
+	code = ''.join(random.choice(string.digits) for i in range(4))
+	while await kwargs['redis'].setnx('nonce.verify.phone.' + code, phone) == 0:
+		code = ''.join(random.choice(string.digits) for i in range(4))
+	await kwargs['redis'].expire('nonce.verify.phone.' + code, 300)
 	return code
 
 async def _get_account_email_phone(uid, **kwargs):
@@ -136,6 +170,9 @@ async def _set_credentials(uid, account, hashed_pw, salt, **kwargs):
 
 async def _set_email(uid, email, **kwargs):
 	await common.execute(f'UPDATE info SET email = "{email}" WHERE unique_id = "{uid}";', account = True, **kwargs)
+
+async def _set_phone(uid, phone, **kwargs):
+	await common.execute(f'UPDATE info SET phone_number = "{phone}" WHERE unique_id = "{uid}";', account = True, **kwargs)
 
 async def _valid_credentials(identifier, value, password, **kwargs):
 	if not _valid_password(password): return False
