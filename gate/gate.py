@@ -18,180 +18,179 @@ and then sending the completed job back to the correct client. Once a job has be
 a client, close the connection to the client.
 '''
 
-import os
-import ssl
-import sys
 import uuid
-import signal
 import asyncio
 import aioredis
 import argparse
 import contextlib
 import nats.aio.client
 
-import platform
-
 class Gate:
-	def __init__(self, args):
-		self.args     = args
-		self.ip       = self._read_ip()
-		self.debug    = False
-		self.cwriters = {}
+	LINE_ENDING = b'\r\n'
 
+	def __init__(self, args):
+		self.cwriters = {}
+		self.args     = args
+		self.nats     = nats.aio.client.Client()
 		self.cs       = None
 		self.ws       = None
 		self.gid      = None
-		self.nats     = None
 		self.redis    = None
-		self.running  = False
 
 
-	'''
-	Starts the gate server. Should only be called once.
-	'''
-	async def start(self, *, debug = False):
-		self.debug = debug or self.args.debug
+	async def init(self):
+		await Gate.add_signal_handler(lambda: asyncio.create_task(self.shutdown()))
+
+		await self.nats.connect(self.args.nats_addr, \
+				ping_interval          = 5, \
+				max_reconnect_attempts = 1, \
+				closed_cb              = Gate.on_nats_closed, \
+				reconnected_cb         = Gate.on_nats_reconnect, \
+				disconnected_cb        = Gate.on_nats_disconnect)
+
+		self.redis = await aioredis.create_redis(f'redis://{self.args.redis_addr}')
+		await self.register_gate()
+
+		self.ws = await asyncio.start_server(self.worker_protocol, port = self.args.wport)
+		self.cs = await asyncio.start_server(self.client_protocol, port = self.args.cport, \
+				ssl = Gate.init_ssl(self.args.certpath, self.args.keyfilepath, self.args.sslpw))
+
+		asyncio.create_task(self.ws.serve_forever())
+		asyncio.create_task(self.cs.serve_forever())
+
+
+
+	async def start(self):
 		try:
 			await self.init()
-			asyncio.create_task(self.cs.serve_forever())
-			asyncio.create_task(self.ws.serve_forever())
 			while self.running:
-				await asyncio.sleep(300)
-				await self.redis.expire('gates.id.' + self.gid, 600)
-				print(f'gate {self.gid}: updating expiration time for redis registry')
+				await asyncio.sleep(1)
+				await self.register_gate()
+			await self.shutdown()
+		except asyncio.CancelledError:
+			pass
 		except:
 			await self.shutdown()
-	
-	'''
-	Gracefully shuts down the gate.
-	Stop accepting incomming client connections and wait for all
-	previously connected client sessions to complete.
-	Then, cancel all remaining tasks and shutdown the server.
-	'''
+
+
 	async def shutdown(self):
-		if self.running:
-			print(f'gate {self.gid}: shutdown signal received, gracefully shutting down...')
-			self.running = False
-			self.cs.sockets[0].close()
-			print(f'gate {self.gid}: closing listening socket. not accepting new connections.')
-			timeout = 4
-			while self.cs._active_count > 0 and timeout > 0:
-				print(f'gate {self.gid}: waiting on {self.cs._active_count}, timing out in {timeout} seconds...')
-				await asyncio.sleep(0.5)
-				timeout -= 1
-			if self.nats.is_connected:
-				await self.nats.close()
-				print(f'gate {self.gid}: nats closed')
-			if not self.redis.closed:
-				await self.redis.delete('gates.id.' + self.gid)
-				self.redis.close()
-				await self.redis.wait_closed()
-				print(f'gate {self.gid}: redis closed')
-			with contextlib.suppress(ValueError):
-				self.ws.close()
-			with contextlib.suppress(ValueError):
-				self.cs.close()
-			# cancel remaining tasks
-			await self.ws.wait_closed()
-			await self.cs.wait_closed()
-			tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-			[task.cancel() for task in tasks]
-		else:
-			print(f'gate {self.gid}: done.')
+		print(f'gate {self.gid}: SIGINT signal received, gracefully shutting down...')
+		self.cs.sockets[0].close()
+		print(f'gate {self.gid}: no longer accepting new connections')
+		timeout = 4
+		while self.cs._active_count > 0 and timeout > 0:
+			print(f'gate {self.gid}: waiting on {self.cs._active_count} clients, \
+					timing out in {timeout} seconds...')
+			await asyncio.sleep(0.5)
+			timeout -= 1
 
-	'''
-	Establishes pre-requisite connections to other network services such as redis and nats.
-	Advertises the port and address of the backend server to be used by workers submitting responses.
-	Starts both socket servers.
-	'''
-	async def init(self):
-		if platform.system() != 'Windows':
-			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, lambda: asyncio.create_task(self.shutdown()))
-		self.nats = nats.aio.client.Client()
-		self.redis = await aioredis.create_redis(f'redis://{self.args.redis_addr}')
-		await self.nats.connect(f'nats://{self.args.nats_addr}', max_reconnect_attempts = 1)
-		await self._next_avail_gid()
-		await self.redis.set('gates.id.' + self.gid, self.ip + ':' + str(self.args.wport), expire = 600)
-		self.ws = await asyncio.start_server(self.worker_protocol, port = self.args.wport)
-		# initialize SSL
-		context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-		path = os.path.dirname(os.path.realpath(__file__))
-		context.load_cert_chain(certfile = path + '/cert/mycert.crt', keyfile = path + '/cert/rsa_private.key', password = 'lukseun1')
-		self.cs = await asyncio.start_server(self.client_protocol, port = self.args.cport, ssl = context)
-		print(f'gate {self.gid}: find me at {self.ip} on ports client: {self.args.cport}  worker: {self.args.wport}')
-		self.running = True
+		if self.nats.is_connected:
+			await self.nats.close()
+			print(f'gate {self.gid}: nats closed')
 
-	'''
-	Reads the client's job request and then submits it to the work queue.
-	The client's writer socket will get closed once the work server receives
-	the response to the client.
-	'''
+		if not self.redis.closed:
+			await self.redis.delete(f'gates.id.{self.gid}')
+			self.redis.close()
+			await self.redis.wait_closed()
+			print(f'gate {self.gid}: redis closed')
+
+		with contextlib.suppress(ValueError):
+			self.ws.close()
+		with contextlib.suppress(ValueError):
+			self.cs.close()
+		await self.ws.wait_closed()
+		await self.cs.wait_closed()
+
+		outstanding = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+		[task.cancel() for task in outstanding]
+		print(f'gate {self.gid}: shutdown done.')
+
+
 	async def client_protocol(self, reader, writer):
 		try:
-			await self._submit_job(await self._receive(reader), writer)
+			await self.submit_job(await Gate.receive(reader), writer)
 		except (asyncio.LimitOverrunError, asyncio.IncompleteReadError):
 			writer.close()
 		finally:
 			with contextlib.suppress(ConnectionResetError):
 				await writer.wait_closed()
 
-	'''
-	Listens for completed jobs from a worker. Once a completed job has been received,
-	launches a task to return that response back to the client.
-	'''
+	async def submit_job(self, job, writer):
+		jid = uuid.uuid4().hex
+		self.cwriters[jid] = writer
+		await self.redis.set(jid, self.gid, expire = 10)
+		await self.nats.publish(self.args.channel, f'{jid}~{job}'.encode())
+		if self.args.debug: print(f'gate: submitted job {jid} {job}')
+
 	async def worker_protocol(self, reader, writer):
 		try:
 			while self.running:
-				asyncio.create_task(self._relay_response(await self._receive(reader)))
+				asyncio.create_task(self.forward(await Gate.receive(reader)))
 		except ValueError:
-			print(f'gate {self.gid}: Missing \'~\' delimiter in message. Closing backend connection.')
+			pass
 		except (asyncio.LimitOverrunError, asyncio.IncompleteReadError):
-			print(f'gate {self.gid}: Backend connection did not follow protocol, closing connection.')
+			pass
 		finally:
 			writer.close()
 			await writer.wait_closed()
 
-	'''
-	Parses the worker message to find the cid of the original request.
-	Uses the cid to discover which client to return the response to.
-	Closes the client's writer socket after sending the response.
-	'''
-	async def _relay_response(self, r):
-		cid, response = r.split('~', maxsplit = 1)
-		cwriter = self.cwriters.pop(cid)
-		cwriter.write((response + '\r\n').encode())
+	async def forward(self, response):
+		jid, resp = response.split('~', maxsplit = 1)
+		cwriter = self.cwriters.pop(jid)
+		cwriter.write(resp.encode() + Gate.LINE_ENDING)
 		await cwriter.drain()
 		cwriter.close()
+		if self.args.debug: print(f'gate: forwarded {jid} {resp}')
 		with contextlib.suppress(ConnectionResetError):
 			await cwriter.wait_closed()
 
-	'''
-	Generates a unique job id, registers the client and gate to redis, and
-	submits the job to the work queue.
-	'''
-	async def _submit_job(self, job, writer):
-		cid = uuid.uuid4().hex
-		self.cwriters[cid] = writer
-		await self.redis.set(cid, self.gid, expire = 10)
-		await self.nats.publish(self.args.channel, (cid + '~' + job).encode())
-		if self.debug: print(f'gate: submitted new job with id {cid} and args {job}')
-		if self.debug: print(f'gate: waiting for job {cid} to complete')
-
-	async def _receive(self, reader):
-		raw = await reader.readuntil(b'\r\n')
+	async def register_gate(self):
+		if self.gid is None:
+			self.gid = 0
+			ip = Gate.get_ip(self.args.hostname)
+			while await self.redis.setnx(f'gates.id.{self.gid}', f'{ip}:{self.args.wport}') == 0:
+				self.gid += 1
+			if self.args.debug:
+				print(f'gate {self.gid}: {ip}  client: {self.args.cport} worker: {self.args.wport}')
+		await self.redis.expire(f'gates.id.{self.gid}', 10)
+	
+	@staticmethod
+	async def receive(reader):
+		raw = await reader.readuntil(Gate.LINE_ENDING)
 		return raw.decode().strip()
+	
+	@staticmethod
+	async def on_nats_disconnect():
+		pass
 
-	async def _next_avail_gid(self):
-		gid = 1
-		while await self.redis.exists('gates.id.' + str(gid)):
-			gid += 1
-		self.gid = str(gid)
+	@staticmethod
+	async def on_nats_reconnect():
+		pass
 
-	# reads the ip address of the machine
-	# TODO possibly move to another module
-	def _read_ip(self):
+	@staticmethod
+	async def on_nats_closed():
+		pass
+
+	@staticmethod
+	async def add_signal_handler(handler):
+		import signal
+		import platform
+		if platform.system() != 'Windows':
+			asyncio.get_running_loop().add_signal_handler(signal.SIGINT, handler)
+
+	@staticmethod
+	def init_ssl(certpath, keyfilepath, pw):
+		import os
+		import ssl
+		context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+		bpath   = os.path.dirname(os.path.realpath(__file__))
+		context.load_cert_chain(certfile = bpath + certpath, keyfile = bpath + keyfilepath, password = pw)
+		return context
+
+	@staticmethod
+	def get_ip(hostname = False):
 		import socket
-		if not self.args.testing:
+		if hostname:
 			return socket.gethostname()
 		try:
 			s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -200,16 +199,27 @@ class Gate:
 		finally:
 			s.close()
 
+	@property
+	def running(self):
+		return not self.nats.is_closed
+
+
+
+
 async def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--debug'     , action = 'store_true')
-	parser.add_argument('--testing'   , action = 'store_true')
-	parser.add_argument('--cport'     , type = int, default = 8880)
-	parser.add_argument('--wport'     , type = int, default = 8201)
-	parser.add_argument('--channel'   , type = str, default = 'jobs')
-	parser.add_argument('--nats-addr' , type = str, default = 'nats://nats')
-	parser.add_argument('--redis-addr', type = str, default = 'redis://redis')
+	parser.add_argument('--debug', action = 'store_true')
+	parser.add_argument('--hostname', action = 'store_true')
+	parser.add_argument('--channel', type = str, default = 'jobs')
+	parser.add_argument('--cport', type = int, default = 8880)
+	parser.add_argument('--wport', type = int, default = 8201)
+	parser.add_argument('--nats-addr', type = str, default = '192.168.1.102:4221')
+	parser.add_argument('--redis-addr', type = str, default = '192.168.1.102')
+	parser.add_argument('--sslpw' , type = str, default = 'lukseun1')
+	parser.add_argument('--certpath' , type = str, default = '/cert/mycert.crt')
+	parser.add_argument('--keyfilepath' , type = str, default = '/cert/rsa_private.key')
 	await Gate(parser.parse_args()).start()
+
 
 if __name__ == '__main__':
 	asyncio.run(main())
