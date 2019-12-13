@@ -19,6 +19,7 @@ ALIYUN_DIRECT_MAIL_API = 'https://dm.aliyuncs.com/'
 ACCESS_KEY_ID = 'LTAI4FqKe1CFpUJUSwrVxTSN'
 SECRET_KEY    = 'YQgBAPiYvycnTdQ0T7auxjMQGsXVdN'
 ACCOUNT_NAME  = 'verify@mail.lukseun.com'
+# ACCOUNT_NAME  = 'verify@mail.lukseun.com'
 
 BASE_REQUEST = \
 {
@@ -31,11 +32,11 @@ BASE_REQUEST = \
 	'ReplyToAddress' : 'False',
 	'SignatureMethod' : 'HMAC-SHA1',
 	'SignatureVersion' : '1.0',
-	'Subject' : 'Your Email Verification Code',
+	'Subject' : '陆逊互娱账户注册验证码',
 	'Version' : '2015-11-23'
 }
 
-with open(os.path.dirname(os.path.realpath(__file__)) + '/verify_email_template.html', 'r') as html:
+with open(os.path.dirname(os.path.realpath(__file__)) + '/verify_email_template_zh.html', 'r', encoding='utf-8') as html:
 	VERIFY_TEMPLATE = html.read()
 
 def percent_encode(item):
