@@ -39,7 +39,6 @@ async def login_unique(uid, **kwargs):
 	await _record_token(uid, token['token'], **kwargs)
 	return common.mt(status, message, token)
 
-
 async def login(identifier, value, password, **kwargs):
 	if not await _valid_credentials(identifier, value, password, **kwargs):
 		return common.mt(1, 'invalid credentials')
