@@ -42,7 +42,7 @@ def percent_encode(item):
 	return urllib.parse.quote(str(item), safe = '')
 
 def canonicalized_query_string(**kwargs):
-	return '&'.join([percent_encode(k) + '=' + percent_encode(v) for k,v in sorted(kwargs.items())])
+	return '&'.join([percent_encode(k) + '=' + percent_encode(v) for k, v in sorted(kwargs.items())])
 
 def sign(cqs, http_method = 'POST'):
 	sts = http_method + '&%2F&' + percent_encode(cqs)

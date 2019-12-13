@@ -423,6 +423,8 @@ Gets all information regarding your family.
 > news: 家族消息，主要是谁离开，谁加入等信息
 >
 > timer：家族正式解散的时间
+>
+> is_checkin：家族签到情况，0表示为签到，1表示签到过
 
 
 ```json
@@ -457,7 +459,8 @@ Gets all information regarding your family.
 			["2019-10-30 06:30:24", "matthew added children."],
 			["2019-10-31 07:24:31", "children purchased gift."]
 		],
-		"timer" : 85647
+		"timer" : 85647,
+        "is_checkin": 0
 	}
 }
 ```

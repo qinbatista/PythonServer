@@ -146,7 +146,9 @@ async def get_all(uid, **kwargs):
 	_, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
 	members = await _get_member_info(name, **kwargs)
 	news = await _get_family_changes(name, **kwargs)
-	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news, 'timer' : -1 if timer is None else int((timer-datetime.now(tz=common.TZ_SH)).total_seconds())})
+	checkin_data = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.FAMILY_CHECK_IN}";', **kwargs)
+	is_checkin = 0 if checkin_data == () else (0 if datetime.strptime(checkin_data[0][0], "%Y-%m-%d").replace(tzinfo=common.TZ_SH) < datetime.now(tz=common.TZ_SH) else 1)
+	return common.mt(0, 'success', {'name' : name, 'icon' : info[0], 'exp' : info[1], 'notice' : info[2], 'board' : info[3], 'members' : members, 'news' : news, 'timer' : -1 if timer is None else int((timer-datetime.now(tz=common.TZ_SH)).total_seconds()), 'is_checkin': is_checkin})
 
 async def get_store(**kwargs):
 	return common.mt(0, 'success', {'merchandise' : [{'item' : k, 'cost' : v} for k, v in kwargs['config']['family']['store']['items'].items()]})
@@ -284,7 +286,7 @@ async def check_in(uid, **kwargs):
 	if timer is not None and now < timer: return common.mt(98, 'already checked in today')
 	time = (now + timedelta(days=1)).strftime('%Y-%m-%d')
 
-	await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FAMILY_CHECK_IN.value}, "{time}") ON DUPLICATE KEY UPDATE `time` = "{time}";', **kwargs)
+	await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FAMILY_CHECK_IN}, "{time}") ON DUPLICATE KEY UPDATE `time` = "{time}";', **kwargs)
 	exp_data = await increase_exp(name, 1, **kwargs)
 	# 增加家族金币和记录金币
 	_, iid_fc, cost_fc = (common.decode_items(kwargs['config']['family']['general']['rewards']['family_coin']))[0]
