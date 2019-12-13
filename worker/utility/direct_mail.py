@@ -19,7 +19,7 @@ ALIYUN_DIRECT_MAIL_API = 'https://dm.aliyuncs.com/'
 ACCESS_KEY_ID = 'LTAI4FqKe1CFpUJUSwrVxTSN'
 SECRET_KEY    = 'YQgBAPiYvycnTdQ0T7auxjMQGsXVdN'
 ACCOUNT_NAME  = 'verify@mail.lukseun.com'
-# ACCOUNT_NAME  = 'verify@mail.lukseun.com'
+
 
 BASE_REQUEST = \
 {
