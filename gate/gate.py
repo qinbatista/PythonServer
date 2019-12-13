@@ -29,13 +29,13 @@ class Gate:
 	LINE_ENDING = b'\r\n'
 
 	def __init__(self, args):
-		self.args = args
-		self.nats = nats.aio.client.Client()
-		self.redis = None
-		self.ws = None
-		self.cs = None
-		self.gid = None
 		self.cwriters = {}
+		self.args     = args
+		self.nats     = nats.aio.client.Client()
+		self.cs       = None
+		self.ws       = None
+		self.gid      = None
+		self.redis    = None
 
 
 	async def init(self):
@@ -208,16 +208,16 @@ class Gate:
 
 async def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--hostname', action = 'store_true')
 	parser.add_argument('--debug', action = 'store_true')
+	parser.add_argument('--hostname', action = 'store_true')
 	parser.add_argument('--channel', type = str, default = 'jobs')
 	parser.add_argument('--cport', type = int, default = 8880)
 	parser.add_argument('--wport', type = int, default = 8201)
 	parser.add_argument('--nats-addr', type = str, default = '192.168.1.102:4221')
 	parser.add_argument('--redis-addr', type = str, default = '192.168.1.102')
+	parser.add_argument('--sslpw' , type = str, default = 'lukseun1')
 	parser.add_argument('--certpath' , type = str, default = '/cert/mycert.crt')
 	parser.add_argument('--keyfilepath' , type = str, default = '/cert/rsa_private.key')
-	parser.add_argument('--sslpw' , type = str, default = 'lukseun1')
 	await Gate(parser.parse_args()).start()
 
 
