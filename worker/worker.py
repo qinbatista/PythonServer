@@ -61,7 +61,7 @@ class Worker:
 		if self.debug: print(f'worker: received new job {work} with id {cid}')
 		try:
 			if self.debug: print(f'worker: calling messagehandler with args: {work}')
-			resp = await asyncio.wait_for(self.mh.resolve(json.loads(work), self.resource, self.configs), 3)
+			resp = await asyncio.wait_for(self.mh.resolve(json.loads(work), self.resource, self.configs), 30)
 		except asyncio.TimeoutError:
 			if self.debug: print(f'worker: message handler call with args: {work} timed out...')
 			resp = '{"status" : -2, "message" : "request timed out"}'

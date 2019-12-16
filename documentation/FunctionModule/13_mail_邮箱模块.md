@@ -1,26 +1,32 @@
 ## 方法列表
 
-* [`upgrade_armor`](##upgrade_armor)
-* [`get_all_armor`](##get_all_armor)
+* [`send_mail`](##send_mail)
+* [`get_new_mail`](##get_new_mail)
+* [`get_all_mail`](##get_all_mail)
+* [`delete_mail`](##delete_mail)
+* [`delete_read_mail`](##delete_read_mail)
 
-## upgrade_armor
+## send_mail
 
 ##### 发送消息JSON格式
 
-升级护甲, 指定`等级`，指定`种类`, 此方法会把`所有`该等级的护甲，按照3:1的比例升级为高等级护甲,
+发送邮件
 
-> aid: 护甲的id
+> gn_target：邮件接收对象
 >
-> level: 护甲的等级
+> subj：邮件主题
+>
+> body：邮件内容
 
 ```json
 {
 	"world": 0,
-	"function": "upgrade_armor",
+	"function": "send_mail",
 	"data": {
 		"token": "my token",
-    	"aid":1,
-    	"level":1
+    	"gn_target": "",
+        "subj": "主题",
+        "body": "内容"
 	}
 }
 ```
@@ -29,11 +35,7 @@
 
 [成功]()
 
-> armors：返回所有关于护甲的信息
->
-> resource：消耗护甲的当前信息
->
-> production：升级护甲的当前信息
+> sent：？？
 
 ```json
 {

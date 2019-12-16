@@ -66,7 +66,7 @@ class MessageHandler:
 		message['exchangedb'] = resource['exchangedb']
 		message['mailserverbaseurl']  = self.mail_base_url
 		message['tokenserverbaseurl'] = self.token_base_url
-		message['config'] = configs  ############configs#################
+		message['config'] = configs  # ###########configs#################
 		return json.dumps(await fn(self, message))
 
 	async def validate_token(self, msg, session):
