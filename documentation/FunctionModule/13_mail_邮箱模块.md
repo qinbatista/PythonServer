@@ -24,7 +24,7 @@
 	"function": "send_mail",
 	"data": {
 		"token": "my token",
-    	"gn_target": "",
+    	"gn_target": "玩家游戏名字",
         "subj": "主题",
         "body": "内容"
 	}
@@ -35,32 +35,38 @@
 
 [成功]()
 
-> sent：？？
+> sent：当天发送出的邮件数量
 
 ```json
 {
-	"status": 0,
-	"message": "success",
-	"data": {
-		"armors": {
-			"resource": {
-				"aid": 1,
-				"level": 1,
-				"quantity": 1
-			},
-			"production": {
-				"aid": 1,
-				"level": 2,
-				"quantity": 3
-			}
-		}
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "sent": 2
+    }
 }
 ```
 
 [失败]()
 
-* 99: 盔甲不足
+* 99：今天发送的邮件已经达到上限
+* 98：邮箱错误
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## get_all_armor
 

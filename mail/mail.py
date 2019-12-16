@@ -80,11 +80,22 @@ class MailServer:
 
 	@staticmethod
 	def send_mail(mbox, world, uid, mail_dict):
+		"""发送邮件
+		mbox：mailbox.Maildir对象
+		world：接收者所在世界
+		uid：接收者的uid
+		mail_dict: 邮件信息（字典）"""
 		return MailServer.deliver_mail(MailServer.get_mail_folder(mbox, world, uid), \
 				MailServer.construct_mail(mail_dict))
 
 	@staticmethod
 	def construct_mail(mail_dict):
+		"""构造邮件
+		time：构造时间
+		from：发送者的uid
+		subj：邮件主题
+		邮件内容
+		"""
 		mail         = mailbox.MaildirMessage()
 		mail['time'] = datetime.now(tz = tz.gettz('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
 		mail.set_payload(urllib.parse.quote(mail_dict.pop('body', ''), safe = ''))
@@ -102,8 +113,10 @@ class MailServer:
 
 	@staticmethod
 	def deliver_mail(folder, mail):
+		"""存放邮件到指定的文件夹下"""
 		if len(folder) >= MailServer.MAILBOX_LIMIT:
 			raise MailServer.MailboxFullError
+		# 获取key并将key添加到邮件中
 		key = folder.add(mail)
 		msg = folder[key]
 		msg['key']  = key
@@ -112,6 +125,7 @@ class MailServer:
 
 	@staticmethod
 	def get_mail_folder(mbox, world, uid):
+		"""创建或指定邮件存放需要的路径，返回邮箱地址对象"""
 		return mbox.add_folder(str(world)).add_folder(uid)
 
 	@staticmethod
