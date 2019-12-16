@@ -54,13 +54,64 @@
 
 
 
+## get_new_mail
 
+##### 发送消息JSON格式
 
+获取新邮件
 
+```json
+{
+	"world": 0,
+	"function": "get_new_mail",
+	"data": {
+		"token": "my token"
+	}
+}
+```
 
+##### 接受消息JSON格式
 
+[成功]()
 
+> mail：所有的新邮件
+>
+> - read：0未读，1已读
+> - body：邮件内容
+> - time：邮件收到的时间
+> - from：来自的玩家游戏名
+> - type：邮件类型
+> - subj：邮件主题
+> - key：用于读邮件需要发送的key
+>
+> count：邮件数量
+>
+> - cur：邮件总数量
+> - max：邮箱最大容量
 
+```
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "mail": [
+            {
+                "read": 0,
+                "body": "\u5185\u5bb91\n",
+                "time": "2019-12-16 17:00:33",
+                "from": "name_h0",
+                "type": "0",
+                "subj": "\u4e3b\u98981",
+                "key": "1576486833.M917814P3900Q560.debian"
+            }
+        ],
+        "count": {
+            "cur": 1,
+            "max": 100
+        }
+    }
+}
+```
 
 
 

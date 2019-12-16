@@ -94,7 +94,8 @@ class MailServer:
 		time：构造时间
 		from：发送者的uid
 		subj：邮件主题
-		邮件内容
+		其他信息以键值对存放进邮件
+		set_payload设置邮件内容
 		"""
 		mail         = mailbox.MaildirMessage()
 		mail['time'] = datetime.now(tz = tz.gettz('Asia/Shanghai')).strftime('%Y-%m-%d %H:%M:%S')
@@ -105,6 +106,13 @@ class MailServer:
 
 	@staticmethod
 	def dump_mail(mail):
+		"""解析每一封邮件，dump包含字段解析
+		read：0未读，1已读
+		body：get_payload读取邮件内容
+		from：发送者的uid
+		subj：邮件主题
+		其他信息以键值对返回
+		"""
 		dump = {'read' : 0 if 'S' not in mail.get_flags() else 1, \
 				'body' : urllib.parse.unquote(mail.get_payload())}
 		for k, v in mail.items():
@@ -130,6 +138,7 @@ class MailServer:
 
 	@staticmethod
 	def read_subfolders(root, subfolders):
+		"""读取邮件信息，读取之后将邮件从new文件夹移到cur文件夹"""
 		mail = []
 		for mid, m in root.iteritems():
 			if m.get_subdir() in subfolders:
@@ -160,6 +169,13 @@ class MailServer:
 
 	@staticmethod
 	def get_mail(mbox, world, uid, subfolders):
+		""" 获取邮件
+		mbox: mailbox.Maildir对象
+		world: 获取的邮件所在世界
+		uid: 获取的邮件所在用户uid
+		subfolders: 子文件夹列表
+		return: 返回邮件信息列表
+		"""
 		return MailServer.read_subfolders(MailServer.get_mail_folder(mbox, world, uid), subfolders)
 
 
