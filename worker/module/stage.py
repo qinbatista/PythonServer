@@ -478,8 +478,7 @@ async def e_boss_stage(uid, stage, **kwargs):
 			data.pop('recover_time')
 			data['times'] = limits[0][0] - 1
 			data['consume'] = consume
-			cd_time = datetime.strptime((datetime.now()+timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d') - datetime.now()
-			data['cd_time'] = int(cd_time.total_seconds())
+			data['cd_time'] = common.remaining_cd()
 			await common.execute(f'UPDATE limits SET value = value - 1 WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 			await set_progress(uid, 'unstage', stage, **kwargs)
 			return common.mt(0, "enter world boss success", data)
