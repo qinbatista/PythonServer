@@ -449,21 +449,9 @@ class MessageHandler:
 		return common.mt(0, 'success', {'tower_config': data['config']['entry_consumables']})
 
 	async def _enter_stage(self, data: dict) -> str:
-		data.update({'player_energy': data['config']['player']['energy']})  # try_energy
-		data.update({'entry_consume': data['config']['entry_consumables'], \
-				'enemy_layouts': data['config']['enemy_layouts']})
-		data['monster_config'] = data['config']['monster']
-		data['boss_life_remaining'] = data['config']['world_boss']['boss_life_remaining']
-		data['boss_life'] = data['config']['world_boss']['boss_life']
-		data['max_enter_time'] = data['config']['world_boss']['max_enter_time']
-		data['max_upload_damage'] = data['config']['world_boss']['max_upload_damage']
 		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _pass_stage(self, data: dict) -> str:
-		data['boss_life_remaining'] = data['config']['world_boss']['boss_life_remaining']
-		data['boss_life'] = data['config']['world_boss']['boss_life']
-		data['pass_rewards'] = data['config']['stage_reward'] 
-		data['max_upload_damage'] = data['config']['world_boss']['max_upload_damage']
 		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _get_config_stage(self, data: dict) -> str:

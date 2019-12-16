@@ -20,7 +20,7 @@ async def enter_stage(uid, stage, **kwargs):
 	if stage < 1000: return await e_general_stage(uid, stage, **kwargs)
 	elif 1000 <= stage < 2000: return await e_tower_stage(uid, stage, **kwargs)
 	elif 2000 <= stage < 3000: return await e_tower_stage(uid, stage, **kwargs)
-	elif 3000 <= stage < 4000: return await enter_world_boss_stage(uid, stage, **kwargs)
+	elif 3000 <= stage < 4000: return await e_boss_stage(uid, stage, **kwargs)
 	else: return common.mt(50, 'Abnormal parameter')
 
 
@@ -48,6 +48,9 @@ async def pass_stage(uid, stage, **kwargs):
 	else: return common.mt(50, 'Abnormal parameter')
 
 
+# #################################################################################################
+# ########################################## GENERAL STAGE ########################################
+# #################################################################################################
 # 进入普通关卡
 async def e_general_stage(uid, stage, **kwargs):
 	# 0 - success
@@ -162,6 +165,9 @@ async def p_general_stage(uid, stage, **kwargs):
 	return common.mt(0, 'success', data={'pass_stages': pass_stages, 'p_exp': p_exp, 'p_stage': p_stage})
 
 
+# #################################################################################################
+# ########################################## TOWER STAGE ##########################################
+# #################################################################################################
 # 进入闯塔关卡
 async def e_tower_stage(uid, stage, **kwargs):
 	# 0 - success
@@ -307,6 +313,9 @@ async def p_tower_stage(uid, stage, **kwargs):
 	return common.mt(0, 'success', data={'pass_stages': pass_towers, 'p_exp': p_exp, 'p_stage': p_stage})
 
 
+# #################################################################################################
+# ########################################## HANG UP ##############################################
+# #################################################################################################
 # 启动挂机方法
 async def start_hang_up(uid, stage, **kwargs):
 	"""
@@ -434,7 +443,9 @@ async def get_hang_up_info(uid, **kwargs):
 	return common.mt(0, 'Successfully get hook information', {'get_hang_up_info': get_hang_up_infos, 'hang_up_info': {'hang_stage': hang_stage, 'time': int(delta_time.total_seconds())}})
 
 
-
+# #################################################################################################
+# ########################################## WORLD BOSS ###########################################
+# #################################################################################################
 async def check_boss_status(uid,**kwargs):
 	timer = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" and tid = {enums.Timer.WORLD_BOSS_CHALLENGE_TIME};', **kwargs)
 	current_time = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d')
@@ -450,13 +461,16 @@ async def check_boss_status(uid,**kwargs):
 	)
 
 	world_boss = {'remaining': enter_times, 'time': common.remaining_cd(), 'month_time': common.remaining_month_cd()}
+	remain_life = kwargs['config']['world_boss']["boss_life_remaining"]
+	boss_life = kwargs['config']['world_boss']["boss_life"]
 	boss_life_ratio = {}
-	for i in range(0, len(kwargs["boss_life_remaining"])):
-		boss_life_ratio[f'boss{i}'] = "%.2f" % (kwargs["boss_life_remaining"][i]/kwargs["boss_life"][i])
+	for i in range(0, len(remain_life)):
+		boss_life_ratio[f'boss{i}'] = "%.2f" % (remain_life[i]/boss_life[i])
 	return common.mt(0, 'Successfully get hook information', {'world_boss': world_boss, 'boss_life_ratio': boss_life_ratio})
 
-async def enter_world_boss_stage(uid, stage,**kwargs):
-	if kwargs["boss_life_remaining"][9] <=0: return common.mt(99, "boss all died")
+
+async def e_boss_stage(uid, stage, **kwargs):
+	if kwargs["config"]["world_boss"]["boss_life_remaining"][-1] <= 0: return common.mt(99, "boss all died")
 	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 	if limits[0][0] >= 1:
 		status, data, consume = await try_stage(uid, stage, BOSS_BASE_STAGE, **kwargs)
@@ -536,7 +550,7 @@ async def leave_world_boss_stage(uid, stage, damage, **kwargs):
 			else:
 				remain_life[i] -= damage
 				damage = 0
-		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(remain_life[i])/int(boss_life[i]))
+		boss_life_ratio[f'boss{i}'] = "%.2f" % (remain_life[i]/boss_life[i])
 	return common.mt(0, 'success', {'new_record': new_record, 'highest_damage': highest_damage, 'boss_life_ratio': boss_life_ratio})
 
 
@@ -615,7 +629,7 @@ async def increase_role_segment(uid, rid, segment, **kwargs):
 	return data
 
 async def try_stage(uid, stage, stage_type, **kwargs):
-	entry_consume =  kwargs['entry_consume']
+	entry_consume = kwargs['config']['entry_consumables']
 	stages = [int(x) for x in entry_consume.keys() if x.isdigit()]
 	for i in range(stage, stage_type, -1):
 		if i in stages:
