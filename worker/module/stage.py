@@ -9,6 +9,7 @@ from module import achievement
 from datetime import datetime, timedelta
 import time
 import random
+import asyncio
 
 GENERAL_BASE_STAGE = 0
 TOWER_BASE_STAGE = 1000
@@ -436,29 +437,26 @@ async def get_hang_up_info(uid, **kwargs):
 
 async def check_boss_status(uid,**kwargs):
 	timer = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" and tid = {enums.Timer.WORLD_BOSS_CHALLENGE_TIME};', **kwargs)
-	current_this_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-	if timer == ():
-		enter_times = 3
-		await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.WORLD_BOSS_CHALLENGE_TIME},"{current_this_time}") ON DUPLICATE KEY UPDATE `tid`= {enums.Timer.WORLD_BOSS_CHALLENGE_TIME}',**kwargs)
-		await common.execute(f'INSERT INTO limits (uid, lid, value) VALUES ("{uid}", {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS},"3") ON DUPLICATE KEY UPDATE `value`= {3}',**kwargs)
-	else:
-		delta_time = datetime.strptime(current_this_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S')
-		if delta_time.days >= 1:
-			enter_times = 3
-			await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.WORLD_BOSS_CHALLENGE_TIME},"{current_this_time}") ON DUPLICATE KEY UPDATE `time`= "{current_this_time}"',**kwargs)
-			await common.execute(f'INSERT INTO limits (uid, lid, value) VALUES ("{uid}", {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS},"3") ON DUPLICATE KEY UPDATE `value`= {3}',**kwargs)
-		else:
-			limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" and lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
-			enter_times = limits[0][0]
-	cd_time = datetime.strptime((datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"), '%Y-%m-%d') - datetime.now()
-	world_boss = {'remaining': enter_times, 'time': int(cd_time.total_seconds()), 'month_time': common.remaining_month_cd()}
+	current_time = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d')
+	sql_time = current_time if timer == () else timer[0][0]
+	delta_time = datetime.strptime(current_time, '%Y-%m-%d').replace(tzinfo=common.TZ_SH) - datetime.strptime(sql_time, '%Y-%m-%d').replace(tzinfo=common.TZ_SH)
+
+	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" and lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
+	enter_times, sql_time = (3, current_time) if limits == () or delta_time.days >= 1 else (limits[0][0], sql_time)
+
+	await asyncio.gather(
+		common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.WORLD_BOSS_CHALLENGE_TIME},"{sql_time}") ON DUPLICATE KEY UPDATE `time`= "{sql_time}"',**kwargs),
+		common.execute(f'INSERT INTO limits (uid, lid, value) VALUES ("{uid}", {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS},"{enter_times}") ON DUPLICATE KEY UPDATE `value`= {enter_times}',**kwargs)
+	)
+
+	world_boss = {'remaining': enter_times, 'time': common.remaining_cd(), 'month_time': common.remaining_month_cd()}
 	boss_life_ratio = {}
 	for i in range(0, len(kwargs["boss_life_remaining"])):
-		boss_life_ratio[f'boss{i}'] = "%.2f" % (int(kwargs["boss_life_remaining"][i])/int(kwargs["boss_life"][i]))
+		boss_life_ratio[f'boss{i}'] = "%.2f" % (kwargs["boss_life_remaining"][i]/kwargs["boss_life"][i])
 	return common.mt(0, 'Successfully get hook information', {'world_boss': world_boss, 'boss_life_ratio': boss_life_ratio})
 
 async def enter_world_boss_stage(uid, stage,**kwargs):
-	if kwargs["boss_life_remaining"][9] <=0 : return common.mt(99, "boss all died")
+	if kwargs["boss_life_remaining"][9] <=0: return common.mt(99, "boss all died")
 	limits = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = {enums.Limits.WORLD_BOSS_CHALLENGE_LIMITS};', **kwargs)
 	if limits[0][0] >= 1:
 		status, data, consume = await try_stage(uid, stage, BOSS_BASE_STAGE, **kwargs)
