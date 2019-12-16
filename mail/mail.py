@@ -63,6 +63,9 @@ class MailServer:
 		return web.json_response({'key' : post['key'] if marked else ''})
 
 	async def get_all(self, request):
+		"""返回所有的邮件，包括新邮件和已读邮件
+		cur：当前所有邮件的数量
+		max：邮箱最大限制的数量"""
 		post = await request.post()
 		mail = await asyncio.wrap_future(self.executor.submit(MailServer.get_mail, self.mailbox, \
 				post['world'], post['uid'], ['new', 'cur']))
@@ -71,6 +74,9 @@ class MailServer:
 				'max' : MailServer.MAILBOX_LIMIT}})
 
 	async def get_new(self, request):
+		"""返回所有的新邮件
+		cur：当前所有邮件的数量
+		max：邮箱最大限制的数量"""
 		post = await request.post()
 		mail = await asyncio.wrap_future(self.executor.submit(MailServer.get_mail, self.mailbox, \
 				post['world'], post['uid'], ['new']))

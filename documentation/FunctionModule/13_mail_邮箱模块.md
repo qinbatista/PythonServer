@@ -58,7 +58,7 @@
 
 ##### 发送消息JSON格式
 
-获取新邮件
+获取所有新邮件
 
 ```json
 {
@@ -115,22 +115,18 @@
 
 
 
-
-
-
-
-## get_all_armor
+## get_all_mail
 
 ##### 发送消息JSON格式
 
-获取所有盔甲的信息
+获取所有邮件，包括所有新邮件
 
 ```json
 {
-	"world": 0, 
-	"function": "get_all_armor",
+	"world": 0,
+	"function": "get_all_mail",
 	"data": {
-		"token": "my toekn ^_^"
+		"token": "my token"
 	}
 }
 ```
@@ -139,35 +135,116 @@
 
 [成功]()
 
-> aid：护甲的id
+> mail：所有的新邮件
 >
-> level：护甲的等级
+> - read：0未读，1已读
+> - body：邮件内容
+> - time：邮件收到的时间
+> - from：来自的玩家游戏名
+> - type：邮件类型
+> - subj：邮件主题
+> - key：用于读邮件需要发送的key
 >
-> quantity：护甲的数量
+> count：邮件数量
+>
+> - cur：邮件总数量
+> - max：邮箱最大容量
 
 ```json
 {
-	"status": 0,
-	"message": "success",
-	"data": {
-		"armors": [
-			{
-				"aid": 1,
-				"level": 1,
-				"quantity": 1
-			},
-			{
-				"aid": 1,
-				"level": 2,
-				"quantity": 3
-			}
-		]
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "mail": [
+            {
+                "read": 0,
+                "body": "\u5185\u5bb91\n",
+                "time": "2019-12-16 17:00:33",
+                "from": "name_h0",
+                "type": "0",
+                "subj": "\u4e3b\u98981",
+                "key": "1576486833.M917814P3900Q560.debian"
+            }
+        ],
+        "count": {
+            "cur": 1,
+            "max": 100
+        }
+    }
 }
 ```
 
 [失败]()
 
-* 如果没有护甲，返回的列表为空
 
+
+## delete_mail
+
+##### 发送消息JSON格式
+
+删除指定邮件
+
+> 
+
+```json
+{
+	"world": 0,
+	"function": "delete_mail",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> 
+
+```json
+
+```
+
+[失败]()
+
+* 99
+
+
+
+
+
+
+
+## delete_read_mail
+
+##### 发送消息JSON格式
+
+删除所有已读邮件
+
+> 
+
+```json
+{
+	"world": 0,
+	"function": "delete_read_mail",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> 
+
+```json
+
+```
+
+[失败]()
+
+* 99
 
