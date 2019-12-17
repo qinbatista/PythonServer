@@ -1,8 +1,8 @@
 import os
 import subprocess
 import argparse
-import start_servers as s
-
+#import start_servers as s
+PATH = os.path.abspath(os.path.join(os.getcwd(), '../'))
 
 images = ['auth', 'config', 'edge', 'gate', 'mail', 'worker']
 
@@ -17,7 +17,7 @@ def docker(path):
 		#subprocess.Popen(['docker', 'build', '-t', f'{path}/{image}:latest', '-f', f'{s.loc()}/{image}/Dockerfile', f'{s.loc()}/{image}'])
 		#subprocess.Popen(['docker', 'push',     f'{path}/{image}:latest'])
 		print(f'starting build of {image}...')
-		os.system(f'docker build -t {path}/{image}:latest -f {s.loc()}/{image}/Dockerfile {s.loc()}/{image}')
+		os.system(f'docker build -t {path}/{image}:latest -f {PATH}/{image}/Dockerfile {PATH}/{image}')
 		print(f'build of image {image} done.')
 		print(f'starting push of {image} to remote...')
 		os.system(f'docker push {path}/{image}:latest')
