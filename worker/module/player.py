@@ -16,7 +16,8 @@ async def create(uid, gn, **kwargs):
 		common.execute(f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED}, 5, 5);', **kwargs),
 		common.execute(f'INSERT INTO role (uid, star, rid) VALUES ("{uid}", 1, {enums.Role.R101});', **kwargs),
 		common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W101});', **kwargs),
-		common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.COIN}, 1000000), ("{uid}", {enums.Item.DIAMOND}, 1000000);', **kwargs)
+		common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.COIN}, 1000000), ("{uid}", {enums.Item.DIAMOND}, 1000000), ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);', **kwargs),
+		common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.LOGIN_TIME}, "{common.datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")}");',**kwargs)
 	)
 	return common.mt(0, 'success', {'gn' : gn})
 

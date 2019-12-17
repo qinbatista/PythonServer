@@ -421,13 +421,9 @@ async def _record_family_change(name, msg, **kwargs):
 	await common.execute(f'INSERT INTO familyhistory(name, date, msg) VALUES("{name}", "{datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")}", "{msg}");', **kwargs)
 
 async def _get_member_info(name, **kwargs):
-	# 没有这个登录时间和贡献记录，返回的数据不全数据
-	await asyncio.gather(
-		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.LOGIN_TIME}, "{datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")}" FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE timer.tid=`tid`;', **kwargs),
-		common.execute(f'INSERT INTO item (uid, iid) SELECT familyrole.uid, {enums.Item.FAMILY_COIN_RECORD} FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE iid=`iid`;', **kwargs)
-	)
+	# await __insert(name, **kwargs)
 	data = await common.execute(f'SELECT player.gn, progress.role, familyrole.role, progress.exp, timer.time, item.value, i2.value FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid join timer on timer.uid = familyrole.uid and timer.tid={enums.Timer.LOGIN_TIME} join item on item.uid = familyrole.uid and item.iid ={enums.Item.FAMILY_COIN} join item as i2 on i2.uid = familyrole.uid and i2.iid ={enums.Item.FAMILY_COIN_RECORD} WHERE familyrole.name = "{name}";', **kwargs)
-	return [{'gn' : m[0], 'player_role' : m[1],'family_role' : m[2], 'exp' : m[3], 'last_login' : m[4], 'family_coin' : m[5], 'family_coin_record' : m[6]} for m in data]
+	return [{'gn' : m[0], 'player_role' : m[1], 'family_role' : m[2], 'exp' : m[3], 'last_login' : m[4], 'family_coin' : m[5], 'family_coin_record' : m[6]} for m in data]
 
 async def _get_family_info(name, *args, **kwargs):
 	data = await common.execute(f'SELECT {",".join(args)} FROM family WHERE name = "{name}";', **kwargs)
@@ -457,8 +453,7 @@ async def _lookup_nonce(nonce, **kwargs):
 		return (None, None) if data[nonce]['status'] != 0 else (data[nonce]['name'], data[nonce]['uid_target'])
 
 async def _remove_from_family(uid, name, **kwargs):
-	await asyncio.gather(common.execute(f'UPDATE player SET fid = NULL WHERE uid = "{uid}";', **kwargs),
-			common.execute(f'DELETE FROM familyrole WHERE uid = "{uid}" AND name = "{name}";', **kwargs))
+	await common.execute(f'DELETE FROM familyrole WHERE uid = "{uid}" AND name = "{name}";', **kwargs)
 
 async def _rmtimes_timer(name, **kwargs):
 	data = await common.execute(f'SELECT rmtimes, rmtimer FROM family WHERE name = "{name}";', **kwargs)
@@ -489,3 +484,11 @@ async def increase_exp(name, exp, **kwargs):
 	await common.execute(f'INSERT INTO family (name, exp) VALUE ("{name}", {sql_exp}) ON DUPLICATE KEY UPDATE exp = {sql_exp};', **kwargs)
 	# 返回总经验、等级、需要经验
 	return {'exp': sql_exp, 'level': level, 'need': need}
+
+async def __insert(name, **kwargs):
+	"""没有这个登录时间和贡献记录，返回的数据不全数据"""
+	await asyncio.gather(
+		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.LOGIN_TIME}, "{datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")}" FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE timer.tid=`tid`;', **kwargs),
+		common.execute(f'INSERT INTO item (uid, iid) SELECT familyrole.uid, {enums.Item.FAMILY_COIN} FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE iid=`iid`;', **kwargs),
+		common.execute(f'INSERT INTO item (uid, iid) SELECT familyrole.uid, {enums.Item.FAMILY_COIN_RECORD} FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE iid=`iid`;', **kwargs)
+	)
