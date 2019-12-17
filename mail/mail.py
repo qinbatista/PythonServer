@@ -45,18 +45,21 @@ class MailServer:
 		return web.json_response({    'status' :  0, 'uid' : post['uid'], 'key' : key})
 
 	async def delete(self, request):
+		"""删除指定邮件"""
 		post = await request.post()
 		deleted = await asyncio.wrap_future(self.executor.submit(MailServer.delete_mail, self.mailbox, \
 				post['world'], post['uid'], lambda mid, m: mid == post['key']))
 		return web.json_response({'keys' : deleted})
 
 	async def delete_read(self, request):
+		"""删除已读的所有邮件"""
 		post = await request.post()
 		deleted = await asyncio.wrap_future(self.executor.submit(MailServer.delete_mail, self.mailbox, \
 				post['world'], post['uid'], lambda mid, m: 'S' in m.get_flags()))
 		return web.json_response({'keys' : deleted})
 
 	async def mark(self, request):
+		"""设置邮件为已读，标记邮件标识"""
 		post   = await request.post()
 		marked = await asyncio.wrap_future(self.executor.submit(MailServer.mark_mail, self.mailbox, \
 				post['world'], post['uid'], post['key'], 'S'))
@@ -155,6 +158,7 @@ class MailServer:
 
 	@staticmethod
 	def mark_mail(mbox, world, uid, key, flags):
+		"""添加标志"""
 		folder = MailServer.get_mail_folder(mbox, world, uid)
 		for mid, m in folder.iteritems():
 			if mid == key:
@@ -165,6 +169,8 @@ class MailServer:
 
 	@staticmethod
 	def delete_mail(mbox, world, uid, condition):
+		"""删除满足条件的邮件
+		condition：匿名方法"""
 		deleted = []
 		folder  = MailServer.get_mail_folder(mbox, world, uid)
 		for mid, m in folder.iteritems():

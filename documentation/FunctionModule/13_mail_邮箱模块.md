@@ -5,6 +5,7 @@
 * [`get_all_mail`](##get_all_mail)
 * [`delete_mail`](##delete_mail)
 * [`delete_read_mail`](##delete_read_mail)
+* [`mark_read_mail`](##mark_read_mail)
 
 ## send_mail
 
@@ -208,7 +209,7 @@
 
 [失败]()
 
-* 99
+* 99：key不能为空
 
 
 
@@ -247,4 +248,45 @@
 [失败]()
 
 * 99
+
+
+
+## mark_read_mail
+
+##### 发送消息JSON格式
+
+阅读邮件
+
+> key：邮件的key值
+
+```json
+{
+	"world": 0,
+	"function": "mark_read_mail",
+	"data": {
+		"token": "my token",
+        "key": "mail key"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> key：设置成功的key值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "key": "mail key"
+    }
+}
+```
+
+[失败]()
+
+* 99：key不能为空
 

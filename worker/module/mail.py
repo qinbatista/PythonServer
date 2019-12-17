@@ -80,12 +80,14 @@ async def delete_mail(uid, key, **kwargs):
 		async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/delete', \
 				data = {'world' : kwargs['world'], 'uid' : uid, 'key' : key}) as resp:
 			return common.mt(0, 'success', await resp.json())
+	return common.mt(99, 'key不能为空')
 
 async def mark_read(uid, key, **kwargs):
 	if key != '':
 		async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/mark_read', \
 				data = {'world' : kwargs['world'], 'uid' : uid, 'key' : key}) as resp:
 			return common.mt(0, 'success', await resp.json())
+	return common.mt(99, 'key不能为空')
 
 async def delete_read(uid, **kwargs):
 	async with kwargs['session'].post(kwargs['mailserverbaseurl'] + '/delete_read', \
