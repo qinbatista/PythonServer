@@ -44,7 +44,7 @@ world = "0"
 token = ""
 unique_id = ""
 testing_people_number = 1000
-DEBUG_LOG = True
+DEBUG_LOG = False
 DEBUG_LOG_DETAIL = True
 FORMAT = False
 IS_WIN = os.name == 'nt'
@@ -168,7 +168,7 @@ def run_task(name):
 	module_25_check_in.check_in_dialog(token, world, info_list[5])  # 签到系统
 	module_26_bag.bag_dialog(token, world, info_list[5])  # 玩家背包
 	module_27_vip.vip_dialog(token, world, info_list[5])  # vip系统
-	# module_12_chat.chat_dialog(token, world, info_list[5])  # vip系统
+	module_12_chat.chat_dialog(token, world, info_list[5])  # vip系统
 	module_28_mall.mall_dialog(token, world, info_list[5], unique_id)  # mall系统
 	end = time.time()
 	debug_log(end - start, "user_" + str(unique_id), "", level=2)

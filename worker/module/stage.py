@@ -512,7 +512,7 @@ async def get_top_damage(uid, page, **kwargs):
 	if data == (): return common.mt(98, 'No data for this page')
 	rank = []
 	for i, d in enumerate(data):
-		rank.append({'NO': (page - 1)*10 + 1 + i, 'name': d[0], 'damage': d[1], 'fid': d[2], 'level': (await increase_exp(d[3], 0, **kwargs))['level']})
+		rank.append({'NO': (page - 1)*10 + 1 + i, 'name': d[0], 'damage': d[1], 'fid': '' if d[2] is None else d[2], 'level': (await increase_exp(d[3], 0, **kwargs))['level']})
 	return common.mt(0, 'success', {'page': page, 'damage': damage, 'ranking': ranking, 'rank': rank})
 
 async def leave_world_boss_stage(uid, stage, damage, **kwargs):

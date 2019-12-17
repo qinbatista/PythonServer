@@ -38,8 +38,8 @@ def get_login_token_chat(token,world):
 	return response['data']['token']
 
 async def send_loop(lc):
-	# while True:
-	await lc.send_message("0000PUBLIC"+datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+	while True:
+		await lc.send_message("0000PUBLIC"+datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 async def recv_loop(lc):
 	while True:
