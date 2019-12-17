@@ -453,7 +453,8 @@ async def _lookup_nonce(nonce, **kwargs):
 		return (None, None) if data[nonce]['status'] != 0 else (data[nonce]['name'], data[nonce]['uid_target'])
 
 async def _remove_from_family(uid, name, **kwargs):
-	await common.execute(f'DELETE FROM familyrole WHERE uid = "{uid}" AND name = "{name}";', **kwargs)
+	await asyncio.gather(common.execute(f'UPDATE player SET fid = NULL WHERE uid = "{uid}";', **kwargs),
+			common.execute(f'DELETE FROM familyrole WHERE uid = "{uid}" AND name = "{name}";', **kwargs))
 
 async def _rmtimes_timer(name, **kwargs):
 	data = await common.execute(f'SELECT rmtimes, rmtimer FROM family WHERE name = "{name}";', **kwargs)
