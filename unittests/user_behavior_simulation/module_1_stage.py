@@ -41,6 +41,10 @@ def stage_dialog(token,world,info_list):
 	# while True:
 	normal_stage = random.randint(1,1)
 	boss_stage = 3000
+	# check_boss_status(**{"world": world, "token": token})
+	# enter_stage(**{"world": world, "token": token, "stage": boss_stage})
+	# pass_stage(**{"world": world, "token": token, "stage": boss_stage, "damage": random.randint(0, 10000)})
+	# input("继续")
 	status=-1
 	while status!=0:
 		normal_stage = random.randint(1,1)
@@ -62,22 +66,16 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': unique_id}})
 	# print(response)
 	# token = response['data']['token']
-	token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzY4MTQ5NzUsInVuaXF1ZV9pZCI6IjAwMCJ9.v2svpl5arsWR5DKo12TFoxuMBGfcQUpiCO6x3yuE6K8'
-	# response = send_tcp_message({'world': 0, 'function': 'enter_stage', 'data': {'token': token, 'stage': 3000, 'damage': 11000}})
-	# response = send_tcp_message({'world': 0, 'function': 'pass_stage', 'data': {'token': token, 'stage': 3000, 'damage': 11000}})
-	response = send_tcp_message({'world': 0, 'function': 'get_config_boss', 'data': {'token': token, 'stage': 3000, 'damage': 11000}})
-	# response = send_tcp_message({'world': 0, 'function': 'get_config_stage', 'data': {'token': token, 'stage': 2}})
-	# response = send_tcp_message({'world': 0, 'function': 'get_config_player', 'data': {'token': token}})
-	print(str(response))
-	# response = send_tcp_message({'world': 0, 'function': 'start_hang_up', 'data': {'token': token, 'stage': 1}})
-	# print(str(response))
-	# response = send_tcp_message({'world': 0, 'function': 'start_hang_up', 'data': {'token': token, 'stage': 1}})
-	# print(str(response))
-
-
-
-# player_info = await common.execute(f'select * from player;', **kwargs)
-# print(player_info)
-
+	world = "s0"
+	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkwNzEwNDYsInVpZCI6ImgwIn0.0etH168lGc1ORWUmcdycKytvDNfLmg5PPOVlzWlhAxM"
+	n = 10
+	while n <= 0:
+		stage = random.choice([1, 2, 1001, 3000])
+		print(f"stage:{stage}")
+		check_boss_status(**{"world": world, "token": token})
+		enter_stage(**{"world": world, "token": token, "stage": stage})
+		pass_stage(**{"world": world, "token": token, "stage": stage, "damage": random.randint(50000, 100000)})
+		n -= 1
+		if n == 1: n = input("继续(n:0):")
 
 

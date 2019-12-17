@@ -49,6 +49,10 @@ async def wrapper(nonce):
 	client = LukseunClient(nonce, 'remote1.magicwandai.com', 9000)
 	await client.create()
 	await client.send_message('00REGISTER' + nonce)
+	# while True:
+	# 	ts = input("请输入需要说的话：")
+	# 	await client.send_message(f"0000PUBLIC{ts}")
+	# 	await client.receive_message()
 	asyncio.create_task(send_loop(client))
 	asyncio.create_task(recv_loop(client))
 	while True:

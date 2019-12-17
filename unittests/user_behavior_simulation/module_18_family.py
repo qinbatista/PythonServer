@@ -92,12 +92,13 @@ def family_dialog(token,world,info,unique_id):
 		print("20:查询家族信息")
 		print("21:随机5个获取家族信息")
 		print("22:获取家族配置文件")
+		print("23:邀请99次")
 		print("unique_id="+unique_id)
 		choice = input("你的输入：")
 		if choice=="1": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'create_family', 'data' : {'token' : token, "name":"family_"+unique_id, "icon":1}})
 		if choice=="2": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'leave_family', 'data' : {'token' : token, "name":"", "icon":1}})
-		if choice=="3": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'remove_user_family', 'data' : {'token' : token, "gn_target":"揪炙尹田陌填"}})
-		if choice=="4": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'invite_user_family', 'data' : {'token' : token, "gn_target":"揪炙尹田陌填"}})
+		if choice=="3": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'remove_user_family', 'data' : {'token' : token, "gn_target":"h001n"}})
+		if choice=="4": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'invite_user_family', 'data' : {'token' : token, "gn_target":"h001t"}})
 		if choice=="5": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'request_join_family', 'data' : {'token' : token, "name":"family_q1"}})
 		if choice=="6": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'respond_family', 'data' : {'token' : token, "key":""}})
 		if choice=="7": user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_all_family', 'data' : {'token' : token, "name":"", "icon":1}})
@@ -116,6 +117,9 @@ def family_dialog(token,world,info,unique_id):
 		if choice=="20":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'search_family', 'data' : {'token' : token, "family_name": "family_q1"}})
 		if choice=="21":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_random_family', 'data' : {'token' : token, "name":"", "icon":1}})
 		if choice=="22":user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_config_family', 'data' : {'token' : token, "name":"", "icon":1}})
+		if choice=="23":
+			for _ in range(99):
+				user_behavior_simulation.send_tcp_message({'world': world, 'function': 'invite_user_family', 'data': {'token': token, "gn_target": "h001t"}})
 
 	# create_family(_token,_world)
 	# leave_family(_token,_world)

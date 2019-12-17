@@ -6,6 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
+import user_behavior_simulation
 
 
 lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
@@ -99,4 +100,20 @@ def mail_dialog(_token,_world,_all_info,_name):
 			gift_request(_all_info["data"]["mail"][i]["key"])
 
 if __name__ == '__main__':
-	send_gift()
+	# send_gift()
+	world = "s0"
+	token1 = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkwNzEwNDYsInVpZCI6ImgwIn0.0etH168lGc1ORWUmcdycKytvDNfLmg5PPOVlzWlhAxM"
+	token2 = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1Nzg3MjgxMzEsInVpZCI6ImgwMDAifQ.C_CRmyMSK8a1MxW74UfwzmfraVJ74XYt2wqYkn0xgo4"
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_new_mail', 'data': {'token': token2}})
+	# input("继续")
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_mail', 'data': {'token': token2}})
+	# input("继续")
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'mark_read_mail', 'data': {'token': token2, "key": ''}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'mark_read_mail', 'data': {'token': token2, "key": '1576493100.M973942P3900Q565.debian'}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'send_mail', 'data': {'token': token1, "gn_target": 'h000n', 'subj': '主题1', 'body': '内容1'}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'send_mail', 'data': {'token': token1, "gn_target": 'h000n', 'subj': '主题2', 'body': '内容2'}})
+	input("继续")
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_mail', 'data': {'token': token2}})
+
+
+

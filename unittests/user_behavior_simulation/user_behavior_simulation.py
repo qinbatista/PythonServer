@@ -38,14 +38,14 @@ import ctypes
 
 # from gevent import monkey; monkey.patch_all()
 logger = tool_lukseun_client.logger
-lukseun = tool_lukseun_client.LukseunClient('aliya', host="192.168.1.143", port=8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya', host="192.168.1.165", port=8880)
 world = "0"
 token = ""
 unique_id = ""
 testing_people_number = 1000
 DEBUG_LOG = True
 DEBUG_LOG_DETAIL = True
-FORMAT = True
+FORMAT = False
 IS_WIN = os.name == 'nt'
 std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11) if IS_WIN else None
 
@@ -175,7 +175,8 @@ def run_task(name):
 
 def run_all_task_multiprocessing():
 	starttime = datetime.now()
-	p = multiprocessing.Pool(processes=12)
+	# p = multiprocessing.Pool(processes=12)
+	p = multiprocessing.Pool()
 	for i in range(0, testing_people_number):
 		p.apply_async(run_task, args=(str(i),))
 	p.close()
@@ -193,5 +194,5 @@ def run_all_task_gevent():
 
 if __name__ == "__main__":
 	# run_task(input("your unique id:"))
-	# run_task("h1")
+	# run_task("h002")
 	run_all_task_multiprocessing()

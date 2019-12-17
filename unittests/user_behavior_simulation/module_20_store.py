@@ -6,6 +6,7 @@ import configparser
 import asyncio
 import tool_lukseun_client
 import random
+import user_behavior_simulation
 
 
 lukseun = tool_lukseun_client.LukseunClient('aliya', port = 8880)
@@ -41,4 +42,4 @@ def print_module(my_string):
 	print("\033[0;37;41m\t"+my_string+"\033[0m")
 
 def mail_dialog(token,world,respons):
-	pass
+	response = user_behavior_simulation.send_tcp_message({'world': world, 'function': 'purchase_success', 'data': {'token' : token, 'pid': 'DIAMOND_MIN', 'order_id': 'order_id', 'channel': 'channel', 'user_name': 'q1', 'currency': 'RMB'}})

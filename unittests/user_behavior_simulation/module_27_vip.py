@@ -52,8 +52,3 @@ def vip_dialog(token,world,info):
 	user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'purchase_vip_card', 'data' : {'token' : token, "card_id": 18}})
 
 
-
-	return ""
-
-
-

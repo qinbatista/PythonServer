@@ -127,11 +127,11 @@ def login_module(unique_id_p: str):
 
 
 if __name__ == "__main__":
-	login_module("0")
-	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1Nzg3MzI3MTAsInVpZCI6ImgxIn0.d5_0P0KodqZhmJbY5UzDqp-5LctpIQSimWYwZDbW9oM"
-	# user_behavior_simulation.send_tcp_message({'function': 'bind_email', 'data': {"token": token, "email": "123456@qq.com"}})
-	# code = input("code:")
-	# user_behavior_simulation.send_tcp_message({'function': 'verify_email_code', 'data': {"token": token, "code": code}})
-	user_behavior_simulation.send_tcp_message({'function': 'bind_phone', 'data': {"token": token, "phone_number": "18323019610"}})
+	# login_module("0")
+	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1Nzg1NzA3MDMsInVpZCI6InEzIn0.mRIb5SIFZqfCxVUSvx4sppfOGebSu5Q0BWtHu3d9EuA"
+	user_behavior_simulation.send_tcp_message({'function': 'bind_email', 'data': {"token": token, "email": "2428437133@qq.com"}})
 	code = input("code:")
-	user_behavior_simulation.send_tcp_message({'function': 'verify_phone_code', 'data': {"token": token, "code": code}})
+	user_behavior_simulation.send_tcp_message({'function': 'verify_email_code', 'data': {"token": token, "code": code}})
+	# user_behavior_simulation.send_tcp_message({'function': 'bind_phone', 'data': {"token": token, "phone_number": "18323019610"}})
+	# code = input("code:")
+	# user_behavior_simulation.send_tcp_message({'function': 'verify_phone_code', 'data': {"token": token, "code": code}})
