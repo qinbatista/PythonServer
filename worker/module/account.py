@@ -77,6 +77,18 @@ async def bind_phone(uid, phone, **kwargs):
 	bound, exists = await asyncio.gather(_phone_bound(uid, **kwargs), common.exists('info', ('phone_number', phone), account = True, **kwargs))
 	if bound: return common.mt(98, 'phone has already been bound')
 	if exists: return common.mt(97, 'phone already exists')
+
+	# 次数限制代码
+	lim = await common.get_limit(uid, enums.Limits.BIND_PHONE, **kwargs)
+	tim = await common.get_timer(uid, enums.Timer.BIND_PHONE_END, '%Y-%m-%d', **kwargs)
+	now = common.datetime.now(tz=common.TZ_SH)
+	if lim is None or tim is None or now >= tim:
+		lim, tim = 5, now + common.timedelta(days=1)
+	if lim <= 0: return common.mt(95, '今天发送短信次数已用完')
+	lim -= 1
+	await common.set_limit(uid, enums.Limits.BIND_PHONE, lim, **kwargs)
+	await common.set_timer(uid, enums.Timer.BIND_PHONE_END, tim, '%Y-%m-%d', **kwargs)
+
 	code = await _gen_phone_code(phone, **kwargs)
 	r = verify_phone.send_verification(phone, code, common.datetime.now(tz=common.TZ_SH).strftime("%Y%m%d"))
 	if r != 'OK': return common.mt(96, 'phone could not be sent', {'message' : r})

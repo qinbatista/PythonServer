@@ -215,6 +215,7 @@
 * 98：phone has already been bound
 * 97：phone already exists
 * 96：phone could not be sent
+* 95：今天发送短信次数已用完
 
 
 

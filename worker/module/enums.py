@@ -254,6 +254,7 @@ class Timer(enum.IntEnum):
 	FAMILY_JOIN_END = 23  # 玩家退出工会后可以再次加入工会的结束时间
 	FAMILY_NOTICE_END = 24  # 管理员发布公告后刷新公告发布次数的剩余时间
 	FAMILY_INVITE_END = 25  # 管理员邀请成员后刷新邀请成员次数的剩余时间
+	BIND_PHONE_END = 26  # 用户绑定手机次数刷新的结束时间
 
 
 class Limits(enum.IntEnum):
@@ -268,6 +269,7 @@ class Limits(enum.IntEnum):
 	MAIL_DAILY_SEND = 9
 	FAMILY_NOTICE = 10  # 管理员可以发布公告的剩余次数
 	FAMILY_INVITE = 11  # 管理员可以邀请成员的剩余次数
+	BIND_PHONE = 12  # 用户绑定手机的剩余次数
 
 
 class Achievement(enum.IntEnum):
