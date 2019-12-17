@@ -418,7 +418,7 @@ Gets all information regarding your family.
 >
 > board：家族简介
 >
-> members：家族成员，`gn`家族名字，`role`使用角色(0，4，8，10)，`exp`经验值，`icon`使用icon.  (需要添加玩家的最后登录时间(秒)，玩家的`家族记录金币(FAMILY_COIN_RECORD)`)
+> members：家族成员，`gn`成员名字，`player_role`当前使用的角色， `family_role`家族成员身份(0，4，8，10)，`exp`经验值，`last_login`家族成员上次登录时间，`family_coin`当前玩家的家族金币，`family_coin_record`家族成员的家族金币历史记录
 >
 > news: 家族消息，主要是谁离开，谁加入等信息
 >
@@ -440,19 +440,12 @@ Gets all information regarding your family.
 		"members" : [
 			{
 				"gn": "matthew",
-				"role": 10,
+				"player_role": 1,
+                "family_role": 10,
 				"exp": 420,
-				"icon": 0,
-				"online_time": 3222,
+				"last_login": "2019-12-13 12:27:57",
+                "family_coin": 30,
 				"family_coin_record": 233
-			},
-			{
-				"gn": "children",
-				"role": 8,
-				"exp": 240,
-				"icon": 1,
-				"online_time": 123,
-				"family_coin_record": 1223
 			}
 		],
 		"news" : [
