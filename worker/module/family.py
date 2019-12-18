@@ -173,29 +173,21 @@ async def set_notice(uid, msg, **kwargs):
 	if not _check_notice_permissions(role): return common.mt(98, 'insufficient permissions')
 	# 以下是公告次数限制的代码
 	owner_data = await common.execute(f'SELECT limits.value, timer.time FROM familyrole JOIN (limits, timer) ON (familyrole.uid=limits.uid AND limits.lid={enums.Limits.FAMILY_NOTICE} AND familyrole.uid=timer.uid AND timer.tid={enums.Timer.FAMILY_NOTICE_END}) WHERE familyrole.name="{name}" AND familyrole.role={enums.FamilyRole.OWNER};', **kwargs)
-	if owner_data == ():
-		await asyncio.gather(
-			common.execute(f'INSERT INTO limits (uid, lid, value) SELECT familyrole.uid, {enums.Limits.FAMILY_NOTICE}, {kwargs["config"]["family"]["general"]["ntimes"]} FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE limits.value={kwargs["config"]["family"]["general"]["ntimes"]};', **kwargs),
-			common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.FAMILY_NOTICE_END}, "{(datetime.now(tz=common.TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d")}" FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE timer.time = "{(datetime.now(tz=common.TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d")}";', **kwargs)
-		)
-		owner_data = await common.execute(f'SELECT limits.value, timer.time FROM familyrole JOIN (limits, timer) ON (familyrole.uid=limits.uid AND limits.lid={enums.Limits.FAMILY_NOTICE} AND familyrole.uid=timer.uid AND timer.tid={enums.Timer.FAMILY_NOTICE_END}) WHERE familyrole.name="{name}" AND familyrole.role={enums.FamilyRole.OWNER};', **kwargs)
-	limit, ntime = owner_data[0]
-	if datetime.strptime(ntime, "%Y-%m-%d").replace(tzinfo=common.TZ_SH) <= datetime.now(tz=common.TZ_SH):
-		limit = kwargs["config"]["family"]["general"]["ntimes"] - 1
-		await asyncio.gather(
-			common.execute(f'INSERT INTO limits (uid, lid, value) SELECT familyrole.uid, {enums.Limits.FAMILY_NOTICE}, {limit} FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE limits.value={limit};', **kwargs),
-			common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.FAMILY_NOTICE_END}, "{(datetime.now(tz=common.TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d")}" FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE timer.time = "{(datetime.now(tz=common.TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d")}";', **kwargs)
-		)
+	now = datetime.now(tz=common.TZ_SH)
+	limit, ntime = (kwargs["config"]["family"]["general"]["ntimes"], (now + timedelta(days=1)).strftime("%Y-%m-%d")) if owner_data == () else owner_data[0]
+	if datetime.strptime(ntime, "%Y-%m-%d").replace(tzinfo=common.TZ_SH) <= now:
+		limit, ntime = kwargs["config"]["family"]["general"]["ntimes"] - 1, (now + timedelta(days=1)).strftime("%Y-%m-%d")
 	elif limit == 0:
 		return common.mt(97, '今天公告次数已用完')
 	else:
 		limit -= 1
-		await common.execute(f'INSERT INTO limits (uid, lid, value) SELECT familyrole.uid, {enums.Limits.FAMILY_NOTICE}, {limit} FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE limits.value={limit};', **kwargs)
-	seconds = int((datetime.strptime(ntime, "%Y-%m-%d").replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
-	if seconds <= 0: seconds = common.remaining_cd()
+	await asyncio.gather(
+		common.execute(f'INSERT INTO limits (uid, lid, value) SELECT familyrole.uid, {enums.Limits.FAMILY_NOTICE}, {limit} FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE limits.value={limit};', **kwargs),
+		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.FAMILY_NOTICE_END}, "{ntime}" FROM familyrole WHERE familyrole.`name` = "{name}" AND familyrole.`role` = {enums.FamilyRole.OWNER} ON DUPLICATE KEY UPDATE timer.time = "{ntime}";', **kwargs)
+	)
 	#  ##############################
 	await common.execute(f'UPDATE family SET notice = "{msg}" WHERE `name` = "{name}";', **kwargs)
-	return common.mt(0, 'success', {'notice' : msg, 'limit': limit, 'seconds': seconds})
+	return common.mt(0, 'success', {'notice' : msg, 'limit': limit, 'seconds': common.remaining_cd()})
 
 async def set_blackboard(uid, msg, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
@@ -314,6 +306,13 @@ async def abdicate(uid, target, **kwargs):
 	actors_role = await _get_role(uid, name, **kwargs)
 	if actors_role != enums.FamilyRole.OWNER: return common.mt(95, '你不是族长')
 	gn = await common.get_gn(uid, **kwargs)
+	await asyncio.gather(
+		_delete_disband_timer(name, **kwargs),
+		common.execute(f'INSERT INTO limits (uid, lid, value) SELECT "{target_uid}", {enums.Limits.FAMILY_INVITE}, (@v:=limits.value) FROM limits WHERE uid="{uid}" AND lid={enums.Limits.FAMILY_INVITE} ON DUPLICATE KEY UPDATE value=@v;', **kwargs),
+		common.execute(f'INSERT INTO limits (uid, lid, value) SELECT "{target_uid}", {enums.Limits.FAMILY_NOTICE}, (@v:=limits.value) FROM limits WHERE uid="{uid}" AND lid={enums.Limits.FAMILY_NOTICE} ON DUPLICATE KEY UPDATE value=@v;', **kwargs),
+		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT "{target_uid}", {enums.Timer.FAMILY_INVITE_END}, (@t:=timer.time) FROM timer WHERE uid="{uid}" AND tid={enums.Timer.FAMILY_INVITE_END} ON DUPLICATE KEY UPDATE time=@t;', **kwargs),
+		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT "{target_uid}", {enums.Timer.FAMILY_NOTICE_END}, (@t:=timer.time) FROM timer WHERE uid="{uid}" AND tid={enums.Timer.FAMILY_NOTICE_END} ON DUPLICATE KEY UPDATE time=@t;', **kwargs)
+	)
 	await common.execute(f'UPDATE familyrole SET role = {enums.FamilyRole.BASIC} WHERE uid = "{uid}" AND `name` = "{name}";', **kwargs)
 	await common.execute(f'UPDATE familyrole SET role = {enums.FamilyRole.OWNER} WHERE uid = "{target_uid}" AND `name` = "{name}";', **kwargs)
 	await _record_family_change(name, f'{gn} <FAMILY_ABDICATE> {target}.', **kwargs)
@@ -389,13 +388,14 @@ async def _get_check_in_timer(uid, **kwargs):
 
 async def _check_delete_family(timer, name, **kwargs):
 	if timer is not None and datetime.now(tz=common.TZ_SH) > timer:
+		await _delete_disband_timer(name, **kwargs)
 		await common.execute(f'DELETE FROM `family` WHERE `name` = "{name}";', **kwargs)
 		return True
 	return False
 
 async def _get_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
-	timer = await common.execute(f'SELECT time FROM `timer` WHERE uid = "{owner_uid[0][0]}" AND tid = {enums.Timer.FAMILY_DISBAND.value};', **kwargs)
+	timer = await common.execute(f'SELECT time FROM `timer` WHERE uid = "{owner_uid[0][0]}" AND tid = {enums.Timer.FAMILY_DISBAND};', **kwargs)
 	return None if timer == () else datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=common.TZ_SH)
 
 async def _set_disband_timer(name, **kwargs):
@@ -407,7 +407,7 @@ async def _set_disband_timer(name, **kwargs):
 
 async def _delete_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
-	await common.execute(f'DELETE FROM `timer` WHERE uid = "{owner_uid[0][0]}" AND tid = {enums.Timer.FAMILY_DISBAND.value};', **kwargs)
+	await common.execute(f'DELETE FROM `timer` WHERE uid = "{owner_uid[0][0]}" AND tid = {enums.Timer.FAMILY_DISBAND};', **kwargs)
 
 async def _count_members(name, **kwargs):
 	count = await common.execute(f'SELECT COUNT(*) FROM familyrole WHERE `name` = "{name}";', **kwargs)
@@ -489,7 +489,7 @@ async def increase_exp(name, exp, **kwargs):
 async def __insert(name, **kwargs):
 	"""没有这个登录时间和贡献记录，返回的数据不全数据"""
 	await asyncio.gather(
-		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.LOGIN_TIME}, "{datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")}" FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE timer.tid=`tid`;', **kwargs),
+		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.LOGIN_TIME}, "{datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d")}" FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE timer.tid=`tid`;', **kwargs),
 		common.execute(f'INSERT INTO item (uid, iid) SELECT familyrole.uid, {enums.Item.FAMILY_COIN} FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE iid=`iid`;', **kwargs),
 		common.execute(f'INSERT INTO item (uid, iid) SELECT familyrole.uid, {enums.Item.FAMILY_COIN_RECORD} FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE iid=`iid`;', **kwargs)
 	)
