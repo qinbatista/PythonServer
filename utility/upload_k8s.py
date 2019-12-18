@@ -2,7 +2,7 @@ import os
 import subprocess
 import argparse
 #import start_servers as s
-PATH = os.path.abspath(os.path.join(os.getcwd(), '../'))
+PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
 
 images = ['auth', 'config', 'edge', 'gate', 'mail', 'worker']
 
