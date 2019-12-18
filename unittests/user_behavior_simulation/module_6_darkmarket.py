@@ -45,7 +45,7 @@ if __name__ == '__main__':
 	world = "s1"
 	while True:
 		get_all_market(token, world)
-		darkmarket_transaction(token, world, pid=0)
+		# darkmarket_transaction(token, world, pid=0)
 		input("继续")
 		refresh_market(token, world)
 

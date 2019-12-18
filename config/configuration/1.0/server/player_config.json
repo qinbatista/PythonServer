@@ -157,6 +157,11 @@
 		},
 		"refresh_store":{
 			"diamond": 100
+		},
+		"constraint": {
+			"grid": 9,
+			"refreshable": 3,
+			"refresh_hours": 3
 		}
 	}
 }

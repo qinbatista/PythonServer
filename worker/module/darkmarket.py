@@ -8,8 +8,6 @@ from module import weapon
 import time
 import random
 from datetime import datetime, timedelta
-GRID = 9
-TIMES = 3
 
 
 async def transaction(uid, pid, **kwargs):
@@ -20,7 +18,7 @@ async def transaction(uid, pid, **kwargs):
 	# 97 : The item has been purchased
 	# 98 : You have not yet done an automatic refresh
 	# 99 : parameter error
-	if pid < 0 or pid > GRID - 1: return common.mt(99, 'parameter error')
+	if pid < 0 or pid > kwargs['config']['player']['dark_market']['constraint']['grid'] - 1: return common.mt(99, 'parameter error')
 
 	data = await common.execute(f'SELECT gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}" AND pid = "{pid}";', **kwargs)
 	if data == (): return common.mt(98, 'You have not yet done an automatic refresh')
@@ -62,19 +60,21 @@ async def get_all_market(uid, **kwargs):
 	# 1 - Get all black market information
 	"""
 	current_time = datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")
+	rtimes = kwargs['config']['player']['dark_market']['constraint']['refreshable']
 	timer = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME}";', **kwargs)
 	limit = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
 	refresh_time = current_time if timer == () else timer[0][0]
-	refreshable = TIMES if limit == () else limit[0][0]
+	refreshable = rtimes if limit == () else limit[0][0]
 	dark_markets = []
 	if refresh_time == current_time:
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
 	else:
 		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')
-		if delta_time.total_seconds() // 3600 >= 3:  # 满足3个小时进行一次刷新
-			frequency = delta_time.total_seconds() // 3600 // 3
-			refreshable = TIMES if refreshable + frequency >= TIMES else int(refreshable + frequency)
-			refresh_time = (datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S') + timedelta(hours=frequency*3)).strftime('%Y-%m-%d %H:%M:%S')
+		refresh_hours = kwargs['config']['player']['dark_market']['constraint']['refresh_hours']
+		if delta_time.total_seconds() // 3600 >= refresh_hours:  # 满足refresh_hours个小时进行一次刷新
+			frequency = delta_time.total_seconds() // 3600 // refresh_hours
+			refreshable = rtimes if refreshable + frequency >= rtimes else int(refreshable + frequency)
+			refresh_time = (datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S') + timedelta(hours=frequency*refresh_hours)).strftime('%Y-%m-%d %H:%M:%S')
 			dark_markets = await refresh_darkmarket(uid, **kwargs)
 	if not dark_markets:
 		data = await common.execute(f'SELECT pid, gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}";', **kwargs)
@@ -194,7 +194,7 @@ async def free_refresh(uid, **kwargs):
 async def refresh_darkmarket(uid, **kwargs):
 	dark_markets = []
 	dark_market_data = kwargs['config']['player']['dark_market']
-	tier_choice = random.choices(dark_market_data['names'], dark_market_data['weights'], k=GRID)
+	tier_choice = random.choices(dark_market_data['names'], dark_market_data['weights'], k=kwargs['config']['player']['dark_market']['constraint']['grid'])
 	key_list = [(random.choices(dark_market_data[tier], k=1))[0] for tier in tier_choice]
 	for pid, merchandise in enumerate(key_list):
 		if "W" in merchandise:
