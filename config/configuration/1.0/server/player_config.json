@@ -23,7 +23,7 @@
 		"weights":[0.40, 0.30, 0.20, 0.10],
 		"names": ["tier1", "tier2", "tier3", "tier4"],
 		"tier1" : ["6", "9", "10", "weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10"],
-		"tier2" : ["7", "2", "weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20", "skill_M0", "skill_P0", "skill_G0"],
+		"tier2" : ["7", "2", "weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20", "skill_P0", "skill_G0"],
 		"tier3" : ["8", "weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30",
 			"skill_M1", "skill_M2", "skill_M3", "skill_P1", "skill_P2", "skill_P3", "skill_G1", "skill_G2", "skill_G3"],
 		"tier4" : [
@@ -32,7 +32,7 @@
 			"skill_G4", "skill_G5", "skill_G6", "skill_G7", "skill_G8", "skill_G9", "skill_G10", "skill_G11", "skill_G12"],
 		"skill_MPG" : {"M": 0, "P": 13, "G": 26},
 		"skill": [
-			"skill_M0", "skill_M1", "skill_M2", "skill_M3", "skill_M4", "skill_M5", "skill_M6", "skill_M7", "skill_M8", "skill_M9", "skill_M10", "skill_M11", "skill_M12",
+			"skill_M1", "skill_M2", "skill_M3", "skill_M4", "skill_M5", "skill_M6", "skill_M7", "skill_M8", "skill_M9", "skill_M10", "skill_M11", "skill_M12",
 			"skill_P0", "skill_P1", "skill_P2", "skill_P3", "skill_P4", "skill_P5", "skill_P6", "skill_P7", "skill_P8", "skill_P9", "skill_P10", "skill_P11", "skill_P12",
 			"skill_G0", "skill_G1", "skill_G2", "skill_G3", "skill_G4", "skill_G5", "skill_G6", "skill_G7", "skill_G8", "skill_G9", "skill_G10", "skill_G11", "skill_G12"
 		],
