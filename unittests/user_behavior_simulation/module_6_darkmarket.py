@@ -39,10 +39,17 @@ def darkmarket_dialog(token, world,**kwargs):
 	# refresh_market(token, world, **kwargs)
 	darkmarket_transaction(token, world, random.randint(0,7), **kwargs)
 
-if __name__ == '__main__':
-	get_all_market()
 
-	# refresh_market()
+if __name__ == '__main__':
+	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNjE4MjMsInVpZCI6IjAifQ.sAnQoaJ5ZWxxUjKcOcR-QZ7W2BsKpIPPeNEiBavHlbU"
+	world = "s1"
+	while True:
+		get_all_market(token, world)
+		darkmarket_transaction(token, world, pid=0)
+		input("继续")
+		refresh_market(token, world)
+
+# refresh_market()
 	# darkmarket_transaction(pid=1)
 
 

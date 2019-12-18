@@ -494,11 +494,9 @@ class MessageHandler:
 
 	###################### darkmarket ######################
 	async def _get_all_market(self, data: dict) -> str:
-		data['dark_market'] = data['config']['player']['dark_market']
 		return await darkmarket.get_all_market(data['data']['unique_id'], **data)
 
 	async def _refresh_market(self, data: dict) -> str:
-		data['dark_market'] = data['config']['player']['dark_market']
 		return await darkmarket.refresh_market(data['data']['unique_id'], **data)
 
 	async def _darkmarket_transaction(self, data: dict) -> str:
