@@ -27,8 +27,7 @@ async def transaction(uid, pid, **kwargs):
 	if amt < 0: return common.mt(97, 'The item has been purchased')
 
 	transactions = {'pid': pid, 'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': -amt}
-	amt = -amt
-	can, currency = await common.try_item(uid, enums.Item(cid), amt, **kwargs)
+	can, currency = await common.try_item(uid, enums.Item(cid), -amt, **kwargs)
 	if not can:
 		return common.mt(96, 'Insufficient currency')
 	remaining = {'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': currency}
@@ -41,14 +40,14 @@ async def transaction(uid, pid, **kwargs):
 			await common.execute_update(f'INSERT INTO skill (uid, sid, level) VALUES ("{uid}", {mid}, {qty});', **kwargs)
 			remaining['qty'] = qty
 		else:
-			await common.try_item(uid, enums.Item(cid), abs(amt), **kwargs)
+			await common.try_item(uid, enums.Item(cid), amt, **kwargs)
 			return common.mt(95, 'You already have this skill')
 	elif gid == enums.Group.ITEM.value:
 		_, _qty = await common.try_item(uid, enums.Item(mid), qty, **kwargs)
 		remaining['qty'] = _qty
 	else:
 		return common.mt(94, 'The server found an abnormal group id')
-	await set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs)
+	await set_darkmarket(uid, pid, gid, mid, qty, cid, -amt, **kwargs)
 	return common.mt(0, 'Purchase success', {'reward': transactions, 'remaining': remaining})
 
 
