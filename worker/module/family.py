@@ -400,7 +400,7 @@ async def _get_disband_timer(name, **kwargs):
 
 async def _set_disband_timer(name, **kwargs):
 	owner_uid = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}" AND `role` = {enums.FamilyRole.OWNER};', **kwargs)
-	seconds = 3600 * 24
+	seconds = int(3600 * kwargs['config']['family']['general']['disband_hours'])
 	time = (datetime.now(tz=common.TZ_SH) + timedelta(seconds=seconds)).strftime('%Y-%m-%d %H:%M:%S')
 	await common.execute(f'INSERT INTO `timer` VALUES ("{owner_uid[0][0]}", {enums.Timer.FAMILY_DISBAND.value}, "{time}");', **kwargs)
 	return seconds
