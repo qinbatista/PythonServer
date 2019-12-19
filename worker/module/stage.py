@@ -90,10 +90,10 @@ async def e_general_stage(uid, stage, **kwargs):
 	energy_consume = entry_consume[stage]['cost']  # 消耗能量数
 
 	for i, iid in enumerate(iid_s):
-		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
+		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		if data == ():
 			await common.execute_update(f'INSERT INTO item (uid, iid) VALUES ("{uid}", "{iid}");', **kwargs)
-			data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
+			data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		values[i] += data[0][0]
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
@@ -208,10 +208,10 @@ async def e_tower_stage(uid, stage, **kwargs):
 	energy_consume = entry_consume[stage]['cost']  # 消耗能量数
 
 	for i, iid in enumerate(iid_s):
-		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
+		data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		if data == ():
 			await common.execute_update(f'INSERT INTO item (uid, iid) VALUES ("{uid}", "{iid}");', **kwargs)
-			data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}" FOR UPDATE;', **kwargs)
+			data = await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{iid}";', **kwargs)
 		values[i] += data[0][0]
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
