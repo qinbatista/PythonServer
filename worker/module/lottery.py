@@ -13,10 +13,12 @@ STANDARD_SEG_COUNT = 30
 
 SWITCH = {}
 
+
 async def random_gift(uid, tier, rewardgroup, **kwargs):
 	t = (random.choices(range(len(kwargs['config']['lottery']['random_gift'][rewardgroup.name]['weights'][tier.name])), kwargs['config']['lottery']['random_gift'][rewardgroup.name]['weights'][tier.name]))[0]
 	gift = (random.choices(kwargs['config']['lottery']['random_gift'][rewardgroup.name]['rewards'][t]))[0]
 	return await SWITCH[rewardgroup](uid, gift, **kwargs)
+
 
 async def fortune_wheel(uid, tier, item, **kwargs):
 	cost = kwargs['config']['lottery']['fortune_wheel']['cost'][tier.name][f'{enums.Group.ITEM.value}:{item.value}']
@@ -39,55 +41,58 @@ async def _try_unlock_weapon(uid, gift, **kwargs):
 	weapon = enums.Weapon(gift)
 	if weapon.name in kwargs['config']['weapon']['star_4']:
 		kwargs.update({"aid": enums.Achievement.GET_4_STAR_WEAPON})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_4_STAR_WEAPON_TIMES})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 	if weapon.name in kwargs['config']['weapon']['star_5']:
 		kwargs.update({"aid": enums.Achievement.GET_5_STAR_WEAPON})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_5_STAR_WEAPON_TIMES})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 	if weapon.name in kwargs['config']['weapon']['star_6']:
 		kwargs.update({"aid": enums.Achievement.GET_6_STAR_WEAPON})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_6_STAR_WEAPON_TIMES})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 	if not await common.exists('weapon', ('uid', uid), ('wid', weapon.value), **kwargs):
 		await common.execute(f'INSERT INTO weapon(uid, wid) VALUES ("{uid}", {weapon.value});', **kwargs)
-		return (True, weapon)
+		return True, weapon
 	await common.execute(f'UPDATE weapon SET segment = segment + {STANDARD_SEG_COUNT} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
-	return (False, weapon)
+	return False, weapon
+
 
 async def _try_unlock_skill(uid, gift, **kwargs):
 	skill = enums.Skill(gift)
 	if not await common.exists('skill', ('uid', uid), ('sid', skill.value), **kwargs):
 		await common.execute(f'INSERT INTO skill(uid, sid) VALUES ("{uid}", {skill.value});', **kwargs)
-		return (True, skill)
+		return True, skill
 	await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.SKILL_SCROLL_10.value}, 1) ON DUPLICATE KEY UPDATE value = value + 1;', **kwargs)
-	return (False, enums.Item.SKILL_SCROLL_10)
+	return False, enums.Item.SKILL_SCROLL_10
+
 
 async def _try_unlock_role(uid, gift, **kwargs):
 	role = enums.Role(gift)
 	if role.name in kwargs['config']['role']['star_4']:
 		kwargs.update({"aid": enums.Achievement.GET_4_STAR_ROLE})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_4_STAR_ROLE_TIMES})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 	if role.name in kwargs['config']['role']['star_5']:
 		kwargs.update({"aid": enums.Achievement.GET_5_STAR_ROLE})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_5_STAR_ROLE_TIMES})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 	if role.name in kwargs['config']['role']['star_6']:
 		kwargs.update({"aid": enums.Achievement.GET_6_STAR_ROLE})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_6_STAR_ROLE_TIMES})
-		await achievement.record_achievement(uid,**kwargs)
+		await achievement.record_achievement(uid, **kwargs)
 	if not await common.exists('role', ('uid', uid), ('rid', role.value), **kwargs):
 		await common.execute(f'INSERT INTO role(uid, rid) VALUES ("{uid}", {role.value});', **kwargs)
-		return (True, role)
+		return True, role
 	await common.execute(f'UPDATE role SET segment = segment + {STANDARD_SEG_COUNT} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
-	return (False, role)
+	return False, role
+
 
 SWITCH[enums.Group.WEAPON] = _try_unlock_weapon
 SWITCH[enums.Group.SKILL] = _try_unlock_skill
