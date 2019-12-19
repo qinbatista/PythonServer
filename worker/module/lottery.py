@@ -9,6 +9,7 @@ from module import enums
 from module import task
 from module import achievement
 
+
 STANDARD_SEG_COUNT = 30
 
 SWITCH = {}
@@ -39,17 +40,17 @@ async def fortune_wheel(uid, tier, item, **kwargs):
 
 async def _try_unlock_weapon(uid, gift, **kwargs):
 	weapon = enums.Weapon(gift)
-	if weapon.name in kwargs['config']['weapon']['star_4']:
+	if "W4" in weapon.name:
 		kwargs.update({"aid": enums.Achievement.GET_4_STAR_WEAPON})
 		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_4_STAR_WEAPON_TIMES})
 		await achievement.record_achievement(uid, **kwargs)
-	if weapon.name in kwargs['config']['weapon']['star_5']:
+	if "W5" in weapon.name:
 		kwargs.update({"aid": enums.Achievement.GET_5_STAR_WEAPON})
 		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_5_STAR_WEAPON_TIMES})
 		await achievement.record_achievement(uid, **kwargs)
-	if weapon.name in kwargs['config']['weapon']['star_6']:
+	if "W6" in weapon.name:
 		kwargs.update({"aid": enums.Achievement.GET_6_STAR_WEAPON})
 		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_6_STAR_WEAPON_TIMES})
@@ -72,17 +73,17 @@ async def _try_unlock_skill(uid, gift, **kwargs):
 
 async def _try_unlock_role(uid, gift, **kwargs):
 	role = enums.Role(gift)
-	if role.name in kwargs['config']['role']['star_4']:
+	if "R4" in role.name:
 		kwargs.update({"aid": enums.Achievement.GET_4_STAR_ROLE})
 		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_4_STAR_ROLE_TIMES})
 		await achievement.record_achievement(uid, **kwargs)
-	if role.name in kwargs['config']['role']['star_5']:
+	if "R5" in role.name:
 		kwargs.update({"aid": enums.Achievement.GET_5_STAR_ROLE})
 		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_5_STAR_ROLE_TIMES})
 		await achievement.record_achievement(uid, **kwargs)
-	if role.name in kwargs['config']['role']['star_6']:
+	if "R6" in role.name:
 		kwargs.update({"aid": enums.Achievement.GET_6_STAR_ROLE})
 		await achievement.record_achievement(uid, **kwargs)
 		kwargs.update({"aid": enums.Achievement.SUMMON_6_STAR_ROLE_TIMES})
