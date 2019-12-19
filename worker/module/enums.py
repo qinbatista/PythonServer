@@ -50,6 +50,8 @@ class Item(enum.IntEnum):
 	UNIVERSAL4_SEGMENT = 40  # 4星万能碎片
 	UNIVERSAL5_SEGMENT = 41  # 5星万能碎片
 	UNIVERSAL6_SEGMENT = 42  # 6星万能碎片
+	VIP_EXP_CARD = 43  # VIP经验卡兑换可获得50VIP经验
+	INTEGRAL = 44  # 抽奖获得积分，积分兑换角色碎片
 
 
 class FamilyRole(enum.IntEnum):

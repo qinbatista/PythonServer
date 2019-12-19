@@ -66,6 +66,8 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': unique_id}})
 	# print(response)
 	# token = response['data']['token']
+	user_behavior_simulation.send_tcp_message({"function":"pass_stage","random":"-45","world":"s0","data":{"stage":6,"clear_time":"100","token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkzMjAyMjAsInVpZCI6IktCRjQ5In0.JRW98TqHSgh5cLhNTEPYNRkUHxjKZyNyOsSEfssOYec"}})
+	input("继续")
 	world = "s0"
 	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkwNzEwNDYsInVpZCI6ImgwIn0.0etH168lGc1ORWUmcdycKytvDNfLmg5PPOVlzWlhAxM"
 	n = 10

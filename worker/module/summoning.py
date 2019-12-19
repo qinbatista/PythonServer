@@ -99,7 +99,16 @@ async def _response_factory_role(uid, rewardgroup, new, reward, item, remaining,
 		return common.mt(5, 'get segment',{'remaining' : {'role' : reward.value, 'star' : star, 'segment' : segment, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'role' : reward.value, 'star' : 0, 'segment': 30, 'cost_item' : item.value, 'cost_quantity': cost}})
 
 
-
 SWITCH[enums.Group.WEAPON] = _response_factory_weapon
 SWITCH[enums.Group.SKILL] = _response_factory_skill
 SWITCH[enums.Group.ROLE] = _response_factory_role
+
+
+# TODO 2019年12月19日
+# ##################################################################
+# ################### 2019年12月19日之后加入的方法 #################
+# ##################################################################
+
+
+# ############################# 私有方法 ###########################
+
