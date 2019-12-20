@@ -1,15 +1,17 @@
 {
 	"5": {
-		"comment": "qty指抽到每个格子消耗钻石的数量，INTEGRAL指抽奖一次得到的积分数，constraint是对此类抽奖的约束限制，specific指特殊商品，总权重需要选出12个位置后才能计算出来",
+		"comment": "qty指抽到每个格子消耗钻石的数量，reward指抽奖一次得到的奖励，constraint是对此类抽奖的约束限制，格子中必须有must下的所有商品，总权重需要选出12个位置后才能计算出来",
 		"qty": 200,
-		"INTEGRAL": 5,
 		"constraint": {
 			"comment": "grid指商品存放的格子数(空格子先满足特殊商品需要，剩下的空格子在普通商品中随机选)，hours指刷新后的冷却时间，times指一天可抽奖的最大次数",
 			"grid": 12,
 			"hours": 48,
 			"times": 12
 		},
-		"specific": {
+		"reward": [
+			"3:44:5"
+		],
+		"must": {
 			"comment": "goods下是必须出现的商品，每个商品有对应的组id、商品id、商品数量、商品权重",
 			"goods": [
 				{
@@ -52,16 +54,18 @@
 		}
 	},
 	"1": {
-		"comment": "qty指抽到每个格子消耗金币的数量，INTEGRAL指抽奖一次得到的积分数，constraint是对此类抽奖的约束限制，specific指特殊商品，总权重需要选出12个位置后才能计算出来",
+		"comment": "qty指抽到每个格子消耗金币的数量，reward指抽奖一次得到的奖励，constraint是对此类抽奖的约束限制，格子中必须有must下的所有商品，总权重需要选出12个位置后才能计算出来",
 		"qty": 10000,
-		"INTEGRAL": 1,
+		"reward": [
+			"3:44:1"
+		],
 		"constraint": {
 			"comment": "grid指商品存放的格子数(空格子先满足特殊商品需要，剩下的空格子在普通商品中随机选)，hours指刷新后的冷却时间，times指一天可抽奖的最大次数",
 			"grid": 12,
 			"hours": 48,
 			"times": 12
 		},
-		"specific": {
+		"must": {
 			"comment": "goods下是必须出现的商品，每个商品有对应的组id、商品id、商品数量、商品权重",
 			"goods": [
 				{
@@ -80,16 +84,18 @@
 		}
 	},
 	"16": {
-		"comment": "qty指抽到每个格子消耗朋友爱心的数量，INTEGRAL指抽奖一次得到的积分数，constraint是对此类抽奖的约束限制，specific指特殊商品，general指普通商品，总权重需要选出12个位置后才能计算出来",
+		"comment": "qty指抽到每个格子消耗朋友爱心的数量，reward指抽奖一次得到的奖励，constraint是对此类抽奖的约束限制，格子中必须有must下的所有商品，general指普通商品，总权重需要选出12个位置后才能计算出来",
 		"qty": 10,
-		"INTEGRAL": 1,
+		"reward": [
+			"3:44:1"
+		],
 		"constraint": {
 			"comment": "grid指商品存放的格子数(空格子先满足特殊商品需要，剩下的空格子在普通商品中随机选)，hours指刷新后的冷却时间，times指一天可抽奖的最大次数",
 			"grid": 12,
 			"hours": 48,
 			"times": 12
 		},
-		"specific": {
+		"must": {
 			"comment": "goods下是必须出现的商品，每个商品有对应的组id、商品id、商品数量、商品权重",
 			"goods": [
 				{
