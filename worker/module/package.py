@@ -48,6 +48,7 @@ async def use_item(uid, iid, eid, **kwargs):
 	"""
 	consume = 1
 	c = common.decode_items(iid)[0]
+	# consume = c[2]
 	if c[0] == enums.Group.ITEM:
 		can, remain = await common.try_item(uid, c[1], -consume, **kwargs)
 		if not can: return common.mt(96, '兑换消耗品不足')

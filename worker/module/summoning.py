@@ -111,4 +111,8 @@ SWITCH[enums.Group.ROLE] = _response_factory_role
 
 
 # ############################# 私有方法 ###########################
+async def _refresh(cid, **kwargs):
+	"""刷新抽奖市场方法，cty代表消耗品类型diamond,coin,gift"""
+	config = kwargs['config']['summon']
+
 

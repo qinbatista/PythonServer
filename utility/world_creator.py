@@ -9,6 +9,20 @@ import pymysql
 import argparse
 
 
+SUMMON = \
+"""
+CREATE TABLE `summon` (
+	 `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
+	 `cid` SMALLINT UNSIGNED NOT NULL COMMENT '消耗品id',
+	 `pid` SMALLINT UNSIGNED NOT NULL COMMENT '位置id',
+	 `mid` VARCHAR(16) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '商品eg=0:1:1',
+	 `wgt` SMALLINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '商品权重weight，只能为正整数',
+	 `isb` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '0：未购买，1：已购买',
+	 PRIMARY KEY (`uid`, `cid`, `pid`),
+	 CONSTRAINT `summon_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+"""
+
 ACHIEVEMENT = \
 """
 CREATE TABLE `achievement` (
@@ -330,7 +344,7 @@ BEGIN
 END;
 """
 
-TABLES = [PLAYER, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET,
+TABLES = [PLAYER, SUMMON, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET,
 		FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LEADERBOARD, LIMITS,
 		PROGRESS, ROLE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE, CONSTRAINT, TRIGGER1, TRIGGER2]
 
@@ -437,4 +451,4 @@ def test(world, mysql_addr, mysql_user, mysql_pw):
 
 if __name__ == '__main__':
 	main()
-	# test("w1", "192.168.1.102", "root", "lukseun")
+	# test("s1", "192.168.1.102", "root", "lukseun")

@@ -1,5 +1,5 @@
 {
-	"diamond": {
+	"5": {
 		"comment": "qty指消耗钻石的数量，INTEGRAL指抽奖一次得到的积分数，constraint是对此类抽奖的约束限制，specific指特殊商品，general指普通商品，总权重需要选出12个位置后才能计算出来",
 		"qty": 200,
 		"INTEGRAL": 5,
@@ -29,7 +29,7 @@
 			"weight": [80, 80, 100, 200]
 		}
 	},
-	"coin": {
+	"1": {
 		"comment": "qty指消耗金币的数量，INTEGRAL指抽奖一次得到的积分数，constraint是对此类抽奖的约束限制，specific指特殊商品，general指普通商品，总权重需要选出12个位置后才能计算出来",
 		"qty": 10000,
 		"INTEGRAL": 1,
@@ -55,7 +55,7 @@
 			"weight": [80, 80, 200, 500]
 		}
 	},
-	"gift": {
+	"16": {
 		"comment": "qty指消耗朋友爱心的数量，INTEGRAL指抽奖一次得到的积分数，constraint是对此类抽奖的约束限制，specific指特殊商品，general指普通商品，总权重需要选出12个位置后才能计算出来",
 		"qty": 10,
 		"INTEGRAL": 1,
@@ -81,7 +81,7 @@
 			"weight": [80, 80, 200, 500]
 		}
 	},
-	"integral": {
+	"44": {
 		"comment": "hours小时后重置积分，满足足够积分直接获取，对应200，400，600，800，1000获取对应奖励",
 		"hours": 168,
 		"specific": {
