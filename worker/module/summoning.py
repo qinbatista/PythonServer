@@ -137,7 +137,7 @@ async def refresh_g(uid, **kwargs):
 async def _refresh(uid, cid: str, **kwargs):
 	"""刷新抽奖市场方法，cid代表消耗品类型5, 1, 16"""
 	if cid not in ['5', '1', '16']: return common.mt(99, 'cid错误')
-	config = kwargs['config']['summon'].get(cid, None)
+	config = kwargs['config']['summon']['resource'].get(cid, None)
 	if config is None: return common.mt(98, '配置文件不存在')
 	data = []
 	grids = [i for i in range(config['constraint'].get('grid', 12))]
