@@ -111,42 +111,63 @@ SWITCH[enums.Group.ROLE] = _response_factory_role
 
 
 # ############################# 私有方法 ###########################
+
+
+async def refresh_d(uid, **kwargs):
+	"""刷新钻石抽奖市场方法"""
+	# TODO 1.消耗操作
+	# TODO 2.奖励积分操作
+	return await _refresh(uid, str(enums.Item.DIAMOND.value), **kwargs)
+
+
+async def refresh_c(uid, **kwargs):
+	"""刷新金币抽奖市场方法"""
+	# TODO 1.消耗操作
+	# TODO 2.奖励积分操作
+	return await _refresh(uid, str(enums.Item.COIN.value), **kwargs)
+
+
+async def refresh_g(uid, **kwargs):
+	"""刷新朋友爱心抽奖市场方法"""
+	# TODO 1.消耗操作
+	# TODO 2.奖励积分操作
+	return await _refresh(uid, str(enums.Item.FRIEND_GIFT.value), **kwargs)
+
+
 async def _refresh(uid, cid: str, **kwargs):
 	"""刷新抽奖市场方法，cid代表消耗品类型5, 1, 16"""
 	if cid not in ['5', '1', '16']: return common.mt(99, 'cid错误')
-	return await SWITCH[enums.Item(int(cid))](uid, **kwargs)
-
-
-async def __refresh_d(uid, **kwargs):
-	"""刷新钻石抽奖市场方法"""
-	config = kwargs['config']['summon'].get('5', None)
+	config = kwargs['config']['summon'].get(cid, None)
 	if config is None: return common.mt(98, '配置文件不存在')
-	prestore = []
+	data = []
 	grids = [i for i in range(config['constraint'].get('grid', 12))]
 	random.shuffle(grids)
-	for grid in grids:
-		# for m in config['specific']
-		prestore.append(1)
-	return common.mt(0, 'success', {})
+	goods = config['must']['goods']
+	goods_qty = len(goods)
+	if len(grids) >= goods_qty:
+		for i, m in enumerate(goods):
+			pid = grids[i]
+			mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
+			wgt = m['weight']
+			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
+			data.append({'cid': cid, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
+		optional = random.choices(kwargs['config']['summon']['merchandise'], k=len(grids) - goods_qty)
+		for i, m in enumerate(optional):
+			pid = grids[goods_qty + i]
+			mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
+			wgt = m['weight']
+			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
+			data.append({'cid': cid, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
+	else:
+		for i, pid in enumerate(grids):
+			m = goods[i]
+			mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
+			wgt = m['weight']
+			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
+			data.append({'cid': cid, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
+	return common.mt(0, 'success', {'refresh': data})
 
 
-async def __refresh_c(uid, **kwargs):
-	"""刷新金币抽奖市场方法"""
-	config = kwargs['config']['summon'].get('1', None)
-	if config is None: return common.mt(98, '配置文件不存在')
-	return common.mt(1, 'success', {})
-
-
-async def __refresh_g(uid, **kwargs):
-	"""刷新朋友爱心抽奖市场方法"""
-	config = kwargs['config']['summon'].get('16', None)
-	if config is None: return common.mt(98, '配置文件不存在')
-	return common.mt(2, 'success', {})
-
-
-SWITCH = {
-	enums.Item.DIAMOND: __refresh_d,
-	enums.Item.COIN: __refresh_c,
-	enums.Item.FRIEND_GIFT: __refresh_g,
-}
+async def _set_summon(uid, cid, pid, mid, wgt, isb, **kwargs):
+	await common.execute_update(f'INSERT INTO summon (uid, cid, pid, mid, wgt, isb) VALUES ("{uid}", {cid}, {pid}, "{mid}", {wgt}, {isb}) ON DUPLICATE KEY UPDATE `mid`= VALUES(`mid`), `wgt`= VALUES(`wgt`), `isb`= VALUES(`isb`);', **kwargs)
 

@@ -138,9 +138,9 @@ def summon_dialog(token,world):
 
 
 if __name__ == '__main__':
-	response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
-	# response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '12'}})
-	print(response)
+	# response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '1'}})
+	# # response = send_tcp_message({'function': 'login_unique', 'data': {'unique_id': '12'}})
+	# print(response)
 	# response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
 	# response = send_tcp_message({'world': 0, 'function': 'friend_summon', 'data': {'token': token, "item":random.choice([1, 5, 11])}})
 	# response = send_tcp_message({'world': 0, 'function': 'check_boss_status', 'data': {'token': token, "item": 11}})
@@ -192,8 +192,12 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'supplement_check_in', 'data': {'token': token, 'item': 5}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_account_world_info', 'data': {'token': token, 'item': 5}})
 	# response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, 'item': 1}})
-	response = send_tcp_message({'world': 0, 'function': 'get_account_world_info', 'data': {'token': token, 'item': 1}})
-	print(str(response).replace("'", "\""))
+	world = "s1"
+	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1Nzg3MjgxMzEsInVpZCI6ImgwMDAifQ.C_CRmyMSK8a1MxW74UfwzmfraVJ74XYt2wqYkn0xgo4"
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_diamond_store', 'data': {'token' : token}})
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_coin_store', 'data': {'token' : token}})
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_gift_store', 'data': {'token' : token}})
+
 
 
 

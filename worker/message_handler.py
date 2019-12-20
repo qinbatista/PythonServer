@@ -279,6 +279,15 @@ class MessageHandler:
 	async def _friend_summon_role_10_times(self, data: dict) -> str:
 		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.ROLE, **data)
 
+	async def _refresh_diamond_store(self, data: dict) -> str:
+		return await summoning.refresh_d(data['data']['unique_id'], **data)
+
+	async def _refresh_coin_store(self, data: dict) -> str:
+		return await summoning.refresh_c(data['data']['unique_id'], **data)
+
+	async def _refresh_gift_store(self, data: dict) -> str:
+		return await summoning.refresh_g(data['data']['unique_id'], **data)
+
 	###################### lottery.py ######################
 	async def _fortune_wheel_basic(self, data: dict) -> str:
 		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.BASIC, enums.Item(int(data['data']['item'])), **data)
@@ -675,6 +684,9 @@ FUNCTION_LIST = {
 	'basic_summon_role_10_times' : MessageHandler._basic_summon_role_10_times,
 	'pro_summon_role_10_times' : MessageHandler._pro_summon_role_10_times,
 	'friend_summon_role_10_times' : MessageHandler._friend_summon_role_10_times,
+	'refresh_diamond_store' : MessageHandler._refresh_diamond_store,
+	'refresh_coin_store' : MessageHandler._refresh_coin_store,
+	'refresh_gift_store' : MessageHandler._refresh_gift_store,
 
 	###################### lottery.py ######################
 	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
