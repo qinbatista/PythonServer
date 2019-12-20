@@ -7,7 +7,7 @@ from module import common
 from module import lottery
 from module import task
 from module import achievement
-
+import random
 # Tier
 # basic, friend, pro, prophet
 # RewardGroup
@@ -111,8 +111,42 @@ SWITCH[enums.Group.ROLE] = _response_factory_role
 
 
 # ############################# 私有方法 ###########################
-async def _refresh(cid, **kwargs):
-	"""刷新抽奖市场方法，cty代表消耗品类型diamond,coin,gift"""
-	config = kwargs['config']['summon']
+async def _refresh(uid, cid: str, **kwargs):
+	"""刷新抽奖市场方法，cid代表消耗品类型5, 1, 16"""
+	if cid not in ['5', '1', '16']: return common.mt(99, 'cid错误')
+	return await SWITCH[enums.Item(int(cid))](uid, **kwargs)
 
+
+async def __refresh_d(uid, **kwargs):
+	"""刷新钻石抽奖市场方法"""
+	config = kwargs['config']['summon'].get('5', None)
+	if config is None: return common.mt(98, '配置文件不存在')
+	prestore = []
+	grids = [i for i in range(config['constraint'].get('grid', 12))]
+	random.shuffle(grids)
+	for grid in grids:
+		# for m in config['specific']
+		prestore.append(1)
+	return common.mt(0, 'success', {})
+
+
+async def __refresh_c(uid, **kwargs):
+	"""刷新金币抽奖市场方法"""
+	config = kwargs['config']['summon'].get('1', None)
+	if config is None: return common.mt(98, '配置文件不存在')
+	return common.mt(1, 'success', {})
+
+
+async def __refresh_g(uid, **kwargs):
+	"""刷新朋友爱心抽奖市场方法"""
+	config = kwargs['config']['summon'].get('16', None)
+	if config is None: return common.mt(98, '配置文件不存在')
+	return common.mt(2, 'success', {})
+
+
+SWITCH = {
+	enums.Item.DIAMOND: __refresh_d,
+	enums.Item.COIN: __refresh_c,
+	enums.Item.FRIEND_GIFT: __refresh_g,
+}
 

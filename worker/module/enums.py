@@ -258,6 +258,9 @@ class Timer(enum.IntEnum):
 	FAMILY_NOTICE_END = 24  # 管理员发布公告后刷新公告发布次数的剩余时间
 	FAMILY_INVITE_END = 25  # 管理员邀请成员后刷新邀请成员次数的剩余时间
 	BIND_PHONE_END = 26  # 用户绑定手机次数刷新的结束时间
+	SUMMON_D_END = 27  # 刷新钻石随机商城的结束时间
+	SUMMON_C_END = 28  # 刷新金币随机商城的结束时间
+	SUMMON_G_END = 29  # 刷新朋友礼物随机商城的结束时间
 
 
 class Limits(enum.IntEnum):

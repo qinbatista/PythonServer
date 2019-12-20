@@ -108,6 +108,7 @@ class ModuleConfigurations:
 		self.configs['task']              = r.json()['task']
 		self.configs['check_in']          = r.json()['check_in']
 		self.configs['version']           = r.json()['version']
+		self.configs['summon']            = r.json()['summon']
 
 		if refresh_world_boss and not already_refreshed_world_boss:
 			refresh_world_boss, already_refreshed_world_boss = False, True
