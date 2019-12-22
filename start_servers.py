@@ -19,47 +19,15 @@ def GetPythonCommand():
 	global PythonVersion
 	if PythonVersion != "":
 		return PythonVersion
-
-	try:
-		version1 = os.popen("python3.7 --version")
-		if version1.read() != "":
-			PythonVersion = "python3.7"
-			print("Your are using python command:" + PythonVersion)
-			return PythonVersion
-	except Exception as e:
-		print(str(e))
-
-	try:
-		version2 = os.popen("python.exe --version")
-		if version2.read() != "":
-			PythonVersion = "python.exe"
-			print("Your are using python command:" + PythonVersion)
-			return PythonVersion
-	except Exception as e:
-		print(str(e))
-
-	try:
-		version3 = os.popen("python3 --version")
-		if version3.read() != "":
-			PythonVersion = "python3"
-			print("Your are using python command:" + PythonVersion)
-			return PythonVersion
-	except Exception as e:
-		print(str(e))
-
-	try:
-		version4 = os.popen("python --version")
-		if version4.read() != "":
-			PythonVersion = "python"
-			print("Your are using python command:" + PythonVersion)
-			return PythonVersion
-	except Exception as e:
-		print(str(e))
-
-	print("Version1:" + version1.read())
-	print("Version2:" + version2.read())
-	print("Version3:" + version3.read())
-	print("Version3:" + version4.read())
+	for cmd in ['python3.7', 'python.exe', 'python3']:
+		try:
+			version = os.popen(f'{cmd} --version')
+			if version.read() != '':
+				PythonVersion = cmd
+				print(f'You are using python command: {cmd}')
+				return PythonVersion
+		except Exception as e:
+			print(e)
 
 
 def get_host_ip():

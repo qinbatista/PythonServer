@@ -4,9 +4,12 @@ import subprocess
 import signal
 import requests
 from socket import *
-PythonVersion=""
+PythonVersion = ""
+
+
 def loc():
 	return os.path.dirname(os.path.realpath(__file__))
+
 
 def get_host_ip():
 	try:
@@ -17,9 +20,10 @@ def get_host_ip():
 		s.close()
 	return ip
 
+
 def GetPythonCommand():
 	global PythonVersion
-	if PythonVersion!="":
+	if PythonVersion != "":
 		return PythonVersion
 	for cmd in ['python3.7', 'python.exe', 'python3']:
 		try:
@@ -51,7 +55,7 @@ def main():
 				'--nats-addr', '192.168.1.102']))
 		time.sleep(0.2)
 		print('Done spawning servers...')
-		while (len(processes) > 0):
+		while len(processes) > 0:
 			time.sleep(5)
 	except KeyboardInterrupt:
 		pass
