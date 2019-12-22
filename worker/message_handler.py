@@ -184,7 +184,7 @@ class MessageHandler:
 		return await family.check_in(data['data']['unique_id'], **data)
 
 	async def _abdicate_family(self, data: dict) -> str:
-		return await family.abdicate(data['data']['unique_id'], data['data']['gn_target'], **data)
+		return await family.abdicate(data['data']['unique_id'], data['data']['target'], **data)
 
 	async def _get_config_family(self, data: dict) -> str:
 		return await family.config(**data)
