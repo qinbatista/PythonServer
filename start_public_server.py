@@ -35,6 +35,7 @@ def GetPythonCommand():
 		except Exception as e:
 			print(e)
 
+
 def main():
 	processes = []
 	try:
