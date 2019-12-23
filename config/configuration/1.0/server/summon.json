@@ -1,6 +1,6 @@
 {
 	"resource": {
-		"5": {
+		"DIAMOND": {
 			"comment": "qty指抽到每个格子消耗钻石的数量，reward指抽奖一次得到的奖励，constraint是对此类抽奖的约束限制，格子中必须有must下的所有商品，总权重需要选出12个位置后才能计算出来",
 			"qty": 200,
 			"constraint": {
@@ -54,7 +54,7 @@
 				]
 			}
 		},
-		"1": {
+		"COIN": {
 			"comment": "qty指抽到每个格子消耗金币的数量，reward指抽奖一次得到的奖励，constraint是对此类抽奖的约束限制，格子中必须有must下的所有商品，总权重需要选出12个位置后才能计算出来",
 			"qty": 10000,
 			"reward": [
@@ -84,7 +84,7 @@
 				]
 			}
 		},
-		"16": {
+		"FRIEND_GIFT": {
 			"comment": "qty指抽到每个格子消耗朋友爱心的数量，reward指抽奖一次得到的奖励，constraint是对此类抽奖的约束限制，格子中必须有must下的所有商品，general指普通商品，总权重需要选出12个位置后才能计算出来",
 			"qty": 10,
 			"reward": [

@@ -8,6 +8,7 @@ from module import lottery
 from module import task
 from module import achievement
 import random
+from datetime import datetime, timedelta
 # Tier
 # basic, friend, pro, prophet
 # RewardGroup
@@ -115,29 +116,43 @@ SWITCH[enums.Group.ROLE] = _response_factory_role
 
 async def refresh_d(uid, **kwargs):
 	"""刷新钻石抽奖市场方法"""
+	end_time = await common.get_timer(uid, enums.Timer.SUMMON_D_END, **kwargs)
+	current  = datetime.now(tz=common.TZ_SH)
+	cid = enums.Item.DIAMOND
+	constraint = kwargs['config']['summon']['resource'][cid.name]['constraint']
+	refresh_data = []
+	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
+	if end_time is not None and end_time > current:
+		if count > 0:  # 这里获取所有的奖品信息
+			data = await _get_summon(uid, cid, **kwargs)
+			refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
+			return common.mt(10, 'get all refresh info', {'refresh': refresh_data, 'cooling': int((end_time - current).total_seconds())})
+		else:  # 这里是指所有奖品被清空后自动刷新一次
+			return await _refresh(uid, cid, **kwargs)
 	# TODO 1.消耗操作
+
 	# TODO 2.奖励积分操作
-	return await _refresh(uid, str(enums.Item.DIAMOND.value), **kwargs)
+	return await _refresh(uid, cid, **kwargs)
 
 
 async def refresh_c(uid, **kwargs):
 	"""刷新金币抽奖市场方法"""
 	# TODO 1.消耗操作
 	# TODO 2.奖励积分操作
-	return await _refresh(uid, str(enums.Item.COIN.value), **kwargs)
+	return await _refresh(uid, enums.Item.COIN, **kwargs)
 
 
 async def refresh_g(uid, **kwargs):
 	"""刷新朋友爱心抽奖市场方法"""
 	# TODO 1.消耗操作
 	# TODO 2.奖励积分操作
-	return await _refresh(uid, str(enums.Item.FRIEND_GIFT.value), **kwargs)
+	return await _refresh(uid, enums.Item.FRIEND_GIFT, **kwargs)
 
 
-async def _refresh(uid, cid: str, **kwargs):
-	"""刷新抽奖市场方法，cid代表消耗品类型5, 1, 16"""
-	if cid not in ['5', '1', '16']: return common.mt(99, 'cid错误')
-	config = kwargs['config']['summon']['resource'].get(cid, None)
+async def _refresh(uid, cid: enums, **kwargs):
+	"""刷新抽奖市场方法，cid代表消耗品类型"""
+	if cid not in SUMMON_SWITCH.keys(): return common.mt(99, 'cid错误')
+	config = kwargs['config']['summon']['resource'].get(cid.name, None)
 	if config is None: return common.mt(98, '配置文件不存在')
 	data = []
 	grids = [i for i in range(config['constraint'].get('grid', 12))]
@@ -150,24 +165,42 @@ async def _refresh(uid, cid: str, **kwargs):
 			mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
 			wgt = m['weight']
 			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
-			data.append({'cid': cid, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
+			data.append({'cid': cid.value, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
 		optional = random.choices(kwargs['config']['summon']['merchandise'], k=len(grids) - goods_qty)
 		for i, m in enumerate(optional):
 			pid = grids[goods_qty + i]
 			mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
 			wgt = m['weight']
 			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
-			data.append({'cid': cid, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
+			data.append({'cid': cid.value, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
 	else:
 		for i, pid in enumerate(grids):
 			m = goods[i]
 			mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
 			wgt = m['weight']
 			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
-			data.append({'cid': cid, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
-	return common.mt(0, 'success', {'refresh': data})
+			data.append({'cid': cid.value, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
+	hours = config['constraint']['hours']
+	end_time = datetime.now(tz=common.TZ_SH) + timedelta(hours=hours)
+	await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)
+	return common.mt(0, 'success', {'refresh': data, 'cooling': hours * 3600})
+
+
+async def _get_isb_count(uid, cid, isb=1, **kwargs):
+	return (await common.execute(f'SELECT COUNT(*) FROM summon WHERE uid = "{uid}" AND cid = {cid} AND isb = {isb};', **kwargs))[0]
+
+
+async def _get_summon(uid, cid, **kwargs):
+	return await common.execute(f'SELECT pid, mid, wgt, isb FROM summon WHERE uid = "{uid}" AND cid = {cid};', **kwargs)
 
 
 async def _set_summon(uid, cid, pid, mid, wgt, isb, **kwargs):
-	await common.execute_update(f'INSERT INTO summon (uid, cid, pid, mid, wgt, isb) VALUES ("{uid}", {cid}, {pid}, "{mid}", {wgt}, {isb}) ON DUPLICATE KEY UPDATE `mid`= VALUES(`mid`), `wgt`= VALUES(`wgt`), `isb`= VALUES(`isb`);', **kwargs)
+	await common.execute(f'INSERT INTO summon (uid, cid, pid, mid, wgt, isb) VALUES ("{uid}", {cid}, {pid}, "{mid}", {wgt}, {isb}) ON DUPLICATE KEY UPDATE `mid`= VALUES(`mid`), `wgt`= VALUES(`wgt`), `isb`= VALUES(`isb`);', **kwargs)
+
+
+SUMMON_SWITCH = {
+	enums.Item.DIAMOND:     enums.Timer.SUMMON_D_END,
+	enums.Item.COIN:        enums.Timer.SUMMON_C_END,
+	enums.Item.FRIEND_GIFT: enums.Timer.SUMMON_G_END,
+}
 
