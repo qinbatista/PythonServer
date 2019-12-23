@@ -72,6 +72,16 @@ async def bind_email(uid, email, **kwargs):
 	if r != 'OK': return common.mt(96, 'email could not be sent', {'message' : r})
 	return common.mt(0, 'success')
 
+async def unbind_email(uid, email, **kwargs):
+	if not await _account_bound(uid, **kwargs): return common.mt(99, 'account is not bound')
+	bound = await common.execute(f'SELECT email FROM info WHERE unique_id = "{uid}";', account=True, **kwargs)
+	if bound[0][0] == '': return common.mt(98, '你未绑定邮箱')
+	if bound[0][0] != email: return common.mt(97, 'email error')
+	code = await _gen_email_code(email, status=1, **kwargs)
+	r = await direct_mail.send_verification(email, code, kwargs['session'])
+	if r != 'OK': return common.mt(96, 'email could not be sent', {'message' : r})
+	return common.mt(0, 'success')
+
 async def bind_phone(uid, phone, **kwargs):
 	if not await _account_bound(uid, **kwargs): return common.mt(99, 'account is not bound')
 	bound, exists = await asyncio.gather(_phone_bound(uid, **kwargs), common.exists('info', ('phone_number', phone), account = True, **kwargs))
@@ -94,27 +104,61 @@ async def bind_phone(uid, phone, **kwargs):
 	if r != 'OK': return common.mt(96, 'phone could not be sent', {'message' : r})
 	return common.mt(0, 'success')
 
-async def verify_email_code(uid, code, **kwargs):
-	email = await kwargs['redis'].get('nonce.verify.email.' + code)
+async def unbind_phone(uid, phone, **kwargs):
+	if not await _account_bound(uid, **kwargs): return common.mt(99, 'account is not bound')
+	bound = await common.execute(f'SELECT phone_number FROM info WHERE unique_id = "{uid}";', account=True, **kwargs)
+	if bound[0][0] == '': return common.mt(98, '你未绑定手机号')
+	if bound[0][0] != phone: return common.mt(97, '手机号错误')
+
+	# 次数限制代码
+	lim = await common.get_limit(uid, enums.Limits.BIND_PHONE, **kwargs)
+	tim = await common.get_timer(uid, enums.Timer.BIND_PHONE_END, '%Y-%m-%d', **kwargs)
+	now = common.datetime.now(tz=common.TZ_SH)
+	if lim is None or tim is None or now >= tim:
+		lim, tim = 5, now + common.timedelta(days=1)
+	if lim <= 0: return common.mt(95, '今天发送短信次数已用完')
+	lim -= 1
+	await common.set_limit(uid, enums.Limits.BIND_PHONE, lim, **kwargs)
+	await common.set_timer(uid, enums.Timer.BIND_PHONE_END, tim, '%Y-%m-%d', **kwargs)
+
+	code = await _gen_phone_code(phone, status=1, **kwargs)
+	r = verify_phone.send_verification(phone, code, common.datetime.now(tz=common.TZ_SH).strftime("%Y%m%d"), index=1)
+	if r != 'OK': return common.mt(96, 'phone could not be sent', {'message' : r})
+	return common.mt(0, 'success')
+
+async def verify_email_code(uid, code, status=0, **kwargs):
+	email = await kwargs['redis'].get(f'nonce.verify.email.{status}.{code}')
 	if not email: return common.mt(99, 'invalid code')
 	email = email.decode()
-	await kwargs['redis'].delete('nonce.verify.email.' + code)
-	bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), account = True, **kwargs))
-	if bound: return common.mt(98, 'account already bound email')
-	if exists: return common.mt(97, 'email already exists')
-	await _set_email(uid, email, **kwargs)
-	return common.mt(0, 'success, email verified', {'email' : email})
+	await kwargs['redis'].delete(f'nonce.verify.email.{status}.{code}')
+	if status == 0:
+		bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), account = True, **kwargs))
+		if bound: return common.mt(98, 'account already bound email')
+		if exists: return common.mt(97, 'email already exists')
+		await _set_email(uid, email, **kwargs)
+		return common.mt(0, 'success, email verified', {'email' : email})
+	elif status == 1:
+		await _set_email(uid, '', **kwargs)
+		return common.mt(1, 'unbind success, email verified', {'email' : email})
+	else:
+		return common.mt(90, '无效状态码')
 
-async def verify_phone_code(uid, code, **kwargs):
-	phone = await kwargs['redis'].get('nonce.verify.phone.' + code)
+async def verify_phone_code(uid, code, status=0, **kwargs):
+	phone = await kwargs['redis'].get(f'nonce.verify.phone.{status}.{code}')
 	if not phone: return common.mt(99, 'invalid code')
 	phone = phone.decode()
-	await kwargs['redis'].delete('nonce.verify.phone.' + code)
-	bound, exists = await asyncio.gather(_phone_bound(uid, **kwargs), common.exists('info', ('phone_number', phone), account = True, **kwargs))
-	if bound: return common.mt(98, 'account already bound phone')
-	if exists: return common.mt(97, 'phone already exists')
-	await _set_phone(uid, phone, **kwargs)
-	return common.mt(0, 'success, phone verified', {'phone' : phone})
+	await kwargs['redis'].delete(f'nonce.verify.phone.{status}.{code}')
+	if status == 0:
+		bound, exists = await asyncio.gather(_phone_bound(uid, **kwargs), common.exists('info', ('phone_number', phone), account = True, **kwargs))
+		if bound: return common.mt(98, 'account already bound phone')
+		if exists: return common.mt(97, 'phone already exists')
+		await _set_phone(uid, phone, **kwargs)
+		return common.mt(0, 'success, phone verified', {'phone' : phone})
+	elif status == 1:
+		await _set_phone(uid, '', **kwargs)
+		return common.mt(1, 'unbind success, phone verified', {'phone' : phone})
+	else:
+		return common.mt(90, '无效状态码')
 
 #######################################################################
 
@@ -136,18 +180,19 @@ async def _phone_bound(uid, **kwargs):
 			account = True, **kwargs)
 	return not (data == () or (None,) in data or ('',) in data)
 
-async def _gen_email_code(email, **kwargs):
+async def _gen_email_code(email, status=0, **kwargs):
 	code = ''.join(random.choice(string.digits) for i in range(6))
-	while await kwargs['redis'].setnx('nonce.verify.email.' + code, email) == 0:
+	while await kwargs['redis'].setnx(f'nonce.verify.email.{status}.{code}', email) == 0:
 		code = ''.join(random.choice(string.digits) for i in range(6))
-	await kwargs['redis'].expire('nonce.verify.email.' + code, 300)
+	await kwargs['redis'].expire(f'nonce.verify.email.{status}.{code}', 300)
 	return code
 
-async def _gen_phone_code(phone, **kwargs):
+async def _gen_phone_code(phone, status=0, **kwargs):
+	"""status是状态码，0绑定，1解绑"""
 	code = ''.join(random.choice(string.digits) for i in range(4))
-	while await kwargs['redis'].setnx('nonce.verify.phone.' + code, phone) == 0:
+	while await kwargs['redis'].setnx(f'nonce.verify.phone.{status}.{code}', phone) == 0:
 		code = ''.join(random.choice(string.digits) for i in range(4))
-	await kwargs['redis'].expire('nonce.verify.phone.' + code, 300)
+	await kwargs['redis'].expire(f'nonce.verify.phone.{status}.{code}', 300)
 	return code
 
 async def _get_account_email_phone(uid, **kwargs):

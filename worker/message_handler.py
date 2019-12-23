@@ -89,14 +89,20 @@ class MessageHandler:
 	async def _bind_email(self, data: dict) -> str:
 		return await account.bind_email(data['data']['unique_id'], data['data']['email'], **data)
 
+	async def _unbind_email(self, data: dict) -> str:
+		return await account.unbind_email(data['data']['unique_id'], data['data']['email'], **data)
+
 	async def _verify_email_code(self, data: dict) -> str:
-		return await account.verify_email_code(data['data']['unique_id'], data['data']['code'], **data)
+		return await account.verify_email_code(data['data']['unique_id'], data['data']['code'], status=data['data'].get('status', 0), **data)
 
 	async def _bind_phone(self, data: dict) -> str:
 		return await account.bind_phone(data['data']['unique_id'], data['data']['phone_number'], **data)
 
+	async def _unbind_phone(self, data: dict) -> str:
+		return await account.unbind_phone(data['data']['unique_id'], data['data']['phone_number'], **data)
+
 	async def _verify_phone_code(self, data: dict) -> str:
-		return await account.verify_phone_code(data['data']['unique_id'], data['data']['code'], **data)
+		return await account.verify_phone_code(data['data']['unique_id'], data['data']['code'], status=data['data'].get('status', 0), **data)
 
 
 	async def _get_player_config(self, data: dict) -> str:
@@ -613,8 +619,10 @@ FUNCTION_LIST = {
 	'login' : MessageHandler._login,
 	'bind_account' : MessageHandler._bind_account,
 	'bind_email' : MessageHandler._bind_email,
+	'unbind_email' : MessageHandler._unbind_email,
 	'verify_email_code' : MessageHandler._verify_email_code,
 	'bind_phone' : MessageHandler._bind_phone,
+	'unbind_phone' : MessageHandler._unbind_phone,
 	'verify_phone_code' : MessageHandler._verify_phone_code,
 	# TODO
 	'get_player_config' : MessageHandler._get_player_config,

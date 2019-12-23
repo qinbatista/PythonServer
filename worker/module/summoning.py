@@ -109,7 +109,7 @@ SWITCH[enums.Group.ROLE] = _response_factory_role
 # ##################################################################
 # ################### 2019年12月19日之后加入的方法 #################
 # ##################################################################
-
+GRID = 12
 
 # ############################# 私有方法 ###########################
 
@@ -155,7 +155,8 @@ async def _refresh(uid, cid: enums, **kwargs):
 	config = kwargs['config']['summon']['resource'].get(cid.name, None)
 	if config is None: return common.mt(98, '配置文件不存在')
 	data = []
-	grids = [i for i in range(config['constraint'].get('grid', 12))]
+	# grids = [i for i in range(config['constraint'].get('grid', GRID))]
+	grids = [i for i in range(GRID)]
 	random.shuffle(grids)
 	goods = config['must']['goods']
 	goods_qty = len(goods)
@@ -182,7 +183,8 @@ async def _refresh(uid, cid: enums, **kwargs):
 			data.append({'cid': cid.value, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
 	hours = config['constraint']['hours']
 	end_time = datetime.now(tz=common.TZ_SH) + timedelta(hours=hours)
-	await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)
+	await common.set_timer(uid, SUMMON_SWITCH[cid]['Timer'], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
+	await common.set_limit(uid, enums.Limits.SUMMON_D, config['constraint']['times'], **kwargs)  # 设置玩家一天可以抽奖的次数
 	return common.mt(0, 'success', {'refresh': data, 'cooling': hours * 3600})
 
 
@@ -199,8 +201,8 @@ async def _set_summon(uid, cid, pid, mid, wgt, isb, **kwargs):
 
 
 SUMMON_SWITCH = {
-	enums.Item.DIAMOND:     enums.Timer.SUMMON_D_END,
-	enums.Item.COIN:        enums.Timer.SUMMON_C_END,
-	enums.Item.FRIEND_GIFT: enums.Timer.SUMMON_G_END,
+	enums.Item.DIAMOND:     {'Timer': enums.Timer.SUMMON_D_END, 'Limits': enums.Limits.SUMMON_D},
+	enums.Item.COIN:        {'Timer': enums.Timer.SUMMON_C_END, 'Limits': enums.Limits.SUMMON_C},
+	enums.Item.FRIEND_GIFT: {'Timer': enums.Timer.SUMMON_G_END, 'Limits': enums.Limits.SUMMON_G},
 }
 
