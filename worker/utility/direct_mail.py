@@ -55,8 +55,13 @@ def merge_kwargs(**kwargs):
 '''
 Returns 'OK' on successful send, an error message otherwise.
 '''
-async def send_verification(to, nonce, session):
+async def send_verification(to, nonce, session, status=0):
 	html = VERIFY_TEMPLATE.replace('~NONCE~', nonce)
+	if status == 0:
+		html = html.replace('~SUBJECT~', '感谢您注册陆逊互娱账号！')
+	elif status == 1:
+		BASE_REQUEST['Subject'] = '解绑陆逊互娱账户验证码'
+		html = html.replace('~SUBJECT~', '你正在解绑你的邮箱！解绑邮箱后，可能会存在账号丢失风险！')
 	snonce = str(secrets.randbits(65))
 	tstamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 	cqs  = canonicalized_query_string(**BASE_REQUEST, HtmlBody = html, SignatureNonce = snonce, Timestamp = tstamp, ToAddress = to)

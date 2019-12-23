@@ -78,7 +78,7 @@ async def unbind_email(uid, email, **kwargs):
 	if bound[0][0] == '': return common.mt(98, '你未绑定邮箱')
 	if bound[0][0] != email: return common.mt(97, 'email error')
 	code = await _gen_email_code(email, status=1, **kwargs)
-	r = await direct_mail.send_verification(email, code, kwargs['session'])
+	r = await direct_mail.send_verification(email, code, kwargs['session'], status=1)
 	if r != 'OK': return common.mt(96, 'email could not be sent', {'message' : r})
 	return common.mt(0, 'success')
 
