@@ -111,42 +111,46 @@ SWITCH[enums.Group.ROLE] = _response_factory_role
 # ##################################################################
 GRID = 12
 
-# ############################# 私有方法 ###########################
-
 
 async def refresh_d(uid, **kwargs):
 	"""刷新钻石抽奖市场方法"""
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_D_END, **kwargs)
 	current  = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.DIAMOND
-	constraint = kwargs['config']['summon']['resource'][cid.name]['constraint']
-	refresh_data = []
 	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
-	if end_time is not None and end_time > current:
-		if count > 0:  # 这里获取所有的奖品信息
-			data = await _get_summon(uid, cid, **kwargs)
-			refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-			return common.mt(10, 'get all refresh info', {'refresh': refresh_data, 'cooling': int((end_time - current).total_seconds())})
-		else:  # 这里是指所有奖品被清空后自动刷新一次
-			return await _refresh(uid, cid, **kwargs)
-	# TODO 1.消耗操作
-
-	# TODO 2.奖励积分操作
+	if end_time is not None and end_time > current and count > 0:
+		data = await _get_summon(uid, cid, **kwargs)
+		refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
+		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'cooling': int((end_time - current).total_seconds())})
 	return await _refresh(uid, cid, **kwargs)
 
 
 async def refresh_c(uid, **kwargs):
 	"""刷新金币抽奖市场方法"""
-	# TODO 1.消耗操作
-	# TODO 2.奖励积分操作
-	return await _refresh(uid, enums.Item.COIN, **kwargs)
+	end_time = await common.get_timer(uid, enums.Timer.SUMMON_C_END, **kwargs)
+	current  = datetime.now(tz=common.TZ_SH)
+	cid = enums.Item.COIN
+	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
+	if end_time is not None and end_time > current and count > 0:
+		data = await _get_summon(uid, cid, **kwargs)
+		refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
+		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'cooling': int((end_time - current).total_seconds())})
+	return await _refresh(uid, cid, **kwargs)
 
 
 async def refresh_g(uid, **kwargs):
 	"""刷新朋友爱心抽奖市场方法"""
-	# TODO 1.消耗操作
-	# TODO 2.奖励积分操作
-	return await _refresh(uid, enums.Item.FRIEND_GIFT, **kwargs)
+	end_time = await common.get_timer(uid, enums.Timer.SUMMON_G_END, **kwargs)
+	current  = datetime.now(tz=common.TZ_SH)
+	cid = enums.Item.FRIEND_GIFT
+	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
+	if end_time is not None and end_time > current and count > 0:
+		data = await _get_summon(uid, cid, **kwargs)
+		refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
+		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'cooling': int((end_time - current).total_seconds())})
+	return await _refresh(uid, cid, **kwargs)
+
+# ############################# 私有方法 ###########################
 
 
 async def _refresh(uid, cid: enums, **kwargs):
@@ -189,7 +193,7 @@ async def _refresh(uid, cid: enums, **kwargs):
 
 
 async def _get_isb_count(uid, cid, isb=1, **kwargs):
-	return (await common.execute(f'SELECT COUNT(*) FROM summon WHERE uid = "{uid}" AND cid = {cid} AND isb = {isb};', **kwargs))[0]
+	return (await common.execute(f'SELECT COUNT(*) FROM summon WHERE uid = "{uid}" AND cid = {cid} AND isb = {isb};', **kwargs))[0][0]
 
 
 async def _get_summon(uid, cid, **kwargs):
