@@ -106,8 +106,8 @@ async def find_person(uid, gn_target, **kwargs):
 	if uid == uid_target: return common.mt(98, "can't add yourself")
 	if data == (): return common.mt(99, 'no such person')
 	isfriends, _, _ = await _are_friends(uid, uid_target, **kwargs)
-	isfamily = await _are_family(uid, uid_target, **kwargs)
-	return common.mt(0, 'find person success', {'gn': data[0][0], 'intro': data[0][1], 'fid': '' if data[0][2] is None else data[0][2], 'exp': data[0][3], 'stage': data[0][4], 'role': data[0][5], "isfriend": str(isfriends), "isfamily": str(isfamily)})
+	canfamily = await _can_invite_family(uid, uid_target, **kwargs)
+	return common.mt(0, 'find person success', {'gn': data[0][0], 'intro': data[0][1], 'fid': '' if data[0][2] is None else data[0][2], 'exp': data[0][3], 'stage': data[0][4], 'role': data[0][5], "isfriend": isfriends, "canfamily": canfamily})
 
 
 ###########################################################################################################
@@ -161,17 +161,16 @@ async def _are_friends(uid, fid, **kwargs):
 	return (True, data[0][0], data[0][1]) if data != () else (False, None, None)
 
 
+async def _can_invite_family(uid, fid, **kwargs):
+	is_family, u_fid, has_family = await _are_family(uid, fid, **kwargs)
+	if is_family or u_fid is None or has_family: return False
+	return family._check_invite_permissions(await family._get_role(uid, u_fid, **kwargs))
+
+
 async def _are_family(uid, fid, **kwargs):
-	data1 = await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}"', **kwargs)
-	data2 = await common.execute(f'SELECT fid FROM player WHERE uid = "{fid}"', **kwargs)
-	if data1[0][0] is None and data2[0][0] is None:
-		return False
-	else:
-		if data1[0][0] == data2[0][0] and family._check_invite_permissions(await family._get_role(uid, data1[0][0], **kwargs))==True:
-			return True
-		else:
-			return False
-# return True if (False if data1[0][0] == '' or data2[0][0] != '' else True) and family._check_invite_permissions(await family._get_role(uid, data1[0][0], **kwargs)) else False
+	u_fid = (await common.execute(f'SELECT fid FROM player WHERE uid = "{uid}"', **kwargs))[0][0]
+	f_fid = (await common.execute(f'SELECT fid FROM player WHERE uid = "{fid}"', **kwargs))[0][0]
+	return u_fid is not None and u_fid == f_fid, u_fid, f_fid is not None
 
 
 async def _get_friend_info(uid, **kwargs):

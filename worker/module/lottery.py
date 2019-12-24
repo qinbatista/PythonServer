@@ -56,7 +56,7 @@ async def _try_unlock_weapon(uid, gift, **kwargs):
 		kwargs.update({"aid": enums.Achievement.SUMMON_6_STAR_WEAPON_TIMES})
 		await achievement.record_achievement(uid, **kwargs)
 	if not await common.exists('weapon', ('uid', uid), ('wid', weapon.value), **kwargs):
-		await common.execute(f'INSERT INTO weapon(uid, wid) VALUES ("{uid}", {weapon.value});', **kwargs)
+		await common.execute(f'INSERT INTO weapon(uid, wid, star) VALUES ("{uid}", {weapon.value}, 1);', **kwargs)
 		return True, weapon
 	await common.execute(f'UPDATE weapon SET segment = segment + {STANDARD_SEG_COUNT} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
 	return False, weapon
@@ -89,7 +89,7 @@ async def _try_unlock_role(uid, gift, **kwargs):
 		kwargs.update({"aid": enums.Achievement.SUMMON_6_STAR_ROLE_TIMES})
 		await achievement.record_achievement(uid, **kwargs)
 	if not await common.exists('role', ('uid', uid), ('rid', role.value), **kwargs):
-		await common.execute(f'INSERT INTO role(uid, rid) VALUES ("{uid}", {role.value});', **kwargs)
+		await common.execute(f'INSERT INTO role(uid, rid, star) VALUES ("{uid}", {role.value}, 1);', **kwargs)
 		return True, role
 	await common.execute(f'UPDATE role SET segment = segment + {STANDARD_SEG_COUNT} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
 	return False, role
