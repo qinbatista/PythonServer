@@ -2,6 +2,7 @@
 
 * [`login_unique`](##login_unique)
 * [`login`](##login)
+* [`account_all_info`](##account_all_info)
 * [`bind_account`](##bind_account)
 * [`bind_email`](##bind_email)
 * [`unbind_email`](##unbind_email)
@@ -104,6 +105,34 @@
 ```
 
 
+
+## account_all_info
+
+获取所有的用户信息
+
+```json
+{
+	"world": 0,
+	"function": "account_all_info",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "account": "account_h0",
+        "email": "2428437133@qq.com",
+        "phone_number": ""
+    }
+}
+```
 
 
 

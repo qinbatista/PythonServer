@@ -49,6 +49,10 @@ async def login(identifier, value, password, **kwargs):
 	data['account'], data['email'], data['phone_number'] = aep
 	return common.mt(0, 'success', data)
 
+async def all_info(uid, **kwargs):
+	account, email, phone_number = await _get_account_email_phone(uid, **kwargs)
+	return common.mt(0, 'success', {'account': account, 'email': email, 'phone_number': phone_number})
+
 async def bind_account(uid, account, password, **kwargs):
 	if await _account_bound(uid, **kwargs): return common.mt(96, 'account already bound')
 	if not _valid_account(account): return common.mt(99, 'invalid account name')

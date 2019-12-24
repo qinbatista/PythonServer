@@ -131,9 +131,10 @@ if __name__ == "__main__":
 	# token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNjE4MjMsInVpZCI6IjAifQ.sAnQoaJ5ZWxxUjKcOcR-QZ7W2BsKpIPPeNEiBavHlbU"
 	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNDM1ODMsInVpZCI6ImgwIn0.sqnbjsCJ_8OefTY-M9IHFARhqQ6cm6kATzUUlRekwjY"
 	world = "s1"
-	user_behavior_simulation.send_tcp_message({"world": world, 'function': 'unbind_email', 'data': {"token": token, "email": "2428437133@qq.com"}})
-	code = input("code:")
-	user_behavior_simulation.send_tcp_message({"world": world, 'function': 'verify_email_code', 'data': {"token": token, "code": code, "status": 1}})
+	user_behavior_simulation.send_tcp_message({"world": world, 'function': 'account_all_info', 'data': {"token": token, "email": "2428437133@qq.com"}})
+	# user_behavior_simulation.send_tcp_message({"world": world, 'function': 'unbind_email', 'data': {"token": token, "email": "2428437133@qq.com"}})
+	# code = input("code:")
+	# user_behavior_simulation.send_tcp_message({"world": world, 'function': 'verify_email_code', 'data': {"token": token, "code": code, "status": 1}})
 	# user_behavior_simulation.send_tcp_message({"world": world, 'function': 'unbind_phone', 'data': {"token": token, "phone_number": "18323019610"}})
 	# code = input("code:")
 	# user_behavior_simulation.send_tcp_message({"world": world, 'function': 'verify_phone_code', 'data': {"token": token, "code": code, "status": 1}})

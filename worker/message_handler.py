@@ -83,6 +83,9 @@ class MessageHandler:
 	async def _login(self, data: dict) -> str:
 		return await account.login(data['data']['identifier'], data['data']['value'], data['data']['password'], **data)
 
+	async def _account_all_info(self, data: dict) -> str:
+		return await account.all_info(data['data']['unique_id'], **data)
+
 	async def _bind_account(self, data: dict) -> str:
 		return await account.bind_account(data['data']['unique_id'], data['data']['account'], data['data']['password'], **data)
 
@@ -617,6 +620,7 @@ FUNCTION_LIST = {
 	###################### account.py ######################
 	'login_unique' : MessageHandler._login_unique,
 	'login' : MessageHandler._login,
+	'account_all_info' : MessageHandler._account_all_info,
 	'bind_account' : MessageHandler._bind_account,
 	'bind_email' : MessageHandler._bind_email,
 	'unbind_email' : MessageHandler._unbind_email,

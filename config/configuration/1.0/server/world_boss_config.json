@@ -11,35 +11,35 @@
 	},
 	"boss2" :
 	{
-		"life_value":100000
+		"life_value":100000000
 	},
 	"boss3" :
 	{
-		"life_value":100000
+		"life_value":100000000
 	},
 	"boss4" :
 	{
-		"life_value":100000
+		"life_value":100000000
 	},
 	"boss5" :
 	{
-		"life_value":100000
+		"life_value":100000000
 	},
 	"boss6" :
 	{
-		"life_value":100000
+		"life_value":100000000
 	},
 	"boss7" :
 	{
-		"life_value":100000
+		"life_value":100000000
 	},
 	"boss8" :
 	{
-		"life_value":100000
+		"life_value":100000000
 	},
 	"boss9" :
 	{
-		"life_value":100000
+		"life_value":100000000
 	}
 }
 
