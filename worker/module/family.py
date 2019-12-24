@@ -75,8 +75,8 @@ async def invite_user(uid, gn_target, **kwargs):
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) > datetime.now(tz=common.TZ_SH):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
 		return common.mt(96, '邀请对象离开家族冷却时间未结束', {'seconds': seconds})
-	exp_info = await stage.increase_exp(uid_target, 0, **kwargs)
-	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "邀请对象等级不满18级")
+	# exp_info = await stage.increase_exp(uid_target, 0, **kwargs)
+	# if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "邀请对象等级不满18级")
 	in_family_target, _ = await _in_family(uid_target, **kwargs)
 	if in_family_target: return common.mt(94, '邀请对象已经加入了家族')
 	# 以下是邀请成员限制的代码
@@ -112,8 +112,8 @@ async def request_join(uid, name, **kwargs):
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) > datetime.now(tz=common.TZ_SH):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
 		return common.mt(96, '离开家族冷却时间未结束', {'seconds': seconds})
-	exp_info = await stage.increase_exp(uid, 0, **kwargs)
-	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "你的等级不满18级", {'exp_info': exp_info})
+	# exp_info = await stage.increase_exp(uid, 0, **kwargs)
+	# if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "你的等级不满18级", {'exp_info': exp_info})
 
 
 	sent = await mail.send_mail({'type' : enums.MailType.FAMILY_REQUEST.value, 'from' : gn, \
