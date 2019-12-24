@@ -4,7 +4,9 @@
 * [`login`](##login)
 * [`bind_account`](##bind_account)
 * [`bind_email`](##bind_email)
+* [`unbind_email`](##unbind_email)
 * [`bind_phone`](##bind_phone)
+* [`unbind_phone`](##unbind_phone)
 * [`verify_email_code`](##verify_email_code)
 * [`verify_phone_code`](##verify_phone_code)
 
@@ -186,6 +188,38 @@
 
 
 
+## unbind_email
+
+```json
+{
+	"world": 0,
+	"function": "unbind_email",
+	"data": {
+		"token": "my token",
+		"email":"123451234@qq.com"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": { }
+}
+```
+
+[绑定失败]()
+
+* 99：account is not bound
+* 98：你未绑定邮箱
+* 97：email error
+* 96：email could not be sent
+
+
+
 ## bind_phone
 
 ```json
@@ -219,8 +253,44 @@
 
 
 
+## unbind_phone
+
+解绑手机
+
+```json
+{
+	"world": 0,
+	"function": "unbind_phone",
+	"data": {
+		"token": "my token",
+		"phone_number":"15000000000"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": { }
+}
+```
+
+[绑定失败]()
+
+* 99：account is not bound
+* 98：你未绑定手机号
+* 97：手机号错误
+* 96：phone could not be sent
+* 95：今天发送短信次数已用完
+
+
 
 ## verify_email_code
+
+> status：0代表绑定邮箱验证，1代表解绑邮箱验证
 
 
 ```json
@@ -229,8 +299,8 @@
 	"function": "verify_email_code",
 	"data": {
 		"token": "my token",
-		"code":"123456"
-
+		"code":"123456",
+        "status": 0
 	}
 }
 ```
@@ -241,7 +311,17 @@
 ```json
 {
 	"status": 0,
-	"message": "success",
+	"message": "success, email verified",
+	"data": {
+		"email": "12341523@qq.com"
+	}
+}
+```
+
+```json
+{
+	"status": 1,
+	"message": "unbind success, email verified",
 	"data": {
 		"email": "12341523@qq.com"
 	}
@@ -253,13 +333,15 @@
 * 97：email already exists
 * 98：account already has an email bound
 * 99：invalid code
-
+* 90：无效状态码
 
 
 
 
 
 ## verify_phone_code
+
+> status：0代表绑定手机验证，1代表解绑手机验证
 
 
 ```json
@@ -268,8 +350,8 @@
 	"function": "verify_phone_code",
 	"data": {
 		"token": "my token",
-		"code":"1234"
-
+		"code":"1234",
+        "status": 0
 	}
 }
 ```
@@ -280,7 +362,17 @@
 ```json
 {
 	"status": 0,
-	"message": "success",
+	"message": "success, phone verified",
+	"data": {
+		"phone": "18323019610"
+	}
+}
+```
+
+```json
+{
+	"status": 1,
+	"message": "unbind success, phone verified",
 	"data": {
 		"phone": "18323019610"
 	}
@@ -292,6 +384,7 @@
 * 97：phone already exists
 * 98：account already bound phone
 * 99：invalid code
+* 90：无效状态码
 
 
 

@@ -112,6 +112,43 @@ SWITCH[enums.Group.ROLE] = _response_factory_role
 GRID = 12
 
 
+async def dozen_d(uid, **kwargs):
+	"""钻石12抽"""
+	pass
+
+
+async def single_d(uid, **kwargs):
+	"""钻石单抽"""
+	cid = enums.Item.DIAMOND
+	if await _get_isb_count(uid, cid, isb=0, **kwargs) == 0: await refresh_d(uid, **kwargs)  # 防止未刷新就调取这个方法
+	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
+	isb_wgt = sum([d[2] for d in isb_data])
+	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
+	weights[-1] = 1 - sum(weights[:-1])
+	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
+	gid, iid, value = common.decode_items(mid)[0]
+	# TODO 消耗物品
+	if len(isb_data) == GRID:  # 第一次免费抽
+		if gid == enums.Group.ITEM:
+			_, remain_v = await common.try_item(uid, iid, value, **kwargs)
+		elif gid == enums.Group.WEAPON:
+			_, remain_v = await common.try_weapon(uid, iid, value, **kwargs)
+		elif gid == enums.Group.SKILL:
+			_, remain_v = await lottery._try_unlock_skill(uid, iid, value, **kwargs)
+		elif gid == enums.Group.ROLE:
+			_, remain_v = await common.try_role(uid, iid, value, **kwargs)
+
+
+async def single_c(uid, **kwargs):
+	"""金币单抽"""
+	pass
+
+
+async def single_g(uid, **kwargs):
+	"""朋友爱心单抽"""
+	pass
+
+
 async def refresh_d(uid, **kwargs):
 	"""刷新钻石抽奖市场方法"""
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_D_END, **kwargs)
@@ -187,13 +224,16 @@ async def _refresh(uid, cid: enums, **kwargs):
 			data.append({'cid': cid.value, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
 	hours = config['constraint']['hours']
 	end_time = datetime.now(tz=common.TZ_SH) + timedelta(hours=hours)
-	await common.set_timer(uid, SUMMON_SWITCH[cid]['Timer'], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
-	await common.set_limit(uid, enums.Limits.SUMMON_D, config['constraint']['times'], **kwargs)  # 设置玩家一天可以抽奖的次数
+	await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
 	return common.mt(0, 'success', {'refresh': data, 'cooling': hours * 3600})
 
 
-async def _get_isb_count(uid, cid, isb=1, **kwargs):
+async def _get_isb_count(uid, cid, isb=0, **kwargs):
 	return (await common.execute(f'SELECT COUNT(*) FROM summon WHERE uid = "{uid}" AND cid = {cid} AND isb = {isb};', **kwargs))[0][0]
+
+
+async def _get_summon_isb(uid, cid, isb=0, **kwargs):
+	return await common.execute(f'SELECT pid, mid, wgt, isb FROM summon WHERE uid = "{uid}" AND cid = {cid} AND isb = {isb};', **kwargs)
 
 
 async def _get_summon(uid, cid, **kwargs):
@@ -205,8 +245,8 @@ async def _set_summon(uid, cid, pid, mid, wgt, isb, **kwargs):
 
 
 SUMMON_SWITCH = {
-	enums.Item.DIAMOND:     {'Timer': enums.Timer.SUMMON_D_END, 'Limits': enums.Limits.SUMMON_D},
-	enums.Item.COIN:        {'Timer': enums.Timer.SUMMON_C_END, 'Limits': enums.Limits.SUMMON_C},
-	enums.Item.FRIEND_GIFT: {'Timer': enums.Timer.SUMMON_G_END, 'Limits': enums.Limits.SUMMON_G},
+	enums.Item.DIAMOND:     enums.Timer.SUMMON_D_END,
+	enums.Item.COIN:        enums.Timer.SUMMON_C_END,
+	enums.Item.FRIEND_GIFT: enums.Timer.SUMMON_G_END,
 }
 

@@ -276,9 +276,6 @@ class Limits(enum.IntEnum):
 	FAMILY_NOTICE = 10  # 管理员可以发布公告的剩余次数
 	FAMILY_INVITE = 11  # 管理员可以邀请成员的剩余次数
 	BIND_PHONE = 12  # 用户绑定手机的剩余次数
-	SUMMON_D = 13  # 今天钻石抽奖剩余次数
-	SUMMON_C = 14  # 今天金币抽奖剩余次数
-	SUMMON_G = 15  # 今天朋友爱心抽奖剩余次数
 
 
 class Achievement(enum.IntEnum):
