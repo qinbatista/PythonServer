@@ -126,17 +126,13 @@ async def single_d(uid, **kwargs):
 	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
-	gid, iid, value = common.decode_items(mid)[0]
 	# TODO 消耗物品
-	if len(isb_data) == GRID:  # 第一次免费抽
-		if gid == enums.Group.ITEM:
-			_, remain_v = await common.try_item(uid, iid, value, **kwargs)
-		elif gid == enums.Group.WEAPON:
-			_, remain_v = await common.try_weapon(uid, iid, value, **kwargs)
-		elif gid == enums.Group.SKILL:
-			_, remain_v = await lottery._try_unlock_skill(uid, iid, value, **kwargs)
-		elif gid == enums.Group.ROLE:
-			_, remain_v = await common.try_role(uid, iid, value, **kwargs)
+	consume = abs(kwargs['config']['summon']['resource'][cid]['qty'])
+	grid = len(isb_data)
+	consume = 0 if grid == GRID else (consume//2 if grid == GRID - 1 else consume)
+	_, qty = await common.try_item(uid, cid, -consume, **kwargs)
+
+	gid, iid, remain_v, value = await _summon_reward(uid, mid, **kwargs)
 
 
 async def single_c(uid, **kwargs):
@@ -188,6 +184,23 @@ async def refresh_g(uid, **kwargs):
 	return await _refresh(uid, cid, **kwargs)
 
 # ############################# 私有方法 ###########################
+
+
+async def _summon_reward(uid, mid: str, **kwargs):
+	"""返回奖励之后的改变情况"""
+	gid, iid, value = common.decode_items(mid)[0]
+	if gid == enums.Group.ITEM:
+		_, remain_v = await common.try_item(uid, iid, value, **kwargs)
+	elif gid == enums.Group.WEAPON:
+		_, remain_v = await common.try_weapon(uid, iid, value, **kwargs)
+	elif gid == enums.Group.SKILL:
+		can, iid = await lottery._try_unlock_skill(uid, iid.value, **kwargs)
+		gid, remain_v, value = (enums.Group.SKILL, 1, 1) if can else (enums.Group.ITEM, (await common.try_item(uid, iid, 0, **kwargs))[1], 1)
+	elif gid == enums.Group.ROLE:
+		_, remain_v = await common.try_role(uid, iid, value, **kwargs)
+	else:
+		remain_v = -1
+	return gid, iid, remain_v, value
 
 
 async def _refresh(uid, cid: enums, **kwargs):

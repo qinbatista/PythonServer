@@ -257,7 +257,7 @@
 
 [抽取成功]()
 
-> data：包含玩家的所有信息，`gn`游戏名字，`intro`玩家个人签名，`fid`家庭id，`exp`玩家经验，`stage`通过的最大关卡，`role`玩家使用的角色，`isfriend`是否是朋友, `isfamily`是否是同一个家族
+> data：包含玩家的所有信息，`gn`游戏名字，`intro`玩家个人签名，`fid`家庭id，`exp`玩家经验，`stage`通过的最大关卡，`role`玩家使用的角色，`isfriend`是否是朋友, `canfamily`是否能邀请进入家族
 >
 
 ```json
@@ -272,7 +272,7 @@
 		"stage": 0,
 		"role": 1,
 		"isfriend": "True",
-		"isfamily": "False"
+		"canfamily": "False"
 	}
 }
 ```
