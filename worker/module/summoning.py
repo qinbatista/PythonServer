@@ -122,17 +122,21 @@ async def single_d(uid, **kwargs):
 	cid = enums.Item.DIAMOND
 	if await _get_isb_count(uid, cid, isb=0, **kwargs) == 0: await refresh_d(uid, **kwargs)  # 防止未刷新就调取这个方法
 	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
-	isb_wgt = sum([d[2] for d in isb_data])
+	# TODO 根据权重随机抽取奖励物品的pid, mid, wgt, isb信息
+	isb_wgt = sum([d[2] for d in isb_data])  # 计算总权重值
 	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
 	# TODO 消耗物品
-	consume = abs(kwargs['config']['summon']['resource'][cid]['qty'])
+	consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 	grid = len(isb_data)
 	consume = 0 if grid == GRID else (consume//2 if grid == GRID - 1 else consume)
-	_, qty = await common.try_item(uid, cid, -consume, **kwargs)
-
+	can, qty = await common.try_item(uid, cid, -consume, **kwargs)
+	if not can: return common.mt(99, 'diamond insufficient')
+	# TODO 奖励物品
 	gid, iid, remain_v, value = await _summon_reward(uid, mid, **kwargs)
+	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
+	return common.mt(0, 'success', {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}', f'{gid.value}:{iid.value}:{remain_v}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}', f'{gid.value}:{iid.value}:{value}'], 'pid': pid})
 
 
 async def single_c(uid, **kwargs):
@@ -192,14 +196,14 @@ async def _summon_reward(uid, mid: str, **kwargs):
 	if gid == enums.Group.ITEM:
 		_, remain_v = await common.try_item(uid, iid, value, **kwargs)
 	elif gid == enums.Group.WEAPON:
-		_, remain_v = await common.try_weapon(uid, iid, value, **kwargs)
+		remain_v = await common.try_weapon(uid, iid, value, **kwargs)
 	elif gid == enums.Group.SKILL:
 		can, iid = await lottery._try_unlock_skill(uid, iid.value, **kwargs)
 		gid, remain_v, value = (enums.Group.SKILL, 1, 1) if can else (enums.Group.ITEM, (await common.try_item(uid, iid, 0, **kwargs))[1], 1)
 	elif gid == enums.Group.ROLE:
-		_, remain_v = await common.try_role(uid, iid, value, **kwargs)
+		remain_v = await common.try_role(uid, iid, value, **kwargs)
 	else:
-		remain_v = -1
+		remain_v = -1  # gid不属于以上四种情况时需要处理
 	return gid, iid, remain_v, value
 
 

@@ -86,15 +86,15 @@ async def try_armor(uid, aid, level, value, **kwargs):
 			return (False, quantity[0][0] + value) if quantity != () else (False, value)
 
 async def try_weapon(uid, weapon, quantity, **kwargs):
-	data = await execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
+	data = await execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = {weapon};', **kwargs)
 	quantity = quantity if data == () else quantity + data[0][0]
-	await execute(f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {weapon.value}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
+	await execute(f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {weapon}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
 	return quantity
 
 async def try_role(uid, role, quantity, **kwargs):
-	data = await execute(f'SELECT segment FROM role WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
+	data = await execute(f'SELECT segment FROM role WHERE uid = "{uid}" AND rid = {role};', **kwargs)
 	quantity = quantity if data == () else quantity + data[0][0]
-	await execute(f'INSERT INTO role (uid, rid, segment) VALUES ("{uid}", {role.value}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
+	await execute(f'INSERT INTO role (uid, rid, segment) VALUES ("{uid}", {role}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
 	return quantity
 
 async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
