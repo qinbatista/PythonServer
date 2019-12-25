@@ -165,7 +165,27 @@ async def single_d(uid, **kwargs):
 
 async def single_c(uid, **kwargs):
 	"""金币单抽"""
-	pass
+	cid = enums.Item.COIN
+	if await _get_isb_count(uid, cid, isb=0, **kwargs) == 0: await refresh_c(uid, **kwargs)  # 防止未刷新就调取这个方法
+	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
+	# TODO 根据权重随机抽取奖励物品的pid, mid, wgt, isb信息
+	isb_wgt = sum([d[2] for d in isb_data])  # 计算总权重值
+	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
+	weights[-1] = 1 - sum(weights[:-1])
+	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
+	# TODO 消耗物品
+	consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
+	can, qty = await common.try_item(uid, cid, -consume, **kwargs)
+	if not can: return common.mt(99, 'coin insufficient')
+	# TODO 奖励物品
+	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': pid}
+	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
+	results = await _summon_reward(uid, items, **kwargs)
+	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
+	for gid, iid, remain_v, value in results:
+		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
+		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
+	return common.mt(0, 'success', data=data)
 
 
 async def single_g(uid, **kwargs):

@@ -300,7 +300,6 @@ class MessageHandler:
 	async def _single_pump_diamond(self, data: dict) -> str:
 		return await summoning.single_d(data['data']['unique_id'], **data)
 
-	# TODO
 	async def _single_pump_coin(self, data: dict) -> str:
 		return await summoning.single_c(data['data']['unique_id'], **data)
 
@@ -715,8 +714,8 @@ FUNCTION_LIST = {
 	'refresh_coin_store' : MessageHandler._refresh_coin_store,
 	'refresh_gift_store' : MessageHandler._refresh_gift_store,
 	'single_pump_diamond' : MessageHandler._single_pump_diamond,
-	# 'single_pump_coin' : MessageHandler._single_pump_diamond,
-	# 'single_pump_gift' : MessageHandler._single_pump_diamond,
+	'single_pump_coin' : MessageHandler._single_pump_coin,
+	# 'single_pump_gift' : MessageHandler._single_pump_gift,
 	'dozen_pump_diamond' : MessageHandler._dozen_pump_diamond,
 
 	###################### lottery.py ######################
