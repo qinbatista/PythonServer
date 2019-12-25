@@ -114,7 +114,26 @@ GRID = 12
 
 async def dozen_d(uid, **kwargs):
 	"""钻石12抽"""
-	pass
+	cid = enums.Item.DIAMOND
+	if await _get_isb_count(uid, cid, isb=0, **kwargs) < GRID: return common.mt(98, f'Less than {GRID} grid')
+	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
+	# TODO 消耗物品
+	consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty']) * GRID
+	can, qty = await common.try_item(uid, cid, -consume, **kwargs)
+	if not can: return common.mt(99, 'diamond insufficient')
+	# TODO 奖励物品
+	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': [d[0] for d in isb_data]}
+	article = [d[1] for d in isb_data]  # 获取所有的物品
+	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * GRID * 2}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
+	items = f"{','.join(article)},{','.join(extra)}"
+	results = await _summon_reward(uid, items, **kwargs)
+	for gid, iid, remain_v, value in results:
+		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
+		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
+	# TODO 重置所有物品
+	reset = await _refresh(uid, cid, **kwargs)
+	data['refresh'] = reset['data']['refresh']
+	return common.mt(0, 'success', data=data)
 
 
 async def single_d(uid, **kwargs):

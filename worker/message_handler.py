@@ -300,6 +300,17 @@ class MessageHandler:
 	async def _single_pump_diamond(self, data: dict) -> str:
 		return await summoning.single_d(data['data']['unique_id'], **data)
 
+	# TODO
+	async def _single_pump_coin(self, data: dict) -> str:
+		return await summoning.single_c(data['data']['unique_id'], **data)
+
+	# TODO
+	async def _single_pump_gift(self, data: dict) -> str:
+		return await summoning.single_g(data['data']['unique_id'], **data)
+
+	async def _dozen_pump_diamond(self, data: dict) -> str:
+		return await summoning.dozen_d(data['data']['unique_id'], **data)
+
 	###################### lottery.py ######################
 	async def _fortune_wheel_basic(self, data: dict) -> str:
 		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.BASIC, enums.Item(int(data['data']['item'])), **data)
@@ -706,6 +717,7 @@ FUNCTION_LIST = {
 	'single_pump_diamond' : MessageHandler._single_pump_diamond,
 	# 'single_pump_coin' : MessageHandler._single_pump_diamond,
 	# 'single_pump_gift' : MessageHandler._single_pump_diamond,
+	'dozen_pump_diamond' : MessageHandler._dozen_pump_diamond,
 
 	###################### lottery.py ######################
 	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
