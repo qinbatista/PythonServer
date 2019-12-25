@@ -134,9 +134,14 @@ async def single_d(uid, **kwargs):
 	can, qty = await common.try_item(uid, cid, -consume, **kwargs)
 	if not can: return common.mt(99, 'diamond insufficient')
 	# TODO 奖励物品
-	gid, iid, remain_v, value = await _summon_reward(uid, mid, **kwargs)
+	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': pid}
+	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
+	results = await _summon_reward(uid, items, **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
-	return common.mt(0, 'success', {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}', f'{gid.value}:{iid.value}:{remain_v}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}', f'{gid.value}:{iid.value}:{value}'], 'pid': pid})
+	for gid, iid, remain_v, value in results:
+		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
+		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
+	return common.mt(0, 'success', data=data)
 
 
 async def single_c(uid, **kwargs):
@@ -190,21 +195,24 @@ async def refresh_g(uid, **kwargs):
 # ############################# 私有方法 ###########################
 
 
-async def _summon_reward(uid, mid: str, **kwargs):
+async def _summon_reward(uid, items: str, **kwargs):
 	"""返回奖励之后的改变情况"""
-	gid, iid, value = common.decode_items(mid)[0]
-	if gid == enums.Group.ITEM:
-		_, remain_v = await common.try_item(uid, iid, value, **kwargs)
-	elif gid == enums.Group.WEAPON:
-		remain_v = await common.try_weapon(uid, iid, value, **kwargs)
-	elif gid == enums.Group.SKILL:
-		can, iid = await lottery._try_unlock_skill(uid, iid.value, **kwargs)
-		gid, remain_v, value = (enums.Group.SKILL, 1, 1) if can else (enums.Group.ITEM, (await common.try_item(uid, iid, 0, **kwargs))[1], 1)
-	elif gid == enums.Group.ROLE:
-		remain_v = await common.try_role(uid, iid, value, **kwargs)
-	else:
-		remain_v = -1  # gid不属于以上四种情况时需要处理
-	return gid, iid, remain_v, value
+	decoded = common.decode_items(items)
+	results = []
+	for gid, iid, value in decoded:
+		if gid == enums.Group.ITEM:
+			_, remain_v = await common.try_item(uid, iid, value, **kwargs)
+		elif gid == enums.Group.WEAPON:
+			remain_v = await common.try_weapon(uid, iid, value, **kwargs)
+		elif gid == enums.Group.SKILL:
+			can, iid = await lottery._try_unlock_skill(uid, iid.value, **kwargs)
+			gid, remain_v, value = (enums.Group.SKILL, 1, 1) if can else (enums.Group.ITEM, (await common.try_item(uid, iid, 0, **kwargs))[1], 1)
+		elif gid == enums.Group.ROLE:
+			remain_v = await common.try_role(uid, iid, value, **kwargs)
+		else:
+			remain_v = -1  # gid不属于以上四种情况时需要处理
+		results.append((gid, iid, remain_v, value))
+	return results
 
 
 async def _refresh(uid, cid: enums, **kwargs):

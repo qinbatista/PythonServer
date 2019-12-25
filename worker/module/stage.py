@@ -466,7 +466,8 @@ async def check_boss_status(uid,**kwargs):
 	boss_life_ratio = {}
 	for i in range(0, len(remain_life)):
 		boss_life_ratio[f'boss{i}'] = "%.2f" % (remain_life[i]/boss_life[i])
-	return common.mt(0, 'Successfully get hook information', {'world_boss': world_boss, 'boss_life_ratio': boss_life_ratio})
+	ld = await common.execute(f'SELECT value FROM leaderboard WHERE uid="{uid}" AND lid={enums.LeaderBoard.WORLD_BOSS};', **kwargs)
+	return common.mt(0, 'Successfully get hook information', {'damage': 0 if ld == () else ld[0][0], 'world_boss': world_boss, 'boss_life_ratio': boss_life_ratio})
 
 
 async def e_boss_stage(uid, stage, **kwargs):
@@ -508,7 +509,7 @@ async def get_top_damage(uid, page, **kwargs):
 		damage = uid_data[0][0]
 		if uid_data[0][1] is None: uid_data = await common.execute(uid_str, **kwargs)
 		ranking = int(uid_data[0][1])
-	data = await common.execute( f'SELECT p.gn, l.value, p.fid, p.uid FROM player p, leaderboard l WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS.value} ORDER BY l.value DESC LIMIT {(page - 1)*10},10;', **kwargs)
+	data = await common.execute( f'SELECT p.gn, l.value, p.fid, p.uid FROM player p, leaderboard l WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS} ORDER BY l.value DESC LIMIT {(page - 1)*10},10;', **kwargs)
 	if data == (): return common.mt(98, 'No data for this page')
 	rank = []
 	for i, d in enumerate(data):

@@ -413,6 +413,8 @@
 
 [成功]()
 
+> damage：自己对boss造成的最高伤害
+>
 > world_boss
 >
 > - remaining：剩余挑战boss的次数
@@ -426,6 +428,7 @@
 	"status": 0,
 	"message": "Successfully get hook information",
 	"data": {
+        "damage": 0,
 		"world_boss": {
 			"remaining": 3,
 			"time": 32393,
