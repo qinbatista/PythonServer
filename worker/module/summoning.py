@@ -9,6 +9,7 @@ from module import task
 from module import achievement
 import random
 from datetime import datetime, timedelta
+import asyncio
 # Tier
 # basic, friend, pro, prophet
 # RewardGroup
@@ -112,6 +113,18 @@ SWITCH[enums.Group.ROLE] = _response_factory_role
 GRID = 12
 
 
+# TODO 未完成
+async def integral_convert(uid, **kwargs):
+	"""积分兑换"""
+	_, integral = await common.try_item(uid, enums.Item.INTEGRAL, 0, **kwargs)
+	limit = await common.get_limit(uid, enums.Limits.INTEGRAL, **kwargs)
+	limit = 0 if limit is None else limit
+	# if limit < 600 and 200 < integral or limit :
+	# 	pass
+
+	# if limit == 600:pass
+
+
 async def dozen_d(uid, **kwargs):
 	"""钻石12抽"""
 	cid = enums.Item.DIAMOND
@@ -174,12 +187,18 @@ async def single_c(uid, **kwargs):
 	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
+	# TODO 次数检查和限制
+	pass
 	# TODO 消耗物品
-	consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
-	can, qty = await common.try_item(uid, cid, -consume, **kwargs)
-	if not can: return common.mt(99, 'coin insufficient')
+	consume_id, consume = enums.Item.SUMMON_SCROLL_C, 1
+	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+	if not can:
+		consume_id = cid
+		consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
+		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+		if not can: return common.mt(99, 'coin insufficient')
 	# TODO 奖励物品
-	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': pid}
+	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
 	results = await _summon_reward(uid, items, **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
@@ -327,6 +346,21 @@ async def _get_summon(uid, cid, **kwargs):
 
 async def _set_summon(uid, cid, pid, mid, wgt, isb, **kwargs):
 	await common.execute(f'INSERT INTO summon (uid, cid, pid, mid, wgt, isb) VALUES ("{uid}", {cid}, {pid}, "{mid}", {wgt}, {isb}) ON DUPLICATE KEY UPDATE `mid`= VALUES(`mid`), `wgt`= VALUES(`wgt`), `isb`= VALUES(`isb`);', **kwargs)
+
+
+async def _refresh_integral(uid, **kwargs):
+	"""用于刷新积分的所有情况"""
+	timer = await common.get_timer(uid, enums.Timer.INTEGRAL, timeformat='%Y-%m-%d', **kwargs)
+	now = datetime.now(tz=common.TZ_SH)
+	timer = now if timer is None else timer
+	if timer.isocalendar()[1] != now.isocalendar()[1]:
+		await asyncio.gather(
+			common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.INTEGRAL}, 0) ON DUPLICATE KEY UPDATE `value` = 0;'),
+			common.set_timer(uid, enums.Timer.INTEGRAL, now, timeformat='%Y-%m-%d', **kwargs),
+			common.set_limit(uid, enums.Limits.INTEGRAL, 0, **kwargs)
+		)
+	elif timer == now:
+		await common.set_timer(uid, enums.Timer.INTEGRAL, timer, timeformat='%Y-%m-%d', **kwargs)
 
 
 SUMMON_SWITCH = {

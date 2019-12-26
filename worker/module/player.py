@@ -6,6 +6,7 @@ from module import mail
 from module import enums
 from module import common
 from module import stage
+from module import summoning
 import asyncio
 
 async def create(uid, gn, **kwargs):
@@ -74,6 +75,7 @@ async def get_info(uid, **kwargs):
 	return common.mt(0, 'success', {'gn': data[0][0], 'family_name': '' if data[0][1] is None else data[0][1], 'energy_info': energy_info['data'], 'exp': info[0][1], 'stage': info[0][2], 'towerstage': info[0][3], 'hangstage': info[0][4]})
 
 async def get_all_resource(uid, **kwargs):
+	await summoning._refresh_integral(uid, **kwargs)
 	item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)
 	return common.mt(0, 'success', {'items': [{'iid': i[0], 'value': i[1]} for i in item]})
 
