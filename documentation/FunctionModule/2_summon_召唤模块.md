@@ -36,7 +36,23 @@
 
 * [`pro_summon_role_10_times`](##pro_summon_role_10_times)
 
-* [`friend_summon_rolel_10_times`](##friend_summon_rolel_10_times)
+* [`friend_summon_role_10_times`](##friend_summon_role_10_times)
+
+* ## <font color=#FFBB00>以下方法为新增方法</font>
+
+* [`refresh_diamond_store`](##refresh_diamond_store)
+
+* [`refresh_coin_store`](##refresh_coin_store)
+
+* [`refresh_gift_store`](##refresh_gift_store)
+
+* [`single_pump_diamond`](##single_pump_diamond)
+
+* [`single_pump_coin`](##single_pump_coin)
+
+* [`single_pump_gift`](##single_pump_gift)
+
+* [`dozen_pump_diamond`](##dozen_pump_diamond)
 
   
 
@@ -982,7 +998,7 @@
 
 * 99：资源不足
 
-##
+
 
 - ## basic_summon_role_10_times
 
@@ -1083,3 +1099,383 @@
 
 * 99：资源不足
 
+
+
+## <font color=#FFBB00>以下方法为新增方法</font>
+
+- ## refresh_diamond_store
+
+- ## refresh_coin_store
+
+- ## refresh_gift_store
+
+##### 发送消息JSON格式
+
+> 刷新或者是获取全部随机商城信息
+
+```json
+{
+	"world": 0,
+	"function": "refresh_coin_store",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> status为0是刷新，为1是获取所有信息
+>
+> refresh：刷新之后获得的所有商品情况
+>
+> - cid：消耗品iid（1代表金币，5代表钻石，16代表朋友礼物）
+> - pid：商品位置id（0-11）
+> - mid：商品信息："gid:iid:qty"
+> - wgt：权重值，权重越大，抽中的概率越大
+> - isb：商品是否被购买（0未被购买，1已被购买）
+>
+> cooling: 冷却时间，剩下多少秒之后会再次刷新商城，当商城的商品被抽完之后这个值不起作用，并立刻刷新
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "refresh": [
+            {
+                "cid": 1,
+                "pid": 11,
+                "mid": "2:16:20",
+                "wgt": 30,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 4,
+                "mid": "1:22:1",
+                "wgt": 10,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 8,
+                "mid": "1:16:1",
+                "wgt": 300,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 3,
+                "mid": "1:22:1",
+                "wgt": 300,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 2,
+                "mid": "3:12:20",
+                "wgt": 500,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 5,
+                "mid": "3:10:20",
+                "wgt": 500,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 10,
+                "mid": "1:32:1",
+                "wgt": 300,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 6,
+                "mid": "0:1:20",
+                "wgt": 200,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 9,
+                "mid": "0:28:20",
+                "wgt": 200,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 7,
+                "mid": "0:8:20",
+                "wgt": 200,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 0,
+                "mid": "0:20:20",
+                "wgt": 200,
+                "isb": 0
+            },
+            {
+                "cid": 1,
+                "pid": 1,
+                "mid": "3:19:20",
+                "wgt": 500,
+                "isb": 0
+            }
+        ],
+        "cooling": 172800
+    }
+}
+```
+
+[失败]()
+
+- 98：The configuration file does not exist
+
+* 99：cid error
+
+
+
+## single_pump_diamond
+
+## single_pump_coin
+
+## single_pump_gift
+
+##### 发送消息JSON格式
+
+> 刷新或者是获取全部随机商城信息
+
+```json
+{
+	"world": 0,
+	"function": "single_pump_gift",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> status为0是刷新，为1是获取所有信息
+>
+> remaining：物品剩余情况
+>
+> reward：物品的改变情况
+>
+> pid: 抽中的物品位置id
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "remaining": [
+            "3:16:80",
+            "3:12:20",
+            "3:44:263"
+        ],
+        "reward": [
+            "3:16:10",
+            "3:12:20",
+            "3:44:1"
+        ],
+        "pid": 3
+    }
+}
+```
+
+[失败]()
+
+* 99：diamond insufficient===coin insufficient===friend gift insufficient
+
+
+
+## dozen_pump_diamond
+
+##### 发送消息JSON格式
+
+> 钻石12抽，一次性获取所有的物资，同时积分得到双倍
+
+```json
+{
+	"world": 0,
+	"function": "dozen_pump_diamond",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> status为0是刷新，为1是获取所有信息
+>
+> remaining：物品剩余情况
+>
+> reward：物品的改变情况
+>
+> pid：这个是象征性的返回，代表所有物品被清空购买并再次刷新
+>
+> refresh：同时刷新所有商品得到的商品信息
+>
+> cooling：冷却时间，剩下多少秒之后会再次刷新商城，当商城的商品被抽完之后这个值不起作用，并立刻刷新
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "remaining": [
+            "3:5:2800",
+            "2:16:40",
+            "0:24:40",
+            "0:18:60",
+            "2:22:20",
+            "0:22:20",
+            "3:43:80",
+            "0:19:40",
+            "2:2:20",
+            "0:21:40",
+            "2:4:20",
+            "1:21:1",
+            "2:24:40",
+            "3:44:383"
+        ],
+        "reward": [
+            "3:5:2400",
+            "2:16:20",
+            "0:24:20",
+            "0:18:20",
+            "2:22:20",
+            "0:22:20",
+            "3:43:20",
+            "0:19:20",
+            "2:2:20",
+            "0:21:20",
+            "2:4:20",
+            "1:21:1",
+            "2:24:20",
+            "3:44:120"
+        ],
+        "pid": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11
+        ],
+        "refresh": [
+            {
+                "cid": 5,
+                "pid": 5,
+                "mid": "0:18:20",
+                "wgt": 30,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 4,
+                "mid": "0:23:20",
+                "wgt": 10,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 8,
+                "mid": "2:18:20",
+                "wgt": 30,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 10,
+                "mid": "2:24:20",
+                "wgt": 10,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 2,
+                "mid": "1:29:1",
+                "wgt": 5,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 11,
+                "mid": "3:43:20",
+                "wgt": 25,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 7,
+                "mid": "3:10:20",
+                "wgt": 500,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 9,
+                "mid": "3:18:20",
+                "wgt": 500,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 1,
+                "mid": "3:2:20",
+                "wgt": 500,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 3,
+                "mid": "0:15:20",
+                "wgt": 200,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 6,
+                "mid": "3:10:20",
+                "wgt": 500,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 0,
+                "mid": "3:22:20",
+                "wgt": 500,
+                "isb": 0
+            }
+        ],
+        "cooling": 172800
+    }
+}
+```
+
+[失败]()
+
+* 99：diamond insufficient
+* 98：Less than {GRID} grid
