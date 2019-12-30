@@ -40,10 +40,10 @@ async def pass_stage(uid, stage, **kwargs):
 		await task.record_task(uid,**kwargs)
 		return await p_tower_stage(uid, stage, **kwargs)
 	elif 2000 <= stage < 3000:
-		await task.record_task(uid,**kwargs)
 		return await p_general_stage(uid, stage, **kwargs)
 	elif 3000 <= stage < 4000:
 		kwargs.update({"task_id":enums.Task.PASS_WORLD_BOSS})
+		await task.record_task(uid,**kwargs)
 		return await leave_world_boss_stage(uid, stage, damage, **kwargs)
 	else: return common.mt(50, 'Abnormal parameter')
 
