@@ -23,7 +23,7 @@ def loc():
 	return os.path.dirname(os.path.realpath(__file__))
 
 class LukseunClient:
-	def __init__(self, client_type: str = 'workingcat', host: str = '127.0.0.1', port: int = 8880):
+	def __init__(self, client_type: str = 'workingcat', host: str = '192.168.1.136', port: int = 8880):
 		self._host = host
 		self._port = port
 		self.token = ""
