@@ -1245,7 +1245,129 @@
 
 ## single_pump_diamond
 
+##### 发送消息JSON格式
+
+> 刷新或者是获取全部随机商城信息
+
+```json
+{
+	"world": 0,
+	"function": "single_pump_gift",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> status为0是刷新，为1是获取所有信息
+>
+> remaining：物品剩余情况
+>
+> reward：物品的改变情况
+>
+> pid: 抽中的物品位置id
+>
+> constraint：部分约束
+>
+> - limit：抽奖的次数，为0时消耗的是免费次数，为1时消耗的是半价次数，后面的仅仅是今天抽奖的次数减一
+> - cooling：剩余冷却时间，时间结束则刷新limit次数，时间范围0-86400
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "remaining": [
+            "3:5:80",
+            "3:12:20",
+            "3:44:263"
+        ],
+        "reward": [
+            "3:5:10",
+            "3:12:20",
+            "3:44:1"
+        ],
+        "pid": 3,
+        "constraint": {
+            "limit": 10,
+            "cooling": 34623
+        }
+    }
+}
+```
+
+[失败]()
+
+* 99：diamond insufficient===coin insufficient===friend gift insufficient
+
+
+
 ## single_pump_coin
+
+##### 发送消息JSON格式
+
+> 刷新或者是获取全部随机商城信息
+
+```json
+{
+	"world": 0,
+	"function": "single_pump_gift",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> status为0是刷新，为1是获取所有信息
+>
+> remaining：物品剩余情况
+>
+> reward：物品的改变情况
+>
+> pid: 抽中的物品位置id
+>
+> constraint：部分约束
+>
+> - limit：剩余可抽奖的次数
+> - cooling：剩余冷却时间，时间结束则刷新limit次数，时间范围0-86400
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "remaining": [
+            "3:1:80",
+            "3:12:20",
+            "3:44:263"
+        ],
+        "reward": [
+            "3:1:10",
+            "3:12:20",
+            "3:44:1"
+        ],
+        "pid": 3,
+        "constraint": {
+            "limit": 10,
+            "cooling": 34623
+        }
+    }
+}
+```
+
+[失败]()
+
+* 99：diamond insufficient===coin insufficient===friend gift insufficient
+
+
 
 ## single_pump_gift
 
@@ -1295,11 +1417,7 @@
             "3:12:20",
             "3:44:1"
         ],
-        "pid": 3,
-        "constraint": {
-            "limit": 10,
-            "cooling": 34623
-        }
+        "pid": 3
     }
 }
 ```

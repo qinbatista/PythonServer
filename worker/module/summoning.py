@@ -165,17 +165,27 @@ async def single_d(uid, **kwargs):
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
 	# TODO 消耗物品
-	consume_id, consume = enums.Item.SUMMON_SCROLL_D, 1
-	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-	if not can:
-		consume_id = cid
-		consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
-		grid = len(isb_data)
-		consume = 0 if grid == GRID else (consume//2 if grid == GRID - 1 else consume)
+	now = datetime.now(tz=common.TZ_SH)
+	tim = await common.get_timer(uid, enums.Timer.SUMMON_D, timeformat='%Y-%m-%d', **kwargs)
+	lim = await common.get_limit(uid, enums.Limits.SUMMON_D, **kwargs)
+	lim = 0 if lim is None or tim is None or tim < now else lim
+	tim = (now + timedelta(days=1)) if tim is None or tim < now else tim
+	if lim > 0:
+		consume_id, consume = enums.Item.SUMMON_SCROLL_D, 1
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-		if not can: return common.mt(99, 'diamond insufficient')
+		if not can:
+			consume_id = cid
+			consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
+			consume = consume // 2 if lim == 1 else consume  # 第二次购买消费减半
+			can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+			if not can: return common.mt(99, 'diamond insufficient')
+	else:
+		consume_id, consume = cid, 0
+		await common.set_timer(uid, enums.Timer.SUMMON_D, tim, timeformat='%Y-%m-%d', **kwargs)
+		_, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+	await common.set_limit(uid, enums.Limits.SUMMON_D, lim + 1, **kwargs)
 	# TODO 奖励物品
-	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid}
+	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
 	results = await _summon_reward(uid, items, **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
