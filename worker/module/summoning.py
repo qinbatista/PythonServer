@@ -131,11 +131,15 @@ async def dozen_d(uid, **kwargs):
 	if await _get_isb_count(uid, cid, isb=0, **kwargs) < GRID: return common.mt(98, f'Less than {GRID} grid')
 	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
 	# TODO 消耗物品
-	consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty']) * GRID
-	can, qty = await common.try_item(uid, cid, -consume, **kwargs)
-	if not can: return common.mt(99, 'diamond insufficient')
+	consume_id, consume = enums.Item.SUMMON_SCROLL_D, GRID
+	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+	if not can:
+		consume_id = cid
+		consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty']) * GRID
+		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+		if not can: return common.mt(99, 'diamond insufficient')
 	# TODO 奖励物品
-	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': [d[0] for d in isb_data]}
+	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': [d[0] for d in isb_data]}
 	article = [d[1] for d in isb_data]  # 获取所有的物品
 	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * GRID * 2}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
 	items = f"{','.join(article)},{','.join(extra)}"
@@ -161,13 +165,17 @@ async def single_d(uid, **kwargs):
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
 	# TODO 消耗物品
-	consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
-	grid = len(isb_data)
-	consume = 0 if grid == GRID else (consume//2 if grid == GRID - 1 else consume)
-	can, qty = await common.try_item(uid, cid, -consume, **kwargs)
-	if not can: return common.mt(99, 'diamond insufficient')
+	consume_id, consume = enums.Item.SUMMON_SCROLL_D, 1
+	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+	if not can:
+		consume_id = cid
+		consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
+		grid = len(isb_data)
+		consume = 0 if grid == GRID else (consume//2 if grid == GRID - 1 else consume)
+		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+		if not can: return common.mt(99, 'diamond insufficient')
 	# TODO 奖励物品
-	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': pid}
+	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
 	results = await _summon_reward(uid, items, **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
