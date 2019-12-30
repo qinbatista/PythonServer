@@ -196,7 +196,8 @@ async def single_d(uid, **kwargs):
 		consume_id, consume = cid, 0
 		await common.set_timer(uid, enums.Timer.SUMMON_D, tim, timeformat='%Y-%m-%d', **kwargs)
 		_, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-	await common.set_limit(uid, enums.Limits.SUMMON_D, lim + 1, **kwargs)
+	lim += 1
+	await common.set_limit(uid, enums.Limits.SUMMON_D, lim, **kwargs)
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
