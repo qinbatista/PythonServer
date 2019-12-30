@@ -58,6 +58,22 @@
 
 
 
+### 错误集
+
+```python
+# 99 - insufficient materials
+# 98 - error item
+# 97 - error item, item type
+# 96 - Less than 12 grid
+# 95 - Insufficient number of lucky draw
+# 94 - cid error
+# 93 - The configuration file does not exist
+```
+
+
+
+
+
 ## get_config_lottery
 
 ##### 发送消息JSON格式
