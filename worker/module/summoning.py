@@ -163,7 +163,7 @@ async def dozen_d(uid, **kwargs):
 	# TODO 重置所有物品
 	reset = await _refresh(uid, cid, **kwargs)
 	data['refresh'] = reset['data']['refresh']
-	data['cooling'] = reset['data']['cooling']
+	data['constraint'] = reset['data']['constraint']
 	return common.mt(0, 'success', data=data)
 
 
@@ -281,7 +281,8 @@ async def refresh_d(uid, **kwargs):
 	if end_time is not None and end_time > current and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'cooling': int((end_time - current).total_seconds())})
+		lim = await common.get_limit(uid, enums.Limits.SUMMON_D, **kwargs)
+		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': {'limit': 0 if lim is None else lim, 'cooling': int((end_time - current).total_seconds())}})
 	return await _refresh(uid, cid, **kwargs)
 
 
@@ -294,7 +295,8 @@ async def refresh_c(uid, **kwargs):
 	if end_time is not None and end_time > current and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'cooling': int((end_time - current).total_seconds())})
+		lim = await common.get_limit(uid, enums.Limits.SUMMON_C, **kwargs)
+		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': {'limit': kwargs['config']['summon']['resource'][cid.name]['constraint']['times'] if lim is None else lim, 'cooling': int((end_time - current).total_seconds())}})
 	return await _refresh(uid, cid, **kwargs)
 
 
@@ -307,7 +309,7 @@ async def refresh_g(uid, **kwargs):
 	if end_time is not None and end_time > current and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'cooling': int((end_time - current).total_seconds())})
+		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': {'cooling': int((end_time - current).total_seconds())}})
 	return await _refresh(uid, cid, **kwargs)
 
 # ############################# 私有方法 ###########################
@@ -341,6 +343,10 @@ async def _summon_reward(uid, items: str, **kwargs):
 
 async def _refresh(uid, cid: enums, **kwargs):
 	"""刷新抽奖市场方法，cid代表消耗品类型"""
+	constraint = {}
+	if cid in SUMMON_CONSTRAINT.keys():
+		lim = await common.get_limit(uid, SUMMON_CONSTRAINT[cid][0], **kwargs)
+		constraint['limit'] = SUMMON_CONSTRAINT[cid][1](kwargs['config']['summon']['resource']) if lim is None else lim
 	if cid not in SUMMON_SWITCH.keys(): return common.mt(99, 'cid error')
 	config = kwargs['config']['summon']['resource'].get(cid.name, None)
 	if config is None: return common.mt(98, 'The configuration file does not exist')
@@ -374,7 +380,8 @@ async def _refresh(uid, cid: enums, **kwargs):
 	hours = config['constraint']['hours']
 	end_time = datetime.now(tz=common.TZ_SH) + timedelta(hours=hours)
 	await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
-	return common.mt(0, 'success', {'refresh': data, 'cooling': hours * 3600})
+	constraint['cooling'] = hours * 3600
+	return common.mt(0, 'success', {'refresh': data, 'constraint': constraint})
 
 
 async def _get_isb_count(uid, cid, isb=0, **kwargs):
@@ -412,5 +419,10 @@ SUMMON_SWITCH = {
 	enums.Item.DIAMOND:     enums.Timer.SUMMON_D_END,
 	enums.Item.COIN:        enums.Timer.SUMMON_C_END,
 	enums.Item.FRIEND_GIFT: enums.Timer.SUMMON_G_END,
+}
+
+SUMMON_CONSTRAINT = {
+	enums.Item.DIAMOND:     (enums.Limits.SUMMON_D, lambda config: 0),
+	enums.Item.COIN:        (enums.Limits.SUMMON_C, lambda config: config['COIN']['constraint']['times']),
 }
 
