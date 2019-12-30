@@ -188,7 +188,15 @@ async def single_c(uid, **kwargs):
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
 	# TODO 次数检查和限制
-	pass
+	now = datetime.now(tz=common.TZ_SH)
+	tim = await common.get_timer(uid, enums.Timer.SUMMON_C, timeformat='%Y-%m-%d', **kwargs)
+	lim = await common.get_limit(uid, enums.Limits.SUMMON_C, **kwargs)
+	lim = kwargs['config']['summon']['resource'][cid.name]['constraint']['times'] if lim is None or tim is None or tim < now else lim
+	tim = (now + timedelta(days=1)) if tim is None or tim < now else tim
+	if lim <= 0: return common.mt(98, 'Insufficient number of lucky draw')
+	lim -= 1
+	await common.set_timer(uid, enums.Timer.SUMMON_C, tim, timeformat='%Y-%m-%d', **kwargs)
+	await common.set_limit(uid, enums.Limits.SUMMON_C, lim, **kwargs)
 	# TODO 消耗物品
 	consume_id, consume = enums.Item.SUMMON_SCROLL_C, 1
 	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
@@ -198,7 +206,7 @@ async def single_c(uid, **kwargs):
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 		if not can: return common.mt(99, 'coin insufficient')
 	# TODO 奖励物品
-	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid}
+	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
 	results = await _summon_reward(uid, items, **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过

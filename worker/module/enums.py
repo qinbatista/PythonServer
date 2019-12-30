@@ -264,6 +264,7 @@ class Timer(enum.IntEnum):
 	SUMMON_C_END = 28  # 刷新金币随机商城的结束时间
 	SUMMON_G_END = 29  # 刷新朋友礼物随机商城的结束时间
 	INTEGRAL = 30  # 代表本周的某一天刷新时间，这里用作和某一天判断是否为同一周
+	SUMMON_C = 31  # 记录金币抽奖次数刷新的开始日期，用于重置金币抽奖次数
 
 
 class Limits(enum.IntEnum):
