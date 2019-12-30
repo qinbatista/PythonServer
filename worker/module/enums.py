@@ -265,6 +265,7 @@ class Timer(enum.IntEnum):
 	SUMMON_G_END = 29  # 刷新朋友礼物随机商城的结束时间
 	INTEGRAL = 30  # 代表本周的某一天刷新时间，这里用作和某一天判断是否为同一周
 	SUMMON_C = 31  # 记录金币抽奖次数刷新的开始日期，用于重置金币抽奖次数
+	SUMMON_D = 32  # 记录钻石抽奖次数刷新的开始日期，用于重置钻石抽奖次数，这里用于限制钻石免费抽和半价抽
 
 
 class Limits(enum.IntEnum):
@@ -282,6 +283,7 @@ class Limits(enum.IntEnum):
 	BIND_PHONE = 12  # 用户绑定手机的剩余次数
 	INTEGRAL = 13  # 代表获取了的阶段积分数值，大于此值时则获取
 	SUMMON_C = 14  # 代表金币抽每天限制的次数，一天限制12次
+	SUMMON_D = 15  # 代表钻石抽每天限制的次数，当天第一次抽奖免费，第二次抽奖半价，这里用于限制钻石免费抽和半价抽
 
 
 class Achievement(enum.IntEnum):
