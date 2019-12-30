@@ -715,7 +715,7 @@ FUNCTION_LIST = {
 	'refresh_gift_store' : MessageHandler._refresh_gift_store,
 	'single_pump_diamond' : MessageHandler._single_pump_diamond,
 	'single_pump_coin' : MessageHandler._single_pump_coin,
-	# 'single_pump_gift' : MessageHandler._single_pump_gift,
+	'single_pump_gift' : MessageHandler._single_pump_gift,
 	'dozen_pump_diamond' : MessageHandler._dozen_pump_diamond,
 
 	###################### lottery.py ######################

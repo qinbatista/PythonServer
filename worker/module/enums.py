@@ -52,6 +52,8 @@ class Item(enum.IntEnum):
 	UNIVERSAL6_SEGMENT = 42  # 6星万能碎片
 	VIP_EXP_CARD = 43  # VIP经验卡兑换可获得50VIP经验
 	INTEGRAL = 44  # 抽奖获得积分，积分兑换角色碎片
+	SUMMON_SCROLL_D = 45  # 高级代抽券，存在时优先消耗，用于钻石抽奖
+	SUMMON_SCROLL_C = 46  # 低级代抽券，存在时优先消耗，用于金币抽奖
 
 
 class FamilyRole(enum.IntEnum):
@@ -261,6 +263,8 @@ class Timer(enum.IntEnum):
 	SUMMON_D_END = 27  # 刷新钻石随机商城的结束时间
 	SUMMON_C_END = 28  # 刷新金币随机商城的结束时间
 	SUMMON_G_END = 29  # 刷新朋友礼物随机商城的结束时间
+	INTEGRAL = 30  # 代表本周的某一天刷新时间，这里用作和某一天判断是否为同一周
+	SUMMON_C = 31  # 记录金币抽奖次数刷新的开始日期，用于重置金币抽奖次数
 
 
 class Limits(enum.IntEnum):
@@ -276,6 +280,8 @@ class Limits(enum.IntEnum):
 	FAMILY_NOTICE = 10  # 管理员可以发布公告的剩余次数
 	FAMILY_INVITE = 11  # 管理员可以邀请成员的剩余次数
 	BIND_PHONE = 12  # 用户绑定手机的剩余次数
+	INTEGRAL = 13  # 代表获取了的阶段积分数值，大于此值时则获取
+	SUMMON_C = 14  # 代表金币抽每天限制的次数，一天限制12次
 
 
 class Achievement(enum.IntEnum):
