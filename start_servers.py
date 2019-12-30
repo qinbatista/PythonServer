@@ -48,7 +48,7 @@ def main():
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/worker/worker.py', \
 				'--channel', get_host_ip(), '--redis-addr', '192.168.1.102', \
 				'--nats-addr', '192.168.1.102', '--token-addr', '192.168.1.165', \
-				'--mail-addr', '192.168.1.165'], shell=False))
+				'--mail-addr', '192.168.1.165', '--debug'], shell=False))
 		processes.append(subprocess.Popen([GetPythonCommand(), loc() + '/gate/gate.py', \
 				'--channel', get_host_ip(), '--redis-addr', '192.168.1.102', \
 				'--nats-addr', '192.168.1.102', '--debug'], shell=False))
