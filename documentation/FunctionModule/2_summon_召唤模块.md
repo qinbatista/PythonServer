@@ -54,7 +54,9 @@
 
 * [`dozen_pump_diamond`](##dozen_pump_diamond)
 
-  
+- [`integral_convert`](##integral_convert)
+
+
 
 ## get_config_lottery
 
@@ -1608,3 +1610,76 @@
 
 * 99：diamond insufficient
 * 98：Less than {GRID} grid
+
+
+
+## integral_convert
+
+##### 发送消息JSON格式
+
+> 积分兑换
+
+```json
+{
+	"world": 0,
+	"function": "integral_convert",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> status为0是获得新角色，为1是获取已有角色的碎片
+>
+> limit：积分进度，分别有0，200，400，600，800，1000
+>
+> rid：角色id
+>
+> star：角色星数
+>
+> remain_seg：角色剩余的碎片数
+>
+> reward_seg：角色得到的碎片数
+>
+
+```json
+{
+    "status": 1,
+    "message": "You get 30 segments",
+    "data": {
+        "limit": 600,
+        "rid": 25,
+        "star": 1,
+        "remain_seg": 90,
+        "reward_seg": 30
+    }
+}
+```
+>limit：积分进度，分别有0，200，400，600，800，1000
+>
+>iid：物品id
+>
+>remain_seg：物品剩余的碎片数
+>
+>reward_seg：物品得到的碎片数
+
+```json
+{
+    "status": 2,
+    "message": "You get the universal segments",
+    "data": {
+        "limit": 1000,
+        "iid": 17,
+        "remain_v": 2,
+        "reward_v": 1
+    }
+}
+```
+
+[失败]()
+
+* 99：integral insufficient

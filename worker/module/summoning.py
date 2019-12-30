@@ -6,6 +6,7 @@ from module import enums
 from module import common
 from module import lottery
 from module import task
+from module import role
 from module import achievement
 import random
 from datetime import datetime, timedelta
@@ -113,16 +114,28 @@ SWITCH[enums.Group.ROLE] = _response_factory_role
 GRID = 12
 
 
-# TODO 未完成
 async def integral_convert(uid, **kwargs):
 	"""积分兑换"""
+	# TODO 限制条件检查
 	_, integral = await common.try_item(uid, enums.Item.INTEGRAL, 0, **kwargs)
-	limit = await common.get_limit(uid, enums.Limits.INTEGRAL, **kwargs)
-	limit = 0 if limit is None else limit
-	# if limit < 600 and 200 < integral or limit :
-	# 	pass
-
-	# if limit == 600:pass
+	lim = await common.get_limit(uid, enums.Limits.INTEGRAL, **kwargs)
+	lim = 0 if lim is None else lim
+	can, lim = _integral_inspect(lim, integral)
+	if not can: return common.mt(99, 'integral insufficient')
+	config = kwargs['config']['summon']['convert']
+	await common.set_limit(uid, enums.Limits.INTEGRAL, lim, **kwargs)
+	# TODO 奖励物品
+	if lim in [200, 400, 600, 800]:
+		mid = config['special']['mid'] if lim == 600 else random.choice(config['role']['mid'])
+		can, rid = await lottery._try_unlock_role(uid, mid, **kwargs)
+		status, msg = (0, 'You unlocked a role') if can else (1, 'You get 30 segments')
+		value = lottery.STANDARD_SEG_COUNT
+		remain_v = await common.try_role(uid, rid, 0, **kwargs)
+		_, star = await role._get_role_info(uid, rid, 'star', **kwargs)
+		return common.mt(status, msg, {'limit': lim, 'rid': mid, 'star': star[0], 'remain_seg': remain_v, 'reward_seg': value})
+	iid, value = config['item']['mid'], abs(config['item']['qty'])
+	_, remain_v = await common.try_item(uid, enums.Item(iid), value, **kwargs)
+	return common.mt(2, 'You get the universal segments', {'limit': lim, 'iid': iid, 'remain_v': remain_v, 'reward_v': value})
 
 
 async def dozen_d(uid, **kwargs):
@@ -298,6 +311,12 @@ async def refresh_g(uid, **kwargs):
 	return await _refresh(uid, cid, **kwargs)
 
 # ############################# 私有方法 ###########################
+
+
+def _integral_inspect(lim, integral):
+	for i in range(200, 1001, 200):
+		if lim < i < integral: return True, i
+	return False, lim
 
 
 async def _summon_reward(uid, items: str, **kwargs):
