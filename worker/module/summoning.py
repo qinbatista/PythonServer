@@ -178,7 +178,7 @@ async def single_d(uid, **kwargs):
 			consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 			consume = consume // 2 if lim == 1 else consume  # 第二次购买消费减半
 			can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-			if not can: return common.mt(99, 'diamond insufficient')
+			if not can: return common.mt(98, 'diamond insufficient')
 	else:
 		consume_id, consume = cid, 0
 		await common.set_timer(uid, enums.Timer.SUMMON_D, tim, timeformat='%Y-%m-%d', **kwargs)
@@ -211,7 +211,7 @@ async def single_c(uid, **kwargs):
 	lim = await common.get_limit(uid, enums.Limits.SUMMON_C, **kwargs)
 	lim = kwargs['config']['summon']['resource'][cid.name]['constraint']['times'] if lim is None or tim is None or tim < now else lim
 	tim = (now + timedelta(days=1)) if tim is None or tim < now else tim
-	if lim <= 0: return common.mt(98, 'Insufficient number of lucky draw')
+	if lim <= 0: return common.mt(96, 'Insufficient number of lucky draw')
 	lim -= 1
 	await common.set_timer(uid, enums.Timer.SUMMON_C, tim, timeformat='%Y-%m-%d', **kwargs)
 	await common.set_limit(uid, enums.Limits.SUMMON_C, lim, **kwargs)
@@ -222,7 +222,7 @@ async def single_c(uid, **kwargs):
 		consume_id = cid
 		consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-		if not can: return common.mt(99, 'coin insufficient')
+		if not can: return common.mt(98, 'coin insufficient')
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
@@ -247,7 +247,7 @@ async def single_g(uid, **kwargs):
 	# TODO 消耗物品
 	consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 	can, qty = await common.try_item(uid, cid, -consume, **kwargs)
-	if not can: return common.mt(99, 'friend gift insufficient')
+	if not can: return common.mt(98, 'friend gift insufficient')
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': pid}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"

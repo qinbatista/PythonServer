@@ -1302,7 +1302,7 @@
 
 [失败]()
 
-* 99：diamond insufficient===coin insufficient===friend gift insufficient
+* 98：diamond insufficient
 
 
 
@@ -1365,7 +1365,9 @@
 
 [失败]()
 
-* 99：diamond insufficient===coin insufficient===friend gift insufficient
+- 96：Insufficient number of lucky draw
+
+* 98：coin insufficient
 
 
 
@@ -1424,7 +1426,7 @@
 
 [失败]()
 
-* 99：diamond insufficient===coin insufficient===friend gift insufficient
+* 98：friend gift insufficient
 
 
 
