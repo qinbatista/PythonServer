@@ -17,6 +17,14 @@ import asyncio
 # weapon, skill, role
 
 SWITCH = {}
+# 99 - insufficient materials
+# 98 - error item
+# 97 - error item, item type
+# 96 - Less than 12 grid
+# 95 - Insufficient number of lucky draw
+# 94 - cid error
+# 93 - The configuration file does not exist
+
 
 async def summon(uid, item, tier, rewardgroup, **kwargs):
 	if item not in enums.Item._value2member_map_.keys():
@@ -121,7 +129,7 @@ async def integral_convert(uid, **kwargs):
 	lim = await common.get_limit(uid, enums.Limits.INTEGRAL, **kwargs)
 	lim = 0 if lim is None else lim
 	can, lim = _integral_inspect(lim, integral)
-	if not can: return common.mt(99, 'integral insufficient')
+	if not can: return common.mt(99, 'insufficient materials')
 	config = kwargs['config']['summon']['convert']
 	await common.set_limit(uid, enums.Limits.INTEGRAL, lim, **kwargs)
 	# TODO 奖励物品
@@ -141,7 +149,7 @@ async def integral_convert(uid, **kwargs):
 async def dozen_d(uid, **kwargs):
 	"""钻石12抽"""
 	cid = enums.Item.DIAMOND
-	if await _get_isb_count(uid, cid, isb=0, **kwargs) < GRID: return common.mt(98, f'Less than {GRID} grid')
+	if await _get_isb_count(uid, cid, isb=0, **kwargs) < GRID: return common.mt(96, f'Less than {GRID} grid')
 	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
 	# TODO 消耗物品
 	consume_id, consume = enums.Item.SUMMON_SCROLL_D, GRID
@@ -150,7 +158,7 @@ async def dozen_d(uid, **kwargs):
 		consume_id = cid
 		consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty']) * GRID
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-		if not can: return common.mt(99, 'diamond insufficient')
+		if not can: return common.mt(99, 'insufficient materials')
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': [d[0] for d in isb_data]}
 	article = [d[1] for d in isb_data]  # 获取所有的物品
@@ -191,7 +199,7 @@ async def single_d(uid, **kwargs):
 			consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 			consume = consume // 2 if lim == 1 else consume  # 第二次购买消费减半
 			can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-			if not can: return common.mt(98, 'diamond insufficient')
+			if not can: return common.mt(99, 'insufficient materials')
 	else:
 		consume_id, consume = cid, 0
 		await common.set_timer(uid, enums.Timer.SUMMON_D, tim, timeformat='%Y-%m-%d', **kwargs)
@@ -225,7 +233,7 @@ async def single_c(uid, **kwargs):
 	lim = await common.get_limit(uid, enums.Limits.SUMMON_C, **kwargs)
 	lim = kwargs['config']['summon']['resource'][cid.name]['constraint']['times'] if lim is None or tim is None or tim < now else lim
 	tim = (now + timedelta(days=1)) if tim is None or tim < now else tim
-	if lim <= 0: return common.mt(96, 'Insufficient number of lucky draw')
+	if lim <= 0: return common.mt(95, 'Insufficient number of lucky draw')
 	lim -= 1
 	await common.set_timer(uid, enums.Timer.SUMMON_C, tim, timeformat='%Y-%m-%d', **kwargs)
 	await common.set_limit(uid, enums.Limits.SUMMON_C, lim, **kwargs)
@@ -236,7 +244,7 @@ async def single_c(uid, **kwargs):
 		consume_id = cid
 		consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-		if not can: return common.mt(98, 'coin insufficient')
+		if not can: return common.mt(99, 'insufficient materials')
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
@@ -261,7 +269,7 @@ async def single_g(uid, **kwargs):
 	# TODO 消耗物品
 	consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 	can, qty = await common.try_item(uid, cid, -consume, **kwargs)
-	if not can: return common.mt(98, 'friend gift insufficient')
+	if not can: return common.mt(99, 'insufficient materials')
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': pid}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
@@ -344,13 +352,13 @@ async def _summon_reward(uid, items: str, **kwargs):
 
 async def _refresh(uid, cid: enums, **kwargs):
 	"""刷新抽奖市场方法，cid代表消耗品类型"""
+	if cid not in SUMMON_SWITCH.keys(): return common.mt(94, 'cid error')
 	constraint = {}
 	if cid in SUMMON_CONSTRAINT.keys():
 		lim = await common.get_limit(uid, SUMMON_CONSTRAINT[cid][0], **kwargs)
 		constraint['limit'] = SUMMON_CONSTRAINT[cid][1](kwargs['config']['summon']['resource']) if lim is None else lim
-	if cid not in SUMMON_SWITCH.keys(): return common.mt(99, 'cid error')
 	config = kwargs['config']['summon']['resource'].get(cid.name, None)
-	if config is None: return common.mt(98, 'The configuration file does not exist')
+	if config is None: return common.mt(93, 'The configuration file does not exist')
 	data = []
 	# grids = [i for i in range(config['constraint'].get('grid', GRID))]
 	grids = [i for i in range(GRID)]
