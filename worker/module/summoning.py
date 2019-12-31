@@ -322,6 +322,21 @@ async def refresh_g(uid, **kwargs):
 		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': {'cooling': int((end_time - current).total_seconds())}})
 	return await _refresh(uid, cid, **kwargs)
 
+
+async def buy_refresh(uid, cid, **kwargs):
+	"""购买刷新,并获取所有刷新信息"""
+	if cid not in BUY_REFRESH.keys(): return common.mt(94, 'cid error')
+	now = datetime.now(tz=common.TZ_SH)
+	tim = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
+	# TODO 消耗物品
+	consume, tim = (0, now + timedelta(days=1)) if tim is None or tim < now else (abs(kwargs['config']['summon']['resource'][cid.name]['constraint']['refresh']), tim)
+	can, qty = await common.try_item(uid, enums.Item.DIAMOND, -consume, **kwargs)
+	await common.set_timer(uid, BUY_REFRESH[cid], tim, timeformat='%Y-%m-%d', **kwargs)
+	if not can: return common.mt(99, 'insufficient materials')
+	# TODO 重构刷新的数据
+	data = (await _refresh(uid, cid, **kwargs))['data']
+	data['consume'] = {'remain_v': qty, 'value': consume}
+	return common.mt(0, 'success', data)
 # ############################# 私有方法 ###########################
 
 
@@ -354,7 +369,10 @@ async def _summon_reward(uid, items: str, **kwargs):
 async def _refresh(uid, cid: enums, **kwargs):
 	"""刷新抽奖市场方法，cid代表消耗品类型"""
 	if cid not in SUMMON_SWITCH.keys(): return common.mt(94, 'cid error')
-	constraint = {}
+	now = datetime.now(tz=common.TZ_SH)
+	tim_refresh = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
+	tim_refresh = now if tim_refresh is None else tim_refresh
+	constraint = {'cooling_refresh': int((tim_refresh - now).total_seconds())}
 	if cid in SUMMON_CONSTRAINT.keys():
 		lim = await common.get_limit(uid, SUMMON_CONSTRAINT[cid][0], **kwargs)
 		constraint['limit'] = SUMMON_CONSTRAINT[cid][1](kwargs['config']['summon']['resource']) if lim is None else lim
@@ -388,7 +406,7 @@ async def _refresh(uid, cid: enums, **kwargs):
 			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
 			data.append({'cid': cid.value, 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
 	hours = config['constraint']['hours']
-	end_time = datetime.now(tz=common.TZ_SH) + timedelta(hours=hours)
+	end_time = now + timedelta(hours=hours)
 	await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
 	constraint['cooling'] = hours * 3600
 	return common.mt(0, 'success', {'refresh': data, 'constraint': constraint})
@@ -436,3 +454,8 @@ SUMMON_CONSTRAINT = {
 	enums.Item.COIN:        (enums.Limits.SUMMON_C, lambda config: config['COIN']['constraint']['times']),
 }
 
+BUY_REFRESH = {
+	enums.Item.DIAMOND:     enums.Timer.SUMMON_D_REFRESH,
+	enums.Item.COIN:        enums.Timer.SUMMON_C_REFRESH,
+	enums.Item.FRIEND_GIFT: enums.Timer.SUMMON_G_REFRESH,
+}

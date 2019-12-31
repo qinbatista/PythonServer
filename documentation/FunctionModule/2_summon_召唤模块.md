@@ -1159,6 +1159,7 @@
 >
 > - limit：refresh_diamond_store下返回的是今天抽奖的次数，refresh_coin_store下返回的是抽奖剩余次数
 > - cooling: 冷却时间，剩下多少秒之后会再次刷新商城，当商城的商品被抽完之后这个值不起作用，并立刻刷新
+> - cooling_refresh：距离下一次可免费时间需要的冷却时间，小于等于0时可进行免费刷新
 
 ```json
 {
@@ -1253,7 +1254,8 @@
         ],
         "constraint": {
             "limit": 11,
-            "cooling": 158088
+            "cooling": 158088,
+            "cooling_refresh": 58088
         }
     }
 }
@@ -1264,6 +1266,165 @@
 - 93：The configuration file does not exist
 
 * 94：cid error
+
+
+
+
+- ## buy_refresh_diamond
+
+- ## buy_refresh_coin
+
+- ## buy_refresh_gift
+
+##### 发送消息JSON格式
+
+> 刷新或者是获取全部随机商城信息
+
+```json
+{
+	"world": 0,
+	"function": "buy_refresh_diamond",
+	"data": {
+		"token": "my token"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> status为0是刷新，为1是获取所有信息
+>
+> refresh：刷新之后获得的所有商品情况
+>
+> - cid：消耗品iid（1代表金币，5代表钻石，16代表朋友礼物）
+> - pid：商品位置id（0-11）
+> - mid：商品信息："gid:iid:qty"
+> - wgt：权重值，权重越大，抽中的概率越大
+> - isb：商品是否被购买（0未被购买，1已被购买）
+>
+> constraint：部分约束
+>
+> - limit：refresh_diamond_store下返回的是今天抽奖的次数，refresh_coin_store下返回的是抽奖剩余次数
+> - cooling: 冷却时间，剩下多少秒之后会再次刷新商城，当商城的商品被抽完之后这个值不起作用，并立刻刷新
+> - cooling_refresh：距离下一次可免费时间需要的冷却时间，小于等于0时可进行免费刷新
+>
+> consume：钻石消耗
+>
+> - remain_v：钻石剩余数量
+> - value：钻石消耗的数量
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "refresh": [
+            {
+                "cid": 5,
+                "pid": 6,
+                "mid": "0:20:20",
+                "wgt": 30,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 8,
+                "mid": "0:25:20",
+                "wgt": 10,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 11,
+                "mid": "2:20:20",
+                "wgt": 30,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 0,
+                "mid": "2:25:20",
+                "wgt": 10,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 2,
+                "mid": "1:23:1",
+                "wgt": 5,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 1,
+                "mid": "3:43:20",
+                "wgt": 25,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 3,
+                "mid": "1:16:1",
+                "wgt": 300,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 9,
+                "mid": "3:9:5",
+                "wgt": 500,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 7,
+                "mid": "0:26:20",
+                "wgt": 200,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 10,
+                "mid": "3:19:5",
+                "wgt": 500,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 5,
+                "mid": "2:20:20",
+                "wgt": 200,
+                "isb": 0
+            },
+            {
+                "cid": 5,
+                "pid": 4,
+                "mid": "0:27:20",
+                "wgt": 200,
+                "isb": 0
+            }
+        ],
+        "constraint": {
+            "cooling_refresh": 41921,
+            "limit": 2,
+            "cooling": 172800
+        },
+        "consume": {
+            "remain_v": 0,
+            "value": 0
+        }
+    }
+}
+```
+
+[失败]()
+
+- 93：The configuration file does not exist
+
+* 94：cid error
+* 99：insufficient materials
 
 
 
