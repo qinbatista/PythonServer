@@ -325,8 +325,8 @@ async def refresh_g(uid, **kwargs):
 
 
 def _integral_inspect(lim, integral):
-	for i in range(200, 1001, 200):
-		if lim < i < integral: return True, i
+	for i in [200, 400, 600, 800, 1000]:
+		if lim < i <= integral: return True, i
 	return False, lim
 
 
