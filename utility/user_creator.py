@@ -17,6 +17,7 @@ def create_table_info(cursor):
 	  `email` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 	  `phone_number` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 	  `salt` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+	  `sex` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
 	  PRIMARY KEY (`unique_id`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
