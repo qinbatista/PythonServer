@@ -297,6 +297,15 @@ class MessageHandler:
 	async def _refresh_gift_store(self, data: dict) -> str:
 		return await summoning.refresh_g(data['data']['unique_id'], **data)
 
+	async def _buy_refresh_diamond(self, data: dict) -> str:
+		return await summoning.buy_refresh(data['data']['unique_id'], enums.Item.DIAMOND, **data)
+
+	async def _buy_refresh_coin(self, data: dict) -> str:
+		return await summoning.buy_refresh(data['data']['unique_id'], enums.Item.COIN, **data)
+
+	async def _buy_refresh_gift(self, data: dict) -> str:
+		return await summoning.buy_refresh(data['data']['unique_id'], enums.Item.FRIEND_GIFT, **data)
+
 	async def _single_pump_diamond(self, data: dict) -> str:
 		return await summoning.single_d(data['data']['unique_id'], **data)
 
@@ -715,6 +724,9 @@ FUNCTION_LIST = {
 	'refresh_diamond_store' : MessageHandler._refresh_diamond_store,
 	'refresh_coin_store' : MessageHandler._refresh_coin_store,
 	'refresh_gift_store' : MessageHandler._refresh_gift_store,
+	'buy_refresh_diamond' : MessageHandler._buy_refresh_diamond,
+	'buy_refresh_coin' : MessageHandler._buy_refresh_coin,
+	'buy_refresh_gift' : MessageHandler._buy_refresh_gift,
 	'single_pump_diamond' : MessageHandler._single_pump_diamond,
 	'single_pump_coin' : MessageHandler._single_pump_coin,
 	'single_pump_gift' : MessageHandler._single_pump_gift,

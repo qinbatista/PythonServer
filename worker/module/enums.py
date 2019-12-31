@@ -266,6 +266,9 @@ class Timer(enum.IntEnum):
 	INTEGRAL = 30  # 代表本周的某一天刷新时间，这里用作和某一天判断是否为同一周
 	SUMMON_C = 31  # 记录金币抽奖次数刷新的开始日期，用于重置金币抽奖次数
 	SUMMON_D = 32  # 记录钻石抽奖次数刷新的开始日期，用于重置钻石抽奖次数，这里用于限制钻石免费抽和半价抽
+	SUMMON_C_REFRESH = 33  # 记录金币抽奖免费刷新的日期
+	SUMMON_D_REFRESH = 34  # 记录钻石抽奖免费刷新的日期
+	SUMMON_G_REFRESH = 35  # 记录爱心抽奖免费刷新的日期
 
 
 class Limits(enum.IntEnum):
