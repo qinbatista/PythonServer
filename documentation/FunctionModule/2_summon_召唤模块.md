@@ -1261,9 +1261,9 @@
 
 [失败]()
 
-- 98：The configuration file does not exist
+- 93：The configuration file does not exist
 
-* 99：cid error
+* 94：cid error
 
 
 
@@ -1326,7 +1326,7 @@
 
 [失败]()
 
-* 98：diamond insufficient
+* 99：insufficient materials
 
 
 
@@ -1389,9 +1389,9 @@
 
 [失败]()
 
-- 96：Insufficient number of lucky draw
+- 95：Insufficient number of lucky draw
 
-* 98：coin insufficient
+* 99：insufficient materials
 
 
 
@@ -1452,7 +1452,7 @@
 
 [失败]()
 
-* 98：friend gift insufficient
+* 99：insufficient materials
 
 
 
@@ -1632,8 +1632,8 @@
 
 [失败]()
 
-* 99：diamond insufficient
-* 98：Less than {GRID} grid
+* 99：insufficient materials
+* 96：Less than {GRID} grid
 
 
 
@@ -1706,4 +1706,4 @@
 
 [失败]()
 
-* 99：integral insufficient
+* 99：insufficient materials
