@@ -141,9 +141,10 @@ async def integral_convert(uid, **kwargs):
 		remain_v = await common.try_role(uid, rid, 0, **kwargs)
 		_, star = await role._get_role_info(uid, rid, 'star', **kwargs)
 		return common.mt(status, msg, {'limit': lim, 'rid': mid, 'star': star[0], 'remain_seg': remain_v, 'reward_seg': value})
-	iid, value = config['item']['mid'], abs(config['item']['qty'])
-	_, remain_v = await common.try_item(uid, enums.Item(iid), value, **kwargs)
-	return common.mt(2, 'You get the universal segments', {'limit': lim, 'iid': iid, 'remain_v': remain_v, 'reward_v': value})
+	else:  # 1000
+		iid, value = config['item']['mid'], abs(config['item']['qty'])
+		_, remain_v = await common.try_item(uid, enums.Item(iid), value, **kwargs)
+		return common.mt(2, 'You get the universal segments', {'limit': lim, 'iid': iid, 'remain_v': remain_v, 'reward_v': value})
 
 
 async def dozen_d(uid, **kwargs):
