@@ -327,17 +327,21 @@ async def abdicate(uid, target, **kwargs):
 	return common.mt(0, 'success', {gn: enums.FamilyRole.BASIC.value, target: enums.FamilyRole.OWNER.value})
 
 # TODO 内部方法
-async def gift_package(uid, **kwargs):
+async def welfare(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
 	data = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
 	members = [m[0] for m in data]
+	del data
+	data = {'remaining': [], 'reward': []}
 	for member in members:
 		for item in kwargs['config']['family']['store']['gift']:
 			_, iid, cost = (common.decode_items(item))[0]
-			await common.try_item(member, iid, cost, **kwargs)
+			_, qty = await common.try_item(member, iid, cost, **kwargs)
+			data['remaining'].append({'iid': iid.value, 'qty': qty})
+			data['reward'].append({'iid': iid.value, 'qty': cost})
 	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_PURCHASED_FAMILY_GIFT_PACKAGE>.', **kwargs)
-	return common.mt(0, 'success')
+	return common.mt(0, 'success', data)
 
 async def search(name, **kwargs):
 	can, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)

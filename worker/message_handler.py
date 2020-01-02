@@ -183,6 +183,9 @@ class MessageHandler:
 	async def _market_purchase_family(self, data: dict) -> str:
 		return await family.purchase(data['data']['unique_id'], data['data']['item'], **data)
 
+	async def _welfare_purchase_family(self, data: dict) -> str:
+		return await family.welfare(data['data']['unique_id'], **data)
+
 	async def _disband_family(self, data: dict) -> str:
 		return await family.disband(data['data']['unique_id'], **data)
 
@@ -197,9 +200,6 @@ class MessageHandler:
 
 	async def _get_config_family(self, data: dict) -> str:
 		return await family.config(**data)
-
-	async def _gift_package_family(self, data: dict) -> str:
-		return await family.gift_package(data['data']['unique_id'], **data)
 
 	async def _search_family(self, data: dict) -> str:
 		return await family.search(data['data']['family_name'], **data)
@@ -687,9 +687,9 @@ FUNCTION_LIST = {
 	'cancel_disband_family' : MessageHandler._cancel_disband_family,
 	'get_store_family' : MessageHandler._get_store_family,
 	'market_purchase_family' : MessageHandler._market_purchase_family,
+	'welfare_purchase_family': MessageHandler._welfare_purchase_family,
 	'check_in_family' : MessageHandler._check_in_family,
 	'abdicate_family' : MessageHandler._abdicate_family,
-	'gift_package_family' : MessageHandler._gift_package_family,
 	'search_family' : MessageHandler._search_family,
 	'get_random_family' : MessageHandler._get_random_family,
 
