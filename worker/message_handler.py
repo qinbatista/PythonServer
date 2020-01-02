@@ -634,6 +634,9 @@ class MessageHandler:
 	async def _exchange_prop(self, data: dict) -> str:
 		return await mall.exchange(data['data']['unique_id'], data['data']['game_id'], data['data']['exchange_id'], **data)
 
+	async def _get_config_notice(self, data: dict) -> str:
+		return common.mt(0, 'success', {'config': data['config']['notice']})
+
 
 ##########################################################################################################
 ##########################################################################################################
@@ -844,6 +847,7 @@ FUNCTION_LIST = {
 	'get_config_version': MessageHandler._get_config_version,
 	'get_config_family': MessageHandler._get_config_family,
 	'get_config_exchange': MessageHandler._get_config_exchange,
+	'get_config_notice': MessageHandler._get_config_notice,
 
 	###################### package ######################
 	'exchange_card': MessageHandler._exchange_card,

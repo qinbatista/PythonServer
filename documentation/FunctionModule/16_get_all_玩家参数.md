@@ -16,6 +16,7 @@
 * [`get_config_factory`](##get_config_factory)
 * [`get_config_family`](##get_config_family)
 * [`get_config_exchange`](##get_config_exchange)
+* [`get_config_notice`](##get_config_notice)
 
 ## get_config_version
 
@@ -3652,6 +3653,76 @@
 				"universal5_segment": 20,
 				"universal6_segment": 10
 			}
+		}
+	}
+}
+```
+
+## get_config_notice
+
+返回公告的配置信息，详细见config_notice.json
+
+##### 发送消息JSON格式
+
+```json
+{
+	"world": 0, 
+	"function": "get_config_notice",
+	"data": {
+		"token": "my toekn ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> 暂时未解释
+
+```
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"config": {
+			"mail_gift": [
+				{
+					"2018-09-11": {
+						"end_time": "2018-09-18",
+						"resource_list": [
+							{
+								"diamond": "300"
+							},
+							{
+								"iron": "300"
+							},
+							{
+								"coin": "600"
+							},
+							{
+								"basic_summon_scroll": "10"
+							}
+						],
+						"content_cn": "没什么想说的，就是心情好给大家送福利第一波",
+						"content_en": "send gift just for fun, part 1"
+					}
+				}
+			],
+			"notice": [
+				{
+					"2020-02-01": {
+						"picture_link": "http://notice.lukseun.com/image/ad.png"
+					}
+				}
+			],
+			"login_screen": [
+				{
+					"2020-02-01": {
+						"picture_link": "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1568185396481&di=21f1843896cdc1d887e6f24aa84e0bf6&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201610%2F10%2F20161010094526_c4dsL.png"
+					}
+				}
+			]
 		}
 	}
 }

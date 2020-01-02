@@ -37,7 +37,7 @@ ENEMY_LAYOUT = loc() + '/configuration/{}/client/level_enemy_layouts_config.json
 ENEMY_LAYOUT_TOWER = loc() + '/configuration/{}/client/level_enemy_layouts_config_tower.json'
 SERVER_CONFIG = loc() + '/configuration/{}/server/server_config.json'
 ENTRY_CONSUMABLES = loc() + '/configuration/{}/server/entry_consumables_config.json'
-ANNOUNCEMENT = loc() + '/configuration/{}/announcement_info.json'
+NOTICE = loc() + '/configuration/{}/notice.json'
 PLAYER_EXPERIENCE = loc() + '/configuration/{}/server/player_experience.json'
 ACHIEVEMENT= loc() + '/configuration/{}/server/achievement_config.json'
 TASK = loc() + '/configuration/{}/server/task.json'
@@ -68,7 +68,7 @@ class ConfigurationManager:
 		self._read_factory_config()
 		self._read_family_config()
 		self._read_mall_config()
-		self._read_announcement_info()
+		self._read_notice_info()
 		self._read_player_experience()
 		self._read_achievement_config()
 		self._read_task_config()
@@ -127,7 +127,7 @@ class ConfigurationManager:
 			'skill' : skill, 'hang_reward' : self._hang_reward_config, 'player' : player,
 			'entry_consumables' : self._entry_consumables_config, "world_boss" : world_boss,
 			"factory": self._factory_config, 'family': self._family_config,
-			"mall": self._mall_config, "announcement": self._announcement_info,
+			"mall": self._mall_config, "notice": self._notice_info,
 			'player_experience': self._player_experience, 'monster_config': self._monster_config,
 			'level_enemy_layouts': self._level_enemy_layouts_config,
 			'level_enemy_layouts_tower': self._level_enemy_layouts_config_tower,
@@ -146,8 +146,8 @@ class ConfigurationManager:
 	def _read_entry_consumables_config(self):
 		self._entry_consumables_config = json.load(open(ENTRY_CONSUMABLES.format(self._cv), encoding = 'utf-8'))
 
-	def _read_announcement_info(self):
-		self._announcement_info = json.load(open(ANNOUNCEMENT.format(self._cv), encoding = 'utf-8'))
+	def _read_notice_info(self):
+		self._notice_info = json.load(open(NOTICE.format(self._cv), encoding = 'utf-8'))
 
 	def _read_player_experience(self):
 		self._player_experience = json.load(open(PLAYER_EXPERIENCE.format(self._sv), encoding = 'utf-8'))
