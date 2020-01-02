@@ -571,46 +571,45 @@ Purchase an item from the family store.
 >
 > RMB购买的可以获取金币和钻石和工会贡献。
 >
-> 购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次`
+> 购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次
 
 ##### 发送消息JSON格式
 
-> Example purchasing item 3:5:10 which costs 3:2:200
->
-> 购买项目3:5:10花费3:2:200 
-
 ```json
 {
-	"world": 0,
+	"world": 0, 
 	"function": "welfare_purchase_family",
 	"data": {
-		"token": "my token",
-		"item" : "3:5:10"
+		"token": "my token ^_^"
 	}
 }
 ```
 
 ##### 接受消息JSON格式
 
-> The outer dictionary key is equal to enums.Group.ITEM.value
->
-> Before purchase, user has 3:5:100 and 3:2:1000
->
-> 外部字典键等于enums.Group.ITEM.value
-> 购买前，用户有3:5:100和3:2:1000
 
 ```json
 {
-	"status": 0,
-	"message": "success",
-	"data": {
-		"3" : [
-			{"iid" : 5, "value" : 110},
-			{"iid" : 2, "value" : 800}
-		]
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "remaining": [
+            {
+                "iid": 5,
+                "qty": 20
+            }
+        ],
+        "reward": [
+            {
+                "iid": 5,
+                "qty": 10
+            }
+        ]
+    }
 }
 ```
+
+[失败]()
 
 
 
@@ -1042,46 +1041,6 @@ Only Admins and above can cancel the disbanding of a family.
 
 
 
-## gift_package
-
-购买之后所有人都可以获得`钻石`和`公会金币`, 公会红包`一人一天之内买一次`
-
-##### 发送消息JSON格式
-
-```json
-{
-	"world": 0, 
-	"function": "gift_package",
-	"data": {
-		"token": "my token ^_^"
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-
-```json
-{
-	"status": 0,
-	"message": "created family",
-	"data": {
-		"name" : "family name",
-        "remaining":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
-        "reward":[
-           {"iid"  : 1,"value": 230},
-           {"iid"  : 36,"value": 230}
-				],
-	}
-}
-```
-
-[失败]()
-
-
 
 ## search_family
 
@@ -1094,7 +1053,7 @@ Only Admins and above can cancel the disbanding of a family.
 ```json
 {
 	"world": 0, 
-	"function": "gift_package",
+	"function": "search_family",
 	"data": {
 		"token": "my token ^_^",
     	"family_name":"大家族"
