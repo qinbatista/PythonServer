@@ -173,16 +173,16 @@ Redis用nonce作为关键字来查询。
 
 聊天系统遵循simple protocol规则。
 
-所有消息的前10位是命令集，结尾由`\r\n`
+所有消息的前10位是命令集，结尾由`\r\n`。
 
-If a valid nonce was supplied, the client can chat normally, otherwise close the connection.
+期望的交互服务器标示在代码集中。
 
-The chat server follows a simple protocol.
-All messages contain a left-zero-padded string of length 10 (called the command), followed by an optional payload, followed by `\r\n`.
-The expected payload changes depending upon the command.
-If the protocol is ever not followed by the client, immediately close the connection.
+如果protocol没有遵循如上规则，服务器会立即中断连接。
+
+Edge
 
 Edge servers use Nats as a **pub-sub** server, to distribute messages across edge nodes.
+
 Public chat messages are published to **chat.$WORLD.public** channel, where **$WORLD** is the world number.
 Family chat messages are published to **chat.$WORLD.family.$FN** channel, where **$WORLD** is the world number and **$FN** is the name of the family.
 
