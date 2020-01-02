@@ -125,6 +125,8 @@ gate整理好收到的消息后，在返回给客户端。
 
 如下每一项介绍都关联对应的微型服务器。
 
+
+
 ### Auth
 
 反馈登陆的合法性和验证结果。
@@ -151,11 +153,15 @@ nonces和交互服务器标识都在Redis中存储。
 
 一旦nonces和交互服务器标识被检索，他们会立即从Redis中移除。
 
+
+
 ### Config
 
 一个简单的http服务器，用于返回服务器所使用的配置文件信息。
 
 他会周期性的从本地文件中读取配置文件，以用于确保使用最新的版本。
+
+
 
 ### Edge
 
@@ -179,123 +185,177 @@ Redis用nonce作为关键字来查询。
 
 如果protocol没有遵循如上规则，服务器会立即中断连接。
 
-Edge
+Edge服务器利用Nats作为**公用**服务器来分发到每一个聊天服务器节点。
 
-Edge servers use Nats as a **pub-sub** server, to distribute messages across edge nodes.
+公共消息会发送到当前这个消息的世界所属频道：**chat.$WORLD.public** 
 
-Public chat messages are published to **chat.$WORLD.public** channel, where **$WORLD** is the world number.
-Family chat messages are published to **chat.$WORLD.family.$FN** channel, where **$WORLD** is the world number and **$FN** is the name of the family.
+家族消息会发送到当前这个消息的家族所属频道**chat.$WORLD.family.$FN**频道，**FN**指代家族的名字。
 
-Consequently, any one subscribing to the **chat.>** channel will be able to receive every message sent in the chat system.
-This behavior makes it very convenient to log all chat messages.
+因此，任何人连接了聊天平台以后，都可以从聊天同样接受消息。
 
-Edge servers subscribe to the proper pub-sub channels depending upon the clients which are connected to it.
-Once an edge server receives a message on a subscribed channel, it forwards that message to all connected clients which are interested in that channel.
+这样的话就可以非常方便的加入所有聊天消息。
+
+Edge服务器会让每一个客户端连接上对应的服务器。
+
+一旦edge服务器接收到对应聊天频道的消息，他会把消息广播到所有连接上聊天服务器的频道。
+
+
 
 ### Gate
 
-The client facing entrance point into the game servers.
-Accepts a single message from the client, pushes that message onto the message queue, and waits for the response.
+gate服务器是用来接收客户端的消息，并由指定的服务器来处理。
 
-When the gate first starts, it creates a network unique gate id.
-No two gates can have the same id.
-It then uses Redis to associate its gate id with its IP address.
-It uses the Redis key **gates.id.$GID** where **$GID** is the unique gate id.
-The gate will periodically send messages to Redis, signalling that this gate id is still operating well.
+一旦接受到客户端发送过来的消息，消息会推送到message queue，然后等待消息返回。
 
-The gate is actually running two TCP servers at the same time.
-The first server is the client server, which operates on port 8880 by default.
-The client server implements the following logic.
+当gate服务器开始运作的时候，他会创建一个用于gate交互的id。
 
-When the gate receives a message from the client, it generates a unique id used to keep track of the message.
-The gate maintains a dictionary who's keys are message ids, and the values are client sockets.
-The gate also uses Redis to associate the message id with the gate id of the gate.
-The client message is then packaged together with the message id, and pushed to the Nats message queue.
-At this point, the gate waits for the response.
+不会存在两个gate拥有一个id。
 
-After the response has been forwarded to the client, the gate performs some cleanup.
-The gate removes the message id and client socket from its dictionary.
-The Redis entry created with the message id and the gate id is automatically deleted after 10 seconds.
+gate服务器会从redis中获得缓存来获得ip地址和gate id。
 
-The second server is the "worker" server, which operates on port 8201 by default.
-This server is used by workers to send responses back to the gate.
+gate服务器利用的Redis关键字为 **gates.id.$GID**,其中 **$GID** 是唯一识别码id。
 
-Its job is quite simple: wait for message responses to arrive from the workers.
-When a response arrives from a worker, it has both the message id, and the actual response.
-The message id is read, and used to lookup which client socket to forward the response to.
-The response is then forwarded to the client socket directly.
-The client socket is then closed.
+gate服务器会周期性的发送消息到Redis，以表示这个gate id正在开放中。
+
+gate服务器实际上同时会运行两个tcp连接。
+
+第一个服务器是客户端服务器，其默认端口为8880。
+
+客户端服务器工具会遵循如下逻辑。
+
+当gate服务器接收到一个客户端的消息，他会生成一个unique id来跟踪整个消息流程。
+
+gate服务器会保持一个字典用于保存消息id和客户端套接字的值。
+
+gate服务器也会用Redis来关联消息id和gate的gate标示id。
+
+客户端会把消息打包并附上消息id，然后推送到Nats消息队列。
+
+在这之后，gate会一直等到消息返回。
+
+当gate服务器收到消息回复会立即把消息推送给客户端，然后清理缓存。
+
+gate服务器会在redis中删除带有消息id和客户端套接字的字典。
+
+Redis进入之后会自动创建一个message和gate id并在10秒后自动删除。
+
+gate服务器连接的第二个服务器是worker服务器，默认端口为8201。
+
+worker服务器会把消息处理完毕之后返回给gate。
+
+这个工作非常简单，等待发送给worker服务器的消息返回。
+
+当一个woker返回给gate 的消息，必定包含message id和实际的返回内容。
+
+这个消息会被识别然后发送到对于的客户端套接字。
+
+这个消息会直接发送给客户端。
+
+然后关闭这个套接字。
+
+
 
 ### Mail
 
-Responsible for creating and retrieving all in-game mail.
-The mail system is at the core of many systems in the game.
-It allows players to send friend and family requests, as well as send gifts.
+负责创建和检索所有的邮件。
 
-The mail server exposes a simple yet capable API via HTTP POST requests.
+邮箱系统是游戏的一个核心功能。
 
-Mail is saved on disk using the standard **Maildir** format.
-Each piece of mail is a single file.
-Each world has a mail folder.
-Within each world folder, there are folders for each unique id.
-Within each unique id folder, are three automatically created folders (cur, new, tmp).
-These folders are part of the Maildir specification.
-The individual pieces of mail are contained within those three folders.
+目前主要用作于家族，朋友和礼物。
 
-When a piece of mail is created, it is assigned a unique key which is generated by the mail server.
+邮箱系统的功能只外放一个简单的http post请求。
 
-The Maildir format requires that the on-disk message representation contain only ascii characters.
-To circumvent this limitation, all values that have the potential to contain non-ascii characters are encoded before being stored on disk.
-These values are always de-encoded before being sent back to the client.
+邮箱会存储到本地，遵循标准**Maildir**格式。
 
-In testing environments, it is okay to store mail in a folder locally.
-However, in production, the mail server should store mail in something like a NAS.
-In this way, if the machine running the mail server encounters an error, no mail is lost.
+每一个邮件实际上就是一个独立的文件。
+
+每一个世界都有一个单独的文件夹。
+
+在每一个世界文件夹中，每一个文件夹也包含一个unique_id。
+
+在每一个unique文件夹中，也会自动创建如下文件夹(cur, new, tmp)。
+
+这些特别命名的文件夹就是邮箱的关键字。
+
+每一个独立的邮箱都有这三个文件。
+
+当一个邮件创立之后，邮箱服务器会分配一个unique id给每一个邮箱。
+
+Maildir格式会让所有存储在邮箱的邮件都以ASCII的格式存储在磁盘中。
+
+为了规避这个问题，我们要保证所有非ASCII码必须先转换为ASCII码在存储到磁盘中。
+
+所有的值同样也会把所有ASCII码编码之后在发送。
+
+在目前的环境中测试，游戏存储一切正常。
+
+然而在实际操作中，邮箱应该存储在专门存放磁盘的地方，比如说NAS。
+
+这样的话，一旦服务器出现问题，不会有任何邮件丢失。
+
+
 
 ### Worker
 
-Responsible for performing the work requested by the client and returning the result back to the correct gate.
-The worker is comprised of a few distinct parts, and each one will be described in detail.
+用于处理客户端的逻辑并且返回对应的结果给gate服务器。
+
+worker由不同模块组成，每一个模块都有自己相应的说明文档。
 
 #### worker.py
 
-The entrypoint to the worker service.
-Provides a framework to accept messages from Nats, work on them, and return them back.
-Initializes all cofigurations, and establishes all network connections needed to complete work.
-MySQL connection pools are established at this level, as well as a Redis and Nats connection.
-An HTTP Client Connection Pool is also created, which is used to communicate with the other services operating via HTTP.
+这个文件是woker服务器的切入点。
 
-Connects to the Nats Message Queue and awaits jobs to come on the queue.
-When a job comes, it contains the message id as well as the message sent from the client.
-The worker separates the message id from the message, and submits the message to the message\_handler for processing.
-Once as result has been obtained, the message id is used to query Redis for the gate id of the gate containing the client.
-If a TCP connection to that gate's worker server has not already been established, a new connection will be made.
-Sends the message id along with the response back to the correct gate.
+这是一整个处理NATs发送过来的消息框架，处理数据，返回数据等。
+
+Mysql连接池会在这一层创建，与此同时，Redis和Nats也会在这一层创建。
+
+Http的连接池也会在这时创建，以用于和其他服务器进行http交互。
+
+worker会连接Nats服务器等待Nats服务器发送过来的消息。
+
+当一个消息发到worker，消息也包含来自客户端的消息id。
+
+woker会把消息id分离出来，然后提交消息到message_handler中处理。
+
+一旦结果被获得之后，message id会用做在redis中查询gate id的关键字。
+
+如果worker和gate的连接并未创立成功，一个新的连接就会被重新创立。
+
+一旦消息处理完毕，就会把结果返回到正确的gate上。
 
 
 
 #### message\_handler.py
 
-Responsible for parsing the job.
-Validates the supplied token (if required), and calls the correct function.
-If the token can not be verified, returns and error to the client.
-If the function passed by the client is not valid, returns an error.
-All other un-caught exceptions get returned to the client as "programming error".
+专门用于解析预处理数据。
 
-After verifiying the token, and finding the correct function in the Function List (a dictionary), it calls the function.
-The logic for the function is found in the individual modules located in the `module` directory.
+通过验证token（如果需要）是否合法来决定使用对于的功能。
+
+如果token不能被验证，则返回失败结果给客户端。
+
+所有无法被正常捕捉的错误都会返回**"programming error"**.
+
+token验证通过之后，会找到对应的功能，在Function list中，功能列表是一个字典形式。
+
+每一个功能的具体逻辑都在各自的模块中，模块的位置在`module`文件中。
 
 #### module
 
-A directory containing code responsible for handling game-related logic.
-Also refers to the individual source code files found in this folder.
+这个文件夹包含所有代码模块的具体功能。
 
-Each source code file in this directory contains functions which are closely related.
-Functions pertaining to family things should be written in the family module.
-The family module should then *not* contain logic related to the weapon system.
+而且每一功能都自己独立的文件夹。
 
-Each module is written using the **functional programming** style.
-The modules do not contain classes, rather individual functions designed to complete a single task only.
+只有相关的文件才会放到同一个功能相同的文件夹中。
+
+比如和家族相关的文件才会被写入到家族模块当中。
+
+就如武器系统相关的文件就不能写入到家族模块中。
+
+每一模块都用**函数式编程**思想去编写。
+
+每一模块都不包含任何class类，直接用独立的方法去完成每一个功能。
+
+这些所有的功能都会写进一个小型的
 
 These functions should be broken up into smaller, logically coherent helper functions.
 This helps improve readability.
