@@ -81,6 +81,22 @@ class MailTemplate(enum.Enum):
 	GIFT_2 = enum.auto()
 
 
+class FamilyHistoryKeys(enum.Enum):
+	ICON           = 'fm_5'
+	ROLE           = 'fm_6'
+	LEAVE          = 'fm_0'
+	REMOVE         = 'fm_1'
+	INVITE         = 'fm_2'
+	RESPOND        = 'fm_3'
+	DISBAND        = 'fm_8'
+	PURCHASE       = 'fm_4'
+	ABDICATE       = 'fm_10'
+	CHANGE_NAME    = 'fm_7'
+	CANCEL_DISBAND = 'fm_9'
+
+
+
+
 class Tier(enum.IntEnum):
 	BASIC = 0
 	FRIEND = 1
@@ -348,3 +364,8 @@ class Factory(enum.IntEnum):
 
 class LeaderBoard(enum.IntEnum):
 	WORLD_BOSS = 1
+
+
+
+
+
