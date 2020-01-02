@@ -30,7 +30,7 @@ class WorkerResources:
 		self.resources = {}
 
 	async def init(self):
-		self.resources['session']   = aiohttp.ClientSession()
+		self.resources['session']   = aiohttp.ClientSession(connector = aiohttp.TCPConnector(limit = 0))
 		self.resources['redis']     = await aioredis.create_redis(f'redis://{self.redis_addr}')
 		self.resources['db']        = await aiomysql.create_pool(maxsize = 10, host = self.db_addr, \
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True)
