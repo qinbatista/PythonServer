@@ -46,6 +46,12 @@
 
 * [`refresh_gift_store`](##refresh_gift_store)
 
+* [`buy_refresh_diamond`](##buy_refresh_diamond)
+
+* [`buy_refresh_coin`](##buy_refresh_coin)
+
+* [`buy_refresh_gift`](##buy_refresh_gift)
+
 * [`single_pump_diamond`](##single_pump_diamond)
 
 * [`single_pump_coin`](##single_pump_coin)
