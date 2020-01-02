@@ -11,7 +11,6 @@ import jwt
 import asyncio
 import aioredis
 import argparse
-import concurrent.futures
 
 from aiohttp import web
 from datetime import datetime, timedelta
@@ -25,7 +24,6 @@ class Auth:
 		self.redis    = None
 		self.secret   = secret
 		self.validity = validity
-		self.executor = concurrent.futures.ProcessPoolExecutor(1)
 
 	async def init(self, aiohttp_app, redis_addr):
 		self.redis = await aioredis.create_redis(f'redis://{redis_addr}', encoding = 'utf-8')
@@ -37,8 +35,7 @@ class Auth:
 
 	async def issue_token(self, request):
 		post  = await request.post()
-		token = await asyncio.wrap_future(self.executor.submit(Auth.generate_token, post['uid'], \
-				self.secret, self.validity))
+		token = Auth.generate_token(post['uid'], self.secret, self.validity)
 		if post['prev_token'] != '':
 			await self.redis.set(f'auth.tokens.invalidated.{post["prev_token"]}', '',expire = self.validity)
 		return web.json_response({'token' : token})
@@ -46,8 +43,7 @@ class Auth:
 	async def validate_token(self, request):
 		post = await request.post()
 		try:
-			uid = await asyncio.wrap_future(self.executor.submit(Auth.decode_token, post['token'], \
-					self.secret))
+			uid = Auth.decode_token(post['token'], self.secret)
 			if await self.redis.exists(f'auth.tokens.invalidated.{post["token"]}') == 0:
 				return web.json_response({'status' : 0, 'data' : {'uid' : uid}})
 		except (jwt.DecodeError, jwt.ExpiredSignatureError):
