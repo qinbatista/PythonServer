@@ -6,6 +6,8 @@ binding email addresses.
 '''
 
 import re
+import os
+import time
 import string
 import random
 import asyncio
@@ -23,19 +25,43 @@ P = 1
 PW_RE = re.compile(r'\A[\w!@#$%^&*()_+|`~=\-\\\[\]:;\'\"{}/?,.<>]{6,30}\Z')
 AC_RE = re.compile(r'^[A-Za-z]\w{5,24}$')
 EM_RE = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
+UID = "lukseun%sM%sP%s"
 
 
-async def login_unique(uid, **kwargs):
-	exists, bound = await asyncio.gather(common.exists('info', ('unique_id', uid), \
-			account = True, **kwargs), _account_bound(uid, **kwargs))
-	if not exists:
+async def register(uid, account, password, **kwargs):
+	"""携带uid、账号密码进行注册"""
+	if uid == '': uid = await yield_uid(**kwargs)
+	if not _valid_account(account): return common.mt(99, 'invalid account name')
+	if not _valid_password(password): return common.mt(98, 'invalid password')
+	exists, bound = await asyncio.gather(common.exists('info', ('unique_id', uid), account=True, **kwargs), _account_bound(uid, **kwargs))
+	if not exists:  # 不存在的情况下创建新用户
 		await _create_new_user(uid, **kwargs)
 		status, message, prev_token = 1, 'new account created', ''
-	elif bound:
-		return common.mt(2, 'account already bound')
-	else:
+	elif bound:  # account账号已经绑定
+		return common.mt(97, 'Your account has been registered, please log in directly')
+	else:  # 存在uid的情况之下获取token
 		status, message, prev_token = 0, 'success', await _get_prev_token('unique_id', uid, **kwargs)
-	token = await _request_new_token(uid, prev_token, **kwargs)
+	token = await _request_new_token(uid, prev_token, **kwargs)  # 生成一个新的token或使用原来的token加长有效时限
+	await _record_token(uid, token['token'], **kwargs)
+	salt = str(secrets.randbits(256))
+	if len(salt) % 2 != 0:
+		salt = '0' + salt
+	hashed_pw = hashlib.scrypt(password.encode(), salt=salt.encode(), n=N, r=R, p=P).hex()
+	await _set_credentials(uid, account, hashed_pw, salt, **kwargs)
+	token['account'] = account
+	return common.mt(status, message, token)
+
+async def login_unique(uid, **kwargs):
+	if uid == '': return common.mt(99, 'unique id is empty')
+	exists, bound = await asyncio.gather(common.exists('info', ('unique_id', uid), account=True, **kwargs), _account_bound(uid, **kwargs))
+	if not exists:  # 不存在的情况下创建新用户
+		await _create_new_user(uid, **kwargs)
+		status, message, prev_token = 1, 'new account created', ''
+	elif bound:  # uid账号已经绑定，要求使用账号密码登录
+		return common.mt(2, 'account already bound')
+	else:  # 存在uid的情况之下获取token
+		status, message, prev_token = 0, 'success', await _get_prev_token('unique_id', uid, **kwargs)
+	token = await _request_new_token(uid, prev_token, **kwargs)  # 生成一个新的token
 	await _record_token(uid, token['token'], **kwargs)
 	return common.mt(status, message, token)
 
@@ -166,9 +192,17 @@ async def verify_phone_code(uid, code, status=0, **kwargs):
 
 #######################################################################
 
+
+async def yield_uid(**kwargs):
+	num, now = 10, time.time()
+	uid = UID % (int(now), int(now % 1 * 1e6), os.getpid())
+	while await common.exists('info', ('unique_id', uid), account=True, **kwargs) and num > 0:
+		num, now= num - 1, time.time()
+		uid = UID % (int(now), int(now % 1 * 1e6), os.getpid())
+	return uid
+
 async def _account_bound(uid, **kwargs):
-	data = await common.execute(f'SELECT account FROM info WHERE unique_id = "{uid}";', \
-			account = True, **kwargs)
+	data = await common.execute(f'SELECT account FROM info WHERE unique_id = "{uid}";', account=True, **kwargs)
 	return not (data == () or (None,) in data or ('',) in data)
 
 async def _create_new_user(uid, **kwargs):
