@@ -1,5 +1,6 @@
 ## 方法列表
 
+* [`register`](##register)
 * [`login_unique`](##login_unique)
 * [`login`](##login)
 * [`account_all_info`](##account_all_info)
@@ -14,6 +15,57 @@
 - [`create_player`](##create_player)
 
 - [`enter_world`](##enter_world)
+
+
+
+
+
+## register
+
+用户直接注册，并不使用uid登录的情况下使用
+
+> unique_id：玩家的唯一id，目前使用unity获取唯一标识符的方法获取唯一标识符
+>
+> account：绑定用户的账号
+>
+> password：用户的密码
+
+```json
+{
+	"world": 0,
+	"function": "register",
+	"data": {
+		"unique_id": "my unique_id",
+        "account": "my account",
+        "password": "password"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[获取资源成功]()
+
+* 0: 存在uid的情况之下返回状态0并绑定账号密码
+* 1: 新账号创建成功，也返回了token和account
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"token": "my token",
+        "account": "my account"
+	}
+}
+```
+
+[调整关卡失败]()
+
+* 2: 账号已经被绑定，请用账户登陆
+* 99：invalid account name
+* 98：invalid password
+* 97：Your account has been registered, please log in directly
 
 
 
@@ -55,6 +107,7 @@
 [调整关卡失败]()
 
 * 2: 账号已经被绑定，请用账户登陆
+* 99：unique id is empty
 
 
 

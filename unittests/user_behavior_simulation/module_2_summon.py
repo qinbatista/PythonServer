@@ -204,10 +204,11 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'supplement_check_in', 'data': {'token': token, 'item': 5}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_account_world_info', 'data': {'token': token, 'item': 5}})
 	# response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, 'item': 1}})
-	pass
-	world = "s1"
-	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1Nzg3MjgxMzEsInVpZCI6ImgwMDAifQ.C_CRmyMSK8a1MxW74UfwzmfraVJ74XYt2wqYkn0xgo4"
-	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token}})
+	# pass
+	# world = "s1"
+	# token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1Nzg3MjgxMzEsInVpZCI6ImgwMDAifQ.C_CRmyMSK8a1MxW74UfwzmfraVJ74XYt2wqYkn0xgo4"
+	user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id' : '', 'account': 'account00', 'password': '0password'}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_notice', 'data': {'token' : token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'buy_refresh_diamond', 'data': {'token' : token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'buy_refresh_coin', 'data': {'token' : token}})

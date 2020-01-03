@@ -77,6 +77,9 @@ class MessageHandler:
 
 
 	###################### account.py ######################
+	async def _register(self, data: dict) -> str:
+		return await account.register(data['data']['unique_id'], data['data']['account'], data['data']['password'], **data)
+
 	async def _login_unique(self, data: dict) -> str:
 		return await account.login_unique(data['data']['unique_id'], **data)
 
@@ -641,10 +644,11 @@ class MessageHandler:
 ##########################################################################################################
 ##########################################################################################################
 
-DOES_NOT_NEED_TOKEN = {'login_unique', 'login'}
+DOES_NOT_NEED_TOKEN = {'register', 'login_unique', 'login'}
 
 FUNCTION_LIST = {
 	###################### account.py ######################
+	'register' : MessageHandler._register,
 	'login_unique' : MessageHandler._login_unique,
 	'login' : MessageHandler._login,
 	'account_all_info' : MessageHandler._account_all_info,
