@@ -504,11 +504,19 @@ async def get_top_damage(uid, page, **kwargs):
 	"""
 	damage = 0  # 玩家造成的伤害
 	ranking = -1  # 玩家在世界boss表中的排行
-	uid_data = await common.execute(uid_str, **kwargs)
-	if uid_data != ():
-		damage = uid_data[0][0]
-		if uid_data[0][1] is None: uid_data = await common.execute(uid_str, **kwargs)
-		ranking = int(uid_data[0][1])
+	cached_uid_data = await kwargs['redis'].hgetall(f'leaderboard.player.{kwargs["world"]}.{uid}')
+	if len(cached_uid_data) == 0:
+		uid_data = await common.execute(uid_str, **kwargs)
+		if uid_data != ():
+			damage = uid_data[0][0]
+			if uid_data[0][1] is None: uid_data = await common.execute(uid_str, **kwargs)
+			ranking = int(uid_data[0][1])
+		await kwargs['redis'].hmset_dict(f'leaderboard.player.{kwargs["world"]}.{uid}', \
+				{'damage' : uid_data[0][0], 'rank' : int(uid_data[0][1])})
+		await kwargs['redis'].expire(f'leaderboard.player.{kwargs["world"]}.{uid}', 30)
+	else:
+		damage, ranking = cached_uid_data['damage'], int(cached_uid_data['rank'])
+
 	data = await common.execute( f'SELECT p.gn, l.value, p.fid, p.uid FROM player p, leaderboard l WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS} ORDER BY l.value DESC LIMIT {(page - 1)*10},10;', **kwargs)
 	if data == (): return common.mt(98, 'No data for this page')
 	rank = []
