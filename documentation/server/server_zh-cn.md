@@ -355,79 +355,114 @@ token验证通过之后，会找到对应的功能，在Function list中，功�
 
 每一模块都不包含任何class类，直接用独立的方法去完成每一个功能。
 
-这些所有的功能都会写进一个小型的
+这些所有的功能都会被分散的写到每一个小功能里面，但是逻辑上是连贯的，这样可以提高阅读性。
 
-These functions should be broken up into smaller, logically coherent helper functions.
-This helps improve readability.
+还有一个比较重要的事情就是`**kwargs` 参数的扩展用法。
 
-Something to note is the extensive use of the `**kwargs` argument.
-This argument contains many helpful tools the function might like to use.
-These tools could be a database connection, redis connection, or an http client.
-Additionally, configuration files can be found in the `**kwargs` argument.
-These can be accessed via `kwargs['config'][ ... ]`.
-You can reference the message\_handler's `resolve` function, which populates this `**kwargs` parameter, to find all the goodies it contains.
-Ultimately, the kwargs parameter allows the programmer to have the convenience of always having access to commonly shared resources.
-And eliminates the clutter of re-declaring network connections and config files everywhere.
+这个方法包含许多有用的功能。
 
-Some unique modules declared are `common.py` and `enums.py`.
-`common.py` contains commonly used functions.
-Examples of these functions are database execution functions, and resolving uids to game names.
-Do not put non-generic functions in this module.
+其中包含数据库连接，redis的连接和http请求。
 
-`enums.py` defines a set of enums used by the entire server system.
-These enums are also the same ones used by the client app.
-The MySQL database makes extensive use of these enum values as composite keys.
-This is because hashing and comparing int values is significantly faster than string values.
-Use this module to define symbolic representations of items, roles, skills in the game.
+另外服务器的配置文件也可以在这里面被找到。
+
+其用法为 `kwargs['config'][ ... ]`.
+
+参考 message\_handler中 `resolve`方法，里面包含了对`**kwargs`的所有解析方式。
+
+于是，kwarges参数可以让程序非常方便的共享共同的资源或配置文件，比如服务器的连接信息或者配置文件的位置等等。
+
+有些独立声明的文件为`common.py` 和 `enums.py`.
+
+`common.py`包含通用的功能。	
+
+这些方法的一个例子就是数据库的执行方法和处理游戏名字，处理uid等方法。
+
+不要把非通用方法放到这些模块中。
+
+`enums.py`定义了整个系统的枚举方法。
+
+这些枚举方法和客户端的枚举方法一摸一样。
+
+MySQL数据库用这些枚举值当作复合关键字。
+
+主要原因是整型的速度要不字符串处理快得多。
+
+所以枚举采用不同的整型值来代表整个游戏中的物品，角色，技能。
+
 
 ## Docker
 
-Our micro-service architecture demands an easy way to distribute and deploy our many servers.
-With multiple servers, each with their own set of required third-party libraries, things can get out of hand quickly.
-Fortunately, Docker provides us with an easy solution to all of that: Docker images.
+我们的微型服务器需要一个非常容易的方法来分发和部署服务器。
 
-You can think of a Docker image like a very simple Virtual Machine.
-It provides an isolated environment for you to run your code in.
-It contains all of the required third-party libraries needed to run your server, in addition to your code.
-This image can then be run from any machine that can run Docker.
+每一服务器都有一个他自己的第三方库，这样他们可以更具有可控性。
 
-To create a Docker image, you need a Dockerfile.
-A Dockerfile is like a recipe for the steps needed to create your perfect isolated environment.
-You write instructions in the Dockerfile for how you would like to setup your "little virtual machine".
-Extensive documentation can be found online for how to create a Dockerfile.
+幸运的是，docker给我们提供了最方便的解决方案，Docker Images。
 
-Once you have your Dockerfile created, you need to actually build the Docker image.
-On linux, you can do that via the `docker build` command.
-However, simplying building the docker image is not that helpful to us.
-We want to both build the image, and publish it in a place that is easily accessible (you will see why later).
+你可以把docker看作一个虚拟机。
 
-We will be using Aliyun's Container Registry service as a location to host our Docker images.
-You can find information about this on Aliyun's website.
-When building the images, you will need to tag them appropriately to be pushed to Aliyun's Registry.
-For example, if I was building the Docker image for the gate service, I would issue a command like this:
+他提供一个独立的环境专门用于执行你的代码。
+
+他们提供所有的第三方库来运行你的服务器，甚至运行你的代码，这个镜像可以在任何有docker的镜像中运行你的代码。
+
+为了创建一个docker镜像，你需要一个Dockerfile文件。
+
+Dockerfile就是一个配置你自己完美运行环境的清单。
+
+你在你的dockerfiles中写入指令来配置你的‘小虚拟机’。
+
+扩展文档可以在在线查看如何生成一个Dockerfile。
+
+一旦你的dockerfile创建以后，你需要实实在在的创建你的docker镜像。
+
+在linux上，你可以通过docker build命令行来创建docker。
+
+然而，只是创建docker镜像，并不能帮助我们。
+
+你需要创建镜像和发布镜像，让镜像可以很容易的被访问（稍后展示）。
+
+我们用阿里云的镜像服务器来存储我们的docker镜像。
+
+更多详细内容在阿里云官网均可查看。
+
+当你创建这些镜像的时候，你需要适当的标记他们，然后把他们提交到阿里云服务器。
+
+例如，如果我在创建一个gate服务器的docker镜像的话，我会提议用这条命令：
+
 `docker build -t registry.cn-hangzhou.aliyuncs.com/lukseun/gate:latest .`
-to build the image.
-Afterwards, I could issue:
-`docker push registry.cn-hangzhou.aliyuncs.com/lukseun/gate:latest`
-to push the built image to Aliyun's Registry.
 
-Once the Docker images for our services have been built and pushed onto Aliyun's Registry, we need a method of deploying them.
+来创建镜像。
+
+成功之后，我会提议用：
+
+`docker push registry.cn-hangzhou.aliyuncs.com/lukseun/gate:latest`
+
+把docker推送到阿里云docker仓库服务器。
+
+一旦我们的服务器打包并发布到远程，我们最后只需要部署他们即可。
+
+
 
 ## Kubernetes
 
-Kubernetes, also know as K8S, is a service that will deploy and manage our micro-services.
-It does this using the Docker images we have created and pushing to Aliyun.
+Kubernetes也被称为K8S，用来专门部署我们的微型服务器。
 
-There is extensive documentation online regarding the use and administration of kubernetes.
-As such, this section will be left rather short, in favor of other documentation.
-However, an excellent interactive tutorial can be found here: [Tutorial](https://kubernetes.io/docs/tutorials/kubernetes-basics/)
+他会使用我们传在阿里云后台的docker镜像。
 
-In general, we will want to create a Kubernetes Deployment for each micro-service.
-For each of these deployments, we will want to create an internally load-balanced Kubernetes Service.
-Each of our micro-services should reference the Kubernetes Service address if they need to communicate with another service.
+更多扩展文档可以查看kubernetes官方网页。
 
-Additionally, we will want to create externally load-balanced Kubernetes Services for the `edge` and `gate` deployments, as these are the only client facing servers.
+比如，如果设置弹性伸缩和其他文档。
 
-We should assign public domain names (such as `edge.aliya.lukseun.com`) to each client facing load-balanced service.
-The client app should use these domain names when connecting to our server.
+当然，更完美互动文档可以在这里查看。[Tutorial](https://kubernetes.io/docs/tutorials/kubernetes-basics/)
+
+通常来说，我们希望用Kubernetes来部署我们每一个微型服务器。
+
+对每一个模块的部署，我们希望创建一个内部可弹性伸缩的服务器。
+
+我们所有需要交互的微型服务器都必须提供Kubernetes服务器地址。
+
+额外的，我们也会为`edge`和`gate`创建一个外部的负载均衡服务器，这是唯一和外部需要交互的服务器。
+
+我们需要分配一个域名给负载均衡服务器（比如 `edge.aliya.lukseun.com`）。
+
+客户端会用这个域名连上我们的服务器。
 
