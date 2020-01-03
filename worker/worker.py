@@ -76,8 +76,9 @@ class Worker:
 			print(f'worker: message handler with args {work} had an error..')
 			print(e)
 			resp = '{"status" : -1, "message" : "programming error, this should not happen"}'
-		if self.args.debug: print(f'worker: returning {jid} to gate..')
+		if self.args.debug: print(f'worker: returning {jid} to gate..', end = '')
 		await self.return_response(jid, resp)
+		if self.args.debug: print('done')
 		self.ujobs -= 1
 	
 	async def return_response(self, jid, resp):
@@ -86,10 +87,10 @@ class Worker:
 		await self.gates[gid][1].drain()
 
 	async def get_gate(self, jid):
-		gid = (await self.resource['redis'].get(jid)).decode()
+		gid = await self.resource['redis'].get(jid)
 		if gid not in self.gates or self.gates[gid][1].is_closing() or self.gates[gid][0].at_eof():
 			if self.args.debug: print(f'worker: adding new gate connection to gate {gid}')
-			ip, port = (await self.resource['redis'].get(f'gates.id.{gid}')).decode().split(':')
+			ip, port = (await self.resource['redis'].get(f'gates.id.{gid}')).split(':')
 			self.gates[gid] = await asyncio.open_connection(ip, int(port))
 		return gid
 
