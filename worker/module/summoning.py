@@ -20,7 +20,7 @@ SWITCH = {}
 # 99 - insufficient materials
 # 98 - error item
 # 97 - error item, item type
-# 96 - Less than 12 grid
+# 96 - ???
 # 95 - Insufficient number of lucky draw
 # 94 - cid error
 # 93 - The configuration file does not exist
@@ -148,22 +148,24 @@ async def integral_convert(uid, **kwargs):
 
 
 async def dozen_d(uid, **kwargs):
-	"""钻石12抽"""
+	"""钻石12抽，不足12次没有双倍积分，但可以连抽"""
 	cid = enums.Item.DIAMOND
-	if await _get_isb_count(uid, cid, isb=0, **kwargs) < GRID: return common.mt(96, f'Less than {GRID} grid')
+	grid = await _get_isb_count(uid, cid, isb=0, **kwargs)
+	grid = grid if grid != 0 else (await _refresh(uid, cid, **kwargs), GRID)[1]
 	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
 	# TODO 消耗物品
-	consume_id, consume = enums.Item.SUMMON_SCROLL_D, GRID
+	consume_id, consume = enums.Item.SUMMON_SCROLL_D, grid
 	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 	if not can:
 		consume_id = cid
-		consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty']) * GRID
+		consume = abs(kwargs['config']['summon']['resource'][cid.name]['qty']) * grid
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 		if not can: return common.mt(99, 'insufficient materials')
 	# TODO 奖励物品
+	multiple = grid * (1 if grid < GRID else 2)  # 计算抽奖获得的积分倍数
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': [d[0] for d in isb_data]}
 	article = [d[1] for d in isb_data]  # 获取所有的物品
-	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * GRID * 2}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
+	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
 	items = f"{','.join(article)},{','.join(extra)}"
 	results = await _summon_reward(uid, items, **kwargs)
 	for gid, iid, remain_v, value in results:
