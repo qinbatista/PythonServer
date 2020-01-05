@@ -86,7 +86,7 @@ async def e_general_stage(uid, stage, **kwargs):
 
 	stage = str(stage)
 	iid_s = [k for k in entry_consume[stage].keys() if k != 'cost']
-	values = [-1 * int(v) for k, v in list(entry_consume[stage].items()) if k != 'cost']
+	values = [-int(v) for k, v in list(entry_consume[stage].items()) if k != 'cost']
 	energy_consume = entry_consume[stage]['cost']  # 消耗能量数
 
 	for i, iid in enumerate(iid_s):
