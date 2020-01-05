@@ -178,11 +178,20 @@ async def dozen_d(uid, **kwargs):
 
 
 async def dozen_c(uid, **kwargs):
-	"""金币12抽，不足12次依然可以连抽"""
+	"""金币12抽，不足12次依然可以连抽，但受到次数限制"""
 	cid = enums.Item.COIN
 	grid = await _get_isb_count(uid, cid, isb=0, **kwargs)
 	grid = grid if grid != 0 else (await _refresh(uid, cid, **kwargs), GRID)[1]
 	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
+	# TODO 次数检查和限制
+	now = datetime.now(tz=common.TZ_SH)
+	tim = await common.get_timer(uid, enums.Timer.SUMMON_C, timeformat='%Y-%m-%d', **kwargs)
+	lim = await common.get_limit(uid, enums.Limits.SUMMON_C, **kwargs)
+	lim = (kwargs['config']['summon']['resource'][cid.name]['constraint']['times'] if lim is None or tim is None or tim < now else lim) - grid
+	tim = (now + timedelta(days=1)) if tim is None or tim < now else tim
+	if lim < 0: return common.mt(95, 'Insufficient number of lucky draw')
+	await common.set_timer(uid, enums.Timer.SUMMON_C, tim, timeformat='%Y-%m-%d', **kwargs)
+	await common.set_limit(uid, enums.Limits.SUMMON_C, lim, **kwargs)
 	# TODO 消耗物品
 	consume_id, consume = enums.Item.SUMMON_SCROLL_C, grid
 	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
