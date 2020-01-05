@@ -321,6 +321,12 @@ class MessageHandler:
 	async def _dozen_pump_diamond(self, data: dict) -> str:
 		return await summoning.dozen_d(data['data']['unique_id'], **data)
 
+	async def _dozen_pump_coin(self, data: dict) -> str:
+		return await summoning.dozen_c(data['data']['unique_id'], **data)
+
+	async def _dozen_pump_gift(self, data: dict) -> str:
+		return await summoning.dozen_g(data['data']['unique_id'], **data)
+
 	async def _integral_convert(self, data: dict) -> str:
 		return await summoning.integral_convert(data['data']['unique_id'], **data)
 
@@ -738,6 +744,8 @@ FUNCTION_LIST = {
 	'single_pump_coin' : MessageHandler._single_pump_coin,
 	'single_pump_gift' : MessageHandler._single_pump_gift,
 	'dozen_pump_diamond' : MessageHandler._dozen_pump_diamond,
+	'dozen_pump_coin' : MessageHandler._dozen_pump_coin,
+	'dozen_pump_gift' : MessageHandler._dozen_pump_gift,
 	'integral_convert' : MessageHandler._integral_convert,
 
 	###################### lottery.py ######################
