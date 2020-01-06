@@ -51,7 +51,7 @@ async def remove_user(uid, gn_target, **kwargs):
 	uid_target = await common.get_uid(gn_target, **kwargs)
 	if uid == uid_target: return common.mt(96, "You can't remove yourself")
 	rmtimes, rmtimer = await _rmtimes_timer(name, **kwargs)
-	if rmtimes == 0: return common.mt(94, "今天移除成员的次数已用完", {"cd_time": common.remaining_cd()})
+	if rmtimes == 0: return common.mt(94, "We have run out of members to remove today", {"cd_time": common.remaining_cd()})
 	rmtimes -= 1
 	in_family, name_target = await _in_family(uid_target, **kwargs)
 	if not in_family: return common.mt(95, "target doesn't have a family")
@@ -70,15 +70,15 @@ async def invite_user(uid, gn_target, **kwargs):
 	role = await _get_role(uid, name, **kwargs)
 	if not _check_invite_permissions(role): return common.mt(98, 'insufficient permissions')
 	uid_target = await common.get_uid(gn_target, **kwargs)
-	if uid_target == "": return common.mt(93, '邀请的用户不存在')
+	if uid_target == "": return common.mt(93, 'The invited user does not exist')
 	join_data = await common.execute(f'SELECT time FROM timer WHERE uid="{uid_target}" AND tid="{enums.Timer.FAMILY_JOIN_END.value}";', **kwargs)
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) > datetime.now(tz=common.TZ_SH):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
-		return common.mt(96, '邀请对象离开家族冷却时间未结束', {'seconds': seconds})
+		return common.mt(96, 'The invitation to the object to leave the family cooldown has not ended', {'seconds': seconds})
 	# exp_info = await stage.increase_exp(uid_target, 0, **kwargs)
 	# if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "邀请对象等级不满18级")
 	in_family_target, _ = await _in_family(uid_target, **kwargs)
-	if in_family_target: return common.mt(94, '邀请对象已经加入了家族')
+	if in_family_target: return common.mt(94, 'The invitee has already joined the family')
 	# 以下是邀请成员限制的代码
 	owner_data = await common.execute(f'SELECT limits.value, timer.time FROM familyrole JOIN (limits, timer) ON (familyrole.uid=limits.uid AND limits.lid={enums.Limits.FAMILY_INVITE} AND familyrole.uid=timer.uid AND timer.tid={enums.Timer.FAMILY_INVITE_END}) WHERE familyrole.name="{name}" AND familyrole.role={enums.FamilyRole.OWNER};', **kwargs)
 	limit, itime = owner_data[0] if owner_data != () else (kwargs["config"]["family"]["general"]["itimes"], (datetime.now(tz=common.TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d"))
@@ -86,7 +86,7 @@ async def invite_user(uid, gn_target, **kwargs):
 		limit = kwargs["config"]["family"]["general"]["itimes"] - 1
 		itime = (datetime.now(tz=common.TZ_SH) + timedelta(days=1)).strftime("%Y-%m-%d")
 	elif limit == 0:
-		return common.mt(91, '今天邀请次数已用完')
+		return common.mt(91, "We've run out of invitations today")
 	else:
 		limit -= 1
 	sent = await mail.send_mail({'type' : enums.MailType.FAMILY_REQUEST.value, 'from' : name, \
@@ -113,9 +113,9 @@ async def request_join(uid, name, **kwargs):
 	join_data = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.FAMILY_JOIN_END.value}";', **kwargs)
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) > datetime.now(tz=common.TZ_SH):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
-		return common.mt(96, '离开家族冷却时间未结束', {'seconds': seconds})
+		return common.mt(96, 'Leaving the family cooldown is not over', {'seconds': seconds})
 	# exp_info = await stage.increase_exp(uid, 0, **kwargs)
-	# if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "你的等级不满18级", {'exp_info': exp_info})
+	# if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "Your rating is below 18", {'exp_info': exp_info})
 
 
 	sent = await mail.send_mail({'type' : enums.MailType.FAMILY_REQUEST.value, 'from' : gn, \
@@ -182,7 +182,7 @@ async def set_notice(uid, msg, **kwargs):
 	if datetime.strptime(ntime, "%Y-%m-%d").replace(tzinfo=common.TZ_SH) <= now:
 		limit, ntime = kwargs["config"]["family"]["general"]["ntimes"] - 1, (now + timedelta(days=1)).strftime("%Y-%m-%d")
 	elif limit == 0:
-		return common.mt(97, '今天公告次数已用完')
+		return common.mt(97, 'The number of announcements today has been used up')
 	else:
 		limit -= 1
 	await asyncio.gather(
@@ -202,13 +202,13 @@ async def set_blackboard(uid, msg, **kwargs):
 	return common.mt(0, 'success', {'board' : msg})
 
 async def set_icon(uid, icon, **kwargs):
-	if icon < 0: return common.mt(99, '图标序号错误')
+	if icon < 0: return common.mt(99, 'Wrong icon number')
 	in_family, name = await _in_family(uid, **kwargs)
-	if not in_family: return common.mt(98, '你没有家族')
+	if not in_family: return common.mt(98, "You don't have a family.")
 	role = await _get_role(uid, name, **kwargs)
-	if not _check_blackboard_permissions(role): return common.mt(98, '你没有权限')
+	if not _check_blackboard_permissions(role): return common.mt(97, 'You have no access.')
 	_, ic = await _get_family_info(name, 'icon', **kwargs)
-	if ic[0] == icon: return common.mt(97, '不能设置为原图标')
+	if ic[0] == icon: return common.mt(96, 'Cannot be set to the original icon')
 	await common.execute(f'UPDATE family SET icon={icon} WHERE name="{name}";', **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
 	await _record_family_change(name, f'{enums.FamilyHistoryKeys.ICON.value}:{gn}', **kwargs)
@@ -225,7 +225,7 @@ async def set_role(uid, gn_target, role, **kwargs):
 	if not target_in_family or target_name != name: return common.mt(97, 'target not in your family')
 	actors_role = await _get_role(uid, name, **kwargs)
 	targets_role = await _get_role(uid_target, name, **kwargs)
-	if targets_role == new_role: return common.mt(94, '成员一直是这个身份')
+	if targets_role == new_role: return common.mt(94, 'Membership has always been this identity')
 	if not _check_set_role_permissions(actors_role, targets_role, new_role): return common.mt(96, 'insufficient permissions')
 	await common.execute(f'UPDATE familyrole SET role = {new_role.value} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
 	gn = await common.get_gn(uid, **kwargs)
@@ -235,7 +235,7 @@ async def set_role(uid, gn_target, role, **kwargs):
 async def change_name(uid, new_name, **kwargs):
 	if not _valid_family_name(new_name): return common.mt(99, 'invalid family name')
 	can_change, _ = await _get_family_info(new_name, 'icon', **kwargs)
-	if can_change: return common.mt(95, '家族名字已经被使用过')
+	if can_change: return common.mt(95, 'Family names have been used')
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(98, 'not in family')
 	role = await _get_role(uid, name, **kwargs)
@@ -305,14 +305,14 @@ async def check_in(uid, **kwargs):
 async def abdicate(uid, target, **kwargs):
 	"""族长让位给族员"""
 	in_family, name = await _in_family(uid, **kwargs)
-	if not in_family: return common.mt(99, '你没有家族')
+	if not in_family: return common.mt(99, "You don't have a family.")
 	target_uid = await common.get_uid(target, **kwargs)
-	if target_uid == "": return common.mt(98, '目标对象不存在')
+	if target_uid == "": return common.mt(98, "The target object does not exist")
 	in_family, target_name = await _in_family(uid, **kwargs)
-	if not in_family: return common.mt(97, '对象没有家族')
-	if name != target_name: return common.mt(96, '你和对象不在同一个家族')
+	if not in_family: return common.mt(97, 'Objects have no family')
+	if name != target_name: return common.mt(96, 'You and your partner are not in the same family')
 	actors_role = await _get_role(uid, name, **kwargs)
-	if actors_role != enums.FamilyRole.OWNER: return common.mt(95, '你不是族长')
+	if actors_role != enums.FamilyRole.OWNER: return common.mt(95, 'You are not a patriarch.')
 	gn = await common.get_gn(uid, **kwargs)
 	await asyncio.gather(
 		_delete_disband_timer(name, **kwargs),
@@ -345,7 +345,7 @@ async def welfare(uid, **kwargs):
 
 async def search(name, **kwargs):
 	can, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)
-	if not can: return common.mt(99, f'没有<{name}>家族')
+	if not can: return common.mt(99, f'There is no <{name}> family')
 	people = (await common.execute(f'SELECT COUNT(*) FROM player WHERE fid="{name}";', **kwargs))[0][0]
 	return common.mt(0, 'success', {'info': {'name': name, 'icon': info[0], 'exp': info[1], 'notice': info[2], 'board': info[3], 'people': people}})
 

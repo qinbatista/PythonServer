@@ -185,6 +185,7 @@ Admins can remove anyone with a role lower than Admin.
 * 97: insufficient permissions
 * 96: You can't remove yourself
 * 95: target doesn't have a family(对方没有家族)
+* 94: We have run out of members to remove today
 * 94: 今天移除成员的次数已用完  cd_time: 剩余恢复移除次数的冷却时间
 
 
@@ -237,10 +238,15 @@ times：家族今天可以邀请玩家的次数
 * 98: insufficient permissions
 * 97: mail could not be sent (internal mail error)
 * 96: 邀请对象离开家族冷却时间未结束
+* 96: The invitation to the object to leave the family cooldown has not ended
 * 95: 邀请对象等级不满18级
 * 94: 邀请对象已经加入了家族
+* 94: The invitee has already joined the family
 * 93: 邀请的用户不存在
+* 93: The invited user does not exist
 * 92: target's mailbox is full
+* 91: 今天邀请次数已用完
+* 91: We've run out of invitations today
 
 
 
@@ -328,7 +334,9 @@ If any of them accept the invitation, user will be added to the family.
 * 98: invalid family
 * 97: mail could not be sent (all mailboxes are full, or internal mail error)
 * 96: 离开家族冷却时间未结束
+* 96: Leaving the family cooldown is not over
 * 95: 你的等级不满18级
+* 95: Your rating is below 18
 
 
 
@@ -664,6 +672,7 @@ seconds：离刷新发布次数剩余秒钟数
 * 99: not in a family
 * 98: insufficient permissions
 * 97: 今天公告次数已用完
+* 97: The number of announcements today has been used up
 
 
 
@@ -747,6 +756,10 @@ icon：图标序号，只要非负即可
 * 98：你没有家族
 * 97：你没有权限
 * 96：不能设置为原图标
+* 99: Wrong icon number
+* 98: You don't have a family.
+* 97: You have no access.
+* 96: Cannot be set to the original icon
 
 
 
@@ -800,6 +813,7 @@ role级别只包括0，4，8，10
 * 96: insufficient permissions
 * 95: role  type error (级别类型错误)
 * 94: 成员一直是这个身份
+* 94: Membership has always been this identity
 
 
 
@@ -851,6 +865,7 @@ The cost to change the family name is determined by `family.json` configuration 
 * 97: insufficient permissions
 * 96: insufficient funds
 * 95: 家族名字已经被使用过
+* 95: Family names have been used
 
 
 
@@ -1039,6 +1054,18 @@ Only Admins and above can cancel the disbanding of a family.
 }
 ```
 
+> 99: You don't have a family.
+>
+> 98: The target object does not exist
+>
+> 97: Objects have no family
+>
+> 96: You and your partner are not in the same family
+>
+> 95: You are not a patriarch.
+
+
+
 
 
 
@@ -1084,6 +1111,8 @@ Only Admins and above can cancel the disbanding of a family.
 [失败]()
 
 * 99: 没有<name>家族
+
+* 99: There is no <name> family
 
   
 
