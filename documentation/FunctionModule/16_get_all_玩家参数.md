@@ -3517,7 +3517,16 @@
 > config：配置信息
 >
 > - general：普通配置信息
+>   - player_level：设置玩家创建家族的等级限制
+>   - leave_days：设置玩家自己退出家族后的再加入家族的冷却时间
+>   - disband_hours：设置解散家族的冷却时间，可以为小数
+>   - rmtimes：设置家族管理员一天可以踢出的家族成员数量
+>   - ntimes：设置管理员可以发布公告的次数
+>   - itimes：设置管理员一天可以邀请玩家进入家族的次数
+>   - jtimes：设置玩家一天可以申请加入家族的次数
 >   - costs：消耗品
+>     - create：创建家族需要消耗的物资
+>     - change_name：修改家族名字需要消耗的物资
 >   - rewards：签到奖励
 >   - members：成员限制
 > - store：商店配置信息
@@ -3534,6 +3543,13 @@
 	"data": {
 		"config": {
 			"general": {
+                "player_level": 18,
+                "leave_days": 1,
+                "disband_hours": 24,
+                "rmtimes": 5,
+                "ntimes": 5,
+                "itimes": 5,
+                "jtimes": 5,
 				"costs": {
 					"create": "3:5:2000",
 					"change_name": "3:5:500"
