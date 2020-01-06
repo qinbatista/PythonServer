@@ -328,7 +328,7 @@ If any of them accept the invitation, user will be added to the family.
 	"message": "requested join",
 	"data": {
 		"name" : "family name",
-        "lim": lim,
+        "lim": 2,
         "cooling": 52123
 	}
 }
