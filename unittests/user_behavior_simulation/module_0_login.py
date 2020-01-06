@@ -130,7 +130,7 @@ if __name__ == "__main__":
 	# login_module("0")
 	# token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNjE4MjMsInVpZCI6IjAifQ.sAnQoaJ5ZWxxUjKcOcR-QZ7W2BsKpIPPeNEiBavHlbU"
 	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNDM1ODMsInVpZCI6ImgwIn0.sqnbjsCJ_8OefTY-M9IHFARhqQ6cm6kATzUUlRekwjY"
-	world = "s1"
+	world = "s0"
 	# user_behavior_simulation.send_tcp_message({"world": world, 'function': 'account_all_info', 'data': {"token": token, "email": "2428437133@qq.com"}})
 	user_behavior_simulation.send_tcp_message({"world": world, 'function': 'bind_email', 'data': {"token": token, "email": "2428437133@qq.com"}})
 	code = input("code:")

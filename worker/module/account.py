@@ -159,7 +159,7 @@ async def unbind_phone(uid, phone, **kwargs):
 async def verify_email_code(uid, code, status=0, **kwargs):
 	email = await kwargs['redis'].get(f'nonce.verify.email.{uid}.{status}.{code}')
 	if not email: return common.mt(99, 'invalid code')
-	email = email.decode()
+	# email = email.decode()
 	await kwargs['redis'].delete(f'nonce.verify.email.{uid}.{status}.{code}')
 	if status == 0:
 		bound, exists = await asyncio.gather(_email_bound(uid, **kwargs), common.exists('info', ('email', email), account = True, **kwargs))
@@ -176,7 +176,7 @@ async def verify_email_code(uid, code, status=0, **kwargs):
 async def verify_phone_code(uid, code, status=0, **kwargs):
 	phone = await kwargs['redis'].get(f'nonce.verify.phone.{uid}.{status}.{code}')
 	if not phone: return common.mt(99, 'invalid code')
-	phone = phone.decode()
+	# phone = phone.decode()
 	await kwargs['redis'].delete(f'nonce.verify.phone.{uid}.{status}.{code}')
 	if status == 0:
 		bound, exists = await asyncio.gather(_phone_bound(uid, **kwargs), common.exists('info', ('phone_number', phone), account = True, **kwargs))
