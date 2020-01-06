@@ -6,6 +6,7 @@
 		"rmtimes": 5,
 		"ntimes": 5,
 		"itimes": 5,
+		"jtimes": 5,
 		"costs": {
 			"create": "3:5:2000",
 			"change_name": "3:5:500"

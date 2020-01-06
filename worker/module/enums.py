@@ -285,6 +285,7 @@ class Timer(enum.IntEnum):
 	SUMMON_C_REFRESH = 33  # 记录金币抽奖免费刷新的日期
 	SUMMON_D_REFRESH = 34  # 记录钻石抽奖免费刷新的日期
 	SUMMON_G_REFRESH = 35  # 记录爱心抽奖免费刷新的日期
+	FAMILY_JOIN = 36  # 玩家当天可发送加入工会邮件的结束时间
 
 
 class Limits(enum.IntEnum):
@@ -303,6 +304,7 @@ class Limits(enum.IntEnum):
 	INTEGRAL = 13  # 代表获取了的阶段积分数值，大于此值时则获取
 	SUMMON_C = 14  # 代表金币抽每天限制的次数，一天限制12次
 	SUMMON_D = 15  # 代表钻石抽每天限制的次数，当天第一次抽奖免费，第二次抽奖半价，这里用于限制钻石免费抽和半价抽
+	FAMILY_JOIN = 16  # 玩家当天可发送加入工会邮件的次数
 
 
 class Achievement(enum.IntEnum):

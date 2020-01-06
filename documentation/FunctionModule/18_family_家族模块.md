@@ -317,13 +317,19 @@ If any of them accept the invitation, user will be added to the family.
 
 ##### 接受消息JSON格式
 
+> lim：可申请加入家族的剩余次数
+>
+> cooling：刷新剩余次数的冷却时间
+
 
 ```json
 {
 	"status": 0,
 	"message": "requested join",
 	"data": {
-		"name" : "family name"
+		"name" : "family name",
+        "lim": lim,
+        "cooling": 52123
 	}
 }
 ```
@@ -337,6 +343,7 @@ If any of them accept the invitation, user will be added to the family.
 * 96: Leaving the family cooldown is not over
 * 95: 你的等级不满18级
 * 95: Your rating is below 18
+* 94: You haven't applied enough to join the family today
 
 
 

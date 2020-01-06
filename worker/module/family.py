@@ -109,21 +109,26 @@ async def request_join(uid, name, **kwargs):
 	if in_family: return common.mt(99, 'already in a family')
 	gn = await common.get_gn(uid, **kwargs)
 	officials = await _get_uid_officials(name, **kwargs)
-	if not officials: return common.mt(98, 'invalid family')
-	join_data = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.FAMILY_JOIN_END.value}";', **kwargs)
+	if officials is None: return common.mt(98, 'invalid family')
+	join_data = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.FAMILY_JOIN_END}";', **kwargs)
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) > datetime.now(tz=common.TZ_SH):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
 		return common.mt(96, 'Leaving the family cooldown is not over', {'seconds': seconds})
 	# exp_info = await stage.increase_exp(uid, 0, **kwargs)
 	# if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "Your rating is below 18", {'exp_info': exp_info})
-
+	# 以下是申请加入家族次数的限制代码
+	now = datetime.now(tz=common.TZ_SH)
+	lim, tim = await asyncio.gather(common.get_limit(uid, enums.Limits.FAMILY_JOIN, **kwargs), common.get_timer(uid, enums.Timer.FAMILY_JOIN, timeformat='%Y-%m-%d', **kwargs))
+	lim, tim = (kwargs["config"]["family"]["general"]["jtimes"] - 1, now + timedelta(days=1)) if tim is None or tim < now else (lim - 1, tim)
+	if lim < 0: return common.mt(94, "You haven't applied enough to join the family today")
+	await asyncio.gather(common.set_timer(uid, enums.Timer.FAMILY_JOIN, tim, timeformat='%Y-%m-%d', **kwargs), common.set_limit(uid, enums.Limits.FAMILY_JOIN, lim, **kwargs))
 
 	sent = await mail.send_mail({'type' : enums.MailType.FAMILY_REQUEST.value, 'from' : gn, \
 			'subj' : enums.MailTemplate.FAMILY_REQUEST.name, 'body' : '', 'uid_target' : uid, \
 			'name' : name}, *officials, **kwargs)
 	for s in sent.values():
 		if s['status'] == 0:
-			return common.mt(0, 'requested join', {'name' : name})
+			return common.mt(0, 'requested join', {'name': name, 'lim': lim, 'cooling': common.remaining_cd()})
 	return common.mt(97, 'request could not be sent')
 
 async def respond(uid, nonce, **kwargs):
