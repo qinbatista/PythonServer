@@ -425,7 +425,7 @@ class MessageHandler:
 		return await role.get_all(data['data']['unique_id'], **data)
 
 	async def _level_up_role(self, data: dict) -> str:
-		return await role.level_up(data['data']['unique_id'], int(data['data']['role']), int(data['data']['amount']), **data)
+		return await role.level_up(data['data']['unique_id'], int(data['data']['role']), data['data'].get('delta', 1), **data)
 
 	async def _level_up_star_role(self, data: dict) -> str:
 		return await role.level_up_star(data['data']['unique_id'], int(data['data']['role']), **data)
