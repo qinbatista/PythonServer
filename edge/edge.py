@@ -117,6 +117,12 @@ class Edge:
 				elif cmd == Command.FAMILY and user.fn is not None:
 					await self.pubsub.publish(self.encode_channel_family(user.world, user.fn), \
 							f'{user.gn}:{payload}'.encode())
+				elif cmd == Command.REGISTER:
+					new_user = await self.validate_login_token(writer, payload)
+					if new_user is None:
+						raise ChatProtocolError
+					await self.register_user(new_user)
+					user = new_user
 				else:
 					break
 		except (ValueError, ChatProtocolError, ConnectionResetError, \
