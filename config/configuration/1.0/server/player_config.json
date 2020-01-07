@@ -1,8 +1,8 @@
 {
 	"energy":
 	{
-		"cooling_time":20,
-		"max_energy":10
+		"cooling_time":6,
+		"max_energy":120
 	},
 	"disintegrate_weapon":
 	{

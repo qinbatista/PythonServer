@@ -14,6 +14,7 @@ async def create(uid, gn, **kwargs):
 	if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, '玩家uid或名字已存在')
 	await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
 	await asyncio.gather(
+		common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180 WHERE uid="{uid}";', **kwargs),
 		common.execute(f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED}, 5, 5);', **kwargs),
 		common.execute(f'INSERT INTO role (uid, star, level, rid) VALUES ("{uid}", 1, 7, {enums.Role.R101}), ("{uid}", 1, 0, {enums.Role.R102});', **kwargs),
 		common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W101}), ("{uid}", 1, {enums.Weapon.W102});', **kwargs),
