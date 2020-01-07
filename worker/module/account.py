@@ -31,7 +31,8 @@ UID = "lukseun%sM%sP%s"
 async def register(uid, account, password, **kwargs):
 	"""携带uid、账号密码进行注册"""
 	if uid == '': uid = await yield_uid(**kwargs)
-	if not _valid_account(account): return common.mt(99, 'invalid account name')
+	exists = await common.exists('info', ('account', account), account=True, **kwargs)
+	if not _valid_account(account) or exists: return common.mt(99, 'invalid account name')
 	if not _valid_password(password): return common.mt(98, 'invalid password')
 	exists, bound = await asyncio.gather(common.exists('info', ('unique_id', uid), account=True, **kwargs), _account_bound(uid, **kwargs))
 	if not exists:  # 不存在的情况下创建新用户

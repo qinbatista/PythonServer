@@ -17,7 +17,7 @@ from collections import defaultdict
 async def get_config(**kwargs):
 	return common.mt(0, 'success', kwargs['config']['weapon'])
 
-async def level_up(uid, wid, amount, **kwargs):
+async def level_up(uid, wid, delta, **kwargs):
 	kwargs.update({"task_id":enums.Task.WEAPON_LEVEL_UP})
 	await task.record_task(uid,**kwargs)
 
@@ -29,17 +29,22 @@ async def level_up(uid, wid, amount, **kwargs):
 	if not exists: return common.mt(99, 'invalid target')
 	star, level, sp = payload
 	if star == 0: return common.mt(96, "You don't have the weapon")
-	upgrade_cnt = min(amount // kwargs['config']['weapon']['standard_costs']['iron'], 100 - level)
-	if upgrade_cnt == 0: return common.mt(98, 'too few incoming materials')
-	can_pay, remaining = await common.try_item(uid, enums.Item.IRON, -upgrade_cnt * kwargs['config']['weapon']['standard_costs']['iron'], **kwargs)
+	if delta <= 0: return common.mt(98, 'The delta must be a positive integer')
+	max_lv = kwargs['config']['weapon']['standard_costs']['upgrade_lv']['max']
+	config = kwargs['config']['weapon']['standard_costs']['upgrade_lv']['iron']
+	if max_lv <= level: return common.mt(95, 'max lv')
+	delta = delta if delta + level <= max_lv else (max_lv - level)
+	consume = config[level + delta - 1] - config[level - 1]
+	_, remain_i = await common.try_item(uid, enums.Item.IRON, 0, **kwargs)
+	if remain_i < consume: return common.mt(97, 'can not pay for upgrade')
+	can_pay, remain_c = await common.try_item(uid, enums.Item.COIN, -consume, **kwargs)
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
-	await common.execute(f'UPDATE weapon SET level = {level + upgrade_cnt}, skillpoint = {sp + upgrade_cnt} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
-	return common.mt(0, 'success', {'remaining' : {enums.Group.WEAPON.value : {'wid' : wid.value, \
-			'level' : level + upgrade_cnt, 'sp' : sp + upgrade_cnt}, enums.Group.ITEM.value : \
-			{'iid' : enums.Item.IRON.value, 'value' : remaining}}, 'reward' : {enums.Group.WEAPON.value : \
-			{'wid' : wid.value, 'level' : upgrade_cnt, 'sp' : upgrade_cnt}, enums.Group.ITEM.value : \
-			{'iid' : enums.Item.IRON.value, \
-			'value' : upgrade_cnt * kwargs['config']['weapon']['standard_costs']['iron']}}})
+	_, remain_i = await common.try_item(uid, enums.Item.IRON, -consume, **kwargs)
+	await common.execute(f'UPDATE weapon SET level = {level + delta}, skillpoint = {sp + delta} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
+	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : level + delta, 'sp' : sp + delta},
+													enums.Group.ITEM.value : [{'iid' : enums.Item.IRON.value, 'value' : remain_i}, {'iid' : enums.Item.COIN.value, 'value' : remain_c}]},
+										'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : delta, 'sp' : delta},
+													enums.Group.ITEM.value : [{'iid' : enums.Item.IRON.value, 'value' :consume}, {'iid' : enums.Item.COIN.value, 'value' : consume}]}})
 
 async def level_up_passive(uid, wid, pid, **kwargs):
 	wid, pid = enums.Weapon(wid), enums.WeaponPassive(pid)

@@ -403,7 +403,7 @@ class MessageHandler:
 
 	###################### weapon.py ######################
 	async def _level_up_weapon(self, data: dict) -> str:
-		return await weapon.level_up(data['data']['unique_id'], int(data['data']['weapon']), int(data['data']['amount']), **data)
+		return await weapon.level_up(data['data']['unique_id'], int(data['data']['weapon']), data['data'].get('delta', 1), **data)
 
 	async def _level_up_passive_weapon(self, data: dict) -> str:
 		return await weapon.level_up_passive(data['data']['unique_id'], int(data['data']['weapon']), int(data['data']['passive']), **data)

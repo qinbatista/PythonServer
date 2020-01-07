@@ -181,7 +181,7 @@ CREATE TABLE `role` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
 	  `rid` SMALLINT UNSIGNED NOT NULL COMMENT '角色id',
 	  `star` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '角色星数',
-	  `level` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '角色等级',
+	  `level` SMALLINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '角色等级',
 	  `skillpoint` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '角色技能剩余点数',
 	  `segment` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '碎片数',
 	  PRIMARY KEY (`uid`,`rid`),
@@ -242,7 +242,7 @@ CREATE TABLE `weapon` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
 	  `wid` SMALLINT UNSIGNED NOT NULL COMMENT '武器id',
 	  `star` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '星数',
-	  `level` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '武器等级',
+	  `level` SMALLINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '武器等级',
 	  `skillpoint` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '武器剩余技能点数',
 	  `segment` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '碎片',
 	  PRIMARY KEY (`uid`,`wid`),
@@ -451,4 +451,4 @@ def test(world, mysql_addr, mysql_user, mysql_pw):
 
 if __name__ == '__main__':
 	main()
-	# test("s1", "192.168.1.102", "root", "lukseun")
+	# test("s6", "192.168.1.102", "root", "lukseun")
