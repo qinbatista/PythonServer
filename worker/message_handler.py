@@ -3,6 +3,7 @@ message_handler.py
 '''
 
 import json
+import random
 
 from module import mail
 from module import chat
@@ -643,6 +644,25 @@ class MessageHandler:
 	async def _exchange_prop(self, data: dict) -> str:
 		return await mall.exchange(data['data']['unique_id'], data['data']['game_id'], data['data']['exchange_id'], **data)
 
+	async def _add_resources(self, data: dict) -> str:
+		await common.try_item(data['data']['unique_id'], enums.Item.COIN, random.randint(1, 50000), **data)
+		await common.try_item(data['data']['unique_id'], enums.Item.IRON, random.randint(1, 5000), **data)
+		await common.try_item(data['data']['unique_id'], enums.Item.FOOD, random.randint(1, 5000), **data)
+		await common.try_item(data['data']['unique_id'], enums.Item.CRYSTAL,random.randint(1, 9000), **data)
+		await common.try_item(data['data']['unique_id'], enums.Item.DIAMOND,random.randint(1, 9000), **data)
+		await common.try_item(data['data']['unique_id'], enums.Item.SUMMON_SCROLL_BASIC, \
+				random.randint(1, 5000), **data)
+		await common.try_item(data['data']['unique_id'], enums.Item.SUMMON_SCROLL_PRO, \
+				random.randint(1, 5000), **data)
+		await common.try_item(data['data']['unique_id'], enums.Item.SUMMON_SCROLL_PROPHET, \
+				random.randint(1, 5000), **data)
+		await common.try_item(data['data']['unique_id'], enums.Item.FORTUNE_WHEEL_BASIC, \
+				random.randint(1, 5000), **data)
+		await common.try_item(data['data']['unique_id'], enums.Item.FORTUNE_WHEEL_PRO, \
+				random.randint(1, 5000), **data)
+
+		return common.mt(0, 'success')
+
 	async def _get_config_notice(self, data: dict) -> str:
 		return common.mt(0, 'success', {'config': data['config']['notice']})
 
@@ -870,5 +890,6 @@ FUNCTION_LIST = {
 	'send_text_mail': MessageHandler._send_text_mail,
 	'purchase_success': MessageHandler._purchase_success,
 	'exchange_prop': MessageHandler._exchange_prop,
+	'add_resources': MessageHandler._add_resources
 }
 
