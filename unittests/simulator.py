@@ -143,8 +143,8 @@ class Simulator:
 			self.users     = self.update_users(pending)
 	
 	def analyze(self, interval, times):
-		print('Summary     Time Unit: seconds')
-		print('==============================')
+		print('Summary      Time Unit: seconds')
+		print('===============================')
 		print(f'Number of Requests   : {len(times)}')
 		print(f'Requests per Second  : {int(len(times) / interval)}')
 		print(f'Minimum              : {min(times):.4}')
