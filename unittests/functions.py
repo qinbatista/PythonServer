@@ -364,6 +364,14 @@ class delete_mail(Function):
 				with contextlib.suppress(ValueError):
 					state['mail'].remove(k)
 
+class delete_read_mail(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+	def after_call(self, state, raw):
+		resp = json.loads(raw.decode().strip())
+		state['mail'] = [m for m in state['mail'] if m['key'] not in resp['data']['keys']]
+
 class mark_read_mail(Function):
 	def __init__(self):
 		super().__init__(self.__class__.__name__)
