@@ -670,7 +670,7 @@ FUNCTION_LIST = {
 	'create_account' : MessageHandler._create_account,
 	'change_game_name' : MessageHandler._change_game_name,
 
-	###################### skill.py ######################
+	###################### chat.py ######################
 	'get_login_token_chat' : MessageHandler._get_login_token_chat,
 
 	###################### player.py ######################
