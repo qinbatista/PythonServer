@@ -134,7 +134,9 @@ class request_join_family(Function):
 		super().__init__(self.__class__.__name__)
 	
 	def before_call(self, state):
-		self.fn['data']['gn_target'] = random.choice(tuple(state['familynames'][state['world']]))
+		self.fn['data']['name'] = ''
+		if len(state['familynames'][state['world']]) != 0:
+			self.fn['data']['name'] = random.choice(tuple(state['familynames'][state['world']]))
 
 class set_role_family(Function):
 	def __init__(self):
