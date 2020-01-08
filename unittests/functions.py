@@ -31,6 +31,11 @@ class Function:
 	def name(self):
 		return self.fn['function']
 
+# Private
+class add_resources(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
 # Account
 class login_unique(Function):
 	def __init__(self):
@@ -668,7 +673,8 @@ class FunctionList:
 		special, normal = {}, {}
 		for name, obj in inspect.getmembers(sys.modules[__name__]):
 			if inspect.isclass(obj) and obj != Function and issubclass(obj, Function):
-				if name not in {'login_unique', 'enter_world', 'create_player', 'get_info_player'}:
+				if name not in {'login_unique', 'enter_world', 'create_player', 'get_info_player', \
+						'add_resources'}:
 					normal[name] = obj
 				else:
 					special[name] = obj

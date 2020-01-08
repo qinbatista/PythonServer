@@ -89,6 +89,7 @@ class User:
 			_, _, raw = await self.call('create_player')
 			if (json.loads(raw.decode().strip()))['status'] != 0:
 				raise Exception('GN already taken')
+			_, _, _ = await self.call('add_resources')
 		_, _, _ = await self.call('get_info_player')
 		return world
 
