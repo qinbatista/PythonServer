@@ -660,7 +660,7 @@ class MessageHandler:
 				random.randint(1, 5000), **data)
 		await common.try_item(data['data']['unique_id'], enums.Item.FORTUNE_WHEEL_PRO, \
 				random.randint(1, 5000), **data)
-
+		await stage.increase_exp(data['data']['unique_id'], random.randint(15000, 5000000), **data)
 		return common.mt(0, 'success')
 
 	async def _get_config_notice(self, data: dict) -> str:
