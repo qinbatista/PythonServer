@@ -146,15 +146,16 @@ class Simulator:
 			self.users     = self.update_users(pending)
 	
 	def analyze(self, interval, times):
-		print('Summary      Time Unit: seconds')
-		print('===============================')
-		print(f'Number of Requests   : {len(times)}')
-		print(f'Requests per Second  : {int(len(times) / interval)}')
-		print(f'Minimum              : {min(times):.4}')
-		print(f'Average              : {statistics.mean(times):.4}')
-		print(f'Median               : {statistics.median(times):.4}')
-		print(f'Maximum              : {max(times):.4}')
-		print(f'Standard Deviation   : {statistics.pstdev(times):.4}', end = '\n\n\n')
+		if len(times) != 0:
+			print('Summary      Time Unit: seconds')
+			print('===============================')
+			print(f'Number of Requests   : {len(times)}')
+			print(f'Requests per Second  : {int(len(times) / interval)}')
+			print(f'Minimum              : {min(times):.4}')
+			print(f'Average              : {statistics.mean(times):.4}')
+			print(f'Median               : {statistics.median(times):.4}')
+			print(f'Maximum              : {max(times):.4}')
+			print(f'Standard Deviation   : {statistics.pstdev(times):.4}', end = '\n\n\n')
 	
 	def target(self, n):
 		self.target_users = n
