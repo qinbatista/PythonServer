@@ -65,6 +65,158 @@ class refresh_market(Function):
 class get_all_family(Function):
 	def __init__(self):
 		super().__init__(self.__class__.__name__)
+	
+	def after_call(self, state, raw):
+		resp = json.loads(raw.decode().strip())
+		if resp['status'] == 0:
+			state['familynames'][state['world']].discard(state['fn'])
+			state['familynames'][state['world']].add(resp['data']['name'])
+			state['fn'] = resp['data']['name']
+			state['familylist'] = {m['gn'] for m in resp['data']['members']}
+			print(state['familylist'])
+
+class create_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['name'] = 'family_' + ''.join(random.choice(string.digits) for _ in range(15))
+		self.fn['data']['icon'] = 1
+	
+	def after_call(self, state, raw):
+		resp = json.loads(raw.decode().strip())
+		if resp['status'] == 0:
+			state['familynames'][state['world']].add(resp['data']['name'])
+			state['fn'] = resp['data']['name']
+
+class leave_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def after_call(self, state, raw):
+		resp = json.loads(raw.decode().strip())
+		if resp['status'] == 0:
+			state['familynames'][state['world']].discard(state['fn'])
+			state['fn'] = ''
+
+class respond_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		key = ''
+		for mail in state['mail']:
+			if mail['type'] == 3:
+				key = mail['key']
+		self.fn['data']['key'] = key
+
+	def after_call(self, state, raw):
+		resp = json.loads(raw.decode().strip())
+		if resp['status'] == 0 and state['fn'] == '':
+			state['fn'] = resp['data']['name']
+
+class remove_user_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['gn_target'] = random.choice(tuple(state['gamenames'][state['world']]))
+	
+class invite_user_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['gn_target'] = random.choice(tuple(state['gamenames'][state['world']]))
+
+class request_join_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['gn_target'] = random.choice(tuple(state['familynames'][state['world']]))
+
+class set_role_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		if len(state['familylist']) != 0:
+			self.fn['data']['gn_target'] = random.choice(tuple(state['familylist']))
+		else:
+			self.fn['data']['gn_target'] = ''
+		self.fn['data']['role'] = random.choice([0, 4, 8])
+
+class set_icon_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['icon'] = random.randint(0, 4)
+
+class set_blackboard_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['msg'] = f'Blackboard updated by {state["gn"]}'
+
+class set_notice_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['msg'] = f'Notice updated by {state["gn"]}'
+
+class change_name_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['name'] = 'family_' + ''.join(random.choice(string.digits) for _ in range(15))
+	
+	def after_call(self, state, raw):
+		resp = json.loads(raw.decode().strip())
+		if resp['status'] == 0:
+			state['familynames'][state['world']].discard(state['fn'])
+			state['familynames'][state['world']].add(resp['data']['name'])
+			state['fn'] = resp['data']['name']
+
+class disband_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class cancel_disband_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class check_in_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class abdicate_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		if len(state['familylist']) != 0:
+			self.fn['data']['target'] = random.choice(tuple(state['familylist']))
+		else:
+			self.fn['data']['target'] = ''
+
+class search_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['family_name'] = ''
+		if len(state['familynames'][state['world']]) != 0:
+			self.fn['data']['family_name'] = random.choice(tuple(state['familynames'][state['world']]))
+
+class get_random_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
 
 
 # Friend
