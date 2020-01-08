@@ -52,6 +52,21 @@ class upgrade_armor(Function):
 		self.fn['data']['aid'] = 1
 		self.fn['data']['level'] = 2
 
+# Darkmarket
+class get_all_market(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class refresh_market(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+# Family
+class get_all_family(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+
 # Friend
 class get_all_friend(Function):
 	def __init__(self):
@@ -142,6 +157,25 @@ class set_armor_factory(Function):
 	def before_call(self, state):
 		self.fn['data']['aid'] = random.randint(1, 4)
 
+class buy_acceleration_factory(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+# Lottery
+class fortune_wheel_basic(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class fortune_wheel_pro(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
 # Mail
 class get_all_mail(Function):
 	def __init__(self):
@@ -173,7 +207,7 @@ class delete_mail(Function):
 		resp = json.loads(raw.decode().strip())
 		if resp['status'] == 0:
 			for k in resp['data']['keys']:
-				with contextlib.suppress(KeyError):
+				with contextlib.suppress(ValueError):
 					state['mail'].remove(k)
 
 class mark_read_mail(Function):
@@ -221,6 +255,13 @@ class get_info_player(Function):
 		if state['fn'] != '':
 			state['familynames'][state['world']].add(state['fn'])
 
+class accept_gifts(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['keys'] = [m['key'] for m in state['mail'] if m['type'] == 1]
+
 # Role
 class level_up_role(Function):
 	def __init__(self):
@@ -250,6 +291,179 @@ class level_up_skill(Function):
 		self.fn['data']['skill'] = random.randint(0, 38)
 		self.fn['data']['item'] = random.randint(6, 8)
 
+
+# Summoning
+class basic_summon(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class pro_summon(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class friend_summon(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class basic_summon_skill(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+
+class pro_summon_skill(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class friend_summon_skill(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class basic_summon_role(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class pro_summon_role(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class friend_summon_role(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class pro_summon_10_times(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class friend_summon_10_times(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class basic_summon_skill_10_times(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class pro_summon_skill_10_times(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class friend_summon_skill_10_times(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class basic_summon_role_10_times(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class pro_summon_role_10_times(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class friend_summon_role_10_times(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+	
+	def before_call(self, state):
+		self.fn['data']['item'] = random.randint(1, 5)
+
+class refresh_diamond_store(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class refresh_coin_store(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class refresh_gift_store(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class buy_refresh_diamond(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class buy_refresh_coin(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class buy_refresh_gift(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class single_pump_diamond(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class single_pump_coin(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class single_pump_gift(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class dozen_pump_diamond(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class dozen_pump_coin(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class dozen_pump_gift(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
+
+class integral_convert(Function):
+	def __init__(self):
+		super().__init__(self.__class__.__name__)
 
 # Weapon
 class level_up_weapon(Function):
