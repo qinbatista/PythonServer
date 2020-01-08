@@ -103,12 +103,13 @@ class User:
 		return 'sim_' + ''.join(random.choice(string.digits) for i in range(15))
 
 class Simulator:
-	def __init__(self, server_ip, target_users, maxdelay, refresh):
+	def __init__(self, server_ip, target_users, maxdelay, refresh, target_fn):
 		self.users = set()
 		self.queue = asyncio.Queue()
 		self.gamenames = collections.defaultdict(set)
 		self.familynames = collections.defaultdict(set)
 
+		self.target_fn = target_fn
 		self.refresh = refresh
 		self.maxdelay = maxdelay
 		self.server_ip = server_ip
@@ -161,7 +162,8 @@ class Simulator:
 			print(f'Scaling up to {self.target_users} users...')
 			for _ in range(self.target_users - len(pending)):
 				pending.add(User(uuid.uuid4().hex, self.queue, Client(self.server_ip), \
-						self.gamenames, self.familynames, maxdelay = self.maxdelay).run())
+						self.gamenames, self.familynames, maxdelay = self.maxdelay, \
+						fn = self.target_fn).run())
 		elif len(pending) > self.target_users:
 			print(f'Scaling down to {self.target_users} users...')
 			for _ in range(len(pending) - self.target_users):
@@ -178,7 +180,7 @@ async def main():
 	parser.add_argument('-d', '--delay',   type = int, default = 10)
 	parser.add_argument('-r', '--refresh', type = int, default = 5)
 	args = parser.parse_args()
-	simulator = Simulator(args.host, args.n, args.delay, args.refresh)
+	simulator = Simulator(args.host, args.n, args.delay, args.refresh, args.fn)
 	await simulator.start()
 
 
