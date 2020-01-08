@@ -7,7 +7,7 @@
 				"comment": "代码中的GRID指商品存放的格子数(空格子先满足特殊商品需要，剩下的空格子在普通商品中随机选)，hours指刷新后的冷却时间，times指一天可抽奖的最大次数，当前的times不引用，refresh指手动刷新需要消耗的钻石数量",
 				"hours": 48,
 				"times": 12,
-				"refresh": 100
+				"refresh": 50
 			},
 			"reward": [
 				"3:44:5"
@@ -64,7 +64,7 @@
 				"comment": "代码中的GRID指商品存放的格子数(空格子先满足特殊商品需要，剩下的空格子在普通商品中随机选)，hours指刷新后的冷却时间，times指一天可抽奖的最大次数，refresh指手动刷新需要消耗的钻石数量",
 				"hours": 48,
 				"times": 12,
-				"refresh": 100
+				"refresh": 20
 			},
 			"must": {
 				"comment": "goods下是必须出现的商品，每个商品有对应的组id、商品id、商品数量、商品权重",
@@ -94,7 +94,7 @@
 				"comment": "代码中的GRID指商品存放的格子数(空格子先满足特殊商品需要，剩下的空格子在普通商品中随机选)，hours指刷新后的冷却时间，times指一天可抽奖的最大次数，当前的times不引用，refresh指手动刷新需要消耗的钻石数量",
 				"hours": 48,
 				"times": 12,
-				"refresh": 100
+				"refresh": 20
 			},
 			"must": {
 				"comment": "goods下是必须出现的商品，每个商品有对应的组id、商品id、商品数量、商品权重",

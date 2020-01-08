@@ -198,7 +198,7 @@ async def yield_uid(**kwargs):
 	num, now = 10, time.time()
 	uid = UID % (int(now), int(now % 1 * 1e6), os.getpid())
 	while await common.exists('info', ('unique_id', uid), account=True, **kwargs) and num > 0:
-		num, now= num - 1, time.time()
+		num, now = num - 1, time.time()
 		uid = UID % (int(now), int(now % 1 * 1e6), os.getpid())
 	return uid
 

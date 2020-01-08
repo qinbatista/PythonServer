@@ -9,7 +9,7 @@ from module import achievement
 from collections import defaultdict
 
 
-async def level_up(uid, rid, amount, **kwargs):
+async def level_up(uid, rid, delta, **kwargs):
 	kwargs.update({"task_id": enums.Task.ROLE_LEVEL_UP})
 	await task.record_task(uid,**kwargs)
 
@@ -21,12 +21,20 @@ async def level_up(uid, rid, amount, **kwargs):
 	if not exists: return common.mt(99, 'invalid target')
 	star, level = payload
 	if star == 0: return common.mt(96, "You don't have the role")
-	upgrade_cnt = min(amount // kwargs['config']['role']['standard_costs']['exp_pot'], 100 - level)
-	if upgrade_cnt == 0: return common.mt(98, 'too few incoming materials or max level')
-	can_pay, remaining = await common.try_item(uid, enums.Item.EXPERIENCE_POTION, -upgrade_cnt * kwargs['config']['role']['standard_costs']['exp_pot'], **kwargs)
+	if delta <= 0: return common.mt(98, 'The delta must be a positive integer')
+	max_lv = kwargs['config']['role']['standard_costs']['upgrade_lv']['max']
+	config = kwargs['config']['role']['standard_costs']['upgrade_lv']['exp_pot']
+	if max_lv <= level: return common.mt(95, 'max lv')
+	delta = delta if delta + level <= max_lv else (max_lv - level)
+	consume = config[level + delta - 1] - config[level - 1]
+	can_pay, remain = await common.try_item(uid, enums.Item.EXPERIENCE_POTION, -consume, **kwargs)
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
-	await common.execute(f'UPDATE role SET level = {level + upgrade_cnt} WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
-	return common.mt(0, 'success', {enums.Group.ROLE.value : {'rid' : rid.value, 'level' : level + upgrade_cnt}, enums.Group.ITEM.value : {'iid' : enums.Item.EXPERIENCE_POTION.value, 'value' : remaining}})
+	await common.execute(f'UPDATE role SET level = {level + delta} WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
+	return common.mt(0, 'success', {'remaining': {enums.Group.ROLE.value: {'rid': rid.value, 'level' : level + delta},
+													enums.Group.ITEM.value: [{'iid': enums.Item.EXPERIENCE_POTION.value, 'value': remain}]},
+										'reward': {enums.Group.ROLE.value: {'rid': rid.value, 'level' : delta},
+													enums.Group.ITEM.value: [{'iid': enums.Item.EXPERIENCE_POTION.value, 'value': consume}]}})
+
 
 async def level_up_star(uid, rid, **kwargs):
 	rid = enums.Role(rid)
@@ -40,7 +48,7 @@ async def level_up_star(uid, rid, **kwargs):
 	return common.mt(0, 'success', {'remaining': {'rid' : rid.value, 'star' : star + 1, 'seg' : segment - cost}, 'reward': {'rid' : rid.value, 'star' : 1, 'seg' : cost}})
 
 async def get_all(uid, **kwargs):
-	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs),"config":{'seg' : kwargs['config']['role']['standard_costs']['seg'], 'exp_pot' : kwargs['config']['role']['standard_costs']['exp_pot']}})
+	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs),"config":{'seg' : kwargs['config']['role']['standard_costs']['seg'], 'exp_pot' : kwargs['config']['role']['standard_costs']['upgrade_lv']['exp_pot']}})
 
 async def get_config(**kwargs):
 	return common.mt(0, 'success', kwargs['config']['role'])

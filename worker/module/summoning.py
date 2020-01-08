@@ -357,7 +357,10 @@ async def refresh_d(uid, **kwargs):
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
 		lim = await common.get_limit(uid, enums.Limits.SUMMON_D, **kwargs)
-		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': {'limit': 0 if lim is None else lim, 'cooling': int((end_time - current).total_seconds())}})
+		tim_refresh = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
+		tim_refresh = current if tim_refresh is None else tim_refresh
+		constraint = {'limit': 0 if lim is None else lim, 'cooling': int((end_time - current).total_seconds()), 'cooling_refresh': int((tim_refresh - current).total_seconds())}
+		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
 	return await _refresh(uid, cid, **kwargs)
 
 
@@ -371,7 +374,10 @@ async def refresh_c(uid, **kwargs):
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'cid': cid.value, 'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
 		lim = await common.get_limit(uid, enums.Limits.SUMMON_C, **kwargs)
-		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': {'limit': kwargs['config']['summon']['resource'][cid.name]['constraint']['times'] if lim is None else lim, 'cooling': int((end_time - current).total_seconds())}})
+		tim_refresh = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
+		tim_refresh = current if tim_refresh is None else tim_refresh
+		constraint = {'limit': kwargs['config']['summon']['resource'][cid.name]['constraint']['times'] if lim is None else lim, 'cooling': int((end_time - current).total_seconds()), 'cooling_refresh': int((tim_refresh - current).total_seconds())}
+		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
 	return await _refresh(uid, cid, **kwargs)
 
 
