@@ -55,7 +55,8 @@ class User:
 		self.maxdelay = maxdelay
 
 		self.state    = {'token' : None, 'world' : None, 'gn' : '', 'fn' : '', 'gamenames' : gamenames, \
-				'familynames' : familynames, 'uid' : self.uid, 'friendlist' : set(), 'mail' : []}
+				'familynames' : familynames, 'uid' : self.uid, 'friendlist' : set(), \
+				'familylist' : set(), 'mail' : []}
 	
 	async def run(self):
 		try:
