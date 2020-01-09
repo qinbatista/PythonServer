@@ -2,7 +2,6 @@
 
 * [`exchange_card`](##_exchange_card)
 * [`use_item`](##use_item)
-* [`upgrade_scroll`](##upgrade_scroll)
 
 - [`get_config_exchange`](##get_config_exchange)
 
@@ -188,57 +187,29 @@
 	}
 }
 ```
+- 卷轴升级的接收json格式
+
+```json
+{
+    "status": 3,
+    "message": "success",
+    "data": {
+        "remaining": {
+            "item": "3:6:922",
+            "eitem": "3:7:23"
+        },
+        "reward": {
+            "item": "3:6:-12",
+            "eitem": "3:7:4"
+        }
+    }
+}
+```
 
 - 99：意外消耗品iid
 - 98：兑换成品类型错误
 - 97：兑换碎片类型不匹配
 - 96：兑换消耗品不足
-
-
-
-## upgrade_scroll
-
-返回卡片兑换的配置信息，详见配置表`package.json`
-
-##### 发送消息JSON格式
-
-> item_id：消耗的卷轴id
-
-```json
-{
-	"world": 0, 
-	"function": "upgrade_scroll",
-	"data": {
-		"token": "my toekn ^_^",
-        "item_id": 6
-	}
-}
-```
-
-##### 接受消息JSON格式
-
-[成功]()
-
-> remaining：剩余物品
->
-> reward：变化物品
-
-```
-{
-    "status": 0,
-    "message": "success",
-    "data": {
-        "remaining": [
-            "3:7:1",
-            "3:8:1"
-        ],
-        "reward": [
-            "3:7:3",
-            "3:8:1"
-        ]
-    }
-}
-```
 
 
 

@@ -47,8 +47,14 @@ async def level_up_star(uid, rid, **kwargs):
 	await common.execute(f'UPDATE role SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND rid = {rid.value};', **kwargs)
 	return common.mt(0, 'success', {'remaining': {'rid' : rid.value, 'star' : star + 1, 'seg' : segment - cost}, 'reward': {'rid' : rid.value, 'star' : 1, 'seg' : cost}})
 
+
+async def unlock_passive(uid, rid, pid, **kwargs):
+	"""解锁被动技能"""
+
+
 async def get_all(uid, **kwargs):
 	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs),"config":{'seg' : kwargs['config']['role']['standard_costs']['seg'], 'exp_pot' : kwargs['config']['role']['standard_costs']['upgrade_lv']['exp_pot']}})
+
 
 async def get_config(**kwargs):
 	return common.mt(0, 'success', kwargs['config']['role'])

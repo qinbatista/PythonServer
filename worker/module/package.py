@@ -55,7 +55,7 @@ async def use_item(uid, iid, eid, **kwargs):
 	c = common.decode_items(iid)[0]
 	consume = c[2]
 	if c[0] == enums.Group.ITEM:
-		can, remain = await common.try_item(uid, c[1], -consume, **kwargs)
+		can, remain = await common.try_item(uid, c[1], -consume, **kwargs)  # 是卷轴则消耗三倍低级卷轴生成一倍高级卷轴
 		if not can: return common.mt(96, '兑换消耗品不足')
 		iid = iid[:iid.rfind(':')]
 		if c[1] in ENERGY:
@@ -84,27 +84,15 @@ async def use_item(uid, iid, eid, **kwargs):
 				else:
 					seg_data = await (common.try_weapon(uid, e[1], seg, **kwargs) if e[0] == enums.Group.WEAPON else common.try_role(uid, e[1], seg, **kwargs))
 					return common.mt(3, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{eid}:{seg_data}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{eid}:{seg}"}})
+			elif c[1] in SCROLL.keys():
+				gid, eid, value = enums.Group.ITEM.value, SCROLL[c[1]], consume//3
+				_, remain_v = await common.try_item(uid, eid, value, **kwargs)
+				return common.mt(4, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{gid}:{eid.value}:{remain_v}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{gid}:{eid.value}:{value}"}})
 			else:
 				await common.try_item(uid, c[1], consume, **kwargs)  # 还原
 				return common.mt(98, '兑换成品类型错误')
 	else:
 		return common.mt(99, f'意外消耗品{iid}')
-
-
-async def upgrade_scroll(uid, iid, **kwargs):
-	if iid not in enums.Item._value2member_map_.keys(): return common.mt(99, 'iid error')
-	iid = enums.Item(iid)
-	if iid not in SCROLL.keys(): return common.mt(98, 'This scroll is not upgradeable')
-	consume = 3  # 消耗数量
-	can, remain_c = await common.try_item(uid, iid, -consume, **kwargs)
-	if not can: return common.mt(97, 'material insufficient')
-	value = 1  # 奖励数量
-	_, remain_v = await common.try_item(uid, SCROLL[iid], value, **kwargs)
-	return common.mt(0, 'success', {'remaining': [f'{enums.Group.ITEM.value}:{iid.value}:{remain_c}', f'{enums.Group.ITEM.value}:{SCROLL[iid].value}:{remain_v}'],
-										'reward': [f'{enums.Group.ITEM.value}:{iid.value}:{consume}', f'{enums.Group.ITEM.value}:{SCROLL[iid].value}:{value}']})
-
-
-
 
 
 async def config(uid, **kwargs):
