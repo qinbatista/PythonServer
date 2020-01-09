@@ -26,6 +26,11 @@ UNIVERSAL = [
 	enums.Item.UNIVERSAL5_SEGMENT,
 	enums.Item.UNIVERSAL6_SEGMENT
 ]
+SCROLL = {
+	enums.Item.SKILL_SCROLL_10: enums.Item.SKILL_SCROLL_30,
+	enums.Item.SKILL_SCROLL_30: enums.Item.SKILL_SCROLL_100
+}
+
 
 async def exchange(uid, cid, qty=1, **kwargs):
 	if cid not in enums.Item._value2member_map_.keys(): return common.mt(99, 'iid error')
@@ -46,32 +51,32 @@ async def use_item(uid, iid, eid, **kwargs):
 	iid: 格式为"1:2:6"，代表兑换消耗品，1是gid：gid都是item类，2是iid，6是iid消耗的数量暂时未使用
 	eid: 格式为"1:2:1", 代表兑换的成品
 	"""
-	consume = 1
+	# consume = 1
 	c = common.decode_items(iid)[0]
-	# consume = c[2]
+	consume = c[2]
 	if c[0] == enums.Group.ITEM:
 		can, remain = await common.try_item(uid, c[1], -consume, **kwargs)
 		if not can: return common.mt(96, '兑换消耗品不足')
 		iid = iid[:iid.rfind(':')]
 		if c[1] in ENERGY:
-			energy = kwargs['config']['package']['exchange_item'][c[1].name.lower()]
+			energy = kwargs['config']['package']['exchange_item'][c[1].name.lower()] * consume
 			energy_data = (await common.try_energy(uid, energy, **kwargs))['data']
 			return common.mt(0, 'success', {'remaining': {'item': f"{iid}:{remain}", 'energy': energy_data['energy'], 'cooling_time': energy_data['cooling_time']}, 'reward': {'item': f"{iid}:{-consume}", 'energy': energy}})
 		else:
 			if c[1] in WEAPON:
-				seg = kwargs['config']['package']['exchange_item'][c[1].name.lower()]
+				seg = kwargs['config']['package']['exchange_item'][c[1].name.lower()] * consume
 				kind = enums.Weapon[choice([k for k in enums.Weapon.__members__.keys() if 'W' + re.search(r"\d", c[1].name).group(0) in k])]
 				seg_data = await common.try_weapon(uid, kind, seg, **kwargs)
 				return common.mt(1, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{enums.Group.WEAPON.value}:{kind.value}:{seg_data}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{enums.Group.WEAPON.value}:{kind.value}:{seg}"}})
 			elif c[1] in ROLE:
-				seg = kwargs['config']['package']['exchange_item'][c[1].name.lower()]
+				seg = kwargs['config']['package']['exchange_item'][c[1].name.lower()] * consume
 				kind = enums.Role[choice([k for k in enums.Role.__members__.keys() if 'R' + re.search(r"\d", c[1].name).group(0) in k])]
 				seg_data = await common.try_role(uid, kind, seg, **kwargs)
 				return common.mt(2, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{enums.Group.ROLE.value}:{kind.value}:{seg_data}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{enums.Group.ROLE.value}:{kind.value}:{seg}"}})
 			elif c[1] in UNIVERSAL:
 				e = common.decode_items(eid)[0]
 				eid = eid[:eid.rfind(':')]
-				seg = kwargs['config']['package']['exchange_item'][c[1].name.lower()]
+				seg = kwargs['config']['package']['exchange_item'][c[1].name.lower()] * consume
 				if (e[0] == enums.Group.ROLE and e[1].name not in [k for k in enums.Role.__members__.keys() if 'R' + re.search(r"\d", c[1].name).group(0) in k]) or \
 					(e[0] == enums.Group.WEAPON and e[1].name not in [k for k in enums.Weapon.__members__.keys() if 'W' + re.search(r"\d", c[1].name).group(0) in k]):
 					await common.try_item(uid, c[1], consume, **kwargs)  # 还原
@@ -84,6 +89,23 @@ async def use_item(uid, iid, eid, **kwargs):
 				return common.mt(98, '兑换成品类型错误')
 	else:
 		return common.mt(99, f'意外消耗品{iid}')
+
+
+async def upgrade_scroll(uid, iid, **kwargs):
+	if iid not in enums.Item._value2member_map_.keys(): return common.mt(99, 'iid error')
+	iid = enums.Item(iid)
+	if iid not in SCROLL.keys(): return common.mt(98, 'This scroll is not upgradeable')
+	consume = 3  # 消耗数量
+	can, remain_c = await common.try_item(uid, iid, -consume, **kwargs)
+	if not can: return common.mt(97, 'material insufficient')
+	value = 1  # 奖励数量
+	_, remain_v = await common.try_item(uid, SCROLL[iid], value, **kwargs)
+	return common.mt(0, 'success', {'remaining': [f'{enums.Group.ITEM.value}:{iid.value}:{remain_c}', f'{enums.Group.ITEM.value}:{SCROLL[iid].value}:{remain_v}'],
+										'reward': [f'{enums.Group.ITEM.value}:{iid.value}:{consume}', f'{enums.Group.ITEM.value}:{SCROLL[iid].value}:{value}']})
+
+
+
+
 
 async def config(uid, **kwargs):
 	return common.mt(0, 'success', {'config': kwargs['config']['package']})

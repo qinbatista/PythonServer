@@ -62,10 +62,9 @@
 
 [调整关卡失败]()
 
-* 2: 账号已经被绑定，请用账户登陆
 * 99：invalid account name
 * 98：invalid password
-* 97：Your account has been registered, please log in directly
+* 97：The account name has been used
 
 
 

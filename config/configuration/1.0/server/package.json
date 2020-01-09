@@ -1,4 +1,5 @@
 {
+	"comment": "exchange_card代表卡片兑换",
 	"exchange_card": {
 		"COIN_CARD": {
 			"sqltable": "item",

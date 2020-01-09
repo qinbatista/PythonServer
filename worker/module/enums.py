@@ -17,7 +17,7 @@ class Item(enum.IntEnum):
 	SKILL_SCROLL_30 = 7
 	SKILL_SCROLL_100 = 8
 	EXPERIENCE_POTION = 9
-	ENERGY_POTION_S = 10  # 能量瓶
+	ENERGY_POTION_S = 10  # 能量瓶 屏蔽使用
 	SUMMON_SCROLL_BASIC = 11
 	SUMMON_SCROLL_PRO = 12
 	SUMMON_SCROLL_PROPHET = 13
@@ -32,7 +32,7 @@ class Item(enum.IntEnum):
 	CRYSTAL_CARD = 22
 	DIAMOND_CARD = 23
 	MINE = 24
-	SMALL_ENERGY_POTION = 25
+	SMALL_ENERGY_POTION = 25  # 屏蔽使用
 	VIP_CARD_MIN = 26
 	VIP_CARD_MAX = 27
 	VIP_CARD_PERPETUAL = 28
@@ -226,6 +226,21 @@ class Role(enum.IntEnum):
 	R603 = 28
 	R604 = 29
 	R605 = 30
+
+
+class RolePassive(enum.IntEnum):
+	"""P101-P199为维度被动技能范围
+	P201-P299未定"""
+	P101 = 101
+	P102 = 102
+	P103 = 103
+	P104 = 104
+	P105 = 105
+	P106 = 106
+	P107 = 107
+	P108 = 108
+	P109 = 109
+	P110 = 110
 
 
 class Armor(enum.IntEnum):

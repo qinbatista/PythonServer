@@ -628,6 +628,9 @@ class MessageHandler:
 	async def _use_item(self, data: dict) -> str:
 		return await package.use_item(data['data']['unique_id'], data['data']['item_id'], data['data'].get('exchange_id', ''), **data)
 
+	async def _upgrade_scroll(self, data: dict) -> str:
+		return await package.upgrade_scroll(data['data']['unique_id'], data['data']['item_id'], **data)
+
 	async def _get_config_exchange(self, data: dict) -> str:
 		return await package.config(data['data']['unique_id'], **data)
 
@@ -864,6 +867,7 @@ FUNCTION_LIST = {
 	###################### package ######################
 	'exchange_card': MessageHandler._exchange_card,
 	'use_item': MessageHandler._use_item,
+	'upgrade_scroll': MessageHandler._upgrade_scroll,
 
 	###################### private(comment before release) ######################
 	'send_gift_mail': MessageHandler._send_gift_mail,
