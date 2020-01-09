@@ -50,10 +50,36 @@ async def level_up_star(uid, rid, **kwargs):
 
 async def unlock_passive(uid, rid, pid, **kwargs):
 	"""解锁被动技能"""
+	if rid not in enums.Role._value2member_map_.keys(): return common.mt(99, 'Role id error')
+	if pid not in enums.RolePassive._value2member_map_.keys() or pid//100 != 1: return common.mt(98, 'Passive skill id error')
+	rid, pid = enums.Role(rid), enums.RolePassive(pid)
+	exists, payload = await _get_role_info(uid, rid, 'star', 'level', **kwargs)
+	if not exists: return common.mt(97, 'invalid target')
+	star, level = payload
+	if star == 0: return common.mt(96, "You don't have the role")
+	lv = kwargs['config']['role']['standard_costs']['unlock_ps'][pid.name]['lv']
+	qty = kwargs['config']['role']['standard_costs']['unlock_ps'][pid.name]['qty']
+	if lv > level: return common.mt(95, 'Your role level has not reached the unlock level')
+	ps = await _get_ps(uid, rid, pid, **kwargs)
+	if ps: return common.mt(94, 'This passive is unlocked', await _get_all_role_passives(uid, **kwargs))
+	can, remain = await common.try_item(uid, enums.Item.COIN, -qty, **kwargs)
+	if not can: return common.mt(93, 'insufficient coin')
+	await _update_ps_lv(uid, rid, pid, 1, **kwargs)
+	return common.mt(0, 'success', {'rid': rid.value, 'pid': pid.value, 'consume': f'{enums.Group.ITEM.value}:{enums.Item.COIN.value}:{remain}:{qty}'})
 
 
+# async def get_all(uid, **kwargs):
+# 	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs),"config":{'seg' : kwargs['config']['role']['standard_costs']['seg'], 'exp_pot' : kwargs['config']['role']['standard_costs']['upgrade_lv']['exp_pot']}})
 async def get_all(uid, **kwargs):
-	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs),"config":{'seg' : kwargs['config']['role']['standard_costs']['seg'], 'exp_pot' : kwargs['config']['role']['standard_costs']['upgrade_lv']['exp_pot']}})
+	roles = await _get_all_role_info(uid, **kwargs)
+	passives = await _get_all_role_passives(uid, **kwargs)
+	for role in roles:
+		for pid in enums.RolePassive:
+			try:
+				role[f'p{pid.value}'] = passives[role['rid']][pid.value]
+			except KeyError:
+				role[f'p{pid.value}'] = 0
+	return common.mt(0, 'success', {'roles' : roles})
 
 
 async def get_config(**kwargs):
@@ -61,15 +87,26 @@ async def get_config(**kwargs):
 
 #################################################################################
 
+
+async def _update_ps_lv(uid, rid, pid, lv, **kwargs):
+	await common.execute(f'INSERT INTO rolepassive(uid, rid, pid, level) VALUES ("{uid}", {rid}, {pid}, {lv}) ON DUPLICATE KEY UPDATE level = {lv};', **kwargs)
+
+
+async def _get_ps(uid, rid, pid, **kwargs):
+	ps = await common.execute(f'SELECT level FROM rolepassive WHERE uid = "{uid}" AND rid = {rid} AND pid = {pid};', **kwargs)
+	return False if ps == () else bool(ps[0][0] == 1)
+
+
 async def _get_role_info(uid, rid, *args, **kwargs):
 	data = await common.execute(f'SELECT {",".join(args)} FROM role WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
 	return (True, data[0]) if data != () else (False, ())
+
 
 async def _get_all_role_info(uid, **kwargs):
 	data = await common.execute(f'SELECT rid, star, level, segment FROM role WHERE uid = "{uid}";', **kwargs)
 	return [{'rid' : r[0], 'star' : r[1], 'level' : r[2], 'seg' : r[3]} for r in data]
 
-# unused right now
+
 async def _get_all_role_passives(uid, **kwargs):
 	data = await common.execute(f'SELECT rid, pid, level FROM rolepassive WHERE uid = "{uid}";', **kwargs)
 	passives = defaultdict(dict)

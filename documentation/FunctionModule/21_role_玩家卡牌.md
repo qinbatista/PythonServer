@@ -3,6 +3,7 @@
 * [`get_all_role`](##get_all_role)
 * [`level_up_role`](##level_up_role)
 * [`level_up_star_role`](##level_up_star_role)
+* [`unlock_passive_role`](##unlock_passive_role)
 * [`get_config_role`](##get_config_role)
 
 ## get_all_role
@@ -25,128 +26,32 @@
 
 [成功]()
 
-> roles：玩家的角色详细数据，`rid`角色id，`star`角色星数，`level`角色等级，`seg`角色碎片
+> roles：玩家的角色详细数据，`rid`角色id，`star`角色星数，`level`角色等级，`seg`角色碎片，p101-p199为角色被动技能，p后面的数值为被动技能代号，0代表未解锁，1代表已解锁
 
 ```json
 {
-	"status": 0,
-	"message": "success",
-	"data": {
-		"roles": [
-			{
-				"rid": 1,
-				"star": 1,
-				"level": 0,
-				"seg": 20
-			},
-			{
-				"rid": 3,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			},
-			{
-				"rid": 4,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			},
-			{
-				"rid": 5,
-				"star": 1,
-				"level": 0,
-				"seg": 30
-			},
-			{
-				"rid": 6,
-				"star": 1,
-				"level": 0,
-				"seg": 420
-			},
-			{
-				"rid": 7,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			},
-			{
-				"rid": 10,
-				"star": 1,
-				"level": 0,
-				"seg": 60
-			},
-			{
-				"rid": 11,
-				"star": 1,
-				"level": 0,
-				"seg": 30
-			},
-			{
-				"rid": 12,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			},
-			{
-				"rid": 14,
-				"star": 1,
-				"level": 0,
-				"seg": 30
-			},
-			{
-				"rid": 15,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			},
-			{
-				"rid": 16,
-				"star": 1,
-				"level": 0,
-				"seg": 60
-			},
-			{
-				"rid": 17,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			},
-			{
-				"rid": 20,
-				"star": 1,
-				"level": 0,
-				"seg": 30
-			},
-			{
-				"rid": 25,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			},
-			{
-				"rid": 26,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			},
-			{
-				"rid": 27,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			},
-			{
-				"rid": 30,
-				"star": 1,
-				"level": 0,
-				"seg": 0
-			}
-		],
-		"config": {
-			"seg": 25,
-			"exp_pot": 5
-		}
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "roles": [
+            {
+                "rid": 1,
+                "star": 1,
+                "level": 18,
+                "seg": 0,
+                "p101": 1,
+                "p102": 0,
+                "p103": 0,
+                "p104": 0,
+                "p105": 0,
+                "p106": 0,
+                "p107": 0,
+                "p108": 0,
+                "p109": 0,
+                "p110": 0
+            }
+        ]
+    }
 }
 ```
 
@@ -277,6 +182,61 @@
 * 99: 物品名错误
 * 98: 材料不足
 * 97: 已经满级
+
+
+
+## unlock_passive_role
+
+##### 发送消息JSON格式
+
+解锁角色被动技能
+
+> role：角色的id
+>
+> passive：角色被动技能id
+
+```json
+{
+	"world": 0, 
+	"function": "unlock_passive_role",
+	"data": {
+		"token": "my toekn ^_^",
+		"role": 1,
+        "passive": 101
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> `rid`角色id，`pid`最新解锁的被动技能id
+>
+> consume：消耗品信息，分别拼接的是组id，物品id，剩余量，消耗量
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "rid": 1,
+        "pid": 102,
+        "consume": "3:1:90000:10000"
+    }
+}
+```
+
+[失败]()
+
+* 99: Role id error
+* 98: Passive skill id error
+* 97: invalid target
+* 96: You don't have the role
+* 95: Your role level has not reached the unlock level
+* 94: This passive is unlocked
+* 93: insufficient coin
+
 
 
 

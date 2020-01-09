@@ -20,4 +20,8 @@ def role_dialog(_token,_world):
 
 
 if __name__ == "__main__":
-	pass
+	world = "s6"
+	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNDM1ODMsInVpZCI6ImgwIn0.sqnbjsCJ_8OefTY-M9IHFARhqQ6cm6kATzUUlRekwjY"
+	response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'unlock_passive_role', 'data' : {'token' : token, "role": 1, 'passive': 102}})#升级请求
+	# response = user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'get_all_role', 'data' : {'token' : token, "role": 1, 'passive': 101}})#升级请求
+

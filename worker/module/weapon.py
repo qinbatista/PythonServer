@@ -51,9 +51,8 @@ async def level_up_passive(uid, wid, pid, **kwargs):
 	exists, payload = await _get_weapon_info(uid, wid, 'skillpoint', **kwargs)
 	if not exists or payload[0] <= 0: return common.mt(99, 'insufficient materials')
 	level = await _increase_passive_level(uid, wid, pid, **kwargs)
-	return common.mt(0, 'success', {'remaining' : {'wid' : wid.value, 'pid' : pid.value, 'level' : level, \
-			'sp' : payload[0] - 1}, 'reward' : {'wid' : wid.value, 'pid' : pid.value, 'level' : 1, \
-			'sp' : 1}})
+	return common.mt(0, 'success', {'remaining': {'wid': wid.value, 'pid': pid.value, 'level': level,
+			'sp': payload[0] - 1}, 'reward': {'wid': wid.value, 'pid': pid.value, 'level': 1, 'sp': 1}})
 
 async def level_up_star(uid, wid, **kwargs):
 	wid = enums.Weapon(wid)
