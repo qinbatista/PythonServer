@@ -55,6 +55,7 @@ async def use_item(uid, iid, eid, **kwargs):
 	c = common.decode_items(iid)[0]
 	consume = c[2]
 	if c[0] == enums.Group.ITEM:
+		if c[1] in SCROLL.keys() and consume % 3 != 0: return common.mt(95, 'Scroll upgrades require multiples of 3')
 		can, remain = await common.try_item(uid, c[1], -consume, **kwargs)  # 是卷轴则消耗三倍低级卷轴生成一倍高级卷轴
 		if not can: return common.mt(96, '兑换消耗品不足')
 		iid = iid[:iid.rfind(':')]
