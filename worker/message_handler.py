@@ -431,6 +431,9 @@ class MessageHandler:
 	async def _level_up_star_role(self, data: dict) -> str:
 		return await role.level_up_star(data['data']['unique_id'], int(data['data']['role']), **data)
 
+	async def _unlock_passive_role(self, data: dict) -> str:
+		return await role.unlock_passive(data['data']['unique_id'], int(data['data']['role']), int(data['data']['passive']), **data)
+
 	async def _get_config_role(self, data: dict) -> str:
 		return await role.get_config(**data)
 
@@ -806,6 +809,7 @@ FUNCTION_LIST = {
 	'level_up_star_role' : MessageHandler._level_up_star_role,
 	'level_up_role' : MessageHandler._level_up_role,
 	'get_all_role' : MessageHandler._get_all_role,
+	'unlock_passive_role' : MessageHandler._unlock_passive_role,
 
 	# TODO
 	###################### 签到系统 ######################
