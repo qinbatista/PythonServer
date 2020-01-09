@@ -394,9 +394,9 @@ async def refresh_g(uid, **kwargs):
 	if end_time is not None and end_time > current and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		config = kwargs['config']['summon']['resource'].get(cid.name, None)
 		tim_refresh = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
 		tim_refresh = current if tim_refresh is None else tim_refresh
+		config = kwargs['config']['summon']['resource'].get(cid.name, None)
 		constraint = {'cooling_refresh': int((tim_refresh - current).total_seconds()), 'cid': cid.value}
 		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
 		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
