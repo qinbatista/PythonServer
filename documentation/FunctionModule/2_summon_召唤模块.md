@@ -1159,7 +1159,6 @@
 >
 > refresh：刷新之后获得的所有商品情况
 >
-> - cid：消耗品iid（1代表金币，5代表钻石，16代表朋友礼物）
 > - pid：商品位置id（0-11）
 > - mid：商品信息："gid:iid:qty"
 > - wgt：权重值，权重越大，抽中的概率越大
@@ -1168,42 +1167,45 @@
 > constraint：部分约束
 >
 > - limit：refresh_diamond_store下返回的是今天抽奖的次数，refresh_coin_store下返回的是抽奖剩余次数
+> - cid：消耗品iid（1代表金币，5代表钻石，16代表朋友礼物）
 > - cooling: 冷却时间，剩下多少秒之后会再次刷新商城，当商城的商品被抽完之后这个值不起作用，并立刻刷新
 > - cooling_refresh：距离下一次可免费时间需要的冷却时间，小于等于0时可进行免费刷新
+> - qty：购买单个物品需要的对应物品数量
+> - refresh：刷新需要的钻石数量
 
 ```json
 {
-    "status": 1,
-    "message": "get all refresh info",
+    "status": 0,
+    "message": "success",
     "data": {
         "refresh": [
             {
-                "cid": 1,
-                "pid": 0,
-                "mid": "0:15:20",
-                "wgt": 200,
-                "isb": 1
-            },
-            {
-                "cid": 1,
-                "pid": 1,
-                "mid": "0:15:20",
-                "wgt": 200,
+                "pid": 3,
+                "mid": "2:18:20",
+                "wgt": 30,
                 "isb": 0
             },
-      		.......
             {
-                "cid": 1,
-                "pid": 11,
-                "mid": "2:21:20",
-                "wgt": 200,
-                "isb": 1
+                "pid": 4,
+                "mid": "1:25:1",
+                "wgt": 10,
+                "isb": 0
+            },
+            ... ...
+            {
+                "pid": 2,
+                "mid": "3:7:5",
+                "wgt": 500,
+                "isb": 0
             }
         ],
         "constraint": {
-            "limit": 11,
-            "cooling": 158088,
-            "cooling_refresh": 58088
+            "cooling_refresh": 0,
+            "cid": 1,
+            "limit": 12,
+            "qty": 10000,
+            "refresh": 20,
+            "cooling": 172800
         }
     }
 }
@@ -1246,7 +1248,6 @@
 >
 > refresh：刷新之后获得的所有商品情况
 >
-> - cid：消耗品iid（1代表金币，5代表钻石，16代表朋友礼物）
 > - pid：商品位置id（0-11）
 > - mid：商品信息："gid:iid:qty"
 > - wgt：权重值，权重越大，抽中的概率越大
@@ -1255,8 +1256,11 @@
 > constraint：部分约束
 >
 > - limit：refresh_diamond_store下返回的是今天抽奖的次数，refresh_coin_store下返回的是抽奖剩余次数
+> - cid：消耗品iid（1代表金币，5代表钻石，16代表朋友礼物）
 > - cooling: 冷却时间，剩下多少秒之后会再次刷新商城，当商城的商品被抽完之后这个值不起作用，并立刻刷新
 > - cooling_refresh：距离下一次可免费时间需要的冷却时间，小于等于0时可进行免费刷新
+> - qty：购买单个物品需要的对应物品数量
+> - refresh：刷新需要的钻石数量
 >
 > consume：钻石消耗
 >
@@ -1270,31 +1274,30 @@
     "data": {
         "refresh": [
             {
-                "cid": 5,
                 "pid": 6,
-                "mid": "0:20:20",
+                "mid": "0:16:20",
                 "wgt": 30,
                 "isb": 0
             },
             {
-                "cid": 5,
-                "pid": 8,
-                "mid": "0:25:20",
+                "pid": 4,
+                "mid": "3:22:1",
                 "wgt": 10,
                 "isb": 0
             },
-      		.......
+            ... ...
             {
-                "cid": 5,
-                "pid": 4,
-                "mid": "0:27:20",
+                "pid": 11,
+                "mid": "0:22:20",
                 "wgt": 200,
                 "isb": 0
             }
         ],
         "constraint": {
-            "cooling_refresh": 41921,
-            "limit": 2,
+            "cooling_refresh": 17629,
+            "cid": 16,
+            "qty": 10,
+            "refresh": 20,
             "cooling": 172800
         },
         "consume": {
@@ -1303,6 +1306,7 @@
         }
     }
 }
+
 ```
 
 [失败]()
@@ -1594,14 +1598,12 @@
         ],
         "refresh": [
             {
-                "cid": 5,
                 "pid": 0,
                 "mid": "0:17:20",
                 "wgt": 30,
                 "isb": 0
             },
             {
-                "cid": 5,
                 "pid": 2,
                 "mid": "0:24:20",
                 "wgt": 10,
@@ -1609,7 +1611,6 @@
             },
       		.......,
             {
-                "cid": 5,
                 "pid": 7,
                 "mid": "2:21:20",
                 "wgt": 200,
@@ -1617,8 +1618,11 @@
             }
         ],
         "constraint": {
-            "cooling_refresh": -385783,
-            "limit": 2,
+            "cooling_refresh": 17271,
+            "cid": 5,
+            "limit": 1,
+            "qty": 200,
+            "refresh": 50,
             "cooling": 172800
         }
     }
@@ -1722,14 +1726,12 @@
         ],
         "refresh": [
             {
-                "cid": 1,
                 "pid": 11,
                 "mid": "2:16:20",
                 "wgt": 30,
                 "isb": 0
             },
             {
-                "cid": 1,
                 "pid": 1,
                 "mid": "1:23:1",
                 "wgt": 10,
@@ -1737,7 +1739,6 @@
             },
       		.......,
             {
-                "cid": 1,
                 "pid": 5,
                 "mid": "1:5:1",
                 "wgt": 300,
@@ -1745,8 +1746,11 @@
             }
         ],
         "constraint": {
-            "cooling_refresh": 0,
+            "cooling_refresh": 17123,
+            "cid": 1,
             "limit": 0,
+            "qty": 10000,
+            "refresh": 20,
             "cooling": 172800
         }
     }
@@ -1849,14 +1853,12 @@
         ],
         "refresh": [
             {
-                "cid": 16,
                 "pid": 4,
                 "mid": "0:16:20",
                 "wgt": 30,
                 "isb": 0
             },
             {
-                "cid": 16,
                 "pid": 3,
                 "mid": "3:22:1",
                 "wgt": 10,
@@ -1864,7 +1866,6 @@
             },
       		.......,
             {
-                "cid": 16,
                 "pid": 7,
                 "mid": "2:1:20",
                 "wgt": 200,
@@ -1872,7 +1873,10 @@
             }
         ],
         "constraint": {
-            "cooling_refresh": 0,
+            "cooling_refresh": 17045,
+            "cid": 16,
+            "qty": 10,
+            "refresh": 20,
             "cooling": 172800
         }
     }
