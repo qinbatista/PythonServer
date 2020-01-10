@@ -13,7 +13,7 @@
 * [`verify_phone_code`](##verify_phone_code)
 
 - [`create_player`](##create_player)
-
+- [`change_player_name`](##change_player_name)
 - [`enter_world`](##enter_world)
 
 
@@ -506,6 +506,58 @@
 
 * 99: 玩家uid或名字已存在
 * 98: 玩家uid或者名字为空
+
+
+
+## change_player_name
+
+修改游戏名字需要消耗100钻石
+
+> gn：输入游戏的名字
+
+```json
+{
+	"world": 0,
+	"function": "change_player_name",
+	"data": {
+		"token": "my token",
+		"gn":"game name",
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[获取资源成功]()
+
+> gn：游戏的名字
+>
+> remaining：剩余的物资信息
+>
+> reward：改变的物资信息
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"gn": "你的新游戏名字",
+		"remaining": [
+			"3:5:9440"
+		],
+		"reward": [
+			"3:5:100"
+		]
+	}
+}
+```
+
+[调整关卡失败]()
+
+* 99: 玩家名字已被使用
+* 98: materials insufficient
+
+
 
 
 

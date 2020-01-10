@@ -130,6 +130,9 @@ class MessageHandler:
 	async def _create_player(self, data: dict) -> str:
 		return await player.create(data['data']['unique_id'], data['data']['gn'], **data)
 
+	async def _change_player_name(self, data: dict) -> str:
+		return await player.change_name(data['data']['unique_id'], data['data']['gn'], **data)
+
 	async def _enter_world(self, data: dict) -> str:
 		return await player.enter_world(data['data']['unique_id'], **data)
 
@@ -701,6 +704,7 @@ FUNCTION_LIST = {
 	'enter_world' : MessageHandler._enter_world,
 	'accept_gifts' : MessageHandler._accept_gifts,
 	'create_player' : MessageHandler._create_player,
+	'change_player_name' : MessageHandler._change_player_name,
 	'get_account_world_info' : MessageHandler._get_account_world_info,
 	'get_info_player' : MessageHandler._get_info_player,
 

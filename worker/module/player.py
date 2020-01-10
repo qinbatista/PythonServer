@@ -9,9 +9,10 @@ from module import stage
 from module import summoning
 import asyncio
 
+
 async def create(uid, gn, **kwargs):
-	if uid == "" or gn == "": return common.mt(98, '玩家uid或者名字为空')
-	if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, '玩家uid或名字已存在')
+	if uid == "" or gn == "": return common.mt(98, 'Player uid or name is empty')
+	if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, 'Player uid or name already exists')
 	await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
 	await asyncio.gather(
 		common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180 WHERE uid="{uid}";', **kwargs),
@@ -24,10 +25,12 @@ async def create(uid, gn, **kwargs):
 	await _meeting_gift(uid, **kwargs)
 	return common.mt(0, 'success', {'gn': gn})
 
+
 async def enter_world(uid, **kwargs):
 	existing_player = await common.exists('player', ('uid', uid), **kwargs)
 	if not existing_player: return common.mt(98, 'have not been in this world before')
 	return common.mt(0, 'success')
+
 
 async def get_account_world_info(uid, **kwargs):
 	worlds = []
@@ -44,6 +47,7 @@ async def get_account_world_info(uid, **kwargs):
 					'world_name' : world['name'], 'gn' : '', 'exp' : 0, 'level' : 0})
 	return common.mt(0, 'success', {'worlds' : worlds})
 
+
 async def accept_gifts(uid, gift, other, **kwargs):
 	error, success = [], {}
 	await asyncio.gather(*[mail.mark_read(uid, o, **kwargs) for o in other])
@@ -53,6 +57,7 @@ async def accept_gifts(uid, gift, other, **kwargs):
 		if valid: success[g] = [dict(r) for r in resp]
 		else: error.append(g)
 	return common.mt(0, 'success', {'error' : error, 'success' : success})
+
 
 async def accept_gift(uid, nonce, **kwargs):
 	await mail.mark_read(uid, nonce, **kwargs)
@@ -64,8 +69,16 @@ async def accept_gift(uid, nonce, **kwargs):
 		r.append({'gid' : item[0], 'id' : item[1], 'remaining' : remaining, 'reward' : item[2]})
 	return True, r
 
-async def change_name(uid, name, **kwargs):
-	pass
+
+async def change_name(uid, gn, **kwargs):
+	"""修改玩家名字"""
+	if (await common.execute(f'SELECT COUNT(*) FROM player WHERE gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, 'The player name has been used')
+	consume = 100
+	can, remain = await common.try_item(uid, enums.Item.DIAMOND, -consume, **kwargs)
+	if not can: return common.mt(98, 'materials insufficient')
+	await common.execute(f'UPDATE player SET gn = "{gn}" WHERE uid="{uid}";', **kwargs),
+	return common.mt(0, 'success', {'gn': gn, 'remaining': [f'{enums.Group.ITEM.value}:{enums.Item.DIAMOND.value}:{remain}'], 'reward': [f'{enums.Group.ITEM.value}:{enums.Item.DIAMOND.value}:{consume}']})
+
 
 async def get_info(uid, **kwargs):
 	# data包含玩家名字和家庭名字，info包含玩家进程信息
@@ -76,6 +89,7 @@ async def get_info(uid, **kwargs):
 		info = await common.execute(f'SELECT energy, exp, stage, towerstage, hangstage FROM progress WHERE uid = "{uid}";', **kwargs)
 	energy_info = await common.try_energy(uid, 0, **kwargs)
 	return common.mt(0, 'success', {'gn': data[0][0], 'family_name': '' if data[0][1] is None else data[0][1], 'energy_info': energy_info['data'], 'exp': info[0][1], 'stage': info[0][2], 'towerstage': info[0][3], 'hangstage': info[0][4]})
+
 
 async def get_all_resource(uid, **kwargs):
 	await summoning._refresh_integral(uid, **kwargs)
@@ -108,6 +122,7 @@ async def _meeting_gift(uid, **kwargs):
 		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.UNIVERSAL4_SEGMENT, 100, **kwargs),
 		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.UNIVERSAL5_SEGMENT, 100, **kwargs),
 		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.ENERGY_POTION_S_MAX, 100, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.EXPERIENCE_POTION, 100_0000, **kwargs),
 	)
 
 
