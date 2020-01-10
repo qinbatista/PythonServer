@@ -6,6 +6,7 @@ Able to make intelligent decisions such as inviting other simulated users to bec
 Records timing metrics for all messages sent.
 '''
 
+import os
 import ssl
 import json
 import time
@@ -15,6 +16,7 @@ import random
 import asyncio
 import argparse
 import contextlib
+import statistics
 
 from functions import FunctionList
 from dataclasses import dataclass, field
@@ -130,6 +132,33 @@ class Metric:
 		return self.decoded
 
 '''
+Contains an aggregation of all the data collected through the entire run time of the simulation.
+'''
+@dataclass
+class Statistics:
+	data: defaultdict(list) = field(default_factory = lambda: defaultdict(list))
+	latest: defaultdict(list) = field(default_factory = lambda: defaultdict(list))
+
+	def add(self, metric):
+		self.data[metric.name].append((metric.finish - metric.start, metric.start, metric.finish))
+		self.latest[metric.name].append((metric.finish - metric.start, metric.start, metric.finish))
+	
+	def print(self):
+		os.system('cls') if os.name == 'nt' else os.system('clear')
+		print(f'{"Function":<35}|{"N":^8}|{"Min":^8}|{"Avg":^8}|{"Med":^8}|{"Max":^8}|{"Std":^8}|')
+		for function in sorted(self.data):
+			times = [t[0] for t in self.data[function]]
+			num_req = len(self.data[function])
+			min_req = min(times)
+			avg_req = statistics.mean(times)
+			med_req = statistics.median(times)
+			max_req = max(times)
+			std_dev = statistics.pstdev(times)
+			print(f'{function:<35}|{num_req:<8}|{min_req:<8.4}|{avg_req:<8.4}|{med_req:<8.4}|{max_req:<8.4}|{std_dev:<8.4}|')
+		self.latest.clear()
+
+
+'''
 Represents a simulated user.
 
 Each user maintains a current state, which contains information such as friends, family status, and mails.
@@ -172,6 +201,7 @@ class User:
 class Simulator:
 	def __init__(self, argv):
 		self.argv = argv
+		self.stats = Statistics()
 		self.global_state = None
 
 	async def start(self):
@@ -179,15 +209,14 @@ class Simulator:
 			self.global_state = GlobalState(Client(self.argv.host, self.argv.port, self.argv.certpath))
 			users=[asyncio.create_task(User(self.global_state, self.argv).run())for _ in range(self.argv.n)]
 			while self.running:
-				await asyncio.wait({self.gather_metrics(metrics := [])}, timeout = self.argv.refresh)
-				print(metrics)
+				await asyncio.wait({self.gather_metrics()}, timeout = self.argv.refresh)
+				self.stats.print()
 		except Exception as e:
 			print(f'Simulator encountered and error: {e}')
 	
-	async def gather_metrics(self, metrics):
-		with contextlib.suppress(asyncio.CancelledError):
-			while True:
-				metrics.append(await self.global_state.metrics.get())
+	async def gather_metrics(self):
+		while True:
+			self.stats.add(await self.global_state.metrics.get())
 	
 	@property
 	def running(self):
