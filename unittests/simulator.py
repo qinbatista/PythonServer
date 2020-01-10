@@ -55,7 +55,8 @@ class User:
 		self.maxdelay = maxdelay
 
 		self.state    = {'token' : None, 'world' : None, 'gn' : '', 'fn' : '', 'gamenames' : gamenames, \
-				'familynames' : familynames, 'uid' : self.uid, 'friendlist' : set(), 'mail' : []}
+				'familynames' : familynames, 'uid' : self.uid, 'friendlist' : set(), \
+				'familylist' : set(), 'mail' : []}
 	
 	async def run(self):
 		try:
@@ -88,6 +89,7 @@ class User:
 			_, _, raw = await self.call('create_player')
 			if (json.loads(raw.decode().strip()))['status'] != 0:
 				raise Exception('GN already taken')
+			_, _, _ = await self.call('add_resources')
 		_, _, _ = await self.call('get_info_player')
 		return world
 
@@ -103,12 +105,13 @@ class User:
 		return 'sim_' + ''.join(random.choice(string.digits) for i in range(15))
 
 class Simulator:
-	def __init__(self, server_ip, target_users, maxdelay, refresh):
+	def __init__(self, server_ip, target_users, maxdelay, refresh, target_fn):
 		self.users = set()
 		self.queue = asyncio.Queue()
 		self.gamenames = collections.defaultdict(set)
 		self.familynames = collections.defaultdict(set)
 
+		self.target_fn = target_fn
 		self.refresh = refresh
 		self.maxdelay = maxdelay
 		self.server_ip = server_ip
@@ -143,15 +146,16 @@ class Simulator:
 			self.users     = self.update_users(pending)
 	
 	def analyze(self, interval, times):
-		print('Summary      Time Unit: seconds')
-		print('===============================')
-		print(f'Number of Requests   : {len(times)}')
-		print(f'Requests per Second  : {int(len(times) / interval)}')
-		print(f'Minimum              : {min(times):.4}')
-		print(f'Average              : {statistics.mean(times):.4}')
-		print(f'Median               : {statistics.median(times):.4}')
-		print(f'Maximum              : {max(times):.4}')
-		print(f'Standard Deviation   : {statistics.pstdev(times):.4}', end = '\n\n\n')
+		if len(times) != 0:
+			print('Summary      Time Unit: seconds')
+			print('===============================')
+			print(f'Number of Requests   : {len(times)}')
+			print(f'Requests per Second  : {int(len(times) / interval)}')
+			print(f'Minimum              : {min(times):.4}')
+			print(f'Average              : {statistics.mean(times):.4}')
+			print(f'Median               : {statistics.median(times):.4}')
+			print(f'Maximum              : {max(times):.4}')
+			print(f'Standard Deviation   : {statistics.pstdev(times):.4}', end = '\n\n\n')
 	
 	def target(self, n):
 		self.target_users = n
@@ -161,7 +165,8 @@ class Simulator:
 			print(f'Scaling up to {self.target_users} users...')
 			for _ in range(self.target_users - len(pending)):
 				pending.add(User(uuid.uuid4().hex, self.queue, Client(self.server_ip), \
-						self.gamenames, self.familynames, maxdelay = self.maxdelay).run())
+						self.gamenames, self.familynames, maxdelay = self.maxdelay, \
+						fn = self.target_fn).run())
 		elif len(pending) > self.target_users:
 			print(f'Scaling down to {self.target_users} users...')
 			for _ in range(len(pending) - self.target_users):
@@ -178,7 +183,7 @@ async def main():
 	parser.add_argument('-d', '--delay',   type = int, default = 10)
 	parser.add_argument('-r', '--refresh', type = int, default = 5)
 	args = parser.parse_args()
-	simulator = Simulator(args.host, args.n, args.delay, args.refresh)
+	simulator = Simulator(args.host, args.n, args.delay, args.refresh, args.fn)
 	await simulator.start()
 
 
