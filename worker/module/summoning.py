@@ -253,26 +253,22 @@ async def single_d(uid, **kwargs):
 	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
+	# TODO 次数检查和限制
+	can, lim = await _refresh_lim(uid, cid, var=1, **kwargs)
 	# TODO 消耗物品
-	now = datetime.now(tz=common.TZ_SH)
-	tim = await common.get_timer(uid, enums.Timer.SUMMON_D, timeformat='%Y-%m-%d', **kwargs)
-	lim = await common.get_limit(uid, enums.Limits.SUMMON_D, **kwargs)
-	lim = 0 if lim is None or tim is None or tim < now else lim
-	tim = (now + timedelta(days=1)) if tim is None or tim < now else tim
-	if lim > 0:
+	if not can:
+		consume_id, consume = cid, 0
+		_, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+	else:
 		consume_id, consume = enums.Item.SUMMON_SCROLL_D, 1
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 		if not can:
 			consume_id, consume = cid, abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
-			consume = consume // 2 if lim == 1 else consume  # 第二次购买消费减半
+			consume = consume // 2 if lim == 2 else consume  # 第二次购买消费减半
 			can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-			if not can: return common.mt(99, 'insufficient materials')
-	else:
-		consume_id, consume = cid, 0
-		await common.set_timer(uid, enums.Timer.SUMMON_D, tim, timeformat='%Y-%m-%d', **kwargs)
-		_, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-	lim += 1
-	await common.set_limit(uid, enums.Limits.SUMMON_D, lim, **kwargs)
+			if not can:  # 材料不足恢复原来的次数
+				await common.set_limit(uid, enums.Limits.SUMMON_D, lim - 1, **kwargs)
+				return common.mt(99, 'insufficient materials')
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
@@ -295,22 +291,17 @@ async def single_c(uid, **kwargs):
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
 	# TODO 次数检查和限制
-	now = datetime.now(tz=common.TZ_SH)
-	tim = await common.get_timer(uid, enums.Timer.SUMMON_C, timeformat='%Y-%m-%d', **kwargs)
-	lim = await common.get_limit(uid, enums.Limits.SUMMON_C, **kwargs)
-	lim = kwargs['config']['summon']['resource'][cid.name]['constraint']['times'] if lim is None or tim is None or tim < now else lim
-	tim = (now + timedelta(days=1)) if tim is None or tim < now else tim
-	if lim <= 0: return common.mt(95, 'Insufficient number of lucky draw')
-	lim -= 1
-	await common.set_timer(uid, enums.Timer.SUMMON_C, tim, timeformat='%Y-%m-%d', **kwargs)
-	await common.set_limit(uid, enums.Limits.SUMMON_C, lim, **kwargs)
+	can, lim = await _refresh_lim(uid, cid, var=-1, **kwargs)
+	if not can: common.mt(95, 'Insufficient number of lucky draw')
 	# TODO 消耗物品
 	consume_id, consume = enums.Item.SUMMON_SCROLL_C, 1
 	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 	if not can:
 		consume_id, consume = cid, abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-		if not can: return common.mt(99, 'insufficient materials')
+		if not can:  # 材料不足恢复原来的次数
+			await common.set_limit(uid, enums.Limits.SUMMON_C, lim + 1, **kwargs)
+			return common.mt(99, 'insufficient materials')
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
@@ -356,12 +347,9 @@ async def refresh_d(uid, **kwargs):
 	if end_time is not None and end_time > current and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		lim = await common.get_limit(uid, enums.Limits.SUMMON_D, **kwargs)
-		tim_refresh = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
-		tim_refresh = current if tim_refresh is None else tim_refresh
 		config = kwargs['config']['summon']['resource'].get(cid.name, None)
-		constraint = {'limit': 0 if lim is None else lim, 'cooling': int((end_time - current).total_seconds()), 'cooling_refresh': int((tim_refresh - current).total_seconds())}
-		constraint.update({'cid': cid.value, 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
+		constraint = {'cid': cid.value, 'limit': (await _refresh_lim(uid, cid, **kwargs))[1], 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
+		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
 		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
 	return await _refresh(uid, cid, **kwargs)
 
@@ -375,12 +363,9 @@ async def refresh_c(uid, **kwargs):
 	if end_time is not None and end_time > current and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		lim = await common.get_limit(uid, enums.Limits.SUMMON_C, **kwargs)
-		tim_refresh = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
-		tim_refresh = current if tim_refresh is None else tim_refresh
 		config = kwargs['config']['summon']['resource'].get(cid.name, None)
-		constraint = {'limit': config['constraint']['times'] if lim is None else lim, 'cooling': int((end_time - current).total_seconds()), 'cooling_refresh': int((tim_refresh - current).total_seconds())}
-		constraint.update({'cid': cid.value, 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
+		constraint = {'cid': cid.value, 'limit': (await _refresh_lim(uid, cid, **kwargs))[1], 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
+		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
 		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
 	return await _refresh(uid, cid, **kwargs)
 
@@ -394,10 +379,8 @@ async def refresh_g(uid, **kwargs):
 	if end_time is not None and end_time > current and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		tim_refresh = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
-		tim_refresh = current if tim_refresh is None else tim_refresh
 		config = kwargs['config']['summon']['resource'].get(cid.name, None)
-		constraint = {'cooling_refresh': int((tim_refresh - current).total_seconds()), 'cid': cid.value}
+		constraint = {'cid': cid.value, 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
 		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
 		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
 	return await _refresh(uid, cid, **kwargs)
@@ -450,12 +433,9 @@ async def _refresh(uid, cid: enums, **kwargs):
 	"""刷新抽奖市场方法，cid代表消耗品类型"""
 	if cid not in SUMMON_SWITCH.keys(): return common.mt(94, 'cid error')
 	now = datetime.now(tz=common.TZ_SH)
-	tim_refresh = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
-	tim_refresh = now if tim_refresh is None else tim_refresh
-	constraint = {'cooling_refresh': int((tim_refresh - now).total_seconds()), 'cid': cid.value}
+	constraint = {'cid': cid.value, 'cooling_refresh': await _refresh_count_down(uid, cid, now, **kwargs)}
 	if cid in SUMMON_CONSTRAINT.keys():
-		lim = await common.get_limit(uid, SUMMON_CONSTRAINT[cid][0], **kwargs)
-		constraint['limit'] = SUMMON_CONSTRAINT[cid][1](kwargs['config']['summon']['resource']) if lim is None else lim
+		constraint['limit'] = (await _refresh_lim(uid, cid, **kwargs))[1]
 	config = kwargs['config']['summon']['resource'].get(cid.name, None)
 	if config is None: return common.mt(93, 'The configuration file does not exist')
 	constraint.update({'qty': config['qty'], 'refresh': config['constraint']['refresh']})
@@ -491,6 +471,30 @@ async def _refresh(uid, cid: enums, **kwargs):
 	await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
 	constraint['cooling'] = hours * 3600
 	return common.mt(0, 'success', {'refresh': data, 'constraint': constraint})
+
+
+async def _refresh_lim(uid, cid, var=0, **kwargs):
+	"""检查刷新钻石商城和金币商城的次数限制"""
+	now = datetime.now(tz=common.TZ_SH)
+	etm, elm, func = SUMMON_CONSTRAINT[cid]
+	tim = await common.get_timer(uid, etm, timeformat='%Y-%m-%d', **kwargs)
+	lim = await common.get_limit(uid, elm, **kwargs)
+	lim, tim = (func(kwargs['config']['summon']['resource']) + var, now + timedelta(days=1)) if lim is None or tim is None or tim < now else (lim + var, tim)
+	if cid == enums.Item.DIAMOND:
+		await common.set_limit(uid, elm, lim, **kwargs)
+		if lim == 1: return False, lim
+	else:  # enums.Item.COIN
+		if lim < 0: return False, lim
+	await common.set_timer(uid, etm, tim, timeformat='%Y-%m-%d', **kwargs)
+	await common.set_limit(uid, elm, lim, **kwargs)
+	return True, lim
+
+
+async def _refresh_count_down(uid, cid, now, **kwargs) -> int:
+	"""返回下次刷新需要的秒钟数"""
+	tim = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
+	tim = now if tim is None else tim
+	return int((tim - now).total_seconds())
 
 
 async def _get_isb_count(uid, cid, isb=0, **kwargs):
@@ -531,8 +535,8 @@ SUMMON_SWITCH = {
 }
 
 SUMMON_CONSTRAINT = {
-	enums.Item.DIAMOND:     (enums.Limits.SUMMON_D, lambda config: 0),
-	enums.Item.COIN:        (enums.Limits.SUMMON_C, lambda config: config['COIN']['constraint']['times']),
+	enums.Item.DIAMOND:     (enums.Timer.SUMMON_D, enums.Limits.SUMMON_D, lambda config: 0),
+	enums.Item.COIN:        (enums.Timer.SUMMON_C, enums.Limits.SUMMON_C, lambda config: config['COIN']['constraint']['times']),
 }
 
 BUY_REFRESH = {
