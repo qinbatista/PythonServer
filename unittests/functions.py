@@ -416,7 +416,8 @@ class accept_gifts(Function):
 		super().__init__(self.__class__.__name__)
 	
 	def before_call(self, global_state, state):
-		self.fn['data']['keys'] = [m['key'] for m in state.mail if m['type'] == 1]
+		self.fn['data']['gift'] = [m['key'] for m in state.mail if m['type'] == 1]
+		self.fn['data']['other'] = [m['key'] for m in state.mail if m['type'] != 1]
 
 # Role
 class level_up_role(Function):
