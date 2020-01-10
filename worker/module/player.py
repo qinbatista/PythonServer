@@ -19,10 +19,10 @@ async def create(uid, gn, **kwargs):
 		common.execute(f'INSERT INTO role (uid, star, level, rid) VALUES ("{uid}", 1, 7, {enums.Role.R101}), ("{uid}", 1, 1, {enums.Role.R102});', **kwargs),
 		common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W101}), ("{uid}", 1, {enums.Weapon.W102});', **kwargs),
 		common.execute(f'INSERT INTO skill(uid, sid, level) VALUES ("{uid}", {enums.Skill.S1}, 1), ("{uid}", {enums.Skill.S2}, 1), ("{uid}", {enums.Skill.S3}, 1), ("{uid}", {enums.Skill.S4}, 1), ("{uid}", {enums.Skill.S5}, 1);', **kwargs),
-		common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.COIN}, 1000000), ("{uid}", {enums.Item.IRON}, 1000000), ("{uid}", {enums.Item.DIAMOND}, 1000000), ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);', **kwargs),
 		common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.LOGIN_TIME}, "{common.datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d")}");',**kwargs)
 	)
-	return common.mt(0, 'success', {'gn' : gn})
+	await _meeting_gift(uid, **kwargs)
+	return common.mt(0, 'success', {'gn': gn})
 
 async def enter_world(uid, **kwargs):
 	existing_player = await common.exists('player', ('uid', uid), **kwargs)
@@ -88,6 +88,26 @@ async def _lookup_nonce(nonce, **kwargs):
 			json = {'keys' : [nonce]}) as resp:
 		data = await resp.json()
 		return None if data[nonce]['status'] != 0 else data[nonce]['items']
+
+
+async def _meeting_gift(uid, **kwargs):
+	"""玩家初次创建角色赠送的见面礼"""
+	await asyncio.gather(
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.DIAMOND, 1_0000, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.COIN, 200_0000, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.FOOD, 10_0000, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.IRON, 10_0000, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.CRYSTAL, 10_0000, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SUMMON_SCROLL_D, 50, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SUMMON_SCROLL_C, 100, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1000, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.VIP_EXP_CARD, 100, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SKILL_SCROLL_100, 100, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.UNIVERSAL4_SEGMENT, 100, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.UNIVERSAL5_SEGMENT, 100, **kwargs),
+		common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.ENERGY_POTION_S_MAX, 100, **kwargs),
+	)
+
 
 
 

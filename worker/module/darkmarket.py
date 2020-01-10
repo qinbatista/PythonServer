@@ -104,12 +104,10 @@ async def refresh_market(uid, **kwargs):
 	98 - Insufficient diamond
 	99 - You have not yet done an automatic refresh
 	"""
-	limit_data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
-	if limit_data == ():
-		await common.execute_update(f'INSERT INTO limits (uid, lid) VALUES ("{uid}", "{enums.Limits.DARK_MARKET_LIMITS.value}");', **kwargs)
-		limit_data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
-	refreshable = limit_data[0][0]
-	if refreshable > 0:
+	refreshable = await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
+	if refreshable is None:
+		return refresh_darkmarket(uid, **kwargs)
+	elif refreshable > 0:
 		free_data = await free_refresh(uid, **kwargs)
 		if free_data['status'] == 98: free_data['status'] = 97
 		return free_data
@@ -123,29 +121,18 @@ async def diamond_refresh(uid, **kwargs):
 	98 - Insufficient diamond
 	99 - You have not yet done an automatic refresh
 	"""
-	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}";', **kwargs)
-	if data == ():
-		await common.execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.DARK_MARKET_TIME.value}");', **kwargs)
-		data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}";', **kwargs)
-	refresh_time = data[0][0]
-	if refresh_time == '':
-		return common.mt(99, 'You have not yet done an automatic refresh')
-
-	limit_data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
-	if limit_data == ():
-		await common.execute_update(f'INSERT INTO limits (uid, lid) VALUES ("{uid}", "{enums.Limits.DARK_MARKET_LIMITS.value}");', **kwargs)
-		limit_data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
-	refreshable = limit_data[0][0]
+	refresh_time = await common.get_timer(uid, enums.Timer.DARK_MARKET_TIME, **kwargs)
+	refreshable =  await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
+	if refresh_time is None or refreshable is None: return common.mt(99, 'You have not yet done an automatic refresh')
 
 	need_diamond = -kwargs['config']['player']['dark_market']['refresh_store']['diamond']
 	can, diamond = await common.try_item(uid, enums.Item.DIAMOND, need_diamond, **kwargs)
-	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 	if not can:
 		return common.mt(98, 'Insufficient diamond')
 	else:
-		refresh_time = current_time
+		refresh_time = datetime.now(tz=common.TZ_SH)
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
-		await common.execute_update(f'UPDATE timer SET time = "{refresh_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}";', **kwargs)
+		await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
 		return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, \
 				'diamond' : {'remaining' : diamond, 'reward' : need_diamond}, \
 				'refresh_time': 3600, 'refreshable': refreshable, 'refresh_diamond': need_diamond})
@@ -157,29 +144,18 @@ async def free_refresh(uid, **kwargs):
 	98 - Insufficient free refresh
 	99 - You have not yet done an automatic refresh
 	"""
-	data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}";', **kwargs)
-	if data == ():
-		await common.execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.DARK_MARKET_TIME.value}");', **kwargs)
-		data = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}";', **kwargs)
-	refresh_time = data[0][0]
-
-	limit_data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
-	if limit_data == ():
-		await common.execute_update(f'INSERT INTO limits (uid, lid) VALUES ("{uid}", "{enums.Limits.DARK_MARKET_LIMITS.value}");', **kwargs)
-		limit_data = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
-	refreshable = limit_data[0][0]
-
-	current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-	if refresh_time == '':
+	current_time = datetime.now(tz=common.TZ_SH)
+	refresh_time = await common.get_timer(uid, enums.Timer.DARK_MARKET_TIME, **kwargs)
+	refreshable =  await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
+	if refresh_time is None or refreshable is None:
 		return common.mt(99, 'You have not yet done an automatic refresh')
 	elif refreshable <= 0:
 		return common.mt(98, 'Insufficient free refresh')
 	else:
-		refreshable -= 1
-		refresh_time = current_time
+		refreshable, refresh_time = refreshable - 1, current_time
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
-		await common.execute_update(f'UPDATE timer SET time = "{refresh_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME.value}";', **kwargs)
-		await common.execute_update(f'UPDATE limits SET value = {refreshable} WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
+		await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
+		await common.set_limit(uid, enums.Limits.DARK_MARKET_LIMITS, refreshable, **kwargs)
 		_, current_diamond = await common.try_item(uid, enums.Item.DIAMOND, 0, **kwargs)
 		return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, \
 				'diamond' : {'remaining' : current_diamond, 'reward' : 0}, \
