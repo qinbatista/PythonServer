@@ -131,7 +131,7 @@ class invite_user_family(Function):
 		super().__init__(self.__class__.__name__)
 	
 	def before_call(self, global_state, state):
-		self.fn['data']['gn_target'] = global_state.random('users', state.world)
+		self.fn['data']['gn_target'] = global_state.random('users', state.world, default = '')
 
 class request_join_family(Function):
 	def __init__(self):
