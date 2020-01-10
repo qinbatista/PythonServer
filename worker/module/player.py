@@ -44,12 +44,14 @@ async def get_account_world_info(uid, **kwargs):
 					'world_name' : world['name'], 'gn' : '', 'exp' : 0, 'level' : 0})
 	return common.mt(0, 'success', {'worlds' : worlds})
 
-async def accept_gifts(uid, keys, **kwargs):
+async def accept_gifts(uid, gift, other, **kwargs):
 	error, success = [], {}
-	for key in keys:
-		valid, resp = await accept_gift(uid, key, **kwargs)
-		if valid: success[key] = [dict(r) for r in resp]
-		else: error.append(key)
+	await asyncio.gather(*[mail.mark_read(uid, o, **kwargs) for o in other])
+	error.extend(other)
+	for g in gift:
+		valid, resp = await accept_gift(uid, g, **kwargs)
+		if valid: success[g] = [dict(r) for r in resp]
+		else: error.append(g)
 	return common.mt(0, 'success', {'error' : error, 'success' : success})
 
 async def accept_gift(uid, nonce, **kwargs):
