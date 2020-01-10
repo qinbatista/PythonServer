@@ -556,6 +556,7 @@
 
 * 99: 玩家名字已被使用
 * 98: materials insufficient
+* 97: Player name is empty
 
 
 
