@@ -219,9 +219,9 @@ if __name__ == '__main__':
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'single_pump_diamond', 'data': {'token' : token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'single_pump_coin', 'data': {'token' : token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'single_pump_gift', 'data': {'token' : token}})
-	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'dozen_pump_diamond', 'data': {'token' : token}})
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'dozen_pump_diamond', 'data': {'token' : token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'dozen_pump_coin', 'data': {'token' : token}})
-	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'dozen_pump_gift', 'data': {'token' : token}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'dozen_pump_gift', 'data': {'token' : token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_coin_store', 'data': {'token' : token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_gift_store', 'data': {'token' : token}})
 
