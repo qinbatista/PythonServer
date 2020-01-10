@@ -137,7 +137,8 @@ class MessageHandler:
 		return await player.get_account_world_info(data['data']['unique_id'], **data)
 
 	async def _accept_gifts(self, data: dict) -> str:
-		return await player.accept_gifts(data['data']['unique_id'], data['data']['keys'], **data)
+		return await player.accept_gifts(data['data']['unique_id'], data['data']['gift'], \
+				data['data']['other'], **data)
 
 	async def _get_info_player(self, data: dict) -> str:
 		data['player_energy'] = data['config']['player']['energy']
