@@ -145,7 +145,8 @@ class Statistics:
 	
 	def print(self):
 		os.system('cls') if os.name == 'nt' else os.system('clear')
-		print(f'{"Function":<35}|{"N":^8}|{"Min":^8}|{"Avg":^8}|{"Med":^8}|{"Max":^8}|{"Std":^8}|')
+		title = f'{"Function":<35}|{"N":^8}|{"Min":^8}|{"Avg":^8}|{"Med":^8}|{"Max":^8}|{"Std":^8}|'
+		print(f'{title}\n{"=" * len(title)}')
 		for function in sorted(self.data):
 			times = [t[0] for t in self.data[function]]
 			num_req = len(self.data[function])
