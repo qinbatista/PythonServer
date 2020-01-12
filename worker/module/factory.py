@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 BASIC_FACTORIES      = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
 				        enums.Factory.IRON    : None, enums.Factory.FOOD  : None}
 
-RESOURCE_FACTORIES   = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None}
+RESOURCE_FACTORIES   = {enums.Factory.FOOD: enums.Item.FOOD, enums.Factory.IRON: enums.Item.IRON, enums.Factory.CRYSTAL: enums.Item.CRYSTAL}
 
 HAS_LEVEL_FACTORIES  = {enums.Factory.FOOD         : None, enums.Factory.IRON  : None, \
 				        enums.Factory.CRYSTAL      : None, enums.Factory.WISHING_POOL : None }
@@ -96,6 +96,29 @@ async def decrease_worker(uid, fid, n, **kwargs):
 	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
 			'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
 			enums.Factory.UNASSIGNED.value : unassigned + n, 'workers' : current_workers[fid] - n}})
+
+
+async def gather_resource(uid, resource, **kwargs):
+	"""收集工厂资源
+	resource: {"1" : 18989. "2" : 18989}"""
+	resource = {enums.Factory(int(k)): v for k, v in resource.items() if enums.Factory(int(k)) in RESOURCE_FACTORIES.keys()}
+	if not resource: return common.mt(99, 'invalid resource')
+	data = {'remaining': [], 'reward': []}
+	_, _, storage = await get_state(uid, **kwargs)
+	# 方式1使用服务器资源
+	for k, value in storage.items():
+		_, remain = await common.try_item(uid, RESOURCE_FACTORIES[k], value, **kwargs)
+		data['remaining'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{remain}')
+		data['reward'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{value}')
+	# 方式2使用客户端资源
+	# for k, value in resource.items():
+	# 	_, remain = await common.try_item(uid, RESOURCE_FACTORIES[k], value, **kwargs)
+	# 	data['remaining'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{remain}')
+	# 	data['reward'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{value}')
+	storage = {k: 0 for k in storage}
+	await record_resources(uid, storage, **kwargs)  # 更新数据库资源
+	data['refresh'] = await refresh(uid, **kwargs)
+	return common.mt(0, 'success', data)
 
 
 async def update_worker(uid, workers, **kwargs):

@@ -1203,6 +1203,8 @@
 
 ## activate_wishing_pool_factory
 
+许愿池每天可以许愿6次
+
 ##### 发送消息JSON格式
 
 ```json
@@ -1231,7 +1233,7 @@
 	"data"   :
 	{
 		"pool" : 3130,
-		"count" : 0,
+		"count" : 5,
 		"pool_diamond" : 50,
 		"remaining" :
 		{

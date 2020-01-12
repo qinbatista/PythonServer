@@ -386,6 +386,7 @@ class MessageHandler:
 
 	async def _upgrade_factory(self, data: dict) -> str:
 		return await factory.upgrade(data['data']['unique_id'], enums.Factory(int(data['data']['fid'])), **data)
+
 	async def _activate_wishing_pool_factory(self, data: dict) -> str:
 		return await factory.wishing_pool(data['data']['unique_id'], enums.Weapon(int(data['data']['wid'])), **data)
 
@@ -397,6 +398,9 @@ class MessageHandler:
 
 	async def _set_armor_factory(self, data: dict) -> str:
 		return await factory.set_armor(data['data']['unique_id'], enums.Armor(int(data['data'].get('aid', -1))), **data)
+
+	async def _gather_resource_factory(self, data: dict) -> str:
+		return await factory.gather_resource(data['data']['unique_id'], data['data']['resource'], **data)
 
 	async def _buy_acceleration_factory(self, data: dict) -> str:
 		return await factory.buy_acceleration(data['data']['unique_id'], **data)
@@ -801,6 +805,7 @@ FUNCTION_LIST = {
 	'activate_wishing_pool_factory' : MessageHandler._activate_wishing_pool_factory,
 	'buy_acceleration_factory' : MessageHandler._buy_acceleration_factory,
 	'set_armor_factory' : MessageHandler._set_armor_factory,
+	'gather_resource_factory' : MessageHandler._gather_resource_factory,
 
 	###################### weapon.py ######################
 	'level_up_weapon' : MessageHandler._level_up_weapon,
