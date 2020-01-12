@@ -106,6 +106,7 @@ async def gather_resource(uid, resource, **kwargs):
 	data = {'remaining': [], 'reward': []}
 	_, _, storage = await get_state(uid, **kwargs)
 	# 方式1使用服务器资源
+	storage = {k: v for k, v in storage if k in RESOURCE_FACTORIES.keys()}
 	for k, value in storage.items():
 		_, remain = await common.try_item(uid, RESOURCE_FACTORIES[k], value, **kwargs)
 		data['remaining'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{remain}')
