@@ -210,15 +210,13 @@ async def buy_acceleration(uid, **kwargs):
 		await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, now, **kwargs)
 	accel_end_t = max(now + timedelta(days=1), accel_end_t + timedelta(days=1))
 	await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, accel_end_t, **kwargs)
-	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'],
-			'armor' : r['data']['armor']}, 'time' : int((accel_end_t - now).total_seconds()),
-			'remaining' : {'diamond' : dia_remain}, 'reward' : {'diamond' : -dia_cost}})
+	return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource'],
+			'armor' : r['data']['armor']}, 'time': int((accel_end_t - now).total_seconds()),
+			'remaining': {'diamond': dia_remain}, 'reward': {'diamond' : -dia_cost}})
 
 async def set_armor(uid, aid, **kwargs):
 	r = await refresh(uid, **kwargs)
-	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `storage`) VALUES \
-			("{uid}", {enums.Factory.ARMOR.value}, 1, {aid.value}) ON DUPLICATE KEY UPDATE \
-			`storage` = {aid.value};', **kwargs)
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `storage`) VALUES ("{uid}", {enums.Factory.ARMOR.value}, 0, {aid.value}) ON DUPLICATE KEY UPDATE `storage` = {aid.value};', **kwargs)
 	return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource'], 'armor' : r['data']['armor']}, 'aid' : aid.value})
 
 ####################################################################################
