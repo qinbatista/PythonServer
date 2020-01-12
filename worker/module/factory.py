@@ -219,8 +219,7 @@ async def set_armor(uid, aid, **kwargs):
 	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `storage`) VALUES \
 			("{uid}", {enums.Factory.ARMOR.value}, 1, {aid.value}) ON DUPLICATE KEY UPDATE \
 			`storage` = {aid.value};', **kwargs)
-	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'],
-			'armor' : r['data']['armor']}, 'aid' : aid.value})
+	return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource'], 'armor' : r['data']['armor']}, 'aid' : aid.value})
 
 ####################################################################################
 
