@@ -244,7 +244,6 @@ class RolePassive(enum.IntEnum):
 
 
 class Armor(enum.IntEnum):
-	EMPTY = -1  # 代表不建造盔甲
 	A1 = 1
 	A2 = 2
 	A3 = 3

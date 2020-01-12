@@ -19,12 +19,12 @@ RESOURCE_FACTORIES   = {enums.Factory.FOOD : None, enums.Factory.IRON : None, en
 HAS_LEVEL_FACTORIES  = {enums.Factory.FOOD         : None, enums.Factory.IRON  : None, \
 				        enums.Factory.CRYSTAL      : None, enums.Factory.WISHING_POOL : None }
 
-HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None}
+HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None}
 
 
 async def refresh(uid, **kwargs):
 	kwargs.update({"task_id": enums.Task.CHECK_FACTORY})
-	await task.record_task(uid,**kwargs)
+	await task.record_task(uid, **kwargs)
 	now              = datetime.now(tz=common.TZ_SH)
 	steps, refresh_t = await steps_since(uid, now, **kwargs)
 	rem, next_ref    = await remaining_seconds(uid, now, refresh_t, **kwargs)
@@ -33,7 +33,6 @@ async def refresh(uid, **kwargs):
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)  # storage真实剩余数据，delta变化数据
 	await record_resources(uid, storage, **kwargs)  # 更新数据库资源
 	aid    = await get_armor(uid, **kwargs)
-	if aid == enums.Armor.EMPTY: delta[enums.Factory.ARMOR] = 0  # 不生产盔甲的情况下置为0生产
 	_, aq  = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
 	pool   = await remaining_pool_time(uid, now, **kwargs)
 	ua, mw = await get_unassigned_workers(uid, **kwargs)  # ua未分配的工人数，mw总工人数
@@ -101,35 +100,32 @@ async def decrease_worker(uid, fid, n, **kwargs):
 
 async def update_worker(uid, workers, **kwargs):
 	# refresh with current settings
-	r = await refresh(uid, **kwargs)
 	l, w, _ = await get_state(uid, **kwargs)
 	ua, mw = await get_unassigned_workers(uid, **kwargs)
-	r_ret = {'resource' : r['data']['resource'], 'armor' : r['data']['armor'], \
-			'next_refresh' : r['data']['next_refresh'], 'time': r['data']['time']}
 
 	# sum workers <= max_worker else: return refresh + current workers
 	uw = sum(w for w in workers.values())
 	if uw > mw:
-		return common.mt(99, 'insufficient workers', {'refresh' : r_ret, 'worker' : \
-				{enums.Factory.UNASSIGNED.value : ua, **{k : w[k] for k in HAS_WORKER_FACTORIES}}})
+		return common.mt(99, 'insufficient workers', {'refresh': await _assist_refresh(uid, **kwargs), 'worker' : \
+				{enums.Factory.UNASSIGNED.value : ua, **{k: w[k] for k in HAS_WORKER_FACTORIES}}})
 
 	# worker_factories each do not exceed worker limit based on level else: return refresh + current workers
 	for fac, new in workers.items():
 		fid = enums.Factory(int(fac))
 		if fid in HAS_WORKER_FACTORIES:
 			if new > kwargs['config']['factory']['general']['worker_limits'][fac][str(l[fid])]:
-				return common.mt(98, 'factory worker over limits', {'refresh' : r_ret, 'worker' : \
-						{enums.Factory.UNASSIGNED.value : ua, **{k : w[k] for k in HAS_WORKER_FACTORIES}}})
+				return common.mt(98, 'factory worker over limits', {'refresh': await _assist_refresh(uid, **kwargs), 'worker': \
+						{enums.Factory.UNASSIGNED.value: ua, **{k: w[k] for k in HAS_WORKER_FACTORIES}}})
 		else:
-			return common.mt(97, 'invalid fid supplied', {'refresh' : r_ret, 'worker' : \
+			return common.mt(97, 'invalid fid supplied', {'refresh' : await _assist_refresh(uid, **kwargs), 'worker' : \
 					{enums.Factory.UNASSIGNED.value : ua, **{k : w[k] for k in HAS_WORKER_FACTORIES}}})
 
+	# 改变工人情况
 	for fac, new in workers.items():
 		fid = enums.Factory(int(fac))
 		await set_worker(uid, fid, new, **kwargs)
 	await set_worker(uid, enums.Factory.UNASSIGNED, mw - uw, **kwargs)
-	return common.mt(0, 'success', {'refresh' : r_ret, \
-			'worker' : {enums.Factory.UNASSIGNED.value : mw - uw, **workers}})
+	return common.mt(0, 'success', {'refresh': await _assist_refresh(uid, **kwargs), 'worker': {enums.Factory.UNASSIGNED.value : mw - uw, **workers}})
 
 async def buy_worker(uid, **kwargs):
 	unassigned, max_worker = await get_unassigned_workers(uid, **kwargs)
@@ -227,6 +223,14 @@ async def set_armor(uid, aid, **kwargs):
 			'armor' : r['data']['armor']}, 'aid' : aid.value})
 
 ####################################################################################
+
+
+async def _assist_refresh(uid, **kwargs) -> dict:
+	"""辅助工厂刷新工人需要的返回值"""
+	r = await refresh(uid, **kwargs)
+	return {'resource': r['data']['resource'], 'armor': r['data']['armor'], 'next_refresh': r['data']['next_refresh'], 'time': r['data']['time']}
+
+
 def roll_segment_value(**kwargs):
 	rng      = random.randint(0, 100)
 	base_seg = kwargs['config']['factory']['wishing_pool']['base_segment']
@@ -251,10 +255,9 @@ def step(level, worker, current, **kwargs):
 	return current
 
 def can_produce(current, factory, level, **kwargs):
-	"""计算工厂当前的是否可生产，可生产的情况下扣除需要扣除的基本材料，这里暂定盔甲工厂存储容量没有上限"""
+	"""计算工厂当前的是否可生产，可生产的情况下扣除需要扣除的基本材料"""
 	cost = {}
-	if factory != enums.Factory.ARMOR and current[factory] + 1 > \
-		kwargs['config']['factory']['general']['storage_limits'][str(factory.value)][str(level[factory])]:
+	if current[factory] + 1 > kwargs['config']['factory']['general']['storage_limits'][str(factory.value)][str(level[factory])]:
 		return False
 	for f, a in kwargs['config']['factory']['general']['costs'][str(factory.value)].items():
 		if current[enums.Factory(int(f))] < a:
@@ -297,7 +300,7 @@ async def steps_since(uid, now, **kwargs):
 
 async def get_armor(uid, **kwargs):
 	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND `fid` = {enums.Factory.ARMOR};', **kwargs)
-	return enums.Armor(data[0][0]) if data != () else enums.Armor.EMPTY
+	return enums.Armor(data[0][0]) if data != () else enums.Armor.A1
 
 async def set_worker(uid, fid, val, **kwargs):
 	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`) VALUES \
