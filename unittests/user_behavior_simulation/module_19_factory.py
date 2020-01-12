@@ -76,3 +76,10 @@ def factory_dialog(token,world,get_all_weapon):
 	# 	else:
 	# 		logger.debug("输入错误")
 	# 		continue
+
+
+if __name__ == '__main__':
+	tk1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEyNDc2NTAsInVpZCI6ImZkZTM4ZThiOWUzNWY2NDYzZGZlYzliMDg3YmVlM2JjOTY3OWYxY2QifQ.dL-yTPFs49KAEpIE0__kBsZt-PuKP0dTQd7zByzQ1gA'
+	wd1 = 's6'
+	response = user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'refresh_factory', 'data' : {'token' : tk1}})
+

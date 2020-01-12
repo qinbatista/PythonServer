@@ -28,11 +28,12 @@ async def refresh(uid, **kwargs):
 	now              = datetime.now(tz=common.TZ_SH)
 	steps, refresh_t = await steps_since(uid, now, **kwargs)
 	rem, next_ref    = await remaining_seconds(uid, now, refresh_t, **kwargs)
-	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds = rem), **kwargs)
+	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds=rem), **kwargs)
 	level, worker, storage = await get_state(uid, **kwargs)
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)  # storage真实剩余数据，delta变化数据
-	await record_resources(uid, storage, **kwargs)  # 数据创建和更新操作
+	await record_resources(uid, storage, **kwargs)  # 更新数据库资源
 	aid    = await get_armor(uid, **kwargs)
+	if aid == enums.Armor.EMPTY: delta[enums.Factory.ARMOR] = 0  # 不生产盔甲的情况下置为0生产
 	_, aq  = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
 	pool   = await remaining_pool_time(uid, now, **kwargs)
 	ua, mw = await get_unassigned_workers(uid, **kwargs)  # ua未分配的工人数，mw总工人数
@@ -45,8 +46,8 @@ async def refresh(uid, **kwargs):
 		else: continue
 		await achievement.record_achievement(kwargs['data']['unique_id'], achievement_value=delta[k], **kwargs)
 	# 计算加速剩余时间做后面的返回
-	accel_end_t         = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
-	accel_time          = 0   if accel_end_t   is None else int((accel_end_t - now).total_seconds())
+	accel_end_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, **kwargs)
+	accel_time  = 0 if accel_end_t is None else int((accel_end_t - now).total_seconds())
 	# 计算许愿池下次许愿许愿消耗的钻石数
 	count   = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
 	diamond = 0 if count is None or pool == 0 else count * kwargs['config']['factory']['wishing_pool']['base_diamond']
@@ -236,21 +237,21 @@ def roll_segment_value(**kwargs):
 	return base_seg
 
 def update_state(steps, level, worker, storage, **kwargs):
-	initial_storage = {k : v for k, v in storage.items()}
+	"""更新剩余量和变化量"""
+	initial_storage = {k: v for k, v in storage.items()}
 	for _ in range(steps):
 		storage = step(level, worker, storage, **kwargs)
-	delta = {k : storage[k] - initial_storage[k] for k in storage}
+	delta = {k: storage[k] - initial_storage[k] for k in storage}
 	return storage, delta
 
 def step(level, worker, current, **kwargs):
+	"""单次的步骤，计算每个工厂单个工人每步的生产效果，单位:(每步/每人/每个)"""
 	for factory in BASIC_FACTORIES:
-		for _ in range(worker[factory]):
-			if not can_produce(current, factory, level, **kwargs):
-				break
-			current[factory] += 1
+		current[factory] += sum([1 if can_produce(current, factory, level, **kwargs) else 0 for _ in range(worker[factory])])
 	return current
 
 def can_produce(current, factory, level, **kwargs):
+	"""计算工厂当前的是否可生产，可生产的情况下扣除需要扣除的基本材料，这里暂定盔甲工厂存储容量没有上限"""
 	cost = {}
 	if factory != enums.Factory.ARMOR and current[factory] + 1 > \
 		kwargs['config']['factory']['general']['storage_limits'][str(factory.value)][str(level[factory])]:
@@ -265,19 +266,18 @@ def can_produce(current, factory, level, **kwargs):
 
 async def has_acceleration(uid, now, **kwargs):
 	accel_end_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
-	if accel_end_t is not None and now < accel_end_t:
-		return True
-	return False
+	return accel_end_t is not None and now < accel_end_t
 
 async def remaining_seconds(uid, now, refresh_t, **kwargs):
+	"""存在加速卡的情况下每步时间减半"""
 	has_accel = await has_acceleration(uid, now, **kwargs)
-	delta     = kwargs['config']['factory']['general']['step'] / 2 if has_accel else \
-				kwargs['config']['factory']['general']['step']
-	remainder = int((now - refresh_t).total_seconds()) % delta
-	next_ref  = int(delta - remainder)
+	delta     = kwargs['config']['factory']['general']['step'] / (2 if has_accel else 1)
+	remainder = int((now - refresh_t).total_seconds()) % delta  # 剩余时间，单位秒
+	next_ref  = int(delta - remainder)  # 距离下次刷新的剩余时间，单位秒
 	return remainder, next_ref
 
 async def steps_since(uid, now, **kwargs):
+	"""返回需要计算的步数和刷新时间"""
 	accel_start_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)  # type => datetime or None
 	accel_end_t   = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)  # type => datetime or None
 	refresh_t     = await common.get_timer(uid, enums.Timer.FACTORY_REFRESH,            **kwargs)  # type => datetime or None
@@ -296,9 +296,8 @@ async def steps_since(uid, now, **kwargs):
 	return steps, refresh_t
 
 async def get_armor(uid, **kwargs):
-	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND \
-			`fid` = {enums.Factory.ARMOR.value};', **kwargs)
-	return enums.Armor(data[0][0]) if data != () else enums.Armor.A1
+	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND `fid` = {enums.Factory.ARMOR};', **kwargs)
+	return enums.Armor(data[0][0]) if data != () else enums.Armor.EMPTY
 
 async def set_worker(uid, fid, val, **kwargs):
 	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`) VALUES \
@@ -314,9 +313,8 @@ async def get_state(uid, **kwargs):
 	return l, w, s
 
 async def get_unassigned_workers(uid, **kwargs):
-	data = await common.execute(f'SELECT `workers`, `storage` FROM `factory` WHERE uid = "{uid}" \
-			AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
-	return data[0][0], data[0][1]
+	data = await common.execute(f'SELECT `workers`, `storage` FROM `factory` WHERE uid = "{uid}" AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
+	return data[0]
 
 
 async def record_resources(uid, storage, **kwargs):
@@ -327,7 +325,5 @@ async def record_resources(uid, storage, **kwargs):
 
 async def remaining_pool_time(uid, now, **kwargs):
 	timer = await common.get_timer(uid, enums.Timer.FACTORY_WISHING_POOL, **kwargs)
-	if timer is None:
-		return 0
-	return max(int((timer - now).total_seconds()), 0)
+	return 0 if timer is None else max(int((timer - now).total_seconds()), 0)
 

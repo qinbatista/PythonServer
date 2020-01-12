@@ -244,6 +244,7 @@ class RolePassive(enum.IntEnum):
 
 
 class Armor(enum.IntEnum):
+	EMPTY = -1  # 代表不建造盔甲
 	A1 = 1
 	A2 = 2
 	A3 = 3
@@ -372,7 +373,7 @@ class Task(enum.IntEnum):
 
 class Factory(enum.IntEnum):
 	WISHING_POOL = -2
-	UNASSIGNED = -1
+	UNASSIGNED = -1  # 未分配工人的情况
 	FOOD = 0
 	IRON = 1
 	CRYSTAL = 2

@@ -396,7 +396,7 @@ class MessageHandler:
 		return await factory.update_worker(data['data']['unique_id'], data['data']['worker'], **data)
 
 	async def _set_armor_factory(self, data: dict) -> str:
-		return await factory.set_armor(data['data']['unique_id'], enums.Armor(int(data['data']['aid'])), **data)
+		return await factory.set_armor(data['data']['unique_id'], enums.Armor(int(data['data'].get('aid', -1))), **data)
 
 	async def _buy_acceleration_factory(self, data: dict) -> str:
 		return await factory.buy_acceleration(data['data']['unique_id'], **data)
