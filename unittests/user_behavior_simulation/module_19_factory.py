@@ -79,7 +79,8 @@ def factory_dialog(token,world,get_all_weapon):
 
 
 if __name__ == '__main__':
-	tk1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEyNDc2NTAsInVpZCI6ImZkZTM4ZThiOWUzNWY2NDYzZGZlYzliMDg3YmVlM2JjOTY3OWYxY2QifQ.dL-yTPFs49KAEpIE0__kBsZt-PuKP0dTQd7zByzQ1gA'
-	wd1 = 's6'
-	response = user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'refresh_factory', 'data' : {'token' : tk1}})
+	tk1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEzODczNDMsInVpZCI6IjEyMzQ1NiJ9.rSz5juTbsj3d6ga7Q35mC0RH3TUmDNalUvbDsc_T-ho'
+	wd1 = 's0'
+	# response = user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'refresh_factory', 'data' : {'token' : tk1}})
+	response = user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'get_config_factory', 'data' : {'token' : tk1}})
 

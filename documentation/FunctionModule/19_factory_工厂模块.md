@@ -1251,5 +1251,6 @@
 
 [获得失败]()
 >
-> * 99: insufficient diamonds
+>* 99: insufficient diamonds
+>* 98: The number of draws has reached the limit today
 >

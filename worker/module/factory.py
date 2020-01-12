@@ -178,20 +178,20 @@ async def wishing_pool(uid, wid, **kwargs):
 	pool                 = await remaining_pool_time(uid, now, **kwargs)
 	level, _, _          = await get_state(uid, **kwargs)
 	if pool == 0:
-		pool  = ((kwargs['config']['factory']['wishing_pool']['base_recover'] - \
-				level[enums.Factory.WISHING_POOL]) * 3600)
+		pool = (kwargs['config']['factory']['wishing_pool']['base_recover'] - level[enums.Factory.WISHING_POOL]) * 3600
 		await common.set_limit(uid, enums.Limits.FACTORY_WISHING_POOL, 1, **kwargs)
 		await common.set_timer(uid, enums.Timer.FACTORY_WISHING_POOL, now+timedelta(seconds=pool), **kwargs)
 		_, dia_remain = await common.try_item(uid, enums.Item.DIAMOND, dia_cost, **kwargs)
 	else:
-		count               = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
-		dia_cost            = -1 * count * kwargs['config']['factory']['wishing_pool']['base_diamond']
+		count = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
+		if count >= kwargs['config']['factory']['wishing_pool']['limit']: return common.mt(98, 'The number of draws has reached the limit today')
+		dia_cost = -count * kwargs['config']['factory']['wishing_pool']['base_diamond']
 		can_pay, dia_remain = await common.try_item(uid, enums.Item.DIAMOND, dia_cost, **kwargs)
 		if not can_pay: return common.mt(99, 'insufficient diamonds')
 		await common.set_limit(uid, enums.Limits.FACTORY_WISHING_POOL, count + 1, **kwargs)
-	seg_reward     = roll_segment_value(**kwargs)
-	seg_remain     = await weapon._update_segment(uid, wid, seg_reward, **kwargs)
-	return common.mt(0, 'success', {'pool' : pool, 'count' : 0 if pool == 0 else count, \
+	seg_reward = roll_segment_value(**kwargs)
+	seg_remain = await weapon._update_segment(uid, wid, seg_reward, **kwargs)
+	return common.mt(0, 'success', {'pool' : pool, 'count' : (0 if pool == 0 else count) + 1, \
 			'pool_diamond' : (count + 1) * kwargs['config']['factory']['wishing_pool']['base_diamond'], \
 			'remaining' : {'wid' : wid.value, 'seg' : seg_remain, 'diamond' : dia_remain}, \
 			'reward'    : {'wid' : wid.value, 'seg' : seg_reward, 'diamond' : dia_cost}})
@@ -232,13 +232,9 @@ async def _assist_refresh(uid, **kwargs) -> dict:
 
 
 def roll_segment_value(**kwargs):
-	rng      = random.randint(0, 100)
-	base_seg = kwargs['config']['factory']['wishing_pool']['base_segment']
-	if 0 <= rng < 10:
-		base_seg *= 3
-	elif 10 <= rng < 55:
-		base_seg *= 2
-	return base_seg
+	population = kwargs['config']['factory']['wishing_pool']['roll']['population']
+	weights = kwargs['config']['factory']['wishing_pool']['roll']['weights']
+	return kwargs['config']['factory']['wishing_pool']['base_segment'] * random.choices(population, weights)[0]
 
 def update_state(steps, level, worker, storage, **kwargs):
 	"""更新剩余量和变化量"""
