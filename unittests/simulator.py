@@ -15,6 +15,7 @@ import queue
 import random
 import asyncio
 import argparse
+import threading
 import contextlib
 import statistics
 
@@ -198,15 +199,24 @@ class User:
 	def running(self):
 		return True
 
+class GUI(threading.Thread):
+	def __init__(self, stats):
+		threading.Thread.__init__(self)
+		self.stats = stats
+	
+	def run(self):
+		pass
 
 class Simulator:
 	def __init__(self, argv):
 		self.argv = argv
 		self.stats = Statistics()
 		self.global_state = None
+		self.gui = GUI(self.stats)
 
 	async def start(self):
 		try:
+			self.gui.start()
 			self.global_state = GlobalState(Client(self.argv.host, self.argv.port, self.argv.certpath))
 			users=[asyncio.create_task(User(self.global_state, self.argv).run())for _ in range(self.argv.n)]
 			while self.running:
@@ -222,6 +232,7 @@ class Simulator:
 	@property
 	def running(self):
 		return True
+
 
 
 async def main():
