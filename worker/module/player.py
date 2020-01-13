@@ -8,10 +8,12 @@ from module import common
 from module import stage
 from module import summoning
 import asyncio
+import re
+GN_RE = re.compile(r'^[\u4e00-\u9fa5_a-zA-Z0-9]+$')
 
 
 async def create(uid, gn, **kwargs):
-	if uid == "" or gn == "": return common.mt(98, 'Player uid or name is empty')
+	if uid == "" or gn == "" or not bool(GN_RE.match(gn)): return common.mt(98, 'Player uid or name is empty or Game name is not legal')
 	if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, 'Player uid or name already exists')
 	await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
 	await asyncio.gather(

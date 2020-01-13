@@ -65,6 +65,7 @@
 * 99：invalid account name
 * 98：invalid password
 * 97：The account name has been used
+* 96：UID contains Spaces
 
 
 
@@ -107,6 +108,7 @@
 
 * 2: 账号已经被绑定，请用账户登陆
 * 99：unique id is empty
+* 96：UID contains Spaces
 
 
 
