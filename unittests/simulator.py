@@ -204,25 +204,37 @@ class User:
 		return True
 
 class GUI(threading.Thread):
-	def __init__(self, stats):
+	def __init__(self, args, stats):
 		threading.Thread.__init__(self)
+		self.args = args
 		self.stats = stats
 
-		plt.rc('font', size = 8)
-		plt.rc('axes', labelsize = 8)
-		plt.rc('axes', labelsize = 8)
-		plt.rc('xtick', labelsize = 8)
-		plt.rc('ytick', labelsize = 8)
+		plt.rc('font', size = 6)
+		plt.rc('axes', labelsize = 6)
+		plt.rc('axes', labelsize = 6)
+		plt.rc('xtick', labelsize = 6)
+		plt.rc('ytick', labelsize = 6)
 
-		#self.fig = plt.figure(figsize = (dpi = 300)
-		self.histogram = self.fig.add_subplot(1, 1, 1)
+		self.fig = plt.figure(figsize = (10, 10), dpi = 150)
+		self.histogram = self.fig.add_subplot(2, 2, 1)
+
+		self.average = self.fig.add_subplot(2, 2, 2)
+		self.average_x, self.average_y = [], []
+
+		self.piechart = self.fig.add_subplot(2, 2, 3)
+
 	
 	def run(self):
-		ani_histogram = ani.FuncAnimation(self.fig, self.update_histogram, interval = 1000)
+		ani_average = ani.FuncAnimation(self.fig, self.update_average, \
+				interval=self.args.refresh*1000)
+		ani_piechart = ani.FuncAnimation(self.fig, self.update_piechart, \
+				interval=self.args.refresh*1000)
+		ani_histogram = ani.FuncAnimation(self.fig, self.update_histogram, \
+				interval=self.args.refresh*1000)
 		plt.show()
 	
 	def update_histogram(self, i):
-		functions = tuple(self.stats.data)
+		functions = tuple(sorted(self.stats.data, reverse = True))
 		y_pos = np.arange(len(functions))
 		count = [len(self.stats.data[fn]) for fn in functions]
 
@@ -232,28 +244,63 @@ class GUI(threading.Thread):
 		self.histogram.barh(y_pos, count, align = 'center', alpha = 0.5)
 		self.histogram.set_yticks(y_pos)
 		self.histogram.set_yticklabels(functions)
+	
+	def update_piechart(self, i):
+		functions = tuple(sorted(self.stats.data, reverse = True))
+		count = [len(self.stats.data[fn]) for fn in functions]
+		self.piechart.clear()
+		self.piechart.axis('equal')
+		self.piechart.pie(count, labels = functions, rotatelabels = True)
+	
+	def update_average(self, i):
+		self.average.clear()
+		self.average.set_title('Average Response')
+		self.average.set_ylabel('Response Time (ms)')
+		self.average.get_xaxis().set_visible(False)
+		num, tot = 0, 0
+		for times in self.stats.data.values():
+			tot += sum(t[0] for t in times)
+			num += len(times)
+		if num != 0:
+			self.average_x.append(time.time())
+			self.average_y.append((tot / num) * 1000)
+			self.average_x = self.average_x[-20:]
+			self.average_y = self.average_y[-20:]
+		self.average.plot(self.average_x, self.average_y)
+
+
 
 class Simulator:
 	def __init__(self, argv):
 		self.argv = argv
 		self.stats = Statistics()
+		self.gui = GUI(self.argv, self.stats)
+
+		self.users = []
 		self.global_state = None
-		self.gui = GUI(self.stats)
 
 	async def start(self):
 		try:
 			self.gui.start()
 			self.global_state = GlobalState(Client(self.argv.host, self.argv.port, self.argv.certpath))
-			users=[asyncio.create_task(User(self.global_state, self.argv).run())for _ in range(self.argv.n)]
+			#users=[asyncio.create_task(User(self.global_state, self.argv).run())for _ in range(self.argv.n)]
 			while self.running:
+				self.scale_users()
 				await asyncio.wait({self.gather_metrics()}, timeout = self.argv.refresh)
 				self.stats.print()
 		except Exception as e:
 			print(f'Simulator encountered and error: {e}')
+		finally:
+			self.gui.join()
 	
 	async def gather_metrics(self):
 		while True:
 			self.stats.add(await self.global_state.metrics.get())
+	
+	def scale_users(self):
+		self.users = [u for u in self.users if u.done() == False]
+		self.users.extend([asyncio.create_task(User(self.global_state, self.argv).run()) \
+				for _ in range(self.argv.n - len(self.users))])
 	
 	@property
 	def running(self):
@@ -267,7 +314,7 @@ async def main():
 	parser.add_argument('--port', type = int, default = 8880)
 	parser.add_argument('-n', type = int, default = 50)
 	parser.add_argument('-d', '--delay', type = int, default = 5)
-	parser.add_argument('-r', '--refresh', type = int, default = 5)
+	parser.add_argument('-r', '--refresh', type = int, default = 2)
 	parser.add_argument('-v', '--verbose', action = 'store_true')
 	parser.add_argument('-fn', type = str, default = None)
 	parser.add_argument('--certpath', type = str, default = '../gate/cert/mycert.crt')
