@@ -124,8 +124,8 @@ def create_data(name):
 	unique_id = name
 	#mail_type: SIMPLE = 0,GIFT = 1, FRIEND_REQUEST = 2 FAMILY_REQUEST = 3
 	#item_id: COIN = 1,IRON = 2,FOOD = 3,CRYSTAL = 4,DIAMOND = 5
-	for i in range(0, 5):
-		# send_tcp_message({'function' : 'send_gift_mail', 'data' : {"token":token, "gn_target":"去污", "group_id":3, "item_id":random.randint(1,5), "quantity":random.randint(100,500)}})#送物品
+	for i in range(0, 50):
+		send_tcp_message({'function' : 'send_gift_mail', 'world':'s0','data' : {"token":token, "gn_target":"Hshs", "group_id":3, "item_id":random.randint(1,5), "quantity":random.randint(100,500)}})#送物品
 		mytime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
 		friend_time = time.strftime('%Y-%m-%d', time.localtime())
 		mydata = time.strftime('%Y-%m', time.localtime())
@@ -149,7 +149,7 @@ def run_task(name):
 	global unique_id
 	unique_id = name
 	call_login(str(name))
-	# create_data(name)
+	create_data(name)
 	start = time.time()
 	info_list = module_16_get_all_data.get_all_info(token, world)  # 加载所有参数信息
 	module_1_stage.stage_dialog(token, world, info_list[5])  ##战役
