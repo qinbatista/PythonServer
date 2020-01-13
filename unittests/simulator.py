@@ -19,6 +19,10 @@ import threading
 import contextlib
 import statistics
 
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as ani
+
 from functions import FunctionList
 from dataclasses import dataclass, field
 from collections import defaultdict
@@ -203,9 +207,31 @@ class GUI(threading.Thread):
 	def __init__(self, stats):
 		threading.Thread.__init__(self)
 		self.stats = stats
+
+		plt.rc('font', size = 8)
+		plt.rc('axes', labelsize = 8)
+		plt.rc('axes', labelsize = 8)
+		plt.rc('xtick', labelsize = 8)
+		plt.rc('ytick', labelsize = 8)
+
+		#self.fig = plt.figure(figsize = (dpi = 300)
+		self.histogram = self.fig.add_subplot(1, 1, 1)
 	
 	def run(self):
-		pass
+		ani_histogram = ani.FuncAnimation(self.fig, self.update_histogram, interval = 1000)
+		plt.show()
+	
+	def update_histogram(self, i):
+		functions = tuple(self.stats.data)
+		y_pos = np.arange(len(functions))
+		count = [len(self.stats.data[fn]) for fn in functions]
+
+		self.histogram.clear()
+		self.histogram.set_title('Function Calls')
+		self.histogram.set_xlabel('Number of Calls')
+		self.histogram.barh(y_pos, count, align = 'center', alpha = 0.5)
+		self.histogram.set_yticks(y_pos)
+		self.histogram.set_yticklabels(functions)
 
 class Simulator:
 	def __init__(self, argv):
