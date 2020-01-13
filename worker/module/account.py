@@ -31,7 +31,7 @@ UID = "lukseun%sM%sP%s"
 
 async def register(uid, account, password, **kwargs):
 	"""携带uid、账号密码进行注册"""
-	if uid.find(' ') != '-1': return common.mt(96, 'UID contains Spaces')
+	if uid.find(' ') != -1: return common.mt(96, 'UID contains Spaces')
 	if uid == '': uid = await yield_uid(**kwargs)
 	if not _valid_account(account): return common.mt(99, 'invalid account name')
 	if not _valid_password(password): return common.mt(98, 'invalid password')
@@ -54,7 +54,7 @@ async def register(uid, account, password, **kwargs):
 	return common.mt(status, message, token)
 
 async def login_unique(uid, **kwargs):
-	if uid.find(' ') != '-1': return common.mt(96, 'UID contains Spaces')
+	if uid.find(' ') != -1: return common.mt(96, 'UID contains Spaces')
 	if uid == '': return common.mt(99, 'unique id is empty')
 	exists, bound = await asyncio.gather(common.exists('info', ('unique_id', uid), account=True, **kwargs), _account_bound(uid, **kwargs))
 	if not exists:  # 不存在的情况下创建新用户
