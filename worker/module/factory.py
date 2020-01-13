@@ -35,7 +35,6 @@ async def refresh(uid, **kwargs):
 	level, worker, storage = await get_state(uid, **kwargs)
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)  # storage真实剩余数据，delta变化数据
 	await record_resources(uid, storage, **kwargs)  # 更新数据库资源
-	aid    = await get_armor(uid, **kwargs)
 	pool   = await remaining_pool_time(uid, now, **kwargs)
 	ua, mw = await get_unassigned_workers(uid, **kwargs)  # ua未分配的工人数，mw总工人数
 	# 记录成就的代码片段
@@ -52,17 +51,19 @@ async def refresh(uid, **kwargs):
 	# 计算许愿池下次许愿许愿消耗的钻石数
 	count   = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
 	diamond = 0 if count is None or pool == 0 else count * kwargs['config']['factory']['wishing_pool']['base_diamond']
-	return common.mt(0, 'success', {'steps' : steps, 'resource' : {
-			'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES},
-			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}},
-			'aid': aid.value,
-			'pool' : pool, 'pool_diamond': diamond,
+	return common.mt(0, 'success', {'steps': steps, 'resource': {
+			'remaining': {k.value: storage[k] for k in RESOURCE_FACTORIES},
+			'reward': {k.value: delta[k] for k in RESOURCE_FACTORIES}},
+			'pool': pool, 'pool_diamond': diamond,
 			'next_refresh' : next_ref,
-			'worker' : {
+			'worker': {
 				enums.Factory.UNASSIGNED.value : ua, 'total' : mw,
 				**{k.value: worker[k] for k in BASIC_FACTORIES}
 			},
-			'level' : {k.value : level[k] for k in HAS_LEVEL_FACTORIES},
+			'level': {
+				enums.Factory.ARMOR.value: level[enums.Factory.ARMOR],
+				**{k.value : level[k] for k in HAS_LEVEL_FACTORIES}
+			},
 			'time': accel_time})
 
 async def increase_worker(uid, fid, n, **kwargs):
@@ -157,35 +158,25 @@ async def buy_worker(uid, **kwargs):
 	unassigned, max_worker = await get_unassigned_workers(uid, **kwargs)
 	max_cost_inc  = kwargs['config']['factory']['workers']['max']
 	upgrade_cost  = kwargs['config']['factory']['workers']['cost'][str(min(max_worker + 1, max_cost_inc))]
-	_, _, storage = await get_state(uid, **kwargs)
-	if storage[enums.Factory.FOOD] < upgrade_cost:
-		return common.mt(98, 'insufficient food')
-	await common.execute(f'UPDATE `factory` SET `storage` = {storage[enums.Factory.FOOD] - upgrade_cost} \
-			WHERE `uid` = "{uid}" AND `fid` = {enums.Factory.FOOD.value};', **kwargs)
+	can, food = await common.try_item(uid, enums.Item.FOOD, -upgrade_cost, **kwargs)
+	if not can: return common.mt(98, 'insufficient food')
 	await common.execute(f'UPDATE `factory` SET `workers` = {unassigned + 1}, `storage` = {max_worker + 1} \
 			WHERE `uid` = "{uid}" AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
-	return common.mt(0, 'success', {'worker' : {enums.Factory.UNASSIGNED.value : unassigned + 1, \
-			'total' : max_worker + 1}, 'food' : {'remaining' : storage[enums.Factory.FOOD] - upgrade_cost, \
-			'reward' : -upgrade_cost}})
+	return common.mt(0, 'success', {'worker': {enums.Factory.UNASSIGNED.value: unassigned + 1, \
+			'total': max_worker + 1}, 'food' : {'remaining': food, 'reward': -upgrade_cost}})
 
 async def upgrade(uid, fid, **kwargs):
 	if fid not in HAS_LEVEL_FACTORIES: return common.mt(99, 'invalid fid')
 	r = await refresh(uid, **kwargs)
 	l = r['data']['level'][fid.value]  # 获取工厂等级
-	crystal = r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value]
 	try:
 		upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(l + 1)]
 	except KeyError:
 		return common.mt(97, 'max level', {'refresh' : {'resource' : r['data']['resource'],
 				'armor' : r['data']['armor']}})
-	if crystal < upgrade_cost:
-		return common.mt(98, 'insufficient funds', {'refresh' : {'resource' : r['data']['resource'],
-				'armor' : r['data']['armor']}})
-	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `level`) VALUES ("{uid}", {fid.value}, \
-			{l + 1}) ON DUPLICATE KEY UPDATE `level` = {l + 1};', **kwargs)
-	await common.execute(f'UPDATE `factory` SET `storage` = {crystal - upgrade_cost} WHERE `uid` = "{uid}" \
-			AND `fid` = {enums.Factory.CRYSTAL.value};', **kwargs)
-	r['data']['resource']['remaining'][enums.Factory.CRYSTAL.value] = crystal - upgrade_cost
+	can, crystal = await common.try_item(uid, enums.Item.CRYSTAL, -upgrade_cost, **kwargs)
+	if not can: return common.mt(98, 'insufficient funds', {'refresh' : {'resource' : r['data']['resource']}})
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `level`) VALUES ("{uid}", {fid.value}, {l + 1}) ON DUPLICATE KEY UPDATE `level` = {l + 1};', **kwargs)
 	# 记录成就的代码片段
 	if fid == enums.Factory.FOOD.value:
 		kwargs["aid"] = enums.Achievement.COLLECT_FOOD
@@ -195,9 +186,8 @@ async def upgrade(uid, fid, **kwargs):
 		kwargs["aid"] = enums.Achievement.COLLECT_CRYSTAL
 	else: kwargs["aid"] = 0
 	if kwargs["aid"]: await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
-	return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'],
-			'armor' : r['data']['armor']}, 'upgrade' : {'cost' : upgrade_cost, 'fid' : fid.value,
-			'level' : l + 1}})
+	return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource']},
+									'upgrade': {'cost': upgrade_cost, 'remain': crystal, 'fid': fid.value, 'level': l + 1}})
 
 async def wishing_pool(uid, wid, **kwargs):
 	now, dia_cost, count = datetime.now(tz=common.TZ_SH), 0, 0
@@ -236,14 +226,13 @@ async def buy_acceleration(uid, **kwargs):
 		await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, now, **kwargs)
 	accel_end_t = max(now + timedelta(days=1), accel_end_t + timedelta(days=1))
 	await common.set_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, accel_end_t, **kwargs)
-	return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource'],
-			'armor' : r['data']['armor']}, 'time': int((accel_end_t - now).total_seconds()),
+	return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource']}, 'time': int((accel_end_t - now).total_seconds()),
 			'remaining': {'diamond': dia_remain}, 'reward': {'diamond' : -dia_cost}})
 
 async def set_armor(uid, aid, **kwargs):
-	r = await refresh(uid, **kwargs)
-	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `storage`) VALUES ("{uid}", {enums.Factory.ARMOR.value}, 0, {aid.value}) ON DUPLICATE KEY UPDATE `storage` = {aid.value};', **kwargs)
-	return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource'], 'armor' : r['data']['armor']}, 'aid' : aid.value})
+	gather = await gather_resource(uid, {enums.Factory.ARMOR: 99}, **kwargs)
+	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `level`) VALUES ("{uid}", {enums.Factory.ARMOR.value}, 0, {aid.value}) ON DUPLICATE KEY UPDATE `level` = {aid.value};', **kwargs)
+	return common.mt(0, 'success', {'gather': gather['data'], 'aid': aid.value})
 
 ####################################################################################
 

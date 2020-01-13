@@ -8,6 +8,7 @@
 * [`^update_worker_factory`](#update_worker_factory)
 * [`buy_acceleration_factory`](#buy_acceleration_factory)
 * [`^activate_wishing_pool_factory`](#activate_wishing_pool_factory)
+* [`gather_resource_factory`](##gather_resource_factory)
 
 ## refresh_factory
 
@@ -30,83 +31,69 @@
 
 > `steps`: the number of steps since the last refresh（ 上次刷新的步骤数 ）
 >
-> `resource`: contains FOOD, IRON, CRYSTAL factories.（含有食品、铁、水晶的工厂）
+> `resource`: contains FOOD, IRON, CRYSTAL factories.（含有食品、铁、水晶、盔甲工厂）
 >
 > - `remaining`: is the total amount（剩余的物资数量）
 >
 > - `reward`: is the change since the last time（物资变化量）
 >
-> `armor`: contains ARMOR factory（盔甲信息）
->
-> - `aid`: the armor id that the factory is producing（暂时生产的盔甲id）
->
-> - `remaining`: total quantity of level 1 armor with given aid（盔甲剩余数量）
->
-> - `reward`: the quantity gained since the last time（盔甲变化量）
->
->
-> `worker`:  information regarding the distribution of workers across all factories（工人信息）
->
-> - `total`: the number of all assigned and unassigned workers（所有工人数量）
+> 
+>`worker`:  information regarding the distribution of workers across all factories（工人信息）
+> 
+>- `total`: the number of all assigned and unassigned workers（所有工人数量）
 > - `unassigned`: the number of available free workers（可分配的工人数量，如下-1）
-> - `Factory ID` : `number of assigned workers`（各个工厂工人数量，如下0-3）
->
-> `level`: information regarding the distribution of levels across all factories（ 关于所有工厂级别分布的信息）
->
-> - `Factory ID` : `level`
+>- `Factory ID` : `number of assigned workers`（各个工厂工人数量，如下0-3）
+> 
+>`level`: information regarding the distribution of levels across all factories（ 关于所有工厂级别分布的信息，其中3是盔甲制造盔甲的种类）
 >
 > `pool` : number of seconds remaining until the wishing pool refreshes（许愿池下次刷新的冷却时间）
 >
-> pool_diamond：下次许愿许愿消耗的钻石数
+> `pool_diamond`：下次许愿许愿消耗的钻石数
+> 
+> `next_refresh`： 整个工厂下次刷新的剩余时间
 >
-> next_refresh：更新剩余时间（秒）
->
-> next_refresh： 整个工厂下次刷新的剩余时间
->
-> time：工厂加速剩余时间，例time：59，工厂加速59秒后结束
+> `time`：工厂加速剩余时间，例time：59，工厂加速59秒后结束
 
 ```json
 {
-	"status": 0,
-	"message": "success",
-	"data": {
-		"steps": 27526,
-		"resource": {
-			"remaining": {
-				"0": 4,
-				"1": 1,
-				"2": 8264
-			},
-			"reward": {
-				"0": 1,
-				"1": -1,
-				"2": 8258
-			}
-		},
-		"armor": {
-			"aid": 1,
-			"remaining": 0,
-			"reward": 0
-		},
-		"pool": 0,
-		"pool_diamond": 0,
-		"next_refresh": 8,
-		"worker": {
-			"-1": 0,
-			"total": 5,
-			"2": 1,
-			"3": 0,
-			"1": 1,
-			"0": 3
-		},
-		"level": {
-			"0": 1,
-			"1": 1,
-			"2": 1,
-			"-2": 1
-		},
-		"time": 0
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "steps": 11,
+        "resource": {
+            "remaining": {
+                "0": 5,
+                "1": 2,
+                "2": 19,
+                "3": 0
+            },
+            "reward": {
+                "0": 0,
+                "1": 1,
+                "2": 3,
+                "3": 0
+            }
+        },
+        "pool": 0,
+        "pool_diamond": 0,
+        "next_refresh": 3,
+        "worker": {
+            "-1": 0,
+            "total": 5,
+            "2": 1,
+            "3": 0,
+            "1": 1,
+            "0": 3
+        },
+        "level": {
+            "3": 1,
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "-2": 1
+        },
+        "time": 0
+    }
 }
 ```
 
@@ -185,35 +172,26 @@
 
 ```json
 {
-	"status" : 98, 
-	"message": "insufficient funds",
-	"data"   :
-	{
-		"refresh" :
-		{
-			"resource" :
-			{
-				"remaining" :
-				{
-					"0" : 253,
-					"1" :   2,
-					"2" : 182
-				},
-				"reward" :
-				{
-					"0" : -53,
-					"1" :   1,
-					"2" :  10
-				}
-			},
-			"armor" :
-			{
-				"aid"       : 2,
-				"remaining" : 5,
-				"reward"    : 1
-			}
-		}
-	}
+    "status": 98,
+    "message": "insufficient funds",
+    "data": {
+        "refresh": {
+            "resource": {
+                "remaining": {
+                    "0": 5,
+                    "1": 3,
+                    "2": 43,
+                    "3": 0
+                },
+                "reward": {
+                    "0": 0,
+                    "1": 1,
+                    "2": 3,
+                    "3": 0
+                }
+            }
+        }
+    }
 }
 ```
 
@@ -280,51 +258,61 @@
 
 ##### 接受消息JSON格式
 
-> refresh: 更新获得的数据信息
->
-> - resource：资源最后结果
-> - reward：资源改变信息
->
-> armor：盔甲信息
->
-> - aid：生产出的盔甲id
-> - remaining：盔甲剩余量
-> - reward：盔甲改变量
+> gather：是收集信息（详见gather_resource_factory方法data返回）
 >
 > aid：设置成的盔甲id
 
 ```json
 {
-	"status" : 0, 
-	"message": "successfully set armor",
-	"data"   :
-	{
-		"refresh" :
-		{
-			"resource" :
-			{
-				"remaining" :
-				{
-					"0" : 253,
-					"1" :   2,
-					"2" : 182
-				},
-				"reward" :
-				{
-					"0" : -53,
-					"1" :   1,
-					"2" :  10
-				}
-			},
-			"armor" :
-			{
-				"aid"       : 1,
-				"remaining" : 5,
-				"reward"    : 1
-			}
-		},
-		"aid" : 2
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "gather": {
+            "remaining": [
+                "4:1:0"
+            ],
+            "reward": [
+                "4:1:0"
+            ],
+            "refresh": {
+                "steps": 188,
+                "resource": {
+                    "remaining": {
+                        "0": 2,
+                        "1": 1,
+                        "2": 88,
+                        "3": 0
+                    },
+                    "reward": {
+                        "0": 1,
+                        "1": -1,
+                        "2": 19,
+                        "3": 0
+                    }
+                },
+                "pool": 170766,
+                "pool_diamond": 50,
+                "next_refresh": 5,
+                "worker": {
+                    "-1": 1,
+                    "total": 6,
+                    "2": 1,
+                    "3": 2,
+                    "1": 1,
+                    "0": 1
+                },
+                "level": {
+                    "3": 1,
+                    "0": 1,
+                    "1": 1,
+                    "2": 1,
+                    "-2": 1
+                },
+                "time": 171786
+            }
+        },
+        "aid": 3
+    }
 }
 ```
 
@@ -888,25 +876,22 @@
 
 > worker：工人的详细内容，`unassigned`（`-1`）没有工作的工人，`total`工人总数
 >
-> food: 食物的详细信息，`remaining`剩余食物，`reward`食物改变量
+> food: 食物的详细信息，`remaining`背包中剩余食物，`reward`背包中食物改变量
 
 ```json
 {
-	"status" : 0, 
-	"message": "success",
-	"data"   :
-	{
-		"worker" :
-		{
-			"-1"    : 3,
-			"total" : 10
-		},
-		"food" :
-		{
-			"remaining" : 2530,
-			"reward"    : -140
-		}
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "worker": {
+            "-1": 1,
+            "total": 6
+        },
+        "food": {
+            "remaining": 11850,
+            "reward": -150
+        }
+    }
 }
 ```
 
@@ -917,7 +902,11 @@
 
 ## update_worker_factory
 
+更新工人情况
+
 ##### 发送消息JSON格式
+
+> 0, 1, 2, 3分别对应各个工厂
 
 
 ```json
@@ -931,7 +920,8 @@
 		{
 			"0" : 3,
 			"1" : 1,
-			"2" : 2
+			"2" : 2,
+            "3" : 0
 		}
 	}
 }
@@ -939,181 +929,154 @@
 
 ##### 接受消息JSON格式
 
-> `resource`: 资源的配置情况
+> `refresh`：刷新得到的信息
 >
-> `reward`: 资源的变化情况
+> - `resource`: 资源的配置情况
+>   - `remaining`：资源剩余情况
 >
-> `armor`：护甲的变化情况
+>   - `reward`: 资源的变化情况
 >
-> `worker`：工人的情况
+>   - `next_refresh`：the number of seconds remaining until the server calculates the next STEP
 >
-> `next_refresh`：the number of seconds remaining until the server calculates the next STEP
+>     Even if there is an error, the server will return the number of workers the SERVER says the client has.（距离下次刷新剩余时间。）
 >
-> Even if there is an error, the server will return the number of workers the SERVER says the client has.
+>   - `time`：工厂加速剩余时间，例time：59，工厂加速59秒后结束
 >
-> 服务器计算下一步之前剩余的秒数，即使出现错误，服务器也会返回客户机所拥有的worker的数量。
->
-> `time`：工厂加速剩余时间，例time：59，工厂加速59秒后结束
+> `worker`：工人的分布情况
 
 ```json
 {
-	"status": 0,
-	"message": "success",
-	"data": {
-		"refresh": {
-			"resource": {
-				"remaining": {
-					"0": 5,
-					"1": 0,
-					"2": 8302
-				},
-				"reward": {
-					"0": 1,
-					"1": -1,
-					"2": 38
-				}
-			},
-			"armor": {
-				"aid": 1,
-				"remaining": 0,
-				"reward": 0
-			},
-			"next_refresh": 7,
-			"time": 0
-		},
-		"worker": {
-			"-1": 0,
-			"0": 3,
-			"1": 1,
-			"2": 1
-		}
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "refresh": {
+            "resource": {
+                "remaining": {
+                    "0": 1,
+                    "1": 2,
+                    "2": 44,
+                    "3": 0
+                },
+                "reward": {
+                    "0": -4,
+                    "1": -1,
+                    "2": 1,
+                    "3": 0
+                }
+            },
+            "next_refresh": 2,
+            "time": 0
+        },
+        "worker": {
+            "-1": 0,
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 2
+        }
+    }
 }
 ```
 
 ```json
 {
-	"status" : 99, 
-	"message": "insufficient workers",
-	"data"   :
-	{
-		"refresh" :
-		{
-			"resource" :
-			{
-				"remaining" :
-				{
-					"0" : 253,
-					"1" :   2,
-					"2" : 182
-				},
-				"reward" :
-				{
-					"0" : -53,
-					"1" :   1,
-					"2" :  10
-				}
-			},
-			"armor" :
-			{
-				"aid"       : 2,
-				"remaining" : 5,
-				"reward"    : 1
-			},
-			"next_refresh" : 4
-		},
-		"worker" :
-		{
-			"-1" : 5,
-			"0"  : 4,
-			"1"  : 2,
-			"2"  : 1
-		}
-	}
+    "status": 99,
+    "message": "insufficient workers",
+    "data": {
+        "refresh": {
+            "resource": {
+                "remaining": {
+                    "0": 3,
+                    "1": 2,
+                    "2": 48,
+                    "3": 0
+                },
+                "reward": {
+                    "0": 2,
+                    "1": 0,
+                    "2": 4,
+                    "3": 0
+                }
+            },
+            "next_refresh": 9,
+            "time": 0
+        },
+        "worker": {
+            "-1": 0,
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 2
+        }
+    }
 }
 ```
 
 ```json
 {
-	"status" : 98, 
-	"message": "factory worker over limits",
-	"data"   :
-	{
-		"refresh" :
-		{
-			"resource" :
-			{
-				"remaining" :
-				{
-					"0" : 253,
-					"1" :   2,
-					"2" : 182
-				},
-				"reward" :
-				{
-					"0" : -53,
-					"1" :   1,
-					"2" :  10
-				}
-			},
-			"armor" :
-			{
-				"aid"       : 2,
-				"remaining" : 5,
-				"reward"    : 1
-			},
-			"next_refresh" : 4
-		},
-		"worker" :
-		{
-			"-1" : 5,
-			"0"  : 4,
-			"1"  : 2,
-			"2"  : 1
-		}
-	}
+    "status": 98,
+    "message": "factory worker over limits",
+    "data": {
+        "refresh": {
+            "resource": {
+                "remaining": {
+                    "0": 3,
+                    "1": 2,
+                    "2": 49,
+                    "3": 0
+                },
+                "reward": {
+                    "0": 0,
+                    "1": 0,
+                    "2": 1,
+                    "3": 0
+                }
+            },
+            "next_refresh": 1,
+            "time": 0
+        },
+        "worker": {
+            "-1": 0,
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 2
+        }
+    }
 }
 ```
 
 ```json
 {
-	"status" : 97, 
-	"message": "invalid fid supplied",
-	"data"   :
-	{
-		"refresh" :
-		{
-			"resource" :
-			{
-				"remaining" :
-				{
-					"0" : 253,
-					"1" :   2,
-					"2" : 182
-				},
-				"reward" :
-				{
-					"0" : -53,
-					"1" :   1,
-					"2" :  10
-				}
-			},
-			"armor" :
-			{
-				"aid"       : 2,
-				"remaining" : 5,
-				"reward"    : 1
-			},
-			"next_refresh" : 4
-		},
-		"worker" :
-		{
-			"-1" : 5,
-			"0"  : 4,
-			"1"  : 2,
-			"2"  : 1
-		}
-	}
+    "status": 97,
+    "message": "invalid fid supplied",
+    "data": {
+        "refresh": {
+            "resource": {
+                "remaining": {
+                    "0": 3,
+                    "1": 0,
+                    "2": 50,
+                    "3": 0
+                },
+                "reward": {
+                    "0": 1,
+                    "1": 0,
+                    "2": 0,
+                    "3": 0
+                }
+            },
+            "next_refresh": 10,
+            "time": 0
+        },
+        "worker": {
+            "-1": 0,
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": 2
+        }
+    }
 }
 ```
 
@@ -1128,13 +1091,13 @@
 
 ##### 发送消息JSON格式
 
-> resource: 资源的配置情况
+> refresh: 资源刷新的配置情况
+>
+> remaining：剩余物资
 >
 > reward: 资源的变化情况
 >
-> armor：护甲的变化情况
->
-> worker：工人的情况
+> time：剩余多久刷新一次许愿池
 
 购买工厂加速，加速工厂需要消耗钻石，钻石的消耗数量依据factory.json的配置信息
 
@@ -1155,51 +1118,41 @@
 
 ```json
 {
-	"status" : 0, 
-	"message": "success",
-	"data"   :
-	{
-		"refresh" :
-		{
-			"resource" :
-			{
-				"remaining" :
-				{
-					"0" : 253,
-					"1" :   2,
-					"2" : 182
-				},
-				"reward" :
-				{
-					"0" : -53,
-					"1" :   1,
-					"2" :  10
-				}
-			},
-			"armor" :
-			{
-				"aid"       : 2,
-				"remaining" : 5,
-				"reward"    : 1
-			}
-		},
-		"time" : 70580,
-		"remaining" : 
-		{
-			"diamond" : 1530
-		},
-		"reward" :
-		{
-			"diamond" : -230
-		}
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "refresh": {
+            "resource": {
+                "remaining": {
+                    "0": 1,
+                    "1": 2,
+                    "2": 69,
+                    "3": 0
+                },
+                "reward": {
+                    "0": -2,
+                    "1": 2,
+                    "2": 1,
+                    "3": 0
+                }
+            }
+        },
+        "time": 172729,
+        "remaining": {
+            "diamond": 9991340
+        },
+        "reward": {
+            "diamond": -30
+        }
+    }
 }
 ```
 
 [获得失败]()
 >
 > * 99: insufficient funds
->
+
+
 
 ## activate_wishing_pool_factory
 
@@ -1214,40 +1167,42 @@
 	"data"    :
 	{
 		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
-		"wid"  : 5
+		"wid"  : 6
 	}
 }
 ```
 
 ##### 接受消息JSON格式
 
->`count`   : the number of times the non-free wishing pool has been used（ 使用免费许愿池的次数 ）
-> `diamond` : the cost of the next non-free wishing pool（下一个非免费许愿池的消耗数量）
-> 
-> pool：许愿池剩余冷却时间
+>`count` : 已经许愿的次数（第一次免费）
+>
+>`pool`：许愿池剩余冷却时间
+>
+>`pool_diamond`：许愿池下次许愿需要消耗的钻石数
+>
+>`remaining`：武器碎片剩余情况和钻石剩余情况
+>
+>`reward`：武器碎片的改变情况和钻石消耗情况
 
 ```json
 {
-	"status" : 0, 
-	"message": "success",
-	"data"   :
-	{
-		"pool" : 3130,
-		"count" : 5,
-		"pool_diamond" : 50,
-		"remaining" :
-		{
-			"wid" : 5,
-			"seg" : 2350,
-			"diamond" : 3323
-		},
-		"reward" :
-		{
-			"wid" : 5,
-			"seg" : 3,
-			"diamond" : -350
-		}
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "pool": 172800,
+        "count": 1,
+        "pool_diamond": 50,
+        "remaining": {
+            "wid": 6,
+            "seg": 22,
+            "diamond": 9991400
+        },
+        "reward": {
+            "wid": 6,
+            "seg": 2,
+            "diamond": 0
+        }
+    }
 }
 ```
 
@@ -1255,7 +1210,8 @@
 >
 >* 99: insufficient diamonds
 >* 98: The number of draws has reached the limit today
->
+
+
 
 ## gather_resource_factory
 
@@ -1283,9 +1239,9 @@
 
 ##### 接受消息JSON格式
 
->remaining：剩余的物资情况
+>remaining：剩余的物资情况（gid:iid:qty）
 >
->reward：改变的物资情况
+>reward：改变的物资情况（gid:iid:qty）
 >
 >refresh：刷新的最新数据
 
@@ -1295,56 +1251,46 @@
     "message": "success",
     "data": {
         "remaining": [
-            "3:3:5",
-            "3:2:0",
-            "3:4:0"
+            "3:3:12"
         ],
         "reward": [
-            "3:3:0",
-            "3:2:0",
-            "3:4:0"
+            "3:3:3"
         ],
         "refresh": {
-            "status": 0,
-            "message": "success",
-            "data": {
-                "steps": 68,
-                "resource": {
-                    "remaining": {
-                        "0": 0,
-                        "1": 0,
-                        "2": 0
-                    },
-                    "reward": {
-                        "0": 0,
-                        "1": 0,
-                        "2": 0
-                    }
-                },
-                "armor": {
-                    "aid": 1,
-                    "remaining": 0,
-                    "reward": 0
-                },
-                "pool": 0,
-                "pool_diamond": 0,
-                "next_refresh": 6,
-                "worker": {
-                    "-1": 5,
-                    "total": 5,
-                    "2": 0,
-                    "3": 0,
-                    "1": 0,
-                    "0": 0
-                },
-                "level": {
+            "steps": 4,
+            "resource": {
+                "remaining": {
                     "0": 1,
                     "1": 1,
-                    "2": 1,
-                    "-2": 1
+                    "2": 50,
+                    "3": 0
                 },
-                "time": 0
-            }
+                "reward": {
+                    "0": 1,
+                    "1": 1,
+                    "2": 0,
+                    "3": 0
+                }
+            },
+            "pool": 0,
+            "pool_diamond": 0,
+            "next_refresh": 1,
+            "worker": {
+                "-1": 0,
+                "total": 5,
+                "2": 1,
+                "3": 2,
+                "1": 1,
+                "0": 1
+            },
+            "level": {
+                "3": 1,
+                "0": 1,
+                "1": 1,
+                "2": 1,
+                "-2": 1
+            },
+            "time": 0
         }
     }
 }
@@ -1352,5 +1298,4 @@
 
 [获得失败]()
 
->* 99: insufficient diamonds
->* 98: The number of draws has reached the limit today
+>* 99: invalid resource
