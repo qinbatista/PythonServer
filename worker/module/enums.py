@@ -372,7 +372,7 @@ class Task(enum.IntEnum):
 
 class Factory(enum.IntEnum):
 	WISHING_POOL = -2
-	UNASSIGNED = -1
+	UNASSIGNED = -1  # 未分配工人的情况
 	FOOD = 0
 	IRON = 1
 	CRYSTAL = 2

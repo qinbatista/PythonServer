@@ -52,7 +52,7 @@ async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
 
 	if enums.Tier.BASIC == tier:
 		kwargs.update({"task_id":enums.Task.BASIC_SUMMONING})
-		await task.record_task(uid,**kwargs)
+		await task.record_task(uid, **kwargs)
 	if enums.Tier.PRO == tier:
 		kwargs.update({"task_id":enums.Task.PRO_SUMMONING})
 		await task.record_task(uid,**kwargs)
@@ -174,6 +174,12 @@ async def dozen_d(uid, **kwargs):
 	reset = await _refresh(uid, cid, **kwargs)
 	data['refresh'] = reset['data']['refresh']
 	data['constraint'] = reset['data']['constraint']
+	# TODO 完成任务
+	kwargs.update({"task_id": enums.Task.PRO_SUMMONING})
+	await task.record_task(uid, **kwargs)
+	# TODO 完成成就
+	kwargs.update({"aid": enums.Achievement.PRO_SUMMON_TIMES})
+	await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -213,6 +219,9 @@ async def dozen_c(uid, **kwargs):
 	reset = await _refresh(uid, cid, **kwargs)
 	data['refresh'] = reset['data']['refresh']
 	data['constraint'] = reset['data']['constraint']
+	# TODO 完成任务
+	kwargs.update({"task_id": enums.Task.BASIC_SUMMONING})
+	await task.record_task(uid, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -277,6 +286,12 @@ async def single_d(uid, **kwargs):
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
+	# TODO 完成任务
+	kwargs.update({"task_id": enums.Task.PRO_SUMMONING})
+	await task.record_task(uid, **kwargs)
+	# TODO 完成成就
+	kwargs.update({"aid": enums.Achievement.PRO_SUMMON_TIMES})
+	await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -310,6 +325,9 @@ async def single_c(uid, **kwargs):
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
+	# TODO 完成任务
+	kwargs.update({"task_id": enums.Task.BASIC_SUMMONING})
+	await task.record_task(uid, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 

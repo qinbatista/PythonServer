@@ -75,8 +75,8 @@ async def invite_user(uid, gn_target, **kwargs):
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) > datetime.now(tz=common.TZ_SH):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
 		return common.mt(96, 'The invitation to the object to leave the family cooldown has not ended', {'seconds': seconds})
-	# exp_info = await stage.increase_exp(uid_target, 0, **kwargs)
-	# if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "邀请对象等级不满18级")
+	exp_info = await stage.increase_exp(uid_target, 0, **kwargs)
+	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "邀请对象等级不满18级")
 	in_family_target, _ = await _in_family(uid_target, **kwargs)
 	if in_family_target: return common.mt(94, 'The invitee has already joined the family')
 	# 以下是邀请成员限制的代码
@@ -114,8 +114,8 @@ async def request_join(uid, name, **kwargs):
 	if join_data != () and datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) > datetime.now(tz=common.TZ_SH):
 		seconds = int((datetime.strptime(join_data[0][0], "%Y-%m-%d %H:%M:%S").replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
 		return common.mt(96, 'Leaving the family cooldown is not over', {'seconds': seconds})
-	# exp_info = await stage.increase_exp(uid, 0, **kwargs)
-	# if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "Your rating is below 18", {'exp_info': exp_info})
+	exp_info = await stage.increase_exp(uid, 0, **kwargs)
+	if exp_info["level"] < kwargs['config']['family']['general']['player_level']: return common.mt(95, "Your rating is below 18", {'exp_info': exp_info})
 	# 以下是申请加入家族次数的限制代码
 	now = datetime.now(tz=common.TZ_SH)
 	lim, tim = await asyncio.gather(common.get_limit(uid, enums.Limits.FAMILY_JOIN, **kwargs), common.get_timer(uid, enums.Timer.FAMILY_JOIN, timeformat='%Y-%m-%d', **kwargs))

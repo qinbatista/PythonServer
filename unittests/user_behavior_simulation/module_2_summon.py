@@ -173,7 +173,9 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'disband_family', 'data': {'token': token, "name": '1newname'}})
 	# response = send_tcp_message({'world': 0, 'function': 'remove_user_family', 'data': {'token': token, "gn_target": '哈哈'}})
 	# response = send_tcp_message({'world': 0, 'function': 'request_join_family', 'data': {'token': token, "name": '1newname'}})
-	# response = send_tcp_message({'world': 0, 'function': 'get_new_mail', 'data': {'token': token, "name": '1newname'}})
+	token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEyNDE4MjEsInVpZCI6IjcxNjIxMDdiYTBlNTc2ODdjODQwNzE5NDUxMmZjMWRmYjQyNmQ0NjIifQ.nJvl0rSwk-BeKs1YIfE9XXF7ziAQbFnuf7LOlTisMHs'
+	# user_behavior_simulation.send_tcp_message({'world': 's9', 'function': 'get_new_mail', 'data': {'token': token}})
+	user_behavior_simulation.send_tcp_message({'world': 's9', 'function': 'respond_friend', 'data': {'token': token, 'key': '1578825778.M606582P1Q158.mail-678b475767-7qwgc'}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_all_mail', 'data': {'token': token, "name": '1newname'}})
 	# response = send_tcp_message({'world': 0, 'function': 'get_all_role', 'data': {'token': token, "name": '1newname'}})
 	# response = send_tcp_message({'world': 0, 'function': 'level_up_role', 'data': {'token': token, 'role': 1, "amount": '10'}})
@@ -205,10 +207,10 @@ if __name__ == '__main__':
 	# response = send_tcp_message({'world': 0, 'function': 'get_account_world_info', 'data': {'token': token, 'item': 5}})
 	# response = send_tcp_message({'world': 0, 'function': 'basic_summon', 'data': {'token': token, 'item': 1}})
 	# pass
-	world = "s2"
-	# token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNDM1ODMsInVpZCI6ImgwIn0.sqnbjsCJ_8OefTY-M9IHFARhqQ6cm6kATzUUlRekwjY"
-	token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEyMzY2NzYsInVpZCI6IkMxNjA0NUQ1LTNBODUtNDVFRC04OTdELTI4ODNERjlDMDA1MCJ9.iG0319v13oHAfxijOkwOvqPMwT42Rptu_TCbjTRAVrg"
-	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'change_player_name', 'data': {'token': token, 'gn': 'bhjb  mnjk csa'}})
+	# world = "s2"
+	# # token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNDM1ODMsInVpZCI6ImgwIn0.sqnbjsCJ_8OefTY-M9IHFARhqQ6cm6kATzUUlRekwjY"
+	# token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEyMzY2NzYsInVpZCI6IkMxNjA0NUQ1LTNBODUtNDVFRC04OTdELTI4ODNERjlDMDA1MCJ9.iG0319v13oHAfxijOkwOvqPMwT42Rptu_TCbjTRAVrg"
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'change_player_name', 'data': {'token': token, 'gn': 'bhjb  mnjk csa'}})
 	# user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'use_item', 'data' : {'token' : token, 'item_id': '3:6:12', 'exchange_id': ''}})
 	# user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id' : '', 'account': 'account00', 'password': '0password'}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token}})
