@@ -929,52 +929,50 @@
 
 ##### 接受消息JSON格式
 
-> `refresh`：刷新得到的信息
->
-> - `resource`: 资源的配置情况
->   - `remaining`：资源剩余情况
->
->   - `reward`: 资源的变化情况
->
->   - `next_refresh`：the number of seconds remaining until the server calculates the next STEP
->
->     Even if there is an error, the server will return the number of workers the SERVER says the client has.（距离下次刷新剩余时间。）
->
->   - `time`：工厂加速剩余时间，例time：59，工厂加速59秒后结束
->
-> `worker`：工人的分布情况
+> `refresh`：和刷新得到的信息一样
 
 ```json
 {
-    "status": 0,
-    "message": "success",
-    "data": {
-        "refresh": {
-            "resource": {
-                "remaining": {
-                    "0": 1,
-                    "1": 2,
-                    "2": 44,
-                    "3": 0
-                },
-                "reward": {
-                    "0": -4,
-                    "1": -1,
-                    "2": 1,
-                    "3": 0
-                }
-            },
-            "next_refresh": 2,
-            "time": 0
-        },
-        "worker": {
-            "-1": 0,
-            "0": 1,
-            "1": 1,
-            "2": 1,
-            "3": 2
-        }
-    }
+	"status": 0,
+	"message": "success",
+	"data": {
+		"refresh": {
+			"steps": 0,
+			"resource": {
+				"remaining": {
+					"0": 2,
+					"1": 0,
+					"2": 0,
+					"3": 0
+				},
+				"reward": {
+					"0": 0,
+					"1": 0,
+					"2": 0,
+					"3": 0
+				}
+			},
+			"pool": 0,
+			"pool_diamond": 0,
+			"next_refresh": 2,
+			"worker": {
+				"-1": 1,
+				"total": 5,
+				"2": 1,
+				"3": 1,
+				"1": 1,
+				"0": 1
+			},
+			"level": {
+				"3": 1,
+				"0": 1,
+				"1": 1,
+				"2": 1,
+				"-2": 1
+			},
+			"time": 0
+		}
+	}
 }
 ```
 
@@ -984,30 +982,41 @@
     "message": "insufficient workers",
     "data": {
         "refresh": {
-            "resource": {
-                "remaining": {
-                    "0": 3,
-                    "1": 2,
-                    "2": 48,
-                    "3": 0
-                },
-                "reward": {
-                    "0": 2,
-                    "1": 0,
-                    "2": 4,
-                    "3": 0
-                }
-            },
-            "next_refresh": 9,
-            "time": 0
-        },
-        "worker": {
-            "-1": 0,
-            "0": 1,
-            "1": 1,
-            "2": 1,
-            "3": 2
-        }
+			"steps": 0,
+			"resource": {
+				"remaining": {
+					"0": 2,
+					"1": 0,
+					"2": 0,
+					"3": 0
+				},
+				"reward": {
+					"0": 0,
+					"1": 0,
+					"2": 0,
+					"3": 0
+				}
+			},
+			"pool": 0,
+			"pool_diamond": 0,
+			"next_refresh": 2,
+			"worker": {
+				"-1": 1,
+				"total": 5,
+				"2": 1,
+				"3": 1,
+				"1": 1,
+				"0": 1
+			},
+			"level": {
+				"3": 1,
+				"0": 1,
+				"1": 1,
+				"2": 1,
+				"-2": 1
+			},
+			"time": 0
+		}
     }
 }
 ```
@@ -1018,30 +1027,41 @@
     "message": "factory worker over limits",
     "data": {
         "refresh": {
-            "resource": {
-                "remaining": {
-                    "0": 3,
-                    "1": 2,
-                    "2": 49,
-                    "3": 0
-                },
-                "reward": {
-                    "0": 0,
-                    "1": 0,
-                    "2": 1,
-                    "3": 0
-                }
-            },
-            "next_refresh": 1,
-            "time": 0
-        },
-        "worker": {
-            "-1": 0,
-            "0": 1,
-            "1": 1,
-            "2": 1,
-            "3": 2
-        }
+			"steps": 0,
+			"resource": {
+				"remaining": {
+					"0": 2,
+					"1": 0,
+					"2": 0,
+					"3": 0
+				},
+				"reward": {
+					"0": 0,
+					"1": 0,
+					"2": 0,
+					"3": 0
+				}
+			},
+			"pool": 0,
+			"pool_diamond": 0,
+			"next_refresh": 2,
+			"worker": {
+				"-1": 1,
+				"total": 5,
+				"2": 1,
+				"3": 1,
+				"1": 1,
+				"0": 1
+			},
+			"level": {
+				"3": 1,
+				"0": 1,
+				"1": 1,
+				"2": 1,
+				"-2": 1
+			},
+			"time": 0
+		}
     }
 }
 ```
@@ -1052,30 +1072,41 @@
     "message": "invalid fid supplied",
     "data": {
         "refresh": {
-            "resource": {
-                "remaining": {
-                    "0": 3,
-                    "1": 0,
-                    "2": 50,
-                    "3": 0
-                },
-                "reward": {
-                    "0": 1,
-                    "1": 0,
-                    "2": 0,
-                    "3": 0
-                }
-            },
-            "next_refresh": 10,
-            "time": 0
-        },
-        "worker": {
-            "-1": 0,
-            "0": 1,
-            "1": 1,
-            "2": 1,
-            "3": 2
-        }
+			"steps": 0,
+			"resource": {
+				"remaining": {
+					"0": 2,
+					"1": 0,
+					"2": 0,
+					"3": 0
+				},
+				"reward": {
+					"0": 0,
+					"1": 0,
+					"2": 0,
+					"3": 0
+				}
+			},
+			"pool": 0,
+			"pool_diamond": 0,
+			"next_refresh": 2,
+			"worker": {
+				"-1": 1,
+				"total": 5,
+				"2": 1,
+				"3": 1,
+				"1": 1,
+				"0": 1
+			},
+			"level": {
+				"3": 1,
+				"0": 1,
+				"1": 1,
+				"2": 1,
+				"-2": 1
+			},
+			"time": 0
+		}
     }
 }
 ```

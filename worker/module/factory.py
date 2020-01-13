@@ -28,9 +28,9 @@ HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, en
 async def refresh(uid, **kwargs):
 	kwargs.update({"task_id": enums.Task.CHECK_FACTORY})
 	await task.record_task(uid, **kwargs)
-	now              = datetime.now(tz=common.TZ_SH)
-	steps, refresh_t = await steps_since(uid, now, **kwargs)
-	rem, next_ref    = await remaining_seconds(uid, now, refresh_t, **kwargs)
+	now                  = datetime.now(tz=common.TZ_SH)
+	steps, refresh_t     = await steps_since(uid, now, **kwargs)
+	rem, next_ref, steps = await remaining_seconds(uid, now, refresh_t, steps, **kwargs)
 	await common.set_timer(uid, enums.Timer.FACTORY_REFRESH, now - timedelta(seconds=rem), **kwargs)
 	level, worker, storage = await get_state(uid, **kwargs)
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)  # storage真实剩余数据，delta变化数据
@@ -121,7 +121,6 @@ async def gather_resource(uid, resource, **kwargs):
 			data['remaining'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{remain}')
 			data['reward'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{value}')
 	await record_resources(uid, storage, **kwargs)  # 更新数据库资源
-	data['refresh'] = (await refresh(uid, **kwargs))['data']
 	return common.mt(0, 'success', data)
 
 
@@ -133,26 +132,23 @@ async def update_worker(uid, workers, **kwargs):
 	# sum workers <= max_worker else: return refresh + current workers
 	uw = sum(w for w in workers.values())
 	if uw > mw:
-		return common.mt(99, 'insufficient workers', {'refresh': await _assist_refresh(uid, **kwargs), 'worker' : \
-				{enums.Factory.UNASSIGNED.value : ua, **{k: w[k] for k in HAS_WORKER_FACTORIES}}})
+		return common.mt(99, 'insufficient workers', {'refresh': await _assist_refresh(uid, **kwargs)})
 
 	# worker_factories each do not exceed worker limit based on level else: return refresh + current workers
 	for fac, new in workers.items():
 		fid = enums.Factory(int(fac))
 		if fid in HAS_WORKER_FACTORIES:
 			if new > kwargs['config']['factory']['general']['worker_limits'][fac][str(l[fid])]:
-				return common.mt(98, 'factory worker over limits', {'refresh': await _assist_refresh(uid, **kwargs), 'worker': \
-						{enums.Factory.UNASSIGNED.value: ua, **{k: w[k] for k in HAS_WORKER_FACTORIES}}})
+				return common.mt(98, 'factory worker over limits', {'refresh': await _assist_refresh(uid, **kwargs)})
 		else:
-			return common.mt(97, 'invalid fid supplied', {'refresh' : await _assist_refresh(uid, **kwargs), 'worker' : \
-					{enums.Factory.UNASSIGNED.value : ua, **{k : w[k] for k in HAS_WORKER_FACTORIES}}})
+			return common.mt(97, 'invalid fid supplied', {'refresh': await _assist_refresh(uid, **kwargs)})
 
 	# 改变工人情况
 	for fac, new in workers.items():
 		fid = enums.Factory(int(fac))
 		await set_worker(uid, fid, new, **kwargs)
 	await set_worker(uid, enums.Factory.UNASSIGNED, mw - uw, **kwargs)
-	return common.mt(0, 'success', {'refresh': await _assist_refresh(uid, **kwargs), 'worker': {enums.Factory.UNASSIGNED.value : mw - uw, **workers}})
+	return common.mt(0, 'success', {'refresh': await _assist_refresh(uid, **kwargs)})
 
 async def buy_worker(uid, **kwargs):
 	unassigned, max_worker = await get_unassigned_workers(uid, **kwargs)
@@ -172,8 +168,7 @@ async def upgrade(uid, fid, **kwargs):
 	try:
 		upgrade_cost = kwargs['config']['factory']['general']['upgrade_cost'][str(fid.value)][str(l + 1)]
 	except KeyError:
-		return common.mt(97, 'max level', {'refresh' : {'resource' : r['data']['resource'],
-				'armor' : r['data']['armor']}})
+		return common.mt(97, 'max level', {'refresh' : {'resource' : r['data']['resource']}})
 	can, crystal = await common.try_item(uid, enums.Item.CRYSTAL, -upgrade_cost, **kwargs)
 	if not can: return common.mt(98, 'insufficient funds', {'refresh' : {'resource' : r['data']['resource']}})
 	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `level`) VALUES ("{uid}", {fid.value}, {l + 1}) ON DUPLICATE KEY UPDATE `level` = {l + 1};', **kwargs)
@@ -240,7 +235,7 @@ async def set_armor(uid, aid, **kwargs):
 async def _assist_refresh(uid, **kwargs) -> dict:
 	"""辅助工厂刷新工人需要的返回值"""
 	r = await refresh(uid, **kwargs)
-	return {'resource': r['data']['resource'], 'next_refresh': r['data']['next_refresh'], 'time': r['data']['time']}
+	return r['data']
 
 
 def roll_segment_value(**kwargs):
@@ -280,13 +275,13 @@ async def has_acceleration(uid, now, **kwargs):
 	accel_end_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)
 	return accel_end_t is not None and now < accel_end_t
 
-async def remaining_seconds(uid, now, refresh_t, **kwargs):
+async def remaining_seconds(uid, now, refresh_t, steps, **kwargs):
 	"""存在加速卡的情况下每步时间减半"""
 	has_accel = await has_acceleration(uid, now, **kwargs)
 	delta     = kwargs['config']['factory']['general']['step'] / (2 if has_accel else 1)
 	remainder = int((now - refresh_t).total_seconds()) % delta  # 剩余时间，单位秒
 	next_ref  = int(delta - remainder)  # 距离下次刷新的剩余时间，单位秒
-	return remainder, next_ref
+	return (0, delta, steps + 1) if next_ref <= 2 else (remainder, next_ref, steps)
 
 async def steps_since(uid, now, **kwargs):
 	"""返回需要计算的步数和刷新时间"""
