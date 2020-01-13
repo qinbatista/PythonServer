@@ -79,8 +79,9 @@ def factory_dialog(token,world,get_all_weapon):
 
 
 if __name__ == '__main__':
-	tk1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEzODczNDMsInVpZCI6IjEyMzQ1NiJ9.rSz5juTbsj3d6ga7Q35mC0RH3TUmDNalUvbDsc_T-ho'
-	wd1 = 's0'
+	tk1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNDM1ODMsInVpZCI6ImgwIn0.sqnbjsCJ_8OefTY-M9IHFARhqQ6cm6kATzUUlRekwjY'
+	wd1 = 's6'
+	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'update_worker_factory', 'data' : {'token' : tk1, 'worker': {"0": 0, "1": 1, "2": 1, "3": 2}}})
 	user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'gather_resource_factory', 'data' : {'token' : tk1, 'resource': {"1": 1888, "2": 18989}}})
 	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'activate_wishing_pool_factory', 'data' : {'token' : tk1, 'wid': 6}})
 	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'refresh_factory', 'data' : {'token' : tk1}})

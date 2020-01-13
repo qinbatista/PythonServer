@@ -1256,3 +1256,101 @@
 >* 99: insufficient diamonds
 >* 98: The number of draws has reached the limit today
 >
+
+## gather_resource_factory
+
+收集资源
+
+##### 发送消息JSON格式
+
+> resource：需要收集的资源（下面的这几种情况可以选取传）
+>
+> - 0：食物工厂下的物资数
+> - 1：矿山工厂下的物资数
+> - 2：水晶工厂下的物资数
+
+```json
+{
+	"world"   : 0, 
+	"function": "gather_resource_factory",
+	"data"    :
+	{
+		"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9",
+		"resource": {"1": 1888, "2": 18989}
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+>remaining：剩余的物资情况
+>
+>reward：改变的物资情况
+>
+>refresh：刷新的最新数据
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "remaining": [
+            "3:3:5",
+            "3:2:0",
+            "3:4:0"
+        ],
+        "reward": [
+            "3:3:0",
+            "3:2:0",
+            "3:4:0"
+        ],
+        "refresh": {
+            "status": 0,
+            "message": "success",
+            "data": {
+                "steps": 68,
+                "resource": {
+                    "remaining": {
+                        "0": 0,
+                        "1": 0,
+                        "2": 0
+                    },
+                    "reward": {
+                        "0": 0,
+                        "1": 0,
+                        "2": 0
+                    }
+                },
+                "armor": {
+                    "aid": 1,
+                    "remaining": 0,
+                    "reward": 0
+                },
+                "pool": 0,
+                "pool_diamond": 0,
+                "next_refresh": 6,
+                "worker": {
+                    "-1": 5,
+                    "total": 5,
+                    "2": 0,
+                    "3": 0,
+                    "1": 0,
+                    "0": 0
+                },
+                "level": {
+                    "0": 1,
+                    "1": 1,
+                    "2": 1,
+                    "-2": 1
+                },
+                "time": 0
+            }
+        }
+    }
+}
+```
+
+[获得失败]()
+
+>* 99: insufficient diamonds
+>* 98: The number of draws has reached the limit today

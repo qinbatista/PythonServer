@@ -40,8 +40,8 @@ import ctypes
 # from gevent import monkey; monkey.patch_all()
 logger = tool_lukseun_client.logger
 # lukseun = tool_lukseun_client.LukseunClient('aliya', host="192.168.1.143", port=8880)
-# lukseun = tool_lukseun_client.LukseunClient('aliya', host="127.0.0.1", port=8880)
-lukseun = tool_lukseun_client.LukseunClient('aliya', host="game.aliya.lukseun.com", port=8880)
+lukseun = tool_lukseun_client.LukseunClient('aliya', host="127.0.0.1", port=8880)
+# lukseun = tool_lukseun_client.LukseunClient('aliya', host="game.aliya.lukseun.com", port=8880)
 world = "0"
 token = ""
 unique_id = ""

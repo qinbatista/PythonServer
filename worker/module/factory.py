@@ -14,7 +14,10 @@ from datetime import datetime, timedelta
 BASIC_FACTORIES      = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
 				        enums.Factory.IRON    : None, enums.Factory.FOOD  : None}
 
-RESOURCE_FACTORIES   = {enums.Factory.FOOD: enums.Item.FOOD, enums.Factory.IRON: enums.Item.IRON, enums.Factory.CRYSTAL: enums.Item.CRYSTAL}
+RESOURCE_FACTORIES   = {enums.Factory.FOOD: enums.Item.FOOD,
+                        enums.Factory.IRON: enums.Item.IRON,
+                        enums.Factory.CRYSTAL: enums.Item.CRYSTAL,
+                        enums.Factory.ARMOR: None}
 
 HAS_LEVEL_FACTORIES  = {enums.Factory.FOOD         : None, enums.Factory.IRON  : None, \
 				        enums.Factory.CRYSTAL      : None, enums.Factory.WISHING_POOL : None }
@@ -33,7 +36,6 @@ async def refresh(uid, **kwargs):
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)  # storage真实剩余数据，delta变化数据
 	await record_resources(uid, storage, **kwargs)  # 更新数据库资源
 	aid    = await get_armor(uid, **kwargs)
-	_, aq  = await common.try_armor(uid, aid, 1, delta[enums.Factory.ARMOR], **kwargs)
 	pool   = await remaining_pool_time(uid, now, **kwargs)
 	ua, mw = await get_unassigned_workers(uid, **kwargs)  # ua未分配的工人数，mw总工人数
 	# 记录成就的代码片段
@@ -53,7 +55,7 @@ async def refresh(uid, **kwargs):
 	return common.mt(0, 'success', {'steps' : steps, 'resource' : {
 			'remaining' : {k.value : storage[k] for k in RESOURCE_FACTORIES},
 			'reward' : {k.value : delta[k] for k in RESOURCE_FACTORIES}},
-			'armor' : {'aid' : aid.value, 'remaining' : aq, 'reward' : delta[enums.Factory.ARMOR]},
+			'aid': aid.value,
 			'pool' : pool, 'pool_diamond': diamond,
 			'next_refresh' : next_ref,
 			'worker' : {
@@ -101,22 +103,22 @@ async def decrease_worker(uid, fid, n, **kwargs):
 async def gather_resource(uid, resource, **kwargs):
 	"""收集工厂资源
 	resource: {"1" : 18989. "2" : 18989}"""
+	_, _, storage = await get_state(uid, **kwargs)
 	resource = {enums.Factory(int(k)): v for k, v in resource.items() if enums.Factory(int(k)) in RESOURCE_FACTORIES.keys()}
+	resource = {k: storage[k] for k in resource.keys()}  # 使用服务器计算的资源
 	if not resource: return common.mt(99, 'invalid resource')
 	data = {'remaining': [], 'reward': []}
-	_, _, storage = await get_state(uid, **kwargs)
-	# 方式1使用服务器资源
-	storage = {k: v for k, v in storage if k in RESOURCE_FACTORIES.keys()}
-	for k, value in storage.items():
-		_, remain = await common.try_item(uid, RESOURCE_FACTORIES[k], value, **kwargs)
-		data['remaining'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{remain}')
-		data['reward'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{value}')
-	# 方式2使用客户端资源
-	# for k, value in resource.items():
-	# 	_, remain = await common.try_item(uid, RESOURCE_FACTORIES[k], value, **kwargs)
-	# 	data['remaining'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{remain}')
-	# 	data['reward'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{value}')
-	storage = {k: 0 for k in storage}
+	for k, value in resource.items():
+		storage[k] = 0
+		if k == enums.Factory.ARMOR:
+			aid = await get_armor(uid, **kwargs)
+			_, remain = await common.try_armor(uid, aid, 1, value, **kwargs)
+			data['remaining'].append(f'{enums.Group.ARMOR.value}:{aid}:{remain}')
+			data['reward'].append(f'{enums.Group.ARMOR.value}:{aid}:{value}')
+		else:
+			_, remain = await common.try_item(uid, RESOURCE_FACTORIES[k], value, **kwargs)
+			data['remaining'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{remain}')
+			data['reward'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{value}')
 	await record_resources(uid, storage, **kwargs)  # 更新数据库资源
 	data['refresh'] = await refresh(uid, **kwargs)
 	return common.mt(0, 'success', data)
@@ -274,7 +276,8 @@ def step(level, worker, current, **kwargs):
 def can_produce(current, factory, level, **kwargs):
 	"""计算工厂当前的是否可生产，可生产的情况下扣除需要扣除的基本材料"""
 	cost = {}
-	if current[factory] + 1 > kwargs['config']['factory']['general']['storage_limits'][str(factory.value)][str(level[factory])]:
+	kind = '1' if factory == enums.Factory.ARMOR else str(level[factory])
+	if current[factory] + 1 > kwargs['config']['factory']['general']['storage_limits'][str(factory.value)][kind]:
 		return False
 	for f, a in kwargs['config']['factory']['general']['costs'][str(factory.value)].items():
 		if current[enums.Factory(int(f))] < a:
@@ -316,7 +319,7 @@ async def steps_since(uid, now, **kwargs):
 	return steps, refresh_t
 
 async def get_armor(uid, **kwargs):
-	data = await common.execute(f'SELECT `storage` FROM `factory` WHERE uid = "{uid}" AND `fid` = {enums.Factory.ARMOR};', **kwargs)
+	data = await common.execute(f'SELECT `level` FROM `factory` WHERE uid = "{uid}" AND `fid` = {enums.Factory.ARMOR};', **kwargs)
 	return enums.Armor(data[0][0]) if data != () else enums.Armor.A1
 
 async def set_worker(uid, fid, val, **kwargs):
