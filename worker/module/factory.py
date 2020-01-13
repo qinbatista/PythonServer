@@ -120,7 +120,7 @@ async def gather_resource(uid, resource, **kwargs):
 			data['remaining'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{remain}')
 			data['reward'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{value}')
 	await record_resources(uid, storage, **kwargs)  # 更新数据库资源
-	data['refresh'] = await refresh(uid, **kwargs)
+	data['refresh'] = (await refresh(uid, **kwargs))['data']
 	return common.mt(0, 'success', data)
 
 
@@ -251,7 +251,7 @@ async def set_armor(uid, aid, **kwargs):
 async def _assist_refresh(uid, **kwargs) -> dict:
 	"""辅助工厂刷新工人需要的返回值"""
 	r = await refresh(uid, **kwargs)
-	return {'resource': r['data']['resource'], 'armor': r['data']['armor'], 'next_refresh': r['data']['next_refresh'], 'time': r['data']['time']}
+	return {'resource': r['data']['resource'], 'next_refresh': r['data']['next_refresh'], 'time': r['data']['time']}
 
 
 def roll_segment_value(**kwargs):
