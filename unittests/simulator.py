@@ -231,6 +231,7 @@ async def main():
 	parser.add_argument('-n', type = int, default = 50)
 	parser.add_argument('-d', '--delay', type = int, default = 5)
 	parser.add_argument('-r', '--refresh', type = int, default = 5)
+	parser.add_argument('-v', '--verbose', action = 'store_true')
 	parser.add_argument('-fn', type = str, default = None)
 	parser.add_argument('--certpath', type = str, default = '../gate/cert/mycert.crt')
 	await Simulator(parser.parse_args()).start()
