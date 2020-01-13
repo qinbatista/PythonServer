@@ -15,7 +15,7 @@ from datetime import datetime
 from dateutil import tz
 
 class MailServer:
-	MAILBOX_LIMIT = 100
+	MAILBOX_LIMIT = 50
 
 	class MailboxFullError(Exception):
 		pass
