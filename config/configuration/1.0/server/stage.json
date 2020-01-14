@@ -1,0 +1,306 @@
+{
+	"comment": "mopping-up是关于扫荡下的消耗与奖励配置",
+	"mopping-up": {
+		"comment": "关于能扫荡关卡下的配置信息",
+		"8":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:200",
+					"3:2:200"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"9":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:210",
+					"3:2:210"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"10":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:220",
+					"3:2:220"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"11":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:230",
+					"3:2:230"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"12":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 12,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:240",
+					"3:2:240"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"13":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:250",
+					"3:2:250"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"14":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:260",
+					"3:2:260"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"15":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:270",
+					"3:2:270"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"16":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:280",
+					"3:2:280"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"17":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:290",
+					"3:2:290"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"18":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:300",
+					"3:2:300"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"19":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:310",
+					"3:2:310"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"20":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:320",
+					"3:2:320"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"21":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:330",
+					"3:2:330"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"22":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:340",
+					"3:2:340"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"23":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:350",
+					"3:2:350"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"24":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:360",
+					"3:2:360"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"25":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:370",
+					"3:2:370"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"26":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:380",
+					"3:2:380"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"27":{
+			"comment": "cost是指消耗的体力点数，rewards是扫荡得到的物资",
+			"cost": 6,
+			"rewards": {
+				"comment": "common是通用物资，special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:390",
+					"3:2:390"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		}
+	}
+}

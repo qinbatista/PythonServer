@@ -125,9 +125,8 @@
 ```json
 {
 	"world": 0,
-	"function": "enter_stage",
+	"function": "login",
 	"data": {
-		"token": "my token",
 		"identifier": "email", 
     	"value":"account", 
     	"password":"123456"

@@ -10,6 +10,7 @@
 * [`enter_world_boss_stage`](##enter_world_boss_stage(enter_stage))
 * [`leave_world_boss_stage`](##leave_world_boss_stage(pass_stage))
 * [`get_config_boss`](##get_config_boss)
+* [`mopping_up_stage`](##mopping_up_stage)
 
 ## start_hang_up
 
@@ -711,7 +712,81 @@
 
 
 
+## mopping_up_stage
 
+##### 发送消息JSON格式
+
+扫荡关卡，扣取体力并立即获得物资
+
+> stage：需要扫荡的关卡
+
+```json
+{
+	"world": 0, 
+	"function": "mopping_up_stage",
+	"data": {
+		"token": "my toekn ^_^",
+		"stage": 8
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> energy：体力变化情况
+>
+> - cooling：距离下次体力恢复剩余时间
+> - remaining：剩余体力
+> - reward：体力改变值
+>
+> remaining：剩余物资情况
+>
+> reward：物资改变情况
+>
+> exp_info：经验信息变化情况
+>
+> - exp：当前经验
+> - level：当前角色等级
+> - need：升到下一级需要的经验
+> - reward：经验改变情况
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "energy": {
+            "cooling": 103,
+            "remaining": 109,
+            "reward": -6
+        },
+        "remaining": [
+            "3:9:425",
+            "3:1:975",
+            "3:2:725"
+        ],
+        "reward": [
+            "3:9:100",
+            "3:1:200",
+            "3:2:200"
+        ],
+        "exp_info": {
+            "exp": 380,
+            "level": 3,
+            "need": 340,
+            "reward": 120
+        }
+    }
+}
+```
+
+[失败]()
+
+- 99：Do not sweep until you pass this checkpoint
+- 98：There is no configuration information for this stage
+- 97：energy insufficient
 
 
 

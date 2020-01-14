@@ -138,7 +138,8 @@ async def update_worker(uid, workers, **kwargs):
 	for fac, new in workers.items():
 		fid = enums.Factory(int(fac))
 		if fid in HAS_WORKER_FACTORIES:
-			if new > kwargs['config']['factory']['general']['worker_limits'][fac][str(l[fid])]:
+			kind = '1' if fid == enums.Factory.ARMOR else f'{l[fid]}'
+			if new > kwargs['config']['factory']['general']['worker_limits'][fac][kind]:
 				return common.mt(98, 'factory worker over limits', {'refresh': await _assist_refresh(uid, **kwargs)})
 		else:
 			return common.mt(97, 'invalid fid supplied', {'refresh': await _assist_refresh(uid, **kwargs)})
@@ -182,7 +183,7 @@ async def upgrade(uid, fid, **kwargs):
 	else: kwargs["aid"] = 0
 	if kwargs["aid"]: await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
 	return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource']},
-									'upgrade': {'cost': upgrade_cost, 'remain': crystal, 'fid': fid.value, 'level': l + 1}})
+									'upgrade': {'cost': upgrade_cost, 'remaining': crystal, 'fid': fid.value, 'level': l + 1}})
 
 async def wishing_pool(uid, wid, **kwargs):
 	now, dia_cost, count = datetime.now(tz=common.TZ_SH), 0, 0
