@@ -7,6 +7,7 @@ A simple on disk mail server using the standardized Maildir format.
 import asyncio
 import mailbox
 import argparse
+import contextlib
 import urllib.parse
 import concurrent.futures
 
@@ -131,7 +132,11 @@ class MailServer:
 	@staticmethod
 	def deliver_mail(folder, mail):
 		"""存放邮件到指定的文件夹下"""
-		if len(folder) >= MailServer.MAILBOX_LIMIT:
+		mail_count = 0
+		with contextlib.suppress(FileNotFoundError):
+			# this can fail in the case where the folder was recently created
+			mail_count = len(folder) 
+		if mail_count >= MailServer.MAILBOX_LIMIT:
 			raise MailServer.MailboxFullError
 		# 获取key并将key添加到邮件中
 		key = folder.add(mail)
