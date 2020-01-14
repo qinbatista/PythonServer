@@ -74,7 +74,7 @@ async def accept_gift(uid, nonce, **kwargs):
 
 async def change_name(uid, gn, **kwargs):
 	"""修改玩家名字"""
-	if gn == "": return common.mt(97, 'Player name is empty')
+	if gn == "" or not bool(GN_RE.match(gn)): return common.mt(97, 'Player name is empty or Game name is not legal')
 	if (await common.execute(f'SELECT COUNT(*) FROM player WHERE gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, 'The player name has been used')
 	consume = 100
 	can, remain = await common.try_item(uid, enums.Item.DIAMOND, -consume, **kwargs)
