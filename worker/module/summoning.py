@@ -126,8 +126,7 @@ async def integral_convert(uid, **kwargs):
 	"""积分兑换"""
 	# TODO 限制条件检查
 	_, integral = await common.try_item(uid, enums.Item.INTEGRAL, 0, **kwargs)
-	lim = await common.get_limit(uid, enums.Limits.INTEGRAL, **kwargs)
-	lim = 0 if lim is None else lim
+	lim = await _get_acp(uid, **kwargs)
 	can, lim = _integral_inspect(lim, integral)
 	if not can: return common.mt(99, 'insufficient materials')
 	config = kwargs['config']['summon']['convert']
@@ -367,7 +366,7 @@ async def refresh_d(uid, **kwargs):
 		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
 		config = kwargs['config']['summon']['resource'].get(cid.name, None)
 		constraint = {'cid': cid.value, 'limit': (await _refresh_lim(uid, cid, **kwargs))[1], 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
-		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
+		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh'], 'acp': await _get_acp(uid, **kwargs)})
 		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
 	return await _refresh(uid, cid, **kwargs)
 
@@ -383,7 +382,7 @@ async def refresh_c(uid, **kwargs):
 		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
 		config = kwargs['config']['summon']['resource'].get(cid.name, None)
 		constraint = {'cid': cid.value, 'limit': (await _refresh_lim(uid, cid, **kwargs))[1], 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
-		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
+		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh'], 'acp': await _get_acp(uid, **kwargs)})
 		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
 	return await _refresh(uid, cid, **kwargs)
 
@@ -398,7 +397,7 @@ async def refresh_g(uid, **kwargs):
 		data = await _get_summon(uid, cid, **kwargs)
 		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
 		config = kwargs['config']['summon']['resource'].get(cid.name, None)
-		constraint = {'cid': cid.value, 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
+		constraint = {'cid': cid.value, 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs), 'acp': await _get_acp(uid, **kwargs)}
 		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
 		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
 	return await _refresh(uid, cid, **kwargs)
@@ -419,6 +418,12 @@ async def buy_refresh(uid, cid, **kwargs):
 	data['consume'] = {'remain_v': qty, 'value': consume}
 	return common.mt(0, 'success', data)
 # ############################# 私有方法 ###########################
+
+
+async def _get_acp(uid, **kwargs):
+	"""获取进度积分"""
+	acp = await common.get_limit(uid, enums.Limits.INTEGRAL, **kwargs)
+	return 0 if acp is None else acp
 
 
 def _integral_inspect(lim, integral):
@@ -488,6 +493,7 @@ async def _refresh(uid, cid: enums, **kwargs):
 	end_time = now + timedelta(hours=hours)
 	await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
 	constraint['cooling'] = hours * 3600
+	constraint['acp'] = await _get_acp(uid, **kwargs)
 	return common.mt(0, 'success', {'refresh': data, 'constraint': constraint})
 
 
