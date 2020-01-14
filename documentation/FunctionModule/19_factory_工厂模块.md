@@ -37,22 +37,24 @@
 >
 > - `reward`: is the change since the last time（物资变化量）
 >
-> 
->`worker`:  information regarding the distribution of workers across all factories（工人信息）
-> 
->- `total`: the number of all assigned and unassigned workers（所有工人数量）
+>
+> `worker`:  information regarding the distribution of workers across all factories（工人信息）
+>
+> - `total`: the number of all assigned and unassigned workers（所有工人数量）
 > - `unassigned`: the number of available free workers（可分配的工人数量，如下-1）
->- `Factory ID` : `number of assigned workers`（各个工厂工人数量，如下0-3）
-> 
->`level`: information regarding the distribution of levels across all factories（ 关于所有工厂级别分布的信息，其中3是盔甲制造盔甲的种类）
+> - `Factory ID` : `number of assigned workers`（各个工厂工人数量，如下0-3）
+>
+> `level`: information regarding the distribution of levels across all factories（ 关于所有工厂级别分布的信息，其中3是盔甲制造盔甲的种类）
 >
 > `pool` : number of seconds remaining until the wishing pool refreshes（许愿池下次刷新的冷却时间）
 >
+> `pool_count`：许愿池已许愿次数
+>
 > `pool_diamond`：下次许愿许愿消耗的钻石数
-> 
+>
 > `next_refresh`： 整个工厂下次刷新的剩余时间
 >
-> `time`：工厂加速剩余时间，例time：59，工厂加速59秒后结束
+> `accel_time`：工厂加速剩余时间，例accel_time：59，工厂加速59秒后结束
 
 ```json
 {
@@ -74,7 +76,8 @@
                 "3": 0
             }
         },
-        "pool": 0,
+        "pool": 0, 
+        "pool_count": 5,
         "pool_diamond": 0,
         "next_refresh": 3,
         "worker": {
@@ -92,7 +95,7 @@
             "2": 1,
             "-2": 1
         },
-        "time": 0
+        "accel_time": 0
     }
 }
 ```
@@ -273,43 +276,7 @@
             ],
             "reward": [
                 "4:1:0"
-            ],
-            "refresh": {
-                "steps": 188,
-                "resource": {
-                    "remaining": {
-                        "0": 2,
-                        "1": 1,
-                        "2": 88,
-                        "3": 0
-                    },
-                    "reward": {
-                        "0": 1,
-                        "1": -1,
-                        "2": 19,
-                        "3": 0
-                    }
-                },
-                "pool": 170766,
-                "pool_diamond": 50,
-                "next_refresh": 5,
-                "worker": {
-                    "-1": 1,
-                    "total": 6,
-                    "2": 1,
-                    "3": 2,
-                    "1": 1,
-                    "0": 1
-                },
-                "level": {
-                    "3": 1,
-                    "0": 1,
-                    "1": 1,
-                    "2": 1,
-                    "-2": 1
-                },
-                "time": 171786
-            }
+            ]
         },
         "aid": 3
     }
@@ -1286,43 +1253,7 @@
         ],
         "reward": [
             "3:3:3"
-        ],
-        "refresh": {
-            "steps": 4,
-            "resource": {
-                "remaining": {
-                    "0": 1,
-                    "1": 1,
-                    "2": 50,
-                    "3": 0
-                },
-                "reward": {
-                    "0": 1,
-                    "1": 1,
-                    "2": 0,
-                    "3": 0
-                }
-            },
-            "pool": 0,
-            "pool_diamond": 0,
-            "next_refresh": 1,
-            "worker": {
-                "-1": 0,
-                "total": 5,
-                "2": 1,
-                "3": 2,
-                "1": 1,
-                "0": 1
-            },
-            "level": {
-                "3": 1,
-                "0": 1,
-                "1": 1,
-                "2": 1,
-                "-2": 1
-            },
-            "time": 0
-        }
+        ]
     }
 }
 ```

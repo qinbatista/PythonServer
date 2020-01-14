@@ -508,6 +508,9 @@ class MessageHandler:
 		return await armor.get_all(data['data']['unique_id'], **data)
 
 	###################### stage ######################
+	async def _mopping_up_stage(self, data: dict) -> str:
+		return await stage.mopping_up(data['data']['unique_id'], data['data']['stage'], **data)
+
 	async def _get_all_tower(self, data: dict) -> str:
 		return common.mt(0, 'success', {'tower_config': data['config']['entry_consumables']})
 
@@ -849,6 +852,7 @@ FUNCTION_LIST = {
 
 	# TODO
 	###################### stage ######################
+	'mopping_up_stage': MessageHandler._mopping_up_stage,
 	'get_all_tower': MessageHandler._get_all_tower,
 	'enter_stage': MessageHandler._enter_stage,
 	'pass_stage': MessageHandler._pass_stage,

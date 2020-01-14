@@ -110,6 +110,7 @@ class ModuleConfigurations:
 		self.configs['check_in']          = r.json()['check_in']
 		self.configs['version']           = r.json()['version']
 		self.configs['summon']            = r.json()['summon']
+		self.configs['stage']             = r.json()['stage']
 		self.configs['notice']            = r.json()['notice']
 
 		if refresh_world_boss and not already_refreshed_world_boss:
