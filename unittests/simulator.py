@@ -12,16 +12,15 @@ import json
 import time
 import uuid
 import queue
+import pickle
 import random
+import struct
+import socket
 import asyncio
 import argparse
 import threading
 import contextlib
 import statistics
-
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as ani
 
 from functions import FunctionList
 from dataclasses import dataclass, field
@@ -51,8 +50,9 @@ class Client:
 			finish = time.time()
 			return Metric(function.name, start, finish, request, raw_resp)
 		finally:
-			writer.close()
-			await writer.wait_closed()
+			if writer:
+				writer.close()
+				await writer.wait_closed()
 
 '''
 Represents the global state of the simulation.
@@ -142,11 +142,11 @@ Contains an aggregation of all the data collected through the entire run time of
 @dataclass
 class Statistics:
 	data: defaultdict(list) = field(default_factory = lambda: defaultdict(list))
-	latest: defaultdict(list) = field(default_factory = lambda: defaultdict(list))
+	pending: queue.Queue = field(default_factory = queue.Queue)
 
 	def add(self, metric):
-		self.data[metric.name].append((metric.finish - metric.start, metric.start, metric.finish))
-		self.latest[metric.name].append((metric.finish - metric.start, metric.start, metric.finish))
+		self.data[metric.name].append((metric.finish - metric.start, metric.start))
+		self.pending.put_nowait((metric.name, metric.start, metric.finish - metric.start))
 	
 	def print(self):
 		os.system('cls') if os.name == 'nt' else os.system('clear')
@@ -161,7 +161,6 @@ class Statistics:
 			max_req = max(times)
 			std_dev = statistics.pstdev(times)
 			print(f'{function:<35}|{num_req:<8}|{min_req:<8.4}|{avg_req:<8.4}|{med_req:<8.4}|{max_req:<8.4}|{std_dev:<8.4}|')
-		self.latest.clear()
 
 
 '''
@@ -203,103 +202,73 @@ class User:
 	def running(self):
 		return True
 
-class GUI(threading.Thread):
-	def __init__(self, args, stats):
-		threading.Thread.__init__(self)
-		self.args = args
-		self.stats = stats
-
-		plt.rc('font', size = 6)
-		plt.rc('axes', labelsize = 6)
-		plt.rc('axes', labelsize = 6)
-		plt.rc('xtick', labelsize = 6)
-		plt.rc('ytick', labelsize = 6)
-
-		self.fig = plt.figure(figsize = (10, 10), dpi = 150)
-		self.histogram = self.fig.add_subplot(2, 2, 1)
-
-		self.average = self.fig.add_subplot(2, 2, 2)
-		self.average_x, self.average_y = [], []
-
-		self.piechart = self.fig.add_subplot(2, 2, 3)
-
+'''
+Pickles metrics collected from the metrics queue and publishes them to the graphite server.
+The graphite server is the queried from the Graphana platform to create real-time graphs.
+'''
+class Submitter:
+	def __init__(self, args, metrics):
+		self.args    = args
+		self.metrics = metrics
+		self.pending = []
 	
-	def run(self):
-		ani_average = ani.FuncAnimation(self.fig, self.update_average, \
-				interval=self.args.refresh*1000)
-		ani_piechart = ani.FuncAnimation(self.fig, self.update_piechart, \
-				interval=self.args.refresh*1000)
-		ani_histogram = ani.FuncAnimation(self.fig, self.update_histogram, \
-				interval=self.args.refresh*1000)
-		plt.show()
+	async def start(self):
+		try:
+			reader, writer = await asyncio.open_connection(self.args.graphite_addr, self.args.graphite_port)
+			while True:
+				m = await self.metrics.get()
+				self.pending.append((f'simulator.functions.{m.name}', (m.start, m.finish - m.start)))
+				if self.should_send():
+					await self.send(writer)
+					self.pending.clear()
+		except asyncio.CancelledError:
+			pass
+		finally:
+			if writer:
+				writer.close()
+				await writer.wait_closed()
 	
-	def update_histogram(self, i):
-		functions = tuple(sorted(self.stats.data, reverse = True))
-		y_pos = np.arange(len(functions))
-		count = [len(self.stats.data[fn]) for fn in functions]
-
-		self.histogram.clear()
-		self.histogram.set_title('Function Calls')
-		self.histogram.set_xlabel('Number of Calls')
-		self.histogram.barh(y_pos, count, align = 'center', alpha = 0.5)
-		self.histogram.set_yticks(y_pos)
-		self.histogram.set_yticklabels(functions)
+	async def send(self, writer):
+		print(f'Picking {len(self.pending)} metrics to send to server.')
+		payload = pickle.dumps(self.pending, protocol = 2)
+		payload = struct.pack('!L', len(payload)) + payload
+		writer.write(payload)
+		await writer.drain()
 	
-	def update_piechart(self, i):
-		functions = tuple(sorted(self.stats.data, reverse = True))
-		count = [len(self.stats.data[fn]) for fn in functions]
-		self.piechart.clear()
-		self.piechart.axis('equal')
-		self.piechart.pie(count, labels = functions, rotatelabels = True)
-	
-	def update_average(self, i):
-		self.average.clear()
-		self.average.set_title('Average Response')
-		self.average.set_ylabel('Response Time (ms)')
-		self.average.get_xaxis().set_visible(False)
-		num, tot = 0, 0
-		for times in self.stats.data.values():
-			tot += sum(t[0] for t in times)
-			num += len(times)
-		if num != 0:
-			self.average_x.append(time.time())
-			self.average_y.append((tot / num) * 1000)
-			self.average_x = self.average_x[-20:]
-			self.average_y = self.average_y[-20:]
-		self.average.plot(self.average_x, self.average_y)
-
+	def should_send(self):
+		return len(self.pending) >= 50
 
 
 class Simulator:
 	def __init__(self, argv):
 		self.argv = argv
 		self.stats = Statistics()
-		self.gui = GUI(self.argv, self.stats)
 
 		self.users = []
-		self.global_state = None
+		self.state = None
+		self.submitter = None
+	
+	async def init(self):
+		self.state = GlobalState(Client(self.argv.host, self.argv.port, self.argv.certpath))
+		self.submitter = Submitter(self.argv, self.state.metrics)
+		asyncio.create_task(self.submitter.start())
 
 	async def start(self):
 		try:
-			self.gui.start()
-			self.global_state = GlobalState(Client(self.argv.host, self.argv.port, self.argv.certpath))
-			#users=[asyncio.create_task(User(self.global_state, self.argv).run())for _ in range(self.argv.n)]
+			await self.init()
 			while self.running:
 				self.scale_users()
-				await asyncio.wait({self.gather_metrics()}, timeout = self.argv.refresh)
-				self.stats.print()
+				await asyncio.sleep(1)
 		except Exception as e:
 			print(f'Simulator encountered and error: {e}')
 		finally:
-			self.gui.join()
-	
-	async def gather_metrics(self):
-		while True:
-			self.stats.add(await self.global_state.metrics.get())
+			pass
 	
 	def scale_users(self):
 		self.users = [u for u in self.users if u.done() == False]
-		self.users.extend([asyncio.create_task(User(self.global_state, self.argv).run()) \
+		if len(self.users) != self.argv.n:
+			print(f'{self.argv.n - len(self.users)} users failed, replacing them with new ones...')
+		self.users.extend([asyncio.create_task(User(self.state, self.argv).run()) \
 				for _ in range(self.argv.n - len(self.users))])
 	
 	@property
@@ -318,6 +287,8 @@ async def main():
 	parser.add_argument('-v', '--verbose', action = 'store_true')
 	parser.add_argument('-fn', type = str, default = None)
 	parser.add_argument('--certpath', type = str, default = '../gate/cert/mycert.crt')
+	parser.add_argument('--graphite-addr', type = str, default = '192.168.1.102')
+	parser.add_argument('--graphite-port', type = int, default = 2004)
 	await Simulator(parser.parse_args()).start()
 
 
