@@ -54,7 +54,7 @@ async def refresh(uid, **kwargs):
 	return common.mt(0, 'success', {'steps': steps, 'resource': {
 			'remaining': {k.value: storage[k] for k in RESOURCE_FACTORIES},
 			'reward': {k.value: delta[k] for k in RESOURCE_FACTORIES}},
-			'count': count, 'pool': pool, 'pool_diamond': diamond,
+			'pool': pool, 'pool_count': count, 'pool_diamond': diamond,
 			'next_refresh' : next_ref,
 			'worker': {
 				enums.Factory.UNASSIGNED.value : ua, 'total' : mw,
@@ -64,7 +64,7 @@ async def refresh(uid, **kwargs):
 				enums.Factory.ARMOR.value: level[enums.Factory.ARMOR],
 				**{k.value : level[k] for k in HAS_LEVEL_FACTORIES}
 			},
-			'time': accel_time})
+			'accel_time': accel_time})
 
 async def increase_worker(uid, fid, n, **kwargs):
 	if n <= 0: return common.mt(96, 'number must be positive')

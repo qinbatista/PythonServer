@@ -46,15 +46,15 @@
 >
 > `level`: information regarding the distribution of levels across all factories（ 关于所有工厂级别分布的信息，其中3是盔甲制造盔甲的种类）
 >
-> `count`：许愿池已许愿次数
->
 > `pool` : number of seconds remaining until the wishing pool refreshes（许愿池下次刷新的冷却时间）
+>
+> `pool_count`：许愿池已许愿次数
 >
 > `pool_diamond`：下次许愿许愿消耗的钻石数
 >
 > `next_refresh`： 整个工厂下次刷新的剩余时间
 >
-> `time`：工厂加速剩余时间，例time：59，工厂加速59秒后结束
+> `accel_time`：工厂加速剩余时间，例accel_time：59，工厂加速59秒后结束
 
 ```json
 {
@@ -76,8 +76,8 @@
                 "3": 0
             }
         },
-        "count": 4, 
-        "pool": 0,
+        "pool": 0, 
+        "pool_count": 5,
         "pool_diamond": 0,
         "next_refresh": 3,
         "worker": {
@@ -95,7 +95,7 @@
             "2": 1,
             "-2": 1
         },
-        "time": 0
+        "accel_time": 0
     }
 }
 ```
