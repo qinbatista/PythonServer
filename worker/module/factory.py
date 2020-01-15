@@ -48,8 +48,8 @@ async def refresh(uid, **kwargs):
 	accel_end_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, **kwargs)
 	accel_time  = 0 if accel_end_t is None else int((accel_end_t - now).total_seconds())
 	# 计算许愿池下次许愿许愿消耗的钻石数
-	pool, count = await _refresh_wishing(uid, level, **kwargs)
-	diamond = 0 if count is None or pool == 0 else count * kwargs['config']['factory']['wishing_pool']['base_diamond']
+	pool, count = await _refresh_wishing(uid, **kwargs)
+	diamond = (kwargs['config']['factory']['wishing_pool']['limit'] - count) * kwargs['config']['factory']['wishing_pool']['base_diamond']
 	return common.mt(0, 'success', {'steps': steps, 'resource': {
 			'remaining': {k.value: storage[k] for k in RESOURCE_FACTORIES},
 			'reward': {k.value: delta[k] for k in RESOURCE_FACTORIES}},
@@ -186,19 +186,19 @@ async def upgrade(uid, fid, **kwargs):
 
 async def wishing_pool(uid, wid, **kwargs):
 	level, _, _ = await get_state(uid, **kwargs)
-	pool, count = await _refresh_wishing(uid, level, **kwargs)
-	if count >= kwargs['config']['factory']['wishing_pool']['limit']: return common.mt(98, 'The number of draws has reached the limit today')
-	dia_cost = -count * kwargs['config']['factory']['wishing_pool']['base_diamond']
+	pool, count = await _refresh_wishing(uid, **kwargs)
+	if count == 0: return common.mt(98, 'The number of draws has reached the limit today')
+	dia_cost = (kwargs['config']['factory']['wishing_pool']['limit']-count) * kwargs['config']['factory']['wishing_pool']['base_diamond']
 	can_pay, dia_remain = await common.try_item(uid, enums.Item.DIAMOND, dia_cost, **kwargs)
 	if not can_pay: return common.mt(99, 'insufficient diamonds')
 	if pool == 0:
 		pool = (kwargs['config']['factory']['wishing_pool']['base_recover'] - level[enums.Factory.WISHING_POOL]) * 3600
 		await common.set_timer(uid, enums.Timer.FACTORY_WISHING_POOL, datetime.now(tz=common.TZ_SH)+timedelta(seconds=pool), **kwargs)
-	await common.set_limit(uid, enums.Limits.FACTORY_WISHING_POOL, count + 1, **kwargs)
+	await common.set_limit(uid, enums.Limits.FACTORY_WISHING_POOL, count - 1, **kwargs)
 	seg_reward = roll_segment_value(**kwargs)
 	seg_remain = await weapon._update_segment(uid, wid, seg_reward, **kwargs)
-	return common.mt(0, 'success', {'pool' : pool, 'count' : (0 if pool == 0 else count) + 1, \
-			'pool_diamond' : (count + 1) * kwargs['config']['factory']['wishing_pool']['base_diamond'], \
+	return common.mt(0, 'success', {'pool': pool, 'count': count - 1, \
+			'pool_diamond': dia_cost + kwargs['config']['factory']['wishing_pool']['base_diamond'], \
 			'remaining' : {'wid' : wid.value, 'seg' : seg_remain, 'diamond' : dia_remain}, \
 			'reward'    : {'wid' : wid.value, 'seg' : seg_reward, 'diamond' : dia_cost}})
 
@@ -227,12 +227,12 @@ async def set_armor(uid, aid, **kwargs):
 ####################################################################################
 
 
-async def _refresh_wishing(uid, level, **kwargs):
+async def _refresh_wishing(uid, **kwargs):
 	now  = datetime.now(tz=common.TZ_SH)
 	pool = await remaining_pool_time(uid, now, **kwargs)
 	if pool == 0:
 		await common.set_limit(uid, enums.Limits.FACTORY_WISHING_POOL, 0, **kwargs)
-		return pool, 0
+		return pool, kwargs['config']['factory']['wishing_pool']['limit']
 	count = await common.get_limit(uid, enums.Limits.FACTORY_WISHING_POOL, **kwargs)
 	return pool, count
 

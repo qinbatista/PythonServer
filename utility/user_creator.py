@@ -11,14 +11,17 @@ def create_table_info(cursor):
 	"""
 	CREATE TABLE `info` (
 	  `unique_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
-	  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-	  `password` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-	  `account` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-	  `email` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-	  `phone_number` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+	  `cuid` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '提供客户端的uid',
+	  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '玩家游戏token',
+	  `password` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '玩家加密后的密码',
+	  `account` varchar(24) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '玩家账号',
+	  `email` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '绑定的邮箱',
+	  `phone_number` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '绑定的手机号',
 	  `salt` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-	  `sex` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-	  PRIMARY KEY (`unique_id`)
+	  `birth` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '玩家的生日',
+	  `sex` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '玩家的性别',
+	  PRIMARY KEY (`unique_id`),
+	  UNIQUE KEY `c_uid` (`cuid`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 	"""
 	cursor.execute(statement)

@@ -27,6 +27,7 @@ PW_RE = re.compile(r'\A[\w!@#$%^&*()_+|`~=\-\\\[\]:;\'\"{}/?,.<>]{6,30}\Z')
 AC_RE = re.compile(r'^[_a-z][_a-z0-9]{4,23}$')
 EM_RE = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
 UID = "lukseun%sM%sP%s"
+CID = "%s#%sr%s"
 
 
 async def register(uid, account, password, **kwargs):
@@ -204,12 +205,23 @@ async def yield_uid(**kwargs):
 		uid = UID % (int(now), int(now % 1 * 1e6), os.getpid())
 	return uid
 
+
+async def yield_cid(uid, **kwargs):
+	num, now, r = 100, time.time(), random.randrange(100000)
+	cid = CID % (int(now), int(now % 1 * 1e6), r)
+	while await common.exists('info', ('cuid', cid), account=True, **kwargs) and num > 0:
+		num, now, r = num - 1, time.time(), random.randrange(100000)
+		cid = CID % (int(now), int(now % 1 * 1e6), r)
+	return uid if num == 0 else cid
+
+
 async def _account_bound(uid, **kwargs):
 	data = await common.execute(f'SELECT account FROM info WHERE unique_id = "{uid}";', account=True, **kwargs)
 	return not (data == () or (None,) in data or ('',) in data)
 
 async def _create_new_user(uid, **kwargs):
-	await common.execute(f'INSERT INTO info (unique_id) VALUES("{uid}");', account = True, **kwargs)
+	cid = await yield_cid(uid, **kwargs)
+	await common.execute(f'INSERT INTO info (unique_id, cuid) VALUES("{uid}", "{cid}");', account = True, **kwargs)
 
 async def _email_bound(uid, **kwargs):
 	data = await common.execute(f'SELECT email FROM info WHERE unique_id = "{uid}";', \
