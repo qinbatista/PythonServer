@@ -7,7 +7,7 @@ PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
 images = ['auth', 'config', 'edge', 'gate', 'mail', 'worker']
 
 
-def login(username, password):
+def login(username='qinbatista', password='lukseun1'):
 	# subprocess.Popen(['docker', f'login --username={username} registry.cn-hangzhou.aliyuncs.com'])
 	os.system(f'docker login --username={username} registry.cn-hangzhou.aliyuncs.com')
 

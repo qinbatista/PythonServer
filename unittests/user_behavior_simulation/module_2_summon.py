@@ -160,7 +160,8 @@ if __name__ == '__main__':
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_new_mail', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'enter_stage', 'data': {'token': token, 'stage': stage}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'pass_stage', 'data': {'token': token, 'stage': stage}})
-	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'mopping_up_stage', 'data': {'token': token, 'stage': stage}})
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_stage', 'data': {'token': token, 'stage': stage}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'mopping_up_stage', 'data': {'token': token, 'stage': stage}})
 	# user_behavior_simulation.send_tcp_message({'world': 's9', 'function': 'respond_friend', 'data': {'token': token, 'key': '1578825778.M606582P1Q158.mail-678b475767-7qwgc'}})
 	# token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEyMzY2NzYsInVpZCI6IkMxNjA0NUQ1LTNBODUtNDVFRC04OTdELTI4ODNERjlDMDA1MCJ9.iG0319v13oHAfxijOkwOvqPMwT42Rptu_TCbjTRAVrg"
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'change_player_name', 'data': {'token': token, 'gn': 'bhjb  mnjk csa'}})

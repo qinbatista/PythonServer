@@ -80,6 +80,8 @@
 > stage_reward_config：返回stage_reward_config.json
 >
 > hang_reward_config: 返回hang_reward_config.json
+>
+> mopping_up：扫荡的配置信息
 
 ```json
 {
@@ -525,7 +527,8 @@
 				"7",
 				"8"
 			]
-		}
+		},
+        "mopping_up": {}
 	}
 }
 ```
