@@ -29,6 +29,8 @@ from collections import defaultdict
 
 '''
 Fascilitates a method of sending timed requests to the server.
+Loads the SSL context a single time.
+All simulated users share the same client instance.
 '''
 class Client:
 	def __init__(self, host, port, certpath):
@@ -56,6 +58,7 @@ class Client:
 
 '''
 Represents the global state of the simulation.
+The global state is shared amongst all of the User instances.
 '''
 @dataclass
 class GlobalState:
@@ -136,32 +139,6 @@ class Metric:
 			self.decoded = json.loads(self.raw_resp.decode().strip())
 		return self.decoded
 
-'''
-Contains an aggregation of all the data collected through the entire run time of the simulation.
-'''
-@dataclass
-class Statistics:
-	data: defaultdict(list) = field(default_factory = lambda: defaultdict(list))
-	pending: queue.Queue = field(default_factory = queue.Queue)
-
-	def add(self, metric):
-		self.data[metric.name].append((metric.finish - metric.start, metric.start))
-		self.pending.put_nowait((metric.name, metric.start, metric.finish - metric.start))
-	
-	def print(self):
-		os.system('cls') if os.name == 'nt' else os.system('clear')
-		title = f'{"Function":<35}|{"N":^8}|{"Min":^8}|{"Avg":^8}|{"Med":^8}|{"Max":^8}|{"Std":^8}|'
-		print(f'{title}\n{"=" * len(title)}')
-		for function in sorted(self.data):
-			times = [t[0] for t in self.data[function]]
-			num_req = len(self.data[function])
-			min_req = min(times)
-			avg_req = statistics.mean(times)
-			med_req = statistics.median(times)
-			max_req = max(times)
-			std_dev = statistics.pstdev(times)
-			print(f'{function:<35}|{num_req:<8}|{min_req:<8.4}|{avg_req:<8.4}|{med_req:<8.4}|{max_req:<8.4}|{std_dev:<8.4}|')
-
 
 '''
 Represents a simulated user.
@@ -204,7 +181,7 @@ class User:
 
 '''
 Pickles metrics collected from the metrics queue and publishes them to the graphite server.
-The graphite server is the queried from the Graphana platform to create real-time graphs.
+The graphite server is then queried from the Graphana platform to create real-time graphs.
 '''
 class Submitter:
 	def __init__(self, args, metrics):
@@ -239,10 +216,16 @@ class Submitter:
 		return len(self.pending) >= 50
 
 
+'''
+Orchestrates the creation and running of simulated users.
+Simulated users make semi-intelligent requests to the server.
+All metrics collected by users are pushed into the global metric queue.
+This queue is fed into the Submitter class, who's job is to collect and submit metric data to a graphite 
+server.
+'''
 class Simulator:
 	def __init__(self, argv):
 		self.argv = argv
-		self.stats = Statistics()
 
 		self.users = []
 		self.state = None
@@ -279,16 +262,14 @@ class Simulator:
 
 async def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('host', type = str)
-	parser.add_argument('--port', type = int, default = 8880)
-	parser.add_argument('-n', type = int, default = 50)
-	parser.add_argument('-d', '--delay', type = int, default = 5)
-	parser.add_argument('-r', '--refresh', type = int, default = 2)
-	parser.add_argument('-v', '--verbose', action = 'store_true')
-	parser.add_argument('-fn', type = str, default = None)
-	parser.add_argument('--certpath', type = str, default = '../gate/cert/mycert.crt')
-	parser.add_argument('--graphite-addr', type = str, default = '192.168.1.102')
+	parser.add_argument('host'           , type = str)
+	parser.add_argument('-d', '--delay'  , type = int, default = 5)
+	parser.add_argument('-n'             , type = int, default = 50)
+	parser.add_argument('-fn'            , type = str, default = None)
+	parser.add_argument('--port'         , type = int, default = 8880)
 	parser.add_argument('--graphite-port', type = int, default = 2004)
+	parser.add_argument('--graphite-addr', type = str, default = '192.168.1.102')
+	parser.add_argument('--certpath'     , type = str, default = '../gate/cert/mycert.crt')
 	await Simulator(parser.parse_args()).start()
 
 
