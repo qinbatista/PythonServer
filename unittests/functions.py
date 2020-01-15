@@ -10,6 +10,13 @@ import inspect
 import contextlib
 
 
+'''
+all functions derive from this abstract base class.
+before_call is always called by the simulated user before sending the request.
+after_call is always called by the simulated user after receiving a response.
+
+both the global_state and state parameters are mutable.
+'''
 class Function:
 	def __init__(self, fn):
 		self.fn = {'function' : fn, 'data' : {}}
@@ -659,6 +666,10 @@ class reset_skill_point_weapon(Function):
 
 #######################################################################################
 class FunctionList:
+	'''
+	loads the list of all functions declared in this file.
+	this removes the need to manually add function classes to a list.
+	'''
 	def load_functions():
 		special, normal = {}, {}
 		for name, obj in inspect.getmembers(sys.modules[__name__]):
