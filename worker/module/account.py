@@ -207,10 +207,10 @@ async def yield_uid(**kwargs):
 
 
 async def yield_cid(uid, **kwargs):
-	num, now, r = 100, time.time(), random.randrange(100000)
+	num, now, r = 100, time.time(), secrets.randbits(64)
 	cid = CID % (int(now), int(now % 1 * 1e6), r)
 	while await common.exists('info', ('cuid', cid), account=True, **kwargs) and num > 0:
-		num, now, r = num - 1, time.time(), random.randrange(100000)
+		num, now, r = num - 1, time.time(), secrets.randbits(64)
 		cid = CID % (int(now), int(now % 1 * 1e6), r)
 	return uid if num == 0 else cid
 
