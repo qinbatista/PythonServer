@@ -153,13 +153,15 @@ if __name__ == '__main__':
 	world = 's6'
 	uid = '000'
 
-	data = {"function": "get_top_damage", "random": "978", "world": "s0", "data": {"page": 1, "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODE2NjIxODMsInVpZCI6IjEyMzQ1NiJ9.vzi3Esjo00IpLHCGwP3mMUoT7iIOWeARwrSiuoWCuDQ"}}
-	user_behavior_simulation.send_tcp_message(data)
-	# res = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})
+	# data = {"function":"supplement_check_in","random":"31","world":"s0","data":{"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODE2NjIxODMsInVpZCI6IjEyMzQ1NiJ9.vzi3Esjo00IpLHCGwP3mMUoT7iIOWeARwrSiuoWCuDQ"}}
+	#
+	# user_behavior_simulation.send_tcp_message(data)
+	res = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})
 	# res = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'unique_id': uid, 'identifier': 'account', "value": "account00", "password":"123456"}})
-	# token = res['data']['token']
+	token = res['data']['token']
 	# token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODE1NzgyNDEsInVpZCI6IjAwMCJ9.MBrqeizGqEClc3GDIKn3cFx3hEeaN5Mqk0N8-Kqu1_U'
 	# stage = 8
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'supplement_check_in', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_new_mail', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'enter_stage', 'data': {'token': token, 'stage': stage}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'pass_stage', 'data': {'token': token, 'stage': stage}})

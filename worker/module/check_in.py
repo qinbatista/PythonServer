@@ -51,11 +51,12 @@ async def check_in(uid, **kwargs):
 	item_set = kwargs["check_in_config"][str(which_day)].split(":")
 	vip_info = await vip.increase_exp(uid, 10, **kwargs)
 	vip_bond = 1 if which_day >= vip_info['level'] else 2
-	if int(item_set[0]) == enums.Group.ITEM.value: _, quantity = await common.try_item(uid, enums.Item(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
-	if int(item_set[0]) == enums.Group.WEAPON.value:  quantity = await common.try_weapon(uid, enums.Weapon(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
-	if int(item_set[0]) == enums.Group.ROLE.value:    quantity = await common.try_role(uid, enums.Role(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
+	gid = enums.Group(int(item_set[0]))
+	if gid == enums.Group.ITEM: _, quantity = await common.try_item(uid, enums.Item(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
+	if gid == enums.Group.WEAPON:  quantity = await common.try_weapon(uid, enums.Weapon(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
+	if gid == enums.Group.ROLE:    quantity = await common.try_role(uid, enums.Role(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
 	await common.execute_update(f'insert into check_in(uid, date, reward) values("{uid}", "{current_time}", 1)', **kwargs)
-	return common.mt(0, 'Sign-in success', {"remaining": [f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{quantity}'], "reward": [f'{item_set[0]}:{enums.Item(int(item_set[1]))}:{vip_bond*int(item_set[2])}']})
+	return common.mt(0, 'Sign-in success', {"remaining": [f'{item_set[0]}:{item_set[1]}:{quantity}'], "reward": [f'{item_set[0]}:{item_set[1]}:{vip_bond*int(item_set[2])}']})
 
 
 async def get_all_check_in_table(uid, **kwargs):
