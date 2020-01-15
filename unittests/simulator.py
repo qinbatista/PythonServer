@@ -195,6 +195,7 @@ class Submitter:
 			while True:
 				m = await self.metrics.get()
 				self.pending.append((f'simulator.functions.{m.name}', (m.start, m.finish - m.start)))
+				self.pending.append(('simulator.bandwidth', (m.start, len(m.request) + len(m.raw_resp))))
 				if self.should_send():
 					await self.send(writer)
 					self.pending.clear()
