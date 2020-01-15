@@ -188,6 +188,9 @@ class Submitter:
 		self.args    = args
 		self.metrics = metrics
 		self.pending = []
+		self.last_sent = time.time()
+		self.last_band = self.last_sent
+		self.bandwidth = 0
 	
 	async def start(self):
 		try:
@@ -196,9 +199,11 @@ class Submitter:
 				m = await self.metrics.get()
 				self.pending.append((f'simulator.functions.{m.name}', (m.start, m.finish - m.start)))
 				self.pending.append(('simulator.bandwidth', (m.start, len(m.request) + len(m.raw_resp))))
+				self.bandwidth += len(m.request) + len(m.raw_resp)
 				if self.should_send():
 					await self.send(writer)
 					self.pending.clear()
+					self.last_sent = time.time()
 		except asyncio.CancelledError:
 			pass
 		finally:
@@ -207,14 +212,22 @@ class Submitter:
 				await writer.wait_closed()
 	
 	async def send(self, writer):
-		print(f'Picking {len(self.pending)} metrics to send to server.')
 		payload = pickle.dumps(self.pending, protocol = 2)
 		payload = struct.pack('!L', len(payload)) + payload
 		writer.write(payload)
 		await writer.drain()
 	
 	def should_send(self):
-		return len(self.pending) >= 50
+		t = time.time()
+		if t - self.last_band > 1:
+			print(f'{self.bandwidth / (t - self.last_band)} bytes / second')
+			self.last_band = t
+			self.bandwidth = 0
+		if len(self.pending) >= 200:
+			return True
+		if t - self.last_sent > 5:
+			return True
+		return False
 
 
 '''
