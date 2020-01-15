@@ -166,16 +166,10 @@ async def try_energy(uid, amount, **kwargs):
 	# - 98 - 无足够能量消耗 === Not enough energy consumption
 	# - 99 - 数据库操作错误 === Database operation error
 	max_energy = kwargs['config']['player']['energy']['max_energy']
-	data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
-	if data == ():
-		await execute_update(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
-		data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
-	sql_energy = data[0][0]
+	sql_energy = await get_progress(uid, 'energy', **kwargs)
+	sql_energy = max_energy if sql_energy is None else sql_energy
 	if sql_energy >= max_energy:
-		timer_data = await execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-		if timer_data == (): await execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.ENERGY_RECOVER_TIME.value}");', **kwargs)
-		else: await execute(f'UPDATE timer SET time = "" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-
+		await execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", "{enums.Timer.ENERGY_RECOVER_TIME}", "") ON DUPLICATE KEY UPDATE time="";', **kwargs)
 	if amount > 0:  # 购买能量
 		data = (await _decrease_energy(uid, 0, **kwargs))['data']
 		status, _ = await execute_update(f'UPDATE progress SET energy = energy + {amount} WHERE uid = "{uid}";', **kwargs)
@@ -194,7 +188,7 @@ async def try_energy(uid, amount, **kwargs):
 		else:
 			data['energy'] = energy_data[0][0]
 			return mt(1, "Purchase energy successfully, energy is not fully restored", data)
-	elif max_energy + amount < 0:
+	elif sql_energy + amount < 0:
 		return mt(status=97, message="Parameter error")
 	else:  # 消耗能量或者查询能量
 		return await _decrease_energy(uid, abs(amount), **kwargs)
