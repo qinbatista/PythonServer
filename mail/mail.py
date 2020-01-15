@@ -32,6 +32,7 @@ class MailServer:
 		aiohttp_app.router.add_post('/all'        , self.get_all)
 		aiohttp_app.router.add_post('/new'        , self.get_new)
 		aiohttp_app.router.add_post('/delete_read', self.delete_read)
+		asyncio.create_task(self.clean_temp())
 		return aiohttp_app
 
 	async def send(self, request):
@@ -87,6 +88,14 @@ class MailServer:
 		return web.json_response({'mail' : mail, 'count' : \
 				{'cur' : len(MailServer.get_mail_folder(self.mailbox, post['world'], post['uid'])), \
 				'max' : MailServer.MAILBOX_LIMIT}})
+	
+	async def clean_temp(self):
+		try:
+			while True:
+				await asyncio.sleep(3600 * 36)
+				self.mailbox.clean()
+		except asyncio.CancelledError:
+			pass
 
 	@staticmethod
 	def send_mail(mbox, world, uid, mail_dict):
