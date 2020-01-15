@@ -262,14 +262,15 @@ class Simulator:
 
 async def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('host'           , type = str)
-	parser.add_argument('-d', '--delay'  , type = int, default = 5)
-	parser.add_argument('-n'             , type = int, default = 50)
-	parser.add_argument('-fn'            , type = str, default = None)
-	parser.add_argument('--port'         , type = int, default = 8880)
-	parser.add_argument('--graphite-port', type = int, default = 2004)
-	parser.add_argument('--graphite-addr', type = str, default = '192.168.1.102')
-	parser.add_argument('--certpath'     , type = str, default = '../gate/cert/mycert.crt')
+	parser.add_argument('host'           , type = str, help = 'lukseun server address')
+	parser.add_argument('-d', '--delay'  , type = int, default = 5, help = 'max delay between requests')
+	parser.add_argument('-n'             , type = int, default = 50, help = 'number of concurrent users')
+	parser.add_argument('-fn'            , type = str, default = None, help = 'force send only this fn')
+	parser.add_argument('--port'         , type = int, default = 8880, help = 'lukseun server port')
+	parser.add_argument('--graphite-port', type = int, default = 2004, help = 'graphite port')
+	parser.add_argument('--graphite-addr', type = str, default = '192.168.1.102', help = 'graphite address')
+	parser.add_argument('--certpath'     , type = str, default = '../gate/cert/mycert.crt', \
+			help = 'path to ssl cert')
 	await Simulator(parser.parse_args()).start()
 
 
