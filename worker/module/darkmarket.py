@@ -77,8 +77,7 @@ async def get_all_market(uid, **kwargs):
 			dark_markets = await refresh_darkmarket(uid, **kwargs)
 	if not dark_markets:
 		data = await common.execute(f'SELECT pid, gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}";', **kwargs)
-		for d in data:
-			dark_markets.append({'pid': d[0], 'gid': d[1], 'mid': d[2], 'qty': d[3], 'cid': d[4], 'amt': d[5]})
+		dark_markets = [{'pid': d[0], 'gid': d[1], 'mid': d[2], 'qty': d[3], 'cid': d[4], 'amt': d[5]} for d in data]
 		refresh_time_s = max(3600 - int((datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')).total_seconds()), 0)
 		return common.mt(1, 'Get all black market information', {'dark_markets': dark_markets, 'refresh_time': refresh_time_s, 'refreshable': refreshable, 'config': {'refresh_diamond': kwargs['config']['player']['dark_market']['refresh_store']['diamond']}})
 	await common.execute_update(f'INSERT INTO timer(uid, tid, time) VALUES ("{uid}", "{enums.Timer.DARK_MARKET_TIME}", "{refresh_time}") ON DUPLICATE KEY UPDATE time="{refresh_time}";', **kwargs)
@@ -172,23 +171,23 @@ async def refresh_darkmarket(uid, **kwargs):
 	tier_choice = random.choices(dark_market_data['names'], dark_market_data['weights'], k=kwargs['config']['player']['dark_market']['constraint']['grid'])
 	key_list = [(random.choices(dark_market_data[tier], k=1))[0] for tier in tier_choice]
 	for pid, merchandise in enumerate(key_list):
-		if "W" in merchandise:
+		if merchandise in enums.Weapon.__members__:
 			currency_type = random.choice(list(dark_market_data['segment'].keys()))
 			merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]['quantity_min']), int(dark_market_data['segment'][currency_type]['quantity_max']))
 			currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]['cost_range_min']), int(dark_market_data['segment'][currency_type]['cost_range_max']))
 			gid = enums.Group.WEAPON.value
-			mid = int(merchandise.replace('W', ''))
+			mid = enums.Weapon[merchandise].value
 			qty = merchandise_quantity
 			cid = dark_market_data['cid'][currency_type]
 			amt = currency_type_price
 			await set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs)
 			dark_markets.append({'pid': pid, 'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': amt})
-		elif "S" in merchandise:  # 技能只加1级
+		elif merchandise in enums.Skill.__members__:  # 技能只加1级
 			currency_type = random.choice(list(dark_market_data['skill'].keys()))
 			merchandise_quantity = 1
 			currency_type_price = random.randint(int(dark_market_data['skill'][currency_type]['cost_range_min']), int(dark_market_data['skill'][currency_type]['cost_range_max']))
 			gid = enums.Group.SKILL.value
-			mid = int(merchandise.replace('S', ''))
+			mid = enums.Skill[merchandise].value
 			qty = merchandise_quantity
 			cid = dark_market_data['cid'][currency_type]
 			amt = currency_type_price

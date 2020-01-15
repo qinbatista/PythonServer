@@ -4,29 +4,15 @@
 		"cooling_time":6,
 		"max_energy":120
 	},
-	"disintegrate_weapon":
-	{
-		"cost":{
-			"diamond":"100"
-		},
-		"reward":
-		{
-			"coin":"10",
-			"segment":"10"
-		},
-		"weapontier1" : ["weapon1", "weapon2", "weapon3", "weapon4", "weapon5", "weapon6", "weapon7", "weapon8", "weapon9", "weapon10"],
-		"weapontier2" : ["weapon11", "weapon12", "weapon13", "weapon14", "weapon15", "weapon16", "weapon17", "weapon18", "weapon19", "weapon20"],
-		"weapontier3" : ["weapon21", "weapon22", "weapon23", "weapon24", "weapon25", "weapon26", "weapon27", "weapon28", "weapon29", "weapon30"]
-	},
 	"dark_market":
 	{
 		"weights":[0.40, 0.30, 0.20, 0.10],
 		"names": ["T1", "T2", "T3", "T4"],
-		"T1" : ["6", "9", "33", "W1", "W2", "W3", "W4", "W5", "W6", "W7", "W8", "W9", "W10"],
-		"T2" : ["7", "2", "W11", "W12", "W13", "W14", "W15", "W16", "W17", "W18", "W19", "W20", "S1", "S2", "S3", "S4", "S5"],
-		"T3" : ["8", "W21", "W22", "W23", "W24", "W25", "S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13", "S14", "S15"],
+		"T1" : ["6", "9", "33", "W101", "W102", "W103", "W104", "W105"],
+		"T2" : ["7", "2", "W201", "W202", "W203", "W204", "W205", "S1", "S2", "S3", "S4", "S5"],
+		"T3" : ["8", "W301", "W302", "W303", "W304", "W305", "S6", "S7", "S8", "S9", "S10", "S11", "S12", "S13", "S14", "S15"],
 		"T4" : [
-			"W26", "W27", "W28", "W29", "W30",
+			"W401", "W402", "W403", "W404", "W405",
 			"S16", "S17", "S18","S19", "S20",
 			"S21", "S22", "S23", "S24", "S25",
 			"S26", "S27", "S28","S29", "S30",

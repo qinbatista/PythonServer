@@ -523,7 +523,8 @@ class MessageHandler:
 	async def _get_config_stage(self, data: dict) -> str:
 		return common.mt(0, 'success', {'entry_consumables_config': data['config']['entry_consumables'], \
 				'stage_reward_config': data['config']['stage_reward'], \
-				'hang_reward_config': data['config']['hang_reward']})
+				'hang_reward_config': data['config']['hang_reward'],
+				'mopping_up': data['config']['stage']['mopping-up']})
 
 	async def _get_top_damage(self, data: dict) -> str:
 		return await stage.get_top_damage(data['data']['unique_id'], data['data']['page'], **data)
