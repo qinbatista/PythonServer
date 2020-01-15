@@ -32,6 +32,7 @@ CID = "%s#%sr%s"
 
 async def register(uid, account, password, **kwargs):
 	"""携带uid、账号密码进行注册"""
+	account = account.lower()
 	if uid.find(' ') != -1: return common.mt(96, 'UID contains Spaces')
 	if uid == '': uid = await yield_uid(**kwargs)
 	if not _valid_account(account): return common.mt(99, 'invalid account name')
@@ -84,6 +85,7 @@ async def all_info(uid, **kwargs):
 	return common.mt(0, 'success', {'account': account, 'email': email, 'phone_number': phone_number})
 
 async def bind_account(uid, account, password, **kwargs):
+	account = account.lower()
 	if await _account_bound(uid, **kwargs): return common.mt(96, 'account already bound')
 	if not _valid_account(account): return common.mt(99, 'invalid account name')
 	if not _valid_password(password): return common.mt(98, 'invalid password')
@@ -286,6 +288,7 @@ async def _set_phone(uid, phone, **kwargs):
 async def _valid_credentials(identifier, value, password, **kwargs):
 	if not _valid_password(password): return False
 	if identifier == 'account':
+		value = value.lower()
 		if not _valid_account(value): return False
 	elif identifier == 'email':
 		if not _valid_email(value): return False
