@@ -512,9 +512,9 @@ async def get_top_damage(uid, page, **kwargs):
 			damage = uid_data[0][0]
 			if uid_data[0][1] is None: uid_data = await common.execute(uid_str, **kwargs)
 			ranking = int(uid_data[0][1])
-		await kwargs['redis'].hmset_dict(f'leaderboard.player.{kwargs["world"]}.{uid}', \
-				{'damage' : uid_data[0][0], 'rank' : int(uid_data[0][1])})
-		await kwargs['redis'].expire(f'leaderboard.player.{kwargs["world"]}.{uid}', 30)
+			await kwargs['redis'].hmset_dict(f'leaderboard.player.{kwargs["world"]}.{uid}', \
+					{'damage' : uid_data[0][0], 'rank' : int(uid_data[0][1])})
+			await kwargs['redis'].expire(f'leaderboard.player.{kwargs["world"]}.{uid}', 30)
 	else:
 		damage, ranking = cached_uid_data['damage'], int(cached_uid_data['rank'])
 
@@ -523,6 +523,7 @@ async def get_top_damage(uid, page, **kwargs):
 	rank = []
 	for i, d in enumerate(data):
 		rank.append({'NO': (page - 1)*10 + 1 + i, 'name': d[0], 'damage': d[1], 'fid': '' if d[2] is None else d[2], 'level': (await increase_exp(d[3], 0, **kwargs))['level']})
+	print(f'测试2')
 	return common.mt(0, 'success', {'page': page, 'damage': damage, 'ranking': ranking, 'rank': rank})
 
 async def leave_world_boss_stage(uid, stage, damage, **kwargs):
