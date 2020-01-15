@@ -405,7 +405,7 @@ class get_info_player(Function):
 	
 	def after_call(self, global_state, state, metric):
 		state.gn = metric.resp['data']['gn']
-		state.fn = metric.resp['data']['fn']
+		state.fn = metric.resp['data']['family_name']
 		if state.gn:
 			global_state.add('users', state.world, state.gn)
 		if state.fn:
