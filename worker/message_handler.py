@@ -509,7 +509,7 @@ class MessageHandler:
 
 	###################### stage ######################
 	async def _mopping_up_stage(self, data: dict) -> str:
-		return await stage.mopping_up(data['data']['unique_id'], data['data']['stage'], **data)
+		return await stage.mopping_up(data['data']['unique_id'], data['data']['stage'], data['data'].get('count', 1), **data)
 
 	async def _get_all_tower(self, data: dict) -> str:
 		return common.mt(0, 'success', {'tower_config': data['config']['entry_consumables']})

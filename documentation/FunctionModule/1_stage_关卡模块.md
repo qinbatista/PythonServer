@@ -719,6 +719,8 @@
 扫荡关卡，扣取体力并立即获得物资
 
 > stage：需要扫荡的关卡
+>
+> count：扫荡的次数
 
 ```json
 {
@@ -726,7 +728,8 @@
 	"function": "mopping_up_stage",
 	"data": {
 		"token": "my toekn ^_^",
-		"stage": 8
+		"stage": 8,
+        "count": 1
 	}
 }
 ```
@@ -787,6 +790,7 @@
 - 99：Do not sweep until you pass this checkpoint
 - 98：There is no configuration information for this stage
 - 97：energy insufficient
+- 96：Can only be a positive integer
 
 
 
