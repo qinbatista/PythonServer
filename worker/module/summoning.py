@@ -505,7 +505,7 @@ async def _refresh_lim(uid, cid, var=0, **kwargs):
 	lim, tim = (func(kwargs['config']['summon']['resource']) + var, now + timedelta(days=1)) if lim is None or tim is None or tim < now else (lim + var, tim)
 	if cid == enums.Item.DIAMOND:
 		await common.set_limit(uid, elm, lim, **kwargs)
-		if lim <= 2: return False, lim
+		if lim <= 1: return False, lim
 	else:  # enums.Item.COIN
 		if lim < 0: return False, lim
 	await common.set_timer(uid, etm, tim, timeformat='%Y-%m-%d', **kwargs)
