@@ -91,7 +91,7 @@ class ConfigurationManager:
 
 		# read this one last
 		self._read_game_manager_config()
-		print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}==>刷新成功")
+		print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}==>refresh success")
 
 	async def get_server_config_location(self):
 		return {'file' : loc() + '/configuration/' + self._sv + '/server/server.conf'}
@@ -289,7 +289,7 @@ def start_timer(seconds: int):
 
 
 def run():
-	start_timer(10)
+	start_timer(600)
 	app = web.Application()
 	app.add_routes(ROUTES)
 	web.run_app(app, port=8000)
