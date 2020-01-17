@@ -43,7 +43,7 @@ async def level_up(uid, wid, delta, **kwargs):
 	level += delta
 	_sp = 1 if level % 10 == 0 else 0
 	await common.execute(f'UPDATE weapon SET level = {level}, skillpoint = {sp + _sp} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
-	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : level, 'sp' : sp},
+	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : level, 'sp' : sp + _sp},
 													enums.Group.ITEM.value : [{'iid' : enums.Item.IRON.value, 'value' : remain_i}, {'iid' : enums.Item.COIN.value, 'value' : remain_c}]},
 										'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : delta, 'sp' : _sp},
 													enums.Group.ITEM.value : [{'iid' : enums.Item.IRON.value, 'value' :consume}, {'iid' : enums.Item.COIN.value, 'value' : consume}]}})

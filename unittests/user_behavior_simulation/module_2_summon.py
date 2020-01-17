@@ -156,12 +156,13 @@ if __name__ == '__main__':
 	# data = {"function":"supplement_check_in","random":"31","world":"s0","data":{"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODE2NjIxODMsInVpZCI6IjEyMzQ1NiJ9.vzi3Esjo00IpLHCGwP3mMUoT7iIOWeARwrSiuoWCuDQ"}}
 	#
 	# user_behavior_simulation.send_tcp_message(data)
-	res = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})
+	# res = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})
 	# res = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'unique_id': uid, 'identifier': 'account', "value": "account00", "password":"123456"}})
-	token = res['data']['token']
-	# token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODE1NzgyNDEsInVpZCI6IjAwMCJ9.MBrqeizGqEClc3GDIKn3cFx3hEeaN5Mqk0N8-Kqu1_U'
+	# token = res['data']['token']
+	token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODE3NDA3MTIsInVpZCI6IjAwMCJ9.HbPs3mmm3AmDaLv9Gg5G7DsNgHWk5qNqKXb7Q45YmVk'
 	# stage = 8
-	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'supplement_check_in', 'data': {'token': token}})
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'level_up_skill', 'data': {'token': token, 'skill': 1, 'item': 6}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'supplement_check_in', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_new_mail', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'enter_stage', 'data': {'token': token, 'stage': stage}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'pass_stage', 'data': {'token': token, 'stage': stage}})

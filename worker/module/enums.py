@@ -95,8 +95,6 @@ class FamilyHistoryKeys(enum.Enum):
 	CANCEL_DISBAND = 'fm_9'
 
 
-
-
 class Tier(enum.IntEnum):
 	BASIC = 0
 	FRIEND = 1

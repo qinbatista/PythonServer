@@ -187,7 +187,7 @@ async def increase_exp(uid, exp, **kwargs):
 	# 返回总经验、等级、需要经验
 	sql_exp += exp
 	level, need = common.__calculate(exp_config, sql_exp)
-	await common.execute(f'INSERT INTO progress (uid, vipexp) VALUE ("{uid}", {sql_exp}) ON DUPLICATE KEY UPDATE exp = {sql_exp};', **kwargs)
+	await common.execute(f'INSERT INTO progress (uid, vipexp) VALUE ("{uid}", {sql_exp}) ON DUPLICATE KEY UPDATE vipexp = {sql_exp};', **kwargs)
 
 	# 成就刷新判断
 	achievement_data = await common.execute(f'SELECT value FROM achievement WHERE uid="{uid}" and aid = "{enums.Achievement.VIP_LEVEL.value}"', **kwargs)
