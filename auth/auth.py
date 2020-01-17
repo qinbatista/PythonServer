@@ -4,7 +4,7 @@ auth.py
 The authentication server is responsible for handling the creation, distribution,
 and validation on jwt login tokens.
 
-Additionally, one-time-use keys (nonces) can be generated and redeemed.
+Additionally, one-time-use keys (nonces) can be registered and redeemed.
 '''
 
 import jwt
