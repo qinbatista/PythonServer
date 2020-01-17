@@ -8,6 +8,7 @@ import random
 
 from module import enums
 from module import common
+FIB = []
 
 
 async def level_up(uid, sid, iid, **kwargs):
@@ -22,13 +23,21 @@ async def level_up(uid, sid, iid, **kwargs):
 	skill_scroll_id = kwargs['config']['skill']['skill_scroll_id']
 	level = await _get_skill(uid, sid, **kwargs)
 	if level['status'] != 0: return common.mt(96, 'skill not yet unlocked')
-	elif level['data']['level'] >= 10: return common.mt(99, 'already max level')
-	if str(iid) not in skill_scroll_id: return common.mt(97, 'invalid scroll id')
-	can_pay, remaining = await common.try_item(uid, enums.Item(iid), -1, **kwargs)
+	level = level['data']['level'] + 1
+	if level > 10: return common.mt(99, 'already max level')
+	if iid not in skill_scroll_id: return common.mt(97, 'invalid scroll id')
+	qty = cache_fib(level)
+	can_pay, remain = await common.try_item(uid, enums.Item(iid), -qty, **kwargs)
 	if not can_pay: return common.mt(98, 'insufficient materials')
-	if not _roll_for_upgrade(iid, kwargs['config']['skill']['upgrade_chance']): return common.mt(1, 'unlucky', {'sid': sid, 'level': level['data']['level'], 'iid': iid, 'value': remaining})
+	data = {'remain': [f'{enums.Group.ITEM}:{iid}:{remain}'], 'reward': [f'{enums.Group.SKILL}:{sid}:0', f'{enums.Group.ITEM}:{iid}:{qty}']}
+	if not _roll_for_upgrade(iid, kwargs['config']['skill']['upgrade_chance']):
+		data['remain'].append(f'{enums.Group.SKILL}:{sid}:{level-1}')
+		data['reward'].append(f'{enums.Group.SKILL}:{sid}:{0}')
+		return common.mt(1, 'unlucky', data)
+	data['remain'].append(f'{enums.Group.SKILL}:{sid}:{level}')
+	data['reward'].append(f'{enums.Group.SKILL}:{sid}:{1}')
 	await common.execute(f'UPDATE skill SET level = level + 1 WHERE uid = "{uid}" AND sid = {sid};', **kwargs)
-	return common.mt(0, 'success', {'sid': sid, 'level': level['data']['level'] + 1, 'iid': iid, 'value': remaining})
+	return common.mt(0, 'success', data)
 
 
 async def get_all(uid, **kwargs):
@@ -53,3 +62,15 @@ async def _get_skill(uid, sid, **kwargs):
 
 def _roll_for_upgrade(iid, upgrade_chance):
 	return random.random() < upgrade_chance[str(iid)]
+
+
+def fib(lv):
+	"""1 1 2 3 5 8 13 21 34 55"""
+	if len(FIB) >= lv: return FIB[lv - 1]
+	return lv if lv < 2 else (fib(lv - 1) + fib(lv - 2))
+
+
+def cache_fib(lv):
+	val = fib(lv)
+	if len(FIB) == lv - 1: FIB.append(val)
+	return val

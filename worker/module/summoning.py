@@ -265,18 +265,17 @@ async def single_d(uid, **kwargs):
 	can, lim = await _refresh_lim(uid, cid, var=1, **kwargs)
 	# TODO 消耗物品
 	if not can:
-		consume_id, consume = cid, 0
-		_, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+		consume_id, consume = cid, 0 if lim == 1 else abs(kwargs['config']['summon']['resource'][cid.name]['qty']) // 2
+		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 	else:
 		consume_id, consume = enums.Item.SUMMON_SCROLL_D, 1
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 		if not can:
 			consume_id, consume = cid, abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
-			consume = consume // 2 if lim == 2 else consume  # 第二次购买消费减半
 			can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-			if not can:  # 材料不足恢复原来的次数
-				await common.set_limit(uid, enums.Limits.SUMMON_D, lim - 1, **kwargs)
-				return common.mt(99, 'insufficient materials')
+	if not can:  # 材料不足恢复原来的次数
+		await common.set_limit(uid, enums.Limits.SUMMON_D, lim - 1, **kwargs)
+		return common.mt(99, 'insufficient materials')
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
@@ -506,7 +505,7 @@ async def _refresh_lim(uid, cid, var=0, **kwargs):
 	lim, tim = (func(kwargs['config']['summon']['resource']) + var, now + timedelta(days=1)) if lim is None or tim is None or tim < now else (lim + var, tim)
 	if cid == enums.Item.DIAMOND:
 		await common.set_limit(uid, elm, lim, **kwargs)
-		if lim == 1: return False, lim
+		if lim <= 2: return False, lim
 	else:  # enums.Item.COIN
 		if lim < 0: return False, lim
 	await common.set_timer(uid, etm, tim, timeformat='%Y-%m-%d', **kwargs)

@@ -17,7 +17,7 @@ async def create(uid, gn, **kwargs):
 	if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, 'Player uid or name already exists')
 	await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
 	await asyncio.gather(
-		common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180 WHERE uid="{uid}";', **kwargs),
+		common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180, role={enums.Role.R401} WHERE uid="{uid}";', **kwargs),
 		common.execute(f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED}, 3, 3);', **kwargs),
 		common.execute(f'INSERT INTO role (uid, star, level, rid) VALUES ("{uid}", 1, 7, {enums.Role.R401}), ("{uid}", 1, 1, {enums.Role.R402}), ("{uid}", 1, 1, {enums.Role.R505}), ("{uid}", 1, 1, {enums.Role.R601});', **kwargs),
 		common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W301}), ("{uid}", 1, {enums.Weapon.W302}), ("{uid}", 1, {enums.Weapon.W303});', **kwargs),
