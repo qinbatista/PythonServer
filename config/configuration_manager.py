@@ -8,6 +8,7 @@ import os
 import json
 import queue
 import threading
+import time
 import configparser
 from aiohttp import web
 from datetime import datetime
@@ -48,15 +49,24 @@ SUMMON = loc() + '/configuration/{}/server/summon.json'
 STAGE = loc() + '/configuration/{}/server/stage.json'
 
 
+class RepeatingTimer(threading.Thread):
+	def __init__(self, dt):
+		MANAGER.refresh_configs()
+		super().__init__(daemon=True)
+		self.dt = dt
+
+	def run(self):
+		while True:
+			time.sleep(self.dt)
+			MANAGER.refresh_configs()
+
+
 class ConfigurationManager:
 	def __init__(self):
 		self._read_version()
-		self._refresh_configurations()
-		self._start_timer(600)
 		self._world_map = defaultdict(lambda: defaultdict(dict))
 
-
-	def _refresh_configurations(self):
+	def refresh_configs(self):
 		self._read_version()
 		self._read_level_enemy_layouts_config()
 		self._read_level_enemy_layouts_config_tower()
@@ -81,6 +91,7 @@ class ConfigurationManager:
 
 		# read this one last
 		self._read_game_manager_config()
+		print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}==>refresh success")
 
 	async def get_server_config_location(self):
 		return {'file' : loc() + '/configuration/' + self._sv + '/server/server.conf'}
@@ -229,14 +240,6 @@ class ConfigurationManager:
 		self._sv = version[most_recent]['server']
 
 
-
-	def _start_timer(self, seconds: int):
-		t = threading.Timer(seconds, self._refresh_configurations)
-		t.daemon = True
-		t.start()
-
-
-
 # Part (2 / 2)
 # we want to define a single instance of the class
 MANAGER = ConfigurationManager()
@@ -280,7 +283,13 @@ async def __get_world_map(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_world_map())
 
 
+def start_timer(seconds: int):
+	t = RepeatingTimer(seconds)
+	t.start()
+
+
 def run():
+	start_timer(600)
 	app = web.Application()
 	app.add_routes(ROUTES)
 	web.run_app(app, port=8000)

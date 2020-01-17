@@ -126,24 +126,24 @@ async def integral_convert(uid, **kwargs):
 	"""积分兑换"""
 	# TODO 限制条件检查
 	_, integral = await common.try_item(uid, enums.Item.INTEGRAL, 0, **kwargs)
-	lim = await _get_acp(uid, **kwargs)
-	can, lim = _integral_inspect(lim, integral)
+	acp = await _get_acp(uid, **kwargs)
+	can, acp = _integral_inspect(acp, integral)
 	if not can: return common.mt(99, 'insufficient materials')
 	config = kwargs['config']['summon']['convert']
-	await common.set_limit(uid, enums.Limits.INTEGRAL, lim, **kwargs)
+	await common.set_limit(uid, enums.Limits.INTEGRAL, acp, **kwargs)
 	# TODO 奖励物品
-	if lim in [200, 400, 600, 800]:
-		mid = config['special']['mid'] if lim == 600 else random.choice(config['role']['mid'])
+	if acp in [200, 400, 600, 800]:
+		mid = config['special']['mid'] if acp == 600 else random.choice(config['role']['mid'])
 		can, rid = await lottery._try_unlock_role(uid, mid, **kwargs)
 		status, msg = (0, 'You unlocked a role') if can else (1, 'You get 30 segments')
 		value = lottery.STANDARD_SEG_COUNT
 		remain_v = await common.try_role(uid, rid, 0, **kwargs)
 		_, star = await role._get_role_info(uid, rid, 'star', **kwargs)
-		return common.mt(status, msg, {'limit': lim, 'rid': mid, 'star': star[0], 'remain_seg': remain_v, 'reward_seg': value})
+		return common.mt(status, msg, {'acp': acp, 'rid': mid, 'star': star[0], 'remain_seg': remain_v, 'reward_seg': value})
 	else:  # 1000
 		iid, value = config['item']['mid'], abs(config['item']['qty'])
 		_, remain_v = await common.try_item(uid, enums.Item(iid), value, **kwargs)
-		return common.mt(2, 'You get the universal segments', {'limit': lim, 'iid': iid, 'remain_v': remain_v, 'reward_v': value})
+		return common.mt(2, 'You get the universal segments', {'acp': acp, 'iid': iid, 'remain_v': remain_v, 'reward_v': value})
 
 
 async def dozen_d(uid, **kwargs):
@@ -264,7 +264,8 @@ async def single_d(uid, **kwargs):
 	# TODO 次数检查和限制
 	can, lim = await _refresh_lim(uid, cid, var=1, **kwargs)
 	# TODO 消耗物品
-	if not can:
+	if can:
+		await common.set_limit(uid, enums.Limits.SUMMON_D, lim, **kwargs)
 		consume_id, consume = cid, 0 if lim == 1 else abs(kwargs['config']['summon']['resource'][cid.name]['qty']) // 2
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 	else:
@@ -502,10 +503,9 @@ async def _refresh_lim(uid, cid, var=0, **kwargs):
 	etm, elm, func = SUMMON_CONSTRAINT[cid]
 	tim = await common.get_timer(uid, etm, timeformat='%Y-%m-%d', **kwargs)
 	lim = await common.get_limit(uid, elm, **kwargs)
-	lim, tim = (func(kwargs['config']['summon']['resource']) + var, now + timedelta(days=1)) if lim is None or tim is None or tim < now else (lim + var, tim)
+	lim, tim = (func(kwargs['config']['summon']['resource']) + var, now + timedelta(days=1)) if (lim is None or tim is None or tim < now) else (lim + var, tim)
 	if cid == enums.Item.DIAMOND:
-		await common.set_limit(uid, elm, lim, **kwargs)
-		if lim <= 2: return False, lim
+		if lim > 2: return False, lim
 	else:  # enums.Item.COIN
 		if lim < 0: return False, lim
 	await common.set_timer(uid, etm, tim, timeformat='%Y-%m-%d', **kwargs)

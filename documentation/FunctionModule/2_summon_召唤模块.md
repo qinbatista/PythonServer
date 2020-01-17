@@ -1915,7 +1915,7 @@
 
 > status为0是获得新角色，为1是获取已有角色的碎片
 >
-> limit：积分进度，分别有0，200，400，600，800，1000
+> acp：积分进度，分别有0，200，400，600，800，1000
 >
 > rid：角色id
 >
@@ -1931,7 +1931,7 @@
     "status": 1,
     "message": "You get 30 segments",
     "data": {
-        "limit": 600,
+        "acp": 600,
         "rid": 25,
         "star": 1,
         "remain_seg": 90,
@@ -1939,7 +1939,7 @@
     }
 }
 ```
->limit：积分进度，分别有0，200，400，600，800，1000
+>acp：积分进度，分别有0，200，400，600，800，1000
 >
 >iid：物品id
 >
@@ -1952,7 +1952,7 @@
     "status": 2,
     "message": "You get the universal segments",
     "data": {
-        "limit": 1000,
+        "acp": 1000,
         "iid": 17,
         "remain_v": 2,
         "reward_v": 1
