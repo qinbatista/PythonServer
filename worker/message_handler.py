@@ -635,7 +635,7 @@ class MessageHandler:
 		return common.mt(0, 'success', {'version': data['config']['version']})
 
 	async def _exchange_card(self, data: dict) -> str:
-		return await package.exchange(data['data']['unique_id'], int(data['data']['card_id']), int(data['data'].get('quantity', 1)), **data)
+		return await package.exchange(data['data']['unique_id'], int(data['data']['cid']), int(data['data'].get('qty', 1)), **data)
 
 	async def _use_item(self, data: dict) -> str:
 		return await package.use_item(data['data']['unique_id'], data['data']['item_id'], data['data'].get('exchange_id', ''), **data)
