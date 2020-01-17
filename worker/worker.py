@@ -147,20 +147,19 @@ class Worker:
 
 async def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--channel', type = str, default = 'jobs')
-	parser.add_argument('--nats-addr', type = str, default = 'nats')
-	parser.add_argument('--redis-addr', type = str, default = 'redis')
-	parser.add_argument('--db-addr', type = str, default = '192.168.1.102')
-	parser.add_argument('--db-user', type = str, default = 'root')
-	parser.add_argument('--db-pw', type = str, default = 'lukseun')
-	parser.add_argument('--config-addr', type = str, default = 'localhost')
+	parser.add_argument('--debug'      , action = 'store_true')
+	parser.add_argument('--db-pw'      , type = str, default = 'lukseun')
+	parser.add_argument('--db-user'    , type = str, default = 'root')
+	parser.add_argument('--db-addr'    , type = str, default = '192.168.1.102')
+	parser.add_argument('--channel'    , type = str, default = 'jobs')
 	parser.add_argument('--config-port', type = int, default = 8000) 
-	parser.add_argument('--mail-addr', type = str, default = 'mail')
-	parser.add_argument('--token-addr', type = str, default = 'token')
-	parser.add_argument('--mail-port', type = int, default = 8020)
-	parser.add_argument('--token-port', type = int, default = 8001)
-	parser.add_argument('--debug', action = 'store_true')
-
+	parser.add_argument('--config-addr', type = str, default = 'localhost')
+	parser.add_argument('--token-addr' , type = str, default = 'token')
+	parser.add_argument('--token-port' , type = int, default = 8001)
+	parser.add_argument('--mail-addr'  , type = str, default = 'mail')
+	parser.add_argument('--mail-port'  , type = int, default = 8020)
+	parser.add_argument('--nats-addr'  , type = str, default = 'nats')
+	parser.add_argument('--redis-addr' , type = str, default = 'redis')
 	await Worker(parser.parse_args()).start()
 
 
