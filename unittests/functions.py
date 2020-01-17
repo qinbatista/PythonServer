@@ -16,6 +16,39 @@ before_call is always called by the simulated user before sending the request.
 after_call is always called by the simulated user after receiving a response.
 
 both the global_state and state parameters are mutable.
+
+
+To create a new function to test, simply define a new class deriving from the Function base class:
+
+	class function_name(Function):
+		def __init__(self):
+			super().__init__(self.__class__.__name__)
+
+This will create a new function of the type "function_name".
+Make sure the function name is the same as the real function's name.
+By default, a function will only send the current user's world and token as arguments.
+To include more arguments, you need to override the before_call function.
+
+		def before_call(self, global_state, state):
+			self.fn['data']['arg1'] = 10
+
+This example adds the value 10 to arg1 in the function.
+More complex examples can be created by referencing data in either the global state or user state.
+
+Occasionally, you will wish to save information from the server's response into the current state.
+This can be accomplished by overriding the after_call function.
+
+		def after_call(self, global_state, state, metric):
+			if metric.resp['status'] == 0:
+				state.coins = metric.resp['data']['coins']
+
+
+This example sets the state's coins value to the value sent from the server.
+Note that the server's JSON response can be accessed via metric.resp
+
+Any new function that is added is automatically made available to the simulated user.
+There is not further action required by the developer.
+This is accomplished by the FunctionList class, which generates a new function list on every run.
 '''
 class Function:
 	def __init__(self, fn):
