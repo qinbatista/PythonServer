@@ -8,7 +8,7 @@ import random
 
 from module import enums
 from module import common
-FIB = []
+FIB = [1]
 
 
 async def level_up(uid, sid, iid, **kwargs):
@@ -29,7 +29,7 @@ async def level_up(uid, sid, iid, **kwargs):
 	qty = cache_fib(level)
 	can_pay, remain = await common.try_item(uid, enums.Item(iid), -qty, **kwargs)
 	if not can_pay: return common.mt(98, 'insufficient materials')
-	data = {'remain': [f'{enums.Group.ITEM}:{iid}:{remain}'], 'reward': [f'{enums.Group.SKILL}:{sid}:0', f'{enums.Group.ITEM}:{iid}:{qty}']}
+	data = {'remain': [f'{enums.Group.ITEM}:{iid}:{remain}'], 'reward': [f'{enums.Group.ITEM}:{iid}:{qty}']}
 	if not _roll_for_upgrade(iid, kwargs['config']['skill']['upgrade_chance']):
 		data['remain'].append(f'{enums.Group.SKILL}:{sid}:{level-1}')
 		data['reward'].append(f'{enums.Group.SKILL}:{sid}:{0}')
@@ -55,9 +55,8 @@ async def config(**kwargs):
 
 async def _get_skill(uid, sid, **kwargs):
 	# 0 - success
-	skill = enums.Skill(sid)
-	level = await common.execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND sid = {skill.value};', **kwargs)
-	return common.mt(0, 'success', {'sid' : skill.value, 'level' : level[0][0]}) if level != () else common.mt(1, 'invalid skill name')
+	level = await common.execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND sid = {sid};', **kwargs)
+	return common.mt(0, 'success', {'sid' : sid, 'level' : level[0][0]}) if level != () else common.mt(1, 'invalid skill name')
 
 
 def _roll_for_upgrade(iid, upgrade_chance):
@@ -71,6 +70,8 @@ def fib(lv):
 
 
 def cache_fib(lv):
-	val = fib(lv)
-	if len(FIB) == lv - 1: FIB.append(val)
-	return val
+	fl = len(FIB)
+	if fl < lv:
+		for i in range(fl + 1, lv + 1):
+			FIB.append(fib(i))
+	return FIB[lv - 1]

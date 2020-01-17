@@ -138,36 +138,38 @@
 
 [成功]()
 
-> sid：技能的id
->
-> level：技能的等级
->
-> iid：卷轴的数字id
->
-> value：卷轴的数量
+> 按`git:iid:qty`解析
 
 ```json
 {
 	"status": 0,
 	"message": "success",
 	"data": {
-		"sid": 1,
-		"level": 2,
-		"iid": 6,
-		"value": 673
+		"remain": [
+			"3:8:10095",
+			"1:1:3"
+		],
+		"reward": [
+			"3:8:3",
+			"1:1:1"
+		]
 	}
 }
 ```
 
-```
+```json
 {
 	"status": 1,
 	"message": "unlucky",
 	"data": {
-		"sid": 0,
-		"level": 1,
-		"iid": 6,
-		"value": 199
+		"remain": [
+			"3:8:10095",
+			"1:1:3"
+		],
+		"reward": [
+			"3:8:3",
+			"1:1:0"
+		]
 	}
 }
 ```
