@@ -222,8 +222,8 @@ class Edge:
 async def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('-p', '--port', type = int, default = 9000)
+	parser.add_argument('--nats-addr' , type = str, default = 'nats://nats')
 	parser.add_argument('--redis-addr', type = str, default = 'redis://redis')
-	parser.add_argument('--nats-addr' , type = str, default = 'nats://nats' )
 	await Edge(parser.parse_args()).start()
 
 if __name__ == '__main__':

@@ -105,7 +105,7 @@ async def refresh_market(uid, **kwargs):
 	"""
 	refreshable = await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
 	if refreshable is None:
-		return refresh_darkmarket(uid, **kwargs)
+		return await refresh_darkmarket(uid, **kwargs)
 	elif refreshable > 0:
 		free_data = await free_refresh(uid, **kwargs)
 		if free_data['status'] == 98: free_data['status'] = 97
