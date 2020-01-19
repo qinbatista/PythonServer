@@ -99,7 +99,7 @@ async def e_general_stage(uid, stage, **kwargs):
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
 	# try_energy 扣体力看是否足够
-	energy_data = await common.try_energy(uid, -1 * energy_consume, **kwargs)
+	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
 	if energy_data["status"] >= 97:
 		return common.mt(97, "Insufficient energy")
 
@@ -217,7 +217,7 @@ async def e_tower_stage(uid, stage, **kwargs):
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
 	# try_energy 扣体力看是否足够
-	energy_data = await common.try_energy(uid, -1 * energy_consume, **kwargs)
+	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
 	if energy_data["status"] >= 97:
 		return common.mt(97, "Insufficient energy")
 
