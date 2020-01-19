@@ -28,7 +28,6 @@ async def level_up(uid, sid, iid, **kwargs):
 	if level > 10: return common.mt(99, 'already max level')
 	if iid not in skill_scroll_id: return common.mt(97, 'invalid scroll id')
 	qty = cache_fib(level)
-	print(f'测试FIB：{qty}')
 	can_pay, remain = await common.try_item(uid, enums.Item(iid), -qty, **kwargs)
 	if not can_pay: return common.mt(98, 'insufficient materials')
 	data = {'remain': [f'{enums.Group.ITEM}:{iid}:{remain}'], 'reward': [f'{enums.Group.ITEM}:{iid}:{qty}']}
