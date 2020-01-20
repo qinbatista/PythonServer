@@ -135,20 +135,21 @@ def translate_world(**kwargs):
 
 def decode_items(items):
 	decoded = []
-	for item in items.split(','):  # "gid:iid:value,gid:iid:value"
-		gid, iid, value = [int(v) if i < 2 else v for i, v in enumerate(item.split(':', maxsplit=2))]
-		gid = enums.Group(gid)
-		if gid == enums.Group.ITEM:
-			decoded.append((gid, enums.Item(iid), int(value)))
-		elif gid == enums.Group.WEAPON:
-			decoded.append((gid, enums.Weapon(iid), int(value)))
-		elif gid == enums.Group.SKILL:
-			decoded.append((gid, enums.Skill(iid), int(value)))  # undecided
-		elif gid == enums.Group.ROLE:
-			decoded.append((gid, enums.Role(iid), int(value)))
-		elif gid == enums.Group.ARMOR:
-			decoded.append((gid, enums.Armor(iid), int(value)))
-			# decoded.append((gid, enums.Armor(iid), value))  # value => 'level:value' => '1:1'
+	if items != '':
+		for item in items.split(','):  # "gid:iid:value,gid:iid:value"
+			gid, iid, value = [int(v) if i < 2 else v for i, v in enumerate(item.split(':', maxsplit=2))]
+			gid = enums.Group(gid)
+			if gid == enums.Group.ITEM:
+				decoded.append((gid, enums.Item(iid), int(value)))
+			elif gid == enums.Group.WEAPON:
+				decoded.append((gid, enums.Weapon(iid), int(value)))
+			elif gid == enums.Group.SKILL:
+				decoded.append((gid, enums.Skill(iid), int(value)))  # undecided
+			elif gid == enums.Group.ROLE:
+				decoded.append((gid, enums.Role(iid), int(value)))
+			elif gid == enums.Group.ARMOR:
+				decoded.append((gid, enums.Armor(iid), int(value)))
+				# decoded.append((gid, enums.Armor(iid), value))  # value => 'level:value' => '1:1'
 	return decoded
 
 
@@ -280,7 +281,7 @@ async def send_gift_sys_mail(uid, gid, iid, qty, **kwargs):
 
 
 async def consume_items(uid, items, **kwargs):
-	items, results, cans = decode_items(items), [], []
+	items, results = decode_items(items), []
 	for gid, iid, qty in items:
 		if gid == enums.Group.ITEM:
 			_, _qty = await try_item(uid, iid, 0, **kwargs)

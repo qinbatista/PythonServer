@@ -434,8 +434,7 @@ def _integral_inspect(lim, integral):
 
 async def reward_items(uid, items: str, **kwargs):
 	"""返回奖励之后的改变情况"""
-	decoded = common.decode_items(items)
-	results = []
+	decoded, results = common.decode_items(items), []
 	for gid, iid, value in decoded:
 		if gid == enums.Group.ITEM:
 			_, remain_v = await common.try_item(uid, iid, value, **kwargs)
