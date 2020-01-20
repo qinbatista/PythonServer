@@ -31,9 +31,10 @@ async def create(uid, gn, **kwargs):
 
 async def enter_world(uid, **kwargs):
 	cid = (await common.execute(f'SELECT cuid FROM info WHERE unique_id = "{uid}";', account=True, **kwargs))[0][0]
-	existing_player = await common.exists('player', ('uid', uid), **kwargs)
-	#token = await account._request_new_token(uid, prev_token = kwargs['data']['token'], **kwargs)
-	session = (await account._request_new_token(uid, **kwargs))['token']
+	translated_uid = common.translate_uid(uid, **kwargs)
+	kwargs['world'] = common.translate_world(**kwargs)
+	existing_player = await common.exists('player', ('uid', translated_uid), **kwargs)
+	session = (await account._request_new_token(translated_uid, **kwargs))['token']
 	if not existing_player:
 		return common.mt(98, 'have not been in this world before', {'cid': cid, 'session' : session})
 	return common.mt(0, 'success', {'cid': cid, 'session' : session})
