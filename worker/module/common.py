@@ -130,8 +130,35 @@ async def get_db(**kwargs):
 def encode_item(gid, iid, value):
 	return f'{gid.value}:{iid.value}:{value}'
 
+# TODO O(n) can easily be refactored to O(1) using hash table with world as key
 def translate_world(**kwargs):
 	return str(kwargs['world'])
+	'''
+	translates the current world into its merged form.
+	worlds can occasionally be merged together to keep them active.
+	in this case, the world names will need to be translated to the new world name.
+	'''
+	try:
+		for world in kwargs['config']['world']['worlds']:
+			if world['id'] == kwargs['world']:
+				return str(kwargs['world']) if world['id'] == world['merge'] else str(world['merge'])
+	except KeyError:
+		print('ERROR: common.translate_world could not find "merge" keyword in world.json config.')
+		return str(kwargs['world'])
+
+# TODO O(n) can easily be refactored to O(1) using hash table with world as key
+def translate_uid(uid, **kwargs):
+	'''
+	translates the given uid to the correct form, based on the world provided
+	returns translated_uid if a translation took place, uid otherwise
+	'''
+	try:
+		for world in kwargs['config']['world']['worlds']:
+			if world['id'] == kwargs['world']:
+				return uid if world['id'] == world['merge'] else f'{uid}_{world["merge"]}'
+	except KeyError:
+		print('ERROR: common.translate_uid could not find "merge" keyword in world.json config.')
+		return uid
 
 def decode_items(items):
 	decoded = []

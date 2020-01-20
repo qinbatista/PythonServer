@@ -60,12 +60,14 @@ class Function:
 	def after_call(self, global_state, state, metric):
 		pass
 
-	def dump(self, token, world):
-		if token:
-			self.fn['data']['token'] = token
+	def dump(self, token, session, world):
+		self.fn['data']['token'] = session if self.use_session() else token
 		if world:
 			self.fn['world'] = world
 		return str(self.fn).replace("'", '"')
+
+	def use_session(self):
+		return True
 
 	@property
 	def name(self):
@@ -80,6 +82,9 @@ class add_resources(Function):
 class login_unique(Function):
 	def __init__(self):
 		super().__init__(self.__class__.__name__)
+	
+	def use_session(self):
+		return False
 	
 	def before_call(self, global_state, state):
 		self.fn['data']['unique_id'] = state.uid
@@ -415,10 +420,14 @@ class enter_world(Function):
 	def __init__(self):
 		super().__init__(self.__class__.__name__)
 	
+	def use_session(self):
+		return False
+	
 	def before_call(self, global_state, state):
 		state.world = 's0'
 
 	def after_call(self, global_state, state, metrics):
+		state.session = metrics.resp['data']['session']
 		if metrics.resp['status'] == 0:
 			state.functions.put(FunctionList.get('get_info_player'))
 		else:
