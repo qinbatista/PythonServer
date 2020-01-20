@@ -38,7 +38,7 @@ async def fortune_wheel(uid, tier, item, **kwargs):
 #######################################################################################################
 
 
-async def _try_unlock_weapon(uid, gift, **kwargs):
+async def try_unlock_weapon(uid, gift, **kwargs):
 	weapon = enums.Weapon(gift)
 	if "W4" in weapon.name:
 		kwargs.update({"aid": enums.Achievement.GET_4_STAR_WEAPON})
@@ -62,7 +62,7 @@ async def _try_unlock_weapon(uid, gift, **kwargs):
 	return False, weapon
 
 
-async def _try_unlock_skill(uid, gift, **kwargs):
+async def try_unlock_skill(uid, gift, **kwargs):
 	skill = enums.Skill(gift)
 	if not await common.exists('skill', ('uid', uid), ('sid', skill.value), **kwargs):
 		await common.execute(f'INSERT INTO skill(uid, sid) VALUES ("{uid}", {skill.value});', **kwargs)
@@ -71,7 +71,7 @@ async def _try_unlock_skill(uid, gift, **kwargs):
 	return False, enums.Item.SKILL_SCROLL_10
 
 
-async def _try_unlock_role(uid, gift, **kwargs):
+async def try_unlock_role(uid, gift, **kwargs):
 	role = enums.Role(gift)
 	if "R4" in role.name:
 		kwargs.update({"aid": enums.Achievement.GET_4_STAR_ROLE})
@@ -95,6 +95,6 @@ async def _try_unlock_role(uid, gift, **kwargs):
 	return False, role
 
 
-SWITCH[enums.Group.WEAPON] = _try_unlock_weapon
-SWITCH[enums.Group.SKILL] = _try_unlock_skill
-SWITCH[enums.Group.ROLE] = _try_unlock_role
+SWITCH[enums.Group.WEAPON] = try_unlock_weapon
+SWITCH[enums.Group.SKILL] = try_unlock_skill
+SWITCH[enums.Group.ROLE] = try_unlock_role

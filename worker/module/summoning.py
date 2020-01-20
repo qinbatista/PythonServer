@@ -134,7 +134,7 @@ async def integral_convert(uid, **kwargs):
 	# TODO 奖励物品
 	if acp in [200, 400, 600, 800]:
 		mid = config['special']['mid'] if acp == 600 else random.choice(config['role']['mid'])
-		can, rid = await lottery._try_unlock_role(uid, mid, **kwargs)
+		can, rid = await lottery.try_unlock_role(uid, mid, **kwargs)
 		status, msg = (0, 'You unlocked a role') if can else (1, 'You get 30 segments')
 		value = lottery.STANDARD_SEG_COUNT
 		remain_v = await common.try_role(uid, rid, 0, **kwargs)
@@ -441,12 +441,13 @@ async def reward_items(uid, items: str, **kwargs):
 		elif gid == enums.Group.WEAPON:
 			remain_v = await common.try_weapon(uid, iid, value, **kwargs)
 		elif gid == enums.Group.SKILL:
-			can, iid = await lottery._try_unlock_skill(uid, iid.value, **kwargs)
+			can, iid = await lottery.try_unlock_skill(uid, iid.value, **kwargs)
 			gid, remain_v, value = (enums.Group.SKILL, 1, 1) if can else (enums.Group.ITEM, (await common.try_item(uid, iid, 0, **kwargs))[1], 1)
 		elif gid == enums.Group.ROLE:
 			remain_v = await common.try_role(uid, iid, value, **kwargs)
 		else:
-			remain_v = -1  # gid不属于以上四种情况时需要处理
+			print(f'不解析此组物品gid={gid},iid={iid}')
+			remain_v = 0  # gid不属于以上四种情况时需要处理
 		results.append((gid, iid, remain_v, value))
 	return results
 
