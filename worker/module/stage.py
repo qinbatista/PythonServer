@@ -581,27 +581,6 @@ async def try_unlock_skill(uid, sid, **kwargs):
 	return False
 
 
-async def increase_exp(uid, exp, **kwargs):
-	"""
-	exp为0则获得经验，反之增加经验，
-	并返回总经验和等级，升到下一级需要的经验
-	"""
-	# 取配置和数据
-	exp_config = kwargs['config']['exp']['player_level']['experience']
-	sql_exp = await common.get_progress(uid, 'exp', **kwargs)
-
-	# 计算等级和需要的经验
-	level, need = common.__calculate(exp_config, sql_exp)
-	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
-
-	# 重新计算等级和需要的经验
-	sql_exp += exp
-	level, need = common.__calculate(exp_config, sql_exp)
-	await common.set_progress(uid, 'exp', sql_exp, **kwargs)
-	# 返回总经验、等级、需要经验
-	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
-
-
 async def increase_weapon_segment(uid, wid, segment, **kwargs):
 	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
 	if data == ():
@@ -650,6 +629,25 @@ async def mopping_up(uid, stage, count=1, **kwargs):
 	# TODO 奖励特殊物资
 	rewards['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
 	return common.mt(0, 'success', rewards)
+
+
+async def increase_exp(uid, exp, **kwargs):
+	"""
+	exp为0则获得经验，反之增加经验，
+	并返回总经验和等级，升到下一级需要的经验
+	"""
+	# TODO 取配置和数据
+	exp_config = kwargs['config']['exp']['player_level']['experience']
+	sql_exp = await common.get_progress(uid, 'exp', **kwargs)
+	# TODO 计算等级和需要的经验
+	level, need = common.__calculate(exp_config, sql_exp)
+	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
+	# TODO 重新计算等级和需要的经验
+	sql_exp += exp
+	level, need = common.__calculate(exp_config, sql_exp)
+	await common.set_progress(uid, 'exp', sql_exp, **kwargs)
+	# TODO 返回总经验、等级、需要经验
+	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
 
 
 
