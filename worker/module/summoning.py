@@ -536,14 +536,14 @@ async def _set_summon(uid, cid, pid, mid, wgt, isb, **kwargs):
 	await common.execute(f'INSERT INTO summon (uid, cid, pid, mid, wgt, isb) VALUES ("{uid}", {cid}, {pid}, "{mid}", {wgt}, {isb}) ON DUPLICATE KEY UPDATE `mid`= VALUES(`mid`), `wgt`= VALUES(`wgt`), `isb`= VALUES(`isb`);', **kwargs)
 
 
-async def _refresh_integral(uid, **kwargs):
+async def refresh_integral(uid, **kwargs):
 	"""用于刷新积分的所有情况"""
 	timer = await common.get_timer(uid, enums.Timer.INTEGRAL, timeformat='%Y-%m-%d', **kwargs)
 	now = datetime.now(tz=common.TZ_SH)
 	timer = now if timer is None else timer
 	if timer.isocalendar()[1] != now.isocalendar()[1]:
 		await asyncio.gather(
-			common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.INTEGRAL}, 0) ON DUPLICATE KEY UPDATE `value` = 0;'),
+			common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.INTEGRAL}, 0) ON DUPLICATE KEY UPDATE `value` = 0;', **kwargs),
 			common.set_timer(uid, enums.Timer.INTEGRAL, now, timeformat='%Y-%m-%d', **kwargs),
 			common.set_limit(uid, enums.Limits.INTEGRAL, 0, **kwargs)
 		)
