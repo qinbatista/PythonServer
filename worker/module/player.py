@@ -101,7 +101,7 @@ async def get_info(uid, **kwargs):
 
 
 async def get_all_resource(uid, **kwargs):
-	await summoning._refresh_integral(uid, **kwargs)
+	await summoning.refresh_integral(uid, **kwargs)
 	item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)
 	return common.mt(0, 'success', {'items': [{'iid': i[0], 'value': i[1]} for i in item]})
 
@@ -117,7 +117,8 @@ async def _lookup_nonce(nonce, **kwargs):
 
 async def _meeting_gift(uid, **kwargs):
 	"""玩家初次创建角色赠送的见面礼"""
-	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.DIAMOND, 1_0000, **kwargs)
+	# await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.DIAMOND, 1_0000, **kwargs)
+	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.DIAMOND, 9_9999_9999, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.COIN, 200_0000, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.FOOD, 10_0000, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.IRON, 10_0000, **kwargs)
@@ -126,7 +127,9 @@ async def _meeting_gift(uid, **kwargs):
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SUMMON_SCROLL_C, 100, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1000, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.VIP_EXP_CARD, 100, **kwargs)
-	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SKILL_SCROLL_100, 100, **kwargs)
+	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SKILL_SCROLL_10, 9_9999_9999, **kwargs)
+	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SKILL_SCROLL_30, 9_9999_9999, **kwargs)
+	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SKILL_SCROLL_100, 9_9999_9999, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.UNIVERSAL4_SEGMENT, 100, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.UNIVERSAL5_SEGMENT, 100, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.ENERGY_POTION_S_MAX, 100, **kwargs)

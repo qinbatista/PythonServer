@@ -99,7 +99,7 @@ async def e_general_stage(uid, stage, **kwargs):
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
 	# try_energy 扣体力看是否足够
-	energy_data = await common.try_energy(uid, -1 * energy_consume, **kwargs)
+	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
 	if energy_data["status"] >= 97:
 		return common.mt(97, "Insufficient energy")
 
@@ -217,7 +217,7 @@ async def e_tower_stage(uid, stage, **kwargs):
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
 	# try_energy 扣体力看是否足够
-	energy_data = await common.try_energy(uid, -1 * energy_consume, **kwargs)
+	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
 	if energy_data["status"] >= 97:
 		return common.mt(97, "Insufficient energy")
 
@@ -631,26 +631,35 @@ async def try_stage(uid, stage, stage_type, **kwargs):
 # ################### 2020年1月14日之后加入的方法 #################
 # ##################################################################
 async def mopping_up(uid, stage, count=1, **kwargs):
-		"""关于扫荡关卡的方法"""
-		if count <= 0: return common.mt(96, 'Can only be a positive integer')
-		sql_stage = await common.get_progress(uid, 'stage', **kwargs)
-		if stage > sql_stage: return common.mt(99, 'Do not sweep until you pass this checkpoint')
-		config = kwargs['config']['stage']['mopping-up'].get(f'{stage}', None)
-		if config is None: return common.mt(98, 'There is no configuration information for this stage')  # 扫荡序章或未写配置的关卡会返回此结果
-		# TODO 消耗体力
-		cast = config['cost'] * count
-		data = await common.try_energy(uid, -cast, **kwargs)
-		if data['status'] >= 97: return common.mt(97, 'energy insufficient')
-		data = {'energy': {'cooling': data['data']['cooling_time'], 'remaining': data['data']['energy'], 'reward': -cast}, 'remaining': [], 'reward': []}
-		# TODO 奖励普通物资
-		items = ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['rewards']['common']])
-		results = await summoning._summon_reward(uid, items, **kwargs)
+	"""关于扫荡关卡的方法"""
+	if count <= 0: return common.mt(96, 'Can only be a positive integer')
+	sql_stage = await common.get_progress(uid, 'stage', **kwargs)
+	if stage > sql_stage: return common.mt(99, 'Do not sweep until you pass this checkpoint')
+	config = kwargs['config']['stage']['mopping-up'].get(f'{stage}', None)
+	if config is None: return common.mt(98, 'There is no configuration information for this stage')  # 扫荡序章或未写配置的关卡会返回此结果
+	rewards = {'remain': [], 'reward': []}  # 初始化奖励信息表
+	# TODO 检查特殊物资是否能消耗
+	energy = config['consumes']['special']['energy'] * count
+	data = await common.try_energy(uid, 0, **kwargs)
+	if data['data']['energy'] < energy: return common.mt(97, 'energy insufficient')
+	# TODO 消耗普通物资
+	items = ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['consumes']['common']])
+	if items != '':
+		can, _ = await common.consume_items(uid, items, **kwargs)
+		if not can: return common.mt(95, 'materials insufficient')
+	# TODO 消耗特殊物资(体力)
+	data = (await common.try_energy(uid, -energy, **kwargs))['data']
+	rewards['energy'] = {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}
+	# TODO 奖励普通物资
+	items = ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['rewards']['common']])
+	if items != '':
+		results = await summoning.reward_items(uid, items, **kwargs)
 		for gid, iid, remain_v, value in results:
-			data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
-			data['reward'].append(f'{gid.value}:{iid.value}:{value}')
-		# TODO 奖励特殊物资
-		data['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
-		return common.mt(0, 'success', data)
+			rewards['remain'].append(f'{gid.value}:{iid.value}:{remain_v}')
+			rewards['reward'].append(f'{gid.value}:{iid.value}:{value}')
+	# TODO 奖励特殊物资
+	rewards['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
+	return common.mt(0, 'success', rewards)
 
 
 

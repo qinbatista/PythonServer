@@ -165,7 +165,7 @@ async def dozen_d(uid, **kwargs):
 	article = [d[1] for d in isb_data]  # 获取所有的物品
 	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
 	items = f"{','.join(article)},{','.join(extra)}"
-	results = await _summon_reward(uid, items, **kwargs)
+	results = await reward_items(uid, items, **kwargs)
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
@@ -210,7 +210,7 @@ async def dozen_c(uid, **kwargs):
 	article = [d[1] for d in isb_data]  # 获取所有的物品
 	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
 	items = f"{','.join(article)},{','.join(extra)}"
-	results = await _summon_reward(uid, items, **kwargs)
+	results = await reward_items(uid, items, **kwargs)
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
@@ -240,7 +240,7 @@ async def dozen_g(uid, **kwargs):
 	article = [d[1] for d in isb_data]  # 获取所有的物品
 	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
 	items = f"{','.join(article)},{','.join(extra)}"
-	results = await _summon_reward(uid, items, **kwargs)
+	results = await reward_items(uid, items, **kwargs)
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
@@ -280,7 +280,7 @@ async def single_d(uid, **kwargs):
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
-	results = await _summon_reward(uid, items, **kwargs)
+	results = await reward_items(uid, items, **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
@@ -319,7 +319,7 @@ async def single_c(uid, **kwargs):
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
-	results = await _summon_reward(uid, items, **kwargs)
+	results = await reward_items(uid, items, **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
@@ -347,7 +347,7 @@ async def single_g(uid, **kwargs):
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': pid}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
-	results = await _summon_reward(uid, items, **kwargs)
+	results = await reward_items(uid, items, **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
@@ -432,7 +432,7 @@ def _integral_inspect(lim, integral):
 	return False, lim
 
 
-async def _summon_reward(uid, items: str, **kwargs):
+async def reward_items(uid, items: str, **kwargs):
 	"""返回奖励之后的改变情况"""
 	decoded = common.decode_items(items)
 	results = []
@@ -536,14 +536,14 @@ async def _set_summon(uid, cid, pid, mid, wgt, isb, **kwargs):
 	await common.execute(f'INSERT INTO summon (uid, cid, pid, mid, wgt, isb) VALUES ("{uid}", {cid}, {pid}, "{mid}", {wgt}, {isb}) ON DUPLICATE KEY UPDATE `mid`= VALUES(`mid`), `wgt`= VALUES(`wgt`), `isb`= VALUES(`isb`);', **kwargs)
 
 
-async def _refresh_integral(uid, **kwargs):
+async def refresh_integral(uid, **kwargs):
 	"""用于刷新积分的所有情况"""
 	timer = await common.get_timer(uid, enums.Timer.INTEGRAL, timeformat='%Y-%m-%d', **kwargs)
 	now = datetime.now(tz=common.TZ_SH)
 	timer = now if timer is None else timer
 	if timer.isocalendar()[1] != now.isocalendar()[1]:
 		await asyncio.gather(
-			common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.INTEGRAL}, 0) ON DUPLICATE KEY UPDATE `value` = 0;'),
+			common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.INTEGRAL}, 0) ON DUPLICATE KEY UPDATE `value` = 0;', **kwargs),
 			common.set_timer(uid, enums.Timer.INTEGRAL, now, timeformat='%Y-%m-%d', **kwargs),
 			common.set_limit(uid, enums.Limits.INTEGRAL, 0, **kwargs)
 		)
