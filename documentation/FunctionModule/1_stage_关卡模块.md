@@ -738,62 +738,47 @@
 
 [成功]()
 
-> consumes：消耗的物资信息
+> remain：剩余物资情况
 >
-> - remain：剩余物资情况
-> - reward：物资改变情况
+> reward：物资改变情况
 >
-> - energy：体力变化情况
->   - cooling：距离下次体力恢复剩余时间
->   - remain：剩余体力
->   - reward：体力改变值
+> energy：体力变化情况
+> - cooling：距离下次体力恢复剩余时间
+> - remain：剩余体力
+> - reward：体力改变值
 >
-> rewards：奖励的物资信息
+> exp_info：经验信息变化情况
 >
-> - remain：剩余物资情况
->
-> - reward：物资改变情况
->
->
-> - exp_info：经验信息变化情况
->
->   - exp：当前经验
->
->   - level：当前角色等级
->   - need：升到下一级需要的经验
->   - reward：经验改变情况
+> - exp：当前经验
+> - level：当前角色等级
+> - need：升到下一级需要的经验
+> - reward：经验改变情况
 
 ```json
 {
     "status": 0,
     "message": "success",
     "data": {
-        "consumes": {
-            "remain": [],
-            "reward": [],
-            "energy": {
-                "cooling": 360,
-                "remain": 114,
-                "reward": -6
-            }
+        "remain": [
+            "3:9:969660",
+            "3:1:2048468",
+            "3:2:150370"
+        ],
+        "reward": [
+            "3:9:100",
+            "3:1:200",
+            "3:2:200"
+        ],
+        "energy": {
+            "cooling": 269,
+            "remain": 105,
+            "reward": -6
         },
-        "rewards": {
-            "remain": [
-                "3:9:969460",
-                "3:1:2048068",
-                "3:2:149970"
-            ],
-            "reward": [
-                "3:9:100",
-                "3:1:200",
-                "3:2:200"
-            ],
-            "exp_info": {
-                "exp": 29760,
-                "level": 22,
-                "need": 600,
-                "reward": 120
-            }
+        "exp_info": {
+            "exp": 30000,
+            "level": 22,
+            "need": 360,
+            "reward": 120
         }
     }
 }
