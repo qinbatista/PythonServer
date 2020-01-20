@@ -1,5 +1,29 @@
 {
-	"comment": "mopping-up是关于扫荡下的消耗与奖励配置,common-stg是关于通用关卡下的消耗与奖励配置",
+	"comment": "eg是配置中的可选详细内容,mopping-up是关于扫荡下的消耗与奖励配置,common-stg是关于通用关卡下的消耗与奖励配置",
+	"eg": {
+		"comment": "关于关卡能配置的信息,consumes是指可消耗的物资,rewards是可得到的物资",
+		"consumes": {
+			"comment": "common是通用物资，special是非通用物资消耗",
+			"common": [
+				"3:?:?"
+			],
+			"special": {
+				"energy": 0
+			}
+		},
+		"rewards": {
+			"comment": "common是通用物资，special是非通用物资奖励",
+			"common": [
+				"0:?:?",
+				"1:?:?",
+				"2:?:?",
+				"3:?:?"
+			],
+			"special": {
+				"exp": 0
+			}
+		}
+	},
 	"mopping-up": {
 		"comment": "关于能扫荡关卡下的配置信息",
 		"8":{
