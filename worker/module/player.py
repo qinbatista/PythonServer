@@ -7,6 +7,7 @@ from module import enums
 from module import common
 from module import stage
 from module import summoning
+from module import account
 import asyncio
 import re
 GN_RE = re.compile(r'^[\u4e00-\u9fa5_a-zA-Z0-9]+$')
@@ -32,8 +33,11 @@ async def create(uid, gn, **kwargs):
 async def enter_world(uid, **kwargs):
 	cid = (await common.execute(f'SELECT cuid FROM info WHERE unique_id = "{uid}";', account=True, **kwargs))[0][0]
 	existing_player = await common.exists('player', ('uid', uid), **kwargs)
-	if not existing_player: return common.mt(98, 'have not been in this world before', {'cid': cid})
-	return common.mt(0, 'success', {'cid': cid})
+	#token = await account._request_new_token(uid, prev_token = kwargs['data']['token'], **kwargs)
+	session = (await account._request_new_token(uid, **kwargs))['token']
+	if not existing_player:
+		return common.mt(98, 'have not been in this world before', {'cid': cid, 'session' : session})
+	return common.mt(0, 'success', {'cid': cid, 'session' : session})
 
 
 async def get_account_world_info(uid, **kwargs):
