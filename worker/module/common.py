@@ -25,7 +25,7 @@ async def execute(statement, account=False, mall=False, exchange=False, **kwargs
 			else kwargs['malldb'].acquire()) if not exchange
 			else kwargs['exchangedb'].acquire()) as conn:
 		if not account and not mall and not exchange:
-			await conn.select_db(str(kwargs['world']))
+			await conn.select_db(translate_world(**kwargs))
 		async with conn.cursor() as cursor:
 			await cursor.execute(statement)
 			return await cursor.fetchall()
@@ -36,7 +36,7 @@ async def execute_update(statement, account=False, mall=False, exchange=False, *
 			else kwargs['malldb'].acquire()) if not exchange
 			else kwargs['exchangedb'].acquire()) as conn:
 		if not account and not mall and not exchange:
-			await conn.select_db(str(kwargs['world']))
+			await conn.select_db(translate_world(**kwargs))
 		async with conn.cursor() as cursor:
 			affected = await cursor.execute(statement)
 			return (affected, await cursor.fetchall())
@@ -60,7 +60,7 @@ def remaining_month_cd():
 
 async def try_item(uid, item, value, **kwargs):
 	async with (await get_db(**kwargs)).acquire() as conn:
-		await conn.select_db(str(kwargs['world']))
+		await conn.select_db(translate_world(**kwargs))
 		async with conn.cursor() as cursor:
 			await cursor.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = "{item.value}" FOR UPDATE;')
 			quantity = await cursor.fetchall()
@@ -72,7 +72,7 @@ async def try_item(uid, item, value, **kwargs):
 
 async def try_armor(uid, aid, level, value, **kwargs):
 	async with (await get_db(**kwargs)).acquire() as conn:
-		await conn.select_db(str(kwargs['world']))
+		await conn.select_db(translate_world(**kwargs))
 		async with conn.cursor() as cursor:
 			await cursor.execute(f'SELECT `quantity` FROM `armor` WHERE `uid` = "{uid}" AND \
 					`aid` = {aid.value} AND `level` = {level} FOR UPDATE;')
@@ -129,6 +129,9 @@ async def get_db(**kwargs):
 
 def encode_item(gid, iid, value):
 	return f'{gid.value}:{iid.value}:{value}'
+
+def translate_world(**kwargs):
+	return str(kwargs['world'])
 
 def decode_items(items):
 	decoded = []
