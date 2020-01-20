@@ -738,48 +738,62 @@
 
 [成功]()
 
-> energy：体力变化情况
+> consumes：消耗的物资信息
 >
-> - cooling：距离下次体力恢复剩余时间
-> - remaining：剩余体力
-> - reward：体力改变值
+> - remain：剩余物资情况
+> - reward：物资改变情况
 >
-> remaining：剩余物资情况
+> - energy：体力变化情况
+>   - cooling：距离下次体力恢复剩余时间
+>   - remain：剩余体力
+>   - reward：体力改变值
 >
-> reward：物资改变情况
+> rewards：奖励的物资信息
 >
-> exp_info：经验信息变化情况
+> - remain：剩余物资情况
 >
-> - exp：当前经验
-> - level：当前角色等级
-> - need：升到下一级需要的经验
-> - reward：经验改变情况
+> - reward：物资改变情况
+>
+>
+> - exp_info：经验信息变化情况
+>
+>   - exp：当前经验
+>
+>   - level：当前角色等级
+>   - need：升到下一级需要的经验
+>   - reward：经验改变情况
 
 ```json
 {
     "status": 0,
     "message": "success",
     "data": {
-        "energy": {
-            "cooling": 103,
-            "remaining": 109,
-            "reward": -6
+        "consumes": {
+            "remain": [],
+            "reward": [],
+            "energy": {
+                "cooling": 360,
+                "remain": 114,
+                "reward": -6
+            }
         },
-        "remaining": [
-            "3:9:425",
-            "3:1:975",
-            "3:2:725"
-        ],
-        "reward": [
-            "3:9:100",
-            "3:1:200",
-            "3:2:200"
-        ],
-        "exp_info": {
-            "exp": 380,
-            "level": 3,
-            "need": 340,
-            "reward": 120
+        "rewards": {
+            "remain": [
+                "3:9:969460",
+                "3:1:2048068",
+                "3:2:149970"
+            ],
+            "reward": [
+                "3:9:100",
+                "3:1:200",
+                "3:2:200"
+            ],
+            "exp_info": {
+                "exp": 29760,
+                "level": 22,
+                "need": 600,
+                "reward": 120
+            }
         }
     }
 }
@@ -791,6 +805,7 @@
 - 98：There is no configuration information for this stage
 - 97：energy insufficient
 - 96：Can only be a positive integer
+- 95：materials insufficient
 
 
 

@@ -276,6 +276,21 @@ async def send_gift_sys_mail(uid, gid, iid, qty, **kwargs):
 			'items': encode_item(gid, iid, qty)}, uid, **kwargs)
 
 
+async def consume_items(uid, items, **kwargs):
+	items, results, cans = decode_items(items), [], []
+	for gid, iid, qty in items:
+		if gid == enums.Group.ITEM:
+			_, _qty = await try_item(uid, iid, 0, **kwargs)
+			if _qty < qty: return False, results
+		else:
+			print(f'消耗品异常gid={gid}')
+	for gid, iid, qty in items:
+		if gid == enums.Group.ITEM:
+			_, rm_qty = await try_item(uid, iid, -qty, **kwargs)
+			results.append((gid, iid, rm_qty, qty))
+	return True, results
+
+
 def __calculate(config: list, sql_exp: int) -> (int, int):
 	values = [e for e in config if e > sql_exp]
 	level, need = config.index(values[0]) if values != [] else len(config), values[0] - sql_exp if values != [] else 0

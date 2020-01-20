@@ -637,20 +637,32 @@ async def mopping_up(uid, stage, count=1, **kwargs):
 	if stage > sql_stage: return common.mt(99, 'Do not sweep until you pass this checkpoint')
 	config = kwargs['config']['stage']['mopping-up'].get(f'{stage}', None)
 	if config is None: return common.mt(98, 'There is no configuration information for this stage')  # 扫荡序章或未写配置的关卡会返回此结果
-	# TODO 消耗体力
-	cast = config['cost'] * count
-	data = await common.try_energy(uid, -cast, **kwargs)
-	if data['status'] >= 97: return common.mt(97, 'energy insufficient')
-	data = {'energy': {'cooling': data['data']['cooling_time'], 'remaining': data['data']['energy'], 'reward': -cast}, 'remaining': [], 'reward': []}
+	consumes, rewards = {'remain': [], 'reward': []}, {'remain': [], 'reward': []}  # 初始化消耗信息表和奖励信息表
+	# TODO 检查特殊物资是否能消耗
+	energy = config['consumes']['special']['energy'] * count
+	data = await common.try_energy(uid, 0, **kwargs)
+	if data['data']['energy'] < energy: return common.mt(97, 'energy insufficient')
+	# TODO 消耗普通物资
+	items = ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['consumes']['common']])
+	if items != '':
+		can, results = await common.consume_items(uid, items, **kwargs)
+		if not can: return common.mt(95, 'materials insufficient')
+		for gid, iid, remain_v, value in results:
+			consumes['remain'].append(f'{gid.value}:{iid.value}:{remain_v}')
+			consumes['reward'].append(f'{gid.value}:{iid.value}:{value}')
+	# TODO 消耗特殊物资(体力)
+	data = (await common.try_energy(uid, -energy, **kwargs))['data']
+	consumes['energy'] = {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}
 	# TODO 奖励普通物资
 	items = ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['rewards']['common']])
-	results = await summoning._summon_reward(uid, items, **kwargs)
-	for gid, iid, remain_v, value in results:
-		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
-		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
+	if items != '':
+		results = await summoning.reward_items(uid, items, **kwargs)
+		for gid, iid, remain_v, value in results:
+			rewards['remain'].append(f'{gid.value}:{iid.value}:{remain_v}')
+			rewards['reward'].append(f'{gid.value}:{iid.value}:{value}')
 	# TODO 奖励特殊物资
-	data['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
-	return common.mt(0, 'success', data)
+	rewards['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
+	return common.mt(0, 'success', {'consumes': consumes, 'rewards': rewards})
 
 
 
