@@ -41,10 +41,10 @@ class Client:
 		self.context.load_verify_locations(certpath)
 		self.context.check_hostname = False
 
-	async def send(self, function, token, world):
+	async def send(self, function, token, session, world):
 		try:
 			reader, writer = await asyncio.open_connection(self.host, self.port, ssl = self.context)
-			request = function.dump(token, world).encode() + self.ending
+			request = function.dump(token, session, world).encode() + self.ending
 			writer.write(request)
 			await writer.drain()
 			start = time.time()
@@ -102,6 +102,7 @@ class UserState:
 	familylist: set = field(default_factory = set)
 	mail: list = field(default_factory = list)
 	token: str = ''
+	session: str = ''
 	world: str = ''
 	uid: str = field(default_factory = lambda: uuid.uuid4().hex)
 	gn: str = ''
@@ -172,7 +173,8 @@ class User:
 	
 	async def call(self, function):
 		function.before_call(self.global_state, self.state)
-		metric = await self.global_state.client.send(function, self.state.token, self.state.world)
+		metric = await self.global_state.client.send(function, self.state.token, \
+				self.state.session, self.state.world)
 		function.after_call(self.global_state, self.state, metric)
 		return metric
 
