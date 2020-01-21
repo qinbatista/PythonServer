@@ -45,10 +45,11 @@ async def get_account_world_info(uid, **kwargs):
 	worlds = []
 	for world in kwargs['config']['world']['worlds']:
 		kwargs['world'] = world['id']
+		translated_uid = common.translate_uid(uid, **kwargs)
 		data = await common.execute(f'SELECT `gn`, `exp` FROM `player` JOIN `progress` ON \
-				`player`.`uid` = `progress`.`uid` WHERE `player`.`uid` = "{uid}";', **kwargs)
+				`player`.`uid` = `progress`.`uid` WHERE `player`.`uid` = "{translated_uid}";', **kwargs)
 		if data != ():
-			exp_info = await stage.increase_exp(uid, 0, **kwargs)
+			exp_info = await stage.increase_exp(translated_uid, 0, **kwargs)
 			worlds.append({'server_status' : world['status'], 'world' : world['id'], \
 					'world_name' : world['name'], 'gn' : data[0][0], 'exp' : data[0][1], 'level': exp_info['level']})
 		else:
