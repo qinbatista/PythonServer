@@ -161,20 +161,21 @@ def translate_uid(uid, **kwargs):
 
 def decode_items(items):
 	decoded = []
-	for item in items.split(','):  # "gid:iid:value,gid:iid:value"
-		gid, iid, value = [int(v) if i < 2 else v for i, v in enumerate(item.split(':', maxsplit=2))]
-		gid = enums.Group(gid)
-		if gid == enums.Group.ITEM:
-			decoded.append((gid, enums.Item(iid), int(value)))
-		elif gid == enums.Group.WEAPON:
-			decoded.append((gid, enums.Weapon(iid), int(value)))
-		elif gid == enums.Group.SKILL:
-			decoded.append((gid, enums.Skill(iid), int(value)))  # undecided
-		elif gid == enums.Group.ROLE:
-			decoded.append((gid, enums.Role(iid), int(value)))
-		elif gid == enums.Group.ARMOR:
-			decoded.append((gid, enums.Armor(iid), int(value)))
-			# decoded.append((gid, enums.Armor(iid), value))  # value => 'level:value' => '1:1'
+	if items != '':
+		for item in items.split(','):  # "gid:iid:value,gid:iid:value"
+			gid, iid, value = [int(v) if i < 2 else v for i, v in enumerate(item.split(':', maxsplit=2))]
+			gid = enums.Group(gid)
+			if gid == enums.Group.ITEM:
+				decoded.append((gid, enums.Item(iid), int(value)))
+			elif gid == enums.Group.WEAPON:
+				decoded.append((gid, enums.Weapon(iid), int(value)))
+			elif gid == enums.Group.SKILL:
+				decoded.append((gid, enums.Skill(iid), int(value)))  # undecided
+			elif gid == enums.Group.ROLE:
+				decoded.append((gid, enums.Role(iid), int(value)))
+			elif gid == enums.Group.ARMOR:
+				decoded.append((gid, enums.Armor(iid), int(value)))
+				# decoded.append((gid, enums.Armor(iid), value))  # value => 'level:value' => '1:1'
 	return decoded
 
 
@@ -193,110 +194,79 @@ async def try_energy(uid, amount, **kwargs):
 	# - 7 - 能量已刷新，未恢复满，已消耗能量，能量值及恢复时间更新成功 === Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully
 	# - 97 - 参数错误 === Parameter error
 	# - 98 - 无足够能量消耗 === Not enough energy consumption
-	# - 99 - 数据库操作错误 === Database operation error
 	max_energy = kwargs['config']['player']['energy']['max_energy']
 	sql_energy = await get_progress(uid, 'energy', **kwargs)
 	sql_energy = max_energy if sql_energy is None else sql_energy
+	now100 = datetime.now(tz=TZ_SH) + timedelta(days=36500)
 	if sql_energy >= max_energy:
-		await execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", "{enums.Timer.ENERGY_RECOVER_TIME}", "") ON DUPLICATE KEY UPDATE time="";', **kwargs)
+		await set_timer(uid, enums.Timer.ENERGY_RECOVER_TIME, now100, **kwargs)
 	if amount > 0:  # 购买能量
-		data = (await _decrease_energy(uid, 0, **kwargs))['data']
-		status, _ = await execute_update(f'UPDATE progress SET energy = energy + {amount} WHERE uid = "{uid}";', **kwargs)
-		energy_data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
-		if energy_data == ():
-			await execute_update(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
-			energy_data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
-		if status == 0:
-			return mt(status=99, message="Database operation error")
-		elif energy_data[0][0] >= max_energy:
-			await execute_update(f'UPDATE timer SET time = "" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-			data['energy'] = energy_data[0][0]
-			data['recover_time'] = ''
-			data['cooling_time'] = -1
-			return mt(0, "Purchase energy successfully", data)
+		data = (await _decrease_energy(uid, 0, sql_energy, max_energy, **kwargs))['data']
+		sql_energy += amount
+		await set_progress(uid, 'energy', sql_energy, **kwargs)
+		if sql_energy >= max_energy:
+			await set_timer(uid, enums.Timer.ENERGY_RECOVER_TIME, now100, **kwargs)
+			return mt(0, "Purchase energy successfully", {'energy': sql_energy, 'recover_time': '', 'cooling_time': -1})
 		else:
-			data['energy'] = energy_data[0][0]
+			data['energy'] = sql_energy
 			return mt(1, "Purchase energy successfully, energy is not fully restored", data)
 	elif sql_energy + amount < 0:
 		return mt(status=97, message="Parameter error")
 	else:  # 消耗能量或者查询能量
-		return await _decrease_energy(uid, abs(amount), **kwargs)
+		return await _decrease_energy(uid, abs(amount), sql_energy, max_energy, **kwargs)
 
 
-async def _decrease_energy(uid, amount, **kwargs) -> dict:
-	max_energy = kwargs['config']['player']['energy']['max_energy']
-	_cooling_time = kwargs['config']['player']['energy']['cooling_time']
-	data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
-	if data == ():
-		await execute_update(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
-		data = await execute(f'SELECT energy FROM progress WHERE uid = "{uid}";', **kwargs)
-	current_energy = data[0][0]
-	data = await execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-	if data == ():
-		await execute_update(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.ENERGY_RECOVER_TIME.value}");', **kwargs)
-		data = await execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-	recover_time = data[0][0]
-	current_time = datetime.now(tz=TZ_SH).strftime('%Y-%m-%d %H:%M:%S')
-	if recover_time == '':
-		"""此时 current_energy == _max_energy 成立，即能力无消耗，满能量状态"""
+async def _decrease_energy(uid, amount, sql_energy, max_energy, **kwargs) -> dict:
+	_cooling, now = kwargs['config']['player']['energy']['cooling_time'] * 60, datetime.now(tz=TZ_SH)
+	cooling, now100 = _cooling, now + timedelta(days=36500)
+	tim = await get_timer(uid, enums.Timer.ENERGY_RECOVER_TIME, **kwargs)
+	tim = now if tim is None else tim
+	if tim >= now:
+		"""满能量状态"""
 		if amount == 0:  # 获取能量
 			# 成功1：如果没有恢复时间且是获取能量值，则直接拿取数据库的值给客户端
-			return mt(2, 'Get energy successfully', {'energy': current_energy, 'recover_time': recover_time, 'cooling_time': -1})
-		current_energy -= amount
+			return mt(2, 'Get energy successfully', {'energy': sql_energy, 'recover_time': tim.strftime('%Y-%m-%d %H:%M:%S'), 'cooling_time': -1})
 		# 成功2：如果没有恢复时间且是消耗能量值，则直接用数据库的值减去消耗的能量值，
 		# 然后存入消耗之后的能量值，以及将当前的时间存入 恢复时间项
-		if current_energy >= max_energy:  # 能量超出满能力状态时，不计算恢复时间
-			current_time = ""
-			cooling_time = -1
-		else:
-			await execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-			cooling_time = 60 * _cooling_time
-		await execute_update(f'UPDATE progress SET energy = {current_energy} WHERE uid = "{uid}";', **kwargs)
-		return mt(3, 'Energy has been consumed, energy value and recovery time updated successfully', {'energy': current_energy, 'recover_time': current_time, 'cooling_time': cooling_time})
+		sql_energy -= amount
+		if sql_energy < 0: return mt(98, 'Not enough energy consumption')
+		tim, cooling = (now100, -1) if sql_energy >= max_energy else (now, _cooling)
+		await __update_energy(uid, sql_energy, tim, **kwargs)
+		return mt(3, 'Energy has been consumed, energy value and recovery time updated successfully', {'energy': sql_energy, 'recover_time': tim.strftime('%Y-%m-%d %H:%M:%S'), 'cooling_time': cooling})
 	else:
-		"""此时 current_energy != _max_energy 成立，即能力已消耗，恢复能量状态"""
-		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=TZ_SH) - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=TZ_SH)
-		recovered_energy = int(delta_time.total_seconds()) // 60 // _cooling_time  # 计算恢复能量的点数
+		"""恢复能量状态"""
+		delta = now - tim
+		cooling, _energy = int(delta.total_seconds()) % _cooling, int(delta.total_seconds()) // _cooling + sql_energy  # 计算恢复后的能量点数
+		cooling, now = _cooling - cooling, now - timedelta(seconds=cooling)
 		if amount == 0:  # 获取能量
-			# 成功3：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
-			# 满足上限的情况：直接将满能量值和空字符串分别存入能量值项和恢复时间项
-			if current_energy + recovered_energy >= max_energy:
-				recover_time, current_energy, cooling_time = "", max_energy, -1
-				await execute_update(f'UPDATE progress SET energy = {current_energy} WHERE uid = "{uid}";', **kwargs)
-				await execute_update(f'UPDATE timer SET time = "{recover_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-				return mt(4, 'Energy has been fully restored, successful energy update', {'energy': current_energy, 'recover_time': recover_time, 'cooling_time': cooling_time})
-			# 成功4：如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
-			# 不满足上限的情况：将能恢复的能量值计算出来，并且计算恢复后的能量值current_energy
+			# 如果有恢复时间且是获取能量值，则加上获取的能量值，并判断能量值是否满足上限
+			# 成功3：满足上限的情况：直接将满能量值和空字符串分别存入能量值项和恢复时间项
+			# 成功4：不满足上限的情况：将能恢复的能量值计算出来，并且计算恢复后的能量值sql_energy
 			# 和恢复时间与恢复能量消耗的时间相减的恢复时间值
-			else:
-				recover_time, current_energy = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=TZ_SH) + timedelta(minutes=recovered_energy * _cooling_time)).strftime("%Y-%m-%d %H:%M:%S"), current_energy + recovered_energy
-				delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S')
-				cooling_time = 60 * _cooling_time - int(delta_time.total_seconds())  # 计算下一点能量需要多少的恢复时间
-				await execute_update(f'UPDATE progress SET energy = {current_energy} WHERE uid = "{uid}";', **kwargs)
-				await execute_update(f'UPDATE timer SET time = "{recover_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-				return mt(5, 'Energy has not fully recovered, successful energy update', {'energy': current_energy, 'recover_time': recover_time, 'cooling_time': cooling_time})
-
-		if recovered_energy + current_energy >= max_energy:
+			tim, sql_energy, cooling = (now100, max_energy, -1) if _energy >= max_energy else (now, _energy, cooling)
+			status, msg = (4, 'Energy has been fully restored, successful energy update') if cooling == -1 else (5, 'Energy has not fully recovered, successful energy update')
+			await __update_energy(uid, sql_energy, tim, **kwargs)
+			return mt(status, msg, {'energy': sql_energy, 'recover_time': tim.strftime('%Y-%m-%d %H:%M:%S'), 'cooling_time': cooling})
+		if _energy >= max_energy:
 			# 成功5：如果有恢复时间且是消耗能量
 			# 满足上限的情况是用上限能量值减去要消耗的能量值，然后设置减去之后的能量值和当前的时间分别存入能量值项和恢复时间项
-			current_energy = max_energy - amount
-			cooling_time = _cooling_time * 60
-			await execute_update(f'UPDATE progress SET energy = {current_energy} WHERE uid = "{uid}";', **kwargs)
-			await execute_update(f'UPDATE timer SET time = "{current_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-			return mt(6, 'After refreshing the energy, the energy value and recovery time are successfully updated', {'energy': current_energy, 'recover_time': current_time, 'cooling_time': cooling_time})
-		elif recovered_energy + current_energy - amount >= 0:
+			tim, sql_energy, cooling = now, max_energy - amount, _cooling
+			await __update_energy(uid, sql_energy, tim, **kwargs)
+			return mt(6, 'After refreshing the energy, the energy value and recovery time are successfully updated', {'energy': sql_energy, 'recover_time': tim.strftime('%Y-%m-%d %H:%M:%S'), 'cooling_time': cooling})
+		elif _energy >= amount:
 			# 成功6：如果有恢复时间且是消耗能量
 			# 不满足上限的情况是用当前数据库的能量值和当前恢复的能量值相加然后减去消耗的能量值为要存入数据库的能量值项
 			# 数据库中的恢复时间与恢复能量消耗的时间相减的恢复时间值存入到数据库的恢复时间项
-			current_energy = recovered_energy + current_energy - amount
-			recover_time = (datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=TZ_SH) + timedelta(minutes=recovered_energy * _cooling_time)).strftime("%Y-%m-%d %H:%M:%S")
-			delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=TZ_SH) - datetime.strptime(recover_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=TZ_SH)
-			cooling_time = 60 * _cooling_time - int(delta_time.total_seconds())
-			await execute_update(f'UPDATE progress SET energy = {current_energy} WHERE uid = "{uid}";', **kwargs)
-			await execute_update(f'UPDATE timer SET time = "{recover_time}" WHERE uid = "{uid}" AND tid = "{enums.Timer.ENERGY_RECOVER_TIME.value}";', **kwargs)
-			return mt(7, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {'energy': current_energy, 'recover_time': recover_time, 'cooling_time': cooling_time})
+			tim, sql_energy = now, _energy - amount
+			await __update_energy(uid, sql_energy, tim, **kwargs)
+			return mt(7, 'Energy has been refreshed, not fully recovered, energy has been consumed, energy value and recovery time updated successfully', {'energy': sql_energy, 'recover_time': tim.strftime('%Y-%m-%d %H:%M:%S'), 'cooling_time': cooling})
 		else:  # 发生的情况是当前能量值和恢复能量值相加比需要消耗的能量值少
 			return mt(98, 'Not enough energy consumption')
+
+
+async def __update_energy(uid, energy, tim, **kwargs):
+	await set_progress(uid, 'energy', energy, **kwargs)
+	await set_timer(uid, enums.Timer.ENERGY_RECOVER_TIME, tim, **kwargs)
 
 
 def mt(status, message, data={}):
@@ -334,6 +304,21 @@ async def send_gift_sys_mail(uid, gid, iid, qty, **kwargs):
 	await mail.send_mail({'type': enums.MailType.GIFT.value, 'from': 'lukseun team', \
 			'subj': enums.MailTemplate.SYSTEM_REWARD.name, 'body': enums.MailTemplate.GIFT_1.name, \
 			'items': encode_item(gid, iid, qty)}, uid, **kwargs)
+
+
+async def consume_items(uid, items, **kwargs):
+	items, results = decode_items(items), []
+	for gid, iid, qty in items:
+		if gid == enums.Group.ITEM:
+			_, _qty = await try_item(uid, iid, 0, **kwargs)
+			if _qty < qty: return False, results
+		else:
+			print(f'消耗品异常gid={gid}')
+	for gid, iid, qty in items:
+		if gid == enums.Group.ITEM:
+			_, rm_qty = await try_item(uid, iid, -qty, **kwargs)
+			results.append((gid, iid, rm_qty, qty))
+	return True, results
 
 
 def __calculate(config: list, sql_exp: int) -> (int, int):

@@ -23,7 +23,8 @@ async def create(uid, gn, **kwargs):
 		common.execute(f'INSERT INTO role (uid, star, level, rid) VALUES ("{uid}", 1, 7, {enums.Role.R401}), ("{uid}", 1, 1, {enums.Role.R402}), ("{uid}", 1, 1, {enums.Role.R505}), ("{uid}", 1, 1, {enums.Role.R601});', **kwargs),
 		common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W301}), ("{uid}", 1, {enums.Weapon.W302}), ("{uid}", 1, {enums.Weapon.W303});', **kwargs),
 		common.execute(f'INSERT INTO skill(uid, sid, level) VALUES ("{uid}", {enums.Skill.S1}, 1), ("{uid}", {enums.Skill.S2}, 1), ("{uid}", {enums.Skill.S3}, 1), ("{uid}", {enums.Skill.S4}, 1), ("{uid}", {enums.Skill.S5}, 1);', **kwargs),
-		common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.LOGIN_TIME}, "{common.datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d")}");',**kwargs)
+		common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.LOGIN_TIME}, "{common.datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d")}");',**kwargs),
+		common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);',**kwargs)
 	)
 	await _meeting_gift(uid, **kwargs)
 	return common.mt(0, 'success', {'gn': gn})
@@ -102,7 +103,7 @@ async def get_info(uid, **kwargs):
 
 
 async def get_all_resource(uid, **kwargs):
-	await summoning._refresh_integral(uid, **kwargs)
+	await summoning.refresh_integral(uid, **kwargs)
 	item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)
 	return common.mt(0, 'success', {'items': [{'iid': i[0], 'value': i[1]} for i in item]})
 
@@ -118,8 +119,10 @@ async def _lookup_nonce(nonce, **kwargs):
 
 async def _meeting_gift(uid, **kwargs):
 	"""玩家初次创建角色赠送的见面礼"""
-	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.DIAMOND, 1_0000, **kwargs)
-	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.COIN, 200_0000, **kwargs)
+	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.DIAMOND, 1_0000_0000, **kwargs)
+	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.COIN, 1_0000_0000, **kwargs)
+	# await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.DIAMOND, 1_0000, **kwargs)
+	# await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.COIN, 200_0000, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.FOOD, 10_0000, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.IRON, 10_0000, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.CRYSTAL, 10_0000, **kwargs)
@@ -127,7 +130,9 @@ async def _meeting_gift(uid, **kwargs):
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SUMMON_SCROLL_C, 100, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1000, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.VIP_EXP_CARD, 100, **kwargs)
-	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SKILL_SCROLL_100, 100, **kwargs)
+	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SKILL_SCROLL_10, 100_0000, **kwargs)
+	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SKILL_SCROLL_30, 100_0000, **kwargs)
+	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.SKILL_SCROLL_100, 100_0000, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.UNIVERSAL4_SEGMENT, 100, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.UNIVERSAL5_SEGMENT, 100, **kwargs)
 	await common.send_gift_sys_mail(uid, enums.Group.ITEM, enums.Item.ENERGY_POTION_S_MAX, 100, **kwargs)

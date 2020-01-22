@@ -99,7 +99,7 @@ async def e_general_stage(uid, stage, **kwargs):
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
 	# try_energy 扣体力看是否足够
-	energy_data = await common.try_energy(uid, -1 * energy_consume, **kwargs)
+	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
 	if energy_data["status"] >= 97:
 		return common.mt(97, "Insufficient energy")
 
@@ -217,7 +217,7 @@ async def e_tower_stage(uid, stage, **kwargs):
 		if values[i] < 0: return common.mt(98, f'{iid} insufficient')
 
 	# try_energy 扣体力看是否足够
-	energy_data = await common.try_energy(uid, -1 * energy_consume, **kwargs)
+	energy_data = await common.try_energy(uid, -energy_consume, **kwargs)
 	if energy_data["status"] >= 97:
 		return common.mt(97, "Insufficient energy")
 
@@ -581,27 +581,6 @@ async def try_unlock_skill(uid, sid, **kwargs):
 	return False
 
 
-async def increase_exp(uid, exp, **kwargs):
-	"""
-	exp为0则获得经验，反之增加经验，
-	并返回总经验和等级，升到下一级需要的经验
-	"""
-	# 取配置和数据
-	exp_config = kwargs['config']['exp']['player_level']['experience']
-	sql_exp = await common.get_progress(uid, 'exp', **kwargs)
-
-	# 计算等级和需要的经验
-	level, need = common.__calculate(exp_config, sql_exp)
-	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
-
-	# 重新计算等级和需要的经验
-	sql_exp += exp
-	level, need = common.__calculate(exp_config, sql_exp)
-	await common.set_progress(uid, 'exp', sql_exp, **kwargs)
-	# 返回总经验、等级、需要经验
-	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
-
-
 async def increase_weapon_segment(uid, wid, segment, **kwargs):
 	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}";', **kwargs)
 	if data == ():
@@ -630,27 +609,104 @@ async def try_stage(uid, stage, stage_type, **kwargs):
 # ##################################################################
 # ################### 2020年1月14日之后加入的方法 #################
 # ##################################################################
+async def enter(uid, stage, **kwargs):
+	"""进入关卡"""
+	if stage <= 0 or 1000 <= stage < 3000 or stage >= 4000: return common.mt(90, 'stage error')
+	stg_type = get_type(stage)
+	if stage > 1 + await common.get_progress(uid, stg_type, **kwargs): return common.mt(90, 'stage error')
+	config = kwargs['config']['stage']['stage'].get(f'{stage}', None)
+	if config is None: return common.mt(98, 'There is no configuration information for this stage')  # 关卡无配置信息
+	# TODO 检查特殊物资是否能消耗
+	energy = config['consumes']['special'].get('energy', 0)
+	if (await common.try_energy(uid, 0, **kwargs))['data']['energy'] < energy: return common.mt(97, 'energy insufficient')
+	# TODO 尝试消耗通用物资
+	if not (await common.consume_items(uid, ','.join(config['consumes']['common']), **kwargs))[0]: return common.mt(95, 'materials insufficient')
+	# TODO 消耗特殊物资(体力)
+	data = (await common.try_energy(uid, -energy, **kwargs))['data']
+	rewards = {'energy': {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}}
+	# TODO 设置关卡进入状态
+	await common.set_progress(uid, 'unstage', stage, **kwargs)
+	return common.mt(0, 'success', rewards)
+
+
+async def victory(uid, stage, damage=0, **kwargs):
+	"""通关"""
+	if stage != await common.get_progress(uid, 'unstage', **kwargs): return common.mt(94, 'stage mismatch')
+	stg_type = get_type(stage)
+	if stage == 1 + await common.get_progress(uid, stg_type, **kwargs) and stg_type != 'boss':
+		await common.set_progress(uid, stg_type, stage, **kwargs)
+	config, rewards = kwargs['config']['stage']['stage'].get(f'{stage}', None), {}
+	# TODO 奖励普通物资
+	results = await summoning.reward_items(uid, ','.join(config['rewards']['common']), **kwargs)
+	rewards['remain'], rewards['reward'] = [f'{g}:{i}:{v}' for g, i, v, _ in results], [f'{g}:{i}:{v}' for g, i, _, v in results]
+	# TODO 奖励特殊物资
+	rewards['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'], **kwargs)
+	if stg_type == 'boss':
+		config, record = kwargs['config']['boss'], damage > await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
+		if damage < 0 or damage >= kwargs['config']['boss'].get('limits', 100_0000): return common.mt(status=93, message="abnormal damage")
+		config[f'{stage}']['hp'] = max(0, config[f'{stage}']['hp'] - damage)
+		await set_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, damage, **kwargs)
+		ratio = {s: "%.2f" % (config[s]['hp']/config[s]['HP']) for s in config}
+		# rewards['']
+	# TODO 设置关卡通过状态
+	await common.set_progress(uid, 'unstage', 0, **kwargs)
+	return common.mt(0, 'success', rewards)
+
+
 async def mopping_up(uid, stage, count=1, **kwargs):
-		"""关于扫荡关卡的方法"""
-		if count <= 0: return common.mt(96, 'Can only be a positive integer')
-		sql_stage = await common.get_progress(uid, 'stage', **kwargs)
-		if stage > sql_stage: return common.mt(99, 'Do not sweep until you pass this checkpoint')
-		config = kwargs['config']['stage']['mopping-up'].get(f'{stage}', None)
-		if config is None: return common.mt(98, 'There is no configuration information for this stage')  # 扫荡序章或未写配置的关卡会返回此结果
-		# TODO 消耗体力
-		cast = config['cost'] * count
-		data = await common.try_energy(uid, -cast, **kwargs)
-		if data['status'] >= 97: return common.mt(97, 'energy insufficient')
-		data = {'energy': {'cooling': data['data']['cooling_time'], 'remaining': data['data']['energy'], 'reward': -cast}, 'remaining': [], 'reward': []}
-		# TODO 奖励普通物资
-		items = ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['rewards']['common']])
-		results = await summoning._summon_reward(uid, items, **kwargs)
-		for gid, iid, remain_v, value in results:
-			data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
-			data['reward'].append(f'{gid.value}:{iid.value}:{value}')
-		# TODO 奖励特殊物资
-		data['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
-		return common.mt(0, 'success', data)
+	"""关于扫荡关卡的方法"""
+	if count <= 0: return common.mt(96, 'Can only be a positive integer')
+	if stage > await common.get_progress(uid, 'stage', **kwargs): return common.mt(99, 'Do not sweep until you pass this checkpoint')
+	config = kwargs['config']['stage']['mopping-up'].get(f'{stage}', None)
+	if config is None: return common.mt(98, 'There is no configuration information for this stage')  # 扫荡序章或未写配置的关卡会返回此结果
+	# TODO 检查特殊物资是否能消耗
+	energy = config['consumes']['special'].get('energy', 0) * count
+	if (await common.try_energy(uid, 0, **kwargs))['data']['energy'] < energy: return common.mt(97, 'energy insufficient')
+	# TODO 尝试消耗通用物资
+	if not (await common.consume_items(uid, ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['consumes']['common']]), **kwargs))[0]: return common.mt(95, 'materials insufficient')
+	# TODO 消耗特殊物资(体力)
+	data = (await common.try_energy(uid, -energy, **kwargs))['data']
+	rewards = {'energy': {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}}
+	# TODO 奖励普通物资
+	results = await summoning.reward_items(uid, ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['rewards']['common']]), **kwargs)
+	rewards['remain'], rewards['reward'] = [f'{g}:{i}:{v}' for g, i, v, _ in results], [f'{g}:{i}:{v}' for g, i, _, v in results]
+	# TODO 奖励特殊物资
+	rewards['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
+	return common.mt(0, 'success', rewards)
+
+
+async def increase_exp(uid, exp, **kwargs):
+	"""
+	exp为0则获得经验，反之增加经验，
+	并返回总经验和等级，升到下一级需要的经验
+	"""
+	# TODO 取配置和数据
+	exp_config = kwargs['config']['exp']['player_level']['experience']
+	sql_exp = await common.get_progress(uid, 'exp', **kwargs)
+	# TODO 计算等级和需要的经验
+	level, need = common.__calculate(exp_config, sql_exp)
+	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
+	# TODO 重新计算等级和需要的经验
+	sql_exp += exp
+	level, need = common.__calculate(exp_config, sql_exp)
+	await common.set_progress(uid, 'exp', sql_exp, **kwargs)
+	# TODO 返回总经验、等级、需要经验
+	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
+
+
+def get_type(stage) -> str:
+	"""1-999:stage === 3000-3999:boss === ????-????:tower"""
+	return 'stage' if stage < 1000 else ('boss' if 3000 <= stage < 4000 else 'tower')
+
+
+async def get_leaderboard(uid, lid, **kwargs):
+	data = await common.execute(f'SELECT value FROM leaderboard WHERE uid = "{uid}" AND lid = {lid};', **kwargs)
+	return 0 if data == () else data[0][0]
+
+
+async def set_leaderboard(uid, lid, damage, **kwargs):
+	await common.execute(f'INSERT INTO leaderboard (uid, lid, value) VALUES ("{uid}", {lid}, {damage});', **kwargs)
+
 
 
 

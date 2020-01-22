@@ -8,7 +8,8 @@ import random
 
 from module import enums
 from module import common
-FIB = [1]
+# FIB = [1]  # 第一次升级需要消耗2个卷轴
+FIB = [1, 1]  # 第一次升级需要消耗1个卷轴
 
 
 async def level_up(uid, sid, iid, **kwargs):

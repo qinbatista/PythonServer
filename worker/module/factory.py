@@ -250,9 +250,11 @@ def roll_segment_value(**kwargs):
 
 def update_state(steps, level, worker, storage, **kwargs):
 	"""更新剩余量和变化量"""
-	initial_storage = {k: v for k, v in storage.items()}
-	for _ in range(steps):
-		storage = step(level, worker, storage, **kwargs)
+	initial_storage, need = {k: v for k, v in storage.items()}, 10000
+	multiple = max(steps / need, 1)
+	[step(level, worker, storage, **kwargs) for _ in range(min(steps, need))]
+	config = kwargs['config']['factory']['general']['storage_limits']
+	storage = {k: min(config[f'{k}']['1' if k == enums.Factory.ARMOR else f'{level[k]}'], int(v * multiple)) if k in BASIC_FACTORIES else v for k, v in storage.items()}
 	delta = {k: storage[k] - initial_storage[k] for k in storage}
 	return storage, delta
 
@@ -260,15 +262,14 @@ def step(level, worker, current, **kwargs):
 	"""单次的步骤，计算每个工厂单个工人每步的生产效果，单位:(每步/每人/每个)"""
 	for factory in BASIC_FACTORIES:
 		current[factory] += sum([1 if can_produce(current, factory, level, **kwargs) else 0 for _ in range(worker[factory])])
-	return current
 
 def can_produce(current, factory, level, **kwargs):
 	"""计算工厂当前的是否可生产，可生产的情况下扣除需要扣除的基本材料"""
 	cost = {}
 	kind = '1' if factory == enums.Factory.ARMOR else str(level[factory])
-	if current[factory] + 1 > kwargs['config']['factory']['general']['storage_limits'][str(factory.value)][kind]:
+	if current[factory] + 1 > kwargs['config']['factory']['general']['storage_limits'][f'{factory}'][kind]:
 		return False
-	for f, a in kwargs['config']['factory']['general']['costs'][str(factory.value)].items():
+	for f, a in kwargs['config']['factory']['general']['costs'][f'{factory}'].items():
 		if current[enums.Factory(int(f))] < a:
 			return False
 		cost[enums.Factory(int(f))] = a

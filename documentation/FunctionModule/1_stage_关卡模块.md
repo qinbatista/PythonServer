@@ -738,15 +738,14 @@
 
 [成功]()
 
-> energy：体力变化情况
->
-> - cooling：距离下次体力恢复剩余时间
-> - remaining：剩余体力
-> - reward：体力改变值
->
-> remaining：剩余物资情况
+> remain：剩余物资情况
 >
 > reward：物资改变情况
+>
+> energy：体力变化情况
+> - cooling：距离下次体力恢复剩余时间
+> - remain：剩余体力
+> - reward：体力改变值
 >
 > exp_info：经验信息变化情况
 >
@@ -760,25 +759,25 @@
     "status": 0,
     "message": "success",
     "data": {
-        "energy": {
-            "cooling": 103,
-            "remaining": 109,
-            "reward": -6
-        },
-        "remaining": [
-            "3:9:425",
-            "3:1:975",
-            "3:2:725"
+        "remain": [
+            "3:9:969660",
+            "3:1:2048468",
+            "3:2:150370"
         ],
         "reward": [
             "3:9:100",
             "3:1:200",
             "3:2:200"
         ],
+        "energy": {
+            "cooling": 269,
+            "remain": 105,
+            "reward": -6
+        },
         "exp_info": {
-            "exp": 380,
-            "level": 3,
-            "need": 340,
+            "exp": 30000,
+            "level": 22,
+            "need": 360,
             "reward": 120
         }
     }
@@ -791,6 +790,7 @@
 - 98：There is no configuration information for this stage
 - 97：energy insufficient
 - 96：Can only be a positive integer
+- 95：materials insufficient
 
 
 
