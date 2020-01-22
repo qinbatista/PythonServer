@@ -299,11 +299,11 @@ async def _send_gift_mail(uid, gn_target, group_id, item_id, quantity, **kwargs)
 	return mt(0, 'success')
 
 
-async def send_gift_sys_mail(uid, gid, iid, qty, **kwargs):
+async def send_gift_sys_mail(uid, items, **kwargs):
 	"""系统给uid用户发送礼物"""
-	await mail.send_mail({'type': enums.MailType.GIFT.value, 'from': 'lukseun team', \
-			'subj': enums.MailTemplate.SYSTEM_REWARD.name, 'body': enums.MailTemplate.GIFT_1.name, \
-			'items': encode_item(gid, iid, qty)}, uid, **kwargs)
+	await mail.send_mail({'type': enums.MailType.GIFT.value, 'from': 'lukseun team',
+			'subj': enums.MailTemplate.SYSTEM_REWARD.name, 'body': enums.MailTemplate.GIFT_1.name,
+			'items': items}, uid, **kwargs)
 
 
 async def consume_items(uid, items, **kwargs):
