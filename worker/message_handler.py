@@ -117,6 +117,7 @@ class MessageHandler:
 	async def _change_game_name(self, data: dict) -> str:
 		return 'function'
 
+
 	###################### chat.py ######################
 	async def _get_login_token_chat(self, data: dict) -> str:
 		return await chat.get_login_token(data['data']['unique_id'], **data)
