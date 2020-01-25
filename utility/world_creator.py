@@ -27,9 +27,9 @@ ACHIEVEMENT = \
 """
 CREATE TABLE `achievement` (
 	 `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
-	 `aid` SMALLINT UNSIGNED NOT NULL COMMENT '成就唯一id',
-	 `value` SMALLINT UNSIGNED DEFAULT 0 COMMENT '成就完成的次数',
-	 `reward` SMALLINT UNSIGNED DEFAULT 0 COMMENT '完成成就领奖的次数',
+	 `aid` INT UNSIGNED NOT NULL COMMENT '成就唯一id',
+	 `value` INT UNSIGNED DEFAULT 0 COMMENT '成就完成的次数',
+	 `reward` INT UNSIGNED DEFAULT 0 COMMENT '完成成就领奖的次数',
 	 PRIMARY KEY (`uid`,`aid`),
 	 CONSTRAINT `achievement_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

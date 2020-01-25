@@ -3,7 +3,7 @@
 	"eg": {
 		"comment": "关于关卡能配置的信息,consumes是指可消耗的物资,rewards是可得到的物资",
 		"consumes": {
-			"comment": "common是通用物资，special是非通用物资消耗",
+			"comment": "common是通用物资,special是非通用物资消耗",
 			"common": [
 				"3:?:?"
 			],
@@ -12,7 +12,7 @@
 			}
 		},
 		"rewards": {
-			"comment": "common是通用物资，special是非通用物资奖励",
+			"comment": "common是通用物资,special是非通用物资奖励",
 			"common": [
 				"0:?:?",
 				"1:?:?",
@@ -27,16 +27,16 @@
 	"mopping-up": {
 		"comment": "关于能扫荡关卡下的配置信息",
 		"8":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:200",
@@ -48,16 +48,16 @@
 			}
 		},
 		"9":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:210",
@@ -69,16 +69,16 @@
 			}
 		},
 		"10":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:220",
@@ -90,16 +90,16 @@
 			}
 		},
 		"11":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:230",
@@ -111,16 +111,16 @@
 			}
 		},
 		"12":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:240",
@@ -132,16 +132,16 @@
 			}
 		},
 		"13":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:250",
@@ -153,16 +153,16 @@
 			}
 		},
 		"14":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:260",
@@ -174,16 +174,16 @@
 			}
 		},
 		"15":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:270",
@@ -195,16 +195,16 @@
 			}
 		},
 		"16":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:280",
@@ -216,16 +216,16 @@
 			}
 		},
 		"17":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:290",
@@ -237,16 +237,16 @@
 			}
 		},
 		"18":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:300",
@@ -258,16 +258,16 @@
 			}
 		},
 		"19":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:310",
@@ -279,16 +279,16 @@
 			}
 		},
 		"20":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:320",
@@ -300,16 +300,16 @@
 			}
 		},
 		"21":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:330",
@@ -321,16 +321,16 @@
 			}
 		},
 		"22":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:340",
@@ -341,16 +341,17 @@
 				}
 			}
 		},
-		"23":{"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+		"23":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:350",
@@ -362,16 +363,16 @@
 			}
 		},
 		"24":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:360",
@@ -383,16 +384,16 @@
 			}
 		},
 		"25":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:370",
@@ -404,16 +405,16 @@
 			}
 		},
 		"26":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:380",
@@ -425,16 +426,16 @@
 			}
 		},
 		"27":{
-			"comment": "consumes是指扫荡关卡需要消耗的物资，rewards是扫荡得到的物资",
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 6
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [
 					"3:9:100",
 					"3:1:390",
@@ -442,6 +443,35 @@
 				],
 				"special": {
 					"exp": 120
+				}
+			}
+		}
+	},
+	"hang-up": {
+		"comment": "关于能挂机关卡下的配置信息",
+		"8":{
+			"comment": "consumes是指挂机需要消耗的物资,rewards是挂机得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,explode是概率获得的物资(eg：{\"6\":[3,10,100]}表示10%100的概率获得3个物品6)",
+				"common": [
+					"3:9:100",
+					"3:1:200",
+					"3:2:200"
+				],
+				"special": {
+					"exp": 120
+				},
+				"explode": {
+					"6": [3, 10, 100],
+					"7": [2, 10, 100],
+					"8": [1, 10, 100]
 				}
 			}
 		}
@@ -455,14 +485,14 @@
 				"HP": 10000
 			},
 			"consumes": {
-				"comment": "common是通用物资，special是非通用物资消耗",
+				"comment": "common是通用物资,special是非通用物资消耗",
 				"common": [],
 				"special": {
 					"energy": 1
 				}
 			},
 			"rewards": {
-				"comment": "common是通用物资，special是非通用物资奖励",
+				"comment": "common是通用物资,special是非通用物资奖励",
 				"common": [],
 				"special": {}
 			}
