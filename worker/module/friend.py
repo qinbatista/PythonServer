@@ -14,6 +14,8 @@ from module import achievement
 from module import family
 from datetime import datetime
 
+MAX_PERSON = 50
+
 
 async def get_all(uid, **kwargs):
 	info = await _get_friend_info(uid, **kwargs)
@@ -57,6 +59,9 @@ async def request(uid, gn_target, **kwargs):
 async def respond(uid, nonce, **kwargs):
 	uid_sender = await _lookup_nonce(nonce, **kwargs)
 	if not uid_sender: return common.mt(99, 'invalid nonce')
+	count = (await common.execute(f'SELECT COUNT(*) FROM friend WHERE uid="{uid}" AND since!="";', **kwargs))[0][0]
+	if count >= MAX_PERSON:
+		return common.mt(97, 'Your buddy list is full')
 	await _add_friend(uid, uid_sender, **kwargs)
 	info = await _get_friend_info(uid_sender, **kwargs)
 	await mail.delete_mail(uid, nonce, **kwargs)
