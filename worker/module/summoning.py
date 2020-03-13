@@ -304,13 +304,14 @@ async def single_c(uid, **kwargs):
 	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
-	# TODO 次数检查和限制
-	can, lim = await _refresh_lim(uid, cid, var=-1, **kwargs)
-	if not can: common.mt(95, 'Insufficient number of lucky draw')
-	# TODO 消耗物品
+	# TODO 消耗低级代抽券
 	consume_id, consume = enums.Item.SUMMON_SCROLL_C, 1
-	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-	if not can:
+	c_can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+	# TODO 次数检查和限制
+	can, lim = await _refresh_lim(uid, cid, var=0 if c_can else -1, **kwargs)
+	if can is False: common.mt(95, 'Insufficient number of lucky draw')
+	# TODO 消耗物品
+	if not c_can:
 		consume_id, consume = cid, abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 		if not can:  # 材料不足恢复原来的次数
