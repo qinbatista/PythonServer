@@ -173,16 +173,21 @@ async def upgrade(uid, fid, **kwargs):
 	if not can: return common.mt(98, 'insufficient funds', {'refresh' : {'resource' : r['data']['resource']}})
 	await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `level`) VALUES ("{uid}", {fid.value}, {l + 1}) ON DUPLICATE KEY UPDATE `level` = {l + 1};', **kwargs)
 	# 记录成就的代码片段
+	kwargs["aid"] = None
 	if fid == enums.Factory.FOOD.value:
 		kwargs["aid"] = enums.Achievement.COLLECT_FOOD
 	elif fid == enums.Factory.IRON.value:
 		kwargs["aid"] = enums.Achievement.COLLECT_MINE
 	elif fid == enums.Factory.CRYSTAL.value:
 		kwargs["aid"] = enums.Achievement.COLLECT_CRYSTAL
-	else: kwargs["aid"] = 0
-	if kwargs["aid"]: await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
+	if kwargs["aid"] is not None:
+		await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
+	pool = r['data']['pool']
+	if fid == enums.Factory.WISHING_POOL:
+		pool = max(0, pool - 3600)
+		await common.set_timer(uid, enums.Timer.FACTORY_WISHING_POOL, datetime.now(tz=common.TZ_SH)+timedelta(seconds=pool), **kwargs)
 	return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource']},
-									'upgrade': {'cost': upgrade_cost, 'remaining': crystal, 'fid': fid.value, 'level': l + 1}})
+									'upgrade': {'cost': upgrade_cost, 'remaining': crystal, 'fid': fid.value, 'level': l + 1, 'pool': pool}})
 
 async def wishing_pool(uid, wid, **kwargs):
 	level, _, _ = await get_state(uid, **kwargs)

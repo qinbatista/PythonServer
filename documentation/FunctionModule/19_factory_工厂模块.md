@@ -129,9 +129,11 @@
 >
 > upgrade：升级工厂的部分信息
 >
-> - cost：消耗品消耗数量
+> - cost：水晶消耗数量
+> - remaining：剩余水晶数量
 > - fid：工厂id
 > - level：工厂现在的等级
+> - pool：许愿池剩余冷却时间
 
 ```json
 {
@@ -165,9 +167,11 @@
 		},
 		"upgrade" :
 		{
-			"cost"  : 800,
-			"fid"   : 2,
-			"level" : 4
+            "cost": 50,
+            "remaining": 99750,
+            "fid": 0,
+            "level": 2,
+            "pool": 0
 		}
 	}
 }
