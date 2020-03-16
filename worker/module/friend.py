@@ -115,7 +115,8 @@ async def send_gift(uid, gn_target, infos=None, **kwargs):
 
 async def send_gift_all(uid, **kwargs):
     """info ==> 0:uid 2:fid 2:fgn 3:recover 4:since"""
-    info = await get_info(**kwargs)
+    # info = await get_info(**kwargs)
+    info = await common.execute(f'SELECT friend.uid, player.uid, player.gn, friend.recover, friend.since FROM friend JOIN player ON player.uid = friend.fid;', **kwargs)
     results = [(i[2], await send_gift(uid, i[2], infos=[i[1], i[3]], **kwargs))
                for i in info if i[0] == uid and i[4] != '']
     if not results: return common.mt(99, 'no friend to send gift')
@@ -140,15 +141,15 @@ async def find_person(uid, gn_target, **kwargs):
 
 
 ###########################################################################################################
-async def get_info(**kwargs):
-    info = await kwargs['redis'].get(f'{kwargs["worlddb"]}.friend')
-    return await _mysql_to_redis(**kwargs) if info is None else json.loads(str(info).replace('\'', '"'))
+# async def get_info(**kwargs):
+#     info = await kwargs['redis'].get(f'{kwargs["worlddb"]}.friend')
+#     return await _mysql_to_redis(**kwargs) if info is None else json.loads(str(info).replace('\'', '"'))
 
 
-async def _mysql_to_redis(**kwargs):
-    info = await common.execute(f'SELECT friend.uid, player.uid, player.gn, friend.recover, friend.since FROM friend JOIN player ON player.uid = friend.fid;', **kwargs)
-    await kwargs['redis'].set(f'{kwargs["worlddb"]}.friend', f'{[list(i) for i in info]}', expire=300)
-    return info
+# async def _mysql_to_redis(**kwargs):
+#     info = await common.execute(f'SELECT friend.uid, player.uid, player.gn, friend.recover, friend.since FROM friend JOIN player ON player.uid = friend.fid;', **kwargs)
+#     await kwargs['redis'].set(f'{kwargs["worlddb"]}.friend', f'{[list(i) for i in info]}', expire=300)
+#     return info
 
 
 def _can_send_gift(now, recover):
@@ -199,11 +200,16 @@ async def _add_friend(uid, fid, **kwargs):
 
 
 async def _are_friends(uid, fid, **kwargs):
-    info = await get_info(**kwargs)
-    for u, f, fgn, r, s in info:
-        if u == uid and f == fid:
-            return True, r, s
-    return False, None, None
+    data = await common.execute(
+        f'SELECT recover, since FROM friend WHERE uid = "{uid}" AND fid = "{fid}";',
+        **kwargs)
+    return (True, data[0][0], data[0][1]) if data != () else (
+        False, None, None)
+    # info = await get_info(**kwargs)
+    # for u, f, fgn, r, s in info:
+    #     if u == uid and f == fid:
+    #         return True, r, s
+    # return False, None, None
 
 
 async def _can_invite_family(uid, fid, **kwargs):

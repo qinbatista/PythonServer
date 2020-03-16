@@ -345,7 +345,7 @@ async def welfare(uid, **kwargs):
 			_, qty = await common.try_item(member, iid, cost, **kwargs)
 			data['remaining'].append({'iid': iid.value, 'qty': qty})
 			data['reward'].append({'iid': iid.value, 'qty': cost})
-	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_PURCHASED_FAMILY_GIFT_PACKAGE>.', **kwargs)
+	await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE.value}:{await common.get_gn(uid, **kwargs)}', **kwargs)
 	return common.mt(0, 'success', data)
 
 async def search(name, **kwargs):
