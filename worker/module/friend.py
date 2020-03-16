@@ -4,6 +4,7 @@ friend.py
 CHECKED RETURN TYPES WITH LIANG
 '''
 
+import json
 import asyncio
 
 from module import mail
@@ -78,13 +79,16 @@ async def respond(uid, nonce, **kwargs):
     return common.mt(0, 'success', {'gn': info[0][0], 'exp': info[0][1]})
 
 
-async def send_gift(uid, gn_target, **kwargs):
+async def send_gift(uid, gn_target, infos=None, **kwargs):
     # 发送朋友礼物
     kwargs.update({"task_id": enums.Task.SEND_FRIEND_GIFT})
     await task.record_task(uid, **kwargs)
-    fid = await common.get_uid(gn_target, **kwargs)
-    friends, recover, since = await _are_friends(uid, fid, **kwargs)
-    if not friends or since == '': return common.mt(99, 'not friends')
+    if infos is None:
+        fid = await common.get_uid(gn_target, **kwargs)
+        friends, recover, since = await _are_friends(uid, fid, **kwargs)
+        if not friends or since == '': return common.mt(99, 'not friends')
+    else:
+        fid, recover = infos
     now = datetime.now(tz=common.TZ_SH)
     if not _can_send_gift(now, recover): return common.mt(98, 'gift cooldown')
 
@@ -110,15 +114,13 @@ async def send_gift(uid, gn_target, **kwargs):
 
 
 async def send_gift_all(uid, **kwargs):
-    info = await common.execute(
-        f'SELECT player.gn FROM friend JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";',
-        **kwargs)
-    if info == (): return common.mt(99, 'no friend to send gift')
-    message_dic = []
-    for index, i in enumerate(info):
-        result = await send_gift(uid, i[0], **kwargs)
-        if result["status"] == 0: message_dic.append(i[0])
-    return common.mt(0, 'you send all friend gift success', message_dic)
+    """info ==> 0:uid 2:fid 2:fgn 3:recover 4:since"""
+    info = await get_info(**kwargs)
+    results = [(i[2], await send_gift(uid, i[2], infos=[i[1], i[3]], **kwargs))
+               for i in info if i[0] == uid and i[4] != '']
+    if not results: return common.mt(99, 'no friend to send gift')
+    msgs = [r[0] for r in results if r[1]["status"] == 0]
+    return common.mt(0, 'you send all friend gift success', msgs)
 
 
 async def find_person(uid, gn_target, **kwargs):
@@ -138,6 +140,16 @@ async def find_person(uid, gn_target, **kwargs):
 
 
 ###########################################################################################################
+async def get_info(**kwargs):
+    info = await kwargs['redis'].get(f'{kwargs["worlddb"]}.friend')
+    return await _mysql_to_redis(**kwargs) if info is None else json.loads(str(info).replace('\'', '"'))
+
+
+async def _mysql_to_redis(**kwargs):
+    info = await common.execute(f'SELECT friend.uid, player.uid, player.gn, friend.recover, friend.since FROM friend JOIN player ON player.uid = friend.fid;', **kwargs)
+    await kwargs['redis'].set(f'{kwargs["worlddb"]}.friend', f'{[list(i) for i in info]}', expire=300)
+    return info
+
 
 def _can_send_gift(now, recover):
     if recover == '': return True
@@ -187,11 +199,11 @@ async def _add_friend(uid, fid, **kwargs):
 
 
 async def _are_friends(uid, fid, **kwargs):
-    data = await common.execute(
-        f'SELECT recover, since FROM friend WHERE uid = "{uid}" AND fid = "{fid}";',
-        **kwargs)
-    return (True, data[0][0], data[0][1]) if data != () else (
-        False, None, None)
+    info = await get_info(**kwargs)
+    for u, f, fgn, r, s in info:
+        if u == uid and f == fid:
+            return True, r, s
+    return False, None, None
 
 
 async def _can_invite_family(uid, fid, **kwargs):
@@ -212,23 +224,11 @@ async def _are_family(uid, fid, **kwargs):
 
 
 async def _get_friend_info(uid, **kwargs):
-    info = await common.execute(
-        f'SELECT player.gn, progress.exp, friend.recover, friend.since, player.fid, player.intro FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";',
-        **kwargs)
-    if info == ():
-        return ()
-    else:
-        return info
+    return await common.execute(f'SELECT player.gn, progress.exp, friend.recover, friend.since, player.fid, player.intro FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
 
 
 async def _get_person_info(uid, **kwargs):
-    info = await common.execute(
-        f'SELECT player.gn, player.intro, player.fid, progress.exp, progress.stage, progress.role FROM progress JOIN player ON progress.uid = player.uid WHERE player.uid = "{uid}";',
-        **kwargs)
-    if info == ():
-        return ()
-    else:
-        return info
+    return await common.execute(f'SELECT player.gn, player.intro, player.fid, progress.exp, progress.stage, progress.role FROM progress JOIN player ON progress.uid = player.uid WHERE player.uid = "{uid}";', **kwargs)
 
 
 async def _lookup_nonce(nonce, **kwargs):

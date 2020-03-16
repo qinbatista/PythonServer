@@ -30,6 +30,9 @@ class WorkerResources:
 		self.resources = {}
 
 	async def init(self):
+		# r = await aioredis.create_redis(f'redis://{self.redis_addr}', \
+		# 		encoding = 'utf-8')
+		# r.execute()
 		self.resources['session']   = aiohttp.ClientSession(connector = aiohttp.TCPConnector(limit = 0))
 		self.resources['redis']     = await aioredis.create_redis(f'redis://{self.redis_addr}', \
 				encoding = 'utf-8')
