@@ -271,9 +271,9 @@ async def _get_unique_id(identifier, value, **kwargs):
 async def _record_token(uid, token, **kwargs):
 	await common.execute(f'UPDATE info SET token = "{token}" WHERE unique_id = "{uid}";', account=True, **kwargs)
 
-async def _request_new_token(uid, **kwargs):
+async def _request_new_token(uid, is_session='0', **kwargs):
 	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/issue_token',
-			data={'uid' : uid}) as resp:
+			data={'uid' : uid, 'is_session': is_session}) as resp:
 		return await resp.json()
 
 async def _set_credentials(uid, account, hashed_pw, salt, **kwargs):

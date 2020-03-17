@@ -11,6 +11,7 @@ import jwt
 import asyncio
 import aioredis
 import argparse
+import contextlib
 
 from aiohttp import web
 from datetime import datetime, timedelta
@@ -41,20 +42,24 @@ class Auth:
     async def issue_token(self, request):
         post = await request.post()
         token = Auth.generate_token(post['uid'], self.secret, self.validity)
-        await self.redis.set(f'auth.tokens.invalidated.{post["uid"]}', token,
-                             expire=self.validity)
+        print(f'{post.get("is_session")}==>{token}')
+        keys = ['auth', 'tokens', 'invalidated', post["uid"]]
+        if post.get("is_session").__eq__('1'):
+            keys.append('world')
+        await self.redis.set('.'.join(keys), token, expire=self.validity)
         return web.json_response({'token': token})
 
     async def validate_token(self, request):
         post = await request.post()
-        try:
+        with contextlib.suppress(jwt.DecodeError, jwt.ExpiredSignatureError):
             uid = Auth.decode_token(post['token'], self.secret)
             if await self.redis.exists(
-                    f'auth.tokens.invalidated.{uid}') == 1 and await self.redis.get(
-                    f'auth.tokens.invalidated.{uid}') == post['token']:
+                f'auth.tokens.invalidated.{uid}') == 1 and await self.redis.get(
+                f'auth.tokens.invalidated.{uid}') == post['token'] \
+                    or await self.redis.exists(
+                f'auth.tokens.invalidated.{uid}.world') == 1 and await self.redis.get(
+                f'auth.tokens.invalidated.{uid}.world') == post['token']:
                 return web.json_response({'status': 0, 'data': {'uid': uid}})
-        except (jwt.DecodeError, jwt.ExpiredSignatureError):
-            pass
         return web.json_response({'status': 1})
 
     async def register_nonce(self, request):
