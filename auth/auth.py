@@ -52,12 +52,12 @@ class Auth:
         post = await request.post()
         with contextlib.suppress(jwt.DecodeError, jwt.ExpiredSignatureError):
             uid = Auth.decode_token(post['token'], self.secret)
-            if await self.redis.exists(
-                f'auth.tokens.invalidated.{uid}') == 1 and await self.redis.get(
-                f'auth.tokens.invalidated.{uid}') == post['token'] \
-                    or await self.redis.exists(
-                f'auth.tokens.invalidated.{uid}.world') == 1 and await self.redis.get(
-                f'auth.tokens.invalidated.{uid}.world') == post['token']:
+            tks = '.'.join(['auth', 'tokens', 'invalidated', uid])
+            sks = '.'.join(['auth', 'tokens', 'invalidated', uid, 'world'])
+            if await self.redis.exists(tks) and \
+                    await self.redis.get(tks) == post['token'] or \
+                    await self.redis.exists(sks) and \
+                    await self.redis.get(sks) == post['token']:
                 return web.json_response({'status': 0, 'data': {'uid': uid}})
         return web.json_response({'status': 1})
 
