@@ -42,7 +42,6 @@ class Auth:
     async def issue_token(self, request):
         post = await request.post()
         token = Auth.generate_token(post['uid'], self.secret, self.validity)
-        print(f'{post.get("is_session")}==>{token}')
         keys = ['auth', 'tokens', 'invalidated', post["uid"]]
         if post.get("is_session").__eq__('1'):
             keys.append('world')
