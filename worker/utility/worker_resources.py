@@ -21,11 +21,12 @@ TZ_SH = tz.gettz('Asia/Shanghai')
 
 
 class WorkerResources:
-	def __init__(self, redis_addr, db_addr, db_user, db_pw):
+	def __init__(self, redis_addr, db_addr, db_user, db_pw, db_port=3306):
 		self.redis_addr = redis_addr
 		self.db_addr = db_addr
 		self.db_user = db_user
 		self.db_pw = db_pw
+		self.db_port = db_port
 
 		self.resources = {}
 
@@ -34,15 +35,15 @@ class WorkerResources:
 		# 		encoding = 'utf-8')
 		# r.execute()
 		self.resources['session']   = aiohttp.ClientSession(connector = aiohttp.TCPConnector(limit = 0))
-		self.resources['redis']     = await aioredis.create_redis(f'redis://{self.redis_addr}', \
+		self.resources['redis']     = await aioredis.create_redis(f'redis://{self.redis_addr}',
 				encoding = 'utf-8')
-		self.resources['db']        = await aiomysql.create_pool(maxsize = 30, host = self.db_addr, \
+		self.resources['db']        = await aiomysql.create_pool(maxsize = 30, host = self.db_addr, port=self.db_port,
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True)
-		self.resources['accountdb'] = await aiomysql.create_pool(maxsize =  4, host = self.db_addr,  \
+		self.resources['accountdb'] = await aiomysql.create_pool(maxsize =  4, host = self.db_addr, port=self.db_port,
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True, db = 'user')
-		self.resources['malldb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, \
+		self.resources['malldb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, port=self.db_port,
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True, db = 'mall')
-		self.resources['exchangedb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, \
+		self.resources['exchangedb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, port=self.db_port,
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True, db = 'exchange')
 
 
