@@ -28,6 +28,7 @@ class Auth:
         self.redis_addr = redis_addr
 
     async def conn(self):
+        print(f'Connect to the redis database {self.redis_addr} ......')
         self.redis = await aioredis.create_redis(f'redis://{self.redis_addr}',
                                                  encoding='utf-8')
 
@@ -40,6 +41,7 @@ class Auth:
         return aiohttp_app
 
     async def issue_token(self, request):
+        not self.redis.closed or await self.conn()
         post = await request.post()
         token = Auth.generate_token(post['uid'], self.secret, self.validity)
         keys = ['auth', 'tokens', 'invalidated', post["uid"]]

@@ -47,6 +47,10 @@ def main():
             [GetPythonCommand(), loc() + '/config/configuration_manager.py'],
             shell=False))
         time.sleep(1)
+        # processes.append(
+        #     subprocess.Popen(
+        #         [GetPythonCommand(), loc() + '/auth/auth.py', 'lukseunsecret',
+        #          '--redis-addr', '192.168.1.143']))
         processes.append(
             subprocess.Popen(
                 [GetPythonCommand(), loc() + '/worker/worker.py', '--channel',
