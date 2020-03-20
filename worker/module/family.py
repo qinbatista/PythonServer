@@ -487,21 +487,19 @@ async def increase_exp(name, exp, **kwargs):
 	exp为0则获得经验，反之取绝对值增加经验，
 	并返回总经验和等级，升到下一级需要的经验
 	"""
-	# 取配置和数据
+	# TODO 取配置和数据
 	exp_config = kwargs['config']['family']['level']['exp']
-	exp_data = await common.execute(f'SELECT exp FROM family WHERE name = "{name}";', **kwargs)
-
-	# 计算等级和需要的经验
-	sql_exp = 0 if exp_data == () else exp_data[0][0]
+	_, fds = await _get_family_info(name, 'exp', **kwargs)
+	sql_exp = fds[0]
+	# TODO 计算等级和需要的经验
 	level, need = common.__calculate(exp_config, sql_exp)
-	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need}
-
-	# 重新计算等级和需要的经验
+	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
+	# TODO 重新计算等级和需要的经验
 	sql_exp += exp
 	level, need = common.__calculate(exp_config, sql_exp)
-	await common.execute(f'INSERT INTO family (name, exp) VALUE ("{name}", {sql_exp}) ON DUPLICATE KEY UPDATE exp = {sql_exp};', **kwargs)
-	# 返回总经验、等级、需要经验
-	return {'exp': sql_exp, 'level': level, 'need': need}
+	await common.update_famliy(name, 'exp', sql_exp, **kwargs)
+	# TODO 返回总经验、等级、需要经验
+	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
 
 async def __insert(name, **kwargs):
 	"""没有这个登录时间和贡献记录，返回的数据不全数据"""

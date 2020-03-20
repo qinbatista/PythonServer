@@ -175,25 +175,21 @@ async def increase_exp(uid, exp, **kwargs):
 	exp为0则获得经验，反之取绝对值增加经验，
 	并返回总经验和等级，升到下一级需要的经验
 	"""
-	# 取配置和数据
+	# TODO 取配置和数据
 	exp_config = kwargs['config']['vip']['vip_level']['experience']
-	exp_data = await common.execute(f'SELECT vipexp FROM progress WHERE uid = "{uid}";', **kwargs)
-
-	# 计算等级和需要的经验
-	sql_exp = 0 if exp_data == () else exp_data[0][0]
+	sql_exp = await common.get_progress(uid, 'vipexp', **kwargs)
+	# TODO 计算等级和需要的经验
 	level, need = common.__calculate(exp_config, sql_exp)
-	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need}
-
-	# 返回总经验、等级、需要经验
+	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
+	# TODO 重新计算等级和需要的经验
 	sql_exp += exp
 	level, need = common.__calculate(exp_config, sql_exp)
-	await common.execute(f'INSERT INTO progress (uid, vipexp) VALUE ("{uid}", {sql_exp}) ON DUPLICATE KEY UPDATE vipexp = {sql_exp};', **kwargs)
-
-	# 成就刷新判断
-	achievement_data = await common.execute(f'SELECT value FROM achievement WHERE uid="{uid}" and aid = "{enums.Achievement.VIP_LEVEL.value}"', **kwargs)
-	if achievement_data == () or achievement_data[0][0] < level: await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {enums.Achievement.VIP_LEVEL.value}, {level},0) ON DUPLICATE KEY UPDATE `value`= {level}', **kwargs)
-	# 返回总经验、等级、需要经验
-	return {'exp': sql_exp, 'level': level, 'need': need}
+	await common.set_progress(uid, 'vipexp', sql_exp, **kwargs)
+	# TODO 成就刷新判断
+	ads = await common.execute(f'SELECT value FROM achievement WHERE uid="{uid}" and aid = "{enums.Achievement.VIP_LEVEL}"', **kwargs)
+	if ads == () or ads[0][0] < level: await common.execute(f'INSERT INTO achievement (uid, aid, value,reward) VALUES ("{uid}", {enums.Achievement.VIP_LEVEL}, {level},0) ON DUPLICATE KEY UPDATE `value`= {level}', **kwargs)
+	# TODO 返回总经验、等级、需要经验
+	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
 
 
 async def increase_item(uid, vip_config, **kwargs) -> (list, list):
