@@ -51,6 +51,10 @@ def main():
         #     subprocess.Popen(
         #         [GetPythonCommand(), loc() + '/auth/auth.py', 'lukseunsecret',
         #          '--redis-addr', '192.168.1.143']))
+        # processes.append(
+        #     subprocess.Popen(
+        #         [GetPythonCommand(), loc() + '/edge/edge.py', '--redis-addr',
+        #          '192.168.1.143', '--nats-addr', '192.168.1.143']))
         processes.append(
             subprocess.Popen(
                 [GetPythonCommand(), loc() + '/worker/worker.py', '--channel',
