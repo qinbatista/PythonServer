@@ -134,7 +134,7 @@ class Edge:
 			self.userlist.remove(user)
 			writer.close()
 			await writer.wait_closed()
-			if user != None: print(f'User {user.gn} has left world {user.world}')
+			if user is not None: print(f'User {user.gn} has left world {user.world}')
 
 	# receives messages from pubsub server and distributes them to the interested connected clients
 	# unsubscribes from pubsub channels when there are no longer any interested clients

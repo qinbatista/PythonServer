@@ -5,6 +5,7 @@ package.py
 from module import enums
 from module import common
 from module import stage
+from module import vip
 from random import choice
 import re
 
@@ -109,12 +110,13 @@ async def update_item(uid, mid, bnum, **kwargs):
 
 
 async def update_progress(uid, mid, bnum, **kwargs):
-	exp_info = await stage.increase_exp(uid, 0, **kwargs)
-	vnum = exp_info['level'] * bnum
-	await common.execute(f'UPDATE progress SET exp = exp + {vnum} WHERE uid = "{uid}";', **kwargs)
-	data = await common.execute(f'SELECT exp FROM progress WHERE uid = "{uid}";', **kwargs)
-	exp_info = await stage.increase_exp(uid, 0, **kwargs)
-	return exp_info, data[0][0], vnum
+	if mid == 'exp':
+		vnum = (await stage.increase_exp(uid, 0, **kwargs))['level'] * bnum
+		exp_info = await stage.increase_exp(uid, vnum, **kwargs)
+	else:
+		vnum = (await vip.increase_exp(uid, 0, **kwargs))['level'] * bnum
+		exp_info = await vip.increase_exp(uid, vnum, **kwargs)
+	return exp_info, exp_info['exp'], vnum
 
 
 SQL_TABLE = {'item': update_item, 'progress': update_progress}

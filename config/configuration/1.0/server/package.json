@@ -11,6 +11,11 @@
 			"mid": "exp",
 			"bnum": 1000
 		},
+		"VIP_EXP_CARD": {
+			"sqltable": "progress",
+			"mid": "vipexp",
+			"bnum": 10
+		},
 		"FOOD_CARD": {
 			"sqltable": "item",
 			"mid": 3,
