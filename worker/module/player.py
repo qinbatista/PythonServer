@@ -132,7 +132,7 @@ GIFTS = [
 	(enums.Group.ITEM, enums.Item.SUMMON_SCROLL_D, 50),
 	(enums.Group.ITEM, enums.Item.SUMMON_SCROLL_C, 100),
 	(enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1000),
-	(enums.Group.ITEM, enums.Item.VIP_EXP_CARD, 100),
+	# (enums.Group.ITEM, enums.Item.VIP_EXP_CARD, 100),
 	(enums.Group.ITEM, enums.Item.SKILL_SCROLL_10, 100_0000),
 	(enums.Group.ITEM, enums.Item.SKILL_SCROLL_30, 100_0000),
 	(enums.Group.ITEM, enums.Item.SKILL_SCROLL_100, 100_0000),
