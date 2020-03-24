@@ -126,7 +126,7 @@ async def set_progress(uid, pid, value, **kwargs):
 async def update_famliy(name, fid, value, **kwargs):
 	await execute(f'UPDATE `famliy` SET {fid}="{value}" WHERE name="{name}";', **kwargs)
 
-async def update_achievement(uid, aid, value, reward=0, reset=False, **kwargs):
+async def set_achievement(uid, aid, value, reward=0, reset=False, **kwargs):
 	if not reset: value = f'`value` + {value}'
 	await execute(f'INSERT INTO achievement(uid, aid, value, reward) VALUES ("{uid}", {aid}, {value}, {reward}) ON DUPLICATE KEY UPDATE `value`= {value}, `reward`= {reward}', **kwargs)
 

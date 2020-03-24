@@ -49,16 +49,15 @@ async def check_achievement(uid, aid, value=1, reward=0, tid=None, **kwargs):
     if value <= 0:
         return common.mt(0, f"record:{aid} failure, 记录值不能为负数")
     if tid is not None:
-        now = datetime.now()
+        now = datetime.now(tz=common.TZ_SH)
         tim = await common.get_timer(uid, tid=tid, timeformat='%Y-%m-%d')
         tim = now if tim is not None else tim
         if aid == enums.Achievement.TOTAL_LOGIN:
-            await common.update_achievement(uid, enums.Achievement.KEEPING_LOGIN,
-                                            value=1, reward=reward,
-                                            reset=(now - tim).days >= 2,
-                                            **kwargs)
+            await common.set_achievement(uid, enums.Achievement.KEEPING_LOGIN,
+                                         value=1, reward=reward,
+                                         reset=(now - tim).days >= 2, **kwargs)
         await common.set_timer(uid, tid, now, timeformat='%Y-%m-%d')
-    await common.update_achievement(uid, aid, value, reward=reward, **kwargs)
+    await common.set_achievement(uid, aid, value, reward=reward, **kwargs)
     return common.mt(0, f"record:{aid} success")
 
 
