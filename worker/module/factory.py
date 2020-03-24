@@ -255,11 +255,27 @@ def roll_segment_value(**kwargs):
 
 def update_state(steps, level, worker, storage, **kwargs):
 	"""更新剩余量和变化量"""
-	initial_storage, need = {k: v for k, v in storage.items()}, 10000
-	multiple = max(steps / need, 1)
-	[step(level, worker, storage, **kwargs) for _ in range(min(steps, need))]
-	config = kwargs['config']['factory']['general']['storage_limits']
-	storage = {k: min(config[f'{k}']['1' if k == enums.Factory.ARMOR else f'{level[k]}'], int(v * multiple)) if k in BASIC_FACTORIES else v for k, v in storage.items()}
+	# initial_storage, need = {k: v for k, v in storage.items()}, 10000
+	# multiple = max(steps / need, 1)
+	# [step(level, worker, storage, **kwargs) for _ in range(min(steps, need))]
+	# config = kwargs['config']['factory']['general']['storage_limits']
+	# storage = {k: min(config[f'{k}']['1' if k == enums.Factory.ARMOR else f'{level[k]}'], int(v * multiple)) if k in BASIC_FACTORIES else v for k, v in storage.items()}
+	# delta = {k: storage[k] - initial_storage[k] for k in storage}
+	fcg = kwargs['config']['factory']['general']  # factory config general
+	initial_storage, lmd = {k: v for k, v in storage.items()}, {}
+	for factory in initial_storage.keys():
+		if factory in BASIC_FACTORIES:
+			# cmv: cost multiple value  cfk: cost factory key
+			km = '1' if factory == enums.Factory.ARMOR else f'{level[factory]}'
+			lmd[factory] = fcg['storage_limits'][f'{factory}'][km]
+			cost, cmv = {}, steps * worker[factory]
+			for cf, cv in fcg['costs'][f'{factory}'].items():
+				cfk = enums.Factory(int(cf))
+				cmv, cost[cfk] = min(storage[cfk] // cv, cmv), cv
+			storage[factory] += cmv
+			for cf, cv in cost.items():
+				storage[cf] -= cv * cmv
+	storage = {k: lmd[k] if (k in BASIC_FACTORIES and lmd[k] < v) else v for k, v in storage.items()}
 	delta = {k: storage[k] - initial_storage[k] for k in storage}
 	return storage, delta
 
@@ -295,23 +311,22 @@ async def remaining_seconds(uid, now, refresh_t, steps, **kwargs):
 	return (0, delta, steps + 1) if next_ref <= 2 else (remainder, next_ref, steps)
 
 async def steps_since(uid, now, **kwargs):
-	"""返回需要计算的步数和刷新时间"""
-	accel_start_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)  # type => datetime or None
-	accel_end_t   = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END,   **kwargs)  # type => datetime or None
-	refresh_t     = await common.get_timer(uid, enums.Timer.FACTORY_REFRESH,            **kwargs)  # type => datetime or None
-	if refresh_t is None:
+	"""返回需要计算的步数和刷新时间
+	ast：acceleration start time
+	aet：acceleration end time
+	rft：refresh time"""
+	ast = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_START, **kwargs)
+	aet = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, **kwargs)
+	rft = await common.get_timer(uid, enums.Timer.FACTORY_REFRESH, **kwargs)
+	if rft is None:
 		return 0, now
-	if accel_end_t is None or now >= accel_end_t:  # 现在时间和工厂加速结束时间比较，如果加速卡结束了
-		accel_start_t, accel_end_t = refresh_t, refresh_t  # 加速卡的开始时间和结束时间都设置为刷新时间
-	def sb(b, s, step):
-		return int((b - s).total_seconds()) // step
+	if aet is None or now >= aet:  # 现在时间和工厂加速结束时间比较，如果加速卡结束了
+		ast, aet = rft, rft  # 加速卡的开始时间和结束时间都设置为刷新时间
 	delta = kwargs['config']['factory']['general']['step']  # 跳跃步
-	steps = int(
-		sb(max(accel_start_t, refresh_t), refresh_t, delta) + \
-		sb(min(accel_end_t, now), max(accel_start_t, refresh_t), delta / 2) + \
-		sb(now, min(accel_end_t, now), delta)
-	)
-	return steps, refresh_t
+	steps = sb(max(ast, rft), rft, delta) +\
+			sb(min(aet, now), max(ast, rft), delta / 2) +\
+			sb(now, min(aet, now), delta)
+	return steps, rft
 
 async def get_armor(uid, **kwargs):
 	data = await common.execute(f'SELECT `level` FROM `factory` WHERE uid = "{uid}" AND `fid` = {enums.Factory.ARMOR};', **kwargs)
@@ -345,3 +360,6 @@ async def remaining_pool_time(uid, now, **kwargs):
 	timer = await common.get_timer(uid, enums.Timer.FACTORY_WISHING_POOL, **kwargs)
 	return 0 if timer is None else max(int((timer - now).total_seconds()), 0)
 
+
+def sb(b, s, step):
+	return int((b - s).total_seconds() // step)
