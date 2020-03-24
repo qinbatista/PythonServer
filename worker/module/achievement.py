@@ -45,7 +45,7 @@ async def record_achievement(uid, achievement_value=1, **kwargs):  # aid->enums.
     return common.mt(0, 'record:' + str(kwargs["aid"]) + " success")
 
 
-async def check_achievement(uid, aid, value=1, reward=0, tid=None, **kwargs):
+async def record(uid, aid, value=1, reward=0, tid=None, **kwargs):
     if value <= 0:
         return common.mt(0, f"record:{aid} failure, 记录值不能为负数")
     if tid is not None:
