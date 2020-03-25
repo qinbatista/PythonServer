@@ -286,12 +286,11 @@ async def check_in(uid, **kwargs):
 
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
-	timer = await _get_check_in_timer(uid, **kwargs)
+	timer = await common.get_timer(uid, enums.Timer.FAMILY_CHECK_IN,
+	                               timeformat='%Y-%m-%d', **kwargs)
 	now = datetime.now(tz=common.TZ_SH)
 	if timer is not None and now < timer: return common.mt(98, 'already checked in today')
-	time = (now + timedelta(days=1)).strftime('%Y-%m-%d')
-
-	await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FAMILY_CHECK_IN}, "{time}") ON DUPLICATE KEY UPDATE `time` = "{time}";', **kwargs)
+	await common.set_timer(uid, enums.Timer.FAMILY_CHECK_IN, now + timedelta(days=1), timeformat='%Y-%m-%d', **kwargs)
 	exp_data = await increase_exp(name, 1, **kwargs)
 	# 增加家族金币和记录金币
 	_, iid_fc, cost_fc = (common.decode_items(kwargs['config']['family']['general']['rewards']['family_coin']))[0]
