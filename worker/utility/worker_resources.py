@@ -85,6 +85,8 @@ class RepeatingTimer(threading.Thread):
 class ModuleConfigurations:
 	def __init__(self, config_addr, config_port):
 		self.configs = {}
+		self.rfb = True
+		self._rfb = False
 		self.baseurl = f'http://{config_addr}:{config_port}'
 		self.repeat  = RepeatingTimer(600, self.refresh, refresh_world_boss = False)
 		self.repeat.start()
@@ -114,9 +116,10 @@ class ModuleConfigurations:
 		self.configs['check_in']          = r.json()['check_in']
 		self.configs['version']           = r.json()['version']
 		self.configs['summon']            = r.json()['summon']
-		self.configs['stage']             = r.json()['stage']
+		self.configs['stages']            = r.json()['stages']
 		self.configs['notice']            = r.json()['notice']
 
+		today = datetime.now(tz=TZ_SH).day
 		if refresh_world_boss and not already_refreshed_world_boss:
 			refresh_world_boss, already_refreshed_world_boss = False, True
 			self.configs['world_boss'] = r.json()['world_boss']
@@ -125,10 +128,20 @@ class ModuleConfigurations:
 			self.configs['world_boss']['boss_life'] = \
 					[self.configs['world_boss'][f'boss{i}']['life_value'] for i in range(10)]
 
-		if datetime.now(tz=TZ_SH).day == 1 and not already_refreshed_world_boss:
+		if today == 1 and not already_refreshed_world_boss:
 			refreshed_world_boss = True
-		if datetime.now(tz=TZ_SH).day != 1 and already_refreshed_world_boss:
+		if today != 1 and already_refreshed_world_boss:
 			already_refreshed_world_boss = False
+
+		if today == 1 and not self._rfb:
+			self.rfb = True
+		elif today != 1 and self._rfb:
+			self._rfb = False
+		if self.rfb and not self._rfb:
+			self.rfb, self._rfb = False, True
+			self.configs['boss'] = self.configs['stages']['boss']
+			self.configs['boss']['hp'] = [b['HP'] for b in self.configs['boss']['boss_info']]
+			self.configs['boss']['HP'] = [b['HP'] for b in self.configs['boss']['boss_info']]
 
 
 	def __getitem__(self, key):

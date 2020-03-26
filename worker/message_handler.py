@@ -541,6 +541,42 @@ class MessageHandler:
 	# 	data.update({'hang_rewards': data['config']['hang_reward']})
 	# 	return await stage.get_hang_up_info(data['data']['unique_id'], **data)
 
+	async def _enter_stage_general(self, data: dict) -> str:
+		return await stage.enter(data['data']['unique_id'], enums.Stage.GENERAL, int(data['data']['stage']), **data)
+
+	async def _victory_stage_general(self, data: dict) -> str:
+		return await stage.victory(data['data']['unique_id'], enums.Stage.GENERAL, int(data['data']['stage']), **data)
+
+	async def _enter_stage_endless(self, data: dict) -> str:
+		return await stage.enter(data['data']['unique_id'], enums.Stage.ENDLESS, int(data['data']['stage']), **data)
+
+	async def _victory_stage_endless(self, data: dict) -> str:
+		return await stage.victory(data['data']['unique_id'], enums.Stage.ENDLESS, int(data['data']['stage']), **data)
+
+	async def _enter_stage_boss(self, data: dict) -> str:
+		return await stage.enter(data['data']['unique_id'], enums.Stage.BOSS, int(data['data']['stage']), **data)
+
+	async def _victory_stage_boss(self, data: dict) -> str:
+		return await stage.victory(data['data']['unique_id'], enums.Stage.BOSS, int(data['data']['stage']), data['data'].get('damage', 0), **data)
+
+	async def _enter_stage_coin(self, data: dict) -> str:
+		return await stage.enter(data['data']['unique_id'], enums.Stage.COIN, int(data['data']['stage']), **data)
+
+	async def _victory_stage_coin(self, data: dict) -> str:
+		return await stage.victory(data['data']['unique_id'], enums.Stage.COIN, int(data['data']['stage']), **data)
+
+	async def _enter_stage_exp(self, data: dict) -> str:
+		return await stage.enter(data['data']['unique_id'], enums.Stage.EXP, int(data['data']['stage']), **data)
+
+	async def _victory_stage_exp(self, data: dict) -> str:
+		return await stage.victory(data['data']['unique_id'], enums.Stage.EXP, int(data['data']['stage']), data['data'].get('damage', 0), **data)
+
+	async def _stage_refresh_boss(self, data: dict) -> str:
+		return await stage.refresh_boss(data['data']['unique_id'], **data)
+
+	async def _stage_damage_ranking(self, data: dict) -> str:
+		return await stage.damage_ranking(data['data']['unique_id'], data['data']['page'], **data)
+
 
 	###################### tasks ######################
 	async def _get_all_task(self, data: dict) -> str:
@@ -858,6 +894,20 @@ FUNCTION_LIST = {
 	# 'pass_tower': MessageHandler._pass_tower,
 	'start_hang_up': MessageHandler._start_hang_up,
 	'get_hang_up_reward': MessageHandler._get_hang_up_reward,
+	# TODO 2020年3月25日之后追加方法
+	'enter_stage_general': MessageHandler._enter_stage_general,
+	'victory_stage_general': MessageHandler._victory_stage_general,
+	'enter_stage_endless': MessageHandler._enter_stage_endless,
+	'victory_stage_endless': MessageHandler._victory_stage_endless,
+	'enter_stage_boss': MessageHandler._enter_stage_boss,
+	'victory_stage_boss': MessageHandler._victory_stage_boss,
+	'enter_stage_coin': MessageHandler._enter_stage_coin,
+	'victory_stage_coin': MessageHandler._victory_stage_coin,
+	'enter_stage_exp': MessageHandler._enter_stage_exp,
+	'victory_stage_exp': MessageHandler._victory_stage_exp,
+	'stage_refresh_boss': MessageHandler._stage_refresh_boss,
+	'stage_damage_ranking': MessageHandler._stage_damage_ranking,
+
 
 	###################### tasks ######################
 	'get_task_config':MessageHandler._get_task_config,

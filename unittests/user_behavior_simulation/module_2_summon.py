@@ -151,19 +151,31 @@ def summon_dialog(token, world):
 
 if __name__ == '__main__':
 	world = 's6'
-	uid = '000'
+	uid = '105'
 	# res = user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
 
-	# token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
+	token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'enter_stage_general', 'data': {'token': token, 'stage': 8}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'victory_stage_general', 'data': {'token': token, 'stage': 8}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'enter_stage_endless', 'data': {'token': token, 'stage': 1001}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'victory_stage_endless', 'data': {'token': token, 'stage': 1001}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'enter_stage_boss', 'data': {'token': token, 'stage': 3001}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'victory_stage_boss', 'data': {'token': token, 'stage': 3001, 'damage': 100000}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'enter_stage_coin', 'data': {'token': token, 'stage': 4001}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'victory_stage_coin', 'data': {'token': token, 'stage': 4001}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'enter_stage_exp', 'data': {'token': token, 'stage': 4151}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'victory_stage_exp', 'data': {'token': token, 'stage': 4151}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_refresh_boss', 'data': {'token': token}})
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_damage_ranking', 'data': {'token': token, 'page': 1}})
 	# user_behavior_simulation.send_tcp_message(
 	# 	{'world': world, 'function': 'request_friend',
 	# 	 'data': {'token': token, 'gn_target': 'a16'}})
-	for i in range(100, 201):
-		uid = f'{i}'
-		token = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})['data']['token']
-		user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
-		user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
-		user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})
+	# for i in range(100, 201):
+	# 	uid = f't{i}'
+		# token = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})['data']['token']
+		# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
+		# user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
+		# user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})
 		# token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
 		# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'request_friend', 'data': {'token': token, 'gn_target': 'a16'}})
 

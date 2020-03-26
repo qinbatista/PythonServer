@@ -1,0 +1,1828 @@
+{
+	"comment": "eg是配置中的可选详细内容,boss是BOSS的相关信息,constraint是相应模式下的约束,mopping-up是关于扫荡下的消耗与奖励配置,common-stg是关于通用关卡下的消耗与奖励配置",
+	"eg": {
+		"comment": "关于关卡能配置的信息,consumes是指可消耗的物资,rewards是可得到的物资",
+		"consumes": {
+			"comment": "common是通用物资,special是非通用物资消耗",
+			"common": [
+				"3:?:?"
+			],
+			"special": {
+				"energy": 0
+			}
+		},
+		"rewards": {
+			"comment": "common是通用物资,special是非通用物资奖励",
+			"common": [
+				"0:?:?",
+				"1:?:?",
+				"2:?:?",
+				"3:?:?"
+			],
+			"special": {
+				"exp": 0
+			}
+		}
+	},
+	"boss": {
+		"comment": "关于BOSS的配置信息,limit是每天能进入BOSS关卡的次数,damage是对BOSS造成的最高伤害,boss_info包含BOSS的相关信息",
+		"limit": 3,
+		"damage": 200000,
+		"boss_info": [
+			{"HP": 10000},
+			{"HP": 100000},
+			{"HP": 1000000},
+			{"HP": 10000000},
+			{"HP": 10000000},
+			{"HP": 10000000},
+			{"HP": 1000000000},
+			{"HP": 10000000000},
+			{"HP": 10000000000},
+			{"HP": 10000000000},
+			{"HP": 100000000000}
+		]
+	},
+	"constraint": {
+		"comment": "相应模式下的约束,COIN是金币挑战模式下的约束,EXP是经验挑战模式下的约束",
+		"COIN": {
+			"comment": "limit是金币挑战的免费次数,buy是购买次数的约束",
+			"limit": 2,
+			"buy": {
+				"comment": "diamond是购买金币挑战需要消耗的钻石,vip是vip相应等级下可购买的次数",
+				"diamond": 50,
+				"vip": {
+					"0": 2,
+					"1": 3
+				}
+			}
+		},
+		"EXP": {
+			"comment": "limit是金币挑战的免费次数,buy是购买次数的约束",
+			"limit": 2,
+			"buy": {
+				"comment": "diamond是购买金币挑战需要消耗的钻石,vip是vip相应等级下可购买的次数",
+				"diamond": 50,
+				"vip": {
+					"0": 2,
+					"1": 3
+				}
+			}
+		}
+	},
+	"mopping-up": {
+		"comment": "关于能扫荡关卡下的配置信息",
+		"8":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:200",
+					"3:2:200"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"9":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:210",
+					"3:2:210"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"10":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:220",
+					"3:2:220"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"11":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:230",
+					"3:2:230"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"12":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:240",
+					"3:2:240"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"13":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:250",
+					"3:2:250"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"14":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:260",
+					"3:2:260"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"15":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:270",
+					"3:2:270"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"16":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:280",
+					"3:2:280"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"17":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:290",
+					"3:2:290"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"18":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:300",
+					"3:2:300"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"19":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:310",
+					"3:2:310"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"20":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:320",
+					"3:2:320"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"21":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:330",
+					"3:2:330"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"22":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:340",
+					"3:2:340"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"23":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:350",
+					"3:2:350"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"24":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:360",
+					"3:2:360"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"25":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:370",
+					"3:2:370"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"26":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:380",
+					"3:2:380"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		},
+		"27":{
+			"comment": "consumes是指扫荡关卡需要消耗的物资,rewards是扫荡得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励",
+				"common": [
+					"3:9:100",
+					"3:1:390",
+					"3:2:390"
+				],
+				"special": {
+					"exp": 120
+				}
+			}
+		}
+	},
+	"hang-up": {
+		"comment": "关于能挂机关卡下的配置信息",
+		"8":{
+			"comment": "consumes是指挂机需要消耗的物资,rewards是挂机得到的物资",
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,explode是概率获得的物资(eg：{\"6\":[3,10,100]}表示10%100的概率获得3个物品6)",
+				"common": [
+					"3:9:100",
+					"3:1:200",
+					"3:2:200"
+				],
+				"special": {
+					"exp": 120
+				},
+				"explode": {
+					"6": [3, 10, 100],
+					"7": [2, 10, 100],
+					"8": [1, 10, 100]
+				}
+			}
+		}
+	},
+	"stage": {
+		"comment": "关于1-999普通模式、1001-1999无尽模式、3001-3999世界BOSS模式、4001-4149金币挑战模式、4151-4299经验挑战模式等通用关卡下的配置信息",
+		"1": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"2": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"3": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"4": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"5": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"6": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"7": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"8": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"9": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"10": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"11": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"12": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"13": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"14": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"15": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"16": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"17": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"18": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"19": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"20": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"21": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"22": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"23": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"24": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"1001": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"1002": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"1003": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"1004": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"1005": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"1006": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"1007": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"1008": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"3001": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"3002": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"4001": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 12
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:1:5000",
+					"3:18:1"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4002": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 18
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:1:10000",
+					"3:18:1"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4003": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 36
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:1:20000",
+					"3:18:1"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4004": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 60
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:1:20000",
+					"3:18:2"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4005": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 80
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:1:30000",
+					"3:18:2"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4006": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 120
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:1:40000",
+					"3:18:2"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4007": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 160
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:1:40000",
+					"3:18:3"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4008": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 200
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:1:50000",
+					"3:18:3"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4151": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 12
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:5000",
+					"3:19:1"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4152": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 18
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:10000",
+					"3:19:1"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4153": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 36
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:20000",
+					"3:19:1"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4154": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 60
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:20000",
+					"3:19:2"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4155": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 80
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:30000",
+					"3:19:2"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4156": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 120
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:40000",
+					"3:19:2"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4157": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 160
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:40000",
+					"3:19:3"
+				],
+				"special": {},
+				"random": 0
+			}
+		},
+		"4158": {
+			"comment": "consumes是指进入关卡需要消耗的物资,rewards是通关关卡得到的物资",
+			"constraint": {
+				"comment": "random为1时开启随机奖励模式,随机奖励common中的部分奖励,为0时则奖励common的所有奖励,level是角色最低等级等级可进入关卡",
+				"random": 0,
+				"level": 200
+			},
+			"consumes": {
+				"comment": "common是通用物资,special是非通用物资消耗",
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"comment": "common是通用物资,special是非通用物资奖励,random是随机common中的物品所奖励的数量",
+				"common": [
+					"3:9:50000",
+					"3:19:3"
+				],
+				"special": {},
+				"random": 0
+			}
+		}
+	}
+}

@@ -25,7 +25,8 @@ async def create(uid, gn, **kwargs):
         common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W301}), ("{uid}", 1, {enums.Weapon.W302}), ("{uid}", 1, {enums.Weapon.W303});', **kwargs),
         common.execute(f'INSERT INTO skill(uid, sid, level) VALUES ("{uid}", {enums.Skill.S1}, 1), ("{uid}", {enums.Skill.S2}, 1), ("{uid}", {enums.Skill.S3}, 1), ("{uid}", {enums.Skill.S4}, 1), ("{uid}", {enums.Skill.S5}, 1);', **kwargs),
         common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.LOGIN_TIME}, "{common.datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d")}");',**kwargs),
-        common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);',**kwargs)
+        common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);',**kwargs),
+        # stage.init_stages(uid, **kwargs)
     )
     await _meeting_gift(uid, **kwargs)
     return common.mt(0, 'success', {'gn': gn})
@@ -38,6 +39,7 @@ async def enter_world(uid, **kwargs):
     existing_player = await common.exists('player', ('uid', translated_uid), **kwargs)
     session = (await account._request_new_token(translated_uid, is_session='1', **kwargs))['token']
     await update_time(uid, **kwargs)
+    # await stage.init_stages(uid, **kwargs)
     if not existing_player:
         return common.mt(98, 'have not been in this world before', {'cid': cid, 'session' : session})
     return common.mt(0, 'success', {'cid': cid, 'session' : session})
@@ -145,7 +147,7 @@ GIFTS = [
     (enums.Group.ITEM, enums.Item.UNIVERSAL4_SEGMENT, 100),
     (enums.Group.ITEM, enums.Item.UNIVERSAL5_SEGMENT, 100),
     (enums.Group.ITEM, enums.Item.ENERGY_POTION_S_MAX, 100),
-    (enums.Group.ITEM, enums.Item.EXPERIENCE_POTION, 100_0000),
+    (enums.Group.ITEM, enums.Item.EXP_POINT, 100_0000),
 ]
 
 

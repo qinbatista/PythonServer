@@ -1,16 +1,54 @@
 ## 方法列表
 
 * [`start_hang_up`](##start_hang_up)
+
 * [`get_hang_up_reward`](##get_hang_up_reward)
+
 * [`get_hang_up_info`](##get_hang_up_info)
+
 * [`enter_stage`](##enter_stage)
+
 * [`pass_stage`](##pass_stage)
-* [`check_boss_status`](##check_boss_status)
-* [`get_top_damage`](##get_top_damage)
+
+* [`check_boss_status`](##check_boss_status)-->[`stage_refresh_boss`](##stage_refresh_boss)
+
+* [`get_top_damage`](##get_top_damage)-->[`stage_damage_ranking`](##stage_damage_ranking)
+
 * [`enter_world_boss_stage`](##enter_world_boss_stage(enter_stage))
+
 * [`leave_world_boss_stage`](##leave_world_boss_stage(pass_stage))
+
 * [`get_config_boss`](##get_config_boss)
+
 * [`mopping_up_stage`](##mopping_up_stage)
+
+* ## <font color=#FFBB00>以下方法为新增方法</font>
+
+* [`enter_stage_general`](##enter_stage_general)
+
+* [`victory_stage_general`](##victory_stage_general)
+
+* [`enter_stage_endless`](##enter_stage_endless)
+
+* [`victory_stage_endless`](##victory_stage_endless)
+
+* [`enter_stage_boss`](##enter_stage_boss)
+
+* [`victory_stage_boss`](##victory_stage_boss)
+
+* [`enter_stage_coin`](##enter_stage_coin)
+
+* [`victory_stage_coin`](##victory_stage_coin)
+
+* [`enter_stage_exp`](##enter_stage_exp)
+
+* [`victory_stage_exp`](##victory_stage_exp)
+
+* [`stage_refresh_boss`](##stage_refresh_boss)
+
+* [`stage_damage_ranking`](##stage_damage_ranking)
+
+
 
 ## start_hang_up
 
@@ -455,6 +493,8 @@
 
 ## get_top_damage
 
+## damage_ranking
+
 ##### 发送消息JSON格式
 
 获取世界boss的伤害排行榜，一次只会获取10个人的伤害排行榜
@@ -462,7 +502,7 @@
 >page: 排行序数，比如1就是排行1～10名的信息，2就是排行11～20的信息依次类推，页码从1开始
 
 ```json
-{ 
+{
 	"world": 0,
 	"function": "get_top_damage",
 	"data": {
@@ -791,6 +831,902 @@
 - 97：energy insufficient
 - 96：Can only be a positive integer
 - 95：materials insufficient
+
+
+
+## <font color=#FFBB00>以下方法为新增方法</font>
+
+##### <font color=#00ccFF>返回状态码集合如下：</font>
+
+```python
+# 99 - Do not sweep until you pass this checkpoint
+# 98 - There is no configuration information for this stage
+# 97 - energy insufficient
+# 96 - Can only be a positive integer
+# 95 - materials insufficient
+# 94 - stage mismatch
+# 93 - abnormal damage
+# 92 - no more ticket, try tomorrow
+# 91 - stage error
+# 90 - level insufficient
+# 89 - Page number error
+# 88 - No data for this page
+# 0 - success
+```
+
+
+
+## enter_stage_general
+
+##### 发送消息JSON格式
+
+进入普通模式关卡<font color=#cc36ee>**1-999**</font>
+
+> stage：进去关卡
+>
+
+```json
+{
+	"world": 0, 
+	"function": "enter_stage_general",
+	"data": {
+		"token": "toekn",
+		"stage": 8
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> energy：体力变化情况
+>
+> - cooling：距离下次体力恢复剩余时间
+> - remain：剩余体力
+> - reward：体力改变值
+>
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "energy": {
+            "cooling": -1,
+            "remain": 4916,
+            "reward": -6
+        }
+    }
+}
+```
+
+[失败]()
+
+```python
+# 98 - There is no configuration information for this stage
+# 97 - energy insufficient
+# 95 - materials insufficient
+# 94 - stage mismatch
+# 92 - no more ticket, try tomorrow
+# 91 - stage error
+# 90 - level insufficient
+# 0 - success
+```
+
+
+
+## victory_stage_general
+
+##### 发送消息JSON格式
+
+通过普通模式关卡<font color=#cc36ee>**1-999**</font>
+
+> stage：通过关卡
+
+```json
+{
+	"world": 0, 
+	"function": "victory_stage_general",
+	"data": {
+		"token": "toekn",
+		"stage": 8
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> boss：BOSS模式下会用到的BOSS相关信息
+>
+> remain：物品剩余情况
+>
+> reward：物品获得情况
+>
+> exp_info：玩家经验信息
+>
+> - exp：总经验值
+> - level：玩家等级
+> - need：距下次升级需要经验值
+> - reward：本次通关获得的经验值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "boss": {},
+        "remain": [
+            "3:9:1026325",
+            "3:2:152025",
+            "3:1:100058375",
+            "3:10:5"
+        ],
+        "reward": [
+            "3:9:125",
+            "3:2:125",
+            "3:1:375",
+            "3:10:1"
+        ],
+        "exp_info": {
+            "exp": 37340,
+            "level": 25,
+            "need": 1660,
+            "reward": 500
+        }
+    }
+}
+```
+
+[失败]()
+
+```python
+# 94 - stage mismatch
+# 91 - stage error
+# 0 - success
+```
+
+
+
+## enter_stage_endless
+
+##### 发送消息JSON格式
+
+进入无尽模式关卡<font color=#cc36ee>**1001-1999**</font>
+
+> stage：进去关卡
+
+```json
+{
+	"world": 0, 
+	"function": "enter_stage_endless",
+	"data": {
+		"token": "toekn",
+		"stage": 1001
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> energy：体力变化情况
+>
+> - cooling：距离下次体力恢复剩余时间
+> - remain：剩余体力
+> - reward：体力改变值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "energy": {
+            "cooling": -1,
+            "remain": 4916,
+            "reward": -6
+        }
+    }
+}
+```
+
+[失败]()
+
+```python
+# 98 - There is no configuration information for this stage
+# 97 - energy insufficient
+# 95 - materials insufficient
+# 94 - stage mismatch
+# 92 - no more ticket, try tomorrow
+# 91 - stage error
+# 90 - level insufficient
+# 0 - success
+```
+
+
+
+## victory_stage_endless
+
+##### 发送消息JSON格式
+
+通过关卡<font color=#cc36ee>**1001-1999**</font>
+
+> stage：通过关卡
+
+```json
+{
+	"world": 0, 
+	"function": "victory_stage_endless",
+	"data": {
+		"token": "toekn",
+		"stage": 1001
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> boss：BOSS模式下会用到的BOSS相关信息
+>
+> remain：物品剩余情况
+>
+> reward：物品获得情况
+>
+> exp_info：玩家经验信息
+>
+> - exp：总经验值
+> - level：玩家等级
+> - need：距下次升级需要经验值
+> - reward：本次通关获得的经验值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "boss": {},
+        "remain": [
+            "3:9:1026325",
+            "3:2:152025",
+            "3:1:100058375",
+            "3:10:5"
+        ],
+        "reward": [
+            "3:9:125",
+            "3:2:125",
+            "3:1:375",
+            "3:10:1"
+        ],
+        "exp_info": {
+            "exp": 37340,
+            "level": 25,
+            "need": 1660,
+            "reward": 500
+        }
+    }
+}
+```
+
+[失败]()
+
+```python
+# 94 - stage mismatch
+# 91 - stage error
+# 0 - success
+```
+
+
+
+## enter_stage_boss
+
+##### 发送消息JSON格式
+
+进入BOSS模式关卡<font color=#cc36ee>**3001-3999**</font>
+
+> stage：进去关卡
+
+```json
+{
+	"world": 0, 
+	"function": "enter_stage_boss",
+	"data": {
+		"token": "toekn",
+		"stage": 3001
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> BOSS：boss门票剩余情况
+>
+> energy：体力变化情况
+>
+> - cooling：距离下次体力恢复剩余时间
+> - remain：剩余体力
+> - reward：体力改变值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "BOSS": {
+            "limits": {
+                "18": 2
+            },
+            "cd": 31280
+        },
+        "energy": {
+            "cooling": -1,
+            "remain": 4892,
+            "reward": -6
+        }
+    }
+}
+
+```
+
+[失败]()
+
+```python
+# 98 - There is no configuration information for this stage
+# 97 - energy insufficient
+# 95 - materials insufficient
+# 94 - stage mismatch
+# 92 - no more ticket, try tomorrow
+# 91 - stage error
+# 90 - level insufficient
+# 0 - success
+```
+
+
+
+## victory_stage_boss
+
+##### 发送消息JSON格式
+
+通过关卡<font color=#cc36ee>**3001-3999**</font>
+
+> stage：通过关卡
+
+```json
+{
+	"world": 0, 
+	"function": "victory_stage_boss",
+	"data": {
+		"token": "toekn",
+		"stage": 3001
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> boss：BOSS模式下会用到的BOSS相关信息
+>
+> - ratio：boss剩余血量
+> - record：1代表是新记录，0代表不是新记录
+> - damage：造成的最高伤害，不是本次造成的伤害
+>
+> remain：物品剩余情况
+>
+> reward：物品获得情况
+>
+> exp_info：玩家经验信息
+>
+> - exp：总经验值
+> - level：玩家等级
+> - need：距下次升级需要经验值
+> - reward：本次通关获得的经验值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "boss": {
+            "ratio": {
+                "0": "0.00",
+                "1": "1.00",
+                "2": "1.00",
+                "3": "1.00",
+                "4": "1.00",
+                "5": "1.00",
+                "6": "1.00",
+                "7": "1.00",
+                "8": "1.00",
+                "9": "1.00",
+                "10": "1.00"
+            },
+            "record": 0,
+            "damage": 100000
+        },
+        "remain": [
+            "3:9:1026825",
+            "3:2:152525",
+            "3:1:100059875",
+            "3:10:9"
+        ],
+        "reward": [
+            "3:9:125",
+            "3:2:125",
+            "3:1:375",
+            "3:10:1"
+        ],
+        "exp_info": {
+            "exp": 39340,
+            "level": 26,
+            "need": 2780,
+            "reward": 500
+        }
+    }
+}
+```
+
+[失败]()
+
+```python
+# 94 - stage mismatch
+# 93 - abnormal damage
+# 91 - stage error
+# 0 - success
+```
+
+
+
+## enter_stage_coin
+
+##### 发送消息JSON格式
+
+进入金币挑战模式关卡<font color=#cc36ee>**4001-4149**</font>
+
+> stage：进去关卡
+
+```json
+{
+	"world": 0, 
+	"function": "enter_stage_coin",
+	"data": {
+		"token": "toekn",
+		"stage": 4001
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> COIN：金币挑战门票情况
+>
+> - limits：门票剩余情况
+>
+>   - 19：金币挑战模式剩余门票数
+>
+>   - 20：剩余可购买门票数
+>
+> - cd：剩余刷新金币挑战门票的时间
+>
+> energy：体力变化情况
+>
+> - cooling：距离下次体力恢复剩余时间
+> - remain：剩余体力
+> - reward：体力改变值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "COIN": {
+            "limits": {
+                "19": 0,
+                "20": 3
+            },
+            "cd": 30471
+        },
+        "energy": {
+            "cooling": -1,
+            "remain": 4886,
+            "reward": -6
+        }
+    }
+}
+```
+
+[失败]()
+
+```python
+# 98 - There is no configuration information for this stage
+# 97 - energy insufficient
+# 95 - materials insufficient
+# 94 - stage mismatch
+# 92 - no more ticket, try tomorrow
+# 91 - stage error
+# 90 - level insufficient
+# 0 - success
+```
+
+
+
+## victory_stage_coin
+
+##### 发送消息JSON格式
+
+通过关卡<font color=#cc36ee>**4001-4149**</font>
+
+> stage：通过关卡
+
+```json
+{
+	"world": 0, 
+	"function": "victory_stage_coin",
+	"data": {
+		"token": "toekn",
+		"stage": 4001
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> boss：BOSS模式下会用到的BOSS相关信息
+>
+> remain：物品剩余情况
+>
+> reward：物品获得情况
+>
+> exp_info：玩家经验信息
+>
+> - exp：总经验值
+> - level：玩家等级
+> - need：距下次升级需要经验值
+> - reward：本次通关获得的经验值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "boss": {},
+        "remain": [
+            "3:1:100064875",
+            "3:18:2"
+        ],
+        "reward": [
+            "3:1:5000",
+            "3:18:1"
+        ],
+        "exp_info": {
+            "exp": 39340,
+            "level": 26,
+            "need": 2780,
+            "reward": 0
+        }
+    }
+}
+```
+
+[失败]()
+
+```python
+# 94 - stage mismatch
+# 91 - stage error
+# 0 - success
+```
+
+
+
+## enter_stage_exp
+
+##### 发送消息JSON格式
+
+进入经验挑战模式关卡<font color=#cc36ee>**4151-4199**</font>
+
+> stage：进去关卡
+
+```json
+{
+	"world": 0, 
+	"function": "enter_stage_exp",
+	"data": {
+		"token": "toekn",
+		"stage": 4151
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> EXP：经验挑战门票情况
+>
+> - limits：门票剩余情况
+>
+>   - 21：经验挑战模式剩余门票数
+>
+>   - 22：剩余可购买门票数
+>
+> - cd：剩余刷新经验挑战门票的时间
+>
+> energy：体力变化情况
+>
+> - cooling：距离下次体力恢复剩余时间
+> - remain：剩余体力
+> - reward：体力改变值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "EXP": {
+            "limits": {
+                "21": 1,
+                "22": 2
+            },
+            "cd": 30061
+        },
+        "energy": {
+            "cooling": -1,
+            "remain": 4880,
+            "reward": -6
+        }
+    }
+}
+```
+
+[失败]()
+
+```python
+# 98 - There is no configuration information for this stage
+# 97 - energy insufficient
+# 95 - materials insufficient
+# 94 - stage mismatch
+# 92 - no more ticket, try tomorrow
+# 91 - stage error
+# 90 - level insufficient
+# 0 - success
+```
+
+
+
+## victory_stage_exp
+
+##### 发送消息JSON格式
+
+通过关卡<font color=#cc36ee>**4151-4199**</font>
+
+> stage：通过关卡
+
+```json
+{
+	"world": 0, 
+	"function": "victory_stage_exp",
+	"data": {
+		"token": "toekn",
+		"stage": 4151
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> boss：BOSS模式下会用到的BOSS相关信息
+>
+> remain：物品剩余情况
+>
+> reward：物品获得情况
+>
+> exp_info：玩家经验信息
+>
+> - exp：总经验值
+> - level：玩家等级
+> - need：距下次升级需要经验值
+> - reward：本次通关获得的经验值
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "boss": {},
+        "remain": [
+            "3:9:1031825",
+            "3:19:1"
+        ],
+        "reward": [
+            "3:9:5000",
+            "3:19:1"
+        ],
+        "exp_info": {
+            "exp": 39340,
+            "level": 26,
+            "need": 2780,
+            "reward": 0
+        }
+    }
+}
+```
+
+[失败]()
+
+```python
+# 94 - stage mismatch
+# 91 - stage error
+# 0 - success
+```
+
+
+
+## stage_refresh_boss
+
+##### 发送消息JSON格式
+
+刷新boss情况，同时更新自己可挑战boss的情况
+
+```json
+{
+	"world": 0, 
+	"function": "stage_refresh_boss",
+	"data": {
+		"token": "toekn"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> damage：自己对BOSS造成的最高伤害
+>
+> limit：今天可挑战BOSS模式的次数
+>
+> cd：今天刷新挑战BOSS模式次数的剩余时间
+>
+> mcd：刷新所有BOSS血量的剩余时间
+>
+> ratio：BOSS的血量情况
+
+```json
+{
+    "status": 0,
+    "message": "Successfully get hook information",
+    "data": {
+        "damage": 100000,
+        "limit": 2,
+        "cd": 27227,
+        "mcd": 459227,
+        "ratio": {
+            "0": "1.00",
+            "1": "1.00",
+            "2": "1.00",
+            "3": "1.00",
+            "4": "1.00",
+            "5": "1.00",
+            "6": "1.00",
+            "7": "1.00",
+            "8": "1.00",
+            "9": "1.00",
+            "10": "1.00"
+        }
+    }
+}
+```
+
+[失败]()
+
+无
+
+## 
+
+## stage_damage_ranking
+
+##### 发送消息JSON格式
+
+获取世界boss的伤害排行榜，一次只会获取10个人的伤害排行榜
+
+>page: 排行序数，比如1就是排行1～10名的信息，2就是排行11～20的信息依次类推，页码从1开始
+
+```json
+{
+	"world": 0,
+	"function": "stage_damage_ranking",
+	"data": {
+		"token": "my token",
+    	"page":1
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功消息]()
+
+> damange: 玩家造成的最高伤害
+>
+> ranking: 玩家的排名，不存在则返回-1
+>
+> rank：排名玩家的信息
+>
+> - NO：名次
+> - name：游戏名字
+> - damage：最高伤害
+> - fid：家族名字
+> - level：玩家等级
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"page": 2,
+		"damage": 4872,
+		"ranking": 5,
+		"rank": [
+			{
+				"NO": 11,
+				"name": "name_1",
+				"damage": 112,
+				"fid": "",
+				"level": 1
+			},
+			{
+				"NO": 12,
+				"name": "name_17",
+				"damage": 17,
+				"fid": "",
+				"level": 1
+			},
+			{
+				"NO": 13,
+				"name": "name_12",
+				"damage": 12,
+				"fid": "",
+				"level": 1
+			},
+			{
+				"NO": 14,
+				"name": "name_10",
+				"damage": 10,
+				"fid": "",
+				"level": 1
+			}
+		]
+	}
+}
+```
+
+[失败消息]()
+
+```python
+# 89 - Page number error
+# 88 - No data for this page
+```
+
+
+
+
+
+
+
+
 
 
 

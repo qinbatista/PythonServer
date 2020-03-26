@@ -33,6 +33,10 @@ SCROLL = {
 }
 
 
+async def buy_energy():
+	pass
+
+
 async def exchange(uid, cid, qty=1, **kwargs):
 	if cid not in enums.Item._value2member_map_.keys(): return common.mt(99, 'iid error')
 	config = kwargs['config']['package']['exchange_card']

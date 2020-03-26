@@ -5,6 +5,18 @@ Contains the CREATE statements necessary to create the lukseun database structur
 Also includes necessary triggers.
 '''
 
+STAGES = \
+"""
+CREATE TABLE `stages` (
+	 `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
+	 `sid` SMALLINT UNSIGNED NOT NULL COMMENT '关卡类型id',
+	 `stage` INT UNSIGNED NOT NULL COMMENT '关卡最高等级',
+	 `btm` VARCHAR(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '进入时间',
+	 PRIMARY KEY (`uid`, `sid`),
+	 CONSTRAINT `stage_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+"""
+
 SUMMON = \
 """
 CREATE TABLE `summon` (
@@ -157,15 +169,12 @@ PROGRESS = \
 """
 CREATE TABLE `progress` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
-	  `energy` SMALLINT UNSIGNED DEFAULT 10 COMMENT '玩家体力值，默认10',
+	  `energy` SMALLINT UNSIGNED DEFAULT 120 COMMENT '玩家体力值',
 	  `exp` INT UNSIGNED DEFAULT 0 COMMENT '玩家经验',
-	  `role` SMALLINT UNSIGNED DEFAULT 1 COMMENT '拥有的角色数',
-	  `weapon` SMALLINT UNSIGNED DEFAULT 0 COMMENT '拥有的武器数',
-	  `stage` SMALLINT UNSIGNED DEFAULT 1 COMMENT '最高普通关卡',
-	  `towerstage` SMALLINT UNSIGNED DEFAULT 1000 COMMENT '冲塔最高关卡',
-	  `hangstage`  SMALLINT UNSIGNED DEFAULT 0 COMMENT '当前挂机的关卡',
 	  `vipexp` INT UNSIGNED DEFAULT 0 COMMENT 'vip经验',
-	  `unstage` SMALLINT UNSIGNED DEFAULT 0 COMMENT '正在进行的关卡',
+	  `role` SMALLINT UNSIGNED DEFAULT 0 COMMENT '正在使用的角色',
+	  `weapon` SMALLINT UNSIGNED DEFAULT 0 COMMENT '正在使用的武器',
+	  `stage` SMALLINT UNSIGNED DEFAULT 0 COMMENT '当前正在进行的关卡',
 	  PRIMARY KEY (`uid`),
 	  CONSTRAINT `progress_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

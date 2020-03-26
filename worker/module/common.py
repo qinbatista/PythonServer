@@ -130,6 +130,12 @@ async def set_achievement(uid, aid, value, reward=0, reset=False, **kwargs):
 	if not reset: value = f'`value` + {value}'
 	await execute(f'INSERT INTO achievement(uid, aid, value, reward) VALUES ("{uid}", {aid}, {value}, {reward}) ON DUPLICATE KEY UPDATE `value`= {value}, `reward`= {reward}', **kwargs)
 
+async def get_stage(uid, sid, **kwargs):
+	data = await execute(f'SELECT `stage`, `btm` FROM `stages` WHERE `uid` = "{uid}" AND `sid` = {sid};', **kwargs)
+	return data[0]
+
+async def set_stage(uid, sid, stage, btm, **kwargs):
+	await execute(f'INSERT INTO `stages` VALUES ("{uid}", {sid}, {stage}, "{btm}") ON DUPLICATE KEY UPDATE `stage` = {stage}, `btm` = "{btm}";', **kwargs)
 
 async def get_db(**kwargs):
 	return kwargs['worlddb']

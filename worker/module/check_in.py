@@ -67,4 +67,4 @@ async def get_all_check_in_table(uid, **kwargs):
 	for d in data:
 		remaining.update({int(d[1][-2:]): {'date': d[1], 'reward': d[2]}})
 	seconds = common.remaining_cd()
-	return common.mt(0, 'Successfully obtained all check-in status this month', data={'today': datetime.today().day, 'time': f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}', 'remaining': remaining, 'config': kwargs['config']})
+	return common.mt(0, 'Successfully obtained all check-in status this month', data={'today': datetime.now(common.TZ_SH).day, 'time': f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}', 'remaining': remaining, 'config': kwargs['config']})
