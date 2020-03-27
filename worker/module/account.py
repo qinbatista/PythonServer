@@ -42,10 +42,10 @@ async def register(uid, account, password, **kwargs):
 	exists = await common.exists('info', ('unique_id', uid), account=True, **kwargs)
 	if not exists:  # 不存在的情况下创建新用户
 		await _create_new_user(uid, **kwargs)
-		status, message, prev_token = 1, 'new account created', ''
-	else:  # 存在uid的情况之下获取token
-		status, message, prev_token = 0, 'success', await _get_prev_token('unique_id', uid, **kwargs)
-	token = await _request_new_token(uid, prev_token, **kwargs)  # 生成一个新的token或使用原来的token加长有效时限
+		status, message = 1, 'new account created'
+	else:
+		status, message = 0, 'success'
+	token = await _request_new_token(uid, **kwargs)  # 生成一个新的token或使用原来的token加长有效时限
 	await _record_token(uid, token['token'], **kwargs)
 	salt = str(secrets.randbits(256))
 	if len(salt) % 2 != 0:
@@ -61,20 +61,20 @@ async def login_unique(uid, **kwargs):
 	exists, bound = await asyncio.gather(common.exists('info', ('unique_id', uid), account=True, **kwargs), _account_bound(uid, **kwargs))
 	if not exists:  # 不存在的情况下创建新用户
 		await _create_new_user(uid, **kwargs)
-		status, message, prev_token = 1, 'new account created', ''
+		status, message = 1, 'new account created'
 	elif bound:  # uid账号已经绑定，要求使用账号密码登录
 		return common.mt(2, 'account already bound')
-	else:  # 存在uid的情况之下获取token
-		status, message, prev_token = 0, 'success', await _get_prev_token('unique_id', uid, **kwargs)
-	token = await _request_new_token(uid, prev_token, **kwargs)  # 生成一个新的token
-	await _record_token(uid, token['token'], **kwargs)
-	return common.mt(status, message, token)
+	else:
+		status, message = 0, 'success'
+	data = await _request_new_token(uid, **kwargs)  # 生成一个新的token
+	await _record_token(uid, data['token'], **kwargs)
+	return common.mt(status, message, data)
 
 async def login(identifier, value, password, **kwargs):
 	if not await _valid_credentials(identifier, value, password, **kwargs):
 		return common.mt(1, 'invalid credentials')
 	uid = await _get_unique_id(identifier, value, **kwargs)
-	data = await _request_new_token(uid, await _get_prev_token(identifier, value, **kwargs), **kwargs)
+	data = await _request_new_token(uid, **kwargs)
 	_, aep = await asyncio.gather(_record_token(uid, data['token'], **kwargs), \
 			_get_account_email_phone(uid, **kwargs))
 	data['account'], data['email'], data['phone_number'] = aep
@@ -269,11 +269,11 @@ async def _get_unique_id(identifier, value, **kwargs):
 	return data[0][0]
 
 async def _record_token(uid, token, **kwargs):
-	await common.execute(f'UPDATE info SET token = "{token}" WHERE unique_id = "{uid}";', account = True, **kwargs)
+	await common.execute(f'UPDATE info SET token = "{token}" WHERE unique_id = "{uid}";', account=True, **kwargs)
 
-async def _request_new_token(uid, prev_token = '', **kwargs):
-	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/issue_token', \
-			data = {'uid' : uid, 'prev_token' : prev_token}) as resp:
+async def _request_new_token(uid, is_session='0', **kwargs):
+	async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/issue_token',
+			data={'uid' : uid, 'is_session': is_session}) as resp:
 		return await resp.json()
 
 async def _set_credentials(uid, account, hashed_pw, salt, **kwargs):

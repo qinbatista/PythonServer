@@ -76,6 +76,8 @@ class Edge:
 	async def start(self):
 		try:
 			await self.init()
+			# 开始接受连接，直到协程被取消。
+			# 当协程被取消时，服务器关闭。
 			asyncio.create_task(self.server.serve_forever())
 			print(f'Starting edge server on port {self.args.port}')
 			while self.running:
@@ -84,7 +86,7 @@ class Edge:
 			await self.shutdown()
 
 	async def init(self):
-		asyncio.get_running_loop().add_signal_handler(signal.SIGINT, \
+		asyncio.get_running_loop().add_signal_handler(signal.SIGINT,
 				lambda: asyncio.create_task(self.shutdown()))
 		await self.pubsub.connect(f'nats://{self.args.nats_addr}', max_reconnect_attempts = 1)
 		self.redis   = await aioredis.create_redis(f'redis://{self.args.redis_addr}', encoding = 'utf-8')
@@ -112,7 +114,7 @@ class Edge:
 			while True:
 				cmd, payload = await self.receive(reader)
 				if cmd == Command.PUBLIC:
-					await self.pubsub.publish(self.encode_channel_public(user.world), \
+					await self.pubsub.publish(self.encode_channel_public(user.world),
 							f'{user.gn}:{payload}'.encode())
 				elif cmd == Command.FAMILY and user.fn is not None:
 					await self.pubsub.publish(self.encode_channel_family(user.world, user.fn), \
@@ -132,7 +134,7 @@ class Edge:
 			self.userlist.remove(user)
 			writer.close()
 			await writer.wait_closed()
-			if user != None: print(f'User {user.gn} has left world {user.world}')
+			if user is not None: print(f'User {user.gn} has left world {user.world}')
 
 	# receives messages from pubsub server and distributes them to the interested connected clients
 	# unsubscribes from pubsub channels when there are no longer any interested clients
@@ -149,6 +151,8 @@ class Edge:
 	
 	# performs initial client handshake. requires client to provide a valid login token.
 	# raises ChatProtocolError if protocol is not followed, or an invalid login token was provided.
+	# 执行初始客户端握手。要求客户端提供有效的登录令牌。
+	# 如果没有遵循协议，或者提供了无效的登录令牌，则会引发ChatProtocolError。
 	async def client_handshake(self, reader, writer):
 		cmd, nonce = await self.receive(reader)
 		if cmd == Command.REGISTER:
@@ -183,7 +187,7 @@ class Edge:
 		if raw == b'':
 			raise ConnectionResetError
 		decoded = raw.decode().strip()
-		return (Command(decoded[:COMMAND_MAX_LENGTH].lstrip('0')), decoded[COMMAND_MAX_LENGTH:])
+		return Command(decoded[:COMMAND_MAX_LENGTH].lstrip('0')), decoded[COMMAND_MAX_LENGTH:]
 
 	# sends the message to all given client writers
 	async def send(self, msg, *writers):

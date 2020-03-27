@@ -286,12 +286,11 @@ async def check_in(uid, **kwargs):
 
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
-	timer = await _get_check_in_timer(uid, **kwargs)
+	timer = await common.get_timer(uid, enums.Timer.FAMILY_CHECK_IN,
+	                               timeformat='%Y-%m-%d', **kwargs)
 	now = datetime.now(tz=common.TZ_SH)
 	if timer is not None and now < timer: return common.mt(98, 'already checked in today')
-	time = (now + timedelta(days=1)).strftime('%Y-%m-%d')
-
-	await common.execute(f'INSERT INTO timer VALUES ("{uid}", {enums.Timer.FAMILY_CHECK_IN}, "{time}") ON DUPLICATE KEY UPDATE `time` = "{time}";', **kwargs)
+	await common.set_timer(uid, enums.Timer.FAMILY_CHECK_IN, now + timedelta(days=1), timeformat='%Y-%m-%d', **kwargs)
 	exp_data = await increase_exp(name, 1, **kwargs)
 	# 增加家族金币和记录金币
 	_, iid_fc, cost_fc = (common.decode_items(kwargs['config']['family']['general']['rewards']['family_coin']))[0]
@@ -345,7 +344,7 @@ async def welfare(uid, **kwargs):
 			_, qty = await common.try_item(member, iid, cost, **kwargs)
 			data['remaining'].append({'iid': iid.value, 'qty': qty})
 			data['reward'].append({'iid': iid.value, 'qty': cost})
-	await _record_family_change(name, f'{await common.get_gn(uid, **kwargs)} <FAMILY_PURCHASED_FAMILY_GIFT_PACKAGE>.', **kwargs)
+	await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE.value}:{await common.get_gn(uid, **kwargs)}', **kwargs)
 	return common.mt(0, 'success', data)
 
 async def search(name, **kwargs):
@@ -487,21 +486,19 @@ async def increase_exp(name, exp, **kwargs):
 	exp为0则获得经验，反之取绝对值增加经验，
 	并返回总经验和等级，升到下一级需要的经验
 	"""
-	# 取配置和数据
+	# TODO 取配置和数据
 	exp_config = kwargs['config']['family']['level']['exp']
-	exp_data = await common.execute(f'SELECT exp FROM family WHERE name = "{name}";', **kwargs)
-
-	# 计算等级和需要的经验
-	sql_exp = 0 if exp_data == () else exp_data[0][0]
+	_, fds = await _get_family_info(name, 'exp', **kwargs)
+	sql_exp = fds[0]
+	# TODO 计算等级和需要的经验
 	level, need = common.__calculate(exp_config, sql_exp)
-	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need}
-
-	# 重新计算等级和需要的经验
+	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
+	# TODO 重新计算等级和需要的经验
 	sql_exp += exp
 	level, need = common.__calculate(exp_config, sql_exp)
-	await common.execute(f'INSERT INTO family (name, exp) VALUE ("{name}", {sql_exp}) ON DUPLICATE KEY UPDATE exp = {sql_exp};', **kwargs)
-	# 返回总经验、等级、需要经验
-	return {'exp': sql_exp, 'level': level, 'need': need}
+	await common.update_famliy(name, 'exp', sql_exp, **kwargs)
+	# TODO 返回总经验、等级、需要经验
+	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
 
 async def __insert(name, **kwargs):
 	"""没有这个登录时间和贡献记录，返回的数据不全数据"""

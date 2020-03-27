@@ -122,7 +122,7 @@
   "status": 0,
 	"message": "purchase success",
   "pid_list":[ 
-  	"EXPERIENCE_POTION_PLENTY",
+  	"EXP_POINT_PLENTY",
     "VIP_CARD_PERMANENT"]
 }
 ```

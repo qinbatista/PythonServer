@@ -21,25 +21,29 @@ TZ_SH = tz.gettz('Asia/Shanghai')
 
 
 class WorkerResources:
-	def __init__(self, redis_addr, db_addr, db_user, db_pw):
+	def __init__(self, redis_addr, db_addr, db_user, db_pw, db_port=3306):
 		self.redis_addr = redis_addr
 		self.db_addr = db_addr
 		self.db_user = db_user
 		self.db_pw = db_pw
+		self.db_port = db_port
 
 		self.resources = {}
 
 	async def init(self):
+		# r = await aioredis.create_redis(f'redis://{self.redis_addr}', \
+		# 		encoding = 'utf-8')
+		# r.execute()
 		self.resources['session']   = aiohttp.ClientSession(connector = aiohttp.TCPConnector(limit = 0))
-		self.resources['redis']     = await aioredis.create_redis(f'redis://{self.redis_addr}', \
+		self.resources['redis']     = await aioredis.create_redis(f'redis://{self.redis_addr}',
 				encoding = 'utf-8')
-		self.resources['db']        = await aiomysql.create_pool(maxsize = 30, host = self.db_addr, \
+		self.resources['db']        = await aiomysql.create_pool(maxsize = 30, host = self.db_addr, port=self.db_port,
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True)
-		self.resources['accountdb'] = await aiomysql.create_pool(maxsize =  4, host = self.db_addr,  \
+		self.resources['accountdb'] = await aiomysql.create_pool(maxsize =  4, host = self.db_addr, port=self.db_port,
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True, db = 'user')
-		self.resources['malldb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, \
+		self.resources['malldb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, port=self.db_port,
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True, db = 'mall')
-		self.resources['exchangedb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, \
+		self.resources['exchangedb'] = await aiomysql.create_pool(maxsize = 4, host = self.db_addr, port=self.db_port,
 				user = self.db_user, password = self.db_pw, charset = 'utf8', autocommit = True, db = 'exchange')
 
 
@@ -81,6 +85,8 @@ class RepeatingTimer(threading.Thread):
 class ModuleConfigurations:
 	def __init__(self, config_addr, config_port):
 		self.configs = {}
+		self.rfb = True
+		self._rfb = False
 		self.baseurl = f'http://{config_addr}:{config_port}'
 		self.repeat  = RepeatingTimer(600, self.refresh, refresh_world_boss = False)
 		self.repeat.start()
@@ -110,9 +116,10 @@ class ModuleConfigurations:
 		self.configs['check_in']          = r.json()['check_in']
 		self.configs['version']           = r.json()['version']
 		self.configs['summon']            = r.json()['summon']
-		self.configs['stage']             = r.json()['stage']
+		self.configs['stages']            = r.json()['stages']
 		self.configs['notice']            = r.json()['notice']
 
+		today = datetime.now(tz=TZ_SH).day
 		if refresh_world_boss and not already_refreshed_world_boss:
 			refresh_world_boss, already_refreshed_world_boss = False, True
 			self.configs['world_boss'] = r.json()['world_boss']
@@ -121,10 +128,20 @@ class ModuleConfigurations:
 			self.configs['world_boss']['boss_life'] = \
 					[self.configs['world_boss'][f'boss{i}']['life_value'] for i in range(10)]
 
-		if datetime.now(tz=TZ_SH).day == 1 and not already_refreshed_world_boss:
+		if today == 1 and not already_refreshed_world_boss:
 			refreshed_world_boss = True
-		if datetime.now(tz=TZ_SH).day != 1 and already_refreshed_world_boss:
+		if today != 1 and already_refreshed_world_boss:
 			already_refreshed_world_boss = False
+
+		if today == 1 and not self._rfb:
+			self.rfb = True
+		elif today != 1 and self._rfb:
+			self._rfb = False
+		if self.rfb and not self._rfb:
+			self.rfb, self._rfb = False, True
+			self.configs['boss'] = self.configs['stages']['boss']
+			self.configs['boss']['hp'] = [b['HP'] for b in self.configs['boss']['boss_info']]
+			self.configs['boss']['HP'] = [b['HP'] for b in self.configs['boss']['boss_info']]
 
 
 	def __getitem__(self, key):

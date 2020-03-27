@@ -27,13 +27,13 @@ async def level_up(uid, rid, delta, **kwargs):
 	if max_lv <= level: return common.mt(95, 'max lv')
 	delta = delta if delta + level <= max_lv else (max_lv - level)
 	consume = config[level + delta - 1] - config[level - 1]
-	can_pay, remain = await common.try_item(uid, enums.Item.EXPERIENCE_POTION, -consume, **kwargs)
+	can_pay, remain = await common.try_item(uid, enums.Item.EXP_POINT, -consume, **kwargs)
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
 	await common.execute(f'UPDATE role SET level = {level + delta} WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
 	return common.mt(0, 'success', {'remaining': {enums.Group.ROLE.value: {'rid': rid.value, 'level' : level + delta},
-													enums.Group.ITEM.value: [{'iid': enums.Item.EXPERIENCE_POTION.value, 'value': remain}]},
+													enums.Group.ITEM.value: [{'iid': enums.Item.EXP_POINT.value, 'value': remain}]},
 										'reward': {enums.Group.ROLE.value: {'rid': rid.value, 'level' : delta},
-													enums.Group.ITEM.value: [{'iid': enums.Item.EXPERIENCE_POTION.value, 'value': consume}]}})
+													enums.Group.ITEM.value: [{'iid': enums.Item.EXP_POINT.value, 'value': consume}]}})
 
 
 async def level_up_star(uid, rid, **kwargs):
