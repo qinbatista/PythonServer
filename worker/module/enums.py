@@ -150,6 +150,9 @@ class Weapon(enum.IntEnum):
     W503 = 503
     W504 = 504
     W505 = 505
+    W506 = 506
+    W507 = 507
+    W508 = 508
     W601 = 601
     W602 = 602
     W603 = 603
@@ -329,9 +332,10 @@ class Timer(enum.IntEnum):
     SUMMON_G_REFRESH = 35  # 记录爱心抽奖免费刷新的日期
     FAMILY_JOIN = 36  # 玩家当天可发送加入工会邮件的结束时间
     DT_ENERGY = 37  # 钻石购买体力的刷新时间
-    WORLD_BOSS = 38  # 世界BOSS下次刷新时间
+    STAGE_WORLD_BOSS = 38  # 世界BOSS下次刷新时间
     STAGE_COIN = 39  # 金币挑战模式下的挑战时间限制，时间满足则刷新可挑战次数和可购买挑战的次数
     STAGE_EXP = 40  # 经验挑战模式下的挑战时间限制，时间满足则刷新可挑战次数和可购买挑战的次数
+    STAGE_HANG_UP = 41  # 挂机模式的开始时间
 
 
 class Limits(enum.IntEnum):
@@ -352,7 +356,7 @@ class Limits(enum.IntEnum):
     SUMMON_D = 15  # 代表钻石抽每天限制的次数，当天第一次抽奖免费，第二次抽奖半价，这里用于限制钻石免费抽和半价抽
     FAMILY_JOIN = 16  # 玩家当天可发送加入工会邮件的次数
     DT_ENERGY = 17  # 钻石购买体力的限制次数
-    WORLD_BOSS = 18  # 世界BOSS记录次数
+    STAGE_WORLD_BOSS = 18  # 世界BOSS记录次数
     STAGE_COIN = 19  # 金币挑战模式下的挑战次数限制
     STAGE_COIN_VIP = 20  # 金币挑战模式下VIP相应等级可购买的挑战次数限制
     STAGE_EXP = 21  # 经验挑战模式下的挑战次数限制

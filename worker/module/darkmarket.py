@@ -58,31 +58,31 @@ async def get_all_market(uid, **kwargs):
 	# 0 - Dark market refreshed successfully
 	# 1 - Get all black market information
 	"""
-	current_time = datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")
-	rtimes = kwargs['config']['player']['dark_market']['constraint']['refreshable']
-	timer = await common.execute(f'SELECT time FROM timer WHERE uid = "{uid}" AND tid = "{enums.Timer.DARK_MARKET_TIME}";', **kwargs)
-	limit = await common.execute(f'SELECT value FROM limits WHERE uid = "{uid}" AND lid = "{enums.Limits.DARK_MARKET_LIMITS.value}";', **kwargs)
-	refresh_time = current_time if timer == () else timer[0][0]
-	refreshable = rtimes if limit == () else limit[0][0]
+	current_time = datetime.now(tz=common.TZ_SH)
+	lim = kwargs['config']['player']['dark_market']['constraint']['refreshable']
+	timer = await common.get_timer(uid, enums.Timer.DARK_MARKET_TIME, **kwargs)
+	limit = await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
+	refresh_time = current_time if timer is None else timer
+	refreshable = lim if limit is None else limit
 	dark_markets = []
 	if refresh_time == current_time:
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
 	else:
-		delta_time = datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')
+		delta_time = current_time - refresh_time
 		refresh_hours = kwargs['config']['player']['dark_market']['constraint']['refresh_hours']
 		if delta_time.total_seconds() // 3600 >= refresh_hours:  # 满足refresh_hours个小时进行一次刷新
 			frequency = delta_time.total_seconds() // 3600 // refresh_hours
-			refreshable = rtimes if refreshable + frequency >= rtimes else int(refreshable + frequency)
-			refresh_time = (datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S') + timedelta(hours=frequency*refresh_hours)).strftime('%Y-%m-%d %H:%M:%S')
+			refreshable = lim if refreshable + frequency >= lim else int(refreshable + frequency)
+			refresh_time = refresh_time + timedelta(hours=frequency*refresh_hours)
 			dark_markets = await refresh_darkmarket(uid, **kwargs)
 	if not dark_markets:
 		data = await common.execute(f'SELECT pid, gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}";', **kwargs)
 		dark_markets = [{'pid': d[0], 'gid': d[1], 'mid': d[2], 'qty': d[3], 'cid': d[4], 'amt': d[5]} for d in data]
-		refresh_time_s = max(3600 - int((datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')).total_seconds()), 0)
+		refresh_time_s = max(3600 - int((current_time - refresh_time).total_seconds()), 0)
 		return common.mt(1, 'Get all black market information', {'dark_markets': dark_markets, 'refresh_time': refresh_time_s, 'refreshable': refreshable, 'config': {'refresh_diamond': kwargs['config']['player']['dark_market']['refresh_store']['diamond']}})
-	await common.execute_update(f'INSERT INTO timer(uid, tid, time) VALUES ("{uid}", "{enums.Timer.DARK_MARKET_TIME}", "{refresh_time}") ON DUPLICATE KEY UPDATE time="{refresh_time}";', **kwargs)
-	await common.execute_update(f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", "{enums.Limits.DARK_MARKET_LIMITS}", {refreshable}) ON DUPLICATE KEY UPDATE value={refreshable};', **kwargs)
-	refresh_time_s = max(3600 - int((datetime.strptime(current_time, '%Y-%m-%d %H:%M:%S') - datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S')).total_seconds()), 0)
+	await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
+	await common.set_limit(uid, enums.Limits.DARK_MARKET_LIMITS, refreshable, **kwargs)
+	refresh_time_s = max(3600 - int((current_time - refresh_time).total_seconds()), 0)
 	return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, 'refresh_time': refresh_time_s, 'refreshable': refreshable, 'config': {'refresh_diamond': kwargs['config']['player']['dark_market']['refresh_store']['diamond']}})
 
 

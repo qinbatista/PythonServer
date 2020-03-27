@@ -102,12 +102,18 @@ async def change_name(uid, gn, **kwargs):
 async def get_info(uid, **kwargs):
     # data包含玩家名字和家庭名字，info包含玩家进程信息
     data = await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs)
+
     info = await common.execute(f'SELECT energy, exp, stage, towerstage, hangstage FROM progress WHERE uid = "{uid}";', **kwargs)
     if info == ():
         await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
         info = await common.execute(f'SELECT energy, exp, stage, towerstage, hangstage FROM progress WHERE uid = "{uid}";', **kwargs)
     energy_info = await common.try_energy(uid, 0, **kwargs)
     return common.mt(0, 'success', {'gn': data[0][0], 'family_name': '' if data[0][1] is None else data[0][1], 'energy_info': energy_info['data'], 'exp': info[0][1], 'stage': info[0][2], 'towerstage': info[0][3], 'hangstage': info[0][4]})
+    # info = await common.execute(f'SELECT energy, exp, stage FROM progress WHERE uid = "{uid}";', **kwargs)
+    # sts = await common.execute(f'SELECT sid, stage FROM stages WHERE uid = "{uid}";', **kwargs)
+    # stages = {s[0]: s[1] for s in sts}
+    # energy_info = await common.try_energy(uid, 0, **kwargs)
+    # return common.mt(0, 'success', {'gn': data[0][0], 'family_name': '' if data[0][1] is None else data[0][1], 'energy_info': energy_info['data'], 'exp': info[0][1], 'stage': info[0][2], 'stages': stages})
 
 
 async def get_all_resource(uid, **kwargs):

@@ -141,7 +141,6 @@ class MessageHandler:
 				data['data']['other'], **data)
 
 	async def _get_info_player(self, data: dict) -> str:
-		data['player_energy'] = data['config']['player']['energy']
 		return await player.get_info(data['data']['unique_id'], **data)
 
 
@@ -521,7 +520,7 @@ class MessageHandler:
 		return common.mt(0, 'success', {'entry_consumables_config': data['config']['entry_consumables'], \
 				'stage_reward_config': data['config']['stage_reward'], \
 				'hang_reward_config': data['config']['hang_reward'],
-				'mopping_up': data['config']['stage']['mopping-up']})
+				'mopping_up': data['config']['stages']['mopping-up']})
 
 	async def _get_top_damage(self, data: dict) -> str:
 		return await stage.get_top_damage(data['data']['unique_id'], data['data']['page'], **data)
@@ -541,34 +540,34 @@ class MessageHandler:
 	# 	data.update({'hang_rewards': data['config']['hang_reward']})
 	# 	return await stage.get_hang_up_info(data['data']['unique_id'], **data)
 
-	async def _enter_stage_general(self, data: dict) -> str:
+	async def _stage_enter_general(self, data: dict) -> str:
 		return await stage.enter(data['data']['unique_id'], enums.Stage.GENERAL, int(data['data']['stage']), **data)
 
-	async def _victory_stage_general(self, data: dict) -> str:
+	async def _stage_victory_general(self, data: dict) -> str:
 		return await stage.victory(data['data']['unique_id'], enums.Stage.GENERAL, int(data['data']['stage']), **data)
 
-	async def _enter_stage_endless(self, data: dict) -> str:
+	async def _stage_enter_endless(self, data: dict) -> str:
 		return await stage.enter(data['data']['unique_id'], enums.Stage.ENDLESS, int(data['data']['stage']), **data)
 
-	async def _victory_stage_endless(self, data: dict) -> str:
+	async def _stage_victory_endless(self, data: dict) -> str:
 		return await stage.victory(data['data']['unique_id'], enums.Stage.ENDLESS, int(data['data']['stage']), **data)
 
-	async def _enter_stage_boss(self, data: dict) -> str:
+	async def _stage_enter_boss(self, data: dict) -> str:
 		return await stage.enter(data['data']['unique_id'], enums.Stage.BOSS, int(data['data']['stage']), **data)
 
-	async def _victory_stage_boss(self, data: dict) -> str:
+	async def _stage_victory_boss(self, data: dict) -> str:
 		return await stage.victory(data['data']['unique_id'], enums.Stage.BOSS, int(data['data']['stage']), data['data'].get('damage', 0), **data)
 
-	async def _enter_stage_coin(self, data: dict) -> str:
+	async def _stage_enter_coin(self, data: dict) -> str:
 		return await stage.enter(data['data']['unique_id'], enums.Stage.COIN, int(data['data']['stage']), **data)
 
-	async def _victory_stage_coin(self, data: dict) -> str:
+	async def _stage_victory_coin(self, data: dict) -> str:
 		return await stage.victory(data['data']['unique_id'], enums.Stage.COIN, int(data['data']['stage']), **data)
 
-	async def _enter_stage_exp(self, data: dict) -> str:
+	async def _stage_enter_exp(self, data: dict) -> str:
 		return await stage.enter(data['data']['unique_id'], enums.Stage.EXP, int(data['data']['stage']), **data)
 
-	async def _victory_stage_exp(self, data: dict) -> str:
+	async def _stage_victory_exp(self, data: dict) -> str:
 		return await stage.victory(data['data']['unique_id'], enums.Stage.EXP, int(data['data']['stage']), data['data'].get('damage', 0), **data)
 
 	async def _stage_refresh_boss(self, data: dict) -> str:
@@ -576,6 +575,9 @@ class MessageHandler:
 
 	async def _stage_damage_ranking(self, data: dict) -> str:
 		return await stage.damage_ranking(data['data']['unique_id'], data['data']['page'], **data)
+
+	async def _stage_hang_up(self, data: dict) -> str:
+		return await stage.hang_up(data['data']['unique_id'], **data)
 
 
 	###################### tasks ######################
@@ -895,18 +897,19 @@ FUNCTION_LIST = {
 	'start_hang_up': MessageHandler._start_hang_up,
 	'get_hang_up_reward': MessageHandler._get_hang_up_reward,
 	# TODO 2020年3月25日之后追加方法
-	'enter_stage_general': MessageHandler._enter_stage_general,
-	'victory_stage_general': MessageHandler._victory_stage_general,
-	'enter_stage_endless': MessageHandler._enter_stage_endless,
-	'victory_stage_endless': MessageHandler._victory_stage_endless,
-	'enter_stage_boss': MessageHandler._enter_stage_boss,
-	'victory_stage_boss': MessageHandler._victory_stage_boss,
-	'enter_stage_coin': MessageHandler._enter_stage_coin,
-	'victory_stage_coin': MessageHandler._victory_stage_coin,
-	'enter_stage_exp': MessageHandler._enter_stage_exp,
-	'victory_stage_exp': MessageHandler._victory_stage_exp,
+	'stage_enter_general': MessageHandler._stage_enter_general,
+	'stage_victory_general': MessageHandler._stage_victory_general,
+	'stage_enter_endless': MessageHandler._stage_enter_endless,
+	'stage_victory_endless': MessageHandler._stage_victory_endless,
+	'stage_enter_boss': MessageHandler._stage_enter_boss,
+	'stage_victory_boss': MessageHandler._stage_victory_boss,
+	'stage_enter_coin': MessageHandler._stage_enter_coin,
+	'stage_victory_coin': MessageHandler._stage_victory_coin,
+	'stage_enter_exp': MessageHandler._stage_enter_exp,
+	'stage_victory_exp': MessageHandler._stage_victory_exp,
 	'stage_refresh_boss': MessageHandler._stage_refresh_boss,
 	'stage_damage_ranking': MessageHandler._stage_damage_ranking,
+	'stage_hang_up': MessageHandler._stage_hang_up,
 
 
 	###################### tasks ######################

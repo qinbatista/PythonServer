@@ -620,6 +620,8 @@ async def try_stage(uid, stage, stage_type, **kwargs):
 # 90 - level insufficient
 # 89 - Page number error
 # 88 - No data for this page
+# 87 - You didn't go pass
+# 86 - You never hung up before
 # 0 - success
 
 
@@ -674,11 +676,10 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
         return common.mt(94, 'stage mismatch')
     config, rewards = kwargs['config']['stages']['stage'].get(f'{stage}', None), {'boss': {}}
     # TODO 奖励普通物资
+    rwc = config['rewards']['common']
     if config['constraint']['random'] == 1:
-        results = await summoning.reward_items(uid, ','.join(random.choices(config['rewards']['common'], k=config['rewards']['random'])), **kwargs)
-    else:
-        results = await summoning.reward_items(uid, ','.join(config['rewards']['common']), **kwargs)
-    rewards['remain'], rewards['reward'] = [f'{g}:{i}:{v}' for g, i, v, _ in results], [f'{g}:{i}:{v}' for g, i, _, v in results]
+        rwc = random.choices(rwc, k=config['rewards']['random'])
+    await rw_common(uid, rwc, rewards, **kwargs)
     # TODO 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['rewards']['special'].get('exp', 0), **kwargs)
     # TODO BOSS模式则记录boss伤害信息
@@ -695,6 +696,8 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
             await set_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, damage, **kwargs)
         ratio = {i: "%.2f" % (hp/config['HP'][i]) for i, hp in enumerate(config['hp'])}
         rewards['boss'] = {'ratio': ratio, 'record': record, 'damage': max(damage, _damage)}
+    if sid == enums.Stage.ENDLESS and stage > _stage:
+        await hang_up(uid, **kwargs)
     # TODO 设置关卡通过状态
     await common.set_stage(uid, sid, max(stage, _stage), '', **kwargs)
     await common.set_progress(uid, 'stage', 0, **kwargs)
@@ -720,8 +723,7 @@ async def mopping_up(uid, stage, count=1, **kwargs):
     data = (await common.try_energy(uid, -energy, **kwargs))['data']
     rewards = {'energy': {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}}
     # TODO 奖励普通物资
-    results = await summoning.reward_items(uid, ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['rewards']['common']]), **kwargs)
-    rewards['remain'], rewards['reward'] = [f'{g}:{i}:{v}' for g, i, v, _ in results], [f'{g}:{i}:{v}' for g, i, _, v in results]
+    await rw_common(uid, config['rewards']['common'], rewards, mul=count, **kwargs)
     # TODO 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
     return common.mt(0, 'success', rewards)
@@ -776,20 +778,51 @@ async def damage_ranking(uid, page, **kwargs):
     return common.mt(0, 'success', {'page': page, 'damage': damage, 'ranking': ranking, 'rank': rank})
 
 
-async def hang_up(uid, stage, **kwargs):
-    pass
+async def hang_up(uid, **kwargs):
+    now = datetime.now(tz=common.TZ_SH)
+    tim = await common.get_timer(uid, enums.Timer.STAGE_HANG_UP, **kwargs)
+    stage, _ = await common.get_stage(uid, enums.Stage.ENDLESS, **kwargs)
+    if tim is None:
+        if stage <= 1000:
+            return common.mt(87, "You didn't go pass")
+        await common.set_timer(uid, enums.Timer.STAGE_HANG_UP, now, **kwargs)
+        return common.mt(86, "You never hung up before")
+    cfc = kwargs['config']['stages']['constraint']['hang-up']['ENDLESS']
+    mul = int(min((now - tim).total_seconds(), cfc['limit'])//cfc['step'])
+    config = kwargs['config']['stages']['hang-up'][f'{stage}']['rewards']
+    rewards = {}
+    # TODO 奖励普通物资
+    await rw_common(uid, config['common'], rewards, mul=mul, **kwargs)
+    # TODO 奖励特殊物资
+    rewards['exp_info'] = await increase_exp(uid, config['special'].get('exp', 0) * mul, **kwargs)
+    await common.set_timer(uid, enums.Timer.STAGE_HANG_UP, now, **kwargs)
+    return common.mt(0, 'success', rewards)
+
+
+async def rw_common(uid, common, rewards, mul=1, **kwargs):
+    cms = ','.join([f'{multiple_rw(mul, item)}' for item in common])
+    results = await summoning.reward_items(uid, cms, **kwargs)
+    rewards['remain'], rewards['reward'] = rm_rw(results)
+
+
+def multiple_rw(mul, item):
+    return f'{item[:item.rfind(":")]}:{int(item[item.rfind(":") + 1:]) * mul}'
+
+
+def rm_rw(results):
+    return [f'{g}:{i}:{v}' for g, i, v, _ in results], [f'{g}:{i}:{v}' for g, i, _, v in results]
 
 
 async def v_coin(uid, lids, **kwargs):
     lv = (await vip.increase_exp(uid, 0, **kwargs))['level']
-    config = kwargs['config']['stages']['constraint']['COIN']
+    config = kwargs['config']['stages']['constraint']['stage']['COIN']
     lcs = [config['limit'], config['buy']['vip'].get(f'{lv}', 2)]
     return await v_constraint(uid, enums.Timer.STAGE_COIN, lids, lcs, **kwargs)
 
 
 async def v_exp(uid, lids, **kwargs):
     lv = (await vip.increase_exp(uid, 0, **kwargs))['level']
-    config = kwargs['config']['stages']['constraint']['EXP']
+    config = kwargs['config']['stages']['constraint']['stage']['EXP']
     lcs = [config['limit'], config['buy']['vip'].get(f'{lv}', 2)]
     return await v_constraint(uid, enums.Timer.STAGE_EXP, lids, lcs, **kwargs)
 
@@ -856,14 +889,14 @@ STAGE_CHECK = {
 
 
 VERIFY = {
-    enums.Stage.BOSS: lambda uid, **kwargs: v_constraint(uid, enums.Timer.WORLD_BOSS, [enums.Limits.WORLD_BOSS, ], [kwargs['config']['boss']['limit'], ], **kwargs),
+    enums.Stage.BOSS: lambda uid, **kwargs: v_constraint(uid, enums.Timer.STAGE_WORLD_BOSS, [enums.Limits.STAGE_WORLD_BOSS, ], [kwargs['config']['boss']['limit'], ], **kwargs),
     enums.Stage.COIN: lambda uid, **kwargs: v_coin(uid, [enums.Limits.STAGE_COIN, enums.Limits.STAGE_COIN_VIP], **kwargs),
     enums.Stage.EXP: lambda uid, **kwargs: v_exp(uid, [enums.Limits.STAGE_EXP, enums.Limits.STAGE_EXP_VIP], **kwargs),
 }
 
 
 REALIZE = {
-    enums.Stage.BOSS: lambda uid, tim, lms, **kwargs: r_constraint(uid, enums.Timer.WORLD_BOSS, tim, lms, **kwargs),
+    enums.Stage.BOSS: lambda uid, tim, lms, **kwargs: r_constraint(uid, enums.Timer.STAGE_WORLD_BOSS, tim, lms, **kwargs),
     enums.Stage.COIN: lambda uid, tim, lms, **kwargs: r_constraint(uid, enums.Timer.STAGE_COIN, tim, lms, **kwargs),
     enums.Stage.EXP: lambda uid, tim, lms, **kwargs: r_constraint(uid, enums.Timer.STAGE_EXP, tim, lms, **kwargs),
 }
