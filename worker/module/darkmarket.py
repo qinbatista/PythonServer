@@ -129,12 +129,13 @@ async def diamond_refresh(uid, **kwargs):
 	if not can:
 		return common.mt(98, 'Insufficient diamond')
 	else:
-		refresh_time = datetime.now(tz=common.TZ_SH)
+		cooling = int((datetime.now(tz=common.TZ_SH) - refresh_time).total_seconds())
+		# refresh_time = datetime.now(tz=common.TZ_SH)
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
-		await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
+		# await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
 		return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, \
 				'diamond' : {'remaining' : diamond, 'reward' : need_diamond}, \
-				'refresh_time': 3600, 'refreshable': refreshable, 'refresh_diamond': need_diamond})
+				'refresh_time': cooling, 'refreshable': refreshable, 'refresh_diamond': need_diamond})
 
 
 async def free_refresh(uid, **kwargs):
@@ -145,20 +146,21 @@ async def free_refresh(uid, **kwargs):
 	"""
 	current_time = datetime.now(tz=common.TZ_SH)
 	refresh_time = await common.get_timer(uid, enums.Timer.DARK_MARKET_TIME, **kwargs)
-	refreshable =  await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
+	refreshable = await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
 	if refresh_time is None or refreshable is None:
 		return common.mt(99, 'You have not yet done an automatic refresh')
 	elif refreshable <= 0:
 		return common.mt(98, 'Insufficient free refresh')
 	else:
+		cooling = int((current_time - refresh_time).total_seconds())
 		refreshable, refresh_time = refreshable - 1, current_time
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
-		await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
+		# await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
 		await common.set_limit(uid, enums.Limits.DARK_MARKET_LIMITS, refreshable, **kwargs)
 		_, current_diamond = await common.try_item(uid, enums.Item.DIAMOND, 0, **kwargs)
 		return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, \
 				'diamond' : {'remaining' : current_diamond, 'reward' : 0}, \
-				'refresh_time': 3600, 'refreshable': refreshable, \
+				'refresh_time': cooling, 'refreshable': refreshable, \
 				'refresh_diamond' : kwargs['config']['player']['dark_market']['refresh_store']['diamond']})
 
 
