@@ -60,7 +60,7 @@ class Worker:
 				disconnected_cb        = Worker.on_nats_disconnect)
 
 		await self.resource.init()
-	
+
 	async def process_job(self, job):
 		self.ujobs += 1
 		jid, work = job.data.decode().split('~', maxsplit = 1)

@@ -50,23 +50,23 @@ def main():
         # processes.append(
         #     subprocess.Popen(
         #         [GetPythonCommand(), loc() + '/auth/auth.py', 'lukseunsecret',
-        #          '--redis-addr', '192.168.1.143']))
+        #          '--redis-addr', '127.0.0.1']))
         # processes.append(
         #     subprocess.Popen(
         #         [GetPythonCommand(), loc() + '/edge/edge.py', '--redis-addr',
-        #          '192.168.1.143', '--nats-addr', '192.168.1.143']))
+        #          '127.0.0.1', '--nats-addr', '127.0.0.1']))
         processes.append(
             subprocess.Popen(
                 [GetPythonCommand(), loc() + '/worker/worker.py', '--channel',
-                 get_host_ip(), '--db_port', '3307', '--redis-addr',
-                 '192.168.1.143', '--nats-addr', '192.168.1.143', '--token-addr',
-                 '192.168.1.143', '--mail-addr', '192.168.1.143', '--debug'],
+                 get_host_ip(), '--db-addr', '127.0.0.1', '--db_port', '3307',
+                 '--redis-addr', '127.0.0.1', '--nats-addr', '127.0.0.1',
+                 '--token-addr', '127.0.0.1', '--mail-addr', '127.0.0.1', '--debug'],
                 shell=False))
         processes.append(
             subprocess.Popen(
                 [GetPythonCommand(), loc() + '/gate/gate.py', '--channel',
-                 get_host_ip(), '--redis-addr', '192.168.1.143', '--nats-addr',
-                 '192.168.1.143', '--debug'], shell=False))
+                 get_host_ip(), '--redis-addr', '127.0.0.1', '--nats-addr',
+                 '127.0.0.1', '--debug'], shell=False))
         time.sleep(0.2)
         print('Done spawning servers...')
         while len(processes) > 0:

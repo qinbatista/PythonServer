@@ -129,7 +129,7 @@ async def diamond_refresh(uid, **kwargs):
 	if not can:
 		return common.mt(98, 'Insufficient diamond')
 	else:
-		cooling = int((datetime.now(tz=common.TZ_SH) - refresh_time).total_seconds())
+		cooling = 3600 - int((datetime.now(tz=common.TZ_SH) - refresh_time).total_seconds())
 		# refresh_time = datetime.now(tz=common.TZ_SH)
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
 		# await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
@@ -152,7 +152,7 @@ async def free_refresh(uid, **kwargs):
 	elif refreshable <= 0:
 		return common.mt(98, 'Insufficient free refresh')
 	else:
-		cooling = int((current_time - refresh_time).total_seconds())
+		cooling = 3600 - int((current_time - refresh_time).total_seconds())
 		refreshable, refresh_time = refreshable - 1, current_time
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
 		# await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
