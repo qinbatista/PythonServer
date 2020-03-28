@@ -608,7 +608,7 @@ async def old_mopping_up(uid, stage, count=1, **kwargs):
     """关于扫荡关卡的方法"""
     if count <= 0: return common.mt(96, 'Can only be a positive integer')
     if stage > await common.get_progress(uid, 'stage', **kwargs): return common.mt(99, 'Do not sweep until you pass this checkpoint')
-    config = kwargs['config']['stage']['mopping-up'].get(f'{stage}', None)
+    config = kwargs['config']['stages']['mopping-up'].get(f'{stage}', None)
     if config is None: return common.mt(98, 'There is no configuration information for this stage')  # 扫荡序章或未写配置的关卡会返回此结果
     # TODO 检查特殊物资是否能消耗
     energy = config['consumes']['special'].get('energy', 0) * count
