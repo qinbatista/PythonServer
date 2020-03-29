@@ -109,9 +109,7 @@ async def refresh_market(uid, **kwargs):
 	if refreshable is None:
 		return await refresh_darkmarket(uid, **kwargs)
 	elif refreshable > 0:
-		free_data = await free_refresh(uid, **kwargs)
-		if free_data['status'] == 98: free_data['status'] = 97
-		return free_data
+		return await free_refresh(uid, **kwargs)
 	else:
 		return await diamond_refresh(uid, **kwargs)
 
@@ -154,7 +152,7 @@ async def free_refresh(uid, **kwargs):
 	if refresh_time is None or refreshable is None:
 		return common.mt(99, 'You have not yet done an automatic refresh')
 	elif refreshable <= 0:
-		return common.mt(98, 'Insufficient free refresh')
+		return common.mt(97, 'Insufficient free refresh')
 	else:
 		if refreshable == lim:
 			refresh_time = current_time
