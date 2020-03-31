@@ -4,15 +4,12 @@ task.py
 
 from module import enums
 from module import common
-from module import achievement
 from datetime import datetime
-import time
-from module import task
 
 
 async def get_all_task(uid, **kwargs):
 	kwargs.update({"task_id":enums.Task.LOGIN})
-	await task.record_task(uid, **kwargs)
+	await record_task(uid, **kwargs)
 	await delete_old_data(uid, **kwargs)
 	task_sql = await common.execute(f'SELECT tid, value, reward, timer FROM task WHERE uid = "{uid}";', **kwargs)
 	return common.mt(0, 'success', {'tasks': [{'tid': t[0], 'task_value': t[1], 'reward': t[2], 'timer': t[3]} for t in task_sql]})
@@ -20,8 +17,9 @@ async def get_all_task(uid, **kwargs):
 
 async def record_task(uid, **kwargs):
 	await delete_old_data(uid, **kwargs)
-	await common.execute(f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["task_id"]},1,0,"{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}") ON DUPLICATE KEY UPDATE `value`= {1}', **kwargs)
-	await common.execute(f'INSERT INTO task (uid, tid, value, reward, timer) SELECT "{uid}", {enums.Task.DONE_10_TASK}, IF((@i:=COUNT(*)) >= 10, 1, 0), 0, IF(COUNT(*) >= 10, "{datetime.now(common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")}", "") FROM task WHERE uid = "{uid}" ON DUPLICATE KEY UPDATE value=IF(@i >= 11 AND reward != 1, 1, value), timer=IF(@i >= 11 AND reward != 1 AND timer = "", "{datetime.now(common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")}", timer);', **kwargs)
+	now = datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")
+	await common.execute(f'INSERT INTO task (uid, tid, value,reward,timer) VALUES ("{uid}", {kwargs["task_id"]},1,0,"{now}") ON DUPLICATE KEY UPDATE `value`= {1}', **kwargs)
+	await common.execute(f'INSERT INTO task (uid, tid, value, reward, timer) SELECT "{uid}", {enums.Task.DONE_10_TASK}, IF((@i:=COUNT(*)) >= 10, 1, 0), 0, IF(COUNT(*) >= 10, "{now}", "") FROM task WHERE uid = "{uid}" ON DUPLICATE KEY UPDATE value=IF(@i >= 11 AND reward != 1, 1, value), timer=IF(@i >= 11 AND reward != 1 AND timer = "", "{now}", timer);', **kwargs)
 	return common.mt(0, 'record:' + str(kwargs["task_id"]) + " success")
 
 
@@ -40,4 +38,5 @@ async def get_task_reward(uid, task_id, **kwargs):
 
 
 async def delete_old_data(uid, **kwargs):
-	await common.execute(f'DELETE FROM task WHERE uid="{uid}" AND timer<"{datetime.now().strftime("%Y-%m-%d")}";', **kwargs)
+	now = datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d 00:00:00")
+	await common.execute(f'DELETE FROM task WHERE uid="{uid}" AND timer<"{now}";', **kwargs)

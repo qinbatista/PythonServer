@@ -39,20 +39,23 @@ def get_login_token_chat(token,world):
 
 async def send_loop(lc):
 	while True:
-		await lc.send_message("0000PUBLIC"+datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+		ts = input("请输入需要说的话：")
+		await lc.send_message(f"0000PUBLIC{ts}")
+		# await lc.send_message("0000PUBLIC"+datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 async def recv_loop(lc):
 	while True:
 		print(await lc.receive_message())
 
 async def wrapper(nonce):
-	client = LukseunClient(nonce, 'remote1.magicwandai.com', 9000)
+	# client = LukseunClient(nonce, 'remote1.magicwandai.com', 9000)
+	client = LukseunClient(nonce, '192.168.1.143', 9000)
 	await client.create()
 	await client.send_message('00REGISTER' + nonce)
 	# while True:
 	# 	ts = input("请输入需要说的话：")
 	# 	await client.send_message(f"0000PUBLIC{ts}")
-	# 	await client.receive_message()
+	# 	print(f'内容：{await client.receive_message()}')
 	asyncio.create_task(send_loop(client))
 	asyncio.create_task(recv_loop(client))
 	while True:
@@ -67,4 +70,7 @@ def chat_dialog(token,world,info):
 
 
 if __name__ == "__main__":
-	pass
+	uid = f'106'
+	wrd = f's6'
+	token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
+	chat_dialog(token, wrd, '')

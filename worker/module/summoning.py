@@ -304,13 +304,14 @@ async def single_c(uid, **kwargs):
 	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
-	# TODO 次数检查和限制
-	can, lim = await _refresh_lim(uid, cid, var=-1, **kwargs)
-	if not can: common.mt(95, 'Insufficient number of lucky draw')
-	# TODO 消耗物品
+	# TODO 消耗低级代抽券
 	consume_id, consume = enums.Item.SUMMON_SCROLL_C, 1
-	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-	if not can:
+	c_can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
+	# TODO 次数检查和限制
+	can, lim = await _refresh_lim(uid, cid, var=0 if c_can else -1, **kwargs)
+	if can is False: common.mt(95, 'Insufficient number of lucky draw')
+	# TODO 消耗物品
+	if not c_can:
 		consume_id, consume = cid, abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 		if not can:  # 材料不足恢复原来的次数
@@ -358,7 +359,7 @@ async def single_g(uid, **kwargs):
 async def refresh_d(uid, **kwargs):
 	"""刷新钻石抽奖市场方法"""
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_D_END, **kwargs)
-	current  = datetime.now(tz=common.TZ_SH)
+	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.DIAMOND
 	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
 	if end_time is not None and end_time > current and count > 0:
@@ -374,7 +375,7 @@ async def refresh_d(uid, **kwargs):
 async def refresh_c(uid, **kwargs):
 	"""刷新金币抽奖市场方法"""
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_C_END, **kwargs)
-	current  = datetime.now(tz=common.TZ_SH)
+	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.COIN
 	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
 	if end_time is not None and end_time > current and count > 0:
@@ -390,7 +391,7 @@ async def refresh_c(uid, **kwargs):
 async def refresh_g(uid, **kwargs):
 	"""刷新朋友爱心抽奖市场方法"""
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_G_END, **kwargs)
-	current  = datetime.now(tz=common.TZ_SH)
+	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.FRIEND_GIFT
 	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
 	if end_time is not None and end_time > current and count > 0:
@@ -462,39 +463,36 @@ async def _refresh(uid, cid: enums, **kwargs):
 	config = kwargs['config']['summon']['resource'].get(cid.name, None)
 	if config is None: return common.mt(93, 'The configuration file does not exist')
 	constraint.update({'qty': config['qty'], 'refresh': config['constraint']['refresh']})
-	data = []
+	rds = []
 	# grids = [i for i in range(config['constraint'].get('grid', GRID))]
 	grids = [i for i in range(GRID)]
 	random.shuffle(grids)
 	goods = config['must']['goods']
-	goods_qty = len(goods)
-	if len(grids) >= goods_qty:
-		for i, m in enumerate(goods):
-			pid = grids[i]
-			mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
-			wgt = m['weight']
-			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
-			data.append({'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
-		optional = random.choices(kwargs['config']['summon']['merchandise'], k=len(grids) - goods_qty)
-		for i, m in enumerate(optional):
-			pid = grids[goods_qty + i]
-			mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
-			wgt = m['weight']
-			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
-			data.append({ 'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
-	else:
-		for i, pid in enumerate(grids):
-			m = goods[i]
-			mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
-			wgt = m['weight']
-			await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
-			data.append({'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
+	await random_summon(uid, cid, grids, goods, rds, 0, **kwargs)
+	gdk = len(goods)
+	k = len(grids) - gdk
+	if k > 0:
+		goods = random.choices(kwargs['config']['summon']['merchandise'], k=k)
+		await random_summon(uid, cid, grids, goods, rds, gdk, **kwargs)
 	hours = config['constraint']['hours']
-	end_time = now + timedelta(hours=hours)
-	await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
-	constraint['cooling'] = hours * 3600
+	tim = await common.get_timer(uid, SUMMON_SWITCH[cid], **kwargs) or now
+	cooling = int((tim - now).total_seconds())
+	if cooling <= 0:
+		cooling = hours * 3600
+		end_time = now + timedelta(seconds=cooling)
+		await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
+	constraint['cooling'] = cooling
 	constraint['acp'] = await _get_acp(uid, **kwargs)
-	return common.mt(0, 'success', {'refresh': data, 'constraint': constraint})
+	return common.mt(0, 'success', {'refresh': rds, 'constraint': constraint})
+
+
+async def random_summon(uid, cid, grids, goods, rds, inc, **kwargs):
+	for i, m in enumerate(goods):
+		pid = grids[i + inc]
+		mid = f'{m["gid"]}:{random.choice(m["mid"])}:{m["qty"]}'
+		wgt = m['weight']
+		await _set_summon(uid, cid, pid, mid, wgt, 0, **kwargs)
+		rds.append({'pid': pid, 'mid': mid, 'wgt': wgt, 'isb': 0})
 
 
 async def _refresh_lim(uid, cid, var=0, **kwargs):

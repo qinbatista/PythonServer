@@ -46,7 +46,7 @@ CHECK_IN = loc() + '/configuration/{}/server/check_in.json'
 VIP_CONFIG = loc() + '/configuration/{}/server/vip_config.json'
 PACKAGE = loc() + '/configuration/{}/server/package.json'
 SUMMON = loc() + '/configuration/{}/server/summon.json'
-STAGE = loc() + '/configuration/{}/server/stage.json'
+STAGES = loc() + '/configuration/{}/server/stages.json'
 
 
 class RepeatingTimer(threading.Thread):
@@ -87,7 +87,7 @@ class ConfigurationManager:
 		self._read_vip_config_config()
 		self._read_package_config()
 		self._read_summon_config()
-		self._read_stage_config()
+		self._read_stages_config()
 
 		# read this one last
 		self._read_game_manager_config()
@@ -126,8 +126,8 @@ class ConfigurationManager:
 	def _read_summon_config(self):
 		self._summon = json.load(open(SUMMON.format(self._sv), encoding='utf-8'))
 
-	def _read_stage_config(self):
-		self._stage = json.load(open(STAGE.format(self._sv), encoding='utf-8'))
+	def _read_stages_config(self):
+		self._stages = json.load(open(STAGES.format(self._sv), encoding='utf-8'))
 
 	def _read_game_manager_config(self):
 		# reward_list = [v for v in (json.load(open(REWARD_LIST.format(self._cv), encoding = 'utf-8'))).values()]
@@ -150,7 +150,7 @@ class ConfigurationManager:
 			'achievement': self._achievement_config, 'task': self._task_config,
 			'check_in': self._check_in_config, 'vip': self._vip_config,
 			'world' : world, 'version': self._sv, 'package': self._package,
-			'summon': self._summon, 'stage': self._stage
+			'summon': self._summon, 'stages': self._stages
 		}
 
 	def _read_level_enemy_layouts_config(self):

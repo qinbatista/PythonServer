@@ -32,8 +32,8 @@ class Worker:
 				token_port = self.args.token_port, mail_addr = self.args.mail_addr, \
 				mail_port = self.args.mail_port)
 		self.configs = worker_resources.ModuleConfigurations(self.args.config_addr, self.args.config_port)
-		self.resource = worker_resources.WorkerResources(self.args.redis_addr, self.args.db_addr, \
-				self.args.db_user, self.args.db_pw)
+		self.resource = worker_resources.WorkerResources(self.args.redis_addr, self.args.db_addr,
+				self.args.db_user, self.args.db_pw, self.args.db_port)
 
 	async def start(self):
 		try:
@@ -60,7 +60,7 @@ class Worker:
 				disconnected_cb        = Worker.on_nats_disconnect)
 
 		await self.resource.init()
-	
+
 	async def process_job(self, job):
 		self.ujobs += 1
 		jid, work = job.data.decode().split('~', maxsplit = 1)
@@ -150,7 +150,8 @@ async def main():
 	parser.add_argument('--debug'      , action = 'store_true')
 	parser.add_argument('--db-pw'      , type = str, default = 'lukseun')
 	parser.add_argument('--db-user'    , type = str, default = 'root')
-	parser.add_argument('--db-addr'    , type = str, default = '192.168.1.102')
+	parser.add_argument('--db-addr'    , type = str, default = '192.168.1.143')
+	parser.add_argument('--db_port'    , type = int, default = 3306)
 	parser.add_argument('--channel'    , type = str, default = 'jobs')
 	parser.add_argument('--config-port', type = int, default = 8000) 
 	parser.add_argument('--config-addr', type = str, default = 'localhost')

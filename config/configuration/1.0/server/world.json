@@ -1,1 +1,64 @@
-{"worlds": [{"id": "s0", "name": "default world", "status": 0, "merge" : "s0"}, {"id": "s1", "name": "world s1", "status": 0, "merge" : "s1"}, {"id": "s2", "name": "world s2", "status": 0, "merge" : "s2"}, {"id": "s3", "name": "world s3", "status": 0, "merge": "s3"}, {"id": "s4", "name": "world s4", "status": 0, "merge": "s4"}, {"id": "s5", "name": "world s5", "status": 0, "merge":"s5"}, {"id": "s6", "name": "world s6", "status": 0, "merge":"s6"}, {"id": "s7", "name": "world s7", "status": 0,"merge":"s7"}, {"id": "s8", "name": "world s8", "status": 0,"merge":"s8"}, {"id": "s9", "name": "world s9", "status": 0,"merge":"s9"}]}
+{
+    "worlds": [
+        {
+            "status": 0,
+            "id": "s0",
+            "name": "world s0",
+            "merge": "s0"
+        },
+        {
+            "status": 0,
+            "id": "s1",
+            "name": "world s1",
+            "merge": "s1"
+        },
+        {
+            "status": 0,
+            "id": "s2",
+            "name": "world s2",
+            "merge": "s2"
+        },
+        {
+            "status": 0,
+            "id": "s3",
+            "name": "world s3",
+            "merge": "s3"
+        },
+        {
+            "status": 0,
+            "id": "s4",
+            "name": "world s4",
+            "merge": "s4"
+        },
+        {
+            "status": 0,
+            "id": "s5",
+            "name": "world s5",
+            "merge": "s5"
+        },
+        {
+            "status": 0,
+            "id": "s6",
+            "name": "world s6",
+            "merge": "s6"
+        },
+        {
+            "status": 0,
+            "id": "s7",
+            "name": "world s7",
+            "merge": "s7"
+        },
+        {
+            "status": 0,
+            "id": "s8",
+            "name": "world s8",
+            "merge": "s8"
+        },
+        {
+            "status": 0,
+            "id": "s9",
+            "name": "world s9",
+            "merge": "s9"
+        }
+    ]
+}

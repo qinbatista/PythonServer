@@ -63,7 +63,7 @@
 		},
 		"repeatable": "y"
 	},
-	"EXPERIENCE_POTION_MIN": {
+	"EXP_POINT_MIN": {
 		"quantity": 100,
 		"price": {
 			"RMB": 7,
@@ -71,7 +71,7 @@
 		},
 		"repeatable": "y"
 	},
-	"EXPERIENCE_POTION_SMALL": {
+	"EXP_POINT_SMALL": {
 		"quantity": 300,
 		"price": {
 			"RMB": 7,
@@ -79,7 +79,7 @@
 		},
 		"repeatable": "y"
 	},
-	"EXPERIENCE_POTION_LARGE": {
+	"EXP_POINT_LARGE": {
 		"quantity": 1000,
 		"price": {
 			"RMB": 7,
@@ -87,7 +87,7 @@
 		},
 		"repeatable": "y"
 	},
-	"EXPERIENCE_POTION_PLENTY": {
+	"EXP_POINT_PLENTY": {
 		"quantity": 10000,
 		"price": {
 			"RMB": 7,
@@ -95,7 +95,7 @@
 		},
 		"repeatable": "y"
 	},
-	"EXPERIENCE_POTION_BAG": {
+	"EXP_POINT_BAG": {
 		"quantity": 10000,
 		"price": {
 			"RMB": 7,

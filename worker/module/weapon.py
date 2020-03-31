@@ -24,13 +24,14 @@ async def level_up(uid, wid, delta, **kwargs):
 	kwargs.update({"aid":enums.Achievement.LEVEL_UP_WEAPON})
 	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
 
+	wst = int(wid//100)
+	max_lv = ((wst if wst < 5 else 5) if wst > 2 else 2) * 20 + 20
 	wid = enums.Weapon(wid)
 	exists, payload = await _get_weapon_info(uid, wid, 'star', 'level', 'skillpoint', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')
 	star, level, sp = payload
 	if star == 0: return common.mt(96, "You don't have the weapon")
 	if delta <= 0: return common.mt(98, 'The delta must be a positive integer')
-	max_lv = kwargs['config']['weapon']['standard_costs']['upgrade_lv']['max']
 	config = kwargs['config']['weapon']['standard_costs']['upgrade_lv']['iron']
 	if max_lv <= level: return common.mt(95, 'max lv')
 	delta = delta if delta + level <= max_lv else (max_lv - level)
@@ -49,11 +50,18 @@ async def level_up(uid, wid, delta, **kwargs):
 													enums.Group.ITEM.value : [{'iid' : enums.Item.IRON.value, 'value' :consume}, {'iid' : enums.Item.COIN.value, 'value' : consume}]}})
 
 async def level_up_passive(uid, wid, pid, **kwargs):
+	max_pid = 4 if wid // 100 > 2 else 3
+	if pid > max_pid:
+		return common.mt(99, 'pid error')
+	max_lv = 1 if (max_pid == pid and wid // 100 <= 4) else 3
 	wid, pid = enums.Weapon(wid), enums.WeaponPassive(pid)
 	exists, payload = await _get_weapon_info(uid, wid, 'skillpoint', **kwargs)
+	lv = await _get_passive_level(uid, wid, pid, **kwargs) + 1
+	if lv > max_lv:
+		return common.mt(99, 'max level')
 	if not exists or payload[0] <= 0: return common.mt(99, 'insufficient materials')
-	level = await _increase_passive_level(uid, wid, pid, **kwargs)
-	return common.mt(0, 'success', {'remaining': {'wid': wid.value, 'pid': pid.value, 'level': level,
+	await _set_passive_level(uid, wid, pid, lv, **kwargs)
+	return common.mt(0, 'success', {'remaining': {'wid': wid.value, 'pid': pid.value, 'level': lv,
 			'sp': payload[0] - 1}, 'reward': {'wid': wid.value, 'pid': pid.value, 'level': 1, 'sp': 1}})
 
 async def level_up_star(uid, wid, **kwargs):
@@ -108,10 +116,12 @@ async def _get_weapon_info(uid, wid, *args, **kwargs):
 	data = await common.execute(f'SELECT {",".join(args)} FROM weapon WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
 	return (True, data[0]) if data != () else (False, ())
 
-async def _increase_passive_level(uid, wid, pid, **kwargs):
-	await asyncio.gather(common.execute(f'UPDATE weapon SET skillpoint = skillpoint - 1 WHERE uid = "{uid}" AND wid = {wid.value};', **kwargs), common.execute(f'INSERT INTO weaponpassive (uid, wid, pid, level) VALUES ("{uid}", {wid.value}, {pid.value}, 1) ON DUPLICATE KEY UPDATE level = level + 1;', **kwargs))
-	level = await common.execute(f'SELECT level FROM weaponpassive WHERE uid = "{uid}" AND wid = {wid.value} AND pid = {pid.value};', **kwargs)
-	return level[0][0]
+async def _get_passive_level(uid, wid, pid, **kwargs):
+	lvd = await common.execute(f'SELECT level FROM weaponpassive WHERE uid = "{uid}" AND wid = {wid} AND pid = {pid};', **kwargs)
+	return 0 if lvd == () else lvd[0][0]
+
+async def _set_passive_level(uid, wid, pid, level, **kwargs):
+	await asyncio.gather(common.execute(f'UPDATE weapon SET skillpoint = skillpoint - 1 WHERE uid = "{uid}" AND wid = {wid};', **kwargs), common.execute(f'INSERT INTO weaponpassive (uid, wid, pid, level) VALUES ("{uid}", {wid}, {pid}, 1) ON DUPLICATE KEY UPDATE level = {level};', **kwargs))
 
 async def _reset_skill_point(uid, wid, **kwargs):
 	reclaimed = sum(level[0] for level in await common.execute(f'SELECT level FROM weaponpassive WHERE uid = "{uid}" AND wid = {wid.value};', **kwargs))

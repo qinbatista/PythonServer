@@ -79,12 +79,12 @@ def factory_dialog(token,world,get_all_weapon):
 
 
 if __name__ == '__main__':
-	tk1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzkxNDM1ODMsInVpZCI6ImgwIn0.sqnbjsCJ_8OefTY-M9IHFARhqQ6cm6kATzUUlRekwjY'
+	tk1 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODY2OTE0MDYsInVpZCI6IjcxNjIxMDdiYTBlNTc2ODdjODQwNzE5NDUxMmZjMWRmYjQyNmQ0NjJfcmVnaXN0ZXJfMTMyMjg1NTQ0OTcxNTYzMDkzNjA3MDY2In0.yPEFnu5TmfDYY_LaKWYRImrYgDg00z5tKKyMEJivrk4'
 	wd1 = 's6'
-	user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'set_armor_factory', 'data' : {'token' : tk1, 'aid': "3"}})
+	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'set_armor_factory', 'data' : {'token' : tk1, 'aid': "3"}})
 	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'buy_acceleration_factory', 'data' : {'token' : tk1, 'fid': "0"}})
 	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'buy_worker_factory', 'data' : {'token' : tk1, 'fid': "0"}})
-	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'upgrade_factory', 'data' : {'token' : tk1, 'fid': "0"}})
+	user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'upgrade_factory', 'data' : {'token' : tk1, 'fid': "0"}})
 	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'update_worker_factory', 'data' : {'token' : tk1, 'worker': {"0": 3, "-1": 0, "2": 0, "3": 0}}})
 	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'gather_resource_factory', 'data' : {'token' : tk1, 'resource': {"0": 3}}})
 	# user_behavior_simulation.send_tcp_message({'world' : wd1, 'function' : 'activate_wishing_pool_factory', 'data' : {'token' : tk1, 'wid': 6}})
