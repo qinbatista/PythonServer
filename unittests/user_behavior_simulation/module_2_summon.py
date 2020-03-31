@@ -172,12 +172,13 @@ if __name__ == '__main__':
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_all_infos', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_damage_ranking', 'data': {'token': token, 'page': 1}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_info_player', 'data': {'token': token, 'page': 1}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_player', 'data': {'token': token, 'page': 1}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_hang_up', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_task', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_task_reward', 'data': {'token': token, 'task_id': 1}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_market', 'data': {'token': token, 'task_id': 1}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_market', 'data': {'token': token, 'task_id': 1}})
-	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_stage', 'data': {'token': token, 'task_id': 1}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_stage', 'data': {'token': token, 'task_id': 1}})
 	# user_behavior_simulation.send_tcp_message(
 	# 	{'world': world, 'function': 'request_friend',
 	# 	 'data': {'token': token, 'gn_target': 'a16'}})

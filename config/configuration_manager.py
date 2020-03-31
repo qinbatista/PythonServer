@@ -25,19 +25,15 @@ FACTORY = loc() + '/configuration/{}/server/factory.json'
 WORLD = loc() + '/configuration/{}/server/world.json'
 
 SKILL = loc() + '/configuration/{}/server/skill_level_up_config.json'
-REWARD = loc() + '/configuration/{}/server/stage_reward_config.json'
 WEAPON = loc() + '/configuration/{}/server/weapon_config.json'
 ROLE = loc() + '/configuration/{}/server/role_config.json'
 PLAYER = loc() + '/configuration/{}/server/player_config.json'
 MALL = loc() + '/configuration/{}/server/mall.json'
 MONSTER = loc() + '/configuration/{}/client/monster_config.json'
-MYSQL_DATA = loc() + '/configuration/{}/server/mysql_data_config.json'
 WORLD_BOSS = loc() + '/configuration/{}/server/world_boss_config.json'
-HANG_REWARD = loc() + '/configuration/{}/server/hang_reward_config.json'
 ENEMY_LAYOUT = loc() + '/configuration/{}/client/level_enemy_layouts_config.json'
 ENEMY_LAYOUT_TOWER = loc() + '/configuration/{}/client/level_enemy_layouts_config_tower.json'
 SERVER_CONFIG = loc() + '/configuration/{}/server/server_config.json'
-ENTRY_CONSUMABLES = loc() + '/configuration/{}/server/entry_consumables_config.json'
 NOTICE = loc() + '/configuration/{}/notice.json'
 PLAYER_EXPERIENCE = loc() + '/configuration/{}/server/player_experience.json'
 ACHIEVEMENT= loc() + '/configuration/{}/server/achievement_config.json'
@@ -71,10 +67,6 @@ class ConfigurationManager:
 		self._read_level_enemy_layouts_config()
 		self._read_level_enemy_layouts_config_tower()
 		self._read_monster_config()
-		self._read_stage_reward_config()
-		self._read_hang_reward_config()
-		self._read_mysql_data_config()
-		self._read_entry_consumables_config()
 		self._read_world_distribution_config()
 		self._read_factory_config()
 		self._read_family_config()
@@ -104,9 +96,6 @@ class ConfigurationManager:
 
 	async def get_game_manager_config(self):
 		return self._game_manager_config
-
-	async def get_mysql_data_config(self):
-		return self._mysql_data_config
 
 	async def get_world_map(self):
 		return self._world_map or {'status' : 'no one has registered yet'}
@@ -139,9 +128,9 @@ class ConfigurationManager:
 		world_boss = json.load(open(WORLD_BOSS.format(self._sv), encoding = 'utf-8'))
 		world = json.load(open(WORLD.format(self._sv), encoding = 'utf-8'))
 		self._game_manager_config = {
-			'reward' : self._stage_reward, 'lottery' : lottery, 'weapon' : weapon, 'role' : role,
-			'skill' : skill, 'hang_reward' : self._hang_reward_config, 'player' : player,
-			'entry_consumables' : self._entry_consumables_config, "world_boss" : world_boss,
+			'lottery' : lottery, 'weapon' : weapon, 'role' : role,
+			'skill' : skill, 'player' : player,
+			"world_boss" : world_boss,
 			"factory": self._factory_config, 'family': self._family_config,
 			"mall": self._mall_config, "notice": self._notice_info,
 			'player_experience': self._player_experience, 'monster_config': self._monster_config,
@@ -158,9 +147,6 @@ class ConfigurationManager:
 
 	def _read_level_enemy_layouts_config_tower(self):
 		self._level_enemy_layouts_config_tower = json.load(open(ENEMY_LAYOUT_TOWER.format(self._cv), encoding = 'utf-8'))
-
-	def _read_entry_consumables_config(self):
-		self._entry_consumables_config = json.load(open(ENTRY_CONSUMABLES.format(self._cv), encoding = 'utf-8'))
 
 	def _read_notice_info(self):
 		self._notice_info = json.load(open(NOTICE.format(self._cv), encoding = 'utf-8'))
@@ -195,15 +181,6 @@ class ConfigurationManager:
 				self._unregistered_chat_servers.put('test')
 			self._unregistered_game_managers.put(sid)
 		self._world_distribution_config = d
-
-	def _read_stage_reward_config(self):
-		self._stage_reward = json.load(open(REWARD.format(self._cv), encoding = 'utf-8'))
-
-	def _read_hang_reward_config(self):
-		self._hang_reward_config = json.load(open(HANG_REWARD.format(self._cv), encoding = 'utf-8'))
-
-	def _read_mysql_data_config(self):
-		self._mysql_data_config = json.load(open(MYSQL_DATA.format(self._sv), encoding = 'utf-8'))
 
 	def _world_range_parser(self, s: str) -> [int]:
 		'''
@@ -261,10 +238,6 @@ def _json_response(body: dict = {}, **kwargs) -> web.Response:
 @ROUTES.get('/get_game_manager_config')
 async def __get_game_manager_config(request: web.Request) -> web.Response:
 	return _json_response(await MANAGER.get_game_manager_config())
-
-@ROUTES.get('/get_mysql_data_config')
-async def __get_mysql_data_config(request: web.Request) -> web.Response:
-	return _json_response(await MANAGER.get_mysql_data_config())
 
 @ROUTES.get('/get_server_version')
 async def __get_server_version(request: web.Request) -> web.Response:

@@ -576,10 +576,6 @@ class MessageHandler:
 	async def _darkmarket_transaction(self, data: dict) -> str:
 		return await darkmarket.transaction(data['data']['unique_id'], data['data']['pid'], **data)
 
-	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
-	async def _stage_reward_config(self, data: dict) -> str:
-		return common.mt(0, 'success', {'config': data['config']['stage_reward']})
-
 
 	async def _get_config_mall(self, data: dict) -> str:
 		return common.mt(0, 'success', {'mall_config': data['config']['mall']})
@@ -889,7 +885,6 @@ FUNCTION_LIST = {
 	'darkmarket_transaction': MessageHandler._darkmarket_transaction,
 
 	# TODO 新增
-	'stage_reward_config': MessageHandler._stage_reward_config,
 	# 'get_hang_up_info': MessageHandler._get_hang_up_info,
 	'check_boss_status':MessageHandler._check_boss_status,
 	'get_factory_info':MessageHandler._get_factory_info,

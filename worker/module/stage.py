@@ -324,7 +324,7 @@ async def set_leaderboard(uid, lid, damage, **kwargs):
 
 async def init_stages(uid, **kwargs):
     await asyncio.gather(
-        common.set_stage(uid, enums.Stage.GENERAL, 7, '', **kwargs),
+        common.set_stage(uid, enums.Stage.GENERAL, 1, '', **kwargs),
         common.set_stage(uid, enums.Stage.ENDLESS, 1000, '', **kwargs),
         common.set_stage(uid, enums.Stage.BOSS, 3000, '', **kwargs),
         common.set_stage(uid, enums.Stage.COIN, 4000, '', **kwargs),

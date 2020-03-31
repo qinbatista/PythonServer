@@ -100,11 +100,11 @@ async def change_name(uid, gn, **kwargs):
 
 
 async def get_info(uid, **kwargs):
-    # data包含玩家名字和家庭名字，info包含玩家进程信息
     gn, fn = (await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs))[0]
     stages = await stage.all_infos(uid, **kwargs)
     energy = await common.try_energy(uid, 0, **kwargs)
-    return common.mt(0, 'success', {'gn': gn, 'fn': fn or '', 'energy_info': energy['data'], 'stages': stages['data']})
+    exp = await common.get_progress(uid, 'exp', **kwargs)
+    return common.mt(0, 'success', {'gn': gn, 'fn': fn or '', 'energy_info': energy['data'], 'stages': stages['data'], 'exp': exp})
 
 
 async def get_all_resource(uid, **kwargs):
@@ -112,6 +112,11 @@ async def get_all_resource(uid, **kwargs):
     item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)
     return common.mt(0, 'success', {'items': [{'iid': i[0], 'value': i[1]} for i in item]})
 
+
+async def map_info(uid, **kwargs):
+    rn = (await common.execute(f'SELECT COUNT(*) FROM role WHERE uid="{uid}" AND star >= 1'))[0][0]
+    wn = (await common.execute(f'SELECT COUNT(*) FROM weapon WHERE uid="{uid}" AND star >= 1'))[0][0]
+    return common.mt(0, 'success', {'rn': rn, 'wn': wn})
 
 #########################################################################################
 
