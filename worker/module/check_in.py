@@ -50,7 +50,7 @@ async def check_in(uid, day=None, **kwargs):
 	if nd != (): return common.mt(99, 'You have already signed in today')
 	which_day = today % 7
 	item_set = kwargs["check_in_config"][f'{which_day}'].split(":")
-	vip_info = await vip.increase_exp(uid, 10, **kwargs)
+	vip_info = await vip.increase_exp(uid, 0, **kwargs)
 	vip_bond = 1 if which_day >= vip_info['level'] else 2
 	gid = enums.Group(int(item_set[0]))
 	if gid == enums.Group.ITEM: _, quantity = await common.try_item(uid, enums.Item(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)

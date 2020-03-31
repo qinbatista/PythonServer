@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import asyncio
 import re
 GN_RE = re.compile(r'^[\u4e00-\u9fa5_a-zA-Z0-9]+$')
+ELEMENT_LIM = 3
 
 
 async def create(uid, gn, **kwargs):
@@ -26,7 +27,9 @@ async def create(uid, gn, **kwargs):
         common.execute(f'INSERT INTO skill(uid, sid, level) VALUES ("{uid}", {enums.Skill.S1}, 1), ("{uid}", {enums.Skill.S2}, 1), ("{uid}", {enums.Skill.S3}, 1), ("{uid}", {enums.Skill.S4}, 1), ("{uid}", {enums.Skill.S5}, 1);', **kwargs),
         common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.LOGIN_TIME}, "{common.datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d")}");',**kwargs),
         common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);',**kwargs),
-        stage.init_stages(uid, **kwargs)
+        common.set_limit(uid, enums.Limits.PLAYER_ELEMENT, ELEMENT_LIM, **kwargs),
+        stage.init_stages(uid, **kwargs),
+        _element_init(uid, **kwargs)
     )
     await _meeting_gift(uid, **kwargs)
     return common.mt(0, 'success', {'gn': gn})
@@ -114,11 +117,50 @@ async def get_all_resource(uid, **kwargs):
 
 
 async def map_info(uid, **kwargs):
-    rn = (await common.execute(f'SELECT COUNT(*) FROM role WHERE uid="{uid}" AND star >= 1'))[0][0]
-    wn = (await common.execute(f'SELECT COUNT(*) FROM weapon WHERE uid="{uid}" AND star >= 1'))[0][0]
+    """图鉴功能"""
+    rn = (await common.execute(f'SELECT COUNT(*) FROM role WHERE uid="{uid}" AND star >= 1', **kwargs))[0][0]
+    wn = (await common.execute(f'SELECT COUNT(*) FROM weapon WHERE uid="{uid}" AND star >= 1', **kwargs))[0][0]
     return common.mt(0, 'success', {'rn': rn, 'wn': wn})
 
+
+async def element_lv(uid, eid, **kwargs):
+    """元素升级"""
+    if eid not in enums.Element._value2member_map_:
+        return common.mt(99, 'eid error')
+    lv = (await stage.increase_exp(uid, 0, **kwargs))['level']
+    evs = 1 + (lv - 15)//10
+    aes = (await element_all(uid, **kwargs))['data']
+    if evs <= sum(aes.values()):
+        return common.mt(98, 'insufficient element skill points')
+    val = aes[eid] + 1
+    if val > 5:
+        return common.mt(97, 'max element skill')
+    await common.set_element(uid, eid, val, **kwargs)
+    aes[eid] = val
+    return common.mt(0, 'success', {'aes': aes, 'reward': {eid: 1}})
+
+
+async def element_reset(uid, **kwargs):
+    """重置元素技能点"""
+    lim = await common.get_limit(uid, enums.Limits.PLAYER_ELEMENT, **kwargs)
+    lim = (ELEMENT_LIM if lim is None else lim) - 1
+    if lim < 0:
+        return common.mt(99, 'Insufficient resets')
+    await _element_init(uid, **kwargs)
+    await common.set_limit(uid, enums.Limits.PLAYER_ELEMENT, lim, **kwargs)
+    aes = (await element_all(uid, **kwargs))['data']
+    return common.mt(0, 'success', {'aes': aes, 'lim': lim})
+
+
+async def element_all(uid, **kwargs):
+    eds = await common.execute(f'SELECT eid, val FROM `elements` WHERE `uid`="{uid}";', **kwargs)
+    return common.mt(0, 'success', {ed[0]: ed[1] for ed in eds})
+
+
 #########################################################################################
+async def _element_init(uid, **kwargs):
+    [await common.set_element(uid, eid, 0, **kwargs) for eid in enums.Element]
+
 
 async def _lookup_nonce(nonce, **kwargs):
     async with kwargs['session'].post(kwargs['tokenserverbaseurl'] + '/redeem_nonce', \

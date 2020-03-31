@@ -14,12 +14,10 @@ import contextlib
 # statement names are imported to the local namespace, so be careful with name collisions
 from world_structure import *
 
-TABLES = [PLAYER, STAGES, SUMMON, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET,
-          FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM,
-          LEADERBOARD, LIMITS,
-          PROGRESS, ROLE, ROLEPASSIVE, SKILL, TASK, TIMER, WEAPON,
-          WEAPONPASSIVE,
-          CONSTRAINT, TRIGGER1, TRIGGER2]
+TABLES = [PLAYER, ELEMENTS, STAGES, SUMMON, ACHIEVEMENT, ARMOR, CHECKIN,
+          DARKMARKET, FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND,
+          ITEM, LEADERBOARD, LIMITS, PROGRESS, ROLE, ROLEPASSIVE, SKILL,
+          TASK, TIMER, WEAPON, WEAPONPASSIVE, CONSTRAINT, TRIGGER1, TRIGGER2]
 
 
 #########################################################################################

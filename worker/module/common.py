@@ -137,6 +137,13 @@ async def get_stage(uid, sid, **kwargs):
 async def set_stage(uid, sid, stage, btm, **kwargs):
 	await execute(f'INSERT INTO `stages` VALUES ("{uid}", {sid}, {stage}, "{btm}") ON DUPLICATE KEY UPDATE `stage` = {stage}, `btm` = "{btm}";', **kwargs)
 
+async def get_element(uid, eid, **kwargs):
+	data = await execute(f'SELECT val FROM `elements` WHERE `uid`="{uid}" AND `eid`={eid};', **kwargs)
+	return data[0][0] if data != () else None
+
+async def set_element(uid, eid, val, **kwargs):
+	await execute(f'INSERT INTO `elements` VALUES ("{uid}", "{eid}", "{val}") ON DUPLICATE KEY UPDATE val="{val}";', **kwargs)
+
 async def get_db(**kwargs):
 	return kwargs['worlddb']
 

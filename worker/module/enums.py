@@ -119,6 +119,14 @@ class Stage(enum.IntEnum):
     EXP = 5  # 经验挑战模式
 
 
+class Element(enum.IntEnum):
+    """玩家技能元素"""
+    FREEZE = 0  # 冰
+    FLAME = 1  # 火
+    TOXIN = 2  # 毒
+    THUNDER = 3  # 雷
+
+
 class Weapon(enum.IntEnum):
     W101 = 101
     W102 = 102
@@ -361,6 +369,7 @@ class Limits(enum.IntEnum):
     STAGE_COIN_VIP = 20  # 金币挑战模式下VIP相应等级可购买的挑战次数限制
     STAGE_EXP = 21  # 经验挑战模式下的挑战次数限制
     STAGE_EXP_VIP = 22  # 经验挑战模式下VIP相应等级可购买的挑战次数限制
+    PLAYER_ELEMENT = 23  # 玩家可以清洗元素技能的剩余次数，不可重置
 
 
 class Achievement(enum.IntEnum):

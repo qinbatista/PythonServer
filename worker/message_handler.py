@@ -143,6 +143,9 @@ class MessageHandler:
 	async def _get_info_player(self, data: dict) -> str:
 		return await player.get_info(data['data']['unique_id'], **data)
 
+	async def _player_map_info(self, data: dict) -> str:
+		return await player.map_info(data['data']['unique_id'], **data)
+
 
 	###################### family.py ######################
 	async def _create_family(self, data: dict) -> str:
@@ -482,6 +485,15 @@ class MessageHandler:
 	async def _get_all_resource(self, data: dict) -> str:
 		return await player.get_all_resource(data['data']['unique_id'], **data)
 
+	async def _player_element_lv(self, data: dict) -> str:
+		return await player.element_lv(data['data']['unique_id'], int(data['data']['eid']), **data)
+
+	async def _player_element_all(self, data: dict) -> str:
+		return await player.element_all(data['data']['unique_id'], **data)
+
+	async def _player_element_reset(self, data: dict) -> str:
+		return await player.element_reset(data['data']['unique_id'], **data)
+
 	###################### achievement ######################
 	async def _get_all_achievement(self, data: dict) -> str:
 		return await achievement.get_all_achievement(data['data']['unique_id'], **data)
@@ -684,6 +696,11 @@ class MessageHandler:
 	async def _get_config_notice(self, data: dict) -> str:
 		return common.mt(0, 'success', {'config': data['config']['notice']})
 
+	async def _update_init(self, data: dict) -> str:
+		# pds = await common.execute(f'SELECT uid FROM `player`;', **data)
+		# for pd in pds:
+		# 	await player._element_init(pd[0], **data)
+		return common.mt(0, 'success')
 
 ##########################################################################################################
 ##########################################################################################################
@@ -691,6 +708,7 @@ class MessageHandler:
 DOES_NOT_NEED_TOKEN = {'register', 'login_unique', 'login'}
 
 FUNCTION_LIST = {
+	'update_init' : MessageHandler._update_init,
 	###################### account.py ######################
 	'register' : MessageHandler._register,
 	'login_unique' : MessageHandler._login_unique,
@@ -718,6 +736,7 @@ FUNCTION_LIST = {
 	'change_player_name' : MessageHandler._change_player_name,
 	'get_account_world_info' : MessageHandler._get_account_world_info,
 	'get_info_player' : MessageHandler._get_info_player,
+	'player_map_info' : MessageHandler._player_map_info,
 
 	###################### family.py ######################
 	'create_family': MessageHandler._create_family,
@@ -843,6 +862,9 @@ FUNCTION_LIST = {
 	# TODO
 	###################### player ######################
 	'get_all_resource': MessageHandler._get_all_resource,
+	'player_element_lv': MessageHandler._player_element_lv,
+	'player_element_all': MessageHandler._player_element_all,
+	'player_element_reset': MessageHandler._player_element_reset,
 
 	# TODO
 	###################### achievement ######################

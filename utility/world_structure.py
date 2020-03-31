@@ -5,6 +5,17 @@ Contains the CREATE statements necessary to create the lukseun database structur
 Also includes necessary triggers.
 '''
 
+ELEMENTS = \
+"""
+CREATE TABLE `elements` (
+	 `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
+	 `eid` SMALLINT UNSIGNED NOT NULL COMMENT '元素类型id',
+	 `val` INT UNSIGNED NOT NULL COMMENT '元素等级',
+	 PRIMARY KEY (`uid`, `eid`),
+	 CONSTRAINT `elements_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+"""
+
 STAGES = \
 """
 CREATE TABLE `stages` (
@@ -13,7 +24,7 @@ CREATE TABLE `stages` (
 	 `stage` INT UNSIGNED NOT NULL COMMENT '关卡最高等级',
 	 `btm` VARCHAR(64) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '进入时间',
 	 PRIMARY KEY (`uid`, `sid`),
-	 CONSTRAINT `stage_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
+	 CONSTRAINT `stages_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 
@@ -348,7 +359,7 @@ BEGIN
 END;
 """
 
-TABLES = [PLAYER, STAGES, SUMMON, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET,
+TABLES = [PLAYER, ELEMENTS, STAGES, SUMMON, ACHIEVEMENT, ARMOR, CHECKIN, DARKMARKET,
 		FACTORY, FAMILY, FAMILYHISTORY, FAMILYROLE, FRIEND, ITEM, LEADERBOARD, LIMITS,
 		PROGRESS, ROLE, ROLEPASSIVE, SKILL, TASK, TIMER, WEAPON, WEAPONPASSIVE,
 		CONSTRAINT]
