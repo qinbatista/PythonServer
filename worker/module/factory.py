@@ -26,8 +26,6 @@ HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, en
 
 
 async def refresh(uid, **kwargs):
-	kwargs.update({"task_id": enums.Task.CHECK_FACTORY})
-	await task.record_task(uid, **kwargs)
 	now                  = datetime.now(tz=common.TZ_SH)
 	steps, refresh_t     = await steps_since(uid, now, **kwargs)
 	rem, next_ref, steps = await remaining_seconds(uid, now, refresh_t, steps, **kwargs)
@@ -36,7 +34,8 @@ async def refresh(uid, **kwargs):
 	storage, delta         = update_state(steps, level, worker, storage, **kwargs)  # storage真实剩余数据，delta变化数据
 	await record_resources(uid, storage, **kwargs)  # 更新数据库资源
 	ua, mw = await get_unassigned_workers(uid, **kwargs)  # ua未分配的工人数，mw总工人数
-	# 记录成就的代码片段
+	# 记录成就和任务的代码片段
+	run_task = False
 	for k in RESOURCE_FACTORIES:
 		if delta[k] <= 0: continue
 		if k == enums.Factory.FOOD: kwargs.update({"aid": enums.Achievement.COLLECT_FOOD})
@@ -44,6 +43,10 @@ async def refresh(uid, **kwargs):
 		elif k == enums.Factory.CRYSTAL: kwargs.update({"aid": enums.Achievement.COLLECT_CRYSTAL})
 		else: continue
 		await achievement.record_achievement(kwargs['data']['unique_id'], achievement_value=delta[k], **kwargs)
+		run_task = True
+	if run_task:
+		kwargs.update({"task_id": enums.Task.CHECK_FACTORY})
+		await task.record_task(uid, **kwargs)
 	# 计算加速剩余时间做后面的返回
 	accel_end_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, **kwargs)
 	accel_time  = 0 if accel_end_t is None else int((accel_end_t - now).total_seconds())

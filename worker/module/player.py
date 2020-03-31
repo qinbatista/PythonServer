@@ -19,7 +19,7 @@ async def create(uid, gn, **kwargs):
     if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, 'Player uid or name already exists')
     await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
     await asyncio.gather(
-        common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180, role={enums.Role.R401} WHERE uid="{uid}";', **kwargs),
+        common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180, rid={enums.Role.R401} WHERE uid="{uid}";', **kwargs),
         common.execute(f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED}, 3, 3);', **kwargs),
         common.execute(f'INSERT INTO role (uid, star, level, rid) VALUES ("{uid}", 1, 7, {enums.Role.R401}), ("{uid}", 1, 1, {enums.Role.R402}), ("{uid}", 1, 1, {enums.Role.R505}), ("{uid}", 1, 1, {enums.Role.R601});', **kwargs),
         common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W301}), ("{uid}", 1, {enums.Weapon.W302}), ("{uid}", 1, {enums.Weapon.W303});', **kwargs),
@@ -101,19 +101,10 @@ async def change_name(uid, gn, **kwargs):
 
 async def get_info(uid, **kwargs):
     # data包含玩家名字和家庭名字，info包含玩家进程信息
-    data = await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs)
-
-    info = await common.execute(f'SELECT energy, exp, stage, towerstage, hangstage FROM progress WHERE uid = "{uid}";', **kwargs)
-    if info == ():
-        await common.execute(f'INSERT INTO progress (uid) VALUE ("{uid}");', **kwargs)
-        info = await common.execute(f'SELECT energy, exp, stage, towerstage, hangstage FROM progress WHERE uid = "{uid}";', **kwargs)
-    energy_info = await common.try_energy(uid, 0, **kwargs)
-    return common.mt(0, 'success', {'gn': data[0][0], 'family_name': '' if data[0][1] is None else data[0][1], 'energy_info': energy_info['data'], 'exp': info[0][1], 'stage': info[0][2], 'towerstage': info[0][3], 'hangstage': info[0][4]})
-    # info = await common.execute(f'SELECT energy, exp, stage FROM progress WHERE uid = "{uid}";', **kwargs)
-    # sts = await common.execute(f'SELECT sid, stage FROM stages WHERE uid = "{uid}";', **kwargs)
-    # stages = {s[0]: s[1] for s in sts}
-    # energy_info = await common.try_energy(uid, 0, **kwargs)
-    # return common.mt(0, 'success', {'gn': data[0][0], 'family_name': '' if data[0][1] is None else data[0][1], 'energy_info': energy_info['data'], 'exp': info[0][1], 'stage': info[0][2], 'stages': stages})
+    gn, fn = (await common.execute(f'SELECT gn, fid FROM player WHERE uid = "{uid}";', **kwargs))[0]
+    stages = await stage.all_infos(uid, **kwargs)
+    energy = await common.try_energy(uid, 0, **kwargs)
+    return common.mt(0, 'success', {'gn': gn, 'fn': fn or '', 'energy_info': energy['data'], 'stages': stages['data']})
 
 
 async def get_all_resource(uid, **kwargs):

@@ -504,39 +504,6 @@ class MessageHandler:
 		return await armor.get_all(data['data']['unique_id'], **data)
 
 	###################### stage ######################
-	async def _mopping_up_stage(self, data: dict) -> str:
-		return await stage.old_mopping_up(data['data']['unique_id'], data['data']['stage'], data['data'].get('count', 1), **data)
-
-	async def _get_all_tower(self, data: dict) -> str:
-		return common.mt(0, 'success', {'tower_config': data['config']['entry_consumables']})
-
-	async def _enter_stage(self, data: dict) -> str:
-		return await stage.enter_stage(data['data']['unique_id'], data['data']['stage'], **data)
-
-	async def _pass_stage(self, data: dict) -> str:
-		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
-
-	async def _get_config_stage(self, data: dict) -> str:
-		return common.mt(0, 'success', data['config']['stages'])
-
-	async def _get_top_damage(self, data: dict) -> str:
-		return await stage.get_top_damage(data['data']['unique_id'], data['data']['page'], **data)
-
-	async def _get_config_boss(self, data: dict):
-		return common.mt(0, 'success', {'config': data['config']['world_boss']})
-
-	async def _start_hang_up(self, data: dict) -> str:
-		data.update({'hang_rewards': data['config']['hang_reward']})
-		return await stage.start_hang_up(data['data']['unique_id'], data['data']['stage'], **data)
-
-	async def _get_hang_up_reward(self, data: dict) -> str:
-		data.update({'hang_rewards': data['config']['hang_reward']})
-		return await stage.get_hang_up_reward(data['data']['unique_id'], **data)
-
-	# async def _get_hang_up_info(self, data: dict) -> str:
-	# 	data.update({'hang_rewards': data['config']['hang_reward']})
-	# 	return await stage.get_hang_up_info(data['data']['unique_id'], **data)
-
 	async def _stage_enter_general(self, data: dict) -> str:
 		return await stage.enter(data['data']['unique_id'], enums.Stage.GENERAL, int(data['data']['stage']), **data)
 
@@ -582,6 +549,8 @@ class MessageHandler:
 	async def _stage_mopping_up(self, data: dict) -> str:
 		return await stage.mopping_up(data['data']['unique_id'], data['data']['stage'], data['data'].get('count', 1), **data)
 
+	async def _get_config_stage(self, data: dict) -> str:
+		return common.mt(0, 'success', data['config']['stages'])
 
 	###################### tasks ######################
 	async def _get_all_task(self, data: dict) -> str:
@@ -891,15 +860,7 @@ FUNCTION_LIST = {
 
 	# TODO
 	###################### stage ######################
-	'mopping_up_stage': MessageHandler._mopping_up_stage,
-	'get_all_tower': MessageHandler._get_all_tower,
-	'enter_stage': MessageHandler._enter_stage,
-	'pass_stage': MessageHandler._pass_stage,
-	# 'enter_tower': MessageHandler._enter_tower,
-	# 'pass_tower': MessageHandler._pass_tower,
-	'start_hang_up': MessageHandler._start_hang_up,
-	'get_hang_up_reward': MessageHandler._get_hang_up_reward,
-	# TODO 2020年3月25日之后追加方法
+	# TODO 2020年3月25日之后优化并改写的方法
 	'stage_enter_general': MessageHandler._stage_enter_general,
 	'stage_victory_general': MessageHandler._stage_victory_general,
 	'stage_enter_endless': MessageHandler._stage_enter_endless,
@@ -934,11 +895,9 @@ FUNCTION_LIST = {
 	'get_factory_info':MessageHandler._get_factory_info,
 	'refresh_all_storage':MessageHandler._refresh_all_storage,
 	'get_all_family_info': MessageHandler._get_all_family_info,
-	'get_top_damage':MessageHandler._get_top_damage,
 
 	###################### get_config ######################
 	'get_config_stage': MessageHandler._get_config_stage,
-	'get_config_boss': MessageHandler._get_config_boss,
 	'get_config_lottery': MessageHandler._get_config_lottery,
 	'get_config_weapon': MessageHandler._get_config_weapon,
 	'get_config_skill': MessageHandler._get_config_skill,
