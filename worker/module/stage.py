@@ -673,13 +673,18 @@ async def enter(uid, sid, stage, **kwargs):
     if (await common.try_energy(uid, 0, **kwargs))['data']['energy'] < energy:
         return common.mt(97, 'energy insufficient')
     # TODO 尝试消耗通用物资
-    if not (await common.consume_items(uid, ','.join(config['consumes']['common']), **kwargs))[0]:
+    can, cmw = await common.consume_items(uid, ','.join(config['consumes']['common']), **kwargs)
+    if not can:
         return common.mt(95, 'materials insufficient')
+    results['remain'], results['reward'] = rm_rw(cmw)
     # TODO 消耗特殊物资(体力)
     data = (await common.try_energy(uid, -energy, **kwargs))['data']
     # TODO 实现部分约束
     if sid in VERIFY:
         await REALIZE[sid](uid, tim, lms, **kwargs)
+    # TODO 附加配置
+    els, monsters = addition(stage, **kwargs)
+    results['addition'] = {'els': els, 'monsters': monsters}
     # TODO 构建结果
     results['energy'] = {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}
     # TODO 设置关卡进入状态
@@ -704,22 +709,13 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
     await rw_common(uid, rwc, rewards, **kwargs)
     # TODO 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['rewards']['special'].get('exp', 0), **kwargs)
-    # TODO BOSS模式则记录boss伤害信息
-    if sid == enums.Stage.BOSS:
-        config, _damage = kwargs['config']['boss'], await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
-        record = int(_damage < damage)
-        if damage < 0 or damage >= kwargs['config']['boss'].get('damage', 100_0000):
-            return common.mt(status=93, message="abnormal damage")
-        for i, hp in enumerate(config['hp']):
-            if hp != 0:
-                config['hp'][i] = max(0, hp - damage)
-                break
-        if record == 1:
-            await set_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, damage, **kwargs)
-        ratio = {i: "%.2f" % (hp/config['HP'][i]) for i, hp in enumerate(config['hp'])}
-        rewards['boss'] = {'ratio': ratio, 'record': record, 'damage': max(damage, _damage)}
-    if sid == enums.Stage.ENDLESS and stage > _stage:
-        await hang_up(uid, **kwargs)
+    rewards['max_stage'] = max(stage, _stage)
+    # TODO 特殊处理
+    if sid in VICTORY_DISPOSE:
+        cm = await VICTORY_DISPOSE[sid](uid, stage, _stage, damage, rewards, **kwargs)
+        print(cm)
+        if isinstance(cm, tuple):
+            return common.mt(cm[0], cm[1])
     # TODO 设置关卡通过状态
     await common.set_stage(uid, sid, max(stage, _stage), '', **kwargs)
     await common.set_progress(uid, 'stage', 0, **kwargs)
@@ -751,12 +747,13 @@ async def mopping_up(uid, stage, count=1, **kwargs):
     return common.mt(0, 'success', rewards)
 
 
-async def refresh_boss(uid,**kwargs):
+async def refresh_boss(uid, **kwargs):
     config = kwargs['config']['boss']
     now = datetime.now(tz=common.TZ_SH)
-    ratio = {i: "%.2f" % (hp / config['HP'][i]) for i, hp in enumerate(config['hp'])}
+    ratio = {s: "%.2f" % (hp / config['HP'][s]) for s, hp in
+             config['hp'].items()}
     damage = await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
-    tid, lid = enums.Timer.WORLD_BOSS, enums.Limits.WORLD_BOSS
+    tid, lid = enums.Timer.STAGE_WORLD_BOSS, enums.Limits.STAGE_WORLD_BOSS
     tim = await common.get_timer(uid, tid, timeformat='%Y-%m-%d', **kwargs)
     lim = await common.get_limit(uid, lid, **kwargs)
     if tim is None or now > tim:
@@ -764,6 +761,13 @@ async def refresh_boss(uid,**kwargs):
         await common.set_limit(uid, lid, lim, **kwargs)
         await common.set_timer(uid, tid, tim, timeformat='%Y-%m-%d', **kwargs)
     return common.mt(0, 'Successfully get hook information', {'damage': damage, 'limit': lim, 'cd': common.remaining_cd(), 'mcd': common.remaining_month_cd(), 'ratio': ratio})
+
+
+async def all_infos(uid, **kwargs):
+    """获取所有的关卡信息"""
+    sts = await common.execute(f'SELECT `sid`, `stage` FROM `stages` WHERE `uid` = "{uid}";', **kwargs)
+    ds = {s[0]: s[1] for s in sts}
+    return common.mt(0, 'success', ds)
 
 
 async def damage_ranking(uid, page, **kwargs):
@@ -800,7 +804,10 @@ async def damage_ranking(uid, page, **kwargs):
     return common.mt(0, 'success', {'page': page, 'damage': damage, 'ranking': ranking, 'rank': rank})
 
 
-async def hang_up(uid, **kwargs):
+async def hang_up(uid, new=True, **kwargs):
+    """开启挂机或获取挂机奖励"""
+    if not new:
+        return None
     now = datetime.now(tz=common.TZ_SH)
     tim = await common.get_timer(uid, enums.Timer.STAGE_HANG_UP, **kwargs)
     stage, _ = await common.get_stage(uid, enums.Stage.ENDLESS, **kwargs)
@@ -821,21 +828,57 @@ async def hang_up(uid, **kwargs):
     return common.mt(0, 'success', rewards)
 
 
+# ########################################### 私有方法 ############################################
+def addition(stage, **kwargs):
+    els = kwargs['config']['enemy_layouts']['enemyLayouts']
+    monsters = kwargs['config']['monster']
+    el = els[-1]['enemyLayout'] if stage > len(els) else els[stage - 1]['enemyLayout']
+    els = []
+    key_words = []
+    for layout in el:
+        for enemy in layout['enemyList']:
+            en = enemy['enemysPrefString']
+            if en not in key_words:
+                key_words.append(en)
+                els.append({en: monsters[en]})
+    del key_words
+    return els, monsters
+
+
+async def b_dispose(uid, stage, damage, results, **kwargs):
+    """BOSS伤害记录等信息处理"""
+    config, _damage = kwargs['config']['boss'], await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
+    record = _damage < damage
+    if damage < 0 or damage >= kwargs['config']['boss'].get('damage', 100_0000):
+        return 93, "abnormal damage"
+    else:
+        hp = config['hp'][f'{stage}']
+        config['hp'][f'{stage}'] = max(0, hp - damage)
+        if record:
+            await set_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, damage, **kwargs)
+        ratio = {s: "%.2f" % (hp/config['HP'][s]) for s, hp in config['hp'].items()}
+        results['boss'] = {'ratio': ratio, 'record': int(record), 'damage': max(damage, _damage)}
+
+
 async def rw_common(uid, common, rewards, mul=1, **kwargs):
+    """通用奖励信息的处理和修改"""
     cms = ','.join([f'{multiple_rw(mul, item)}' for item in common])
     results = await summoning.reward_items(uid, cms, **kwargs)
     rewards['remain'], rewards['reward'] = rm_rw(results)
 
 
 def multiple_rw(mul, item):
+    """倍数构造"""
     return f'{item[:item.rfind(":")]}:{int(item[item.rfind(":") + 1:]) * mul}'
 
 
 def rm_rw(results):
+    """剩余和改变情况的构造"""
     return [f'{g}:{i}:{v}' for g, i, v, _ in results], [f'{g}:{i}:{v}' for g, i, _, v in results]
 
 
 async def v_coin(uid, lids, **kwargs):
+    """验证金币挑战模式下的约束情况"""
     lv = (await vip.increase_exp(uid, 0, **kwargs))['level']
     config = kwargs['config']['stages']['constraint']['stage']['COIN']
     lcs = [config['limit'], config['buy']['vip'].get(f'{lv}', 2)]
@@ -843,6 +886,7 @@ async def v_coin(uid, lids, **kwargs):
 
 
 async def v_exp(uid, lids, **kwargs):
+    """验证经验挑战模式下的约束情况"""
     lv = (await vip.increase_exp(uid, 0, **kwargs))['level']
     config = kwargs['config']['stages']['constraint']['stage']['EXP']
     lcs = [config['limit'], config['buy']['vip'].get(f'{lv}', 2)]
@@ -850,6 +894,7 @@ async def v_exp(uid, lids, **kwargs):
 
 
 async def v_constraint(uid, tid, lids, lcs, **kwargs):
+    """各个模式下的验证、修改和重置"""
     now = datetime.now(tz=common.TZ_SH)
     tim = await common.get_timer(uid, tid, timeformat='%Y-%m-%d', **kwargs)
     lms = [await common.get_limit(uid, lid, **kwargs) for lid in lids]
@@ -859,6 +904,7 @@ async def v_constraint(uid, tid, lids, lcs, **kwargs):
 
 
 async def r_constraint(uid, tid, tim, lms, **kwargs):
+    """实现相应模式下的修改和重置"""
     await common.set_timer(uid, tid, tim, timeformat='%Y-%m-%d', **kwargs)
     [await common.set_limit(uid, lid, lim, **kwargs) for lid, lim in lms.items()]
 
@@ -923,6 +969,11 @@ REALIZE = {
     enums.Stage.EXP: lambda uid, tim, lms, **kwargs: r_constraint(uid, enums.Timer.STAGE_EXP, tim, lms, **kwargs),
 }
 
+
+VICTORY_DISPOSE = {
+    enums.Stage.BOSS: lambda uid, stage, _stage, damage, results, **kwargs: b_dispose(uid, stage, damage, results, **kwargs),
+    enums.Stage.ENDLESS: lambda uid, stage, _stage, damage, results, **kwargs: hang_up(uid, new=stage > _stage, **kwargs),
+}
 
 
 

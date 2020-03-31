@@ -517,10 +517,7 @@ class MessageHandler:
 		return await stage.pass_stage(data['data']['unique_id'], data['data']['stage'], **data)
 
 	async def _get_config_stage(self, data: dict) -> str:
-		return common.mt(0, 'success', {'entry_consumables_config': data['config']['entry_consumables'], \
-				'stage_reward_config': data['config']['stage_reward'], \
-				'hang_reward_config': data['config']['hang_reward'],
-				'mopping_up': data['config']['stages']['mopping-up']})
+		return common.mt(0, 'success', data['config']['stages'])
 
 	async def _get_top_damage(self, data: dict) -> str:
 		return await stage.get_top_damage(data['data']['unique_id'], data['data']['page'], **data)
@@ -573,11 +570,17 @@ class MessageHandler:
 	async def _stage_refresh_boss(self, data: dict) -> str:
 		return await stage.refresh_boss(data['data']['unique_id'], **data)
 
+	async def _stage_all_infos(self, data: dict) -> str:
+		return await stage.all_infos(data['data']['unique_id'], **data)
+
 	async def _stage_damage_ranking(self, data: dict) -> str:
 		return await stage.damage_ranking(data['data']['unique_id'], data['data']['page'], **data)
 
 	async def _stage_hang_up(self, data: dict) -> str:
 		return await stage.hang_up(data['data']['unique_id'], **data)
+
+	async def _stage_mopping_up(self, data: dict) -> str:
+		return await stage.mopping_up(data['data']['unique_id'], data['data']['stage'], data['data'].get('count', 1), **data)
 
 
 	###################### tasks ######################
@@ -908,8 +911,10 @@ FUNCTION_LIST = {
 	'stage_enter_exp': MessageHandler._stage_enter_exp,
 	'stage_victory_exp': MessageHandler._stage_victory_exp,
 	'stage_refresh_boss': MessageHandler._stage_refresh_boss,
+	'stage_all_infos': MessageHandler._stage_all_infos,
 	'stage_damage_ranking': MessageHandler._stage_damage_ranking,
 	'stage_hang_up': MessageHandler._stage_hang_up,
+	'stage_mopping_up': MessageHandler._stage_mopping_up,
 
 
 	###################### tasks ######################

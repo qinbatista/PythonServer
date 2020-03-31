@@ -139,10 +139,9 @@ class ModuleConfigurations:
 			self._rfb = False
 		if self.rfb and not self._rfb:
 			self.rfb, self._rfb = False, True
-			self.configs['boss'] = self.configs['stages']['boss']
-			self.configs['boss']['hp'] = [b['HP'] for b in self.configs['boss']['boss_info']]
-			self.configs['boss']['HP'] = [b['HP'] for b in self.configs['boss']['boss_info']]
-
+			self.configs['boss'] = self.configs['stages']['constraint']['stage']['BOSS']
+			self.configs['boss']['HP'] = {k: v['boss']['HP'] for k, v in self.configs['stages']['stage'].items() if (k.isdigit() and 3000 < int(k) < 4000)}
+			self.configs['boss']['hp'] = {s: hp for s, hp in self.configs['boss']['HP'].items()}
 
 	def __getitem__(self, key):
 		return self.configs[key]
