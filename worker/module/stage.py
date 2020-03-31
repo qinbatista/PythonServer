@@ -690,7 +690,7 @@ async def enter(uid, sid, stage, **kwargs):
     # TODO 设置关卡进入状态
     btm = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d %H:%M:%S')
     await common.set_stage(uid, sid, _stage, btm, **kwargs)
-    await common.set_progress(uid, 'stage', stage, **kwargs)
+    await kwargs['redis'].set(f'stage.{uid}', stage)
     return common.mt(0, 'success', results)
 
 
@@ -699,7 +699,8 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
     if not STAGE_CHECK[sid](stage):
         return common.mt(91, 'stage error')
     _stage, _btm = await common.get_stage(uid, sid, **kwargs)
-    if _btm == '' or stage != await common.get_progress(uid, 'stage', **kwargs):
+    _stg = await kwargs['redis'].get(f'stage.{uid}')
+    if _btm == '' or _stg is None or stage != int(_stg):
         return common.mt(94, 'stage mismatch')
     config, rewards = kwargs['config']['stages']['stage'].get(f'{stage}', None), {'boss': {}}
     # TODO 奖励普通物资
@@ -713,12 +714,11 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
     # TODO 特殊处理
     if sid in VICTORY_DISPOSE:
         cm = await VICTORY_DISPOSE[sid](uid, stage, _stage, damage, rewards, **kwargs)
-        print(cm)
         if isinstance(cm, tuple):
             return common.mt(cm[0], cm[1])
     # TODO 设置关卡通过状态
     await common.set_stage(uid, sid, max(stage, _stage), '', **kwargs)
-    await common.set_progress(uid, 'stage', 0, **kwargs)
+    await kwargs['redis'].delete(f'stage.{uid}')
     return common.mt(0, 'success', rewards)
 
 
