@@ -121,10 +121,10 @@ class Stage(enum.IntEnum):
 
 class Element(enum.IntEnum):
     """玩家技能元素"""
-    FREEZE = 0  # 冰
-    FLAME = 1  # 火
-    TOXIN = 2  # 毒
-    THUNDER = 3  # 雷
+    FLAME = 1000  # 火
+    THUNDER = 1001  # 雷
+    FREEZE = 1002  # 冰
+    TOXIN = 1003  # 毒
 
 
 class Weapon(enum.IntEnum):

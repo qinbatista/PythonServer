@@ -28,6 +28,7 @@ from module import darkmarket
 from module import package
 from module import vip
 from module import mall
+from module import science
 
 
 
@@ -143,8 +144,10 @@ class MessageHandler:
 	async def _get_info_player(self, data: dict) -> str:
 		return await player.get_info(data['data']['unique_id'], **data)
 
-	async def _player_map_info(self, data: dict) -> str:
-		return await player.map_info(data['data']['unique_id'], **data)
+
+	###################### science.py ######################
+	async def _science_infos(self, data: dict) -> str:
+		return await science.infos(data['data']['unique_id'], **data)
 
 
 	###################### family.py ######################
@@ -736,7 +739,6 @@ FUNCTION_LIST = {
 	'change_player_name' : MessageHandler._change_player_name,
 	'get_account_world_info' : MessageHandler._get_account_world_info,
 	'get_info_player' : MessageHandler._get_info_player,
-	'player_map_info' : MessageHandler._player_map_info,
 
 	###################### family.py ######################
 	'create_family': MessageHandler._create_family,
@@ -865,6 +867,10 @@ FUNCTION_LIST = {
 	'player_element_lv': MessageHandler._player_element_lv,
 	'player_element_all': MessageHandler._player_element_all,
 	'player_element_reset': MessageHandler._player_element_reset,
+
+	# TODO
+	###################### player ######################
+	'science_infos': MessageHandler._science_infos,
 
 	# TODO
 	###################### achievement ######################
