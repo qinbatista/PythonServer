@@ -117,19 +117,6 @@ class ModuleConfigurations:
 		self.configs['notice']            = r.json()['notice']
 
 		today = datetime.now(tz=TZ_SH).day
-		if refresh_world_boss and not already_refreshed_world_boss:
-			refresh_world_boss, already_refreshed_world_boss = False, True
-			self.configs['world_boss'] = r.json()['world_boss']
-			self.configs['world_boss']['boss_life_remaining'] = \
-					[self.configs['world_boss'][f'boss{i}']['life_value'] for i in range(10)]
-			self.configs['world_boss']['boss_life'] = \
-					[self.configs['world_boss'][f'boss{i}']['life_value'] for i in range(10)]
-
-		if today == 1 and not already_refreshed_world_boss:
-			refreshed_world_boss = True
-		if today != 1 and already_refreshed_world_boss:
-			already_refreshed_world_boss = False
-
 		if today == 1 and not self._rfb:
 			self.rfb = True
 		elif today != 1 and self._rfb:

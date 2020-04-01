@@ -1342,6 +1342,87 @@
 				"random": 0
 			}
 		},
+		"3003": {
+			"boss": {
+				"HP": 1000000
+			},
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"3004": {
+			"boss": {
+				"HP": 10000000
+			},
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
+		"3005": {
+			"boss": {
+				"HP": 100000000
+			},
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 6
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 500
+				},
+				"random": 0
+			}
+		},
 		"4001": {
 			"constraint": {
 				"random": 0,

@@ -145,7 +145,10 @@ async def refresh_boss(uid, **kwargs):
         lim, tim = kwargs['config']['boss']['limit'], now + timedelta(days=1)
         await common.set_limit(uid, lid, lim, **kwargs)
         await common.set_timer(uid, tid, tim, timeformat='%Y-%m-%d', **kwargs)
-    return common.mt(0, 'Successfully get hook information', {'damage': damage, 'limit': lim, 'cd': common.remaining_cd(), 'mcd': common.remaining_month_cd(), 'ratio': ratio})
+    return common.mt(0, 'Successfully get hook information',
+                     {'damage': damage, 'limit': lim, 'cd': common.remaining_cd(),
+                      'mcd': common.remaining_month_cd(), 'ratio': ratio,
+                      'hp': config['hp']})
 
 
 async def all_infos(uid, **kwargs):
@@ -237,12 +240,13 @@ async def b_dispose(uid, stage, damage, results, **kwargs):
     if damage < 0 or damage >= kwargs['config']['boss'].get('damage', 100_0000):
         return 93, "abnormal damage"
     else:
-        hp = config['hp'][f'{stage}']
-        config['hp'][f'{stage}'] = max(0, hp - damage)
+        hp = max(0, config['hp'][f'{stage}'] - damage)
+        config['hp'][f'{stage}'] = hp
         if record:
             await set_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, damage, **kwargs)
-        ratio = {s: "%.2f" % (hp/config['HP'][s]) for s, hp in config['hp'].items()}
-        results['boss'] = {'ratio': ratio, 'record': int(record), 'damage': max(damage, _damage)}
+        ratio = {s: "%.2f" % (h/config['HP'][s]) for s, h in config['hp'].items()}
+        results['boss'] = {'ratio': ratio, 'record': int(record),
+                           'damage': max(damage, _damage), 'hp': config['hp']}
 
 
 async def rw_common(uid, common, rewards, mul=1, **kwargs):
@@ -319,7 +323,7 @@ async def get_leaderboard(uid, lid, **kwargs):
 
 
 async def set_leaderboard(uid, lid, damage, **kwargs):
-    await common.execute(f'INSERT INTO leaderboard (uid, lid, value) VALUES ("{uid}", {lid}, {damage});', **kwargs)
+    await common.execute(f'INSERT INTO leaderboard (uid, lid, value) VALUES ("{uid}", {lid}, {damage}) ON DUPLICATE KEY UPDATE value="{damage}";;', **kwargs)
 
 
 async def init_stages(uid, **kwargs):

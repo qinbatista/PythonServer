@@ -42,7 +42,6 @@ async def enter_world(uid, **kwargs):
     existing_player = await common.exists('player', ('uid', translated_uid), **kwargs)
     session = (await account._request_new_token(translated_uid, is_session='1', **kwargs))['token']
     await update_time(uid, **kwargs)
-    # await stage.init_stages(uid, **kwargs)
     if not existing_player:
         return common.mt(98, 'have not been in this world before', {'cid': cid, 'session' : session})
     return common.mt(0, 'success', {'cid': cid, 'session' : session})
@@ -61,10 +60,10 @@ async def get_account_world_info(uid, **kwargs):
                 `player`.`uid` = `progress`.`uid` WHERE `player`.`uid` = "{translated_uid}";', **kwargs)
         if data != ():
             exp_info = await stage.increase_exp(translated_uid, 0, **kwargs)
-            worlds.append({'server_status' : world['status'], 'world' : world['id'], \
+            worlds.append({'server_status' : world['status'], 'world' : world['id'],
                     'world_name' : world['name'], 'gn' : data[0][0], 'exp' : data[0][1], 'level': exp_info['level']})
         else:
-            worlds.append({'server_status' : world['status'], 'world' : world['id'], \
+            worlds.append({'server_status' : world['status'], 'world' : world['id'],
                     'world_name' : world['name'], 'gn' : '', 'exp' : 0, 'level' : 0})
     return common.mt(0, 'success', {'worlds' : worlds})
 
@@ -107,7 +106,12 @@ async def get_info(uid, **kwargs):
     stages = await stage.all_infos(uid, **kwargs)
     energy = await common.try_energy(uid, 0, **kwargs)
     exp = await common.get_progress(uid, 'exp', **kwargs)
-    return common.mt(0, 'success', {'gn': gn, 'fn': fn or '', 'energy_info': energy['data'], 'stages': stages['data'], 'exp': exp})
+    es = await _element_all(uid, **kwargs)
+    elm = await common.get_limit(uid, enums.Limits.PLAYER_ELEMENT, **kwargs)
+    return common.mt(0, 'success',
+                     {'gn': gn, 'fn': fn or '', 'energy_info': energy['data'],
+                      'stages': stages['data'], 'exp': exp, 'elements': es,
+                      'elm': elm})
 
 
 async def get_all_resource(uid, **kwargs):
@@ -129,15 +133,15 @@ async def element_lv(uid, eid, **kwargs):
         return common.mt(99, 'eid error')
     lv = (await stage.increase_exp(uid, 0, **kwargs))['level']
     evs = 1 + (lv - 15)//10
-    aes = (await element_all(uid, **kwargs))['data']
-    if evs <= sum(aes.values()):
+    elements = await _element_all(uid, **kwargs)
+    if evs <= sum(elements.values()):
         return common.mt(98, 'insufficient element skill points')
-    val = aes[eid] + 1
+    val = elements[eid] + 1
     if val > 5:
         return common.mt(97, 'max element skill')
     await common.set_element(uid, eid, val, **kwargs)
-    aes[eid] = val
-    return common.mt(0, 'success', {'aes': aes, 'reward': {eid: 1}})
+    elements[eid] = val
+    return common.mt(0, 'success', {'elements': elements, 'reward': {eid: 1}})
 
 
 async def element_reset(uid, **kwargs):
@@ -148,16 +152,21 @@ async def element_reset(uid, **kwargs):
         return common.mt(99, 'Insufficient resets')
     await _element_init(uid, **kwargs)
     await common.set_limit(uid, enums.Limits.PLAYER_ELEMENT, lim, **kwargs)
-    aes = (await element_all(uid, **kwargs))['data']
-    return common.mt(0, 'success', {'aes': aes, 'lim': lim})
+    elements = await _element_all(uid, **kwargs)
+    return common.mt(0, 'success', {'elements': elements, 'lim': lim})
 
 
 async def element_all(uid, **kwargs):
-    eds = await common.execute(f'SELECT eid, val FROM `elements` WHERE `uid`="{uid}";', **kwargs)
-    return common.mt(0, 'success', {ed[0]: ed[1] for ed in eds})
+    elements = await _element_all(uid, **kwargs)
+    return common.mt(0, 'success', elements)
 
 
 #########################################################################################
+async def _element_all(uid, **kwargs):
+    eds = await common.execute(f'SELECT eid, val FROM `elements` WHERE `uid`="{uid}";', **kwargs)
+    return {ed[0]: ed[1] for ed in eds}
+
+
 async def _element_init(uid, **kwargs):
     [await common.set_element(uid, eid, 0, **kwargs) for eid in enums.Element]
 
