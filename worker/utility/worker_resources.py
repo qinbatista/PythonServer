@@ -114,6 +114,7 @@ class ModuleConfigurations:
 		self.configs['version']           = r.json()['version']
 		self.configs['summon']            = r.json()['summon']
 		self.configs['stages']            = r.json()['stages']
+		self.configs['sciences']          = r.json()['sciences']
 		self.configs['notice']            = r.json()['notice']
 
 		today = datetime.now(tz=TZ_SH).day

@@ -5,6 +5,18 @@ Contains the CREATE statements necessary to create the lukseun database structur
 Also includes necessary triggers.
 '''
 
+SCIENCES = \
+"""
+CREATE TABLE `sciences` (
+	 `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
+	 `pid` SMALLINT UNSIGNED NOT NULL COMMENT '科技类id',
+	 `sid` SMALLINT UNSIGNED NOT NULL COMMENT '科技子类id',
+	 `level` INT UNSIGNED NOT NULL COMMENT '科技等级',
+	 PRIMARY KEY (`uid`, `pid`, `sid`),
+	 CONSTRAINT `sciences_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+"""
+
 ELEMENTS = \
 """
 CREATE TABLE `elements` (

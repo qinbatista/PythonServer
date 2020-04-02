@@ -36,6 +36,7 @@ def main():
 	parser.add_argument('-p', type=str)
 	args = parser.parse_args()
 	# login(args.u, args.p)
+	# docker('registry.cn-beijing.aliyuncs.com/lukseun')
 	docker('registry.cn-hangzhou.aliyuncs.com/lukseun')
 	k8s()
 

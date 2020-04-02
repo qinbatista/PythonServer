@@ -144,6 +144,13 @@ async def get_element(uid, eid, **kwargs):
 async def set_element(uid, eid, val, **kwargs):
 	await execute(f'INSERT INTO `elements` VALUES ("{uid}", "{eid}", "{val}") ON DUPLICATE KEY UPDATE val="{val}";', **kwargs)
 
+async def get_science(uid, pid, sid, **kwargs):
+	data = await execute(f'SELECT level FROM `sciences` WHERE `uid`="{uid}" AND `pid`={pid} AND `sid`={sid};', **kwargs)
+	return data[0][0] if data != () else 0
+
+async def set_science(uid, pid, sid, level, **kwargs):
+	await execute(f'INSERT INTO `sciences` VALUES ("{uid}", "{pid}", "{sid}", "{level}") ON DUPLICATE KEY UPDATE level="{level}";', **kwargs)
+
 async def get_db(**kwargs):
 	return kwargs['worlddb']
 

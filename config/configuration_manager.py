@@ -30,7 +30,6 @@ ROLE = loc() + '/configuration/{}/server/role_config.json'
 PLAYER = loc() + '/configuration/{}/server/player_config.json'
 MALL = loc() + '/configuration/{}/server/mall.json'
 MONSTER = loc() + '/configuration/{}/client/monster_config.json'
-WORLD_BOSS = loc() + '/configuration/{}/server/world_boss_config.json'
 ENEMY_LAYOUT = loc() + '/configuration/{}/client/level_enemy_layouts_config.json'
 ENEMY_LAYOUT_TOWER = loc() + '/configuration/{}/client/level_enemy_layouts_config_tower.json'
 SERVER_CONFIG = loc() + '/configuration/{}/server/server_config.json'
@@ -43,6 +42,7 @@ VIP_CONFIG = loc() + '/configuration/{}/server/vip_config.json'
 PACKAGE = loc() + '/configuration/{}/server/package.json'
 SUMMON = loc() + '/configuration/{}/server/summon.json'
 STAGES = loc() + '/configuration/{}/server/stages.json'
+SCIENCES = loc() + '/configuration/{}/server/sciences.json'
 
 
 class RepeatingTimer(threading.Thread):
@@ -80,6 +80,7 @@ class ConfigurationManager:
 		self._read_package_config()
 		self._read_summon_config()
 		self._read_stages_config()
+		self._read_sciences_config()
 
 		# read this one last
 		self._read_game_manager_config()
@@ -118,19 +119,19 @@ class ConfigurationManager:
 	def _read_stages_config(self):
 		self._stages = json.load(open(STAGES.format(self._sv), encoding='utf-8'))
 
+	def _read_sciences_config(self):
+		self._sciences = json.load(open(SCIENCES.format(self._sv), encoding='utf-8'))
+
 	def _read_game_manager_config(self):
-		# reward_list = [v for v in (json.load(open(REWARD_LIST.format(self._cv), encoding = 'utf-8'))).values()]
 		lottery = json.load(open(LOTTERY.format(self._sv), encoding = 'utf-8'))
 		weapon = json.load(open(WEAPON.format(self._sv), encoding = 'utf-8'))
 		role = json.load(open(ROLE.format(self._sv), encoding = 'utf-8'))
 		skill = json.load(open(SKILL.format(self._sv), encoding = 'utf-8'))
 		player = json.load(open(PLAYER.format(self._sv), encoding = 'utf-8'))
-		world_boss = json.load(open(WORLD_BOSS.format(self._sv), encoding = 'utf-8'))
 		world = json.load(open(WORLD.format(self._sv), encoding = 'utf-8'))
 		self._game_manager_config = {
 			'lottery' : lottery, 'weapon' : weapon, 'role' : role,
-			'skill' : skill, 'player' : player,
-			"world_boss" : world_boss,
+			'skill' : skill, 'player' : player, 'sciences': self._sciences,
 			"factory": self._factory_config, 'family': self._family_config,
 			"mall": self._mall_config, "notice": self._notice_info,
 			'player_experience': self._player_experience, 'monster_config': self._monster_config,

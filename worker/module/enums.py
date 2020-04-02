@@ -433,6 +433,13 @@ class LeaderBoard(enum.IntEnum):
     WORLD_BOSS = 1
 
 
+class Science(enum.IntEnum):
+    FACTORY = 1  # 工厂科技分支
+
+
+class ScienceSub(enum.IntEnum):
+    ROLE = 1  # 角色科技
+    WEAPON = 2  # 武器科技
 
 
 

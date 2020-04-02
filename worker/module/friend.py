@@ -130,14 +130,14 @@ async def find_person(uid, gn_target, **kwargs):
     uid_target = await common.get_uid(gn_target, **kwargs)
     if uid == uid_target: return common.mt(98, "can't add yourself")
     if data == (): return common.mt(99, 'no such person')
+    stage, _ = await common.get_stage(uid, enums.Stage.GENERAL, **kwargs)
     isfriends, _, _ = await _are_friends(uid, uid_target, **kwargs)
     canfamily = await _can_invite_family(uid, uid_target, **kwargs)
     return common.mt(0, 'find person success',
                      {'gn': data[0][0], 'intro': data[0][1],
-                      'fid': '' if data[0][2] is None else data[0][2],
-                      'exp': data[0][3], 'stage': data[0][4],
-                      'role': data[0][5], "isfriend": isfriends,
-                      "canfamily": canfamily})
+                      'fid': data[0][2] or '', 'exp': data[0][3],
+                      'role': data[0][4], 'stage': stage,
+                      "isfriend": isfriends, "canfamily": canfamily})
 
 
 ###########################################################################################################
@@ -234,7 +234,7 @@ async def _get_friend_info(uid, **kwargs):
 
 
 async def _get_person_info(uid, **kwargs):
-    return await common.execute(f'SELECT player.gn, player.intro, player.fid, progress.exp, progress.stage, progress.role FROM progress JOIN player ON progress.uid = player.uid WHERE player.uid = "{uid}";', **kwargs)
+    return await common.execute(f'SELECT player.gn, player.intro, player.fid, progress.exp, progress.rid FROM progress JOIN player ON progress.uid = player.uid WHERE player.uid = "{uid}";', **kwargs)
 
 
 async def _lookup_nonce(nonce, **kwargs):
