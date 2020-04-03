@@ -24,9 +24,13 @@ HAS_LEVEL_FACTORIES  = {enums.Factory.FOOD         : None, enums.Factory.IRON  :
 
 HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None}
 
-ACHIEVEMENT_FACTORIES = {enums.Factory.FOOD: enums.Achievement.COLLECT_FOOD,
+COLLECTS = {enums.Factory.FOOD: enums.Achievement.COLLECT_FOOD,
                         enums.Factory.IRON: enums.Achievement.COLLECT_MINE,
                         enums.Factory.CRYSTAL: enums.Achievement.COLLECT_CRYSTAL}
+
+UPGRADES = {enums.Factory.FOOD: enums.Achievement.UPGRADE_FOOD_FACTORY,
+                        enums.Factory.IRON: enums.Achievement.UPGRADE_MINE_FACTORY,
+                        enums.Factory.CRYSTAL: enums.Achievement.UPGRADE_CRYSTAL_FACTORY}
 
 async def refresh(uid, **kwargs):
     now                  = datetime.now(tz=common.TZ_SH)
@@ -38,9 +42,9 @@ async def refresh(uid, **kwargs):
     await record_resources(uid, storage, **kwargs)  # 更新数据库资源
     ua, mw = await get_unassigned_workers(uid, **kwargs)  # ua未分配的工人数，mw总工人数
     # 记录成就和任务的代码片段
-    for k in ACHIEVEMENT_FACTORIES:
+    for k in COLLECTS:
         if delta[k] <= 0: continue
-        await achievement.record(uid, ACHIEVEMENT_FACTORIES[k], value=delta[k], **kwargs)
+        await achievement.record(uid, COLLECTS[k], value=delta[k], **kwargs)
         await task.record(uid, enums.Task.CHECK_FACTORY, **kwargs)
     # 计算加速剩余时间做后面的返回
     accel_end_t = await common.get_timer(uid, enums.Timer.FACTORY_ACCELERATION_END, **kwargs)
@@ -174,6 +178,9 @@ async def upgrade(uid, fid, **kwargs):
     if fid == enums.Factory.WISHING_POOL:
         pool = max(0, pool - 3600)
         await common.set_timer(uid, enums.Timer.FACTORY_WISHING_POOL, datetime.now(tz=common.TZ_SH)+timedelta(seconds=pool), **kwargs)
+    # 记录成就的代码片段
+    for k in UPGRADES:
+        await achievement.record(uid, UPGRADES[k], **kwargs)
     return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource']},
                                     'upgrade': {'cost': upgrade_cost, 'remaining': crystal, 'fid': fid.value, 'level': l + 1, 'pool': pool}})
 
