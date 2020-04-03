@@ -179,8 +179,8 @@ async def upgrade(uid, fid, **kwargs):
         pool = max(0, pool - 3600)
         await common.set_timer(uid, enums.Timer.FACTORY_WISHING_POOL, datetime.now(tz=common.TZ_SH)+timedelta(seconds=pool), **kwargs)
     # 记录成就的代码片段
-    for k in UPGRADES:
-        await achievement.record(uid, UPGRADES[k], **kwargs)
+    if fid in UPGRADES:
+        await achievement.record(uid, UPGRADES[fid], **kwargs)
     return common.mt(0, 'success', {'refresh': {'resource' : r['data']['resource']},
                                     'upgrade': {'cost': upgrade_cost, 'remaining': crystal, 'fid': fid.value, 'level': l + 1, 'pool': pool}})
 
