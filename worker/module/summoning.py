@@ -167,7 +167,8 @@ async def dozen_d(uid, **kwargs):
 	# TODO 完成任务
 	await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
 	# TODO 完成成就
-	await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, **kwargs)
+	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, value=grid, **kwargs)
+	await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, value=grid, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -209,6 +210,7 @@ async def dozen_c(uid, **kwargs):
 	data['constraint'] = reset['data']['constraint']
 	# TODO 完成任务
 	await task.record(uid, enums.Task.BASIC_SUMMONING, **kwargs)
+	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, value=grid, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -236,6 +238,7 @@ async def dozen_g(uid, **kwargs):
 	reset = await _refresh(uid, cid, **kwargs)
 	data['refresh'] = reset['data']['refresh']
 	data['constraint'] = reset['data']['constraint']
+	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, value=grid, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -276,6 +279,7 @@ async def single_d(uid, **kwargs):
 	# TODO 完成任务
 	await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
 	# TODO 完成成就
+	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, **kwargs)
 	await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, **kwargs)
 	return common.mt(0, 'success', data=data)
 
@@ -312,6 +316,7 @@ async def single_c(uid, **kwargs):
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
 	# TODO 完成任务
+	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, **kwargs)
 	await task.record(uid, enums.Task.BASIC_SUMMONING, **kwargs)
 	return common.mt(0, 'success', data=data)
 
@@ -338,6 +343,7 @@ async def single_g(uid, **kwargs):
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
+	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
