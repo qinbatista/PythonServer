@@ -680,26 +680,16 @@ class MessageHandler:
 		return await mall.exchange(data['data']['unique_id'], data['data']['game_id'], data['data']['exchange_id'], **data)
 
 	async def _add_resources(self, data: dict) -> str:
-		await common.try_item(data['data']['unique_id'], enums.Item.COIN, random.randint(1, 50000), **data)
-		await common.try_item(data['data']['unique_id'], enums.Item.IRON, random.randint(1, 5000), **data)
-		await common.try_item(data['data']['unique_id'], enums.Item.FOOD, random.randint(1, 5000), **data)
-		await common.try_item(data['data']['unique_id'], enums.Item.CRYSTAL,random.randint(1, 9000), **data)
-		await common.try_item(data['data']['unique_id'], enums.Item.DIAMOND,random.randint(1, 9000), **data)
-		await common.try_item(data['data']['unique_id'], enums.Item.SUMMON_SCROLL_BASIC, \
-				random.randint(1, 5000), **data)
-		await common.try_item(data['data']['unique_id'], enums.Item.SUMMON_SCROLL_PRO, \
-				random.randint(1, 5000), **data)
-		await common.try_item(data['data']['unique_id'], enums.Item.SUMMON_SCROLL_PROPHET, \
-				random.randint(1, 5000), **data)
-		await common.try_item(data['data']['unique_id'], enums.Item.FORTUNE_WHEEL_BASIC, \
-				random.randint(1, 5000), **data)
-		await common.try_item(data['data']['unique_id'], enums.Item.FORTUNE_WHEEL_PRO, \
-				random.randint(1, 5000), **data)
-		await stage.increase_exp(data['data']['unique_id'], random.randint(15000, 5000000), **data)
-		return common.mt(0, 'success')
+		results = {}
+		await stage.rw_common(data['data']['unique_id'], data['data']['items'], results, **data)
+		# await stage.increase_exp(data['data']['unique_id'], random.randint(15000, 5000000), **data)
+		return common.mt(0, 'success', results)
 
 	async def _get_config_notice(self, data: dict) -> str:
 		return common.mt(0, 'success', {'config': data['config']['notice']})
+
+	async def _get_config_science(self, data: dict) -> str:
+		return common.mt(0, 'success', {'config': data['config']['sciences']})
 
 	async def _update_init(self, data: dict) -> str:
 		# pds = await common.execute(f'SELECT uid FROM `player`;', **data)
@@ -939,6 +929,7 @@ FUNCTION_LIST = {
 	'get_config_family': MessageHandler._get_config_family,
 	'get_config_exchange': MessageHandler._get_config_exchange,
 	'get_config_notice': MessageHandler._get_config_notice,
+	'get_config_science': MessageHandler._get_config_science,
 
 	###################### package ######################
 	'exchange_card': MessageHandler._exchange_card,

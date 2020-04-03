@@ -47,7 +47,7 @@ async def fr_up(uid, **kwargs):
 
 # ################################# private #################################
 async def _up(uid, pid, sid, **kwargs):
-    config = kwargs['config']['sciences'][pid.name][sid.name]
+    config = kwargs['config']['sciences'][f'{pid}'][f'{sid}']
     lv = (await stage.increase_exp(uid, 0, **kwargs))['level']
     if lv < config['constraint']['level']:
         return common.mt(99, 'insufficient level')

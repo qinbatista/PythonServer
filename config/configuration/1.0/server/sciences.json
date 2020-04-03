@@ -1,8 +1,8 @@
 {
-	"comment": "FACTORY是工厂模式下的科技",
-	"FACTORY": {
-		"comment": "ROLE是角色科技",
-		"ROLE": {
+	"comment": "1是工厂模式下的科技",
+	"1": {
+		"comment": "1是角色科技,2是角色科技",
+		"1": {
 			"comment": "constraint是升级需要受到的限制,consume是升级需要消耗的物资",
 			"constraint": {
 				"level": 0
@@ -90,7 +90,7 @@
 				]
 			}
 		},
-		"WEAPON": {
+		"2": {
 			"comment": "constraint是升级需要受到的限制,consume是升级需要消耗的物资",
 			"constraint": {
 				"level": 0
