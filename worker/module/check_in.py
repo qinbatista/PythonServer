@@ -51,7 +51,7 @@ async def check_in(uid, day=None, **kwargs):
 	if gid == enums.Group.WEAPON:  quantity = await common.try_weapon(uid, enums.Weapon(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
 	if gid == enums.Group.ROLE:    quantity = await common.try_role(uid, enums.Role(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
 	await common.execute_update(f'insert into check_in(uid, date, reward) values("{uid}", "{_now}", 1)', **kwargs)
-	await task.record(uid, enums.Task.CHECK_IN, *kwargs)
+	await task.record(uid, enums.Task.CHECK_IN, **kwargs)
 	return common.mt(0, 'Sign-in success', {"remaining": [f'{item_set[0]}:{item_set[1]}:{quantity}'], "reward": [f'{item_set[0]}:{item_set[1]}:{vip_bond*int(item_set[2])}']})
 
 
@@ -63,4 +63,4 @@ async def get_all_check_in_table(uid, **kwargs):
 	for d in data:
 		remaining.update({d[1][-2:]: {'date': d[1], 'reward': d[2]}})
 	seconds = common.remaining_cd()
-	return common.mt(0, 'Successfully obtained all check-in status this month', data={'today': datetime.now(common.TZ_SH).day, 'time': f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}', 'remaining': remaining, 'config': kwargs['config']})
+	return common.mt(0, 'Successfully obtained all check-in status this month', data={'today': datetime.now(common.TZ_SH).day, 'time': f'{seconds//3600}:{"0" if seconds%3600//60 < 10 else ""}{seconds%3600//60}:{"0" if seconds%60 < 10 else ""}{seconds%60}', 'remaining': remaining, 'config': kwargs['config']['check_in']})

@@ -464,7 +464,6 @@ class MessageHandler:
 		return await check_in.supplement_check_in(data['data']['unique_id'],**data)
 
 	async def _get_all_check_in_table(self, data: dict) -> str:
-		data.update({"config": data['config']['check_in']})
 		return await check_in.get_all_check_in_table(data['data']['unique_id'],**data)
 
 	async def _get_config_check_in(self, data: dict) -> str:
