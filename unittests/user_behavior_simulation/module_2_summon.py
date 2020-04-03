@@ -182,12 +182,12 @@ if __name__ == '__main__':
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_market', 'data': {'token': token, 'task_id': 1}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'science_infos', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'science_fr_up', 'data': {'token': token}})
-	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_science', 'data': {'token': token}})
+	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_science', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'player_element_lv', 'data': {'token': token, 'eid': 1000}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'player_element_all', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'player_element_reset', 'data': {'token': token}})
 	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_stage', 'data': {'token': token, 'task_id': 1}})
-	user_behavior_simulation.send_tcp_message({'world': world, 'function': 'add_resources', 'data': {'token': token, 'items': ['3:1:100', '3:2:100', '3:5:100']}})
+	# user_behavior_simulation.send_tcp_message({'world': world, 'function': 'add_resources', 'data': {'token': token, 'items': ['3:1:100', '3:2:100', '3:5:100']}})
 	# user_behavior_simulation.send_tcp_message(
 	# 	{'world': world, 'function': 'request_friend',
 	# 	 'data': {'token': token, 'gn_target': 'a16'}})

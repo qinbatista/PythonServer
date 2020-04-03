@@ -52,7 +52,6 @@ async def check_in(uid, day=None, **kwargs):
 	if gid == enums.Group.ROLE:    quantity = await common.try_role(uid, enums.Role(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
 	await common.execute_update(f'insert into check_in(uid, date, reward) values("{uid}", "{_now}", 1)', **kwargs)
 	await task.record(uid, enums.Task.CHECK_IN, *kwargs)
-	await achievement.record(uid, enums.Achievement.TOTAL_LOGIN, tid=enums.Timer.CONTINUOUS_LOGIN, **kwargs)
 	return common.mt(0, 'Sign-in success', {"remaining": [f'{item_set[0]}:{item_set[1]}:{quantity}'], "reward": [f'{item_set[0]}:{item_set[1]}:{vip_bond*int(item_set[2])}']})
 
 

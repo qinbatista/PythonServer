@@ -24,7 +24,7 @@ class Item(enum.IntEnum):
     FORTUNE_WHEEL_BASIC = 14  # 暂未使用
     FORTUNE_WHEEL_PRO = 15  # 暂未使用
     FRIEND_GIFT = 16
-    UNIVERSAL_SEGMENT = 17  # 万能碎片
+    UNIVERSAL_SEGMENT = 17  # 万能碎片  暂未使用
     COIN_CARD = 18
     EXP_CARD = 19
     FOOD_CARD = 20

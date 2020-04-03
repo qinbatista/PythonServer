@@ -100,7 +100,11 @@ async def try_role(uid, role, quantity, **kwargs):
 async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
 	data = await execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
 			`tid` = {tid.value};', **kwargs)
-	return datetime.strptime(data[0][0], timeformat).replace(tzinfo=TZ_SH) if data != () else None
+	try:
+		tim = datetime.strptime(data[0][0], timeformat).replace(tzinfo=TZ_SH) if data != () else None
+	except ValueError:
+		tim = datetime.strptime(f'{data[0][0]} 00:00:00', timeformat).replace(tzinfo=TZ_SH)
+	return tim
 
 async def set_timer(uid, tid, time, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
 	await execute(f'INSERT INTO `timer` VALUES ("{uid}", {tid.value}, \
@@ -126,9 +130,9 @@ async def set_progress(uid, pid, value, **kwargs):
 async def update_famliy(name, fid, value, **kwargs):
 	await execute(f'UPDATE `family` SET {fid}="{value}" WHERE name="{name}";', **kwargs)
 
-async def set_achievement(uid, aid, value, reward=0, reset=False, **kwargs):
+async def set_achievement(uid, aid, value, reset=False, **kwargs):
 	if not reset: value = f'`value` + {value}'
-	await execute(f'INSERT INTO achievement(uid, aid, value, reward) VALUES ("{uid}", {aid}, {value}, {reward}) ON DUPLICATE KEY UPDATE `value`= {value}, `reward`= {reward}', **kwargs)
+	await execute(f'INSERT INTO achievement(uid, aid, value, reward) VALUES ("{uid}", {aid}, {value}, 0) ON DUPLICATE KEY UPDATE `value`= {value}', **kwargs)
 
 async def get_stage(uid, sid, **kwargs):
 	data = await execute(f'SELECT `stage`, `btm` FROM `stages` WHERE `uid` = "{uid}" AND `sid` = {sid};', **kwargs)
