@@ -18,12 +18,6 @@ async def get_config(**kwargs):
 	return common.mt(0, 'success', kwargs['config']['weapon'])
 
 async def level_up(uid, wid, delta, **kwargs):
-	kwargs.update({"task_id":enums.Task.WEAPON_LEVEL_UP})
-	await task.record_task(uid,**kwargs)
-
-	kwargs.update({"aid":enums.Achievement.LEVEL_UP_WEAPON})
-	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
-
 	wst = int(wid//100)
 	max_lv = ((wst if wst < 5 else 5) if wst > 2 else 2) * 20 + 20
 	wid = enums.Weapon(wid)
@@ -44,6 +38,8 @@ async def level_up(uid, wid, delta, **kwargs):
 	level += delta
 	_sp = 1 if level % 10 == 0 else 0
 	await common.execute(f'UPDATE weapon SET level = {level}, skillpoint = {sp + _sp} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
+	await task.record(uid, enums.Task.WEAPON_LEVEL_UP, **kwargs)
+	await achievement.record(uid, enums.Achievement.LEVEL_UP_WEAPON, **kwargs)
 	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : level, 'sp' : sp + _sp},
 													enums.Group.ITEM.value : [{'iid' : enums.Item.IRON.value, 'value' : remain_i}, {'iid' : enums.Item.COIN.value, 'value' : remain_c}]},
 										'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : delta, 'sp' : _sp},

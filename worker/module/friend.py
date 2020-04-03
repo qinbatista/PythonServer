@@ -38,10 +38,6 @@ async def remove(uid, gn_target, **kwargs):
 async def request(uid, gn_target, **kwargs):
     if await _is_request_max(uid, **kwargs):
         return common.mt(96, '6 request for 1 day, try tommorrow')
-
-    kwargs.update({"aid": enums.Achievement.FRIEND_REQUEST})
-    await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
-
     uid_target = await common.get_uid(gn_target, **kwargs)
     if uid_target == "": return common.mt(97, 'no such person')
     if uid == uid_target: return common.mt(99, 'do not be an idiot')
@@ -59,6 +55,7 @@ async def request(uid, gn_target, **kwargs):
         return common.mt(94, 'target mailbox full')
     if sent[uid_target]['status'] != 0:
         return common.mt(98, 'could not send mail')
+    await achievement.record(uid, enums.Achievement.FRIEND_REQUEST, **kwargs)
     await common.execute(f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, value+1) ON DUPLICATE KEY UPDATE value = value+1;', **kwargs)
     return common.mt(0, 'request sent', {'gn': gn_target})
 
@@ -81,8 +78,6 @@ async def respond(uid, nonce, **kwargs):
 
 async def send_gift(uid, gn_target, infos=None, **kwargs):
     # 发送朋友礼物
-    kwargs.update({"task_id": enums.Task.SEND_FRIEND_GIFT})
-    await task.record_task(uid, **kwargs)
     if infos is None:
         fid = await common.get_uid(gn_target, **kwargs)
         friends, recover, since = await _are_friends(uid, fid, **kwargs)
@@ -105,11 +100,11 @@ async def send_gift(uid, gn_target, infos=None, **kwargs):
     if sent[fid]['status'] != 0:
         return common.mt(97, 'mailbox error')
 
-    kwargs.update({"aid": enums.Achievement.FRIEND_GIFT})
-    await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
     await common.execute(
         f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";',
         **kwargs)
+    await task.record(uid, enums.Task.SEND_FRIEND_GIFT, **kwargs)
+    await achievement.record(uid, enums.Achievement.FRIEND_GIFT, **kwargs)
     return common.mt(0, 'success')
 
 

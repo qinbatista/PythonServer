@@ -10,12 +10,6 @@ from collections import defaultdict
 
 
 async def level_up(uid, rid, delta, **kwargs):
-	kwargs.update({"task_id": enums.Task.ROLE_LEVEL_UP})
-	await task.record_task(uid,**kwargs)
-
-	kwargs.update({"aid":enums.Achievement.LEVEL_UP_ROLE})
-	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
-
 	rid = enums.Role(rid)
 	exists, payload = await _get_role_info(uid, rid, 'star', 'level', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')
@@ -31,6 +25,8 @@ async def level_up(uid, rid, delta, **kwargs):
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
 	rm = [{'iid': r[1], 'value': r[2]} for r in results]
 	rw = [{'iid': r[1], 'value': r[3]} for r in results]
+	await task.record(uid, enums.Task.ROLE_LEVEL_UP, **kwargs)
+	await achievement.record(uid, enums.Achievement.LEVEL_UP_ROLE, **kwargs)
 	await common.execute(f'UPDATE role SET level = {level + delta} WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
 	return common.mt(0, 'success', {'remaining': {enums.Group.ROLE.value: {'rid': rid.value, 'level' : level + delta},
 													enums.Group.ITEM.value: rm},

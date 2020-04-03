@@ -47,17 +47,12 @@ async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
 	if not can_pay: return common.mt(99, 'insufficient materials')
 	new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
 
-	kwargs.update({"aid":enums.Achievement.SUMMON_TIMES})
-	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
-
+	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, **kwargs)
 	if enums.Tier.BASIC == tier:
-		kwargs.update({"task_id":enums.Task.BASIC_SUMMONING})
-		await task.record_task(uid, **kwargs)
+		await task.task(uid, enums.Task.BASIC_SUMMONING, **kwargs)
 	if enums.Tier.PRO == tier:
-		kwargs.update({"task_id":enums.Task.PRO_SUMMONING})
-		await task.record_task(uid,**kwargs)
-		kwargs.update({"aid":enums.Achievement.PRO_SUMMON_TIMES})
-		await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
+		await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
+		await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, **kwargs)
 
 	return await _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)
 
@@ -68,15 +63,11 @@ async def _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs):
 	if not can_pay: return common.mt(99, 'insufficient materials')
 	response = {'remaining' : {}, 'reward' : {}}
 	for time in range(num_times):
-
 		if enums.Tier.BASIC == tier:
-			kwargs.update({"task_id":enums.Task.BASIC_SUMMONING})
-			await task.record_task(uid,**kwargs)
+			await task.record(uid, enums.Task.BASIC_SUMMONING, **kwargs)
 		if enums.Tier.PRO == tier:
-			kwargs.update({"task_id":enums.Task.PRO_SUMMONING})
-			await task.record_task(uid,**kwargs)
-			kwargs.update({"aid":enums.Achievement.PRO_SUMMON_TIMES})
-			await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
+			await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
+			await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, **kwargs)
 
 		new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
 		result = await _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)
@@ -174,11 +165,9 @@ async def dozen_d(uid, **kwargs):
 	data['refresh'] = reset['data']['refresh']
 	data['constraint'] = reset['data']['constraint']
 	# TODO 完成任务
-	kwargs.update({"task_id": enums.Task.PRO_SUMMONING})
-	await task.record_task(uid, **kwargs)
+	await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
 	# TODO 完成成就
-	kwargs.update({"aid": enums.Achievement.PRO_SUMMON_TIMES})
-	await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
+	await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -219,8 +208,7 @@ async def dozen_c(uid, **kwargs):
 	data['refresh'] = reset['data']['refresh']
 	data['constraint'] = reset['data']['constraint']
 	# TODO 完成任务
-	kwargs.update({"task_id": enums.Task.BASIC_SUMMONING})
-	await task.record_task(uid, **kwargs)
+	await task.record(uid, enums.Task.BASIC_SUMMONING, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -286,11 +274,9 @@ async def single_d(uid, **kwargs):
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
 	# TODO 完成任务
-	kwargs.update({"task_id": enums.Task.PRO_SUMMONING})
-	await task.record_task(uid, **kwargs)
+	await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
 	# TODO 完成成就
-	kwargs.update({"aid": enums.Achievement.PRO_SUMMON_TIMES})
-	await achievement.record_achievement(kwargs['data']['unique_id'], **kwargs)
+	await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -326,8 +312,7 @@ async def single_c(uid, **kwargs):
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
 	# TODO 完成任务
-	kwargs.update({"task_id": enums.Task.BASIC_SUMMONING})
-	await task.record_task(uid, **kwargs)
+	await task.record(uid, enums.Task.BASIC_SUMMONING, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 

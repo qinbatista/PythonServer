@@ -37,12 +37,6 @@ async def check_in(uid, day=None, **kwargs):
 	"""每日签到"""
 	# 0 - Sign-in success
 	# 99 - You have already signed in today
-	kwargs.update({"task_id": enums.Task.CHECK_IN})
-	await task.record_task(uid, **kwargs)
-
-	kwargs.update({"aid":enums.Achievement.TOTAL_LOGIN})
-	await achievement.record_achievement(uid,**kwargs)
-
 	now = datetime.now(common.TZ_SH)
 	today = now.day
 	_now = now.strftime('%Y-%m-%d' if day is None else f'%Y-%m-{day}')
@@ -57,6 +51,8 @@ async def check_in(uid, day=None, **kwargs):
 	if gid == enums.Group.WEAPON:  quantity = await common.try_weapon(uid, enums.Weapon(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
 	if gid == enums.Group.ROLE:    quantity = await common.try_role(uid, enums.Role(int(item_set[1])), vip_bond * int(item_set[2]), **kwargs)
 	await common.execute_update(f'insert into check_in(uid, date, reward) values("{uid}", "{_now}", 1)', **kwargs)
+	await task.record(uid, enums.Task.CHECK_IN, *kwargs)
+	await achievement.record(uid, enums.Achievement.TOTAL_LOGIN, tid=enums.Timer.CONTINUOUS_LOGIN, **kwargs)
 	return common.mt(0, 'Sign-in success', {"remaining": [f'{item_set[0]}:{item_set[1]}:{quantity}'], "reward": [f'{item_set[0]}:{item_set[1]}:{vip_bond*int(item_set[2])}']})
 
 

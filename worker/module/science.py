@@ -61,13 +61,13 @@ async def _up(uid, pid, sid, **kwargs):
     if not can:
         return common.mt(96, 'materials insufficient')
     await common.set_science(uid, pid, sid, _lv, **kwargs)
-    results = {'science': await _all(uid, **kwargs), 'rws': f'{pid}:{sid}:1'}
+    results = {'science': await _all(uid, **kwargs), 'rws': {f'{pid}': {f'{sid}': 1}}}
     results['remain'], results['reward'] = stage.rm_rw(cmw)
     return common.mt(0, 'success', results)
 
 
 async def _all(uid, **kwargs):
     sds = await common.execute(f'SELECT pid, sid, level FROM sciences WHERE uid="{uid}"', **kwargs)
-    return [f'{p}:{s}:{l}' for p, s, l in sds]
+    return {f'{p}': {f'{s}': l} for p, s, l in sds}
 
 

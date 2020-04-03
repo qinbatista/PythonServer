@@ -247,6 +247,7 @@ async def b_dispose(uid, stage, damage, results, **kwargs):
         ratio = {s: "%.2f" % (h/config['HP'][s]) for s, h in config['hp'].items()}
         results['boss'] = {'ratio': ratio, 'record': int(record),
                            'damage': max(damage, _damage), 'hp': config['hp']}
+        await record(uid, enums.Task.PASS_WORLD_BOSS, **kwargs)
 
 
 async def rw_common(uid, common, rewards, mul=1, **kwargs):

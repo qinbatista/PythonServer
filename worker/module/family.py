@@ -278,12 +278,6 @@ async def cancel_disband(uid, **kwargs):
 	return common.mt(0, 'success')
 
 async def check_in(uid, **kwargs):
-	kwargs.update({"task_id":enums.Task.FAMILY_CHECK_IN})
-	await task.record_task(uid,**kwargs)
-
-	kwargs.update({"aid":enums.Achievement.CHECK_IN_FAMILY})
-	await achievement.record_achievement(kwargs['data']['unique_id'],**kwargs)
-
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
 	timer = await common.get_timer(uid, enums.Timer.FAMILY_CHECK_IN,
@@ -304,6 +298,8 @@ async def check_in(uid, **kwargs):
 		_, remain = await common.try_item(uid, iid, cost, **kwargs)
 		data['remaining'].append({"iid": iid.value, "value": remain})
 		data['reward'].append({"iid": iid.value, "value": cost})
+	await task.record(uid, enums.Task.FAMILY_CHECK_IN, **kwargs)
+	await achievement.record(uid, enums.Achievement.CHECK_IN_FAMILY, **kwargs)
 	return common.mt(0, 'success', data)
 
 async def abdicate(uid, target, **kwargs):

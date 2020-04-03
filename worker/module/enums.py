@@ -373,8 +373,8 @@ class Limits(enum.IntEnum):
 
 
 class Achievement(enum.IntEnum):
-    TOTAL_LOGIN = 1
-    KEEPING_LOGIN = 2
+    TOTAL_LOGIN = 1  # 总登陆天数
+    KEEPING_LOGIN = 2  # 保持登陆天数
     VIP_LEVEL = 3
     GET_4_STAR_ROLE = 4
     GET_5_STAR_ROLE = 5
@@ -405,19 +405,19 @@ class Achievement(enum.IntEnum):
 
 
 class Task(enum.IntEnum):
-    LOGIN = 1
-    CHECK_IN = 2
-    ROLE_LEVEL_UP = 3
-    WEAPON_LEVEL_UP = 4
-    PASS_MAIN_STAGE = 5
-    PASS_SPECIAL_STAGE = 6
-    PASS_WORLD_BOSS = 7
-    BASIC_SUMMONING = 8
-    PRO_SUMMONING = 9
-    CHECK_FACTORY = 10
-    SEND_FRIEND_GIFT = 11
-    FAMILY_CHECK_IN = 12
-    DONE_10_TASK = 13
+    LOGIN = 1  # 当天首次登陆
+    CHECK_IN = 2  # 当天签到
+    ROLE_LEVEL_UP = 3  # 角色升级
+    WEAPON_LEVEL_UP = 4  # 武器升级
+    PASS_MAIN_STAGE = 5  # 通过主线关卡
+    PASS_SPECIAL_STAGE = 6  # 通关特殊关卡（未做）
+    PASS_WORLD_BOSS = 7  #  通关BOSS关卡
+    BASIC_SUMMONING = 8  # 完成金币抽奖
+    PRO_SUMMONING = 9  # 完成钻石抽奖
+    CHECK_FACTORY = 10  # 完成工厂资源增加
+    SEND_FRIEND_GIFT = 11  # 完成发送好友礼物
+    FAMILY_CHECK_IN = 12  # 完成家族签到
+    DONE_10_TASK = 13  # 完成10个任务
 
 
 class Factory(enum.IntEnum):
