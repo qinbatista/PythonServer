@@ -26,9 +26,10 @@ async def create(uid, gn, **kwargs):
         common.execute(f'INSERT INTO role (uid, star, level, rid) VALUES ("{uid}", 1, 1, {enums.Role.R402}), ("{uid}", 1, 1, {enums.Role.R505}), ("{uid}", 1, 1, {enums.Role.R601});', **kwargs),
         common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W301}), ("{uid}", 1, {enums.Weapon.W302}), ("{uid}", 1, {enums.Weapon.W303});', **kwargs),
         common.execute(f'INSERT INTO skill(uid, sid, level) VALUES ("{uid}", {enums.Skill.S1}, 1), ("{uid}", {enums.Skill.S2}, 1), ("{uid}", {enums.Skill.S3}, 1), ("{uid}", {enums.Skill.S4}, 1), ("{uid}", {enums.Skill.S5}, 1);', **kwargs),
-        common.set_timer(uid, enums.Timer.LOGIN_TIME, now, **kwargs),
         common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);',**kwargs),
+        common.set_timer(uid, enums.Timer.LOGIN_TIME, now, **kwargs),
         common.set_limit(uid, enums.Limits.PLAYER_ELEMENT, ELEMENT_LIM, **kwargs),
+        common.set_science(uid, enums.Science.FACTORY, enums.ScienceSub.MASTER, 1, **kwargs),
         stage.init_stages(uid, **kwargs),
         _element_init(uid, **kwargs)
     )

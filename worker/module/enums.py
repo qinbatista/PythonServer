@@ -438,8 +438,9 @@ class Science(enum.IntEnum):
 
 
 class ScienceSub(enum.IntEnum):
-    ROLE = 1  # 角色科技
-    WEAPON = 2  # 武器科技
+    MASTER = 1  # 科技所限制其他科技升级的最大级数
+    ROLE = 2  # 角色科技
+    WEAPON = 3  # 武器科技
 
 
 
