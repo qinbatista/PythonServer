@@ -233,6 +233,12 @@ def addition(stage, **kwargs):
     return els, monsters
 
 
+async def g_dispose(uid, stage, _stage, **kwargs):
+    await task.record(uid, enums.Task.PASS_MAIN_STAGE, **kwargs)
+    if stage > _stage:
+        await achievement.record(uid, enums.Achievement.PASS_STAGE, **kwargs)
+
+
 async def b_dispose(uid, stage, damage, results, **kwargs):
     """BOSS伤害记录等信息处理"""
     config, _damage = kwargs['config']['boss'], await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
@@ -248,6 +254,11 @@ async def b_dispose(uid, stage, damage, results, **kwargs):
         results['boss'] = {'ratio': ratio, 'record': int(record),
                            'damage': max(damage, _damage), 'hp': config['hp']}
         await task.record(uid, enums.Task.PASS_WORLD_BOSS, **kwargs)
+
+
+async def e_dispose(uid, stage, _stage, **kwargs):
+    await task.record(uid, enums.Task.PASS_SPECIAL_STAGE, **kwargs)
+    await hang_up(uid, new=stage > _stage, **kwargs)
 
 
 async def rw_common(uid, common, rewards, mul=1, **kwargs):
@@ -361,8 +372,9 @@ REALIZE = {
 
 
 VICTORY_DISPOSE = {
+    enums.Stage.GENERAL: lambda uid, stage, _stage, damage, results, **kwargs: g_dispose(uid, stage, _stage, **kwargs),
     enums.Stage.BOSS: lambda uid, stage, _stage, damage, results, **kwargs: b_dispose(uid, stage, damage, results, **kwargs),
-    enums.Stage.ENDLESS: lambda uid, stage, _stage, damage, results, **kwargs: hang_up(uid, new=stage > _stage, **kwargs),
+    enums.Stage.ENDLESS: lambda uid, stage, _stage, damage, results, **kwargs: e_dispose(uid, stage, _stage, **kwargs),
 }
 
 
