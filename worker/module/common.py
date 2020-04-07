@@ -85,17 +85,24 @@ async def try_armor(uid, aid, level, value, **kwargs):
 				return (True, quantity[0][0] + value) if quantity != () else (True, value)
 			return (False, quantity[0][0] + value) if quantity != () else (False, value)
 
-async def try_weapon(uid, weapon, quantity, **kwargs):
-	data = await execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = {weapon};', **kwargs)
+async def try_weapon(uid, wid, quantity, **kwargs):
+	data = await execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = {wid};', **kwargs)
 	quantity = quantity if data == () else quantity + data[0][0]
-	await execute(f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {weapon}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
+	await execute(f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {wid}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
 	return quantity
 
-async def try_role(uid, role, quantity, **kwargs):
-	data = await execute(f'SELECT segment FROM role WHERE uid = "{uid}" AND rid = {role};', **kwargs)
+async def try_role(uid, rid, quantity, **kwargs):
+	data = await execute(f'SELECT segment FROM role WHERE uid = "{uid}" AND rid = {rid};', **kwargs)
 	quantity = quantity if data == () else quantity + data[0][0]
-	await execute(f'INSERT INTO role (uid, rid, segment) VALUES ("{uid}", {role}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
+	await execute(f'INSERT INTO role (uid, rid, segment) VALUES ("{uid}", {rid}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
 	return quantity
+
+async def try_skill(uid, sid, **kwargs):
+	data = await execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND sid = {sid};', **kwargs)
+	can = data == ()
+	if can:
+		await execute(f'INSERT INTO skill (uid, sid, level) VALUES ("{uid}", {sid}, 1);', **kwargs)
+	return can
 
 async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
 	data = await execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \
