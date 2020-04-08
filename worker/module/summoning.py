@@ -353,14 +353,14 @@ async def refresh_d(uid, **kwargs):
 	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.DIAMOND
 	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
-	if end_time is not None and end_time > current and count > 0:
-		data = await _get_summon(uid, cid, **kwargs)
-		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		config = kwargs['config']['summon']['resource'].get(cid.name, None)
-		constraint = {'cid': cid.value, 'limit': (await _refresh_lim(uid, cid, **kwargs))[1], 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
-		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh'], 'acp': await _get_acp(uid, **kwargs)})
-		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
-	return await _refresh(uid, cid, **kwargs)
+	# if end_time is not None and end_time > current and count > 0:
+	data = await _get_summon(uid, cid, **kwargs)
+	refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
+	config = kwargs['config']['summon']['resource'].get(cid.name, None)
+	constraint = {'cid': cid.value, 'limit': (await _refresh_lim(uid, cid, **kwargs))[1], 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
+	constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh'], 'acp': await _get_acp(uid, **kwargs)})
+	return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
+	# return await _refresh(uid, cid, **kwargs)
 
 
 async def refresh_c(uid, **kwargs):
@@ -369,14 +369,14 @@ async def refresh_c(uid, **kwargs):
 	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.COIN
 	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
-	if end_time is not None and end_time > current and count > 0:
-		data = await _get_summon(uid, cid, **kwargs)
-		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		config = kwargs['config']['summon']['resource'].get(cid.name, None)
-		constraint = {'cid': cid.value, 'limit': (await _refresh_lim(uid, cid, **kwargs))[1], 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
-		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh'], 'acp': await _get_acp(uid, **kwargs)})
-		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
-	return await _refresh(uid, cid, **kwargs)
+	# if end_time is not None and end_time > current and count > 0:
+	data = await _get_summon(uid, cid, **kwargs)
+	refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
+	config = kwargs['config']['summon']['resource'].get(cid.name, None)
+	constraint = {'cid': cid.value, 'limit': (await _refresh_lim(uid, cid, **kwargs))[1], 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs)}
+	constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh'], 'acp': await _get_acp(uid, **kwargs)})
+	return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
+	# return await _refresh(uid, cid, **kwargs)
 
 
 async def refresh_g(uid, **kwargs):
@@ -385,25 +385,26 @@ async def refresh_g(uid, **kwargs):
 	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.FRIEND_GIFT
 	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
-	if end_time is not None and end_time > current and count > 0:
-		data = await _get_summon(uid, cid, **kwargs)
-		refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
-		config = kwargs['config']['summon']['resource'].get(cid.name, None)
-		constraint = {'cid': cid.value, 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs), 'acp': await _get_acp(uid, **kwargs)}
-		constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
-		return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
-	return await _refresh(uid, cid, **kwargs)
+	# if end_time is not None and end_time > current and count > 0:
+	data = await _get_summon(uid, cid, **kwargs)
+	refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
+	config = kwargs['config']['summon']['resource'].get(cid.name, None)
+	constraint = {'cid': cid.value, 'cooling_refresh': await _refresh_count_down(uid, cid, current, **kwargs), 'acp': await _get_acp(uid, **kwargs)}
+	constraint.update({'cooling': int((end_time - current).total_seconds()), 'qty': config['qty'], 'refresh': config['constraint']['refresh']})
+	return common.mt(1, 'get all refresh info', {'refresh': refresh_data, 'constraint': constraint})
+	# return await _refresh(uid, cid, **kwargs)
 
 
 async def buy_refresh(uid, cid, **kwargs):
 	"""购买刷新,并获取所有刷新信息"""
 	if cid not in BUY_REFRESH.keys(): return common.mt(94, 'cid error')
 	now = datetime.now(tz=common.TZ_SH)
-	tim = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
+	tim = await common.get_timer(uid, BUY_REFRESH[cid], **kwargs)
 	# TODO 消耗物品
-	consume, tim = (0, now + timedelta(days=1)) if tim is None or tim < now else (abs(kwargs['config']['summon']['resource'][cid.name]['constraint']['refresh']), tim)
+	config = kwargs['config']['summon']['resource'][cid.name]['constraint']['refresh']
+	consume, tim = (0, now + timedelta(hours=config['hours'])) if tim is None or tim < now else (abs(config['qty']), tim)
 	can, qty = await common.try_item(uid, enums.Item.DIAMOND, -consume, **kwargs)
-	await common.set_timer(uid, BUY_REFRESH[cid], tim, timeformat='%Y-%m-%d', **kwargs)
+	await common.set_timer(uid, BUY_REFRESH[cid], tim, **kwargs)
 	if not can: return common.mt(99, 'insufficient materials')
 	# TODO 重构刷新的数据
 	data = (await _refresh(uid, cid, **kwargs))['data']
@@ -453,7 +454,7 @@ async def _refresh(uid, cid: enums, **kwargs):
 		constraint['limit'] = (await _refresh_lim(uid, cid, **kwargs))[1]
 	config = kwargs['config']['summon']['resource'].get(cid.name, None)
 	if config is None: return common.mt(93, 'The configuration file does not exist')
-	constraint.update({'qty': config['qty'], 'refresh': config['constraint']['refresh']})
+	constraint.update({'qty': config['qty'], 'refresh': config['constraint']['refresh']['qty']})
 	rds = []
 	# grids = [i for i in range(config['constraint'].get('grid', GRID))]
 	grids = [i for i in range(GRID)]
@@ -504,7 +505,7 @@ async def _refresh_lim(uid, cid, var=0, **kwargs):
 
 async def _refresh_count_down(uid, cid, now, **kwargs) -> int:
 	"""返回下次刷新需要的秒钟数"""
-	tim = await common.get_timer(uid, BUY_REFRESH[cid], timeformat='%Y-%m-%d', **kwargs)
+	tim = await common.get_timer(uid, BUY_REFRESH[cid], **kwargs)
 	tim = now if tim is None else tim
 	return int((tim - now).total_seconds())
 
