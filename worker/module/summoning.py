@@ -352,7 +352,7 @@ async def refresh_d(uid, **kwargs):
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_D_END, **kwargs)
 	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.DIAMOND
-	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
+	# count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
 	# if end_time is not None and end_time > current and count > 0:
 	data = await _get_summon(uid, cid, **kwargs)
 	refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
@@ -368,7 +368,7 @@ async def refresh_c(uid, **kwargs):
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_C_END, **kwargs)
 	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.COIN
-	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
+	# count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
 	# if end_time is not None and end_time > current and count > 0:
 	data = await _get_summon(uid, cid, **kwargs)
 	refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]
@@ -384,7 +384,7 @@ async def refresh_g(uid, **kwargs):
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_G_END, **kwargs)
 	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.FRIEND_GIFT
-	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
+	# count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
 	# if end_time is not None and end_time > current and count > 0:
 	data = await _get_summon(uid, cid, **kwargs)
 	refresh_data = [{'pid': d[0], 'mid': d[1], 'wgt': d[2], 'isb': d[3]} for d in data]

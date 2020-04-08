@@ -1,0 +1,866 @@
+{
+	"VIP_CARD_NORMAL": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "n"
+	},
+	"VIP_CARD_ULTIMATE": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "n"
+	},
+	"VIP_CARD_PERMANENT": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "n"
+	},
+	"DIAMOND_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"DIAMOND_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"DIAMOND_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"DIAMOND_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"DIAMOND_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_POINT_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_POINT_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_POINT_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_POINT_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_POINT_BAG": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ENERGY_POTION_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ENERGY_POTION_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ENERGY_POTION_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ENERGY_POTION_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ENERGY_POTION_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"IRON_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"IRON_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"IRON_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"IRON_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"IRON_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_10_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_10_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_10_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_10_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_10_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_30_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_30_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_30_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_30_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_30_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_100_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_100_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_100_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_100_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_SCROLL_100_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_BASIC_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_BASIC_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_BASIC_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_BASIC_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_BASIC_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PRO_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PRO_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PRO_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PRO_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PRO_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PROPHET_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PROPHET_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PROPHET_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PROPHET_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SUMMON_SCROLL_PROPHET_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_BASIC_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_BASIC_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_BASIC_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_BASIC_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_BASIC_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_PRO_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_PRO_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_PRO_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_PRO_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FORTUNE_WHEEL_PRO_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"COIN_CARD_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"COIN_CARD_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"COIN_CARD_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"COIN_CARD_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"COIN_CARD_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_CARD_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_CARD_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_CARD_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_CARD_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"EXP_CARD_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FOOD_CARD_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FOOD_CARD_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FOOD_CARD_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FOOD_CARD_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"FOOD_CARD_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"MINE_CARD_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"MINE_CARD_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"MINE_CARD_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"MINE_CARD_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"MINE_CARD_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"CRYSTAL_CARD_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"CRYSTAL_CARD_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"CRYSTAL_CARD_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"CRYSTAL_CARD_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"CRYSTAL_CARD_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"DIAMOND_CARD_MIN": {
+		"quantity": 100,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"DIAMOND_CARD_SMALL": {
+		"quantity": 300,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"DIAMOND_CARD_LARGE": {
+		"quantity": 1000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"DIAMOND_CARD_PLENTY": {
+		"quantity": 10000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"DIAMOND_CARD_BAG": {
+		"quantity": 100000,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ROLE_SEGMENT_STAR_1": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ROLE_SEGMENT_STAR_2": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ROLE_SEGMENT_STAR_3": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ROLE_SEGMENT_STAR_4": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ROLE_SEGMENT_STAR_5": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"ROLE_SEGMENT_STAR_6": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"WEAPON_STAR_1": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"WEAPON_STAR_2": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"WEAPON_STAR_3": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"WEAPON_STAR_4": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"WEAPON_STAR_5": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"WEAPON_STAR_6": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_LAYER_1": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_LAYER_2": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	},
+	"SKILL_LAYER_3": {
+		"quantity": 1,
+		"price": {
+			"RMB": 7,
+			"USDollar": 1
+		},
+		"repeatable": "y"
+	}
+}
