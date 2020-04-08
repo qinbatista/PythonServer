@@ -13,6 +13,7 @@
 # 97 - config does not exist
 # 96 - materials insufficient
 # 95 - The level of science master is inadequate
+# 94 - ssa error
 # 0 - success
 ```
 
@@ -123,6 +124,7 @@
 # 97 - config does not exist
 # 96 - materials insufficient
 # 95 - The level of science master is inadequate
+# 94 - ssa error
 ```
 
 

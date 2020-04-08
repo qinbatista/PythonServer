@@ -10,6 +10,7 @@ from module import summoning
 from module import stage
 from module import vip
 from datetime import datetime, timedelta
+import contextlib
 import random
 import asyncio
 
@@ -19,7 +20,7 @@ import asyncio
 # 97 - config does not exist
 # 96 - materials insufficient
 # 95 - The level of science master is inadequate
-# 94 -
+# 94 - ssa error
 # 93 -
 # 92 -
 # 91 -
@@ -41,7 +42,10 @@ async def infos(uid, **kwargs):
 
 
 async def up(uid, ssa, **kwargs):
-    pid, sid, aid = _decrypt(ssa)
+    dss = _decrypt(ssa)
+    if dss is None:
+        return common.mt(94, 'ssa error')
+    pid, sid, aid = dss
     config = kwargs['config']['sciences'][f'{pid}']
     lv = (await stage.increase_exp(uid, 0, **kwargs))['level']
     if lv < config['constraint']['level']:
@@ -114,10 +118,11 @@ def _encrypt(pid, sid, aid=0):
 
 def _decrypt(ssa):
     """解密"""
-    pid = enums.Science(ssa>>16)
-    sid = enums.ScienceSub((ssa&0xff00)>>8)
-    aid = enums.SSAffiliate(ssa&0xff)
-    return pid, sid, aid
+    with contextlib.suppress(ValueError):
+        pid = enums.Science(ssa>>16)
+        sid = enums.ScienceSub((ssa&0xff00)>>8)
+        aid = enums.SSAffiliate(ssa&0xff)
+        return pid, sid, aid
 
 
 
