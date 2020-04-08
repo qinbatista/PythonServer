@@ -149,12 +149,8 @@ class MessageHandler:
 	async def _science_infos(self, data: dict) -> str:
 		return await science.infos(data['data']['unique_id'], **data)
 
-	async def _science_fr_up(self, data: dict) -> str:
-		return await science.fr_up(data['data']['unique_id'], **data)
-
-	async def _science_fm_up(self, data: dict) -> str:
-		return await science.fm_up(data['data']['unique_id'], **data)
-
+	async def _science_up(self, data: dict) -> str:
+		return await science.up(data['data']['unique_id'], int(data['data']['ssa']), **data)
 
 	###################### family.py ######################
 	async def _create_family(self, data: dict) -> str:
@@ -865,8 +861,7 @@ FUNCTION_LIST = {
 	# TODO
 	###################### player ######################
 	'science_infos': MessageHandler._science_infos,
-	'science_fr_up': MessageHandler._science_fr_up,
-	'science_fm_up': MessageHandler._science_fm_up,
+	'science_up': MessageHandler._science_up,
 
 	# TODO
 	###################### achievement ######################

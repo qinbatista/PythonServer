@@ -17,6 +17,7 @@
 * [`get_config_family`](##get_config_family)
 * [`get_config_exchange`](##get_config_exchange)
 * [`get_config_notice`](##get_config_notice)
+* [`get_config_science`](##get_config_science)
 
 ## get_config_version
 
@@ -3742,6 +3743,47 @@
 					}
 				}
 			]
+		}
+	}
+}
+```
+
+## get_config_science
+
+返回公告的配置信息，详细见config_notice.json
+
+##### 发送消息JSON格式
+
+```json
+{
+	"world": 0,
+	"function": "get_config_science",
+	"data": {
+		"token": "my toekn ^_^"
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> 暂时未解释
+
+```json
+{
+	"status": 0,
+	"message": "success",
+	"data": {
+		"config": {
+			"comment": "1是工厂模式下的科技",
+			"1": {
+				"comment": "constraint是该模式下的约束信息,level是玩家开启工厂等级的约束,slv是科技最高等级限制",
+				"constraint": {
+					"level": 0,
+					"slv": 20
+				}
+			}
 		}
 	}
 }

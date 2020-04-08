@@ -40,58 +40,84 @@ async def infos(uid, **kwargs):
     return common.mt(0, 'success', {'science': science})
 
 
-# ################################# factory #################################
-async def fm_up(uid, **kwargs):
-    pid = enums.Science.FACTORY
-    sid = enums.ScienceSub.MASTER
-    return await _up(uid, pid, sid, **kwargs)
-
-
-async def fr_up(uid, **kwargs):
-    pid = enums.Science.FACTORY
-    sid = enums.ScienceSub.ROLE
-    return await _up(uid, pid, sid, **kwargs)
-
-
-# ################################# private #################################
-async def _constraint_lv(uid, pid, sid, _lv, **kwargs):
-    if pid == enums.Science.FACTORY and sid != enums.ScienceSub.MASTER:
-        lv = await common.get_science(uid, pid, enums.ScienceSub.MASTER, **kwargs)
-        if lv < _lv:
-            return 95, 'The level of science master is inadequate'
-
-
-
-async def _up(uid, pid, sid, **kwargs):
-    config = kwargs['config']['sciences'][f'{pid}'][f'{sid}']
+async def up(uid, ssa, **kwargs):
+    pid, sid, aid = _decrypt(ssa)
+    config = kwargs['config']['sciences'][f'{pid}']
     lv = (await stage.increase_exp(uid, 0, **kwargs))['level']
     if lv < config['constraint']['level']:
         return common.mt(99, 'insufficient level')
-    _lv = await common.get_science(uid, pid, sid, **kwargs) + 1
-    if _lv > len(config['consume'].keys()):
+    _lv = await common.get_science(uid, ssa, **kwargs) + 1
+    if _lv > config['constraint']['slv']:
         return common.mt(98, 'max level')
-    clv = await _constraint_lv(uid, pid, sid, _lv, **kwargs)
-    if isinstance(clv, tuple):
-        return common.mt(clv[0], clv[1])
-    cms = config['consume'].get(f'{_lv}')
-    if cms is None:
-        return common.mt(97, 'config does not exist')
-    can, cmw = await common.consume_items(uid, ','.join(cms), **kwargs)
+    cds = await _constraint_lv(uid, pid, sid, _lv, **kwargs)
+    if isinstance(cds, tuple):
+        return common.mt(cds[0], cds[1])
+    cms = _consume(_lv, pid, sid)
+    can, cmw = await common.consume_items(uid, cms, **kwargs)
     if not can:
         return common.mt(96, 'materials insufficient')
-    await common.set_science(uid, pid, sid, _lv, **kwargs)
-    results = {'science': await _all(uid, **kwargs),
-               'rws': {f'{pid}': {f'{sid}': 1}}}
+    await common.set_science(uid, ssa, _lv, **kwargs)
+    results = {'science': await _all(uid, **kwargs), 'rws': {f'{ssa}': 1}}
     results['remain'], results['reward'] = stage.rm_rw(cmw)
     return common.mt(0, 'success', results)
 
 
+async def init(uid, **kwargs):
+    await common.set_science(uid, _encrypt(enums.Science.FACTORY, enums.ScienceSub.MASTER), 1, **kwargs)
+
+
+# ################################# private #################################
+async def _constraint_lv(uid, pid, sid, _lv, **kwargs):
+    ssa = _encrypt(pid, enums.ScienceSub.MASTER)
+    if pid == enums.Science.FACTORY and sid != enums.ScienceSub.MASTER:
+        lv = await common.get_science(uid, ssa, **kwargs)
+        if lv < _lv:
+            return 95, 'The level of science master is inadequate'
+
+
 async def _all(uid, **kwargs):
-    sds = await common.execute(f'SELECT pid, sid, level FROM sciences '
+    sds = await common.execute(f'SELECT ssa, level FROM sciences '
                                f'WHERE uid="{uid}"', **kwargs)
-    ds = {f'{p}': {} for p, s, l in sds}
-    for p, s, l in sds:
-        ds[f'{p}'].update({f'{s}': l})
-    return ds
+    return {f'{ssa}': lv for ssa, lv in sds}
+
+
+def _consume(lv, pid, sid):
+    gid, qty = enums.Group.ITEM, 0
+    if pid == enums.Science.FACTORY:
+        if sid == enums.ScienceSub.ROLE:
+            if lv <= 5:
+                qty = (lv - 1) * 200 + 100
+            elif lv <= 9:
+                qty = (lv - 4) * 1000
+            elif lv <= 14:
+                qty = (lv - 9) * 10000
+            elif lv <= 18:
+                qty = (lv - 13) * 40000
+            else:
+                qty = (lv - 14) * 50000
+            return f'{gid}:{enums.Item.CRYSTAL}:{qty},{gid}:{enums.Item.COIN}:{qty * 10}'
+        if sid == enums.ScienceSub.MASTER:
+            if lv <= 7:
+                qty = 6000 * (lv + 2)
+            elif lv <= 17:
+                qty = 54000 + (lv - 7) * 12000
+            else:
+                qty = 174000 + (lv - 17) * 60000
+            return f'{gid}:{enums.Item.CRYSTAL}:{qty}'
+    return ''
+
+
+def _encrypt(pid, sid, aid=0):
+    """加密"""
+    return (pid << 16) + (sid << 8) + aid
+
+
+def _decrypt(ssa):
+    """解密"""
+    pid = enums.Science(ssa>>16)
+    sid = enums.ScienceSub((ssa&0xff00)>>8)
+    aid = enums.SSAffiliate(ssa&0xff)
+    return pid, sid, aid
+
 
 

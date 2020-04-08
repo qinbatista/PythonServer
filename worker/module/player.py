@@ -6,6 +6,7 @@ from module import mail
 from module import enums
 from module import common
 from module import stage
+from module import science
 from module import summoning
 from module import account
 from datetime import datetime, timedelta
@@ -18,7 +19,6 @@ ELEMENT_LIM = 3
 async def create(uid, gn, **kwargs):
     if uid == "" or gn == "" or not bool(GN_RE.match(gn)): return common.mt(98, 'Player uid or name is empty or Game name is not legal')
     if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, 'Player uid or name already exists')
-    now = datetime.now(tz=common.TZ_SH)
     await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
     await asyncio.gather(
         common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180, rid={enums.Role.R401} WHERE uid="{uid}";', **kwargs),
@@ -27,10 +27,9 @@ async def create(uid, gn, **kwargs):
         common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W301}), ("{uid}", 1, {enums.Weapon.W302}), ("{uid}", 1, {enums.Weapon.W303});', **kwargs),
         common.execute(f'INSERT INTO skill(uid, sid, level) VALUES ("{uid}", {enums.Skill.S1}, 1), ("{uid}", {enums.Skill.S2}, 1), ("{uid}", {enums.Skill.S3}, 1), ("{uid}", {enums.Skill.S4}, 1), ("{uid}", {enums.Skill.S5}, 1);', **kwargs),
         common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);',**kwargs),
-        common.set_timer(uid, enums.Timer.LOGIN_TIME, now, **kwargs),
         common.set_limit(uid, enums.Limits.PLAYER_ELEMENT, ELEMENT_LIM, **kwargs),
-        common.set_science(uid, enums.Science.FACTORY, enums.ScienceSub.MASTER, 1, **kwargs),
-        stage.init_stages(uid, **kwargs),
+        stage.init(uid, **kwargs),
+        science.init(uid, **kwargs),
         _element_init(uid, **kwargs)
     )
     await _meeting_gift(uid, **kwargs)

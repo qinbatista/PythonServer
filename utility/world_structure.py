@@ -9,10 +9,9 @@ SCIENCES = \
 """
 CREATE TABLE `sciences` (
 	 `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
-	 `pid` SMALLINT UNSIGNED NOT NULL COMMENT '科技类id',
-	 `sid` SMALLINT UNSIGNED NOT NULL COMMENT '科技子类id',
+	 `ssa` INT UNSIGNED NOT NULL COMMENT '科技类\子类\附属类',
 	 `level` INT UNSIGNED NOT NULL COMMENT '科技等级',
-	 PRIMARY KEY (`uid`, `pid`, `sid`),
+	 PRIMARY KEY (`uid`, `ssa`),
 	 CONSTRAINT `sciences_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
