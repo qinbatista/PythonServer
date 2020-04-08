@@ -2,7 +2,7 @@
 	"general": {
 		"player_level": 18,
 		"leave_days": 1,
-		"disband_hours": 0.0025,
+		"disband_hours": 24,
 		"rmtimes": 5,
 		"ntimes": 5,
 		"itimes": 5,
