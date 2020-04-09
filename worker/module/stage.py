@@ -261,16 +261,10 @@ async def e_dispose(uid, stage, _stage, **kwargs):
     await hang_up(uid, new=stage > _stage, **kwargs)
 
 
-async def rw_common(uid, common, rewards, mul=1, **kwargs):
+async def rw_common(uid, items, rewards, mul=1, **kwargs):
     """通用奖励信息的处理和修改"""
-    cms = ','.join([f'{multiple_rw(mul, item)}' for item in common])
-    results = await summoning.reward_items(uid, cms, **kwargs)
+    results = await summoning.reward_items(uid, ','.join(items), mul=mul, **kwargs)
     rewards['remain'], rewards['reward'] = rm_rw(results)
-
-
-def multiple_rw(mul, item):
-    """倍数构造"""
-    return f'{item[:item.rfind(":")]}:{int(item[item.rfind(":") + 1:]) * mul}'
 
 
 def rm_rw(results):

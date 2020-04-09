@@ -20,18 +20,7 @@ async def create(uid, gn, **kwargs):
     if uid == "" or gn == "" or not bool(GN_RE.match(gn)): return common.mt(98, 'Player uid or name is empty or Game name is not legal')
     if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, 'Player uid or name already exists')
     await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
-    await asyncio.gather(
-        common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180, rid={enums.Role.R401} WHERE uid="{uid}";', **kwargs),
-        common.execute(f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED}, 3, 3);', **kwargs),
-        common.execute(f'INSERT INTO role (uid, star, level, rid) VALUES ("{uid}", 1, 1, {enums.Role.R402}), ("{uid}", 1, 1, {enums.Role.R505}), ("{uid}", 1, 1, {enums.Role.R601});', **kwargs),
-        common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W301}), ("{uid}", 1, {enums.Weapon.W302}), ("{uid}", 1, {enums.Weapon.W303});', **kwargs),
-        common.execute(f'INSERT INTO skill(uid, sid, level) VALUES ("{uid}", {enums.Skill.S1}, 1), ("{uid}", {enums.Skill.S2}, 1), ("{uid}", {enums.Skill.S3}, 1), ("{uid}", {enums.Skill.S4}, 1), ("{uid}", {enums.Skill.S5}, 1);', **kwargs),
-        common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);',**kwargs),
-        common.set_limit(uid, enums.Limits.PLAYER_ELEMENT, ELEMENT_LIM, **kwargs),
-        stage.init(uid, **kwargs),
-        science.init(uid, **kwargs),
-        _element_init(uid, **kwargs)
-    )
+    await init(uid, **kwargs)
     await _meeting_gift(uid, **kwargs)
     return common.mt(0, 'success', {'gn': gn})
 
@@ -121,6 +110,20 @@ async def get_all_resource(uid, **kwargs):
     return common.mt(0, 'success', {'items': [{'iid': i[0], 'value': i[1]} for i in item]})
 
 
+async def init(uid, **kwargs):
+    await asyncio.gather(
+        common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180, rid={enums.Role.R402} WHERE uid="{uid}";', **kwargs),
+        common.execute(f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED}, 3, 3);', **kwargs),
+        common.execute(f'INSERT INTO role (uid, star, level, rid) VALUES ("{uid}", 1, 1, {enums.Role.R402});', **kwargs),
+        common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W301}), ("{uid}", 1, {enums.Weapon.W302}), ("{uid}", 1, {enums.Weapon.W303});', **kwargs),
+        # common.execute(f'INSERT INTO skill(uid, sid, level) VALUES ("{uid}", {enums.Skill.S1}, 1), ("{uid}", {enums.Skill.S2}, 1);', **kwargs),
+        common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.FAMILY_COIN}, 0), ("{uid}", {enums.Item.FAMILY_COIN_RECORD}, 0);',**kwargs),
+        common.set_limit(uid, enums.Limits.PLAYER_ELEMENT, ELEMENT_LIM, **kwargs),
+        stage.init(uid, **kwargs),
+        science.init(uid, **kwargs),
+        _element_init(uid, **kwargs)
+    )
+
 async def element_lv(uid, eid, **kwargs):
     """元素升级"""
     if eid not in enums.Element._value2member_map_:
@@ -180,8 +183,8 @@ async def _meeting_gift(uid, **kwargs):
 
 
 GIFTS = [
-    (enums.Group.ITEM, enums.Item.DIAMOND, 1_0000_0000),
-    (enums.Group.ITEM, enums.Item.COIN, 1_0000_0000),
+    (enums.Group.ITEM, enums.Item.DIAMOND, 1_0000),
+    (enums.Group.ITEM, enums.Item.COIN, 200_0000),
     (enums.Group.ITEM, enums.Item.FOOD, 10_0000),
     (enums.Group.ITEM, enums.Item.IRON, 10_0000),
     (enums.Group.ITEM, enums.Item.CRYSTAL, 10_0000),
@@ -189,12 +192,12 @@ GIFTS = [
     (enums.Group.ITEM, enums.Item.SUMMON_SCROLL_C, 100),
     (enums.Group.ITEM, enums.Item.FRIEND_GIFT, 1000),
     # (enums.Group.ITEM, enums.Item.VIP_EXP_CARD, 100),
-    (enums.Group.ITEM, enums.Item.SKILL_SCROLL_10, 100_0000),
-    (enums.Group.ITEM, enums.Item.SKILL_SCROLL_30, 100_0000),
-    (enums.Group.ITEM, enums.Item.SKILL_SCROLL_100, 100_0000),
+    # (enums.Group.ITEM, enums.Item.SKILL_SCROLL_10, 100_0000),
+    # (enums.Group.ITEM, enums.Item.SKILL_SCROLL_30, 100_0000),
+    (enums.Group.ITEM, enums.Item.SKILL_SCROLL_100, 100),
     (enums.Group.ITEM, enums.Item.UNIVERSAL4_SEGMENT, 100),
     (enums.Group.ITEM, enums.Item.UNIVERSAL5_SEGMENT, 100),
-    (enums.Group.ITEM, enums.Item.ENERGY_POTION_S_MAX, 100),
+    (enums.Group.ITEM, enums.Item.ENERGY_POTION_S_MAX, 17),
     (enums.Group.ITEM, enums.Item.EXP_POINT, 100_0000),
 ]
 

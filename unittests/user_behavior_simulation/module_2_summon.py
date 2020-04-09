@@ -184,9 +184,11 @@ if __name__ == '__main__':
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_market', 'data': {'token': token, 'task_id': 1}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_market', 'data': {'token': token, 'task_id': 1}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'science_infos', 'data': {'token': token}})
-    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'science_up', 'data': {'token': token, 'ssa': encrypt(1, 1)}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'science_up', 'data': {'token': token, 'ssa': encrypt(1, 1)}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_science', 'data': {'token': token}})
-    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'check_in', 'data': {'token': token}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'check_in_sign', 'data': {'token': token}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'check_in_supplement', 'data': {'token': token}})
+    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'check_in_all', 'data': {'token': token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'player_element_lv', 'data': {'token': token, 'eid': 1000}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'player_element_all', 'data': {'token': token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'player_element_reset', 'data': {'token': token}})
@@ -206,7 +208,6 @@ if __name__ == '__main__':
         # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
         # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'request_friend', 'data': {'token': token, 'gn_target': 'a16'}})
 
-    # data = {"function":"supplement_check_in","random":"31","world":"s0","data":{"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODE2NjIxODMsInVpZCI6IjEyMzQ1NiJ9.vzi3Esjo00IpLHCGwP3mMUoT7iIOWeARwrSiuoWCuDQ"}}
     #
     # user_behavior_simulation.send_tcp_message(data)
     # res = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})
