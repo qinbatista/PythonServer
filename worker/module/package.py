@@ -65,24 +65,24 @@ async def use_item(uid, iid, eid, **kwargs):
 		if not can: return common.mt(96, '兑换消耗品不足')
 		iid = iid[:iid.rfind(':')]
 		if c[1] in ENERGY:
-			energy = kwargs['config']['package']['exchange_item'][c[1].name.lower()] * consume
+			energy = kwargs['config']['package']['exchange_item'][c[1].name] * consume
 			energy_data = (await common.try_energy(uid, energy, **kwargs))['data']
 			return common.mt(0, 'success', {'remaining': {'item': f"{iid}:{remain}", 'energy': energy_data['energy'], 'cooling_time': energy_data['cooling_time']}, 'reward': {'item': f"{iid}:{-consume}", 'energy': energy}})
 		else:
 			if c[1] in WEAPON:
-				seg = kwargs['config']['package']['exchange_item'][c[1].name.lower()] * consume
+				seg = kwargs['config']['package']['exchange_item'][c[1].name] * consume
 				kind = enums.Weapon[choice([k for k in enums.Weapon.__members__.keys() if 'W' + re.search(r"\d", c[1].name).group(0) in k])]
 				seg_data = await common.try_weapon(uid, kind, seg, **kwargs)
 				return common.mt(1, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{enums.Group.WEAPON.value}:{kind.value}:{seg_data}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{enums.Group.WEAPON.value}:{kind.value}:{seg}"}})
 			elif c[1] in ROLE:
-				seg = kwargs['config']['package']['exchange_item'][c[1].name.lower()] * consume
+				seg = kwargs['config']['package']['exchange_item'][c[1].name] * consume
 				kind = enums.Role[choice([k for k in enums.Role.__members__.keys() if 'R' + re.search(r"\d", c[1].name).group(0) in k])]
 				seg_data = await common.try_role(uid, kind, seg, **kwargs)
 				return common.mt(2, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{enums.Group.ROLE.value}:{kind.value}:{seg_data}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{enums.Group.ROLE.value}:{kind.value}:{seg}"}})
 			elif c[1] in UNIVERSAL:
 				e = common.decode_items(eid)[0]
 				eid = eid[:eid.rfind(':')]
-				seg = kwargs['config']['package']['exchange_item'][c[1].name.lower()] * consume
+				seg = kwargs['config']['package']['exchange_item'][c[1].name] * consume
 				if (e[0] == enums.Group.ROLE and e[1].name not in [k for k in enums.Role.__members__.keys() if 'R' + re.search(r"\d", c[1].name).group(0) in k]) or \
 					(e[0] == enums.Group.WEAPON and e[1].name not in [k for k in enums.Weapon.__members__.keys() if 'W' + re.search(r"\d", c[1].name).group(0) in k]):
 					await common.try_item(uid, c[1], consume, **kwargs)  # 还原

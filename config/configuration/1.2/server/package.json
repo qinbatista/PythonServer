@@ -38,14 +38,14 @@
 		}
 	},
 	"exchange_item": {
-		"energy_potion_s_min": 50,
-		"energy_potion_s_max": 100,
-		"role4_universal_segment": 30,
-		"role5_universal_segment": 15,
-		"weapon4_universal_segment": 20,
-		"weapon5_universal_segment": 10,
-		"universal4_segment": 30,
-		"universal5_segment": 20,
-		"universal6_segment": 10
+		"ENERGY_POTION_S_MIN": 50,
+		"ENERGY_POTION_S_MAX": 100,
+		"ROLE4_UNIVERSAL_SEGMENT": 1,
+		"ROLE5_UNIVERSAL_SEGMENT": 1,
+		"WEAPON4_UNIVERSAL_SEGMENT": 1,
+		"WEAPON5_UNIVERSAL_SEGMENT": 1,
+		"UNIVERSAL4_SEGMENT": 1,
+		"UNIVERSAL5_SEGMENT": 1,
+		"UNIVERSAL6_SEGMENT": 1
 	}
 }
