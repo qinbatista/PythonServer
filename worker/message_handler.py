@@ -14,7 +14,6 @@ from module import factory
 from module import friend
 from module import common
 from module import account
-from module import lottery
 from module import weapon
 from module import summoning
 from module import achievement
@@ -243,63 +242,6 @@ class MessageHandler:
 		return 'function'
 
 	###################### summoning.py ######################
-	async def _basic_summon(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.WEAPON, **data)
-
-	async def _pro_summon(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.WEAPON, **data)
-
-	async def _friend_summon(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.WEAPON, **data)
-
-	async def _prophet_summon(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PROPHET, enums.Group.WEAPON, **data)
-
-	async def _basic_summon_skill(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.SKILL, **data)
-
-	async def _pro_summon_skill(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.SKILL, **data)
-
-	async def _friend_summon_skill(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.SKILL, **data)
-
-	async def _basic_summon_role(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.ROLE, **data)
-
-	async def _pro_summon_role(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.ROLE, **data)
-
-	async def _friend_summon_role(self, data: dict) -> str:
-		return await summoning.summon(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.ROLE, **data)
-
-	async def _basic_summon_10_times(self, data: dict) -> str:
-		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.WEAPON, **data)
-
-	async def _pro_summon_10_times(self, data: dict) -> str:
-		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.WEAPON, **data)
-
-	async def _friend_summon_10_times(self, data: dict) -> str:
-		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.WEAPON, **data)
-
-	async def _basic_summon_skill_10_times(self, data: dict) -> str:
-		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.SKILL, **data)
-
-	async def _pro_summon_skill_10_times(self, data: dict) -> str:
-		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.SKILL, **data)
-
-	async def _friend_summon_skill_10_times(self, data: dict) -> str:
-		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.SKILL, **data)
-
-	async def _basic_summon_role_10_times(self, data: dict) -> str:
-		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.BASIC, enums.Group.ROLE, **data)
-
-	async def _pro_summon_role_10_times(self, data: dict) -> str:
-		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.PRO, enums.Group.ROLE, **data)
-
-	async def _friend_summon_role_10_times(self, data: dict) -> str:
-		return await summoning.summon_multi(data['data']['unique_id'], int(data['data']['item']), enums.Tier.FRIEND, enums.Group.ROLE, **data)
-
 	async def _refresh_diamond_store(self, data: dict) -> str:
 		return await summoning.refresh_d(data['data']['unique_id'], **data)
 
@@ -338,20 +280,6 @@ class MessageHandler:
 
 	async def _integral_convert(self, data: dict) -> str:
 		return await summoning.integral_convert(data['data']['unique_id'], **data)
-
-	###################### lottery.py ######################
-	async def _fortune_wheel_basic(self, data: dict) -> str:
-		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.BASIC, enums.Item(int(data['data']['item'])), **data)
-
-	async def _fortune_wheel_pro(self, data: dict) -> str:
-		return await lottery.fortune_wheel(data['data']['unique_id'], enums.Tier.PRO, enums.Item(int(data['data']['item'])), **data)
-
-	async def _get_config_lottery(self, data: dict) -> str:
-		return common.mt(0, 'success', {'config': \
-				{'skills': data['config']['lottery']['random_gift']['SKILL']['cost'], \
-				'weapons': data['config']['lottery']['random_gift']['WEAPON']['cost'], \
-				'roles': data['config']['lottery']['random_gift']['ROLE']['cost'], \
-				'fortune_wheel': data['config']['lottery']['fortune_wheel']['cost']}})
 
 	###################### skill.py ######################
 	async def _get_all_skill(self, data: dict) -> str:
@@ -762,26 +690,6 @@ FUNCTION_LIST = {
 	'send_merchandise' : MessageHandler._send_merchandise,
 
 	###################### summoning.py ######################
-	'basic_summon' : MessageHandler._basic_summon,
-	'pro_summon' : MessageHandler._pro_summon,
-	'friend_summon' : MessageHandler._friend_summon,
-	'prophet_summon' : MessageHandler._friend_summon,
-	'basic_summon_skill' : MessageHandler._basic_summon_skill,
-	'pro_summon_skill' : MessageHandler._pro_summon_skill,
-	'friend_summon_skill' : MessageHandler._friend_summon_skill,
-	'basic_summon_role' : MessageHandler._basic_summon_role,
-	'pro_summon_role' : MessageHandler._pro_summon_role,
-	'friend_summon_role' : MessageHandler._friend_summon_role,
-	'basic_summon_10_times' : MessageHandler._basic_summon_10_times,
-	'pro_summon_10_times' : MessageHandler._pro_summon_10_times,
-	'friend_summon_10_times' : MessageHandler._friend_summon_10_times,
-	'basic_summon_skill_10_times' : MessageHandler._basic_summon_skill_10_times,
-	'pro_summon_skill_10_times' : MessageHandler._pro_summon_skill_10_times,
-	'friend_summon_skill_10_times' : MessageHandler._friend_summon_skill_10_times,
-	'basic_summon_role_10_times' : MessageHandler._basic_summon_role_10_times,
-	'pro_summon_role_10_times' : MessageHandler._pro_summon_role_10_times,
-	'friend_summon_role_10_times' : MessageHandler._friend_summon_role_10_times,
-
 	'refresh_diamond_store' : MessageHandler._refresh_diamond_store,
 	'refresh_coin_store' : MessageHandler._refresh_coin_store,
 	'refresh_gift_store' : MessageHandler._refresh_gift_store,
@@ -795,10 +703,6 @@ FUNCTION_LIST = {
 	'dozen_pump_coin' : MessageHandler._dozen_pump_coin,
 	'dozen_pump_gift' : MessageHandler._dozen_pump_gift,
 	'integral_convert' : MessageHandler._integral_convert,
-
-	###################### lottery.py ######################
-	'fortune_wheel_basic' : MessageHandler._fortune_wheel_basic,
-	'fortune_wheel_pro' : MessageHandler._fortune_wheel_pro,
 
 	###################### skill.py ######################
 	'get_all_skill' : MessageHandler._get_all_skill,
@@ -910,7 +814,6 @@ FUNCTION_LIST = {
 
 	###################### get_config ######################
 	'get_config_stage': MessageHandler._get_config_stage,
-	'get_config_lottery': MessageHandler._get_config_lottery,
 	'get_config_weapon': MessageHandler._get_config_weapon,
 	'get_config_skill': MessageHandler._get_config_skill,
 	'get_config_mall': MessageHandler._get_config_mall,

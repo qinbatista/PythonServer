@@ -37,7 +37,7 @@ async def transaction(uid, pid, **kwargs):
 	elif gid == enums.Group.SKILL.value:
 		data = await common.execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND sid = "{mid}";', **kwargs)
 		if data == ():
-			await common.execute_update(f'INSERT INTO skill (uid, sid, level) VALUES ("{uid}", {mid}, {qty});', **kwargs)
+			await common.execute(f'INSERT INTO skill (uid, sid, level) VALUES ("{uid}", {mid}, {qty});', **kwargs)
 			remaining['qty'] = qty
 		else:
 			await common.try_item(uid, enums.Item(cid), amt, **kwargs)
@@ -216,6 +216,6 @@ async def refresh_darkmarket(uid, **kwargs):
 
 
 async def set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs):
-	await common.execute_update(f'INSERT INTO darkmarket (uid, pid, gid, mid, qty, cid, amt) VALUES ("{uid}", {pid}, {gid}, {mid}, {qty}, {cid}, {amt}) ON DUPLICATE KEY UPDATE `gid`= values(`gid`), `mid`= values(`mid`), `qty`= values(`qty`), `cid`= values(`cid`), `amt`= values(`amt`);', **kwargs)
+	await common.execute(f'INSERT INTO darkmarket (uid, pid, gid, mid, qty, cid, amt) VALUES ("{uid}", {pid}, {gid}, {mid}, {qty}, {cid}, {amt}) ON DUPLICATE KEY UPDATE `gid`= values(`gid`), `mid`= values(`mid`), `qty`= values(`qty`), `cid`= values(`cid`), `amt`= values(`amt`);', **kwargs)
 
 

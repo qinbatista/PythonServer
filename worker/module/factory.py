@@ -28,9 +28,9 @@ COLLECTS = {enums.Factory.FOOD: enums.Achievement.COLLECT_FOOD,
                         enums.Factory.IRON: enums.Achievement.COLLECT_MINE,
                         enums.Factory.CRYSTAL: enums.Achievement.COLLECT_CRYSTAL}
 
-UPGRADES = {enums.Factory.FOOD: enums.Achievement.UPGRADE_FOOD_FACTORY,
-                        enums.Factory.IRON: enums.Achievement.UPGRADE_MINE_FACTORY,
-                        enums.Factory.CRYSTAL: enums.Achievement.UPGRADE_CRYSTAL_FACTORY}
+UPGRADES = {enums.Factory.FOOD: enums.Achievement.UPGRADE_FOOD,
+                        enums.Factory.IRON: enums.Achievement.UPGRADE_MINE,
+                        enums.Factory.CRYSTAL: enums.Achievement.UPGRADE_CRYSTAL}
 
 async def refresh(uid, **kwargs):
     now                  = datetime.now(tz=common.TZ_SH)
@@ -266,7 +266,7 @@ def update_state(steps, level, worker, storage, **kwargs):
             cost, cmv = {}, steps * worker[factory]
             for cf, cv in fcg['costs'][f'{factory}'].items():
                 cfk = enums.Factory(int(cf))
-                cmv, cost[cfk] = min(storage[cfk] // cv, cmv), cv
+                cmv, cost[cfk] = min(storage[cfk] // cv, cmv, lmd[factory] - storage[factory]), cv
             storage[factory] += cmv
             for cf, cv in cost.items():
                 storage[cf] -= cv * cmv

@@ -30,17 +30,6 @@ async def execute(statement, account=False, mall=False, exchange=False, **kwargs
 			await cursor.execute(statement)
 			return await cursor.fetchall()
 
-async def execute_update(statement, account=False, mall=False, exchange=False, **kwargs):
-	async with ((((await get_db(**kwargs)).acquire() if not account
-			else kwargs['accountdb'].acquire()) if not mall
-			else kwargs['malldb'].acquire()) if not exchange
-			else kwargs['exchangedb'].acquire()) as conn:
-		if not account and not mall and not exchange:
-			await conn.select_db(translate_world(**kwargs))
-		async with conn.cursor() as cursor:
-			affected = await cursor.execute(statement)
-			return (affected, await cursor.fetchall())
-
 async def get_gn(uid, **kwargs):
 	data = await execute(f'SELECT gn FROM player WHERE uid = "{uid}";', **kwargs)
 	return "" if data == () else data[0][0]
@@ -85,17 +74,15 @@ async def try_armor(uid, aid, level, value, **kwargs):
 				return (True, quantity[0][0] + value) if quantity != () else (True, value)
 			return (False, quantity[0][0] + value) if quantity != () else (False, value)
 
-async def try_weapon(uid, wid, quantity, **kwargs):
-	data = await execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = {wid};', **kwargs)
-	quantity = quantity if data == () else quantity + data[0][0]
-	await execute(f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {wid}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
-	return quantity
+async def try_weapon(uid, wid, val, **kwargs):
+	val += await get_weapon(uid, wid, **kwargs)
+	await set_weapon(uid, wid, val, **kwargs)
+	return val
 
-async def try_role(uid, rid, quantity, **kwargs):
-	data = await execute(f'SELECT segment FROM role WHERE uid = "{uid}" AND rid = {rid};', **kwargs)
-	quantity = quantity if data == () else quantity + data[0][0]
-	await execute(f'INSERT INTO role (uid, rid, segment) VALUES ("{uid}", {rid}, {quantity}) ON DUPLICATE KEY UPDATE segment=VALUES(segment);', **kwargs)
-	return quantity
+async def try_role(uid, rid, val, **kwargs):
+	val += await get_role(uid, rid, **kwargs)
+	await set_role(uid, rid, val, **kwargs)
+	return val
 
 async def try_skill(uid, sid, **kwargs):
 	data = await execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND sid = {sid};', **kwargs)
@@ -103,6 +90,20 @@ async def try_skill(uid, sid, **kwargs):
 	if can:
 		await execute(f'INSERT INTO skill (uid, sid, level) VALUES ("{uid}", {sid}, 1);', **kwargs)
 	return can
+
+async def get_weapon(uid, wid, key='segment', **kwargs):
+	data = await execute(f'SELECT {key} FROM weapon WHERE uid = "{uid}" AND wid = {wid};', **kwargs)
+	return 0 if data == () else data[0][0]
+
+async def set_weapon(uid, wid, val, key='segment', **kwargs):
+	await execute(f'INSERT INTO weapon (uid, wid, {key}) VALUES ("{uid}", {wid}, {val}) ON DUPLICATE KEY UPDATE {key}=VALUES({key});', **kwargs)
+
+async def get_role(uid, rid, key='segment', **kwargs):
+	data = await execute(f'SELECT {key} FROM role WHERE uid = "{uid}" AND rid = {rid};', **kwargs)
+	return 0 if data == () else data[0][0]
+
+async def set_role(uid, rid, val, key='segment', **kwargs):
+	await execute(f'INSERT INTO role (uid, rid, {key}) VALUES ("{uid}", {rid}, {val}) ON DUPLICATE KEY UPDATE {key}=VALUES({key});', **kwargs)
 
 async def get_timer(uid, tid, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
 	data = await execute(f'SELECT `time` FROM `timer` WHERE `uid` = "{uid}" AND \

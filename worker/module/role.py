@@ -5,6 +5,7 @@ role.py
 from module import enums
 from module import common
 from module import task
+from module import lottery
 from module import achievement
 from collections import defaultdict
 
@@ -26,7 +27,7 @@ async def level_up(uid, rid, delta, **kwargs):
 	rm = [{'iid': r[1], 'value': r[2]} for r in results]
 	rw = [{'iid': r[1], 'value': r[3]} for r in results]
 	await task.record(uid, enums.Task.ROLE_LEVEL_UP, **kwargs)
-	await achievement.record(uid, enums.Achievement.LEVEL_UP_ROLE, **kwargs)
+	await achievement.record(uid, enums.Achievement.LV_UPR, **kwargs)
 	await common.execute(f'UPDATE role SET level = {level + delta} WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
 	return common.mt(0, 'success', {'remaining': {enums.Group.ROLE.value: {'rid': rid.value, 'level' : level + delta},
 													enums.Group.ITEM.value: rm},
@@ -42,8 +43,12 @@ async def level_up_star(uid, rid, **kwargs):
 	if star >= 10: return common.mt(97, 'max star')
 	cost = kwargs['config']['role']['standard_costs']['seg'] * (1 + star)
 	if segment < cost: return common.mt(98, 'insufficient segments')
-	# TODO 加成就代码
 	await common.execute(f'UPDATE role SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND rid = {rid.value};', **kwargs)
+	# TODO 加成就代码
+	if star == 0:
+		rnp = rid.name[:2]
+		if rnp in lottery.RECORD_GET:
+			await lottery.RECORD_GET[rnp](uid, **kwargs)
 	return common.mt(0, 'success', {'remaining': {'rid' : rid.value, 'star' : star + 1, 'seg' : segment - cost}, 'reward': {'rid' : rid.value, 'star' : 1, 'seg' : cost}})
 
 

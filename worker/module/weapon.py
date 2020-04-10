@@ -9,6 +9,7 @@ import asyncio
 from module import enums
 from module import common
 from module import task
+from module import lottery
 from module import achievement
 
 from collections import defaultdict
@@ -39,7 +40,7 @@ async def level_up(uid, wid, delta, **kwargs):
 	_sp = 1 if level % 10 == 0 else 0
 	await common.execute(f'UPDATE weapon SET level = {level}, skillpoint = {sp + _sp} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
 	await task.record(uid, enums.Task.WEAPON_LEVEL_UP, **kwargs)
-	await achievement.record(uid, enums.Achievement.LEVEL_UP_WEAPON, **kwargs)
+	await achievement.record(uid, enums.Achievement.LV_UPW, **kwargs)
 	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : level, 'sp' : sp + _sp},
 													enums.Group.ITEM.value : [{'iid' : enums.Item.IRON.value, 'value' : remain_i}, {'iid' : enums.Item.COIN.value, 'value' : remain_c}]},
 										'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : delta, 'sp' : _sp},
@@ -70,6 +71,11 @@ async def level_up_star(uid, wid, **kwargs):
 	if segment < cost: return common.mt(98, 'insufficient segments')
 	await common.execute(f'UPDATE weapon SET star = {star + 1}, segment = {segment - cost} WHERE \
 			uid = "{uid}" AND wid = {wid.value};', **kwargs)
+	# TODO 加成就代码
+	if star == 0:
+		wnp = wid.name[:2]
+		if wnp in lottery.RECORD_GET:
+			await lottery.RECORD_GET[wnp](uid, **kwargs)
 	return common.mt(0, 'success', {'remaining' : {'wid' : wid.value, 'star' : star + 1, \
 			'seg' : segment - cost}, 'reward' : {'wid' : wid.value, 'star' : 1, 'seg' : cost}})
 
@@ -104,7 +110,7 @@ async def get_all(uid, **kwargs):
 ####################################################################################
 
 async def _update_segment(uid, wid, segment, **kwargs):
-	await common.execute_update( f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {wid}, {segment}) ON DUPLICATE KEY UPDATE segment = segment + {segment};', **kwargs)
+	await common.execute( f'INSERT INTO weapon (uid, wid, segment) VALUES ("{uid}", {wid}, {segment}) ON DUPLICATE KEY UPDATE segment = segment + {segment};', **kwargs)
 	data = await common.execute(f'SELECT segment FROM weapon WHERE uid = "{uid}" AND wid = "{wid}"', **kwargs)
 	return data[0][0]
 

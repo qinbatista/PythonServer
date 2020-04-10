@@ -1,8 +1,10 @@
 ## 方法列表
 
 * [`get_achievement_reward`](##get_achievement_reward)
+
 * [`get_all_achievement`](##get_all_achievement)
-* 内部方法[`record_achievement`](##record_achievement（内部方法）)
+
+  
 
 ## get_achievement_reward
 
@@ -25,28 +27,25 @@
 
 [成功]()
 
-> remaining：剩余的数量，item_id：5表示钻石，item_value表示钻石数量，aid表示任务的id，value表示成就的完成次数
+> remain：剩余物资
 >
-> reward：变化量，item_id：5表示钻石，item_value表示钻石获得的数量，aid表示任务的id，value完成这个成就需要的次数，这个次数是已经达标并领取了奖励的次数
+> reward：变化物资
+>
+> achievement："aid:val:rwv"
 
 ```json
 {
-	"status": 0,
-	"message": "get reward success",
-	"data": {
-		"remaining": {
-			"item_id": 5,
-			"item_value": 241480,
-			"aid": 1,
-			"value": 999999
-		},
-		"reward": {
-			"item_id": 5,
-			"item_value": 310,
-			"aid": 1,
-			"value": 987
-		}
-	}
+    "status": 0,
+    "message": "success",
+    "data": {
+        "remain": [
+            "3:5:999110"
+        ],
+        "reward": [
+            "3:5:30"
+        ],
+        "achievement": "1:1:1"
+    }
 }
 ```
 
@@ -106,25 +105,6 @@
 		]
 	}
 }
-```
-
-
-
-
-
-## record_achievement（内部方法）
-
-##### 发送消息JSON格式
-
-内部使用记录每日任务的方法
-
-> kwargs：传入需要的任务id和任务值，tid为任务id，可以从枚举中获得，task_value为任务值，0表示未完成，1表示完成
->
-> record_task：uid为玩家的唯一id
-
-```json
-kwargs.update({"tid": enums.achievement.TOTAL_LOGIN, "task_value": 1})
-record_achievement(uid,**kwargs)
 ```
 
 

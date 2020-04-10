@@ -10,7 +10,7 @@ from module import task
 from module import achievement
 
 
-STANDARD_SEG_COUNT = 30
+SEG_COUNT = 30
 
 SWITCH = {}
 
@@ -39,14 +39,17 @@ async def fortune_wheel(uid, tier, item, **kwargs):
 
 
 async def try_unlock_weapon(uid, gift, **kwargs):
-	weapon = enums.Weapon(gift)
-	if not await common.exists('weapon', ('uid', uid), ('wid', weapon.value), **kwargs):
-		await common.execute(f'INSERT INTO weapon(uid, wid, star) VALUES ("{uid}", {weapon.value}, 1);', **kwargs)
-		wnp = weapon.name[:2]
-		if wnp in RECORD: await RECORD[wnp](uid, **kwargs)
-		return True, weapon
-	await common.execute(f'UPDATE weapon SET segment = segment + {STANDARD_SEG_COUNT} WHERE uid = "{uid}" AND wid = {weapon.value};', **kwargs)
-	return False, weapon
+	wid = enums.wid(gift)
+	wnp = wid.name[:2]
+	if wnp in RECORD_SUM:
+		await RECORD_SUM[wnp](uid, **kwargs)
+	if await common.get_weapon(uid, wid, key='star', **kwargs) == 0:
+		await common.set_weapon(uid, wid, val=1, key='star', **kwargs)
+		if wnp in RECORD_GET:
+			await RECORD_GET[wnp](uid, **kwargs)
+		return True, wid
+	await common.set_weapon(uid, wid, val=SEG_COUNT, **kwargs)
+	return False, wid
 
 
 async def try_unlock_skill(uid, gift, **kwargs):
@@ -59,14 +62,16 @@ async def try_unlock_skill(uid, gift, **kwargs):
 
 
 async def try_unlock_role(uid, gift, **kwargs):
-	role = enums.Role(gift)
-	if not await common.exists('role', ('uid', uid), ('rid', role.value), **kwargs):
-		await common.execute(f'INSERT INTO role(uid, rid, star) VALUES ("{uid}", {role.value}, 1);', **kwargs)
-		rnp = role.name[:2]
-		if rnp in RECORD: await RECORD[rnp](uid, **kwargs)
-		return True, role
-	await common.execute(f'UPDATE role SET segment = segment + {STANDARD_SEG_COUNT} WHERE uid = "{uid}" AND rid = {role.value};', **kwargs)
-	return False, role
+	rid = enums.Role(gift)
+	rnp = rid.name[:2]
+	if rnp in RECORD_SUM:
+		await RECORD_SUM[rnp](uid, **kwargs)
+	if await common.get_role(uid, rid, key='star', **kwargs) == 0:
+		await common.set_role(uid, rid, val=1, key='star', **kwargs)
+		if rnp in RECORD_GET: await RECORD_GET[rnp](uid, **kwargs)
+		return True, rid
+	await common.set_role(uid, rid, val=SEG_COUNT, **kwargs)
+	return False, rid
 
 
 SWITCH[enums.Group.WEAPON] = try_unlock_weapon
@@ -74,15 +79,21 @@ SWITCH[enums.Group.SKILL] = try_unlock_skill
 SWITCH[enums.Group.ROLE] = try_unlock_role
 
 
-async def ach_record(uid, aids, **kwargs):
-	[await achievement.record(uid, aid, **kwargs) for aid in aids]
+RECORD_GET = {
+	"R4": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.GET_4R, **kwargs),
+	"R5": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.GET_5R, **kwargs),
+	"R6": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.GET_6R, **kwargs),
+	"W4": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.GET_4W, **kwargs),
+	"W5": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.GET_5W, **kwargs),
+	"W6": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.GET_6W, **kwargs),
+}
 
 
-RECORD = {
-	"R4": lambda uid, **kwargs: ach_record(uid, [enums.Achievement.GET_4_STAR_ROLE, enums.Achievement.SUMMON_4_STAR_ROLE_TIMES], **kwargs),
-	"R5": lambda uid, **kwargs: ach_record(uid, [enums.Achievement.GET_5_STAR_ROLE, enums.Achievement.SUMMON_5_STAR_ROLE_TIMES], **kwargs),
-	"R6": lambda uid, **kwargs: ach_record(uid, [enums.Achievement.GET_6_STAR_ROLE, enums.Achievement.SUMMON_6_STAR_ROLE_TIMES], **kwargs),
-	"W4": lambda uid, **kwargs: ach_record(uid, [enums.Achievement.GET_4_STAR_WEAPON, enums.Achievement.SUMMON_4_STAR_WEAPON_TIMES], **kwargs),
-	"W5": lambda uid, **kwargs: ach_record(uid, [enums.Achievement.GET_5_STAR_WEAPON, enums.Achievement.SUMMON_5_STAR_WEAPON_TIMES], **kwargs),
-	"W6": lambda uid, **kwargs: ach_record(uid, [enums.Achievement.GET_6_STAR_WEAPON, enums.Achievement.SUMMON_6_STAR_WEAPON_TIMES], **kwargs),
+RECORD_SUM = {
+	"R3": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.SUMMON_3R, **kwargs),
+	"R4": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.SUMMON_4R, **kwargs),
+	"R5": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.SUMMON_5R, **kwargs),
+	"W3": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.SUMMON_3W, **kwargs),
+	"W4": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.SUMMON_4W, **kwargs),
+	"W5": lambda uid, **kwargs: achievement.record(uid, enums.Achievement.SUMMON_5W, **kwargs),
 }

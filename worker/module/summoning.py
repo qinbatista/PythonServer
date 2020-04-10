@@ -11,12 +11,6 @@ from module import achievement
 import random
 from datetime import datetime, timedelta
 import asyncio
-# Tier
-# basic, friend, pro, prophet
-# RewardGroup
-# weapon, skill, role
-
-SWITCH = {}
 # 99 - insufficient materials
 # 98 - error item
 # 97 - error item, item type
@@ -24,86 +18,6 @@ SWITCH = {}
 # 95 - Insufficient number of lucky draw
 # 94 - cid error
 # 93 - The configuration file does not exist
-
-
-async def summon(uid, item, tier, rewardgroup, **kwargs):
-	if item not in enums.Item._value2member_map_.keys():
-		return common.mt(97, f'error item:{item}, item type:{type(item)}')
-	item = enums.Item(item)
-	return await _base_summon(uid, item, tier, rewardgroup, **kwargs)
-
-async def summon_multi(uid, item, tier, rewardgroup, num_times = 10, **kwargs):
-	if item not in enums.Item._value2member_map_.keys():
-		return common.mt(97, f'error item:{item}, item type:{type(item)}')
-	item = enums.Item(item)
-	return await _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs)
-
-##############################################################
-
-async def _base_summon(uid, item, tier, rewardgroup, **kwargs):
-	if f'{enums.Group.ITEM.value}:{item.value}' not in kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'][tier.name].keys(): return common.mt(98, f'error item:{item}')
-	cost = kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'][tier.name][f'{enums.Group.ITEM.value}:{item.value}']
-	can_pay, remaining = await common.try_item(uid, item, -cost, **kwargs)
-	if not can_pay: return common.mt(99, 'insufficient materials')
-	new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
-
-	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, **kwargs)
-	if enums.Tier.BASIC == tier:
-		await task.task(uid, enums.Task.BASIC_SUMMONING, **kwargs)
-	if enums.Tier.PRO == tier:
-		await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
-		await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, **kwargs)
-
-	return await _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)
-
-async def _base_summon_multi(uid, item, tier, rewardgroup, num_times, **kwargs):
-	if f'{enums.Group.ITEM.value}:{item.value}' not in kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'][tier.name].keys(): return common.mt(98, f'error item:{item}')
-	cost = kwargs['config']['lottery']['random_gift'][rewardgroup.name]['cost'][tier.name][f'{enums.Group.ITEM.value}:{item.value}']
-	can_pay, remaining = await common.try_item(uid, item, -cost * num_times, **kwargs)
-	if not can_pay: return common.mt(99, 'insufficient materials')
-	response = {'remaining' : {}, 'reward' : {}}
-	for time in range(num_times):
-		if enums.Tier.BASIC == tier:
-			await task.record(uid, enums.Task.BASIC_SUMMONING, **kwargs)
-		if enums.Tier.PRO == tier:
-			await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
-			await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, **kwargs)
-
-		new, reward = await lottery.random_gift(uid, tier, rewardgroup, **kwargs)
-		result = await _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)
-		response['remaining'][time] = result['data']['remaining']
-		response['reward'][time] = result['data']['reward']
-	return common.mt(0, 'success', response)
-
-
-async def _response_factory(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs):
-	return await SWITCH[rewardgroup](uid, rewardgroup, new, reward, item, remaining, cost, **kwargs)
-
-async def _response_factory_weapon(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs):
-	if new:
-		return common.mt(2, 'new weapon unlocked', {'remaining' : {'weapon' : reward.value, 'star' : 1, 'segment' : 0, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'weapon' : reward.value, 'star' : 1, 'segment': 0, 'cost_item' : item.value, 'cost_quantity': cost}})
-	else:
-		star, segment = (await common.execute(f'SELECT star, segment FROM weapon WHERE uid = "{uid}" AND wid = "{reward.value}";', **kwargs))[0]
-		return common.mt(3, 'get segment',{'remaining' : {'weapon' : reward.value, 'star' : star, 'segment' : segment, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'weapon' : reward.value, 'star' : 0, 'segment': 30, 'cost_item' : item.value, 'cost_quantity': cost}})
-
-async def _response_factory_skill(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs):
-	if new:
-		return common.mt(0, 'new skill unlocked', {'remaining' : {'skill' : reward.value, 'level' : 1, 'scroll_id' : -1, 'scroll_quantity' : -1, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'skill' : reward.value, 'level' : 1, 'scroll_id' : -1, 'scroll_quantity' : -1, 'cost_item' : item.value, 'cost_quantity' : cost}})
-	else:
-		scroll_quantity = (await common.execute(f'SELECT value FROM item WHERE uid = "{uid}" AND iid = {reward.value};', **kwargs))[0][0]
-		return common.mt(1, 'get scroll', {'remaining' : {'skill' : -1, 'level' : -1, 'scroll_id' : reward.value, 'scroll_quantity' : scroll_quantity, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'skill' : -1, 'level' : -1, 'scroll_id' : reward.value, 'scroll_quantity' : 1, 'cost_item' : item.value, 'cost_quantity' : cost}})
-
-async def _response_factory_role(uid, rewardgroup, new, reward, item, remaining, cost, **kwargs):
-	if new:
-		return common.mt(4, 'new role unlocked', {'remaining' : {'role' : reward.value, 'star' : 1, 'segment' : 0, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'role' : reward.value, 'star' : 1, 'segment': 0, 'cost_item' : item.value, 'cost_quantity': cost}})
-	else:
-		star, segment = (await common.execute(f'SELECT star, segment FROM role WHERE uid = "{uid}" AND rid = "{reward.value}";', **kwargs))[0]
-		return common.mt(5, 'get segment',{'remaining' : {'role' : reward.value, 'star' : star, 'segment' : segment, 'cost_item' : item.value, 'cost_quantity' : remaining}, 'reward' : {'role' : reward.value, 'star' : 0, 'segment': 30, 'cost_item' : item.value, 'cost_quantity': cost}})
-
-
-SWITCH[enums.Group.WEAPON] = _response_factory_weapon
-SWITCH[enums.Group.SKILL] = _response_factory_skill
-SWITCH[enums.Group.ROLE] = _response_factory_role
 
 
 # TODO 2019年12月19日
@@ -127,7 +41,7 @@ async def integral_convert(uid, **kwargs):
 		mid = config['special']['mid'] if acp == 600 else random.choice(config['role']['mid'])
 		can, rid = await lottery.try_unlock_role(uid, mid, **kwargs)
 		status, msg = (0, 'You unlocked a role') if can else (1, 'You get 30 segments')
-		value = lottery.STANDARD_SEG_COUNT
+		value = lottery.SEG_COUNT
 		remain_v = await common.try_role(uid, rid, 0, **kwargs)
 		_, star = await role._get_role_info(uid, rid, 'star', **kwargs)
 		return common.mt(status, msg, {'acp': acp, 'rid': mid, 'star': star[0], 'remain_seg': remain_v, 'reward_seg': value})
@@ -166,9 +80,7 @@ async def dozen_d(uid, **kwargs):
 	data['constraint'] = reset['data']['constraint']
 	# TODO 完成任务
 	await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
-	# TODO 完成成就
-	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, value=grid, **kwargs)
-	await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, value=grid, **kwargs)
+	await achievement.record(uid, enums.Achievement.SUMMON_D, value=grid, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -185,8 +97,6 @@ async def dozen_c(uid, **kwargs):
 	lim = (kwargs['config']['summon']['resource'][cid.name]['constraint']['times'] if lim is None or tim is None or tim < now else lim) - grid
 	tim = (now + timedelta(days=1)) if tim is None or tim < now else tim
 	if lim < 0: return common.mt(95, 'Insufficient number of lucky draw')
-	await common.set_timer(uid, enums.Timer.SUMMON_C, tim, timeformat='%Y-%m-%d', **kwargs)
-	await common.set_limit(uid, enums.Limits.SUMMON_C, lim, **kwargs)
 	# TODO 消耗物品
 	consume_id, consume = enums.Item.SUMMON_SCROLL_C, grid
 	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
@@ -194,6 +104,11 @@ async def dozen_c(uid, **kwargs):
 		consume_id, consume = cid, abs(kwargs['config']['summon']['resource'][cid.name]['qty']) * grid
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 		if not can: return common.mt(99, 'insufficient materials')
+	else:
+		lim += grid
+	# TODO 保存时间和次数
+	await common.set_timer(uid, enums.Timer.SUMMON_C, tim, timeformat='%Y-%m-%d', **kwargs)
+	await common.set_limit(uid, enums.Limits.SUMMON_C, lim, **kwargs)
 	# TODO 奖励物品
 	multiple = grid  # 计算抽奖获得的积分倍数
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': [d[0] for d in isb_data]}
@@ -210,7 +125,6 @@ async def dozen_c(uid, **kwargs):
 	data['constraint'] = reset['data']['constraint']
 	# TODO 完成任务
 	await task.record(uid, enums.Task.BASIC_SUMMONING, **kwargs)
-	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, value=grid, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -238,7 +152,6 @@ async def dozen_g(uid, **kwargs):
 	reset = await _refresh(uid, cid, **kwargs)
 	data['refresh'] = reset['data']['refresh']
 	data['constraint'] = reset['data']['constraint']
-	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, value=grid, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -278,9 +191,7 @@ async def single_d(uid, **kwargs):
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
 	# TODO 完成任务
 	await task.record(uid, enums.Task.PRO_SUMMONING, **kwargs)
-	# TODO 完成成就
-	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, **kwargs)
-	await achievement.record(uid, enums.Achievement.PRO_SUMMON_TIMES, **kwargs)
+	await achievement.record(uid, enums.Achievement.SUMMON_D, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 
@@ -316,7 +227,6 @@ async def single_c(uid, **kwargs):
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
 	# TODO 完成任务
-	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, **kwargs)
 	await task.record(uid, enums.Task.BASIC_SUMMONING, **kwargs)
 	return common.mt(0, 'success', data=data)
 
@@ -343,7 +253,6 @@ async def single_g(uid, **kwargs):
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
-	await achievement.record(uid, enums.Achievement.SUMMON_TIMES, **kwargs)
 	return common.mt(0, 'success', data=data)
 
 

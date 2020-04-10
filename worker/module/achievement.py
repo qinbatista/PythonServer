@@ -12,7 +12,7 @@ async def get_all(uid, **kwargs):
     now = datetime.now(tz=common.TZ_SH)
     tim = await common.get_timer(uid, enums.Timer.LOGIN_TIME, **kwargs)
     tim = now - timedelta(days=1) if tim is None else tim
-    if now.day > tim.day:
+    if now.day != tim.day:
         await record(uid, enums.Achievement.TOTAL_LOGIN, **kwargs)
     await common.set_timer(uid, enums.Timer.LOGIN_TIME, now, **kwargs)
     ads = await common.execute(f'SELECT aid, value, reward FROM achievement WHERE uid = "{uid}";', **kwargs)
@@ -39,16 +39,24 @@ async def record(uid, aid, value=1, **kwargs):
 
 
 async def get_reward(uid, aid, **kwargs):
-    if aid not in enums.Achievement._value2member_map_.keys(): return common.mt(97, 'Aid does not exist')
-    config = kwargs["config"]["achievement"][str.lower(enums.Achievement(aid).name)]
-    quantity = config["quantity"]
-    amount = config["diamond"]
+    if aid not in enums.Achievement._value2member_map_: return common.mt(97, 'Aid does not exist')
+    config = kwargs["config"]["achievement"][f'{aid}']
+    count = config["count"]
+    qty = config["qty"]
     data = await common.execute(f'SELECT value, reward FROM achievement WHERE uid = "{uid}" AND aid = "{aid}"',**kwargs)
-    if data == (): return common.mt(98, f'no reward for this achievement:{enums.Achievement(aid).name}')
-    if len(quantity) != len(amount): return common.mt(98, 'data base problem, achievement configuration is not match')
-    for i, qty in enumerate(quantity):
-        if data[0][1] < qty <= data[0][0]:  # reward是领奖时的成就次数，value是完成成就的次数
-            _, remaining = await common.try_item(uid, enums.Item.DIAMOND, amount[i], **kwargs)
-            await common.execute_update(f'UPDATE achievement set reward = {qty} WHERE uid = "{uid}" AND aid = "{aid}";', **kwargs)
-            return common.mt(0, 'get reward success',{"remaining": {"item_id": 5, "item_value": remaining, "aid": aid, "value": data[0][0]},"reward": {"item_id": 5, "item_value": amount[i], "aid": aid, "value": quantity[i]}})
-    return common.mt(99, f'no reward for this achievement:{enums.Achievement(aid).name}')
+    if data == ():
+        return common.mt(98, f'no reward for this achievement:{aid}')
+    if len(count) != len(qty):
+        return common.mt(98, 'data base problem, achievement configuration is not match')
+    val, _rwv = data[0]
+    for i, rwv in enumerate(count):
+        if _rwv < rwv <= val:  # reward是领奖时的成就次数，value是完成成就的次数
+            gid = enums.Group.ITEM
+            iid = enums.Item.DIAMOND
+            _, _qty = await common.try_item(uid, iid, qty[i], **kwargs)
+            await common.execute(f'UPDATE achievement set reward = {rwv} WHERE uid = "{uid}" AND aid = "{aid}";', **kwargs)
+            return common.mt(0, 'success',
+                             {"remain": [f'{gid}:{iid}:{_qty}'],
+                              "reward": [f'{gid}:{iid}:{qty[i]}'],
+                              "achievement": f'{aid}:{val}:{rwv}'})
+    return common.mt(99, f'no reward for this achievement:{aid}')

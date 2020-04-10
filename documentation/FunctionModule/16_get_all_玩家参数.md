@@ -1724,7 +1724,7 @@
 					750
 				]
 			},
-			"get_4_star_role": {
+			"GET_4R": {
 				"quantity": [
 					0,
 					1,
@@ -1744,7 +1744,7 @@
 					300
 				]
 			},
-			"get_5_star_role": {
+			"GET_5R": {
 				"quantity": [
 					0,
 					1,
@@ -1764,7 +1764,7 @@
 					600
 				]
 			},
-			"get_6_star_role": {
+			"GET_6R": {
 				"quantity": [
 					0,
 					1,
@@ -1813,7 +1813,7 @@
 					200
 				]
 			},
-			"get_4_star_weapon": {
+			"GET_4W": {
 				"quantity": [
 					0,
 					1,
@@ -1833,7 +1833,7 @@
 					300
 				]
 			},
-			"get_5_star_weapon": {
+			"GET_5W": {
 				"quantity": [
 					0,
 					1,
@@ -1853,7 +1853,7 @@
 					600
 				]
 			},
-			"get_6_star_weapon": {
+			"GET_6W": {
 				"quantity": [
 					0,
 					1,
@@ -2172,7 +2172,7 @@
 					200
 				]
 			},
-			"summon_4_star_weapon_times": {
+			"SUMMON_4W": {
 				"quantity": [
 					0,
 					1,
@@ -2190,7 +2190,7 @@
 					400
 				]
 			},
-			"summon_5_star_weapon_times": {
+			"SUMMON_5W": {
 				"quantity": [
 					0,
 					1,
@@ -2226,7 +2226,7 @@
 					200
 				]
 			},
-			"summon_4_star_role_times": {
+			"SUMMON_4R": {
 				"quantity": [
 					0,
 					1,
@@ -2244,7 +2244,7 @@
 					400
 				]
 			},
-			"summon_5_star_role_times": {
+			"SUMMON_5R": {
 				"quantity": [
 					0,
 					1,

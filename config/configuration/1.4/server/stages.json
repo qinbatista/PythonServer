@@ -563,7 +563,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -582,7 +582,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -601,7 +601,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -620,7 +620,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -639,7 +639,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -658,7 +658,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -677,7 +677,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -707,7 +707,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -731,7 +731,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -755,7 +755,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -779,7 +779,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -803,7 +803,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -827,7 +827,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -851,7 +851,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -875,7 +875,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -899,7 +899,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -923,7 +923,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -947,7 +947,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -971,7 +971,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -995,7 +995,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1019,7 +1019,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1043,7 +1043,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1067,7 +1067,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1091,7 +1091,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1115,7 +1115,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1139,7 +1139,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1163,7 +1163,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1187,7 +1187,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1211,7 +1211,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1235,7 +1235,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1259,7 +1259,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1283,7 +1283,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1310,7 +1310,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1337,7 +1337,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1364,7 +1364,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1391,7 +1391,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}
@@ -1418,7 +1418,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 500
+					"exp": 120
 				},
 				"random": 0
 			}

@@ -7,8 +7,8 @@
 			"bnum": 2000
 		},
 		"EXP_CARD": {
-			"sqltable": "progress",
-			"mid": "exp",
+			"sqltable": "item",
+			"mid": 9,
 			"bnum": 1000
 		},
 		"VIP_EXP_CARD": {
