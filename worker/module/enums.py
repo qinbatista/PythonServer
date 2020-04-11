@@ -381,6 +381,7 @@ class Timer(enum.IntEnum):
     STAGE_COIN = 39  # 金币挑战模式下的挑战时间限制，时间满足则刷新可挑战次数和可购买挑战的次数
     STAGE_EXP = 40  # 经验挑战模式下的挑战时间限制，时间满足则刷新可挑战次数和可购买挑战的次数
     STAGE_HANG_UP = 41  # 挂机模式的开始时间
+    PACKAGE_ENERGY = 42  # 购买体力的刷新开始时间
 
 
 class Limits(enum.IntEnum):
@@ -407,6 +408,7 @@ class Limits(enum.IntEnum):
     STAGE_EXP = 21  # 经验挑战模式下的挑战次数限制
     STAGE_EXP_VIP = 22  # 经验挑战模式下VIP相应等级可购买的挑战次数限制
     PLAYER_ELEMENT = 23  # 玩家可以清洗元素技能的剩余次数，不可重置
+    PACKAGE_ENERGY = 24  # 购买体力的次数
 
 
 class Achievement(enum.IntEnum):

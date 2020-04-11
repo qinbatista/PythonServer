@@ -530,6 +530,12 @@ class MessageHandler:
 	async def _get_config_version(self, data: dict) -> str:
 		return common.mt(0, 'success', {'version': data['config']['version']})
 
+	async def _buy_energy(self, data: dict) -> str:
+		return await package.buy_energy(data['data']['unique_id'], **data)
+
+	async def _buy_coin(self, data: dict) -> str:
+		return await package.buy_coin(data['data']['unique_id'], int(data['data'].get('qty', 1)), **data)
+
 	async def _exchange_card(self, data: dict) -> str:
 		return await package.exchange(data['data']['unique_id'], int(data['data']['cid']), int(data['data'].get('qty', 1)), **data)
 
@@ -772,6 +778,8 @@ FUNCTION_LIST = {
 	'get_config_science': MessageHandler._get_config_science,
 
 	###################### package ######################
+	'buy_energy': MessageHandler._buy_energy,
+	'buy_coin': MessageHandler._buy_coin,
 	'exchange_card': MessageHandler._exchange_card,
 	'use_item': MessageHandler._use_item,
 

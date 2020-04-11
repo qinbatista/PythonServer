@@ -7,6 +7,7 @@ from module import common
 from module import stage
 from module import vip
 from random import choice
+from datetime import datetime, timedelta
 import re
 
 
@@ -31,10 +32,40 @@ SCROLL = {
 	enums.Item.SKILL_SCROLL_10: enums.Item.SKILL_SCROLL_30,
 	enums.Item.SKILL_SCROLL_30: enums.Item.SKILL_SCROLL_100
 }
+DIAMONDS = [30, 60, 90, 120, 150, 180]
 
 
-async def buy_energy():
-	pass
+async def buy_energy(uid, **kwargs):
+	now = datetime.now(tz=common.TZ_SH)
+	lid, tid = enums.Limits.PACKAGE_ENERGY, enums.Timer.PACKAGE_ENERGY
+	lim = await common.get_limit(uid, lid, **kwargs)
+	tim = await common.get_timer(uid, tid, timeformat='%Y-%m-%d', **kwargs)
+	if tim is None or tim < now:
+		tim, lim = now + timedelta(days=1), 0
+	if lim >= len(DIAMONDS):
+		return common.mt(0, 'Insufficient purchase times')
+	drw, erw = 30, DIAMONDS[lim]
+	can, drm = await common.try_item(uid, enums.Item.DIAMOND, -drw, **kwargs)
+	if not can:
+		return common.mt(99, 'Insufficient materials')
+	energy = (await common.try_energy(uid, erw, **kwargs))['data']
+	await common.set_limit(uid, lid, lim + 1, **kwargs)
+	await common.set_timer(uid, tid, tim, timeformat='%Y-%m-%d', **kwargs)
+	return common.mt(0, 'success', {'diamond': {'remain': drm, 'reward': drw},
+	                                'energy': {**energy, 'reward': erw},
+	                                'lim': lim + 1, 'cd': common.remaining_cd()})
+
+
+async def buy_coin(uid, qty, **kwargs):
+	drw, crw = 300*qty, qty
+	gid, did, cid = enums.Group.ITEM, enums.Item.DIAMOND, enums.Item.COIN_CARD
+	can, drm = await common.try_item(uid, did, -drw, **kwargs)
+	if not can:
+		return common.mt(99, 'Insufficient materials')
+	_, crm = await common.try_item(uid, cid, crw, **kwargs)
+	return common.mt(0, 'success',
+	                 {'remain': [f'{gid}:{did}:{drm}', f'{gid}:{cid}:{crm}'],
+	                  'reward': [f'{gid}:{did}:{drw}', f'{gid}:{cid}:{crw}']})
 
 
 async def exchange(uid, cid, qty=1, **kwargs):
