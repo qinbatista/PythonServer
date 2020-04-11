@@ -299,7 +299,7 @@ async def check_in(uid, **kwargs):
 		data['remaining'].append({"iid": iid.value, "value": remain})
 		data['reward'].append({"iid": iid.value, "value": cost})
 	await task.record(uid, enums.Task.FAMILY_CHECK_IN, **kwargs)
-	await achievement.record(uid, enums.Achievement.CHECK_IN_FAMILY, **kwargs)
+	await achievement.record(uid, enums.Achievement.FAMILY_CHECK_IN, **kwargs)
 	return common.mt(0, 'success', data)
 
 async def abdicate(uid, target, **kwargs):
