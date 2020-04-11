@@ -43,7 +43,7 @@ async def buy_energy(uid, **kwargs):
 	if tim is None or tim < now:
 		tim, lim = now + timedelta(days=1), 0
 	if lim >= len(DIAMONDS):
-		return common.mt(0, 'Insufficient purchase times')
+		return common.mt(98, 'Insufficient purchase times')
 	drw, erw = 30, DIAMONDS[lim]
 	can, drm = await common.try_item(uid, enums.Item.DIAMOND, -drw, **kwargs)
 	if not can:
