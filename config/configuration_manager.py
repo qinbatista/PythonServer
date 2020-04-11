@@ -43,6 +43,7 @@ PACKAGE = loc() + '/configuration/{}/server/package.json'
 SUMMON = loc() + '/configuration/{}/server/summon.json'
 STAGES = loc() + '/configuration/{}/server/stages.json'
 SCIENCES = loc() + '/configuration/{}/server/sciences.json'
+MARKETS = loc() + '/configuration/{}/server/markets.json'
 
 
 class RepeatingTimer(threading.Thread):
@@ -81,6 +82,7 @@ class ConfigurationManager:
 		self._read_summon_config()
 		self._read_stages_config()
 		self._read_sciences_config()
+		self._read_markets_config()
 
 		# read this one last
 		self._read_game_manager_config()
@@ -122,6 +124,9 @@ class ConfigurationManager:
 	def _read_sciences_config(self):
 		self._sciences = json.load(open(SCIENCES.format(self._sv), encoding='utf-8'))
 
+	def _read_markets_config(self):
+		self._markets = json.load(open(MARKETS.format(self._sv), encoding='utf-8'))
+
 	def _read_game_manager_config(self):
 		lottery = json.load(open(LOTTERY.format(self._sv), encoding = 'utf-8'))
 		weapon = json.load(open(WEAPON.format(self._sv), encoding = 'utf-8'))
@@ -134,13 +139,13 @@ class ConfigurationManager:
 			'skill' : skill, 'player' : player, 'sciences': self._sciences,
 			"factory": self._factory_config, 'family': self._family_config,
 			"mall": self._mall_config, "notice": self._notice_info,
-			'player_experience': self._player_experience, 'monster_config': self._monster_config,
+			'player_experience': self._player_experience, 'monster': self._monster,
 			'level_enemy_layouts': self._level_enemy_layouts_config,
 			'level_enemy_layouts_tower': self._level_enemy_layouts_config_tower,
-			'achievement': self._achievement_config, 'task': self._task_config,
-			'check_in': self._check_in_config, 'vip': self._vip_config,
+			'achievement': self._achievement, 'task': self._tasks,
+			'check_in': self._check_in, 'vip': self._vips,
 			'world' : world, 'version': self._sv, 'package': self._package,
-			'summon': self._summon, 'stages': self._stages
+			'summon': self._summon, 'stages': self._stages, 'markets': self._markets
 		}
 
 	def _read_level_enemy_layouts_config(self):
@@ -156,19 +161,19 @@ class ConfigurationManager:
 		self._player_experience = json.load(open(PLAYER_EXPERIENCE.format(self._sv), encoding = 'utf-8'))
 
 	def _read_monster_config(self):
-		self._monster_config = json.load(open(MONSTER.format(self._cv), encoding = 'utf-8'))
+		self._monster = json.load(open(MONSTER.format(self._cv), encoding = 'utf-8'))
 
 	def _read_achievement_config(self):
-		self._achievement_config = json.load(open(ACHIEVEMENT.format(self._cv), encoding = 'utf-8'))
+		self._achievement = json.load(open(ACHIEVEMENT.format(self._cv), encoding = 'utf-8'))
 
 	def _read_task_config(self):
-		self._task_config = json.load(open(TASK.format(self._sv), encoding = 'utf-8'))
+		self._tasks = json.load(open(TASK.format(self._sv), encoding = 'utf-8'))
 
 	def _read_check_in_config(self):
-		self._check_in_config = json.load(open(CHECK_IN.format(self._sv), encoding = 'utf-8'))
+		self._check_in = json.load(open(CHECK_IN.format(self._sv), encoding = 'utf-8'))
 
 	def _read_vip_config_config(self):
-		self._vip_config = json.load(open(VIP_CONFIG.format(self._sv), encoding = 'utf-8'))
+		self._vips = json.load(open(VIP_CONFIG.format(self._sv), encoding = 'utf-8'))
 
 	def _read_world_distribution_config(self):
 		d = json.load(open(SERVER_CONFIG.format(self._cv), encoding = 'utf-8'))

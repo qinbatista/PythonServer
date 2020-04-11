@@ -521,58 +521,6 @@ class MessageHandler:
 	async def _get_config_mall(self, data: dict) -> str:
 		return common.mt(0, 'success', {'mall_config': data['config']['mall']})
 
-	# TODO
-	async def _check_boss_status(self, data: dict) -> str:
-		data['boss_life_remaining'] = data['config']['world_boss']['boss_life_remaining']
-		data['boss_life'] = data['config']['world_boss']['boss_life']
-		data['max_enter_time'] = data['config']['world_boss']['max_enter_time']
-		data['max_upload_damage'] = data['config']['world_boss']['max_upload_damage']
-		return await stage.check_boss_status(data['data']['unique_id'], **data)
-		# return {'status' : 0, 'message' : 'temp function success', 'data' :{'boss' :{'world_boss_enter_time':"2019/10/10 17:00:00",'world_boss_remaining_times':"20",'hp_values':["%.2f" %(int(self._boss_life_remaining[i])/int(self._boss_life[i])) for i in range(0,9)]}}}
-
-	# TODO Done 在这里直接返回配置信息，后面配置信息存放位置变动会做相应的改动
-	async def _get_factory_info(self, data: dict) -> str:
-		return common.mt(0, 'success', {'config': self._factory_config})
-
-	# TODO
-	async def _refresh_all_storage(self, data: dict) -> str:
-		return {'status' : 0, 'message' : 'temp function success', 'data' :
-				{
-					'worker':200,
-					'factory':
-					[
-						{"fid":0,"worker":5,"level":5,"storage":2222,"time":"2019-01-01 22:22:22","setting":""},
-						{"fid":1,"worker":5,"level":5,"storage":2222,"time":"2019-01-01 22:22:22","setting":""},
-						{"fid":2,"worker":5,"level":15,"storage":2222,"time":"2019-01-01 22:22:22","setting":""},
-						{"fid":3,"worker":5,"level":35,"storage":2222,"time":"2019-01-01 22:22:22","setting":{"armorid":1}},
-						{"fid":4,"worker":0,"level":35,"storage":0,"time":"2019-01-01 22:22:22","setting":""},
-					]
-				}
-		}
-
-	async def _get_all_family_info(self, data: dict) -> str:
-		return {"status" : 0, "message" : "temp function success", "data" :
-    			{
-					"famliy" :{"name":"LOL","icon":"2","exp":1222,"notice":"everyone must buy red pack","announcement":"we are top family"},
-					"member":
-					[
-						{"name":"Matthew","level":"100","postion":"0","check_in":0},
-						{"name":"houyao","level":"100","postion":"1","check_in":0},
-						{"name":"覃yupeng","level":"100","postion":"2","check_in":0}
-					],
-					"blackboard":
-					[
-						["Matthew kick out children"],
-						["children join our family, welcome!"],
-						["children bought red pack for everyone"],
-						["Matthew set children as owner"],
-						["children disband family, family will disband in 24 hours"],
-						["Matthew cancel disband family"],
-						["children leave family"]
-					]
-				}
-				}
-
 	async def _get_config_player(self, data: dict) -> str:
 		data['exp_config'] = data['config']['exp']['player_level']['experience']
 		energy = data['config']['player']['energy']
@@ -804,13 +752,6 @@ FUNCTION_LIST = {
 	'get_all_market': MessageHandler._get_all_market,
 	'refresh_market': MessageHandler._refresh_market,
 	'darkmarket_transaction': MessageHandler._darkmarket_transaction,
-
-	# TODO 新增
-	# 'get_hang_up_info': MessageHandler._get_hang_up_info,
-	'check_boss_status':MessageHandler._check_boss_status,
-	'get_factory_info':MessageHandler._get_factory_info,
-	'refresh_all_storage':MessageHandler._refresh_all_storage,
-	'get_all_family_info': MessageHandler._get_all_family_info,
 
 	###################### get_config ######################
 	'get_config_stage': MessageHandler._get_config_stage,

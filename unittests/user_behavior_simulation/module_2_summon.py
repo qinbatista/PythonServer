@@ -154,14 +154,16 @@ def encrypt(pid, sid, aid=0):
 
 if __name__ == '__main__':
     world = 's6'
-    uid = '100'
+    uid = 't106'
     # res = user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
 
     # user_behavior_simulation.send_tcp_message({"function":"level_up_passive_weapon","random":"-284","world":"s6","data":{"weapon":"302","passive":"4","token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODgxNTUwNjksInVpZCI6IjEwMCJ9.NKnPGjQWul4LXG5HnQrMK--LBIWotQZJloCxQVm2VXg"}})
 
-    # token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
+    token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
     # user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_market', 'data': {'token': token}})
+    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'refresh_market', 'data': {'token': token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_enter_general', 'data': {'token': token, 'stage': 8}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_victory_general', 'data': {'token': token, 'stage': 8}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_enter_endless', 'data': {'token': token, 'stage': 1001}})
@@ -202,12 +204,12 @@ if __name__ == '__main__':
 
     # user_behavior_simulation.send_tcp_message({'function': 'update_init', 'world': world, 'data': {'token': token}})
     # user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})
-    for i in range(100, 201):
-        uid = f't{i}'
-        # token = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})['data']['token']
-        user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
-        token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
-        user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
+    # for i in range(100, 201):
+    #     uid = f't{i}'
+    #     # token = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})['data']['token']
+    #     user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
+    #     token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
+    #     user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
         # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'request_friend', 'data': {'token': token, 'gn_target': 'a16'}})
 
     #

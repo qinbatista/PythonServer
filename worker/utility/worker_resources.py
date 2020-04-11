@@ -106,7 +106,7 @@ class ModuleConfigurations:
 		self.configs['exp']               = r.json()['player_experience']
 		self.configs['mall']              = r.json()['mall']
 		self.configs['player']            = r.json()['player']
-		self.configs['monster']           = r.json()['monster_config']
+		self.configs['monster']           = r.json()['monster']
 		self.configs['enemy_layouts']     = r.json()['level_enemy_layouts']
 		self.configs['achievement']       = r.json()['achievement']
 		self.configs['task']              = r.json()['task']
@@ -116,6 +116,7 @@ class ModuleConfigurations:
 		self.configs['stages']            = r.json()['stages']
 		self.configs['sciences']          = r.json()['sciences']
 		self.configs['notice']            = r.json()['notice']
+		self.configs['markets']           = r.json()['markets']
 
 		today = datetime.now(tz=TZ_SH).day
 		if today == 1 and not self._rfb:

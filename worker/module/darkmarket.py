@@ -33,11 +33,11 @@ async def transaction(uid, pid, **kwargs):
 	remaining = {'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': currency}
 
 	if gid == enums.Group.WEAPON.value:
-		remaining['qty'] = await weapon._update_segment(uid, mid, qty, **kwargs)
+		remaining['qty'] = await common.try_weapon(uid, mid, qty, **kwargs)
+	elif gid == enums.Group.ROLE.value:
+		remaining['qty'] = await common.try_role(uid, mid, qty, **kwargs)
 	elif gid == enums.Group.SKILL.value:
-		data = await common.execute(f'SELECT level FROM skill WHERE uid = "{uid}" AND sid = "{mid}";', **kwargs)
-		if data == ():
-			await common.execute(f'INSERT INTO skill (uid, sid, level) VALUES ("{uid}", {mid}, {qty});', **kwargs)
+		if await common.try_skill(uid, mid, **kwargs):
 			remaining['qty'] = qty
 		else:
 			await common.try_item(uid, enums.Item(cid), amt, **kwargs)
@@ -173,41 +173,45 @@ async def free_refresh(uid, **kwargs):
 
 async def refresh_darkmarket(uid, **kwargs):
 	dark_markets = []
-	dark_market_data = kwargs['config']['player']['dark_market']
-	tier_choice = random.choices(dark_market_data['names'], dark_market_data['weights'], k=kwargs['config']['player']['dark_market']['constraint']['grid'])
-	key_list = [(random.choices(dark_market_data[tier], k=1))[0] for tier in tier_choice]
+	config = kwargs['config']['player']['dark_market']
+	tier_choice = random.choices(config['names'], config['weights'], k=kwargs['config']['player']['dark_market']['constraint']['grid'])
+	key_list = [(random.choices(config[tier], k=1))[0] for tier in tier_choice]
 	for pid, merchandise in enumerate(key_list):
-		if merchandise in enums.Weapon.__members__:
-			currency_type = random.choice(list(dark_market_data['segment'].keys()))
-			merchandise_quantity = random.randint(int(dark_market_data['segment'][currency_type]['quantity_min']), int(dark_market_data['segment'][currency_type]['quantity_max']))
-			currency_type_price = random.randint(int(dark_market_data['segment'][currency_type]['cost_range_min']), int(dark_market_data['segment'][currency_type]['cost_range_max']))
-			gid = enums.Group.WEAPON.value
-			mid = enums.Weapon[merchandise].value
-			qty = merchandise_quantity
-			cid = dark_market_data['cid'][currency_type]
-			amt = currency_type_price
+		if merchandise in enums.Weapon.__members__ or merchandise in enums.Role.__members__:
+			pre = merchandise[:2]
+			cty = random.choice(list(config['segment'][pre]))
+			cfg = config['segment'][pre][cty]
+			mul = random.randint(cfg['multiple_min'], cfg['multiple_max'])
+			mnq, mxq = cfg['quantity_min'] * mul, cfg['quantity_max'] * mul
+			mnc, mxc = cfg['cost_range_min'] * mul, cfg['cost_range_max'] * mul
+			gid = enums.Group['WEAPON' if 'W' in pre else 'ROLE']
+			mid = merchandise[1:]
+			qty = random.randint(mnq, mxq)
+			cid = config['cid'][cty]
+			amt = random.randint(mnc, mxc)
 			await set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs)
 			dark_markets.append({'pid': pid, 'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': amt})
 		elif merchandise in enums.Skill.__members__:  # 技能只加1级
-			currency_type = random.choice(list(dark_market_data['skill'].keys()))
-			merchandise_quantity = 1
-			currency_type_price = random.randint(int(dark_market_data['skill'][currency_type]['cost_range_min']), int(dark_market_data['skill'][currency_type]['cost_range_max']))
-			gid = enums.Group.SKILL.value
-			mid = enums.Skill[merchandise].value
-			qty = merchandise_quantity
-			cid = dark_market_data['cid'][currency_type]
-			amt = currency_type_price
+			cty = random.choice(list(config['skill']))
+			ctp = random.randint(int(config['skill'][cty]['cost_range_min']), int(config['skill'][cty]['cost_range_max']))
+			gid = enums.Group.SKILL
+			mid = enums.Skill[merchandise]
+			qty = 1
+			cid = config['cid'][cty]
+			amt = ctp
 			await set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs)
 			dark_markets.append({'pid': pid, 'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': amt})
-		elif merchandise in dark_market_data['items'].keys():
-			currency_type = random.choice(list(dark_market_data['items'][merchandise].keys()))
-			merchandise_quantity = random.randint(int(dark_market_data['items'][merchandise][currency_type]['quantity_min']), int(dark_market_data['items'][merchandise][currency_type]['quantity_max']))
-			currency_type_price = random.randint(int(dark_market_data['items'][merchandise][currency_type]['cost_range_min']), int(dark_market_data['items'][merchandise][currency_type]['cost_range_max']))
-			gid = enums.Group.ITEM.value
+		elif merchandise in config['items']:
+			cty = random.choice(list(config['items'][merchandise]))
+			cfg = config['items'][merchandise][cty]
+			mul = random.randint(cfg['multiple_min'], cfg['multiple_max'])
+			mnq, mxq = cfg['quantity_min'] * mul, cfg['quantity_max'] * mul
+			mnc, mxc = cfg['cost_range_min'] * mul, cfg['cost_range_max'] * mul
+			gid = enums.Group.ITEM
 			mid = int(merchandise)
-			qty = merchandise_quantity
-			cid = dark_market_data['cid'][currency_type]
-			amt = currency_type_price
+			qty = random.randint(mnq, mxq)
+			cid = config['cid'][cty]
+			amt = random.randint(mnc, mxc)
 			await set_darkmarket(uid, pid, gid, mid, qty, cid, amt, **kwargs)
 			dark_markets.append({'pid': pid, 'gid': gid, 'mid': mid, 'qty': qty, 'cid': cid, 'amt': amt})
 		else:
