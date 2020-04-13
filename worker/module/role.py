@@ -42,7 +42,7 @@ async def level_up_star(uid, rid, **kwargs):
 	star, segment = payload
 	if star >= 10: return common.mt(97, 'max star')
 	cost = kwargs['config']['role']['standard_costs']['seg'] * (1 + star)
-	if segment < cost: return common.mt(98, 'insufficient segments')
+	if segment <= cost: return common.mt(98, 'insufficient segments')
 	await common.execute(f'UPDATE role SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND rid = {rid.value};', **kwargs)
 	# TODO 加成就代码
 	if star == 0:

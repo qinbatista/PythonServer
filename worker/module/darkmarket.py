@@ -62,8 +62,8 @@ async def get_all_market(uid, **kwargs):
 	config = kwargs['config']['player']['dark_market']
 	lim = config['constraint']['refreshable']
 	refresh_hours = config['constraint']['refresh_hours']
-	timer = await common.get_timer(uid, enums.Timer.DARK_MARKET_TIME, **kwargs)
-	limit = await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
+	timer = await common.get_timer(uid, enums.Timer.DARK_MARKET, **kwargs)
+	limit = await common.get_limit(uid, enums.Limits.DARK_MARKET, **kwargs)
 	refresh_time = current_time if timer is None else timer
 	refreshable = lim if limit is None else limit
 	dark_markets = []
@@ -78,8 +78,8 @@ async def get_all_market(uid, **kwargs):
 			dark_markets = await refresh_darkmarket(uid, **kwargs)
 	if refreshable == lim:
 		refresh_time = current_time
-	await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
-	await common.set_limit(uid, enums.Limits.DARK_MARKET_LIMITS, refreshable, **kwargs)
+	await common.set_timer(uid, enums.Timer.DARK_MARKET, refresh_time, **kwargs)
+	await common.set_limit(uid, enums.Limits.DARK_MARKET, refreshable, **kwargs)
 	refresh_time_s = max(3600 * refresh_hours - int((current_time - refresh_time).total_seconds()), 0)
 	if not dark_markets:
 		data = await common.execute(f'SELECT pid, gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}";', **kwargs)
@@ -105,7 +105,7 @@ async def refresh_market(uid, **kwargs):
 	98 - Insufficient diamond
 	99 - You have not yet done an automatic refresh
 	"""
-	refreshable = await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
+	refreshable = await common.get_limit(uid, enums.Limits.DARK_MARKET, **kwargs)
 	if refreshable is None:
 		return await refresh_darkmarket(uid, **kwargs)
 	elif refreshable > 0:
@@ -120,8 +120,8 @@ async def diamond_refresh(uid, **kwargs):
 	98 - Insufficient diamond
 	99 - You have not yet done an automatic refresh
 	"""
-	refresh_time = await common.get_timer(uid, enums.Timer.DARK_MARKET_TIME, **kwargs)
-	refreshable = await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
+	refresh_time = await common.get_timer(uid, enums.Timer.DARK_MARKET, **kwargs)
+	refreshable = await common.get_limit(uid, enums.Limits.DARK_MARKET, **kwargs)
 	refresh_hours = kwargs['config']['player']['dark_market']['constraint']['refresh_hours']
 	if refresh_time is None or refreshable is None: return common.mt(99, 'You have not yet done an automatic refresh')
 
@@ -144,8 +144,8 @@ async def free_refresh(uid, **kwargs):
 	99 - You have not yet done an automatic refresh
 	"""
 	current_time = datetime.now(tz=common.TZ_SH)
-	refresh_time = await common.get_timer(uid, enums.Timer.DARK_MARKET_TIME, **kwargs)
-	refreshable = await common.get_limit(uid, enums.Limits.DARK_MARKET_LIMITS, **kwargs)
+	refresh_time = await common.get_timer(uid, enums.Timer.DARK_MARKET, **kwargs)
+	refreshable = await common.get_limit(uid, enums.Limits.DARK_MARKET, **kwargs)
 	config = kwargs['config']['player']['dark_market']
 	lim = config['constraint']['refreshable']
 	refresh_hours = config['constraint']['refresh_hours']
@@ -159,8 +159,8 @@ async def free_refresh(uid, **kwargs):
 		cooling = 3600 * refresh_hours - int((current_time - refresh_time).total_seconds())
 		refreshable -= 1
 		dark_markets = await refresh_darkmarket(uid, **kwargs)
-		await common.set_timer(uid, enums.Timer.DARK_MARKET_TIME, refresh_time, **kwargs)
-		await common.set_limit(uid, enums.Limits.DARK_MARKET_LIMITS, refreshable, **kwargs)
+		await common.set_timer(uid, enums.Timer.DARK_MARKET, refresh_time, **kwargs)
+		await common.set_limit(uid, enums.Limits.DARK_MARKET, refreshable, **kwargs)
 		_, current_diamond = await common.try_item(uid, enums.Item.DIAMOND, 0, **kwargs)
 		return common.mt(0, 'Dark market refreshed successfully', {'dark_markets': dark_markets, \
 				'diamond' : {'remaining' : current_diamond, 'reward' : 0}, \

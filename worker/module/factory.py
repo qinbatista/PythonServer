@@ -11,8 +11,12 @@ from module import task
 from module import achievement
 from datetime import datetime, timedelta
 
-BASIC_FACTORIES      = {enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None, \
-                        enums.Factory.IRON    : None, enums.Factory.FOOD  : None}
+BASIC_FACTORIES      = {enums.Factory.IRON    : None, enums.Factory.ARMOR : None,
+                        enums.Factory.CRYSTAL : None, enums.Factory.FOOD  : None}
+
+# BASIC_FACTORIES      = {enums.Factory.CRYSTAL : None,
+#                         enums.Factory.IRON : None,
+#                         enums.Factory.FOOD : None}
 
 RESOURCE_FACTORIES   = {enums.Factory.FOOD: enums.Item.FOOD,
                         enums.Factory.IRON: enums.Item.IRON,
@@ -256,28 +260,36 @@ def update_state(steps, level, worker, storage, **kwargs):
     # config = kwargs['config']['factory']['general']['storage_limits']
     # storage = {k: min(config[f'{k}']['1' if k == enums.Factory.ARMOR else f'{level[k]}'], int(v * multiple)) if k in BASIC_FACTORIES else v for k, v in storage.items()}
     # delta = {k: storage[k] - initial_storage[k] for k in storage}
-    fcg = kwargs['config']['factory']['general']  # factory config general
-    initial_storage, lmd = {k: v for k, v in storage.items()}, {}
-    for factory in initial_storage.keys():
-        if factory in BASIC_FACTORIES:
-            # cmv: cost multiple value  cfk: cost factory key
-            km = '1' if factory == enums.Factory.ARMOR else f'{level[factory]}'
-            lmd[factory] = fcg['storage_limits'][f'{factory}'][km]
-            cost, cmv = {}, steps * worker[factory]
-            for cf, cv in fcg['costs'][f'{factory}'].items():
-                cfk = enums.Factory(int(cf))
-                cmv, cost[cfk] = min(storage[cfk] // cv, cmv, lmd[factory] - storage[factory]), cv
-            storage[factory] += cmv
-            for cf, cv in cost.items():
-                storage[cf] -= cv * cmv
-    storage = {k: lmd[k] if (k in BASIC_FACTORIES and lmd[k] < v) else v for k, v in storage.items()}
+    # fcg = factory config general
+    # lmd: limit data
+    # cmv: cost multiple value
+    # cfk: cost factory key
+    # km: kind limit
+    # ctd: cost data
+    # cfv: consume food value
+    # cms: common step
+    fcg = kwargs['config']['factory']['general']
+    fid = enums.Factory.FOOD
+    initial_storage = {k: v for k, v in storage.items()}
+    lmd = {f: fcg['storage_limits'][f'{f}']['1' if f == enums.Factory.ARMOR else f'{level[f]}'] for f in BASIC_FACTORIES}
+    ctd = {f: fcg['costs'].get(f'{f}', {}) for f in BASIC_FACTORIES}
+    cfv = worker[fid] - sum([ct.get(f'{fid}', 0) for ct in ctd.values()])  # excel:与配置食物消耗一致
+    cms = 0 if (cfv == 0 or storage[fid] // cfv <= 0) else storage[fid] // cfv  # 大于此数需要进行调整
+    if steps > cms:
+        steps = steps - cms
+        storage[fid] += cfv * cms
+        for f in BASIC_FACTORIES:
+            if f != fid:
+                storage[f] += worker[f] * cms
+    storage[fid] += steps * worker[fid]
+    for f in BASIC_FACTORIES:
+        if f != fid:
+            ct = ctd[f].get(f'{fid}', 1)
+            var = min(lmd[f]-storage[f], storage[fid]//ct, worker[f]*steps)
+            storage[f] += var
+            storage[fid] -= var * ct
     delta = {k: storage[k] - initial_storage[k] for k in storage}
     return storage, delta
-
-def step(level, worker, current, **kwargs):
-    """单次的步骤，计算每个工厂单个工人每步的生产效果，单位:(每步/每人/每个)"""
-    for factory in BASIC_FACTORIES:
-        current[factory] += sum([1 if can_produce(current, factory, level, **kwargs) else 0 for _ in range(worker[factory])])
 
 def can_produce(current, factory, level, **kwargs):
     """计算工厂当前的是否可生产，可生产的情况下扣除需要扣除的基本材料"""

@@ -434,7 +434,7 @@ async def _record_family_change(name, msg, **kwargs):
 
 async def _get_member_info(name, **kwargs):
 	# await __insert(name, **kwargs)
-	data = await common.execute(f'SELECT player.gn, progress.rid, familyrole.role, progress.exp, timer.time, item.value, i2.value FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid join timer on timer.uid = familyrole.uid and timer.tid={enums.Timer.LOGIN_TIME} join item on item.uid = familyrole.uid and item.iid ={enums.Item.FAMILY_COIN} join item as i2 on i2.uid = familyrole.uid and i2.iid ={enums.Item.FAMILY_COIN_RECORD} WHERE familyrole.name = "{name}";', **kwargs)
+	data = await common.execute(f'SELECT player.gn, progress.rid, familyrole.role, progress.exp, timer.time, item.value, i2.value FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid join timer on timer.uid = familyrole.uid and timer.tid={enums.Timer.LOGIN} join item on item.uid = familyrole.uid and item.iid ={enums.Item.FAMILY_COIN} join item as i2 on i2.uid = familyrole.uid and i2.iid ={enums.Item.FAMILY_COIN_RECORD} WHERE familyrole.name = "{name}";', **kwargs)
 	return [{'gn' : m[0], 'player_role' : m[1], 'family_role' : m[2], 'exp' : m[3], 'last_login' : m[4], 'family_coin' : m[5], 'family_coin_record' : m[6]} for m in data]
 
 async def _get_family_info(name, *args, **kwargs):
@@ -499,7 +499,7 @@ async def increase_exp(name, exp, **kwargs):
 async def __insert(name, **kwargs):
 	"""没有这个登录时间和贡献记录，返回的数据不全数据"""
 	await asyncio.gather(
-		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.LOGIN_TIME}, "{datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d")}" FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE timer.tid=`tid`;', **kwargs),
+		common.execute(f'INSERT INTO timer (uid, tid, time) SELECT familyrole.uid, {enums.Timer.LOGIN}, "{datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d")}" FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE timer.tid=`tid`;', **kwargs),
 		common.execute(f'INSERT INTO item (uid, iid) SELECT familyrole.uid, {enums.Item.FAMILY_COIN} FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE iid=`iid`;', **kwargs),
 		common.execute(f'INSERT INTO item (uid, iid) SELECT familyrole.uid, {enums.Item.FAMILY_COIN_RECORD} FROM familyrole WHERE name="{name}" ON DUPLICATE KEY UPDATE iid=`iid`;', **kwargs)
 	)

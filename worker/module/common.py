@@ -238,13 +238,13 @@ async def try_energy(uid, amount, **kwargs):
 	sql_energy = max_energy if sql_energy is None else sql_energy
 	now100 = datetime.now(tz=TZ_SH) + timedelta(days=36500)
 	if sql_energy >= max_energy:
-		await set_timer(uid, enums.Timer.ENERGY_RECOVER_TIME, now100, **kwargs)
+		await set_timer(uid, enums.Timer.ENERGY_RECOVER, now100, **kwargs)
 	if amount > 0:  # 购买能量
 		data = (await _decrease_energy(uid, 0, sql_energy, max_energy, **kwargs))['data']
 		sql_energy += amount
 		await set_progress(uid, 'energy', sql_energy, **kwargs)
 		if sql_energy >= max_energy:
-			await set_timer(uid, enums.Timer.ENERGY_RECOVER_TIME, now100, **kwargs)
+			await set_timer(uid, enums.Timer.ENERGY_RECOVER, now100, **kwargs)
 			return mt(0, "Purchase energy successfully", {'energy': sql_energy, 'recover_time': '', 'cooling_time': -1})
 		else:
 			data['energy'] = sql_energy
@@ -258,7 +258,7 @@ async def try_energy(uid, amount, **kwargs):
 async def _decrease_energy(uid, amount, sql_energy, max_energy, **kwargs) -> dict:
 	_cooling, now = kwargs['config']['player']['energy']['cooling_time'] * 60, datetime.now(tz=TZ_SH)
 	cooling, now100 = _cooling, now + timedelta(days=36500)
-	tim = await get_timer(uid, enums.Timer.ENERGY_RECOVER_TIME, **kwargs)
+	tim = await get_timer(uid, enums.Timer.ENERGY_RECOVER, **kwargs)
 	tim = now if tim is None else tim
 	if tim >= now:
 		"""满能量状态"""
@@ -305,7 +305,7 @@ async def _decrease_energy(uid, amount, sql_energy, max_energy, **kwargs) -> dic
 
 async def __update_energy(uid, energy, tim, **kwargs):
 	await set_progress(uid, 'energy', energy, **kwargs)
-	await set_timer(uid, enums.Timer.ENERGY_RECOVER_TIME, tim, **kwargs)
+	await set_timer(uid, enums.Timer.ENERGY_RECOVER, tim, **kwargs)
 
 
 def mt(status, message, data={}):

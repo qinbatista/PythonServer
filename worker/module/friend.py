@@ -56,7 +56,7 @@ async def request(uid, gn_target, **kwargs):
     if sent[uid_target]['status'] != 0:
         return common.mt(98, 'could not send mail')
     await achievement.record(uid, enums.Achievement.FRIEND_REQUEST, **kwargs)
-    await common.execute(f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, value+1) ON DUPLICATE KEY UPDATE value = value+1;', **kwargs)
+    await common.execute(f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND}, value+1) ON DUPLICATE KEY UPDATE value = value+1;', **kwargs)
     return common.mt(0, 'request sent', {'gn': gn_target})
 
 
@@ -157,14 +157,14 @@ def _can_send_gift(now, recover):
 async def _is_request_max(uid, **kwargs):
     now = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d')
     data = await common.execute(
-        f"SELECT limits.value, timer.time FROM limits JOIN timer ON limits.uid = timer.uid WHERE limits.uid='{uid}' and limits.lid={enums.Limits.REQUEST_FRIEND_LIMITS} and timer.tid={enums.Timer.REQUEST_FRIEND_TIME}",
+        f"SELECT limits.value, timer.time FROM limits JOIN timer ON limits.uid = timer.uid WHERE limits.uid='{uid}' and limits.lid={enums.Limits.REQUEST_FRIEND} and timer.tid={enums.Timer.REQUEST_FRIEND}",
         **kwargs)
     if data == ():
         await common.execute(
-            f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, 0) ON DUPLICATE KEY UPDATE value = 0;',
+            f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND}, 0) ON DUPLICATE KEY UPDATE value = 0;',
             **kwargs)
         await common.execute(
-            f'INSERT INTO timer(uid, tid, time) VALUES ("{uid}", {enums.Timer.REQUEST_FRIEND_TIME}, "{now}") ON DUPLICATE KEY UPDATE time = "{now}";',
+            f'INSERT INTO timer(uid, tid, time) VALUES ("{uid}", {enums.Timer.REQUEST_FRIEND}, "{now}") ON DUPLICATE KEY UPDATE time = "{now}";',
             **kwargs)
         count, record_time = 0, now
     else:
@@ -174,10 +174,10 @@ async def _is_request_max(uid, **kwargs):
         tzinfo=common.TZ_SH)
     if delta_time.days >= 1:
         await common.execute(
-            f'INSERT INTO timer(uid, tid, time) VALUES ("{uid}", {enums.Timer.REQUEST_FRIEND_TIME}, "{now}") ON DUPLICATE KEY UPDATE time = "{now}";',
+            f'INSERT INTO timer(uid, tid, time) VALUES ("{uid}", {enums.Timer.REQUEST_FRIEND}, "{now}") ON DUPLICATE KEY UPDATE time = "{now}";',
             **kwargs)
         await common.execute(
-            f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND_LIMITS}, 0) ON DUPLICATE KEY UPDATE value = 0;',
+            f'INSERT INTO limits(uid, lid, value) VALUES ("{uid}", {enums.Limits.REQUEST_FRIEND}, 0) ON DUPLICATE KEY UPDATE value = 0;',
             **kwargs)
     if delta_time.days < 1 and count <= 5:
         return False

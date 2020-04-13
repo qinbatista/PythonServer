@@ -340,26 +340,19 @@ class ArmorTier(enum.IntEnum):
 
 
 class Timer(enum.IntEnum):
-    HANG_UP_TIME = 1
-    DAILY_REWARD_TIME = 2
-    TASK_TIME = 3
-    ADD_FRIENDS_TIME = 4
-    DARK_MARKET_TIME = 5
-    WORLD_BOSS_CHALLENGE_TIME = 6
+    DARK_MARKET = 5
     FAMILY_CHECK_IN = 7
-    FAMILY_REMOVE_USER_TIME = 8
     FAMILY_DISBAND = 9
-    FAMILY_LEAVE_TIME = 10
-    ENERGY_RECOVER_TIME = 11
-    LOGIN_TIME = 12
+    ENERGY_RECOVER = 11
+    LOGIN = 12
     FACTORY_REFRESH = 13
     FACTORY_ACCELERATION_START = 14
     FACTORY_ACCELERATION_END = 15
     FACTORY_WISHING_POOL = 16
-    VIP_MIN_END_TIME = 17  # VIP小月卡结束时间
-    VIP_MAX_END_TIME = 18  # VIP大月卡结束时间
-    REQUEST_FRIEND_TIME = 19
-    VIP_COOLING_TIME = 20  # VIP礼包领取冷却结束时间
+    VIP_MIN_END = 17  # VIP小月卡结束时间
+    VIP_MAX_END = 18  # VIP大月卡结束时间
+    REQUEST_FRIEND = 19
+    VIP_COOLING = 20  # VIP礼包领取冷却结束时间
     CONTINUOUS_LOGIN = 21
     MAIL_LAST_SENT = 22  # last time user sent SIMPLE mail to another player
     FAMILY_JOIN_END = 23  # 玩家退出工会后可以再次加入工会的结束时间
@@ -385,14 +378,9 @@ class Timer(enum.IntEnum):
 
 
 class Limits(enum.IntEnum):
-    DARK_MARKET_LIMITS = 1
-    ADD_FRIENDS_LIMITS = 2
-    WORLD_BOSS_CHALLENGE_LIMITS = 3
-    FAMILY_REMOVE_USER_LIMITS = 4
+    DARK_MARKET = 1
     FACTORY_WISHING_POOL = 5
-    REQUEST_FRIEND_LIMITS = 6
-    BUY_ENERGY_LIMITS = 7  # 购买体力上限次数键
-    BUY_STAGE_LIMITS = 8  # 购买副本上限次数键
+    REQUEST_FRIEND = 6
     MAIL_DAILY_SEND = 9
     FAMILY_NOTICE = 10  # 管理员可以发布公告的剩余次数
     FAMILY_INVITE = 11  # 管理员可以邀请成员的剩余次数
@@ -470,6 +458,7 @@ class Factory(enum.IntEnum):
 
 class LeaderBoard(enum.IntEnum):
     WORLD_BOSS = 1
+    TOTAL_WB = 2
 
 
 class Science(enum.IntEnum):

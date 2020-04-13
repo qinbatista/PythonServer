@@ -31,7 +31,7 @@
 			"BOSS": {
 				"comment": "limit是每天能进入BOSS关卡的次数,damage是对BOSS造成的最高伤害",
 				"limit": 3,
-				"damage": 200000,
+				"damage": 500000,
 				"buy": {
 					"comment": "diamond是购买BOSS挑战需要消耗的钻石,vip是vip相应等级下可购买的次数",
 					"diamond": 50,
@@ -1104,7 +1104,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1128,7 +1128,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1152,7 +1152,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1176,7 +1176,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1200,7 +1200,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1224,7 +1224,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1248,7 +1248,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1272,7 +1272,7 @@
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1290,16 +1290,16 @@
 		},
 		"3001": {
 			"boss": {
-				"HP": 10000
+				"HP": 10000000
 			},
 			"constraint": {
 				"random": 0,
-				"level": 0
+				"level": 24
 			},
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1310,23 +1310,23 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
+					"exp": 0
 				},
 				"random": 0
 			}
 		},
 		"3002": {
 			"boss": {
-				"HP": 100000
+				"HP": 30000000
 			},
 			"constraint": {
 				"random": 0,
-				"level": 0
+				"level": 24
 			},
 			"consumes": {
 				"common": [],
 				"special": {
-					"energy": 6
+					"energy": 0
 				}
 			},
 			"rewards": {
@@ -1337,88 +1337,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
-				},
-				"random": 0
-			}
-		},
-		"3003": {
-			"boss": {
-				"HP": 1000000
-			},
-			"constraint": {
-				"random": 0,
-				"level": 0
-			},
-			"consumes": {
-				"common": [],
-				"special": {
-					"energy": 6
-				}
-			},
-			"rewards": {
-				"common": [
-					"3:9:125",
-					"3:2:125",
-					"3:1:375",
-					"3:10:1"
-				],
-				"special": {
-					"exp": 120
-				},
-				"random": 0
-			}
-		},
-		"3004": {
-			"boss": {
-				"HP": 10000000
-			},
-			"constraint": {
-				"random": 0,
-				"level": 0
-			},
-			"consumes": {
-				"common": [],
-				"special": {
-					"energy": 6
-				}
-			},
-			"rewards": {
-				"common": [
-					"3:9:125",
-					"3:2:125",
-					"3:1:375",
-					"3:10:1"
-				],
-				"special": {
-					"exp": 120
-				},
-				"random": 0
-			}
-		},
-		"3005": {
-			"boss": {
-				"HP": 100000000
-			},
-			"constraint": {
-				"random": 0,
-				"level": 0
-			},
-			"consumes": {
-				"common": [],
-				"special": {
-					"energy": 6
-				}
-			},
-			"rewards": {
-				"common": [
-					"3:9:125",
-					"3:2:125",
-					"3:1:375",
-					"3:10:1"
-				],
-				"special": {
-					"exp": 120
+					"exp": 0
 				},
 				"random": 0
 			}

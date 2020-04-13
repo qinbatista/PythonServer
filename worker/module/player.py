@@ -9,6 +9,7 @@ from module import stage
 from module import science
 from module import summoning
 from module import account
+from module import package
 from datetime import datetime, timedelta
 import asyncio
 import re
@@ -98,10 +99,11 @@ async def get_info(uid, **kwargs):
     exp = await common.get_progress(uid, 'exp', **kwargs)
     es = await _element_all(uid, **kwargs)
     elm = await common.get_limit(uid, enums.Limits.PLAYER_ELEMENT, **kwargs)
+    bel = await package.get_lim(uid, enums.Timer.PACKAGE_ENERGY, enums.Limits.PACKAGE_ENERGY, len(package.DIAMONDS), **kwargs)
     return common.mt(0, 'success',
                      {'gn': gn, 'fn': fn or '', 'energy_info': energy['data'],
                       'stages': stages['data'], 'exp': exp, 'elements': es,
-                      'elm': elm})
+                      'elm': elm, 'bel': bel, 'cd': common.remaining_cd()})
 
 
 async def get_all_resource(uid, **kwargs):

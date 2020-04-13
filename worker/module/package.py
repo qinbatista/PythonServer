@@ -35,25 +35,32 @@ SCROLL = {
 DIAMONDS = [30, 60, 90, 120, 150, 180]
 
 
-async def buy_energy(uid, **kwargs):
+async def get_lim(uid, tid, lid, top, **kwargs):
 	now = datetime.now(tz=common.TZ_SH)
-	lid, tid = enums.Limits.PACKAGE_ENERGY, enums.Timer.PACKAGE_ENERGY
 	lim = await common.get_limit(uid, lid, **kwargs)
 	tim = await common.get_timer(uid, tid, timeformat='%Y-%m-%d', **kwargs)
 	if tim is None or tim < now:
-		tim, lim = now + timedelta(days=1), 0
-	if lim >= len(DIAMONDS):
+		tim, lim = now + timedelta(days=1), top
+		await common.set_limit(uid, lid, lim, **kwargs)
+		await common.set_timer(uid, tid, tim, timeformat='%Y-%m-%d', **kwargs)
+	return lim
+
+
+async def buy_energy(uid, **kwargs):
+	top = len(DIAMONDS)
+	lid, tid = enums.Limits.PACKAGE_ENERGY, enums.Timer.PACKAGE_ENERGY
+	lim = await get_lim(uid, tid, lid, top, **kwargs) - 1
+	if lim < 0:
 		return common.mt(98, 'Insufficient purchase times')
-	drw, erw = 30, DIAMONDS[lim]
+	drw, erw = DIAMONDS[top - lim - 1], 30
 	can, drm = await common.try_item(uid, enums.Item.DIAMOND, -drw, **kwargs)
 	if not can:
 		return common.mt(99, 'Insufficient materials')
 	energy = (await common.try_energy(uid, erw, **kwargs))['data']
-	await common.set_limit(uid, lid, lim + 1, **kwargs)
-	await common.set_timer(uid, tid, tim, timeformat='%Y-%m-%d', **kwargs)
+	await common.set_limit(uid, lid, lim, **kwargs)
 	return common.mt(0, 'success', {'diamond': {'remain': drm, 'reward': drw},
 	                                'energy': {**energy, 'reward': erw},
-	                                'lim': lim + 1, 'cd': common.remaining_cd()})
+	                                'lim': lim, 'cd': common.remaining_cd()})
 
 
 async def buy_coin(uid, qty, **kwargs):

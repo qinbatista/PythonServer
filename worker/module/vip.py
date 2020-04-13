@@ -19,16 +19,16 @@ async def get_info(uid, **kwargs):
 	min_card, max_card, perpetual_card = await check_card(uid, **kwargs)
 	min_seconds, max_seconds = 0, 0
 	if min_card:
-		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END_TIME.value}";', **kwargs)
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END.value}";', **kwargs)
 		min_seconds = int((datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
 	if max_card:
-		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MAX_END.value}";', **kwargs)
 		max_seconds = int((datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
 
-	timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+	timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING.value}";', **kwargs)
 	if timer == ():
-		await common.execute(f'INSERT INTO timer (uid, tid) VALUE ("{uid}", "{enums.Timer.VIP_COOLING_TIME.value}");', **kwargs)
-		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+		await common.execute(f'INSERT INTO timer (uid, tid) VALUE ("{uid}", "{enums.Timer.VIP_COOLING.value}");', **kwargs)
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING.value}";', **kwargs)
 	cooling_time = -1
 	if timer[0][0] != '':
 		cooling_time = int((datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=common.TZ_SH) - datetime.now(tz=common.TZ_SH)).total_seconds())
@@ -43,10 +43,10 @@ async def get_daily_reward(uid, **kwargs):
 	"""
 	config = kwargs['config']['vip']
 	current = datetime.now(tz=common.TZ_SH)
-	timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+	timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING.value}";', **kwargs)
 	if timer == ():
-		await common.execute(f'INSERT INTO timer (uid, tid) VALUE ("{uid}", "{enums.Timer.VIP_COOLING_TIME.value}");', **kwargs)
-		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+		await common.execute(f'INSERT INTO timer (uid, tid) VALUE ("{uid}", "{enums.Timer.VIP_COOLING.value}");', **kwargs)
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING.value}";', **kwargs)
 	if timer[0][0] != '' and current < datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=common.TZ_SH):
 		return common.mt(99, 'The cooling time is not over')
 
@@ -71,7 +71,7 @@ async def get_daily_reward(uid, **kwargs):
 		data['reward']['perpetual_card']['item'] = reward
 	if exp_info == {}: return common.mt(98, "You're not a VIP")
 	current = (current + timedelta(seconds=config["vip_daily_reward"].get("cooling_time", 86400))).strftime("%Y-%m-%d %H:%M:%S")
-	await common.execute(f'UPDATE timer SET time="{current}" WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING_TIME.value}";', **kwargs)
+	await common.execute(f'UPDATE timer SET time="{current}" WHERE uid="{uid}" AND tid="{enums.Timer.VIP_COOLING.value}";', **kwargs)
 	data['remaining']['exp_info'] = exp_info
 	return common.mt(0, 'success', data)
 
@@ -123,7 +123,7 @@ async def buy_card(uid, cid, **kwargs):
 	seconds = -1
 	await common.execute(f'UPDATE item SET value=1 WHERE uid="{uid}" AND iid={cid};', **kwargs)
 	if cid != enums.Item.VIP_CARD_PERPETUAL.value:
-		tid = enums.Timer.VIP_MIN_END_TIME.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END_TIME.value
+		tid = enums.Timer.VIP_MIN_END.value if cid == enums.Item.VIP_CARD_MIN.value else enums.Timer.VIP_MAX_END.value
 		current = datetime.now(tz=common.TZ_SH)
 		if min_card and cid == enums.Item.VIP_CARD_MIN.value or max_card and cid == enums.Item.VIP_CARD_MAX.value:
 			timer = (await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{tid}";', **kwargs))[0][0]
@@ -145,9 +145,9 @@ async def check_card(uid, **kwargs):
 	item = await common.execute(f'SELECT value FROM item WHERE uid="{uid}" AND iid="{enums.Item.VIP_CARD_MIN.value}";', **kwargs)
 	if item == ():
 		await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", "{enums.Item.VIP_CARD_MIN.value}", 0);', **kwargs)
-		await common.execute(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.VIP_MIN_END_TIME.value}");', **kwargs)
+		await common.execute(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.VIP_MIN_END.value}");', **kwargs)
 	else:
-		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END_TIME.value}";', **kwargs)
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MIN_END.value}";', **kwargs)
 		if timer == (): await common.execute(f'DELETE FROM item WHERE uid="{uid}" AND iid="{enums.Item.VIP_CARD_MIN.value}";', **kwargs)
 		elif timer[0][0] == '': pass
 		else: min_card = datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=common.TZ_SH) > current
@@ -156,9 +156,9 @@ async def check_card(uid, **kwargs):
 	item = await common.execute(f'SELECT value FROM item WHERE uid="{uid}" AND iid="{enums.Item.VIP_CARD_MAX.value}";', **kwargs)
 	if item == ():
 		await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", "{enums.Item.VIP_CARD_MAX.value}", 0);', **kwargs)
-		await common.execute(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.VIP_MAX_END_TIME.value}");', **kwargs)
+		await common.execute(f'INSERT INTO timer (uid, tid) VALUES ("{uid}", "{enums.Timer.VIP_MAX_END.value}");', **kwargs)
 	else:
-		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MAX_END_TIME.value}";', **kwargs)
+		timer = await common.execute(f'SELECT time FROM timer WHERE uid="{uid}" AND tid="{enums.Timer.VIP_MAX_END.value}";', **kwargs)
 		if timer == (): await common.execute(f'DELETE FROM item WHERE uid="{uid}" AND iid="{enums.Item.VIP_CARD_MAX.value}";', **kwargs)
 		elif timer[0][0] == '': pass
 		else: max_card = datetime.strptime(timer[0][0], '%Y-%m-%d %H:%M:%S').replace(tzinfo=common.TZ_SH) > current

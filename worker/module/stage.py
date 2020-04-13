@@ -138,6 +138,7 @@ async def refresh_boss(uid, **kwargs):
     ratio = {s: "%.2f" % (hp / config['HP'][s]) for s, hp in
              config['hp'].items()}
     damage = await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
+    total = await get_leaderboard(uid, enums.LeaderBoard.TOTAL_WB, **kwargs)
     tid, lid = enums.Timer.STAGE_WORLD_BOSS, enums.Limits.STAGE_WORLD_BOSS
     tim = await common.get_timer(uid, tid, timeformat='%Y-%m-%d', **kwargs)
     lim = await common.get_limit(uid, lid, **kwargs)
@@ -148,48 +149,62 @@ async def refresh_boss(uid, **kwargs):
     return common.mt(0, 'Successfully get hook information',
                      {'damage': damage, 'limit': lim, 'cd': common.remaining_cd(),
                       'mcd': common.remaining_month_cd(), 'ratio': ratio,
-                      'hp': config['hp']})
+                      'hp': config['hp'], 'total': total})
 
 
 async def all_infos(uid, **kwargs):
     """获取所有的关卡信息"""
     sts = await common.execute(f'SELECT `sid`, `stage` FROM `stages` WHERE `uid` = "{uid}";', **kwargs)
-    ds = {s[0]: s[1] for s in sts}
-    return common.mt(0, 'success', ds)
+    infos = {s[0]: s[1] for s in sts}
+    limits = {f'{sid}': {k: v + 1 for k, v in (await VERIFY[sid](uid, **kwargs))[2].items()} for sid in VERIFY}
+    return common.mt(0, 'success', {'infos': infos, 'limits': limits})
 
 
 async def damage_ranking(uid, page, **kwargs):
     if page < 1:
         return common.mt(89, 'Page number error')
-    uid_str = f"""
-    SELECT c.value, c.NO FROM (
-        SELECT * FROM (
-            SELECT p.gn, l.value, (@i:=@i + 1) AS NO
-            FROM player p, leaderboard l
-            WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS.value} ORDER BY l.value DESC) temp,
-            (SELECT (@i:=0)) t ORDER BY temp.`value` DESC
-        ) c, player p
-    WHERE p.uid = "{uid}" AND c.gn = p.gn
-    """
-    damage = 0  # 玩家造成的伤害
-    ranking = -1  # 玩家在世界boss表中的排行
-    cached_uid_data = await kwargs['redis'].hgetall(f'leaderboard.player.{kwargs["world"]}.{uid}')
-    if len(cached_uid_data) == 0:
-        uid_data = await common.execute(uid_str, **kwargs)
-        if uid_data != ():
-            damage = uid_data[0][0]
-            if uid_data[0][1] is None: uid_data = await common.execute(uid_str, **kwargs)
-            ranking = int(uid_data[0][1])
-            await kwargs['redis'].hmset_dict(f'leaderboard.player.{kwargs["world"]}.{uid}',
-                                             {'damage' : uid_data[0][0], 'rank': int(uid_data[0][1])})
-            await kwargs['redis'].expire(f'leaderboard.player.{kwargs["world"]}.{uid}', 30)
-    else:
-        damage, ranking = cached_uid_data['damage'], int(cached_uid_data['rank'])
+    lid = enums.LeaderBoard.WORLD_BOSS
+    total_lid = enums.LeaderBoard.TOTAL_WB
+    rks = f'leaderboard.player.{kwargs["world"]}.{uid}'
+    rds = await kwargs['redis'].hgetall(rks)
+    if len(rds) == 0:
+        ds = await rank_own(uid, lid, **kwargs)
+        tds = await rank_own(uid, total_lid, **kwargs)
+        if ds is not None and (ds[1] is None or tds[1] is None):
+            ds = await rank_own(uid, lid, **kwargs)
+            tds = await rank_own(uid, total_lid, **kwargs)
+        rds = {f'{lid}': {'damage' : ds[0], 'rank': ds[1]},  # 玩家造成的伤害和排行
+               f'{total_lid}': {'damage' : tds[0], 'rank': tds[1]}}
+        await kwargs['redis'].hmset_dict(rks, rds)
+        await kwargs['redis'].expire(rks, 30)
+    ads = await rank_all(total_lid, page, **kwargs)
+    if ads is None: return common.mt(88, 'No data for this page')
+    rank = [{'NO': (page - 1)*10 + 1 + i, 'name': d[0],
+            'damage': d[1], 'fid': d[2] or '',
+             'level': (await increase_exp(d[3], 0, **kwargs))['level']} for i, d in enumerate(ads)]
+    return common.mt(0, 'success', {'page': page, 'own_rank': rds, 'rank': rank})
 
-    data = await common.execute(f'SELECT p.gn, l.value, p.fid, p.uid FROM player p, leaderboard l WHERE p.uid = l.uid AND l.lid = {enums.LeaderBoard.WORLD_BOSS} ORDER BY l.value DESC LIMIT {(page - 1)*10},10;', **kwargs)
-    if data == (): return common.mt(88, 'No data for this page')
-    rank = [{'NO': (page - 1)*10 + 1 + i, 'name': d[0], 'damage': d[1], 'fid': '' if d[2] is None else d[2], 'level': (await increase_exp(d[3], 0, **kwargs))['level']} for i, d in enumerate(data)]
-    return common.mt(0, 'success', {'page': page, 'damage': damage, 'ranking': ranking, 'rank': rank})
+
+async def rank_all(lid, page, **kwargs):
+    data = await common.execute(f'SELECT p.gn, l.value, p.fid, p.uid FROM '
+                                f'player p, leaderboard l WHERE p.uid = l.uid '
+                                f'AND l.lid = {lid} ORDER BY l.value DESC '
+                                f'LIMIT {(page - 1)*10},10;', **kwargs)
+    return None if data == () else data
+
+
+async def rank_own(uid, lid, **kwargs):
+    sql = \
+        f"""SELECT c.value, c.NO FROM (
+            SELECT * FROM (
+                SELECT p.gn, l.value, (@i:=@i + 1) AS NO
+                FROM player p, leaderboard l
+                WHERE p.uid = l.uid AND l.lid = {lid} ORDER BY l.value DESC) temp,
+                (SELECT (@i:=0)) t ORDER BY temp.`value` DESC
+            ) c, player p
+        WHERE p.uid = "{uid}" AND c.gn = p.gn"""
+    data = await common.execute(sql, **kwargs)
+    return None if data == () else data[0]
 
 
 async def hang_up(uid, new=True, **kwargs):
@@ -241,7 +256,10 @@ async def g_dispose(uid, stage, _stage, **kwargs):
 
 async def b_dispose(uid, stage, damage, results, **kwargs):
     """BOSS伤害记录等信息处理"""
-    config, _damage = kwargs['config']['boss'], await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
+    config = kwargs['config']['boss']
+    _damage = await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
+    total = await get_leaderboard(uid, enums.LeaderBoard.TOTAL_WB, **kwargs) + damage
+    await set_leaderboard(uid, enums.LeaderBoard.TOTAL_WB, total, **kwargs)
     record = _damage < damage
     if damage < 0 or damage >= kwargs['config']['boss'].get('damage', 100_0000):
         return 93, "abnormal damage"
@@ -252,7 +270,8 @@ async def b_dispose(uid, stage, damage, results, **kwargs):
             await set_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, damage, **kwargs)
         ratio = {s: "%.2f" % (h/config['HP'][s]) for s, h in config['hp'].items()}
         results['boss'] = {'ratio': ratio, 'record': int(record),
-                           'damage': max(damage, _damage), 'hp': config['hp']}
+                           'damage': max(damage, _damage), 'hp': config['hp'],
+                           'total': total}
         await task.record(uid, enums.Task.PASS_WORLD_BOSS, **kwargs)
 
 
