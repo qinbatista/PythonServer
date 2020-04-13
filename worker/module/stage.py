@@ -10,6 +10,7 @@ from module import summoning
 from module import vip
 from datetime import datetime, timedelta
 import random
+import json
 import asyncio
 # TODO 2020年1月14日
 # ##################################################################
@@ -136,7 +137,7 @@ async def refresh_boss(uid, **kwargs):
     config = kwargs['config']['boss']
     now = datetime.now(tz=common.TZ_SH)
     ratio = {s: "%.2f" % (hp / config['HP'][s]) for s, hp in
-             config['hp'].items()}
+             config['hp'][kwargs['world']].items()}
     damage = await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
     total = await get_leaderboard(uid, enums.LeaderBoard.TOTAL_WB, **kwargs)
     tid, lid = enums.Timer.STAGE_WORLD_BOSS, enums.Limits.STAGE_WORLD_BOSS
@@ -149,7 +150,7 @@ async def refresh_boss(uid, **kwargs):
     return common.mt(0, 'Successfully get hook information',
                      {'damage': damage, 'limit': lim, 'cd': common.remaining_cd(),
                       'mcd': common.remaining_month_cd(), 'ratio': ratio,
-                      'hp': config['hp'], 'total': total})
+                      'hp': config['hp'][kwargs['world']], 'total': total})
 
 
 async def all_infos(uid, **kwargs):
@@ -166,8 +167,8 @@ async def damage_ranking(uid, page, **kwargs):
     lid = enums.LeaderBoard.WORLD_BOSS
     total_lid = enums.LeaderBoard.TOTAL_WB
     rks = f'leaderboard.player.{kwargs["world"]}.{uid}'
-    rds = await kwargs['redis'].hgetall(rks)
-    if len(rds) == 0:
+    rds = await kwargs['redis'].get(rks)
+    if rds is None:
         ds = await rank_own(uid, lid, **kwargs)
         tds = await rank_own(uid, total_lid, **kwargs)
         if ds is not None and (ds[1] is None or tds[1] is None):
@@ -175,8 +176,9 @@ async def damage_ranking(uid, page, **kwargs):
             tds = await rank_own(uid, total_lid, **kwargs)
         rds = {f'{lid}': {'damage' : ds[0], 'rank': ds[1]},  # 玩家造成的伤害和排行
                f'{total_lid}': {'damage' : tds[0], 'rank': tds[1]}}
-        await kwargs['redis'].hmset_dict(rks, rds)
-        await kwargs['redis'].expire(rks, 30)
+        await kwargs['redis'].set(rks, json.dumps(rds), expire=30)
+    else:
+        rds = json.loads(rds)
     ads = await rank_all(total_lid, page, **kwargs)
     if ads is None: return common.mt(88, 'No data for this page')
     rank = [{'NO': (page - 1)*10 + 1 + i, 'name': d[0],
@@ -257,27 +259,29 @@ async def g_dispose(uid, stage, _stage, **kwargs):
 async def b_dispose(uid, stage, damage, results, **kwargs):
     """BOSS伤害记录等信息处理"""
     config = kwargs['config']['boss']
+    boss_hp = config['hp'][kwargs['world']]
     _damage = await get_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, **kwargs)
     total = await get_leaderboard(uid, enums.LeaderBoard.TOTAL_WB, **kwargs) + damage
     await set_leaderboard(uid, enums.LeaderBoard.TOTAL_WB, total, **kwargs)
+    damage = min(damage, kwargs['config']['boss'].get('damage', 100_0000))
     record = _damage < damage
-    if damage < 0 or damage >= kwargs['config']['boss'].get('damage', 100_0000):
-        return 93, "abnormal damage"
-    else:
-        hp = max(0, config['hp'][f'{stage}'] - damage)
-        config['hp'][f'{stage}'] = hp
-        if record:
-            await set_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, damage, **kwargs)
-        ratio = {s: "%.2f" % (h/config['HP'][s]) for s, h in config['hp'].items()}
-        results['boss'] = {'ratio': ratio, 'record': int(record),
-                           'damage': max(damage, _damage), 'hp': config['hp'],
-                           'total': total}
-        await task.record(uid, enums.Task.PASS_WORLD_BOSS, **kwargs)
+    # if damage < 0 or damage >= kwargs['config']['boss'].get('damage', 100_0000):
+    #     return 93, "abnormal damage"
+    # else:
+    hp = max(0, config['hp'][f'{stage}'] - damage)
+    boss_hp[f'{stage}'] = hp
+    if record:
+        await set_leaderboard(uid, enums.LeaderBoard.WORLD_BOSS, damage, **kwargs)
+    ratio = {s: "%.2f" % (h/config['HP'][s]) for s, h in boss_hp.items()}
+    results['boss'] = {'ratio': ratio, 'record': int(record),
+                       'damage': max(damage, _damage), 'hp': boss_hp,
+                       'total': total}
+    await task.record(uid, enums.Task.PASS_WORLD_BOSS, **kwargs)
 
 
 async def e_dispose(uid, stage, _stage, **kwargs):
     await task.record(uid, enums.Task.PASS_SPECIAL_STAGE, **kwargs)
-    await hang_up(uid, new=stage > _stage, **kwargs)
+    # await hang_up(uid, new=stage > _stage, **kwargs)
 
 
 async def rw_common(uid, items, rewards, mul=1, **kwargs):

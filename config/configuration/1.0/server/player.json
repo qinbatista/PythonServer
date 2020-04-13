@@ -219,7 +219,7 @@
 		"constraint": {
 			"grid": 9,
 			"refreshable": 3,
-			"refresh_hours": 1
+			"refresh_hours": 3
 		}
 	}
 }

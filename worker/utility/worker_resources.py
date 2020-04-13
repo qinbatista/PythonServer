@@ -33,7 +33,7 @@ class WorkerResources:
 	async def init(self):
 		# r = await aioredis.create_redis(f'redis://{self.redis_addr}', \
 		# 		encoding = 'utf-8')
-		# r.execute()
+		# r.set()
 		self.resources['session']   = aiohttp.ClientSession(connector = aiohttp.TCPConnector(limit = 0))
 		self.resources['redis']     = await aioredis.create_redis(f'redis://{self.redis_addr}',
 				encoding = 'utf-8')
@@ -125,9 +125,10 @@ class ModuleConfigurations:
 			self._rfb = False
 		if self.rfb and not self._rfb:
 			self.rfb, self._rfb = False, True
-			self.configs['boss'] = self.configs['stages']['constraint']['stage']['BOSS']
-			self.configs['boss']['HP'] = {k: v['boss']['HP'] for k, v in self.configs['stages']['stage'].items() if (k.isdigit() and 3000 < int(k) < 4000)}
-			self.configs['boss']['hp'] = {s: hp for s, hp in self.configs['boss']['HP'].items()}
+			if self.configs.get('boss') is None:
+				self.configs['boss'] = self.configs['stages']['constraint']['stage']['BOSS']
+				self.configs['boss']['HP'] = {k: v['boss']['HP'] for k, v in self.configs['stages']['stage'].items() if (k.isdigit() and 3000 < int(k) < 4000)}
+			self.configs['boss']['hp'] = {w['id']: {s: hp for s, hp in self.configs['boss']['HP'].items()} for w in self.configs['world']['worlds']}
 
 	def __getitem__(self, key):
 		return self.configs[key]

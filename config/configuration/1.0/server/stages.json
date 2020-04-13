@@ -43,7 +43,7 @@
 			},
 			"COIN": {
 				"comment": "limit是金币挑战的免费次数,buy是购买次数的约束",
-				"limit": 2,
+				"limit": 3,
 				"buy": {
 					"comment": "diamond是购买金币挑战需要消耗的钻石,vip是vip相应等级下可购买的次数",
 					"diamond": 50,
@@ -54,8 +54,8 @@
 				}
 			},
 			"EXP": {
-				"comment": "limit是金币挑战的免费次数,buy是购买次数的约束",
-				"limit": 2,
+				"comment": "limit是经验挑战的免费次数,buy是购买次数的约束",
+				"limit": 3,
 				"buy": {
 					"comment": "diamond是购买金币挑战需要消耗的钻石,vip是vip相应等级下可购买的次数",
 					"diamond": 50,
@@ -516,6 +516,216 @@
 					"3:1:40"
 				],
 				"special": {},
+				"explode": {}
+			}
+		},
+		"1005":{
+			"rewards": {
+				"common": [
+					"3:1:50"
+				],
+				"special": {},
+				"explode": {}
+			}
+		},
+		"1006":{
+			"rewards": {
+				"common": [
+					"3:1:60"
+				],
+				"special": {},
+				"explode": {}
+			}
+		},
+		"1007":{
+			"rewards": {
+				"common": [
+					"3:1:70"
+				],
+				"special": {},
+				"explode": {}
+			}
+		},
+		"1008":{
+			"rewards": {
+				"common": [
+					"3:1:80"
+				],
+				"special": {},
+				"explode": {}
+			}
+		},
+		"1009":{
+			"rewards": {
+				"common": [
+					"3:1:90"
+				],
+				"special": {},
+				"explode": {}
+			}
+		},
+		"1010":{
+			"rewards": {
+				"common": [
+					"3:1:100"
+				],
+				"special": {
+					"exp": 50
+				},
+				"explode": {}
+			}
+		},
+		"1011":{
+			"rewards": {
+				"common": [
+					"3:1:110"
+				],
+				"special": {
+					"exp": 55
+				},
+				"explode": {}
+			}
+		},
+		"1012":{
+			"rewards": {
+				"common": [
+					"3:1:120"
+				],
+				"special": {
+					"exp": 60
+				},
+				"explode": {}
+			}
+		},
+		"1013":{
+			"rewards": {
+				"common": [
+					"3:1:130"
+				],
+				"special": {
+					"exp": 65
+				},
+				"explode": {}
+			}
+		},
+		"1014":{
+			"rewards": {
+				"common": [
+					"3:1:140"
+				],
+				"special": {
+					"exp": 70
+				},
+				"explode": {}
+			}
+		},
+		"1015":{
+			"rewards": {
+				"common": [
+					"3:1:150"
+				],
+				"special": {
+					"exp": 75
+				},
+				"explode": {}
+			}
+		},
+		"1016":{
+			"rewards": {
+				"common": [
+					"3:1:160"
+				],
+				"special": {
+					"exp": 80
+				},
+				"explode": {}
+			}
+		},
+		"1017":{
+			"rewards": {
+				"common": [
+					"3:1:170"
+				],
+				"special": {
+					"exp": 85
+				},
+				"explode": {}
+			}
+		},
+		"1018":{
+			"rewards": {
+				"common": [
+					"3:1:180"
+				],
+				"special": {
+					"exp": 90
+				},
+				"explode": {}
+			}
+		},
+		"1019":{
+			"rewards": {
+				"common": [
+					"3:1:190"
+				],
+				"special": {
+					"exp": 95
+				},
+				"explode": {}
+			}
+		},
+		"1020":{
+			"rewards": {
+				"common": [
+					"3:1:200"
+				],
+				"special": {
+					"exp": 100
+				},
+				"explode": {}
+			}
+		},
+		"1021":{
+			"rewards": {
+				"common": [
+					"3:1:205"
+				],
+				"special": {
+					"exp": 105
+				},
+				"explode": {}
+			}
+		},
+		"1022":{
+			"rewards": {
+				"common": [
+					"3:1:210"
+				],
+				"special": {
+					"exp": 110
+				},
+				"explode": {}
+			}
+		},
+		"1023":{
+			"rewards": {
+				"common": [
+					"3:1:215"
+				],
+				"special": {
+					"exp": 115
+				},
+				"explode": {}
+			}
+		},
+		"1024":{
+			"rewards": {
+				"common": [
+					"3:1:220"
+				],
+				"special": {
+					"exp": 120
+				},
 				"explode": {}
 			}
 		}
@@ -1115,7 +1325,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
+					"exp": 0
 				},
 				"random": 0
 			}
@@ -1139,7 +1349,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
+					"exp": 0
 				},
 				"random": 0
 			}
@@ -1163,7 +1373,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
+					"exp": 0
 				},
 				"random": 0
 			}
@@ -1187,7 +1397,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
+					"exp": 0
 				},
 				"random": 0
 			}
@@ -1211,7 +1421,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
+					"exp": 0
 				},
 				"random": 0
 			}
@@ -1235,7 +1445,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
+					"exp": 0
 				},
 				"random": 0
 			}
@@ -1259,7 +1469,7 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
+					"exp": 0
 				},
 				"random": 0
 			}
@@ -1283,7 +1493,391 @@
 					"3:10:1"
 				],
 				"special": {
-					"exp": 120
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1009": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1010": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1011": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1012": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1013": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1014": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1015": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1016": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1017": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1018": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1019": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1020": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1021": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1022": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1023": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1024": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
 				},
 				"random": 0
 			}

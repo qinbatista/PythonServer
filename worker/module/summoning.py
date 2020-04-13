@@ -39,10 +39,10 @@ async def integral_convert(uid, **kwargs):
 	# TODO 奖励物品
 	if acp in [200, 400, 600, 800]:
 		mid = config['special']['mid'] if acp == 600 else random.choice(config['role']['mid'])
-		can, rid = await lottery.try_unlock_role(uid, mid, **kwargs)
-		status, msg = (0, 'You unlocked a role') if can else (1, 'You get 30 segments')
-		value = lottery.SEG_COUNT
-		remain_v = await common.try_role(uid, rid, 0, **kwargs)
+		rid = enums.Role(int(mid))
+		can, remain_v = await lottery.try_unlock_role(uid, rid, **kwargs)
+		status, msg, value = (0, 'You unlocked a role', 0) if can \
+			else (1, 'You get 30 segments', lottery.SEG_COUNT_R)
 		_, star = await role._get_role_info(uid, rid, 'star', **kwargs)
 		return common.mt(status, msg, {'acp': acp, 'rid': mid, 'star': star[0], 'remain_seg': remain_v, 'reward_seg': value})
 	else:  # 1000
@@ -70,7 +70,7 @@ async def dozen_d(uid, **kwargs):
 	article = [d[1] for d in isb_data]  # 获取所有的物品
 	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
 	items = f"{','.join(article)},{','.join(extra)}"
-	results = await reward_items(uid, items, **kwargs)
+	results = await reward_items(uid, items, module='sum', **kwargs)
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
@@ -115,7 +115,7 @@ async def dozen_c(uid, **kwargs):
 	article = [d[1] for d in isb_data]  # 获取所有的物品
 	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
 	items = f"{','.join(article)},{','.join(extra)}"
-	results = await reward_items(uid, items, **kwargs)
+	results = await reward_items(uid, items, module='sum', **kwargs)
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
@@ -144,7 +144,7 @@ async def dozen_g(uid, **kwargs):
 	article = [d[1] for d in isb_data]  # 获取所有的物品
 	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
 	items = f"{','.join(article)},{','.join(extra)}"
-	results = await reward_items(uid, items, **kwargs)
+	results = await reward_items(uid, items, module='sum', **kwargs)
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
@@ -184,7 +184,7 @@ async def single_d(uid, **kwargs):
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
-	results = await reward_items(uid, items, **kwargs)
+	results = await reward_items(uid, items, module='sum', **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
@@ -221,7 +221,7 @@ async def single_c(uid, **kwargs):
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
-	results = await reward_items(uid, items, **kwargs)
+	results = await reward_items(uid, items, module='sum', **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
@@ -248,7 +248,7 @@ async def single_g(uid, **kwargs):
 	# TODO 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': pid}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
-	results = await reward_items(uid, items, **kwargs)
+	results = await reward_items(uid, items, module='sum', **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
@@ -340,19 +340,27 @@ def _integral_inspect(lim, integral):
 	return False, lim
 
 
-async def reward_items(uid, items: str,  mul=1, **kwargs):
+async def reward_items(uid, items: str,  mul=1, module=None, **kwargs):
 	"""返回奖励之后的改变情况"""
 	decoded, results = common.decode_items(items, mul=mul), []
 	for gid, iid, value in decoded:
 		if gid == enums.Group.ITEM:
 			_, remain_v = await common.try_item(uid, iid, value, **kwargs)
 		elif gid == enums.Group.WEAPON:
-			remain_v = await common.try_weapon(uid, iid, value, **kwargs)
-		elif gid == enums.Group.SKILL:
-			can, iid = await lottery.try_unlock_skill(uid, iid.value, **kwargs)
-			gid, remain_v, value = (enums.Group.SKILL, 1, 1) if can else (enums.Group.ITEM, (await common.try_item(uid, iid, 0, **kwargs))[1], 1)
+			if module is None:
+				remain_v = await common.try_weapon(uid, iid, value, **kwargs)
+			else:
+				can, remain_v = await lottery.try_unlock_weapon(uid, iid, module, **kwargs)
+				value = 0 if can else lottery.SEG_COUNT_W
 		elif gid == enums.Group.ROLE:
-			remain_v = await common.try_role(uid, iid, value, **kwargs)
+			if module is None:
+				remain_v = await common.try_role(uid, iid, value, **kwargs)
+			else:
+				can, remain_v = await lottery.try_unlock_role(uid, iid, module, **kwargs)
+				value = 0 if can else lottery.SEG_COUNT_R
+		elif gid == enums.Group.SKILL:
+			can, iid = await lottery.try_unlock_skill(uid, iid, **kwargs)
+			gid, remain_v, value = (enums.Group.SKILL, 1, 1) if can else (enums.Group.ITEM, (await common.try_item(uid, iid, 0, **kwargs))[1], 1)
 		else:
 			print(f'不解析此组物品gid={gid},iid={iid}')
 			remain_v = 0  # gid不属于以上四种情况时需要处理
