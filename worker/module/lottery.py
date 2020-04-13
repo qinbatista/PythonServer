@@ -48,7 +48,7 @@ async def try_unlock_role(uid, rid, module=None, **kwargs):
 async def try_unlock_skill(uid, sid, **kwargs):
 	if not await common.exists('skill', ('uid', uid), ('sid', sid), **kwargs):
 		await common.execute(f'INSERT INTO skill(uid, sid) VALUES ("{uid}", {sid});', **kwargs)
-		return True, 1
+		return True, sid
 	await common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.SKILL_SCROLL_10}, 1) ON DUPLICATE KEY UPDATE value = value + 1;', **kwargs)
 	return False, enums.Item.SKILL_SCROLL_10
 

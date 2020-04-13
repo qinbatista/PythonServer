@@ -476,7 +476,7 @@ class MessageHandler:
 		return await stage.victory(data['data']['unique_id'], enums.Stage.EXP, int(data['data']['stage']), data['data'].get('damage', 0), **data)
 
 	async def _stage_refresh_boss(self, data: dict) -> str:
-		return await stage.refresh_boss(data['data']['unique_id'], **data)
+		return await stage.refresh_boss(data['data']['unique_id'], int(data['data']['stage']), **data)
 
 	async def _stage_all_infos(self, data: dict) -> str:
 		return await stage.all_infos(data['data']['unique_id'], **data)
