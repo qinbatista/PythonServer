@@ -273,7 +273,7 @@
 					"mid": 3,
 					"bnum": 200
 				},
-				"MINE_CARD": {
+				"IRON_CARD": {
 					"sqltable": "item",
 					"mid": 24,
 					"bnum": 100

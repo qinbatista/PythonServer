@@ -23,17 +23,17 @@ RESOURCE_FACTORIES   = {enums.Factory.FOOD: enums.Item.FOOD,
                         enums.Factory.CRYSTAL: enums.Item.CRYSTAL,
                         enums.Factory.ARMOR: None}
 
-HAS_LEVEL_FACTORIES  = {enums.Factory.FOOD         : None, enums.Factory.IRON  : None, \
+HAS_LEVEL_FACTORIES  = {enums.Factory.FOOD         : None, enums.Factory.IRON  : None,
                         enums.Factory.CRYSTAL      : None, enums.Factory.WISHING_POOL : None }
 
 HAS_WORKER_FACTORIES = {enums.Factory.FOOD : None, enums.Factory.IRON : None, enums.Factory.CRYSTAL : None, enums.Factory.ARMOR : None}
 
 COLLECTS = {enums.Factory.FOOD: enums.Achievement.COLLECT_FOOD,
-                        enums.Factory.IRON: enums.Achievement.COLLECT_MINE,
+                        enums.Factory.IRON: enums.Achievement.COLLECT_IRON,
                         enums.Factory.CRYSTAL: enums.Achievement.COLLECT_CRYSTAL}
 
 UPGRADES = {enums.Factory.FOOD: enums.Achievement.UPGRADE_FOOD,
-                        enums.Factory.IRON: enums.Achievement.UPGRADE_MINE,
+                        enums.Factory.IRON: enums.Achievement.UPGRADE_IRON,
                         enums.Factory.CRYSTAL: enums.Achievement.UPGRADE_CRYSTAL}
 
 async def refresh(uid, **kwargs):
@@ -98,11 +98,11 @@ async def decrease_worker(uid, fid, n, **kwargs):
     if n > current_workers[fid]: return common.mt(99, 'insufficient assigned workers')
     r = await refresh(uid, **kwargs)
     await common.execute(f'UPDATE `factory` SET `workers` = {unassigned + n} WHERE `uid` = "{uid}" \
-            AND `fid` = {enums.Factory.UNASSIGNED.value};', **kwargs)
+            AND `fid` = {enums.Factory.UNASSIGNED};', **kwargs)
     await common.execute(f'UPDATE `factory` SET `workers` = {current_workers[fid] - n} WHERE \
-            `uid` = "{uid}" AND `fid` = {fid.value};', **kwargs)
-    return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
-            'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
+            `uid` = "{uid}" AND `fid` = {fid};', **kwargs)
+    return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'],
+            'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value,
             enums.Factory.UNASSIGNED.value : unassigned + n, 'workers' : current_workers[fid] - n}})
 
 
@@ -119,12 +119,12 @@ async def gather_resource(uid, resource, **kwargs):
         if k == enums.Factory.ARMOR:
             aid = await get_armor(uid, **kwargs)
             _, remain = await common.try_armor(uid, aid, 1, value, **kwargs)
-            data['remaining'].append(f'{enums.Group.ARMOR.value}:{aid}:{remain}')
-            data['reward'].append(f'{enums.Group.ARMOR.value}:{aid}:{value}')
+            data['remaining'].append(f'{enums.Group.ARMOR}:{aid}:{remain}')
+            data['reward'].append(f'{enums.Group.ARMOR}:{aid}:{value}')
         else:
             _, remain = await common.try_item(uid, RESOURCE_FACTORIES[k], value, **kwargs)
-            data['remaining'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{remain}')
-            data['reward'].append(f'{enums.Group.ITEM.value}:{RESOURCE_FACTORIES[k].value}:{value}')
+            data['remaining'].append(f'{enums.Group.ITEM}:{RESOURCE_FACTORIES[k]}:{remain}')
+            data['reward'].append(f'{enums.Group.ITEM}:{RESOURCE_FACTORIES[k]}:{value}')
     await record_resources(uid, storage, **kwargs)  # 更新数据库资源
     return common.mt(0, 'success', data)
 
@@ -224,10 +224,24 @@ async def buy_acceleration(uid, **kwargs):
             'remaining': {'diamond': dia_remain}, 'reward': {'diamond' : -dia_cost}})
 
 async def set_armor(uid, aid, **kwargs):
-    gather = await gather_resource(uid, {enums.Factory.ARMOR: 99}, **kwargs)
-    await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `level`) VALUES ("{uid}", {enums.Factory.ARMOR.value}, 0, {aid.value}) ON DUPLICATE KEY UPDATE `level` = {aid.value};', **kwargs)
+    gather = await gather_resource(uid, {enums.Factory.ARMOR: 0}, **kwargs)
+    await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`, `level`) VALUES ("{uid}", {enums.Factory.ARMOR}, 0, {aid}) ON DUPLICATE KEY UPDATE `level` = {aid};', **kwargs)
     return common.mt(0, 'success', {'gather': gather['data'], 'aid': aid.value})
 
+
+#####################################  会删除的功能 #################################
+async def iron_convert(uid, aid, qty, **kwargs):
+    qty_iron = 20 * qty
+    if int(aid) not in enums.Armor._value2member_map_:
+        return common.mt(99, 'aid error')
+    can, _qty_iron = await common.try_item(uid, enums.Item.IRON, -qty_iron, **kwargs)
+    if not can:
+        return common.mt(98, 'Insufficient iron')
+    _, _qty = await common.try_armor(uid, aid, 1, qty, **kwargs)
+    return common.mt(0, 'success', {
+        'remain': [f'{enums.Group.ARMOR}:{aid}:{_qty}', f'{enums.Group.ITEM}:{enums.Item.IRON}:{_qty_iron}'],
+        'reward': [f'{enums.Group.ARMOR}:{aid}:{qty}', f'{enums.Group.ITEM}:{enums.Item.IRON}:{qty_iron}'],
+    })
 ####################################################################################
 
 

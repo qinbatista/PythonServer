@@ -28,10 +28,9 @@ class Item(enum.IntEnum):
     COIN_CARD = 18
     EXP_CARD = 19
     FOOD_CARD = 20
-    MINE_CARD = 21  # 暂未使用
+    IRON_CARD = 21  # 暂未使用
     CRYSTAL_CARD = 22
     DIAMOND_CARD = 23
-    MINE = 24  # 暂未使用，被IRON代替
     SMALL_ENERGY_POTION = 25  # 暂未使用
     VIP_CARD_MIN = 26
     VIP_CARD_MAX = 27
@@ -421,10 +420,10 @@ class Achievement(enum.IntEnum):
     SUMMON_5R = 19
     PASS_STAGE = 20
     COLLECT_FOOD = 21
-    COLLECT_MINE = 22
+    COLLECT_IRON = 22
     COLLECT_CRYSTAL = 23
     UPGRADE_FOOD = 24
-    UPGRADE_MINE = 25
+    UPGRADE_IRON = 25
     UPGRADE_CRYSTAL = 26
     FRIEND_REQUEST = 27
     FRIEND_GIFT = 28

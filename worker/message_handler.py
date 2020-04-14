@@ -334,6 +334,9 @@ class MessageHandler:
 	async def _gather_resource_factory(self, data: dict) -> str:
 		return await factory.gather_resource(data['data']['unique_id'], data['data']['resource'], **data)
 
+	async def _iron_convert_factory(self, data: dict) -> str:
+		return await factory.iron_convert(data['data']['unique_id'], data['data']['aid'], int(data['data']['qty']), **data)
+
 	async def _buy_acceleration_factory(self, data: dict) -> str:
 		return await factory.buy_acceleration(data['data']['unique_id'], **data)
 
@@ -476,13 +479,13 @@ class MessageHandler:
 		return await stage.victory(data['data']['unique_id'], enums.Stage.EXP, int(data['data']['stage']), data['data'].get('damage', 0), **data)
 
 	async def _stage_refresh_boss(self, data: dict) -> str:
-		return await stage.refresh_boss(data['data']['unique_id'], int(data['data']['stage']), **data)
+		return await stage.refresh_boss(data['data']['unique_id'], **data)
 
 	async def _stage_all_infos(self, data: dict) -> str:
 		return await stage.all_infos(data['data']['unique_id'], **data)
 
 	async def _stage_damage_ranking(self, data: dict) -> str:
-		return await stage.damage_ranking(data['data']['unique_id'], data['data']['page'], **data)
+		return await stage.damage_ranking(data['data']['unique_id'], data['data'].get('stage', 3000), data['data'].get('page', 1), **data)
 
 	async def _stage_hang_up(self, data: dict) -> str:
 		return await stage.hang_up(data['data']['unique_id'], **data)
@@ -680,6 +683,7 @@ FUNCTION_LIST = {
 	'buy_acceleration_factory' : MessageHandler._buy_acceleration_factory,
 	'set_armor_factory' : MessageHandler._set_armor_factory,
 	'gather_resource_factory' : MessageHandler._gather_resource_factory,
+	'iron_convert_factory' : MessageHandler._iron_convert_factory,
 
 	###################### weapon.py ######################
 	'level_up_weapon' : MessageHandler._level_up_weapon,

@@ -89,11 +89,11 @@ RMB_LIMIT = {
     "FOOD_CARD_LARGE": enums.Item.FOOD_CARD,
     "FOOD_CARD_PLENTY": enums.Item.FOOD_CARD,
     "FOOD_CARD_BAG": enums.Item.FOOD_CARD,
-    "MINE_CARD_MIN": enums.Item.MINE_CARD,
-    "MINE_CARD_SMALL": enums.Item.MINE_CARD,
-    "MINE_CARD_LARGE": enums.Item.MINE_CARD,
-    "MINE_CARD_PLENTY": enums.Item.MINE_CARD,
-    "MINE_CARD_BAG": enums.Item.MINE_CARD,
+    "IRON_CARD_MIN": enums.Item.IRON_CARD,
+    "IRON_CARD_SMALL": enums.Item.IRON_CARD,
+    "IRON_CARD_LARGE": enums.Item.IRON_CARD,
+    "IRON_CARD_PLENTY": enums.Item.IRON_CARD,
+    "IRON_CARD_BAG": enums.Item.IRON_CARD,
     "CRYSTAL_CARD_MIN": enums.Item.CRYSTAL_CARD,
     "CRYSTAL_CARD_SMALL": enums.Item.CRYSTAL_CARD,
     "CRYSTAL_CARD_LARGE": enums.Item.CRYSTAL_CARD,
@@ -154,7 +154,7 @@ async def purchase_resource_card(pid, oid, channel, user, currency,
         return common.mt(98, "pid error")
     if RMB_LIMIT[pid] not in [enums.Item.COIN_CARD, enums.Item.EXP_CARD,
                               enums.Item.FOOD_CARD,
-                              enums.Item.MINE_CARD, enums.Item.CRYSTAL_CARD,
+                              enums.Item.IRON_CARD, enums.Item.CRYSTAL_CARD,
                               enums.Item.DIAMOND_CARD]:
         return common.mt(96, "你购买的不是资源卡")
     return await rmb_mall(pid, oid, channel, user, currency, **kwargs)

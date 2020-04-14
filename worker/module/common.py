@@ -64,15 +64,15 @@ async def try_armor(uid, aid, level, value, **kwargs):
 		await conn.select_db(translate_world(**kwargs))
 		async with conn.cursor() as cursor:
 			await cursor.execute(f'SELECT `quantity` FROM `armor` WHERE `uid` = "{uid}" AND \
-					`aid` = {aid.value} AND `level` = {level} FOR UPDATE;')
-			quantity = await cursor.fetchall()
-			if value >= 0 or (quantity != () and quantity[0][0] + value >= 0):
-				if await cursor.execute(f'INSERT INTO `armor` VALUES ("{uid}", {aid.value}, {level}, \
+					`aid` = {aid} AND `level` = {level} FOR UPDATE;')
+			qty = await cursor.fetchall()
+			if value >= 0 or (qty != () and qty[0][0] + value >= 0):
+				if await cursor.execute(f'INSERT INTO `armor` VALUES ("{uid}", {aid}, {level}, \
 						{value}) ON DUPLICATE KEY UPDATE quantity = quantity + {value};') == 1:
 					await cursor.execute(f'UPDATE `armor` SET `quantity` = {value} WHERE `uid` = "{uid}" \
-							AND `aid` = {aid.value} AND `level` = {level};')
-				return (True, quantity[0][0] + value) if quantity != () else (True, value)
-			return (False, quantity[0][0] + value) if quantity != () else (False, value)
+							AND `aid` = {aid} AND `level` = {level};')
+				return (True, qty[0][0] + value) if qty != () else (True, value)
+			return (False, qty[0][0] + value) if qty != () else (False, value)
 
 async def try_weapon(uid, wid, val, **kwargs):
 	val += await get_weapon(uid, wid, **kwargs)

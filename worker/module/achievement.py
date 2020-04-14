@@ -14,7 +14,7 @@ async def get_all(uid, **kwargs):
     tim = now - timedelta(days=1) if tim is None else tim
     if now.day != tim.day:
         await record(uid, enums.Achievement.TOTAL_LOGIN, **kwargs)
-    await common.set_timer(uid, enums.Timer.LOGIN, now, **kwargs)
+        await common.set_timer(uid, enums.Timer.LOGIN, now, **kwargs)
     ads = await common.execute(f'SELECT aid, value, reward FROM achievement WHERE uid = "{uid}";', **kwargs)
     if ads == (): return common.mt(0, 'success', {'achievements': []})
     return common.mt(0, 'success', {

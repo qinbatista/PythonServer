@@ -623,7 +623,7 @@
 		},
 		"repeatable": "y"
 	},
-	"MINE_CARD_MIN": {
+	"IRON_CARD_MIN": {
 		"quantity": 100,
 		"price": {
 			"RMB": 7,
@@ -631,7 +631,7 @@
 		},
 		"repeatable": "y"
 	},
-	"MINE_CARD_SMALL": {
+	"IRON_CARD_SMALL": {
 		"quantity": 300,
 		"price": {
 			"RMB": 7,
@@ -639,7 +639,7 @@
 		},
 		"repeatable": "y"
 	},
-	"MINE_CARD_LARGE": {
+	"IRON_CARD_LARGE": {
 		"quantity": 1000,
 		"price": {
 			"RMB": 7,
@@ -647,7 +647,7 @@
 		},
 		"repeatable": "y"
 	},
-	"MINE_CARD_PLENTY": {
+	"IRON_CARD_PLENTY": {
 		"quantity": 10000,
 		"price": {
 			"RMB": 7,
@@ -655,7 +655,7 @@
 		},
 		"repeatable": "y"
 	},
-	"MINE_CARD_BAG": {
+	"IRON_CARD_BAG": {
 		"quantity": 100000,
 		"price": {
 			"RMB": 7,
