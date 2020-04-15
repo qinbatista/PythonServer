@@ -13,7 +13,7 @@ import contextlib
 import random
 import json
 import asyncio
-# TODO 2020年1月14日
+# H 2020年1月14日
 # ##################################################################
 # ################### 2020年1月14日之后加入的方法 ###################
 # ##################################################################
@@ -48,33 +48,33 @@ async def enter(uid, sid, stage, **kwargs):
     if (await increase_exp(uid, 0, **kwargs))['level'] < config['constraint']['level']:
         return common.mt(90, 'level insufficient')
     results = {}
-    # TODO 部分约束信息
+    # H 部分约束信息
     tim, lms = None, {}
     if sid in VERIFY:
         can, tim, lms = await VERIFY[sid](uid, **kwargs)
         if can:
             return common.mt(92, 'no more ticket, try tomorrow')
         results[sid.name] = {'limits': lms, 'cd': common.remaining_cd()}
-    # TODO 检查特殊物资是否能消耗
+    # H 检查特殊物资是否能消耗
     energy = config['consumes']['special'].get('energy', 0)
     if (await common.try_energy(uid, 0, **kwargs))['data']['energy'] < energy:
         return common.mt(97, 'energy insufficient')
-    # TODO 尝试消耗通用物资
+    # H 尝试消耗通用物资
     can, cmw = await common.consume_items(uid, ','.join(config['consumes']['common']), **kwargs)
     if not can:
         return common.mt(95, 'materials insufficient')
     results['remain'], results['reward'] = rm_rw(cmw)
-    # TODO 消耗特殊物资(体力)
+    # H 消耗特殊物资(体力)
     data = (await common.try_energy(uid, -energy, **kwargs))['data']
-    # TODO 实现部分约束
+    # H 实现部分约束
     if sid in VERIFY:
         await REALIZE[sid](uid, tim, lms, **kwargs)
-    # TODO 附加配置
+    # H 附加配置
     els, monsters = addition(stage, **kwargs)
     results['addition'] = {'els': els, 'monsters': monsters}
-    # TODO 构建结果
+    # H 构建结果
     results['energy'] = {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}
-    # TODO 设置关卡进入状态
+    # H 设置关卡进入状态
     btm = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d %H:%M:%S')
     await common.set_stage(uid, sid, _stage, btm, **kwargs)
     await kwargs['redis'].set(f'stage.{uid}', stage)
@@ -90,20 +90,20 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
     if _btm == '' or _stg is None or stage != int(_stg):
         return common.mt(94, 'stage mismatch')
     config, rewards = kwargs['config']['stages']['stage'].get(f'{stage}', None), {'boss': {}}
-    # TODO 奖励普通物资
+    # H 奖励普通物资
     rwc = config['rewards']['common']
     if config['constraint']['random'] == 1:
         rwc = random.choices(rwc, k=config['rewards']['random'])
     await rw_common(uid, rwc, rewards, **kwargs)
-    # TODO 奖励特殊物资
+    # H 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['rewards']['special'].get('exp', 0), **kwargs)
     rewards['max_stage'] = max(stage, _stage)
-    # TODO 特殊处理
+    # H 特殊处理
     if sid in VICTORY_DISPOSE:
         cm = await VICTORY_DISPOSE[sid](uid, stage, _stage, damage, rewards, **kwargs)
         if isinstance(cm, tuple):
             return common.mt(cm[0], cm[1])
-    # TODO 设置关卡通过状态
+    # H 设置关卡通过状态
     await common.set_stage(uid, sid, max(stage, _stage), '', **kwargs)
     await kwargs['redis'].delete(f'stage.{uid}')
     return common.mt(0, 'success', rewards)
@@ -118,20 +118,20 @@ async def mopping_up(uid, stage, count=1, **kwargs):
     config = kwargs['config']['stages']['mopping-up'].get(f'{stage}', None)
     if config is None:
         return common.mt(98, 'There is no configuration information for this stage')  # 扫荡序章或未写配置的关卡会返回此结果
-    # TODO 检查特殊物资是否能消耗
+    # H 检查特殊物资是否能消耗
     energy = config['consumes']['special'].get('energy', 0) * count
     if (await common.try_energy(uid, 0, **kwargs))['data']['energy'] < energy: return common.mt(97, 'energy insufficient')
-    # TODO 尝试消耗通用物资
+    # H 尝试消耗通用物资
     if not (await common.consume_items(uid, ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['consumes']['common']]), **kwargs))[0]:
         return common.mt(95, 'materials insufficient')
-    # TODO 消耗特殊物资(体力)
+    # H 消耗特殊物资(体力)
     data = (await common.try_energy(uid, -energy, **kwargs))['data']
     rewards = {'energy': {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}}
-    # TODO 奖励普通物资
+    # H 奖励普通物资
     await rw_common(uid, config['rewards']['common'], rewards, mul=count, **kwargs)
-    # TODO 奖励特殊物资
+    # H 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
-    # TODO 任务记录
+    # H 任务记录
     await task.record(uid, enums.Task.PASS_MAIN_STAGE, **kwargs)
     return common.mt(0, 'success', rewards)
 
@@ -203,9 +203,9 @@ async def hang_up(uid, new=True, **kwargs):
     mul = int(min((now - tim).total_seconds(), cfc['limit'])//cfc['step'])
     config = kwargs['config']['stages']['hang-up'][f'{stage}']['rewards']
     rewards = {}
-    # TODO 奖励普通物资
+    # H 奖励普通物资
     await rw_common(uid, config['common'], rewards, mul=mul, **kwargs)
-    # TODO 奖励特殊物资
+    # H 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['special'].get('exp', 0) * mul, **kwargs)
     await common.set_timer(uid, enums.Timer.STAGE_HANG_UP, now, **kwargs)
     return common.mt(0, 'success', rewards)
@@ -350,17 +350,17 @@ async def increase_exp(uid, exp, **kwargs):
     exp为0则获得经验，反之增加经验，
     并返回总经验和等级，升到下一级需要的经验
     """
-    # TODO 取配置和数据
+    # H 取配置和数据
     exp_config = kwargs['config']['exp']['player_level']['experience']
     sql_exp = await common.get_progress(uid, 'exp', **kwargs)
-    # TODO 计算等级和需要的经验
+    # H 计算等级和需要的经验
     level, need = common.__calculate(exp_config, sql_exp)
     if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
-    # TODO 重新计算等级和需要的经验
+    # H 重新计算等级和需要的经验
     sql_exp += exp
     level, need = common.__calculate(exp_config, sql_exp)
     await common.set_progress(uid, 'exp', sql_exp, **kwargs)
-    # TODO 返回总经验、等级、需要经验
+    # H 返回总经验、等级、需要经验
     return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
 
 

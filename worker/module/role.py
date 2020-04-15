@@ -44,7 +44,7 @@ async def level_up_star(uid, rid, **kwargs):
 	cost = kwargs['config']['role']['standard_costs']['seg'] * (1 + star)
 	if segment <= cost: return common.mt(98, 'insufficient segments')
 	await common.execute(f'UPDATE role SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND rid = {rid.value};', **kwargs)
-	# TODO 加成就代码
+	# H 加成就代码
 	if star == 0:
 		rnp = rid.name[:2]
 		if rnp in lottery.RECORD_GET:

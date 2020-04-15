@@ -169,7 +169,7 @@ async def get_db(**kwargs):
 def encode_item(gid, iid, value):
 	return f'{gid.value}:{iid.value}:{value}'
 
-# TODO O(n) can easily be refactored to O(1) using hash table with world as key
+# H O(n) can easily be refactored to O(1) using hash table with world as key
 def translate_world(**kwargs):
 	'''
 	translates the current world into its merged form.
@@ -184,7 +184,7 @@ def translate_world(**kwargs):
 		print('ERROR: common.translate_world could not find "merge" keyword in world.json config.')
 		return str(kwargs['world'])
 
-# TODO O(n) can easily be refactored to O(1) using hash table with world as key
+# H O(n) can easily be refactored to O(1) using hash table with world as key
 def translate_uid(uid, **kwargs):
 	'''
 	translates the given uid to the correct form, based on the world provided

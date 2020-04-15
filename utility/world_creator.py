@@ -55,7 +55,7 @@ def create_world(world, mysql_addr, mysql_user, mysql_pw, port):
     create_mailbox(world)
 
 
-# TODO update path / make this compatible with aliyun mounted NAS
+# H update path / make this compatible with aliyun mounted NAS
 
 
 def loc():

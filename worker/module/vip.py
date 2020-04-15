@@ -175,18 +175,18 @@ async def increase_exp(uid, exp, **kwargs):
 	exp为0则获得经验，反之取绝对值增加经验，
 	并返回总经验和等级，升到下一级需要的经验
 	"""
-	# TODO 取配置和数据
+	# H 取配置和数据
 	exp_config = kwargs['config']['vip']['vip_level']['experience']
 	sql_exp = await common.get_progress(uid, 'vipexp', **kwargs)
-	# TODO 计算等级和需要的经验
+	# H 计算等级和需要的经验
 	level, need = common.__calculate(exp_config, sql_exp)
 	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
-	# TODO 重新计算等级和需要的经验
+	# H 重新计算等级和需要的经验
 	sql_exp += exp
 	level, need = common.__calculate(exp_config, sql_exp)
 	await common.set_progress(uid, 'vipexp', sql_exp, **kwargs)
-	# TODO 成就刷新判断
-	# TODO 返回总经验、等级、需要经验
+	# H 成就刷新判断
+	# H 返回总经验、等级、需要经验
 	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
 
 

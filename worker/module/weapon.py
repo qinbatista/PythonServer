@@ -71,7 +71,7 @@ async def level_up_star(uid, wid, **kwargs):
 	if segment < cost: return common.mt(98, 'insufficient segments')
 	await common.execute(f'UPDATE weapon SET star = {star + 1}, segment = {segment - cost} WHERE \
 			uid = "{uid}" AND wid = {wid.value};', **kwargs)
-	# TODO 加成就代码
+	# H 加成就代码
 	if star == 0:
 		wnp = wid.name[:2]
 		if wnp in lottery.RECORD_GET:

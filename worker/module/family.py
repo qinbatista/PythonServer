@@ -326,7 +326,7 @@ async def abdicate(uid, target, **kwargs):
 	await _record_family_change(name, f'{enums.FamilyHistoryKeys.ABDICATE.value}:{gn},{target}', **kwargs)
 	return common.mt(0, 'success', {gn: enums.FamilyRole.BASIC.value, target: enums.FamilyRole.OWNER.value})
 
-# TODO 内部方法
+# H 内部方法
 async def welfare(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
@@ -482,18 +482,18 @@ async def increase_exp(name, exp, **kwargs):
 	exp为0则获得经验，反之取绝对值增加经验，
 	并返回总经验和等级，升到下一级需要的经验
 	"""
-	# TODO 取配置和数据
+	# H 取配置和数据
 	exp_config = kwargs['config']['family']['level']['exp']
 	_, fds = await _get_family_info(name, 'exp', **kwargs)
 	sql_exp = fds[0]
-	# TODO 计算等级和需要的经验
+	# H 计算等级和需要的经验
 	level, need = common.__calculate(exp_config, sql_exp)
 	if exp == 0: return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
-	# TODO 重新计算等级和需要的经验
+	# H 重新计算等级和需要的经验
 	sql_exp += exp
 	level, need = common.__calculate(exp_config, sql_exp)
 	await common.update_famliy(name, 'exp', sql_exp, **kwargs)
-	# TODO 返回总经验、等级、需要经验
+	# H 返回总经验、等级、需要经验
 	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
 
 async def __insert(name, **kwargs):
