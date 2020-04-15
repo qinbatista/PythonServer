@@ -728,6 +728,831 @@
 				},
 				"explode": {}
 			}
+		},
+		"1025":{
+			"rewards": {
+				"common": [
+					"3:1:225"
+				],
+				"special": {
+					"exp": 125
+				},
+				"explode": {}
+			}
+		},
+		"1026":{
+			"rewards": {
+				"common": [
+					"3:1:230"
+				],
+				"special": {
+					"exp": 130
+				},
+				"explode": {}
+			}
+		},
+		"1027":{
+			"rewards": {
+				"common": [
+					"3:1:235"
+				],
+				"special": {
+					"exp": 135
+				},
+				"explode": {}
+			}
+		},
+		"1028":{
+			"rewards": {
+				"common": [
+					"3:1:240"
+				],
+				"special": {
+					"exp": 140
+				},
+				"explode": {}
+			}
+		},
+		"1029":{
+			"rewards": {
+				"common": [
+					"3:1:245"
+				],
+				"special": {
+					"exp": 145
+				},
+				"explode": {}
+			}
+		},
+		"1030":{
+			"rewards": {
+				"common": [
+					"3:1:250"
+				],
+				"special": {
+					"exp": 150
+				},
+				"explode": {}
+			}
+		},
+		"1031":{
+			"rewards": {
+				"common": [
+					"3:1:255"
+				],
+				"special": {
+					"exp": 155
+				},
+				"explode": {}
+			}
+		},
+		"1032":{
+			"rewards": {
+				"common": [
+					"3:1:260"
+				],
+				"special": {
+					"exp": 160
+				},
+				"explode": {}
+			}
+		},
+		"1033":{
+			"rewards": {
+				"common": [
+					"3:1:265"
+				],
+				"special": {
+					"exp": 165
+				},
+				"explode": {}
+			}
+		},
+		"1034":{
+			"rewards": {
+				"common": [
+					"3:1:270"
+				],
+				"special": {
+					"exp": 170
+				},
+				"explode": {}
+			}
+		},
+		"1035":{
+			"rewards": {
+				"common": [
+					"3:1:275"
+				],
+				"special": {
+					"exp": 175
+				},
+				"explode": {}
+			}
+		},
+		"1036":{
+			"rewards": {
+				"common": [
+					"3:1:280"
+				],
+				"special": {
+					"exp": 180
+				},
+				"explode": {}
+			}
+		},
+		"1037":{
+			"rewards": {
+				"common": [
+					"3:1:285"
+				],
+				"special": {
+					"exp": 185
+				},
+				"explode": {}
+			}
+		},
+		"1038":{
+			"rewards": {
+				"common": [
+					"3:1:290"
+				],
+				"special": {
+					"exp": 190
+				},
+				"explode": {}
+			}
+		},
+		"1039":{
+			"rewards": {
+				"common": [
+					"3:1:295"
+				],
+				"special": {
+					"exp": 195
+				},
+				"explode": {}
+			}
+		},
+		"1040":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1041":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1042":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1043":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1044":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1045":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1046":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1047":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1048":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1049":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1050":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1051":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1052":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1053":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1054":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1055":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1056":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1057":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1058":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1059":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1060":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1061":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1062":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1063":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1064":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1065":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1066":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1067":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1068":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1069":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1070":{
+			"rewards": {
+				"common": [
+					"3:1:300"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1071":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1072":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1073":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1074":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1075":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1076":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1077":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1078":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1079":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1080":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1081":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1082":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1083":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1084":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1085":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1086":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1087":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1088":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1089":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1090":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1091":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1092":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1093":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1094":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1095":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1096":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1097":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1099":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
+		},
+		"1100":{
+			"rewards": {
+				"common": [
+					"3:1:310"
+				],
+				"special": {
+					"exp": 200
+				},
+				"explode": {}
+			}
 		}
 	},
 	"stage": {
@@ -1859,6 +2684,1830 @@
 			}
 		},
 		"1024": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1025": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1026": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1027": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1028": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1029": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1030": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1031": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1032": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1033": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1034": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1035": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1036": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1037": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1038": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1039": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1040": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1041": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1042": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1043": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1044": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1045": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1046": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1047": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1048": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1049": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1050": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1051": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1052": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1053": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1054": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1055": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1056": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1057": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1058": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1059": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1060": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1061": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1062": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1063": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1064": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1065": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1066": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1067": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1068": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1069": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1070": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1071": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1072": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1073": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1074": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1075": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1076": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1077": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1078": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1079": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1080": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1081": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1082": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1083": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1084": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1085": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1086": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1087": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1088": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1089": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1090": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1091": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1092": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1093": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1094": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1095": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1096": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1097": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1098": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1099": {
+			"constraint": {
+				"random": 0,
+				"level": 0
+			},
+			"consumes": {
+				"common": [],
+				"special": {
+					"energy": 0
+				}
+			},
+			"rewards": {
+				"common": [
+					"3:9:125",
+					"3:2:125",
+					"3:1:375",
+					"3:10:1"
+				],
+				"special": {
+					"exp": 0
+				},
+				"random": 0
+			}
+		},
+		"1100": {
 			"constraint": {
 				"random": 0,
 				"level": 0
