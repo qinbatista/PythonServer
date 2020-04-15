@@ -5,7 +5,7 @@ import argparse
 PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
 
 images = ['auth', 'config', 'edge', 'gate', 'mail', 'worker']
-# images = ['worker']
+# images = ['config']
 
 
 def login(username='qinbatista', password='lukseun1'):

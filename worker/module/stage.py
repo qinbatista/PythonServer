@@ -49,9 +49,11 @@ async def enter(uid, sid, stage, **kwargs):
         return common.mt(90, 'level insufficient')
     results = {}
     # H 部分约束信息
-    tim, lms = None, {}
+    tim, lms, eds = None, {}, {'stage': stage}
     if sid in VERIFY:
         can, tim, lms = await VERIFY[sid](uid, **kwargs)
+        eds.update({f'{k}': v for k, v in lms.items()})
+        lms = {k: lms[k] + (1 if i==0 else 0) for i, k in enumerate(lms)}
         if can:
             return common.mt(92, 'no more ticket, try tomorrow')
         results[sid.name] = {'limits': lms, 'cd': common.remaining_cd()}
@@ -65,14 +67,12 @@ async def enter(uid, sid, stage, **kwargs):
         return common.mt(95, 'materials insufficient')
     results['remain'], results['reward'] = rm_rw(cmw)
     # H 保存待消耗
-    eds = {'stage': stage, 'energy': energy}
+    eds['energy'] = energy
     # H 消耗特殊物资(体力)
     energy = 0
     data = (await common.try_energy(uid, -energy, **kwargs))['data']
     # H 实现部分约束
     if sid in VERIFY:
-        eds.update({f'{k}': v for k, v in lms.items()})
-        lms = {k: v + 1 for k, v in lms.items()}
         await REALIZE[sid](uid, tim, lms, **kwargs)
     # H 附加配置
     els, monsters = addition(stage, **kwargs)
