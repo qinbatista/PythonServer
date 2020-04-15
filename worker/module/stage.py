@@ -75,8 +75,8 @@ async def enter(uid, sid, stage, **kwargs):
     # H 构建结果
     results['energy'] = {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}
     # H 设置关卡进入状态
-    btm = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d %H:%M:%S')
-    await common.set_stage(uid, sid, _stage, btm, **kwargs)
+    # btm = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d %H:%M:%S')
+    # await common.set_stage(uid, sid, _stage, btm, **kwargs)
     await kwargs['redis'].set(f'stage.{uid}', stage)
     return common.mt(0, 'success', results)
 
@@ -87,7 +87,8 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
         return common.mt(91, 'stage error')
     _stage, _btm = await common.get_stage(uid, sid, **kwargs)
     _stg = await kwargs['redis'].get(f'stage.{uid}')
-    if _btm == '' or _stg is None or stage != int(_stg):
+    # if _btm == '' or _stg is None or stage != int(_stg):
+    if _stg is None or stage != int(_stg):
         return common.mt(94, 'stage mismatch')
     config, rewards = kwargs['config']['stages']['stage'].get(f'{stage}', None), {'boss': {}}
     # H 奖励普通物资
@@ -104,7 +105,7 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
         if isinstance(cm, tuple):
             return common.mt(cm[0], cm[1])
     # H 设置关卡通过状态
-    await common.set_stage(uid, sid, max(stage, _stage), '', **kwargs)
+    if stage > _stage: await common.set_stage(uid, sid, stage, '', **kwargs)
     await kwargs['redis'].delete(f'stage.{uid}')
     return common.mt(0, 'success', rewards)
 
