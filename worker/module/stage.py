@@ -131,6 +131,8 @@ async def mopping_up(uid, stage, count=1, **kwargs):
     await rw_common(uid, config['rewards']['common'], rewards, mul=count, **kwargs)
     # TODO 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
+    # TODO 任务记录
+    await task.record(uid, enums.Task.PASS_MAIN_STAGE, **kwargs)
     return common.mt(0, 'success', rewards)
 
 
@@ -297,7 +299,7 @@ async def b_dispose(uid, stage, damage, results, **kwargs):
 
 async def e_dispose(uid, stage, _stage, **kwargs):
     await task.record(uid, enums.Task.PASS_SPECIAL_STAGE, **kwargs)
-    # await hang_up(uid, new=stage > _stage, **kwargs)
+    if stage == 3001 and stage > _stage: await hang_up(uid, **kwargs)
 
 
 async def rw_common(uid, items, rewards, mul=1, **kwargs):
