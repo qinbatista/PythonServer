@@ -24,7 +24,7 @@ P = 1
 
 PW_RE = re.compile(r'\A[\w!@#$%^&*()_+|`~=\-\\\[\]:;\'\"{}/?,.<>]{6,30}\Z')
 # AC_RE = re.compile(r'^(?=.*[a-z])(?=.*[0-9])[_a-z0-9]{5,24}$')
-AC_RE = re.compile(r'^[_a-z][_a-z0-9]{4,23}$')
+AC_RE = re.compile(r'^[_a-z]{1}[_a-z0-9]{3,22}$')
 EM_RE = re.compile(r'^s*([A-Za-z0-9_-]+(.\w+)*@(\w+.)+\w{2,5})s*$')
 UID = "lukseun%sM%sP%s"
 CID = "%s#%sr%s"

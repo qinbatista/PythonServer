@@ -86,8 +86,8 @@ async def increase_worker(uid, fid, n, **kwargs):
     await common.execute(f'INSERT INTO `factory` (`uid`, `fid`, `workers`) VALUES ("{uid}", {fid.value}, \
             {current_workers[fid] + n}) ON DUPLICATE KEY UPDATE \
             `workers` = {current_workers[fid] + n};', **kwargs)
-    return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'], \
-            'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value, \
+    return common.mt(0, 'success', {'refresh' : {'resource' : r['data']['resource'],
+            'armor' : r['data']['armor']}, 'worker' : {'fid' : fid.value,
             enums.Factory.UNASSIGNED.value : unassigned - n, 'workers' : current_workers[fid] + n}})
 
 async def decrease_worker(uid, fid, n, **kwargs):
@@ -231,6 +231,8 @@ async def set_armor(uid, aid, **kwargs):
 
 #####################################  会删除的功能 #################################
 async def iron_convert(uid, aid, qty, **kwargs):
+    if qty < 0:
+        return common.mt(99, 'qty error')
     qty_iron = 20 * qty
     if int(aid) not in enums.Armor._value2member_map_:
         return common.mt(99, 'aid error')

@@ -300,7 +300,7 @@ async def b_dispose(uid, stage, damage, results, **kwargs):
 
 async def e_dispose(uid, stage, _stage, **kwargs):
     await task.record(uid, enums.Task.PASS_SPECIAL_STAGE, **kwargs)
-    if stage == 3001 and stage > _stage: await hang_up(uid, **kwargs)
+    if stage == 1001 and stage > _stage: await hang_up(uid, **kwargs)
 
 
 async def rw_common(uid, items, rewards, mul=1, **kwargs):
