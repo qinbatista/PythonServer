@@ -64,10 +64,15 @@ async def enter(uid, sid, stage, **kwargs):
     if not can:
         return common.mt(95, 'materials insufficient')
     results['remain'], results['reward'] = rm_rw(cmw)
+    # H 保存待消耗
+    eds = {'stage': stage, 'energy': energy}
     # H 消耗特殊物资(体力)
+    energy = 0
     data = (await common.try_energy(uid, -energy, **kwargs))['data']
     # H 实现部分约束
     if sid in VERIFY:
+        eds.update({f'{k}': v for k, v in lms.items()})
+        lms = {k: v + 1 for k, v in lms.items()}
         await REALIZE[sid](uid, tim, lms, **kwargs)
     # H 附加配置
     els, monsters = addition(stage, **kwargs)
@@ -77,7 +82,7 @@ async def enter(uid, sid, stage, **kwargs):
     # H 设置关卡进入状态
     # btm = datetime.now(tz=common.TZ_SH).strftime('%Y-%m-%d %H:%M:%S')
     # await common.set_stage(uid, sid, _stage, btm, **kwargs)
-    await kwargs['redis'].set(f'stage.{uid}', stage)
+    await kwargs['redis'].hmset_dict(f'stage.check.{uid}', eds)
     return common.mt(0, 'success', results)
 
 
@@ -86,11 +91,22 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
     if not STAGE_CHECK[sid](stage):
         return common.mt(91, 'stage error')
     _stage, _btm = await common.get_stage(uid, sid, **kwargs)
-    _stg = await kwargs['redis'].get(f'stage.{uid}')
+    eds = await kwargs['redis'].hgetall(f'stage.check.{uid}')
     # if _btm == '' or _stg is None or stage != int(_stg):
-    if _stg is None or stage != int(_stg):
+    eds = {k: int(v) for k, v in eds.items()}
+    if len(eds) == 0 or stage != eds['stage']:
         return common.mt(94, 'stage mismatch')
-    config, rewards = kwargs['config']['stages']['stage'].get(f'{stage}', None), {'boss': {}}
+    # 删除缓存
+    await kwargs['redis'].delete(f'stage.check.{uid}')
+    # H 消耗特殊物资(体力)
+    rewards = {'energy_info': (await common.try_energy(uid, -eds['energy'], **kwargs))['data'], 'boss': {}}
+    # H 实现部分约束
+    if sid in VERIFY:
+        eds.pop('stage')
+        eds.pop('energy')
+        await REALIZE[sid](uid, None, eds, **kwargs)
+        rewards[sid.name] = {'limits': eds, 'cd': common.remaining_cd()}
+    config = kwargs['config']['stages']['stage'].get(f'{stage}', None)
     # H 奖励普通物资
     rwc = config['rewards']['common']
     if config['constraint']['random'] == 1:
@@ -210,6 +226,19 @@ async def hang_up(uid, new=True, **kwargs):
     rewards['exp_info'] = await increase_exp(uid, config['special'].get('exp', 0) * mul, **kwargs)
     await common.set_timer(uid, enums.Timer.STAGE_HANG_UP, now, **kwargs)
     return common.mt(0, 'success', rewards)
+
+
+async def hu_show(uid, **kwargs):
+    now = datetime.now(tz=common.TZ_SH)
+    tim = await common.get_timer(uid, enums.Timer.STAGE_HANG_UP, **kwargs)
+    stage, _ = await common.get_stage(uid, enums.Stage.ENDLESS, **kwargs)
+    if stage == 1000:
+        tim, stage = now, 1001
+    cfc = kwargs['config']['stages']['constraint']['hang-up']['ENDLESS']
+    config = kwargs['config']['stages']['hang-up'][f'{stage}']['rewards']
+    mul = int(min((now - tim).total_seconds(), cfc['limit'])//cfc['step'])
+    results = [f"{s[:s.rfind(':')]}:{int(s[s.rfind(':')+1:])*mul}" for s in config['common']]
+    return common.mt(0, 'success', {'show': results})
 
 
 # ########################################### 私有方法 ############################################
@@ -342,7 +371,8 @@ async def v_constraint(uid, tid, lids, lcs, **kwargs):
 
 async def r_constraint(uid, tid, tim, lms, **kwargs):
     """实现相应模式下的修改和重置"""
-    await common.set_timer(uid, tid, tim, timeformat='%Y-%m-%d', **kwargs)
+    if tim is not None:
+        await common.set_timer(uid, tid, tim, timeformat='%Y-%m-%d', **kwargs)
     [await common.set_limit(uid, lid, lim, **kwargs) for lid, lim in lms.items()]
 
 

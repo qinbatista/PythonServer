@@ -490,6 +490,9 @@ class MessageHandler:
 	async def _stage_hang_up(self, data: dict) -> str:
 		return await stage.hang_up(data['data']['unique_id'], **data)
 
+	async def _stage_hu_show(self, data: dict) -> str:
+		return await stage.hu_show(data['data']['unique_id'], **data)
+
 	async def _stage_mopping_up(self, data: dict) -> str:
 		return await stage.mopping_up(data['data']['unique_id'], data['data']['stage'], data['data'].get('count', 1), **data)
 
@@ -750,6 +753,7 @@ FUNCTION_LIST = {
 	'stage_all_infos': MessageHandler._stage_all_infos,
 	'stage_damage_ranking': MessageHandler._stage_damage_ranking,
 	'stage_hang_up': MessageHandler._stage_hang_up,
+	'stage_hu_show': MessageHandler._stage_hu_show,
 	'stage_mopping_up': MessageHandler._stage_mopping_up,
 
 

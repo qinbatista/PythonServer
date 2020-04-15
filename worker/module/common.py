@@ -121,11 +121,11 @@ async def set_timer(uid, tid, time, timeformat = '%Y-%m-%d %H:%M:%S', **kwargs):
 
 async def get_limit(uid, lid, **kwargs):
 	data = await execute(f'SELECT `value` FROM `limits` WHERE `uid` = "{uid}" AND \
-			`lid` = {lid.value};', **kwargs)
+			`lid` = {lid};', **kwargs)
 	return data[0][0] if data != () else None
 
 async def set_limit(uid, lid, value, **kwargs):
-	await execute(f'INSERT INTO `limits` VALUES ("{uid}", {lid.value}, {value}) \
+	await execute(f'INSERT INTO `limits` VALUES ("{uid}", {lid}, {value}) \
 			ON DUPLICATE KEY UPDATE `value` = {value};', **kwargs)
 
 async def get_progress(uid, pid, **kwargs):
