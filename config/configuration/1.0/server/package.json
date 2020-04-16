@@ -23,7 +23,7 @@
 		},
 		"IRON_CARD": {
 			"sqltable": "item",
-			"mid": 24,
+			"mid": 2,
 			"bnum": 100
 		},
 		"CRYSTAL_CARD": {
