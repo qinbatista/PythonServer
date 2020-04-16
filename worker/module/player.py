@@ -107,7 +107,7 @@ async def get_info(uid, **kwargs):
 
 
 async def get_all_resource(uid, **kwargs):
-    await summoning.refresh_integral(uid, **kwargs)
+    # await summoning.refresh_integral(uid, **kwargs)
     item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)
     return common.mt(0, 'success', {'items': [{'iid': i[0], 'value': i[1]} for i in item]})
 

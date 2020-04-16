@@ -115,13 +115,13 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
     # H 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['rewards']['special'].get('exp', 0), **kwargs)
     rewards['max_stage'] = max(stage, _stage)
+    # H 设置关卡通过状态
+    if stage > _stage: await common.set_stage(uid, sid, stage, '', **kwargs)
     # H 特殊处理
     if sid in VICTORY_DISPOSE:
         cm = await VICTORY_DISPOSE[sid](uid, stage, _stage, damage, rewards, **kwargs)
         if isinstance(cm, tuple):
             return common.mt(cm[0], cm[1])
-    # H 设置关卡通过状态
-    if stage > _stage: await common.set_stage(uid, sid, stage, '', **kwargs)
     await kwargs['redis'].delete(f'stage.{uid}')
     return common.mt(0, 'success', rewards)
 

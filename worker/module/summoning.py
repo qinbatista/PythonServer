@@ -48,7 +48,9 @@ async def integral_convert(uid, **kwargs):
 	else:  # 1000
 		iid, value = config['item']['mid'], abs(config['item']['qty'])
 		_, remain_v = await common.try_item(uid, enums.Item(iid), value, **kwargs)
-		return common.mt(2, 'You get the universal segments', {'acp': acp, 'iid': iid, 'remain_v': remain_v, 'reward_v': value})
+		_, integral = await common.try_item(uid, enums.Item.INTEGRAL, -1000, **kwargs)
+		await common.set_limit(uid, enums.Limits.INTEGRAL, 0, **kwargs)
+		return common.mt(2, 'You get the universal segments', {'acp': 0, 'iid': iid, 'remain_v': remain_v, 'reward_v': value, 'integral': integral})
 
 
 async def dozen_d(uid, **kwargs):
@@ -453,17 +455,17 @@ async def _set_summon(uid, cid, pid, mid, wgt, isb, **kwargs):
 
 async def refresh_integral(uid, **kwargs):
 	"""用于刷新积分的所有情况"""
-	timer = await common.get_timer(uid, enums.Timer.INTEGRAL, timeformat='%Y-%m-%d', **kwargs)
+	tim = await common.get_timer(uid, enums.Timer.INTEGRAL, timeformat='%Y-%m-%d', **kwargs)
 	now = datetime.now(tz=common.TZ_SH)
-	timer = now if timer is None else timer
-	if timer.isocalendar()[1] != now.isocalendar()[1]:
+	tim = tim or now
+	if tim.isocalendar()[1] != now.isocalendar()[1]:
 		await asyncio.gather(
 			common.execute(f'INSERT INTO item (uid, iid, value) VALUES ("{uid}", {enums.Item.INTEGRAL}, 0) ON DUPLICATE KEY UPDATE `value` = 0;', **kwargs),
 			common.set_timer(uid, enums.Timer.INTEGRAL, now, timeformat='%Y-%m-%d', **kwargs),
 			common.set_limit(uid, enums.Limits.INTEGRAL, 0, **kwargs)
 		)
-	elif timer == now:
-		await common.set_timer(uid, enums.Timer.INTEGRAL, timer, timeformat='%Y-%m-%d', **kwargs)
+	elif tim == now:
+		await common.set_timer(uid, enums.Timer.INTEGRAL, tim, timeformat='%Y-%m-%d', **kwargs)
 
 
 SUMMON_SWITCH = {
