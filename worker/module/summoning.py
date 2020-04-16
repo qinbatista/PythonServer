@@ -347,17 +347,19 @@ async def reward_items(uid, items: str,  mul=1, module=None, **kwargs):
 		if gid == enums.Group.ITEM:
 			_, remain_v = await common.try_item(uid, iid, value, **kwargs)
 		elif gid == enums.Group.WEAPON:
-			if module is None:
-				remain_v = await common.try_weapon(uid, iid, value, **kwargs)
-			else:
-				can, remain_v = await lottery.try_unlock_weapon(uid, iid, module, **kwargs)
-				value = 0 if can else lottery.SEG_COUNT_W
+			remain_v = await common.try_weapon(uid, iid, value, **kwargs)
+			# if module is None:
+			# 	remain_v = await common.try_weapon(uid, iid, value, **kwargs)
+			# else:
+			# 	can, remain_v = await lottery.try_unlock_weapon(uid, iid, module, **kwargs)
+			# 	value = 0 if can else lottery.SEG_COUNT_W
 		elif gid == enums.Group.ROLE:
-			if module is None:
-				remain_v = await common.try_role(uid, iid, value, **kwargs)
-			else:
-				can, remain_v = await lottery.try_unlock_role(uid, iid, module, **kwargs)
-				value = 0 if can else lottery.SEG_COUNT_R
+			remain_v = await common.try_role(uid, iid, value, **kwargs)
+			# if module is None:
+			# 	remain_v = await common.try_role(uid, iid, value, **kwargs)
+			# else:
+			# 	can, remain_v = await lottery.try_unlock_role(uid, iid, module, **kwargs)
+			# 	value = 0 if can else lottery.SEG_COUNT_R
 		elif gid == enums.Group.SKILL:
 			can, iid = await lottery.try_unlock_skill(uid, iid, **kwargs)
 			gid, remain_v, value = (enums.Group.SKILL, 1, 1) if can else (enums.Group.ITEM, (await common.try_item(uid, iid, 0, **kwargs))[1], 1)

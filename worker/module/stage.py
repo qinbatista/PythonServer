@@ -232,8 +232,9 @@ async def hu_show(uid, **kwargs):
     now = datetime.now(tz=common.TZ_SH)
     tim = await common.get_timer(uid, enums.Timer.STAGE_HANG_UP, **kwargs)
     stage, _ = await common.get_stage(uid, enums.Stage.ENDLESS, **kwargs)
+    tim = tim or now
     if stage == 1000:
-        tim, stage = now, 1001
+        stage = 1001
     cfc = kwargs['config']['stages']['constraint']['hang-up']['ENDLESS']
     config = kwargs['config']['stages']['hang-up'][f'{stage}']['rewards']
     mul = int(min((now - tim).total_seconds(), cfc['limit'])//cfc['step'])
