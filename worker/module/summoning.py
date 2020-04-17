@@ -1,4 +1,5 @@
 '''
+author:hy
 summoning.py
 '''
 
@@ -20,10 +21,6 @@ import asyncio
 # 93 - The configuration file does not exist
 
 
-# H 2019年12月19日
-# ##################################################################
-# ################### 2019年12月19日之后加入的方法 #################
-# ##################################################################
 GRID = 12
 
 
@@ -67,10 +64,10 @@ async def dozen_d(uid, **kwargs):
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 		if not can: return common.mt(99, 'insufficient materials')
 	# H 奖励物品
-	multiple = grid * (1 if grid < GRID else 2)  # 计算抽奖获得的积分倍数
+	multiple = grid * (1 if grid < GRID else 2)
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': [d[0] for d in isb_data]}
-	article = [d[1] for d in isb_data]  # 获取所有的物品
-	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
+	article = [d[1] for d in isb_data]
+	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]
 	items = f"{','.join(article)},{','.join(extra)}"
 	results = await reward_items(uid, items, module='sum', **kwargs)
 	for gid, iid, remain_v, value in results:
@@ -112,10 +109,10 @@ async def dozen_c(uid, **kwargs):
 	await common.set_timer(uid, enums.Timer.SUMMON_C, tim, timeformat='%Y-%m-%d', **kwargs)
 	await common.set_limit(uid, enums.Limits.SUMMON_C, lim, **kwargs)
 	# H 奖励物品
-	multiple = grid  # 计算抽奖获得的积分倍数
+	multiple = grid
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': [d[0] for d in isb_data]}
-	article = [d[1] for d in isb_data]  # 获取所有的物品
-	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
+	article = [d[1] for d in isb_data]
+	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]
 	items = f"{','.join(article)},{','.join(extra)}"
 	results = await reward_items(uid, items, module='sum', **kwargs)
 	for gid, iid, remain_v, value in results:
@@ -141,10 +138,10 @@ async def dozen_g(uid, **kwargs):
 	can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
 	if not can: return common.mt(99, 'insufficient materials')
 	# H 奖励物品
-	multiple = grid  # 计算抽奖获得的积分倍数
+	multiple = grid
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': [d[0] for d in isb_data]}
-	article = [d[1] for d in isb_data]  # 获取所有的物品
-	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]  # 获取所有的额外物品
+	article = [d[1] for d in isb_data]
+	extra = [f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * multiple}' for r in kwargs['config']['summon']['resource'][cid.name]['reward']]
 	items = f"{','.join(article)},{','.join(extra)}"
 	results = await reward_items(uid, items, module='sum', **kwargs)
 	for gid, iid, remain_v, value in results:
@@ -160,10 +157,10 @@ async def dozen_g(uid, **kwargs):
 async def single_d(uid, **kwargs):
 	"""钻石单抽"""
 	cid = enums.Item.DIAMOND
-	if await _get_isb_count(uid, cid, isb=0, **kwargs) == 0: await refresh_d(uid, **kwargs)  # 防止未刷新就调取这个方法
+	if await _get_isb_count(uid, cid, isb=0, **kwargs) == 0: await refresh_d(uid, **kwargs)
 	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
 	# H 根据权重随机抽取奖励物品的pid, mid, wgt, isb信息
-	isb_wgt = sum([d[2] for d in isb_data])  # 计算总权重值
+	isb_wgt = sum([d[2] for d in isb_data])
 	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
@@ -180,14 +177,14 @@ async def single_d(uid, **kwargs):
 		if not can:
 			consume_id, consume = cid, abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 			can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-	if not can:  # 材料不足恢复原来的次数
+	if not can:
 		await common.set_limit(uid, enums.Limits.SUMMON_D, lim - 1, **kwargs)
 		return common.mt(99, 'insufficient materials')
 	# H 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
 	results = await reward_items(uid, items, module='sum', **kwargs)
-	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
+	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
@@ -200,10 +197,10 @@ async def single_d(uid, **kwargs):
 async def single_c(uid, **kwargs):
 	"""金币单抽"""
 	cid = enums.Item.COIN
-	if await _get_isb_count(uid, cid, isb=0, **kwargs) == 0: await refresh_c(uid, **kwargs)  # 防止未刷新就调取这个方法
+	if await _get_isb_count(uid, cid, isb=0, **kwargs) == 0: await refresh_c(uid, **kwargs)
 	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
 	# H 根据权重随机抽取奖励物品的pid, mid, wgt, isb信息
-	isb_wgt = sum([d[2] for d in isb_data])  # 计算总权重值
+	isb_wgt = sum([d[2] for d in isb_data])
 	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
@@ -217,14 +214,14 @@ async def single_c(uid, **kwargs):
 	if not c_can:
 		consume_id, consume = cid, abs(kwargs['config']['summon']['resource'][cid.name]['qty'])
 		can, qty = await common.try_item(uid, consume_id, -consume, **kwargs)
-		if not can:  # 材料不足恢复原来的次数
+		if not can:
 			await common.set_limit(uid, enums.Limits.SUMMON_C, lim + 1, **kwargs)
 			return common.mt(99, 'insufficient materials')
 	# H 奖励物品
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{consume_id.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{consume_id.value}:{consume}'], 'pid': pid, 'constraint': {'limit': lim, 'cooling': common.remaining_cd()}}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
 	results = await reward_items(uid, items, module='sum', **kwargs)
-	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
+	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
@@ -236,10 +233,10 @@ async def single_c(uid, **kwargs):
 async def single_g(uid, **kwargs):
 	"""朋友爱心单抽"""
 	cid = enums.Item.FRIEND_GIFT
-	if await _get_isb_count(uid, cid, isb=0, **kwargs) == 0: await refresh_g(uid, **kwargs)  # 防止未刷新就调取这个方法
+	if await _get_isb_count(uid, cid, isb=0, **kwargs) == 0: await refresh_g(uid, **kwargs)
 	isb_data = await _get_summon_isb(uid, cid, isb=0, **kwargs)
 	# H 根据权重随机抽取奖励物品的pid, mid, wgt, isb信息
-	isb_wgt = sum([d[2] for d in isb_data])  # 计算总权重值
+	isb_wgt = sum([d[2] for d in isb_data])
 	weights = [round(d[2]/isb_wgt, 2) for d in isb_data]
 	weights[-1] = 1 - sum(weights[:-1])
 	pid, mid, wgt, isb = random.choices(isb_data, weights=weights, k=1)[0]
@@ -251,7 +248,7 @@ async def single_g(uid, **kwargs):
 	data = {'remaining': [f'{enums.Group.ITEM.value}:{cid.value}:{qty}'], 'reward': [f'{enums.Group.ITEM.value}:{cid.value}:{consume}'], 'pid': pid}
 	items = f"{mid},{','.join(kwargs['config']['summon']['resource'][cid.name]['reward'])}"
 	results = await reward_items(uid, items, module='sum', **kwargs)
-	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)  # 设置物品已被购买过
+	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)
 	for gid, iid, remain_v, value in results:
 		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
 		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
@@ -263,7 +260,7 @@ async def refresh_d(uid, **kwargs):
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_D_END, **kwargs)
 	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.DIAMOND
-	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
+	count = await _get_isb_count(uid, cid, isb=0, **kwargs)
 	# if end_time is not None and end_time > current and count > 0:
 	if end_time is not None and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
@@ -281,7 +278,7 @@ async def refresh_c(uid, **kwargs):
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_C_END, **kwargs)
 	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.COIN
-	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
+	count = await _get_isb_count(uid, cid, isb=0, **kwargs)
 	# if end_time is not None and end_time > current and count > 0:
 	if end_time is not None and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
@@ -299,7 +296,7 @@ async def refresh_g(uid, **kwargs):
 	end_time = await common.get_timer(uid, enums.Timer.SUMMON_G_END, **kwargs)
 	current = datetime.now(tz=common.TZ_SH)
 	cid = enums.Item.FRIEND_GIFT
-	count = await _get_isb_count(uid, cid, isb=0, **kwargs)  # 获取未被抽中的数量
+	count = await _get_isb_count(uid, cid, isb=0, **kwargs)
 	# if end_time is not None and end_time > current and count > 0:
 	if end_time is not None and count > 0:
 		data = await _get_summon(uid, cid, **kwargs)
@@ -399,7 +396,7 @@ async def _refresh(uid, cid: enums, **kwargs):
 	if cooling <= 0:
 		cooling = hours * 3600
 		end_time = now + timedelta(seconds=cooling)
-		await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)  # 设置玩家下次刷新的开始时间
+		await common.set_timer(uid, SUMMON_SWITCH[cid], end_time, **kwargs)
 	constraint['cooling'] = cooling
 	constraint['acp'] = await _get_acp(uid, **kwargs)
 	return common.mt(0, 'success', {'refresh': rds, 'constraint': constraint})
@@ -423,7 +420,7 @@ async def _refresh_lim(uid, cid, var=0, **kwargs):
 	lim, tim = (func(kwargs['config']['summon']['resource']) + var, now + timedelta(days=1)) if (lim is None or tim is None or tim < now) else (lim + var, tim)
 	if cid == enums.Item.DIAMOND:
 		if lim > 2: return False, lim
-	else:  # enums.Item.COIN
+	else:
 		if lim < 0: return False, lim
 	await common.set_timer(uid, etm, tim, timeformat='%Y-%m-%d', **kwargs)
 	await common.set_limit(uid, elm, lim, **kwargs)

@@ -1,4 +1,5 @@
 '''
+author:hy
 achievement.py
 '''
 
@@ -8,7 +9,7 @@ from module import mail
 from datetime import datetime, timedelta
 
 
-async def get_all(uid, **kwargs):
+async def all(uid, **kwargs):
     now = datetime.now(tz=common.TZ_SH)
     tim = await common.get_timer(uid, enums.Timer.LOGIN, **kwargs)
     tim = now - timedelta(days=1) if tim is None else tim
@@ -38,7 +39,7 @@ async def record(uid, aid, value=1, **kwargs):
     return common.mt(0, f"record:{aid} success")
 
 
-async def get_reward(uid, aid, **kwargs):
+async def reward(uid, aid, **kwargs):
     if aid not in enums.Achievement._value2member_map_: return common.mt(97, 'Aid does not exist')
     config = kwargs["config"]["achievement"][f'{aid}']
     count = config["count"]

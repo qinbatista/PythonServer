@@ -429,10 +429,10 @@ class MessageHandler:
 
 	###################### achievement ######################
 	async def _get_all_achievement(self, data: dict) -> str:
-		return await achievement.get_all(data['data']['unique_id'], **data)
+		return await achievement.all(data['data']['unique_id'], **data)
 
 	async def _get_achievement_reward(self, data: dict) -> str:
-		return await achievement.get_reward(data['data']['unique_id'], data["data"]["achievement_id"], **data)
+		return await achievement.reward(data['data']['unique_id'], data["data"]["achievement_id"], **data)
 
 	async def _get_achievement_config(self, data: dict) -> str:
 		return common.mt(0, 'success', data={'config': data['config']['achievement']})
