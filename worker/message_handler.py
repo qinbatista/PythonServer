@@ -428,6 +428,9 @@ class MessageHandler:
 		return await player.element_reset(data['data']['unique_id'], **data)
 
 	###################### achievement ######################
+	async def _activate_achievement(self, data: dict) -> str:
+		return await achievement.activate(data['data']['unique_id'], int(data["data"]["aid"]), **data)
+
 	async def _get_all_achievement(self, data: dict) -> str:
 		return await achievement.all(data['data']['unique_id'], **data)
 
@@ -695,14 +698,12 @@ FUNCTION_LIST = {
 	'reset_skill_point_weapon' : MessageHandler._reset_skill_point_weapon,
 	'get_all_weapon' : MessageHandler._get_all_weapon,
 
-	# TODO
 	###################### role.py ######################
 	'level_up_star_role' : MessageHandler._level_up_star_role,
 	'level_up_role' : MessageHandler._level_up_role,
 	'get_all_role' : MessageHandler._get_all_role,
 	'unlock_passive_role' : MessageHandler._unlock_passive_role,
 
-	# TODO
 	###################### 签到系统 ######################
 	'check_in_sign' : MessageHandler._check_in_sign,
 	'check_in_supplement' : MessageHandler._check_in_supplement,
@@ -714,20 +715,18 @@ FUNCTION_LIST = {
 	'purchase_vip_card' : MessageHandler._purchase_vip_card,
 	'get_info_vip' : MessageHandler._get_info_vip,
 
-	# TODO
 	###################### player ######################
 	'get_all_resource': MessageHandler._get_all_resource,
 	'player_element_lv': MessageHandler._player_element_lv,
 	'player_element_all': MessageHandler._player_element_all,
 	'player_element_reset': MessageHandler._player_element_reset,
 
-	# TODO
 	###################### player ######################
 	'science_infos': MessageHandler._science_infos,
 	'science_up': MessageHandler._science_up,
 
-	# TODO
 	###################### achievement ######################
+	'activate_achievement': MessageHandler._activate_achievement,
 	'get_all_achievement': MessageHandler._get_all_achievement,
 	'get_achievement_reward':MessageHandler._get_achievement_reward,
 	'get_achievement_config':MessageHandler._get_achievement_config,
@@ -736,7 +735,6 @@ FUNCTION_LIST = {
 	'upgrade_armor': MessageHandler._upgrade_armor,
 	'get_all_armor': MessageHandler._get_all_armor,
 
-	# TODO
 	###################### stage ######################
 	# TODO 2020年3月25日之后优化并改写的方法
 	'stage_enter_general': MessageHandler._stage_enter_general,

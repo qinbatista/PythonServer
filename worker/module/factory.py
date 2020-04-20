@@ -304,6 +304,7 @@ def update_state(steps, level, worker, storage, **kwargs):
             var = min(lmd[f]-storage[f], storage[fid]//ct, worker[f]*steps)
             storage[f] += var
             storage[fid] -= var * ct
+    storage[fid] = min(storage[fid], lmd[fid])
     delta = {k: storage[k] - initial_storage[k] for k in storage}
     return storage, delta
 

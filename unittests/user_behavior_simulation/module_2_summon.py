@@ -160,6 +160,8 @@ if __name__ == '__main__':
     # user_behavior_simulation.send_tcp_message({"function":"level_up_passive_weapon","random":"-284","world":"s6","data":{"weapon":"302","passive":"4","token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODgxNTUwNjksInVpZCI6IjEwMCJ9.NKnPGjQWul4LXG5HnQrMK--LBIWotQZJloCxQVm2VXg"}})
 
     token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
+    # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'activate_achievement', 'data' : {'token' : token, 'aid': 30}})
+    # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token' : token, 'cid': '21', 'qty': 2}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_hu_show', 'data': {'token': token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'iron_convert_factory', 'data': {'token': token, 'aid': 1, 'qty': 1}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
@@ -171,8 +173,8 @@ if __name__ == '__main__':
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_victory_general', 'data': {'token': token, 'stage': 8}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_enter_endless', 'data': {'token': token, 'stage': 1001}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_victory_endless', 'data': {'token': token, 'stage': 1001}})
-    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_enter_boss', 'data': {'token': token, 'stage': 3001}})
-    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_victory_boss', 'data': {'token': token, 'stage': 3001, 'damage': 5500}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_enter_boss', 'data': {'token': token, 'stage': 3001}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_victory_boss', 'data': {'token': token, 'stage': 3001, 'damage': 5500}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_enter_coin', 'data': {'token': token, 'stage': 4001}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_victory_coin', 'data': {'token': token, 'stage': 4001}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_enter_exp', 'data': {'token': token, 'stage': 4151}})
@@ -199,7 +201,7 @@ if __name__ == '__main__':
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'player_element_reset', 'data': {'token': token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_stage', 'data': {'token': token, 'task_id': 1}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_achievement', 'data': {'token': token}})
-    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_achievement_reward', 'data': {'token': token, 'achievement_id': 1}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_achievement_reward', 'data': {'token': token, 'achievement_id': 30}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'add_resources', 'data': {'token': token, 'items': ['3:1:100', '3:2:100', '3:5:100']}})
 
     # user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
@@ -234,7 +236,6 @@ if __name__ == '__main__':
     # user_behavior_simulation.send_tcp_message({'world': 's9', 'function': 'respond_friend', 'data': {'token': token, 'key': '1578825778.M606582P1Q158.mail-678b475767-7qwgc'}})
     # token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEyMzY2NzYsInVpZCI6IkMxNjA0NUQ1LTNBODUtNDVFRC04OTdELTI4ODNERjlDMDA1MCJ9.iG0319v13oHAfxijOkwOvqPMwT42Rptu_TCbjTRAVrg"
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'change_player_name', 'data': {'token': token, 'gn': 'bhjb  mnjk csa'}})
-    # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'use_item', 'data' : {'token' : token, 'item_id': '3:6:12', 'exchange_id': ''}})
     # user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id' : '', 'account': 'account00', 'password': '0password'}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_notice', 'data': {'token' : token}})
