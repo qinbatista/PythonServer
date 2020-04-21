@@ -388,7 +388,7 @@ async def _refresh(uid, cid: enums, **kwargs):
 	gdk = len(goods)
 	k = len(grids) - gdk
 	if k > 0:
-		goods = random.choices(kwargs['config']['summon']['merchandise'], k=k)
+		goods = random.choices(config['other']['goods'], k=k)
 		await random_summon(uid, cid, grids, goods, rds, gdk, **kwargs)
 	hours = config['constraint']['hours']
 	tim = await common.get_timer(uid, SUMMON_SWITCH[cid], **kwargs) or now

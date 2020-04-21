@@ -428,8 +428,8 @@ class Achievement(enum.IntEnum):
     FRIEND_REQUEST = 27
     FRIEND_GIFT = 28
     FAMILY_CHECK_IN = 29
-    ACT_AI = 30  # AI第一次意识觉醒
-    ACT_UNS = 31  # 不使用技能触发
+    ACT_AI = 101  # AI第一次意识觉醒
+    ACT_UNS = 102  # 不使用技能触发
 
 
 class Task(enum.IntEnum):

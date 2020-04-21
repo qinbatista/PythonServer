@@ -36,15 +36,15 @@ async def level_up(uid, wid, delta, **kwargs):
 	can_pay, remain_c = await common.try_item(uid, enums.Item.COIN, -consume, **kwargs)
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
 	_, remain_i = await common.try_item(uid, enums.Item.IRON, -consume, **kwargs)
+	_sp = (level + delta) // 10 - level // 10
 	level += delta
-	_sp = 1 if level % 10 == 0 else 0
 	await common.execute(f'UPDATE weapon SET level = {level}, skillpoint = {sp + _sp} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
 	await task.record(uid, enums.Task.WEAPON_LEVEL_UP, **kwargs)
 	await achievement.record(uid, enums.Achievement.LV_UPW, **kwargs)
-	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : level, 'sp' : sp + _sp},
-													enums.Group.ITEM.value : [{'iid' : enums.Item.IRON.value, 'value' : remain_i}, {'iid' : enums.Item.COIN.value, 'value' : remain_c}]},
-										'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, 'level' : delta, 'sp' : _sp},
-													enums.Group.ITEM.value : [{'iid' : enums.Item.IRON.value, 'value' :consume}, {'iid' : enums.Item.COIN.value, 'value' : consume}]}})
+	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON : {'wid' : wid, 'level' : level, 'sp' : sp + _sp},
+													enums.Group.ITEM : [{'iid' : enums.Item.IRON, 'value' : remain_i}, {'iid' : enums.Item.COIN, 'value' : remain_c}]},
+										'reward': {enums.Group.WEAPON : {'wid' : wid, 'level' : delta, 'sp' : _sp},
+													enums.Group.ITEM : [{'iid' : enums.Item.IRON, 'value' :consume}, {'iid' : enums.Item.COIN, 'value' : consume}]}})
 
 async def level_up_passive(uid, wid, pid, **kwargs):
 	max_pid = 4 if wid // 100 > 2 else 3

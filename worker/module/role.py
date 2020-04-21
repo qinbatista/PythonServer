@@ -54,8 +54,8 @@ async def level_up_star(uid, rid, **kwargs):
 
 async def unlock_passive(uid, rid, pid, **kwargs):
 	"""解锁被动技能"""
-	if rid not in enums.Role._value2member_map_.keys(): return common.mt(99, 'Role id error')
-	if pid not in enums.RolePassive._value2member_map_.keys() or pid//100 != 1: return common.mt(98, 'Passive skill id error')
+	if rid not in enums.Role._value2member_map_: return common.mt(99, 'Role id error')
+	if pid not in enums.RolePassive._value2member_map_ or pid//100 != 1: return common.mt(98, 'Passive skill id error')
 	rid, pid = enums.Role(rid), enums.RolePassive(pid)
 	exists, payload = await _get_role_info(uid, rid, 'star', 'level', **kwargs)
 	if not exists: return common.mt(97, 'invalid target')
@@ -69,7 +69,7 @@ async def unlock_passive(uid, rid, pid, **kwargs):
 	can, remain = await common.try_item(uid, enums.Item.COIN, -qty, **kwargs)
 	if not can: return common.mt(93, 'insufficient coin')
 	await _update_ps_lv(uid, rid, pid, 1, **kwargs)
-	return common.mt(0, 'success', {'rid': rid.value, 'pid': pid.value, 'consume': f'{enums.Group.ITEM.value}:{enums.Item.COIN.value}:{remain}:{qty}'})
+	return common.mt(0, 'success', {'rid': rid, 'pid': pid, 'consume': f'{enums.Group.ITEM}:{enums.Item.COIN}:{remain}:{qty}'})
 
 
 # async def get_all(uid, **kwargs):
@@ -102,7 +102,7 @@ async def _get_ps(uid, rid, pid, **kwargs):
 
 
 async def _get_role_info(uid, rid, *args, **kwargs):
-	data = await common.execute(f'SELECT {",".join(args)} FROM role WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
+	data = await common.execute(f'SELECT {",".join(args)} FROM role WHERE uid = "{uid}" AND rid = {rid}', **kwargs)
 	return (True, data[0]) if data != () else (False, ())
 
 

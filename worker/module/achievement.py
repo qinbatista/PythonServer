@@ -9,16 +9,9 @@ from module import mail
 from datetime import datetime, timedelta
 
 
-ACT = [
-    enums.Achievement.ACT_AI,
-    enums.Achievement.ACT_UNS,
-]
-
-
 async def activate(uid, aid, **kwargs):
-    if aid not in enums.Achievement._value2member_map_: return common.mt(97, 'Aid does not exist')
+    if aid not in enums.Achievement._value2member_map_ and 100 < aid < 200: return common.mt(97, 'Aid does not exist')
     aid = enums.Achievement(aid)
-    if aid not in ACT: return common.mt(96, 'Aid error')
     await record(uid, aid, **kwargs)
     return common.mt(0, 'success')
 

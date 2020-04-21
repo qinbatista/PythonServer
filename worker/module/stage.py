@@ -318,7 +318,8 @@ async def b_dispose(uid, stage, damage, results, **kwargs):
     damage = min(damage, kwargs['config']['boss'].get('damage', 100_0000))
     record = _damage < damage
     total = await get_leaderboard(uid, tlid, stage, **kwargs) + damage
-    await set_leaderboard(uid, tlid, total, stage, **kwargs)
+    if total != 0:
+        await set_leaderboard(uid, tlid, total, stage, **kwargs)
     hp = max(0, boss_hp[f'{stage}'] - damage)
     boss_hp[f'{stage}'] = hp
     if record:

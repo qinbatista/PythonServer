@@ -326,7 +326,7 @@ async def abdicate(uid, target, **kwargs):
 	await _record_family_change(name, f'{enums.FamilyHistoryKeys.ABDICATE.value}:{gn},{target}', **kwargs)
 	return common.mt(0, 'success', {gn: enums.FamilyRole.BASIC.value, target: enums.FamilyRole.OWNER.value})
 
-# H 内部方法
+
 async def welfare(uid, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
@@ -338,9 +338,9 @@ async def welfare(uid, **kwargs):
 		for item in kwargs['config']['family']['store']['gift']:
 			_, iid, cost = (common.decode_items(item))[0]
 			_, qty = await common.try_item(member, iid, cost, **kwargs)
-			data['remaining'].append({'iid': iid.value, 'qty': qty})
-			data['reward'].append({'iid': iid.value, 'qty': cost})
-	await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE.value}:{await common.get_gn(uid, **kwargs)}', **kwargs)
+			data['remaining'].append({'iid': iid, 'qty': qty})
+			data['reward'].append({'iid': iid, 'qty': cost})
+	await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE}:{await common.get_gn(uid, **kwargs)}', **kwargs)
 	return common.mt(0, 'success', data)
 
 async def search(name, **kwargs):
