@@ -426,16 +426,15 @@ async def _count_members(name, **kwargs):
 	return count[0][0]
 
 async def _get_family_changes(name, **kwargs):
-	data = await common.execute(f'SELECT `date`, `msg` FROM familyhistory WHERE `name` = "{name}" ORDER BY `hid` LIMIT 30;', **kwargs)
-	return data
+	return await common.execute(f'SELECT `date`, `msg` FROM familyhistory WHERE `name` = "{name}" ORDER BY `hid` LIMIT 30;', **kwargs)
 
 async def _record_family_change(name, msg, **kwargs):
 	await common.execute(f'INSERT INTO familyhistory(name, date, msg) VALUES("{name}", "{datetime.now(tz=common.TZ_SH).strftime("%Y-%m-%d %H:%M:%S")}", "{msg}");', **kwargs)
 
 async def _get_member_info(name, **kwargs):
 	# await __insert(name, **kwargs)
-	data = await common.execute(f'SELECT player.gn, progress.rid, familyrole.role, progress.exp, timer.time, item.value, i2.value FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid join timer on timer.uid = familyrole.uid and timer.tid={enums.Timer.LOGIN} join item on item.uid = familyrole.uid and item.iid ={enums.Item.FAMILY_COIN} join item as i2 on i2.uid = familyrole.uid and i2.iid ={enums.Item.FAMILY_COIN_RECORD} WHERE familyrole.name = "{name}";', **kwargs)
-	return [{'gn' : m[0], 'player_role' : m[1], 'family_role' : m[2], 'exp' : m[3], 'last_login' : m[4], 'family_coin' : m[5], 'family_coin_record' : m[6]} for m in data]
+	data = await common.execute(f'SELECT player.gn, player.icon, familyrole.role, progress.exp, timer.time, item.value, i2.value FROM familyrole JOIN player ON player.uid = familyrole.uid JOIN progress ON progress.uid = familyrole.uid join timer on timer.uid = familyrole.uid and timer.tid={enums.Timer.LOGIN} join item on item.uid = familyrole.uid and item.iid ={enums.Item.FAMILY_COIN} join item as i2 on i2.uid = familyrole.uid and i2.iid ={enums.Item.FAMILY_COIN_RECORD} WHERE familyrole.name = "{name}";', **kwargs)
+	return [{'gn' : m[0], 'icon' : m[1], 'family_role' : m[2], 'exp' : m[3], 'login' : m[4], 'family_coin' : m[5], 'family_coin_record' : m[6]} for m in data]
 
 async def _get_family_info(name, *args, **kwargs):
 	data = await common.execute(f'SELECT {",".join(args)} FROM family WHERE name = "{name}";', **kwargs)
@@ -492,7 +491,7 @@ async def increase_exp(name, exp, **kwargs):
 	# H 重新计算等级和需要的经验
 	sql_exp += exp
 	level, need = common.__calculate(exp_config, sql_exp)
-	await common.update_famliy(name, 'exp', sql_exp, **kwargs)
+	await common.set_famliy(name, 'exp', sql_exp, **kwargs)
 	# H 返回总经验、等级、需要经验
 	return {'exp': sql_exp, 'level': level, 'need': need, 'reward': exp}
 

@@ -135,7 +135,14 @@ async def get_progress(uid, pid, **kwargs):
 async def set_progress(uid, pid, value, **kwargs):
 	await execute(f'INSERT INTO `progress` (uid, {pid}) VALUES ("{uid}", "{value}") ON DUPLICATE KEY UPDATE {pid}="{value}";', **kwargs)
 
-async def update_famliy(name, fid, value, **kwargs):
+async def get_player(uid, pid, **kwargs):
+	data = await execute(f'SELECT {pid} FROM `player` WHERE `uid` = "{uid}";', **kwargs)
+	return data[0][0] if data != () else None
+
+async def set_player(uid, pid, value, **kwargs):
+	await execute(f'UPDATE `player` SET {pid}="{value}" WHERE uid="{uid}";', **kwargs)
+
+async def set_famliy(name, fid, value, **kwargs):
 	await execute(f'UPDATE `family` SET {fid}="{value}" WHERE name="{name}";', **kwargs)
 
 async def set_achievement(uid, aid, value, reset=False, **kwargs):

@@ -158,13 +158,15 @@ if __name__ == '__main__':
     # res = user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
 
     # user_behavior_simulation.send_tcp_message({"function":"level_up_passive_weapon","random":"-284","world":"s6","data":{"weapon":"302","passive":"4","token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODgxNTUwNjksInVpZCI6IjEwMCJ9.NKnPGjQWul4LXG5HnQrMK--LBIWotQZJloCxQVm2VXg"}})
-
+    # user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
     token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
+
+    # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'bind_phone', 'data' : {'token' : token, 'phone_number': '18323019610'}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'activate_achievement', 'data' : {'token' : token, 'aid': 30}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token' : token, 'cid': '21', 'qty': 2}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'stage_hu_show', 'data': {'token': token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'iron_convert_factory', 'data': {'token': token, 'aid': 1, 'qty': 1}})
-    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
     # user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_all_market', 'data': {'token': token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'buy_energy', 'data': {'token': token}})
@@ -214,7 +216,7 @@ if __name__ == '__main__':
     #     # token = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})['data']['token']
     #     user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
     #     token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
-    #     user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
+    #     user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}', 'icon': f'1'}})
         # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'request_friend', 'data': {'token': token, 'gn_target': 'a16'}})
 
     #

@@ -14,6 +14,7 @@ import aioredis
 import aiomysql
 import requests
 import threading
+import copy
 
 from datetime import datetime
 from dateutil import tz
@@ -130,7 +131,7 @@ class ModuleConfigurations:
 			if self.configs.get('boss') is None:
 				self.configs['boss'] = self.configs['stages']['constraint']['stage']['BOSS']
 				self.configs['boss']['HP'] = {k: v['boss']['HP'] for k, v in self.configs['stages']['stage'].items() if (k.isdigit() and 3000 < int(k) < 4000)}
-			self.configs['boss']['hp'] = {w['id']: {s: hp for s, hp in self.configs['boss']['HP'].items()} for w in self.configs['world']['worlds']}
+			self.configs['boss']['hp'] = {w['id']: copy.deepcopy(self.configs['boss']['HP']) for w in self.configs['world']['worlds']}
 
 	def __getitem__(self, key):
 		return self.configs[key]

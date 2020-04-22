@@ -200,8 +200,8 @@ async def damage_ranking(uid, stage, page, **kwargs):
     adt = await rank_all(tlid, stage, page, **kwargs)
     if adt == (): return common.mt(88, 'No data for this page')
     # adw = await rank_all(lid, stage, page, **kwargs)
-    rank = {f'{tlid}': await rank_info(adt, page, **kwargs)}
-            # f'{lid}': await rank_info(adw, page, **kwargs)}
+    rank = {f'{tlid}': await rank_info(adt, page)}
+            # f'{lid}': await rank_info(adw, page)}
     return common.mt(0, 'success', {'page': page, 'own_rank': rds, 'rank': rank})
 
 
@@ -244,10 +244,10 @@ async def hu_show(uid, **kwargs):
 
 
 # ########################################### 私有方法 ############################################
-async def rank_info(ads, page, **kwargs) -> list:
-    return [{'NO': (page - 1)*10 + 1 + i, 'name': d[0],
-            'damage': d[1], 'fid': d[2] or '',
-             'level': (await increase_exp(d[3], 0, **kwargs))['level']} for i, d in enumerate(ads)]
+async def rank_info(ads, page) -> list:
+    # pl.gn, pl.fid, p.icon, pr.exp, l.value
+    return [{'NO': (page - 1)*50 + 1 + i, 'name': d[0], 'fid': d[1] or '',
+             'icon': d[2], 'exp': d[3], 'damage': d[4]} for i, d in enumerate(ads)]
 
 
 async def rank_update(uid, key, stage, **kwargs):
@@ -267,10 +267,12 @@ async def rank_update(uid, key, stage, **kwargs):
 
 
 async def rank_all(lid, stage, page, **kwargs):
-    return await common.execute(f'SELECT p.gn, l.value, p.fid, p.uid FROM '
-                                f'player p, leaderboard l WHERE p.uid = l.uid '
-                                f'AND l.lid = {lid} AND l.stage = {stage} ORDER'
-                                f' BY l.value DESC LIMIT {(page - 1)*50}, 50;', **kwargs)
+    return await common.execute(f'SELECT pl.gn, pl.fid, pl.icon, pr.exp, l.value '
+                                f'FROM progress AS pr JOIN player AS pl JOIN '
+                                f'leaderboard AS l ON pr.uid = pl.uid AND '
+                                f'l.uid = pr.uid AND l.lid = {lid} AND '
+                                f'l.stage = {stage} ORDER BY l.value DESC '
+                                f'LIMIT {(page - 1)*50}, 50;', **kwargs)
 
 
 async def rank_own(uid, lid, stage, **kwargs):

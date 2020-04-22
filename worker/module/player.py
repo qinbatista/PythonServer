@@ -17,13 +17,13 @@ GN_RE = re.compile(r'^[\u4e00-\u9fa5_a-zA-Z0-9]+$')
 ELEMENT_LIM = 3
 
 
-async def create(uid, gn, **kwargs):
+async def create(uid, gn, icon, **kwargs):
     if uid == "" or gn == "" or not bool(GN_RE.match(gn)): return common.mt(98, 'Player uid or name is empty or Game name is not legal')
     if (await common.execute(f'SELECT COUNT(*) FROM player WHERE uid = "{uid}" OR gn = "{gn}";', **kwargs))[0][0] != 0: return common.mt(99, 'Player uid or name already exists')
-    await common.execute(f'INSERT INTO player(uid, gn) VALUES ("{uid}", "{gn}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
+    await common.execute(f'INSERT INTO player(uid, gn, icon) VALUES ("{uid}", "{gn}", "{icon}") ON DUPLICATE KEY UPDATE gn = gn;', **kwargs)
     await init(uid, **kwargs)
     await _meeting_gift(uid, **kwargs)
-    return common.mt(0, 'success', {'gn': gn})
+    return common.mt(0, 'success', {'gn': gn, 'icon': icon})
 
 
 async def enter_world(uid, **kwargs):
@@ -32,14 +32,19 @@ async def enter_world(uid, **kwargs):
     kwargs['world'] = common.translate_world(**kwargs)
     existing_player = await common.exists('player', ('uid', translated_uid), **kwargs)
     session = (await account._request_new_token(translated_uid, is_session='1', **kwargs))['token']
-    await update_time(uid, **kwargs)
     if not existing_player:
         return common.mt(98, 'have not been in this world before', {'cid': cid, 'session' : session})
     return common.mt(0, 'success', {'cid': cid, 'session' : session})
 
 
-async def update_time(uid, **kwargs):
-    pass
+async def set_icon(uid, icon, **kwargs):
+    await common.set_player(uid, 'icon', icon, **kwargs)
+    return common.mt(0, 'success', {'icon': icon})
+
+
+async def set_intro(uid, intro, **kwargs):
+    await common.set_player(uid, 'intro', intro, **kwargs)
+    return common.mt(0, 'success', {'intro': intro})
 
 
 async def get_account_world_info(uid, **kwargs):
@@ -106,7 +111,7 @@ async def get_info(uid, **kwargs):
                       'elm': elm, 'bel': bel, 'cd': common.remaining_cd()})
 
 
-async def get_all_resource(uid, **kwargs):
+async def all_resource(uid, **kwargs):
     # await summoning.refresh_integral(uid, **kwargs)
     item = await common.execute(f'SELECT iid, value FROM item WHERE uid = "{uid}";', **kwargs)
     return common.mt(0, 'success', {'items': [{'iid': i[0], 'value': i[1]} for i in item]})
@@ -114,7 +119,7 @@ async def get_all_resource(uid, **kwargs):
 
 async def init(uid, **kwargs):
     await asyncio.gather(
-        common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180, rid={enums.Role.R402} WHERE uid="{uid}";', **kwargs),
+        common.execute(f'UPDATE progress SET energy={kwargs["config"]["player"]["energy"]["max_energy"]}, exp=180 WHERE uid="{uid}";', **kwargs),
         common.execute(f'INSERT INTO factory (uid, fid, workers, storage) VALUES ("{uid}", {enums.Factory.UNASSIGNED}, 3, 3);', **kwargs),
         common.execute(f'INSERT INTO role (uid, star, level, rid) VALUES ("{uid}", 1, 1, {enums.Role.R402});', **kwargs),
         common.execute(f'INSERT INTO weapon(uid, star, wid) VALUES ("{uid}", 1, {enums.Weapon.W301}), ("{uid}", 1, {enums.Weapon.W302}), ("{uid}", 1, {enums.Weapon.W303});', **kwargs),

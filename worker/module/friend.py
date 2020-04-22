@@ -22,8 +22,8 @@ async def get_all(uid, **kwargs):
     info = await _get_friend_info(uid, **kwargs)
     return common.mt(0, 'got all friends', {'friends': [
         {'gn': i[0], 'exp': i[1], 'recover': i[2], 'since': i[3],
-         'fid': '' if i[4] is None else i[4], 'intro': i[5], 'icon': 101} for i
-        in info]})
+         'fid': '' if i[4] is None else i[4], 'icon': i[5], 'intro': i[6]}
+        for i in info]})
 
 
 async def remove(uid, gn_target, **kwargs):
@@ -120,19 +120,18 @@ async def send_gift_all(uid, **kwargs):
 
 
 async def find_person(uid, gn_target, **kwargs):
-    data = await _get_person_info(await common.get_uid(gn_target, **kwargs),
-                                  **kwargs)
-    uid_target = await common.get_uid(gn_target, **kwargs)
-    if uid == uid_target: return common.mt(98, "can't add yourself")
-    if data == (): return common.mt(99, 'no such person')
+    tid = await common.get_uid(gn_target, **kwargs)
+    info = await _get_person_info(tid, **kwargs)
+    if uid == tid: return common.mt(98, "can't add yourself")
+    if info == (): return common.mt(99, 'no such person')
     stage, _ = await common.get_stage(uid, enums.Stage.GENERAL, **kwargs)
-    isfriends, _, _ = await _are_friends(uid, uid_target, **kwargs)
-    canfamily = await _can_invite_family(uid, uid_target, **kwargs)
+    isfriends, _, _ = await _are_friends(uid, tid, **kwargs)
+    canfamily = await _can_invite_family(uid, tid, **kwargs)
     return common.mt(0, 'find person success',
-                     {'gn': data[0][0], 'intro': data[0][1],
-                      'fid': data[0][2] or '', 'exp': data[0][3],
-                      'role': data[0][4], 'stage': stage,
-                      "isfriend": isfriends, "canfamily": canfamily})
+                     {'gn': info[0][0], 'fid': info[0][1] or '',
+                      'icon': info[0][2], 'intro': info[0][3],
+                      'exp': info[0][4], 'stage': stage,
+                      'isfriend': isfriends, 'canfamily': canfamily})
 
 
 ###########################################################################################################
@@ -225,11 +224,11 @@ async def _are_family(uid, fid, **kwargs):
 
 
 async def _get_friend_info(uid, **kwargs):
-    return await common.execute(f'SELECT player.gn, progress.exp, friend.recover, friend.since, player.fid, player.intro FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
+    return await common.execute(f'SELECT player.gn, progress.exp, friend.recover, friend.since, player.fid, player.icon, player.intro FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
 
 
 async def _get_person_info(uid, **kwargs):
-    return await common.execute(f'SELECT player.gn, player.intro, player.fid, progress.exp, progress.rid FROM progress JOIN player ON progress.uid = player.uid WHERE player.uid = "{uid}";', **kwargs)
+    return await common.execute(f'SELECT player.gn, player.fid, player.icon, player.intro, progress.exp FROM progress JOIN player ON progress.uid = player.uid WHERE player.uid = "{uid}";', **kwargs)
 
 
 async def _lookup_nonce(nonce, **kwargs):

@@ -125,10 +125,16 @@ class MessageHandler:
 
 	###################### player.py ######################
 	async def _create_player(self, data: dict) -> str:
-		return await player.create(data['data']['unique_id'], data['data']['gn'], **data)
+		return await player.create(data['data']['unique_id'], data['data']['gn'], data['data']['icon'], **data)
 
 	async def _change_player_name(self, data: dict) -> str:
 		return await player.change_name(data['data']['unique_id'], data['data']['gn'], **data)
+
+	async def _player_set_intro(self, data: dict) -> str:
+		return await player.set_intro(data['data']['unique_id'], data['data']['intro'], **data)
+
+	async def _player_set_icon(self, data: dict) -> str:
+		return await player.set_icon(data['data']['unique_id'], data['data']['icon'], **data)
 
 	async def _enter_world(self, data: dict) -> str:
 		return await player.enter_world(data['data']['unique_id'], **data)
@@ -416,7 +422,7 @@ class MessageHandler:
 
 	###################### player ######################
 	async def _get_all_resource(self, data: dict) -> str:
-		return await player.get_all_resource(data['data']['unique_id'], **data)
+		return await player.all_resource(data['data']['unique_id'], **data)
 
 	async def _player_element_lv(self, data: dict) -> str:
 		return await player.element_lv(data['data']['unique_id'], int(data['data']['eid']), **data)
@@ -616,6 +622,8 @@ FUNCTION_LIST = {
 	'accept_gifts' : MessageHandler._accept_gifts,
 	'create_player' : MessageHandler._create_player,
 	'change_player_name' : MessageHandler._change_player_name,
+	'player_set_intro' : MessageHandler._player_set_intro,
+	'player_set_icon' : MessageHandler._player_set_icon,
 	'get_account_world_info' : MessageHandler._get_account_world_info,
 	'get_info_player' : MessageHandler._get_info_player,
 

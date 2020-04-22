@@ -223,8 +223,8 @@ async def single_c(uid, **kwargs):
 	results = await reward_items(uid, items, module='sum', **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)
 	for gid, iid, remain_v, value in results:
-		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
-		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
+		data['remaining'].append(f'{gid}:{iid}:{remain_v}')
+		data['reward'].append(f'{gid}:{iid}:{value}')
 	# H 完成任务
 	await task.record(uid, enums.Task.BASIC_SUMMONING, **kwargs)
 	return common.mt(0, 'success', data=data)
@@ -250,8 +250,8 @@ async def single_g(uid, **kwargs):
 	results = await reward_items(uid, items, module='sum', **kwargs)
 	await _set_summon(uid, cid, pid, mid, wgt, 1, **kwargs)
 	for gid, iid, remain_v, value in results:
-		data['remaining'].append(f'{gid.value}:{iid.value}:{remain_v}')
-		data['reward'].append(f'{gid.value}:{iid.value}:{value}')
+		data['remaining'].append(f'{gid}:{iid}:{remain_v}')
+		data['reward'].append(f'{gid}:{iid}:{value}')
 	return common.mt(0, 'success', data=data)
 
 

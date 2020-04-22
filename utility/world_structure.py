@@ -178,7 +178,8 @@ CREATE TABLE `player` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
 	  `gn` VARCHAR(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家游戏名',
 	  `fid` VARCHAR(32) COLLATE utf8mb4_unicode_ci COMMENT '家族id(名字)',
-	  `intro` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '玩家自我介绍',
+	  `icon` VARCHAR(16) COLLATE utf8mb4_unicode_ci COMMENT '玩家头像',
+	  `intro` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '玩家自我介绍',
 	  PRIMARY KEY (`uid`),
 	  UNIQUE KEY `u_gn` (`gn`)
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -191,7 +192,7 @@ PROGRESS = \
 """
 CREATE TABLE `progress` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '玩家id',
-	  `energy` SMALLINT UNSIGNED DEFAULT 120 COMMENT '玩家体力值',
+	  `energy` INT UNSIGNED DEFAULT 120 COMMENT '玩家体力值',
 	  `exp` INT UNSIGNED DEFAULT 0 COMMENT '玩家经验',
 	  `vipexp` INT UNSIGNED DEFAULT 0 COMMENT 'vip经验',
 	  `rid` SMALLINT UNSIGNED DEFAULT 0 COMMENT '正在使用的角色',
