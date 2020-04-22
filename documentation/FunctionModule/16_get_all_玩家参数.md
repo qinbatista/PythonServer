@@ -875,7 +875,7 @@
 
 ## get_config_skill
 
-获取skill_level_up_config.json的配置文件信息
+获取skills.json的配置文件信息
 
 ##### 发送消息JSON格式
 
@@ -893,11 +893,11 @@
 
 ##### 接受消息JSON格式
 
-返回技能配置信息，配置文件来自skill_level_up_config.json
+返回技能配置信息，配置文件来自skills.json
 
 [成功]()
 
-> skill_config：返回skill_level_up_config.json
+> skill_config：返回skills.json
 
 ```json
 {
@@ -1397,7 +1397,7 @@
 
 ## get_config_role
 
-获取role_config.json的配置文件信息
+获取roles.json的配置文件信息
 
 ##### 发送消息JSON格式
 
@@ -1415,11 +1415,11 @@
 
 ##### 接受消息JSON格式
 
-返回角色配置信息，配置文件来自role_config.json
+返回角色配置信息，配置文件来自roles.json
 
 [成功]()
 
-> role_config：返回role_config.json
+> roles：返回roles.json
 
 ```json
 {
@@ -1428,7 +1428,7 @@
 	"data": {
 		"seg": 25,
 		"exp_pot": 5,
-		"role_config": {
+		"roles": {
 			"standard_experience_potion_count": 20,
 			"standard_segment_count": 30,
 			"standard_reset_role_skill_coin_count": 100,

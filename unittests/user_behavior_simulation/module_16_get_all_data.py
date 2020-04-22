@@ -61,9 +61,9 @@ def get_all_info(_token,_world):
 			get_config_stage(),# 获取关卡的消耗列表与关卡的奖励列表entry_consumables_config.json,stage_reward_config.json 关卡 hang_reward_config.json挂机信息
 			get_config_lottery(),# 获取lottery.json的配置文件  抽奖和转盘
 			get_config_weapon (),#获取weapon_config.json 武器升级的概率
-			get_config_skill (),#获取skill_level_up_config 技能升级的概率
+			get_config_skill (),#获取skills 技能升级的概率
 			get_config_mall(),# 获取mall_config.json 商店的物品
-			get_config_role(),# 获取role_config.json 角色的物品
+			get_config_role(),# 获取roles.json 角色的物品
 			get_config_task(),# 获取task.json 任务奖励
 			get_config_achievement(),# 获取achievement_config.json 获取成就
 			get_config_check_in(),# 获取check_in.json 获取签到成就

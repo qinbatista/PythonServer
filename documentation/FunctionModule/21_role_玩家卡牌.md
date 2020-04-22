@@ -135,7 +135,7 @@
 
 ##### 发送消息JSON格式
 
-角色的升级需要消耗该角色的碎片，角色碎片的消耗量参考role_config.json
+角色的升级需要消耗该角色的碎片，角色碎片的消耗量参考roles.json
 
 > role：角色的id
 
@@ -260,11 +260,11 @@
 
 ##### 接受消息JSON格式
 
-返回转盘和抽奖的消耗信息，配置文件来自role_config.json
+返回转盘和抽奖的消耗信息，配置文件来自roles.json
 
 [成功]()
 
-> role_config：返回role_config.json
+> roles：返回roles.json
 >
 > seg：角色突破需要消耗的碎片基础数据
 >
@@ -275,7 +275,7 @@
 	"status": 0,
 	"message": "success",
 	"data": {
-		"role_config": {
+		"roles": {
 			"standard_costs" :
 			{
 				"exp_pot" : 5,
