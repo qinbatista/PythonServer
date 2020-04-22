@@ -29,10 +29,10 @@ async def level_up(uid, rid, delta, **kwargs):
 	await task.record(uid, enums.Task.ROLE_LEVEL_UP, **kwargs)
 	await achievement.record(uid, enums.Achievement.LV_UPR, **kwargs)
 	await common.execute(f'UPDATE role SET level = {level + delta} WHERE uid = "{uid}" AND rid = {rid.value}', **kwargs)
-	return common.mt(0, 'success', {'remaining': {enums.Group.ROLE.value: {'rid': rid.value, 'level' : level + delta},
-													enums.Group.ITEM.value: rm},
-										'reward': {enums.Group.ROLE.value: {'rid': rid.value, 'level' : delta},
-													enums.Group.ITEM.value: rw}})
+	return common.mt(0, 'success', {'remaining': {enums.Group.ROLE: {'rid': rid, 'level' : level + delta},
+													enums.Group.ITEM: rm},
+										'reward': {enums.Group.ROLE: {'rid': rid, 'level' : delta},
+													enums.Group.ITEM: rw}})
 
 
 async def level_up_star(uid, rid, **kwargs):
@@ -43,13 +43,13 @@ async def level_up_star(uid, rid, **kwargs):
 	if star >= 10: return common.mt(97, 'max star')
 	cost = kwargs['config']['role']['standard_costs']['seg'] * (1 + star)
 	if segment < cost: return common.mt(98, 'insufficient segments')
-	await common.execute(f'UPDATE role SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND rid = {rid.value};', **kwargs)
+	await common.execute(f'UPDATE role SET star = {star + 1}, segment = {segment - cost} WHERE uid = "{uid}" AND rid = {rid};', **kwargs)
 	# H 加成就代码
 	if star == 0:
 		rnp = rid.name[:2]
 		if rnp in lottery.RECORD_GET:
 			await lottery.RECORD_GET[rnp](uid, **kwargs)
-	return common.mt(0, 'success', {'remaining': {'rid' : rid.value, 'star' : star + 1, 'seg' : segment - cost}, 'reward': {'rid' : rid.value, 'star' : 1, 'seg' : cost}})
+	return common.mt(0, 'success', {'remaining': {'rid' : rid, 'star' : star + 1, 'seg' : segment - cost}, 'reward': {'rid' : rid, 'star' : 1, 'seg' : cost}})
 
 
 async def unlock_passive(uid, rid, pid, **kwargs):
@@ -81,9 +81,9 @@ async def get_all(uid, **kwargs):
 	for role in roles:
 		for pid in enums.RolePassive:
 			try:
-				role[f'p{pid.value}'] = passives[role['rid']][pid.value]
+				role[f'p{pid}'] = passives[role['rid']][pid.value]
 			except KeyError:
-				role[f'p{pid.value}'] = 0
+				role[f'p{pid}'] = 0
 	return common.mt(0, 'success', {'roles' : roles})
 
 

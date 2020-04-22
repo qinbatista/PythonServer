@@ -5,7 +5,7 @@
 		},
 		"unlock_ps": {
             "comment": "cty是消耗物品类型,consume是消耗的详细内容",
-			"cty": 5,
+			"cty": 1,
 			"consume": {
 			    "comment": "101-199是被动技能系列，lv是解锁的角色最低等级，qty是消耗的金币数量",
 				"101": {
