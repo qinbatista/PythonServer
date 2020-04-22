@@ -73,17 +73,15 @@ async def unlock_passive(uid, rid, pid, **kwargs):
 	return common.mt(0, 'success', {'rid': rid, 'pid': pid, 'consume': f'{enums.Group.ITEM}:{iid}:{_qty}:{qty}'})
 
 
-# async def get_all(uid, **kwargs):
-# 	return common.mt(0, 'success', {'roles' : await _get_all_role_info(uid, **kwargs),"config":{'seg' : kwargs['config']['role']['standard_costs']['seg'], 'exp_pot' : kwargs['config']['role']['standard_costs']['upgrade_lv']['exp_pot']}})
 async def get_all(uid, **kwargs):
 	roles = await _get_all_role_info(uid, **kwargs)
 	passives = await _get_all_role_passives(uid, **kwargs)
 	for role in roles:
 		for pid in enums.RolePassive:
 			try:
-				role[f'p{pid}'] = passives[role['rid']][pid.value]
+				role[f'{pid}'] = passives[role['rid']][pid.value]
 			except KeyError:
-				role[f'p{pid}'] = 0
+				role[f'{pid}'] = 0
 	return common.mt(0, 'success', {'roles' : roles})
 
 
