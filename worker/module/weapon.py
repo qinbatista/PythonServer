@@ -38,7 +38,7 @@ async def level_up(uid, wid, delta, **kwargs):
 	_, remain_i = await common.try_item(uid, enums.Item.IRON, -consume, **kwargs)
 	_sp = (level + delta) // 10 - level // 10
 	level += delta
-	await common.execute(f'UPDATE weapon SET level = {level}, skillpoint = {sp + _sp} WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
+	await common.execute(f'UPDATE weapon SET level = {level}, skillpoint = {sp + _sp} WHERE uid = "{uid}" AND wid = {wid}', **kwargs)
 	await task.record(uid, enums.Task.WEAPON_LEVEL_UP, **kwargs)
 	await achievement.record(uid, enums.Achievement.LV_UPW, **kwargs)
 	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON : {'wid' : wid, 'level' : level, 'sp' : sp + _sp},
@@ -58,8 +58,8 @@ async def level_up_passive(uid, wid, pid, **kwargs):
 		return common.mt(99, 'max level')
 	if not exists or payload[0] <= 0: return common.mt(99, 'insufficient materials')
 	await _set_passive_level(uid, wid, pid, lv, **kwargs)
-	return common.mt(0, 'success', {'remaining': {'wid': wid.value, 'pid': pid.value, 'level': lv,
-			'sp': payload[0] - 1}, 'reward': {'wid': wid.value, 'pid': pid.value, 'level': 1, 'sp': 1}})
+	return common.mt(0, 'success', {'remaining': {'wid': wid, 'pid': pid, 'level': lv,
+			'sp': payload[0] - 1}, 'reward': {'wid': wid, 'pid': pid, 'level': 1, 'sp': 1}})
 
 async def level_up_star(uid, wid, **kwargs):
 	wid = enums.Weapon(wid)
@@ -69,28 +69,28 @@ async def level_up_star(uid, wid, **kwargs):
 	if star >= 10: return common.mt(97, 'max star')
 	cost = kwargs['config']['weapon']['standard_costs']['seg'] * (1 + star)
 	if segment < cost: return common.mt(98, 'insufficient segments')
-	await common.execute(f'UPDATE weapon SET star = {star + 1}, segment = {segment - cost} WHERE \
-			uid = "{uid}" AND wid = {wid.value};', **kwargs)
+	await common.execute(f'UPDATE weapon SET star = {star + 1}, segment={segment - cost}'
+	                     f' WHERE uid = "{uid}" AND wid = {wid};', **kwargs)
 	# H 加成就代码
 	if star == 0:
 		wnp = wid.name[:2]
 		if wnp in lottery.RECORD_GET:
 			await lottery.RECORD_GET[wnp](uid, **kwargs)
-	return common.mt(0, 'success', {'remaining' : {'wid' : wid.value, 'star' : star + 1, \
-			'seg' : segment - cost}, 'reward' : {'wid' : wid.value, 'star' : 1, 'seg' : cost}})
+	return common.mt(0, 'success', {'remaining' : {'wid' : wid, 'star' : star + 1, \
+			'seg' : segment - cost}, 'reward' : {'wid' : wid, 'star' : 1, 'seg' : cost}})
 
 async def reset_skill_point(uid, wid, **kwargs):
 	wid = enums.Weapon(wid)
 	exists, payload = await _get_weapon_info(uid, wid, 'skillpoint', **kwargs)
 	if not exists: return common.mt(99, 'invalid target')
-	can_pay, remaining = await common.try_item(uid, enums.Item.COIN, \
+	can_pay, remain = await common.try_item(uid, enums.Item.DIAMOND,
 			-kwargs['config']['weapon']['standard_costs']['reset'], **kwargs)
 	if not can_pay: return common.mt(98, 'insufficient coins')
 	reclaimed = await _reset_skill_point(uid, wid, **kwargs)
-	return common.mt(0, 'success', {'remaining' : {enums.Group.WEAPON.value : {'wid' : wid.value, \
-			'sp' : payload[0] + reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, \
-			'value' : remaining}}, 'reward': {enums.Group.WEAPON.value : {'wid' : wid.value, \
-			'sp' : reclaimed}, enums.Group.ITEM.value : {'iid' : enums.Item.COIN.value, \
+	return common.mt(0, 'success', {'remaining' : {enums.Group.WEAPON : {'wid' : wid,
+			'sp' : payload[0] + reclaimed}, enums.Group.ITEM : {'iid' : enums.Item.DIAMOND,
+			'value' : remain}}, 'reward': {enums.Group.WEAPON : {'wid' : wid,
+			'sp' : reclaimed}, enums.Group.ITEM : {'iid' : enums.Item.DIAMOND,
 			'value' : kwargs['config']['weapon']['standard_costs']['reset']}}})
 
 async def get_all(uid, **kwargs):
@@ -99,9 +99,9 @@ async def get_all(uid, **kwargs):
 	for wep in weps:
 		for pid in enums.WeaponPassive:
 			try:
-				wep[f'p{str(pid.value)}'] = passives[wep['wid']][pid.value]
+				wep[f'p{str(pid)}'] = passives[wep['wid']][pid.value]
 			except KeyError:
-				wep[f'p{str(pid.value)}'] = 0
+				wep[f'p{str(pid)}'] = 0
 	return common.mt(0, 'success', {'weapons' : weps})
 
 
@@ -115,7 +115,7 @@ async def _update_segment(uid, wid, segment, **kwargs):
 	return data[0][0]
 
 async def _get_weapon_info(uid, wid, *args, **kwargs):
-	data = await common.execute(f'SELECT {",".join(args)} FROM weapon WHERE uid = "{uid}" AND wid = {wid.value}', **kwargs)
+	data = await common.execute(f'SELECT {",".join(args)} FROM weapon WHERE uid = "{uid}" AND wid = {wid}', **kwargs)
 	return (True, data[0]) if data != () else (False, ())
 
 async def _get_passive_level(uid, wid, pid, **kwargs):
@@ -126,8 +126,8 @@ async def _set_passive_level(uid, wid, pid, level, **kwargs):
 	await asyncio.gather(common.execute(f'UPDATE weapon SET skillpoint = skillpoint - 1 WHERE uid = "{uid}" AND wid = {wid};', **kwargs), common.execute(f'INSERT INTO weaponpassive (uid, wid, pid, level) VALUES ("{uid}", {wid}, {pid}, 1) ON DUPLICATE KEY UPDATE level = {level};', **kwargs))
 
 async def _reset_skill_point(uid, wid, **kwargs):
-	reclaimed = sum(level[0] for level in await common.execute(f'SELECT level FROM weaponpassive WHERE uid = "{uid}" AND wid = {wid.value};', **kwargs))
-	await asyncio.gather(common.execute(f'UPDATE weaponpassive SET level = 0 WHERE uid = "{uid}" AND wid = {wid.value};', **kwargs), common.execute(f'UPDATE weapon SET skillpoint = skillpoint + {reclaimed} WHERE uid = "{uid}" AND wid = {wid.value};', **kwargs))
+	reclaimed = sum(level[0] for level in await common.execute(f'SELECT level FROM weaponpassive WHERE uid = "{uid}" AND wid = {wid};', **kwargs))
+	await asyncio.gather(common.execute(f'UPDATE weaponpassive SET level = 0 WHERE uid = "{uid}" AND wid = {wid};', **kwargs), common.execute(f'UPDATE weapon SET skillpoint = skillpoint + {reclaimed} WHERE uid = "{uid}" AND wid = {wid};', **kwargs))
 	return reclaimed
 
 async def _get_all_weapon_info(uid, **kwargs):
