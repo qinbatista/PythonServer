@@ -2,6 +2,7 @@
 black_market.py
 '''
 
+import asyncio
 from module import enums
 from module import common
 from module import weapon
@@ -62,8 +63,10 @@ async def get_all_market(uid, **kwargs):
 	config = kwargs['config']['player']['dark_market']
 	lim = config['constraint']['refreshable']
 	refresh_hours = config['constraint']['refresh_hours']
-	timer = await common.get_timer(uid, enums.Timer.DARK_MARKET, **kwargs)
-	limit = await common.get_limit(uid, enums.Limits.DARK_MARKET, **kwargs)
+	timer, limit = await asyncio.gather(
+		common.get_timer(uid, enums.Timer.DARK_MARKET, **kwargs),
+		common.get_limit(uid, enums.Limits.DARK_MARKET, **kwargs)
+	)
 	refresh_time = current_time if timer is None else timer
 	refreshable = lim if limit is None else limit
 	dark_markets = []
@@ -78,8 +81,10 @@ async def get_all_market(uid, **kwargs):
 			dark_markets = await refresh_darkmarket(uid, **kwargs)
 	if refreshable == lim:
 		refresh_time = current_time
-	await common.set_timer(uid, enums.Timer.DARK_MARKET, refresh_time, **kwargs)
-	await common.set_limit(uid, enums.Limits.DARK_MARKET, refreshable, **kwargs)
+	await asyncio.gather(
+		common.set_timer(uid, enums.Timer.DARK_MARKET, refresh_time, **kwargs),
+		common.set_limit(uid, enums.Limits.DARK_MARKET, refreshable, **kwargs)
+	)
 	refresh_time_s = max(3600 * refresh_hours - int((current_time - refresh_time).total_seconds()), 0)
 	if not dark_markets:
 		data = await common.execute(f'SELECT pid, gid, mid, qty, cid, amt From darkmarket WHERE uid = "{uid}";', **kwargs)

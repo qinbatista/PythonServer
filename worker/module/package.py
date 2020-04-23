@@ -15,14 +15,16 @@ ENERGY = [
 	enums.Item.ENERGY_POTION_S_MIN,
 	enums.Item.ENERGY_POTION_S_MAX
 ]
-WEAPON = [
-	enums.Item.WEAPON4_UNIVERSAL_SEGMENT,
-	enums.Item.WEAPON5_UNIVERSAL_SEGMENT
-]
-ROLE = [
-	enums.Item.ROLE4_UNIVERSAL_SEGMENT,
-	enums.Item.ROLE5_UNIVERSAL_SEGMENT
-]
+WEAPON = {
+	enums.Item.WEAPON4_UNIVERSAL_SEGMENT: [401, 402, 405],
+	enums.Item.WEAPON5_UNIVERSAL_SEGMENT: [501, 502, 503, 504, 505, 506, 507],
+	enums.Item.WEAPON6_UNIVERSAL_SEGMENT: [601]
+}
+ROLE = {
+	enums.Item.ROLE4_UNIVERSAL_SEGMENT: [402, 403, 404, 405, 406, 407],
+	enums.Item.ROLE5_UNIVERSAL_SEGMENT: [501, 504, 505, 506],
+	enums.Item.ROLE6_UNIVERSAL_SEGMENT: [601]
+}
 UNIVERSAL = [
 	enums.Item.UNIVERSAL4_SEGMENT,
 	enums.Item.UNIVERSAL5_SEGMENT,
@@ -95,45 +97,46 @@ async def use_item(uid, iid, eid, **kwargs):
 	eid: 格式为"1:2:1", 代表兑换的成品
 	"""
 	# consume = 1
-	c = common.decode_items(iid)[0]
-	consume = c[2]
-	if c[0] == enums.Group.ITEM:
-		if c[1] in SCROLL.keys() and consume % 3 != 0: return common.mt(95, 'Scroll upgrades require multiples of 3')
-		can, remain = await common.try_item(uid, c[1], -consume, **kwargs)  # 是卷轴则消耗三倍低级卷轴生成一倍高级卷轴
+	g, i, mul = common.decode_items(iid)[0]
+	if g == enums.Group.ITEM:
+		if i in SCROLL and mul % 3 != 0: return common.mt(95, 'Scroll upgrades require multiples of 3')
+		can, iq = await common.try_item(uid, i, -mul, **kwargs)  # 是卷轴则消耗三倍低级卷轴生成一倍高级卷轴
 		if not can: return common.mt(96, '兑换消耗品不足')
 		iid = iid[:iid.rfind(':')]
-		if c[1] in ENERGY:
-			energy = kwargs['config']['package']['exchange_item'][c[1].name] * consume
+		if i in ENERGY:
+			energy = kwargs['config']['package']['exchange_item'][i.name] * mul
 			energy_data = (await common.try_energy(uid, energy, **kwargs))['data']
-			return common.mt(0, 'success', {'remaining': {'item': f"{iid}:{remain}", 'energy': energy_data['energy'], 'cooling_time': energy_data['cooling_time']}, 'reward': {'item': f"{iid}:{-consume}", 'energy': energy}})
+			return common.mt(0, 'success', {'remaining': {'item': f"{iid}:{iq}", 'energy': energy_data['energy'], 'cooling_time': energy_data['cooling_time']}, 'reward': {'item': f"{iid}:{mul}", 'energy': energy}})
 		else:
-			if c[1] in WEAPON:
-				seg = kwargs['config']['package']['exchange_item'][c[1].name] * consume
-				kind = enums.Weapon[choice([k for k in enums.Weapon.__members__.keys() if 'W' + re.search(r"\d", c[1].name).group(0) in k])]
+			if i in WEAPON:
+				seg = kwargs['config']['package']['exchange_item'][i.name] * mul
+				kind = choice(WEAPON[i])
+				# kind = enums.Weapon[choice([k for k in enums.Weapon.__members__ if 'W' + re.search(r"\d", i.name).group(0) in k])]
 				seg_data = await common.try_weapon(uid, kind, seg, **kwargs)
-				return common.mt(1, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{enums.Group.WEAPON.value}:{kind.value}:{seg_data}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{enums.Group.WEAPON.value}:{kind.value}:{seg}"}})
-			elif c[1] in ROLE:
-				seg = kwargs['config']['package']['exchange_item'][c[1].name] * consume
-				kind = enums.Role[choice([k for k in enums.Role.__members__.keys() if 'R' + re.search(r"\d", c[1].name).group(0) in k])]
+				return common.mt(1, 'success', {'remaining': {'item': f"{iid}:{iq}", 'eitem': f"{enums.Group.WEAPON}:{kind}:{seg_data}"}, 'reward': {'item': f"{iid}:{mul}", 'eitem': f"{enums.Group.WEAPON}:{kind}:{seg}"}})
+			elif i in ROLE:
+				seg = kwargs['config']['package']['exchange_item'][i.name] * mul
+				kind = choice(ROLE[i])
+				# kind = enums.Role[choice([k for k in enums.Role.__members__ if 'R' + re.search(r"\d", i.name).group(0) in k])]
 				seg_data = await common.try_role(uid, kind, seg, **kwargs)
-				return common.mt(2, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{enums.Group.ROLE.value}:{kind.value}:{seg_data}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{enums.Group.ROLE.value}:{kind.value}:{seg}"}})
-			elif c[1] in UNIVERSAL:
-				e = common.decode_items(eid)[0]
+				return common.mt(2, 'success', {'remaining': {'item': f"{iid}:{iq}", 'eitem': f"{enums.Group.ROLE}:{kind}:{seg_data}"}, 'reward': {'item': f"{iid}:{mul}", 'eitem': f"{enums.Group.ROLE}:{kind}:{seg}"}})
+			elif i in UNIVERSAL:
+				eg, ei, eq = common.decode_items(eid)[0]
 				eid = eid[:eid.rfind(':')]
-				seg = kwargs['config']['package']['exchange_item'][c[1].name] * consume
-				if (e[0] == enums.Group.ROLE and e[1].name not in [k for k in enums.Role.__members__.keys() if 'R' + re.search(r"\d", c[1].name).group(0) in k]) or \
-					(e[0] == enums.Group.WEAPON and e[1].name not in [k for k in enums.Weapon.__members__.keys() if 'W' + re.search(r"\d", c[1].name).group(0) in k]):
-					await common.try_item(uid, c[1], consume, **kwargs)  # 还原
+				seg = kwargs['config']['package']['exchange_item'][i.name] * mul
+				if (eg == enums.Group.ROLE and ei.name not in [k for k in enums.Role.__members__ if 'R' + re.search(r"\d", i.name).group(0) in k]) or \
+					(eg == enums.Group.WEAPON and ei.name not in [k for k in enums.Weapon.__members__ if 'W' + re.search(r"\d", i.name).group(0) in k]):
+					await common.try_item(uid, i, mul, **kwargs)  # 还原
 					return common.mt(97, '兑换碎片类型不匹配')
 				else:
-					seg_data = await (common.try_weapon(uid, e[1], seg, **kwargs) if e[0] == enums.Group.WEAPON else common.try_role(uid, e[1], seg, **kwargs))
-					return common.mt(3, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{eid}:{seg_data}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{eid}:{seg}"}})
-			elif c[1] in SCROLL.keys():
-				gid, eid, value = enums.Group.ITEM.value, SCROLL[c[1]], consume//3
-				_, remain_v = await common.try_item(uid, eid, value, **kwargs)
-				return common.mt(4, 'success', {'remaining': {'item': f"{iid}:{remain}", 'eitem': f"{gid}:{eid.value}:{remain_v}"}, 'reward': {'item': f"{iid}:{-consume}", 'eitem': f"{gid}:{eid.value}:{value}"}})
+					seg_data = await (common.try_weapon(uid, ei, seg, **kwargs) if eg == enums.Group.WEAPON else common.try_role(uid, ei, seg, **kwargs))
+					return common.mt(3, 'success', {'remaining': {'item': f"{iid}:{iq}", 'eitem': f"{eid}:{seg_data}"}, 'reward': {'item': f"{iid}:{mul}", 'eitem': f"{eid}:{seg}"}})
+			elif i in SCROLL:
+				eg, ei, eq = enums.Group.ITEM, SCROLL[i], mul//3
+				_, _eq = await common.try_item(uid, ei, eq, **kwargs)
+				return common.mt(4, 'success', {'remaining': {'item': f"{iid}:{iq}", 'eitem': f"{eg}:{ei}:{_eq}"}, 'reward': {'item': f"{iid}:{mul}", 'eitem': f"{eg}:{ei}:{eq}"}})
 			else:
-				await common.try_item(uid, c[1], consume, **kwargs)  # 还原
+				await common.try_item(uid, i, mul, **kwargs)  # 还原
 				return common.mt(98, '兑换成品类型错误')
 	else:
 		return common.mt(99, f'意外消耗品{iid}')

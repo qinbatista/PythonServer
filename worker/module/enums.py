@@ -41,7 +41,6 @@ class Item(enum.IntEnum):
     ROLE6_UNIVERSAL_SEGMENT = 32  # 6星角色万能碎片
     ENERGY_POTION_S_MIN = 33  # 小能量瓶
     ENERGY_POTION_S_MAX = 34  # 大能量瓶
-    FAMILY_CONTRIBUTE = 35  # 玩家家族贡献值
     FAMILY_COIN = 36
     FAMILY_COIN_RECORD = 37
     WEAPON4_UNIVERSAL_SEGMENT = 38  # 4星武器万能碎片
