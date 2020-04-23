@@ -19,6 +19,7 @@ a client, close the connection to the client.
 '''
 
 import uuid
+import socket
 import asyncio
 import aioredis
 import argparse
@@ -29,36 +30,30 @@ class Gate:
     LINE_ENDING = b'\r\n'
 
     def __init__(self, args):
-        self.cwriters = {}
-        self.args     = args
-        self.nats     = nats.aio.client.Client()
-        self.cs       = None
-        self.ws       = None
-        self.gid      = None
-        self.redis    = None
+        self.cws = {}
+        self.args = args
+        self.ns = nats.aio.client.Client()
+        self.cs = None
+        self.ws = None
+        self.gid = None
+        self.redis = None
 
 
     async def init(self):
         await Gate.add_signal_handler(lambda: asyncio.create_task(self.shutdown()))
-
-        await self.nats.connect(self.args.nats_addr,
-                ping_interval = 5,
-                max_reconnect_attempts = 1,
-                closed_cb = Gate.on_nats_closed,
-                reconnected_cb = Gate.on_nats_reconnect,
-                disconnected_cb = Gate.on_nats_disconnect)
-
+        await self.ns.connect(self.args.nats_addr,
+                ping_interval=5,
+                max_reconnect_attempts=1,
+                closed_cb=Gate.on_nats_closed,
+                reconnected_cb=Gate.on_nats_reconnect,
+                disconnected_cb=Gate.on_nats_disconnect)
         self.redis = await aioredis.create_redis(f'redis://{self.args.redis_addr}')
         await self.register_gate()
-
         self.ws = await asyncio.start_server(self.worker_protocol, port=self.args.wport)
         self.cs = await asyncio.start_server(self.client_protocol, port=self.args.cport,
                 ssl=Gate.init_ssl(self.args.certpath, self.args.keyfilepath, self.args.sslpw))
-
         asyncio.create_task(self.ws.serve_forever())
         asyncio.create_task(self.cs.serve_forever())
-
-
 
     async def start(self):
         try:
@@ -84,8 +79,8 @@ class Gate:
             await asyncio.sleep(0.5)
             timeout -= 1
 
-        if self.nats.is_connected:
-            await self.nats.close()
+        if self.ns.is_connected:
+            await self.ns.close()
             print(f'gate {self.gid}: nats closed')
 
         if not self.redis.closed:
@@ -117,9 +112,9 @@ class Gate:
 
     async def submit_job(self, job, writer):
         jid = uuid.uuid4().hex
-        self.cwriters[jid] = writer
-        await self.redis.set(jid, self.gid, expire = 10)
-        await self.nats.publish(self.args.channel, f'{jid}~{job}'.encode())
+        self.cws[jid] = writer
+        await self.redis.set(jid, self.gid, expire=10)
+        await self.ns.publish(self.args.channel, f'{jid}~{job}'.encode())
         if self.args.debug: print(f'gate: submitted job {jid} {job}')
 
     async def worker_protocol(self, reader, writer):
@@ -135,14 +130,14 @@ class Gate:
             await writer.wait_closed()
 
     async def forward(self, response):
-        jid, resp = response.split('~', maxsplit = 1)
-        cwriter = self.cwriters.pop(jid)
-        cwriter.write(resp.encode() + Gate.LINE_ENDING)
-        await cwriter.drain()
-        cwriter.close()
+        jid, resp = response.split('~', maxsplit=1)
+        cw = self.cws.pop(jid)
+        cw.write(resp.encode() + Gate.LINE_ENDING)
+        await cw.drain()
+        cw.close()
         if self.args.debug: print(f'gate: forwarded {jid} {resp}')
-        with contextlib.suppress(ConnectionResetError):
-            await cwriter.wait_closed()
+        with contextlib.suppress(ConnectionResetError, ConnectionAbortedError):
+            await cw.wait_closed()
 
     async def register_gate(self):
         if self.gid is None:
@@ -153,12 +148,12 @@ class Gate:
             if self.args.debug:
                 print(f'gate {self.gid}: {ip}  client: {self.args.cport} worker: {self.args.wport}')
         await self.redis.expire(f'gates.id.{self.gid}', 10)
-    
+
     @staticmethod
     async def receive(reader):
         raw = await reader.readuntil(Gate.LINE_ENDING)
         return raw.decode().strip()
-    
+
     @staticmethod
     async def on_nats_disconnect():
         pass
@@ -183,13 +178,12 @@ class Gate:
         import os
         import ssl
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        bpath   = os.path.dirname(os.path.realpath(__file__))
-        context.load_cert_chain(certfile = bpath + certpath, keyfile = bpath + keyfilepath, password = pw)
+        path   = os.path.dirname(os.path.realpath(__file__))
+        context.load_cert_chain(certfile=path+certpath, keyfile=path+keyfilepath, password = pw)
         return context
 
     @staticmethod
-    def get_ip(hostname = False):
-        import socket
+    def get_ip(hostname=False):
         if hostname:
             return socket.gethostname()
         try:
@@ -201,23 +195,23 @@ class Gate:
 
     @property
     def running(self):
-        return not self.nats.is_closed
+        return not self.ns.is_closed
 
 
 
 
 async def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--debug', action = 'store_true')
-    parser.add_argument('--hostname', action = 'store_true')
-    parser.add_argument('--channel', type = str, default = 'jobs')
-    parser.add_argument('--cport', type = int, default = 8880)
-    parser.add_argument('--wport', type = int, default = 8201)
-    parser.add_argument('--nats-addr', type = str, default = '192.168.1.102:4221')
-    parser.add_argument('--redis-addr', type = str, default = '192.168.1.102')
-    parser.add_argument('--sslpw' , type = str, default = 'lukseun1')
-    parser.add_argument('--certpath' , type = str, default = '/cert/mycert.crt')
-    parser.add_argument('--keyfilepath' , type = str, default = '/cert/rsa_private.key')
+    parser.add_argument('--debug', action='store_true')
+    parser.add_argument('--hostname', action='store_true')
+    parser.add_argument('--channel', type=str, default='jobs')
+    parser.add_argument('--cport', type=int, default=8880)
+    parser.add_argument('--wport', type=int, default=8201)
+    parser.add_argument('--nats-addr', type=str, default='192.168.1.102:4221')
+    parser.add_argument('--redis-addr', type=str, default='192.168.1.102')
+    parser.add_argument('--sslpw' , type=str, default='lukseun1')
+    parser.add_argument('--certpath' , type=str, default='/cert/mycert.crt')
+    parser.add_argument('--keyfilepath' , type=str, default='/cert/rsa_private.key')
     await Gate(parser.parse_args()).start()
 
 
