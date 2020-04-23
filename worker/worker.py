@@ -13,10 +13,10 @@ Completed jobs are sent to the gate server which contains the requesting client.
 import json
 import asyncio
 import argparse
-import message_handler
+import message_handler as mh
 import nats.aio.client
 
-from utility import worker_resources
+from utility import worker_resources as wr
 
 class Worker:
     LINE_ENDING = b'\r\n'
@@ -28,11 +28,12 @@ class Worker:
         self.args = args
         self.nats = nats.aio.client.Client()
 
-        self.mh = message_handler.MessageHandler(token_addr = self.args.token_addr,
-                token_port = self.args.token_port, mail_addr = self.args.mail_addr,
-                mail_port = self.args.mail_port)
-        self.configs = worker_resources.ModuleConfigurations(self.args.config_addr, self.args.config_port)
-        self.resource = worker_resources.WorkerResources(self.args.redis_addr, self.args.db_addr,
+        self.mh = mh.MessageHandler(token_addr=self.args.token_addr,
+                token_port=self.args.token_port, mail_addr=self.args.mail_addr,
+                mail_port=self.args.mail_port)
+        self.configs = wr.ModuleConfigurations(self.args.config_addr,
+                                               self.args.config_port)
+        self.resource = wr.WorkerResources(self.args.redis_addr, self.args.db_addr,
                 self.args.db_user, self.args.db_pw, self.args.db_port)
 
     async def start(self):
@@ -51,14 +52,12 @@ class Worker:
 
     async def init(self):
         await Worker.add_signal_handler(lambda: asyncio.create_task(self.shutdown()))
-
         await self.nats.connect(self.args.nats_addr,
-                ping_interval          = 5,
+                ping_interval = 5,
                 max_reconnect_attempts = 1,
-                closed_cb              = Worker.on_nats_closed,
-                reconnected_cb         = Worker.on_nats_reconnect,
-                disconnected_cb        = Worker.on_nats_disconnect)
-
+                closed_cb = Worker.on_nats_closed,
+                reconnected_cb = Worker.on_nats_reconnect,
+                disconnected_cb = Worker.on_nats_disconnect)
         await self.resource.init()
 
     async def process_job(self, job):
