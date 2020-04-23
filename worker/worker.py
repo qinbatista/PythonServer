@@ -26,8 +26,7 @@ class Worker:
         self.ujobs = 0
         self.gates = {}
         self.args = args
-        self.nats = nats.aio.client.Client()
-
+        self.ns = nats.aio.client.Client()
         self.mh = mh.MessageHandler(token_addr=self.args.token_addr,
                 token_port=self.args.token_port, mail_addr=self.args.mail_addr,
                 mail_port=self.args.mail_port)
@@ -40,10 +39,10 @@ class Worker:
         try:
             await self.init()
             print(f'this worker is operating on channel: {self.args.channel}')
-            self.sid = await self.nats.subscribe(self.args.channel, 'workers', self.process_job)
+            self.sid = await self.ns.subscribe(self.args.channel, 'workers', self.process_job)
             while self.running:
                 await asyncio.sleep(1)
-                await self.nats.flush()
+                await self.ns.flush()
             await self.shutdown()
         except asyncio.CancelledError:
             pass
@@ -52,19 +51,15 @@ class Worker:
 
     async def init(self):
         await Worker.add_signal_handler(lambda: asyncio.create_task(self.shutdown()))
-        await self.nats.connect(self.args.nats_addr,
-                ping_interval = 5,
-                max_reconnect_attempts = 1,
-                closed_cb = Worker.on_nats_closed,
-                reconnected_cb = Worker.on_nats_reconnect,
-                disconnected_cb = Worker.on_nats_disconnect)
+        await self.ns.connect(self.args.nats_addr, ping_interval=5,
+            max_reconnect_attempts=1, closed_cb=Worker.closed_cb,
+            reconnected_cb=Worker.reconnected_cb, disconnected_cb=Worker.disconnected_cb)
         await self.resource.init()
 
     async def process_job(self, job):
         self.ujobs += 1
         jid, work = job.data.decode().split('~', maxsplit = 1)
         if self.args.debug: print(f'worker: received {jid}')
-
         try:
             if self.args.debug: print(f'worker: calling messagehandler with args: {work}')
             resp = await asyncio.wait_for(self.mh.resolve(json.loads(work), self.resource, self.configs), 10)
@@ -79,7 +74,7 @@ class Worker:
         await self.return_response(jid, resp)
         if self.args.debug: print('done')
         self.ujobs -= 1
-    
+
     async def return_response(self, jid, resp):
         gid = await self.get_gate(jid)
         self.gates[gid][1].write(f'{jid}~{resp}'.encode() + Worker.LINE_ENDING)
@@ -93,19 +88,16 @@ class Worker:
             self.gates[gid] = await asyncio.open_connection(ip, int(port))
         return gid
 
-
     async def shutdown(self):
         print('worker: SIGINT received, gracefully shutting down...')
-        await self.nats._unsubscribe(self.sid)
-        await self.nats.flush()
+        await self.ns._unsubscribe(self.sid)
+        await self.ns.flush()
         print('worker: unsubscribed from job queue. not accepting new jobs')
-        
         timeout = 4
         while self.ujobs > 0 and timeout > 0:
             print(f'worker: there are {self.ujobs} outstanding jobs..')
             await asyncio.sleep(1)
             timeout -= 1
-
         print('worker: closing gate connections.')
         await self.resource.shutdown()
         for r, w in self.gates.values():
@@ -113,23 +105,20 @@ class Worker:
             await w.wait_closed()
         print('worker: mh shutting down..')
         await self.mh.shutdown()
-
         outstanding = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
         [task.cancel() for task in outstanding]
-
         print('worker: shutdown complete')
 
-
     @staticmethod
-    async def on_nats_disconnect():
+    async def disconnected_cb():
         pass
 
     @staticmethod
-    async def on_nats_reconnect():
+    async def reconnected_cb():
         pass
 
     @staticmethod
-    async def on_nats_closed():
+    async def closed_cb():
         pass
 
     @staticmethod
@@ -141,7 +130,7 @@ class Worker:
 
     @property
     def running(self):
-        return not self.nats.is_closed
+        return not self.ns.is_closed
 
 
 async def main():

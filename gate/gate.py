@@ -178,7 +178,7 @@ class Gate:
         import os
         import ssl
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        path   = os.path.dirname(os.path.realpath(__file__))
+        path = os.path.dirname(os.path.realpath(__file__))
         context.load_cert_chain(certfile=path+certpath, keyfile=path+keyfilepath, password = pw)
         return context
 
