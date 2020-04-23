@@ -44,9 +44,9 @@ class Gate:
         await self.ns.connect(self.args.nats_addr,
                 ping_interval=5,
                 max_reconnect_attempts=1,
-                closed_cb=Gate.on_nats_closed,
-                reconnected_cb=Gate.on_nats_reconnect,
-                disconnected_cb=Gate.on_nats_disconnect)
+                closed_cb=Gate.closed_cb,
+                reconnected_cb=Gate.reconnected_cb,
+                disconnected_cb=Gate.disconnected_cb)
         self.redis = await aioredis.create_redis(f'redis://{self.args.redis_addr}')
         await self.register_gate()
         self.ws = await asyncio.start_server(self.worker_protocol, port=self.args.wport)
@@ -66,7 +66,6 @@ class Gate:
             pass
         except:
             await self.shutdown()
-
 
     async def shutdown(self):
         print(f'gate {self.gid}: SIGINT signal received, gracefully shutting down...')
@@ -155,15 +154,15 @@ class Gate:
         return raw.decode().strip()
 
     @staticmethod
-    async def on_nats_disconnect():
+    async def disconnected_cb():
         pass
 
     @staticmethod
-    async def on_nats_reconnect():
+    async def reconnected_cb():
         pass
 
     @staticmethod
-    async def on_nats_closed():
+    async def closed_cb():
         pass
 
     @staticmethod
