@@ -62,15 +62,18 @@ async def unlock_passive(uid, rid, pid, **kwargs):
 	star, level = payload
 	if star == 0: return common.mt(96, "You don't have the role")
 	cfg = kwargs['config']['role']['standard_costs']['unlock_ps']
+	gid = enums.Group.ITEM
 	iid = enums.Item(cfg['cty'])
 	lv, qty = cfg['consume'][f'{pid}']['lv'], cfg['consume'][f'{pid}']['qty']
-	if lv >= level: return common.mt(95, 'Your role level has not reached the unlock level')
+	if lv > level: return common.mt(95, 'Your role level has not reached the unlock level')
 	ps = await _get_ps(uid, rid, pid, **kwargs)
 	if ps: return common.mt(94, 'This passive is unlocked', await _get_all_role_passives(uid, **kwargs))
 	can, _qty = await common.try_item(uid, iid, -qty, **kwargs)
 	if not can: return common.mt(93, 'insufficient materials')
 	await _update_ps_lv(uid, rid, pid, 1, **kwargs)
-	return common.mt(0, 'success', {'rid': rid, 'pid': pid, 'consume': f'{enums.Group.ITEM}:{iid}:{_qty}:{qty}'})
+	return common.mt(0, 'success', {'rid': rid, 'pid': pid,
+	                                'remain': f'{gid}:{iid}:{_qty}',
+	                                'reward': f'{gid}:{iid}:{qty}'})
 
 
 async def get_all(uid, **kwargs):

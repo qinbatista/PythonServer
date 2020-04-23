@@ -191,9 +191,9 @@
 
 解锁角色被动技能
 
-> role：角色的id
+> rid：角色的id
 >
-> passive：角色被动技能id
+> pid：角色被动技能id
 
 ```json
 {
@@ -201,8 +201,8 @@
 	"function": "unlock_passive_role",
 	"data": {
 		"token": "my toekn ^_^",
-		"role": 1,
-        "passive": 101
+		"rid": 1,
+        "pid": 101
 	}
 }
 ```

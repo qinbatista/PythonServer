@@ -381,7 +381,7 @@ class MessageHandler:
 		return await role.level_up_star(data['data']['unique_id'], int(data['data']['role']), **data)
 
 	async def _unlock_passive_role(self, data: dict) -> str:
-		return await role.unlock_passive(data['data']['unique_id'], int(data['data']['role']), int(data['data']['passive']), **data)
+		return await role.unlock_passive(data['data']['unique_id'], int(data['data']['rid']), int(data['data']['pid']), **data)
 
 	async def _get_config_role(self, data: dict) -> str:
 		return await role.get_config(**data)
