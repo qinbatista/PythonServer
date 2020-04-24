@@ -327,21 +327,21 @@ async def abdicate(uid, target, **kwargs):
 	return common.mt(0, 'success', {gn: enums.FamilyRole.BASIC.value, target: enums.FamilyRole.OWNER.value})
 
 
-async def welfare(uid, **kwargs):
+async def welfare(uid, items, **kwargs):
 	in_family, name = await _in_family(uid, **kwargs)
 	if not in_family: return common.mt(99, 'not in family')
-	data = await common.execute(f'SELECT uid FROM `familyrole` WHERE `name` = "{name}";', **kwargs)
-	members = [m[0] for m in data]
-	del data
-	data = {'remaining': [], 'reward': []}
-	for member in members:
-		for item in kwargs['config']['family']['store']['gift']:
-			_, iid, cost = (common.decode_items(item))[0]
-			_, qty = await common.try_item(member, iid, cost, **kwargs)
-			data['remaining'].append({'iid': iid, 'qty': qty})
-			data['reward'].append({'iid': iid, 'qty': cost})
-	await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE}:{await common.get_gn(uid, **kwargs)}', **kwargs)
-	return common.mt(0, 'success', data)
+	members = await common.execute(f'SELECT uid, gn FROM `player` WHERE `fid` = "{name}";', **kwargs)
+	can, cis = await common.consume_items(uid, items, **kwargs)
+	if not can: return common.mt(98, 'lack of material')
+	rm, rw = stage.rm_rw(cis)
+	gn = await common.get_gn(uid, **kwargs)
+	results, rewards = {'remain': rm, 'reward': rw}, {}
+	rms = kwargs['config']['family']['store']['gift'].get(items, [])
+	[await stage.rw_common(mid, rms, rewards if mgn == gn else {}, **kwargs) for mid, mgn in members]
+	results['remain'].extend(rewards['remain'])
+	results['reward'].extend(rewards['reward'])
+	await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE}:{gn}', **kwargs)
+	return common.mt(0, 'success', results)
 
 async def search(name, **kwargs):
 	can, info = await _get_family_info(name, 'icon', 'exp', 'notice', 'board', **kwargs)

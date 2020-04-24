@@ -29,8 +29,8 @@ class MailServer:
         app.router.add_post('/mark_read', self.mark)
         app.router.add_post('/send', self.send)
         app.router.add_post('/delete', self.delete)
-        app.router.add_post('/all', self.get_all)
-        app.router.add_post('/new', self.get_new)
+        app.router.add_post('/all', self.all)
+        app.router.add_post('/new', self.new)
         app.router.add_post('/delete_read', self.delete_read)
         asyncio.create_task(self.clean_temp())
         return app
@@ -67,7 +67,7 @@ class MailServer:
                 post['world'], post['uid'], post['key'], 'S'))
         return web.json_response({'key': post['key'] if marked else ''})
 
-    async def get_all(self, request):
+    async def all(self, request):
         """返回所有的邮件，包括新邮件和已读邮件
         cur：当前所有邮件的数量
         max：邮箱最大限制的数量"""
@@ -78,7 +78,7 @@ class MailServer:
                 {'cur': len(MailServer.get_mail_folder(self.mailbox, post['world'], post['uid'])),
                 'max': MailServer.MAILBOX_LIMIT}})
 
-    async def get_new(self, request):
+    async def new(self, request):
         """返回所有的新邮件
         cur：当前所有邮件的数量
         max：邮箱最大限制的数量"""
@@ -98,13 +98,13 @@ class MailServer:
             pass
 
     @staticmethod
-    def send_mail(mbox, world, uid, mail_dict):
+    def send_mail(box, world, uid, mail_dict):
         """发送邮件
         mbox：mailbox.Maildir对象
         world：接收者所在世界
         uid：接收者的uid
         mail_dict: 邮件信息（字典）"""
-        return MailServer.deliver_mail(MailServer.get_mail_folder(mbox, world, uid),
+        return MailServer.deliver_mail(MailServer.get_mail_folder(box, world, uid),
                 MailServer.construct_mail(mail_dict))
 
     @staticmethod
@@ -155,9 +155,9 @@ class MailServer:
         return key
 
     @staticmethod
-    def get_mail_folder(mbox, world, uid):
+    def get_mail_folder(box, world, uid):
         """创建或指定邮件存放需要的路径，返回邮箱地址对象"""
-        return mbox.add_folder(str(world)).add_folder(uid)
+        return box.add_folder(str(world)).add_folder(uid)
 
     @staticmethod
     def read_subfolders(root, subfolders):
@@ -171,9 +171,9 @@ class MailServer:
         return mail
 
     @staticmethod
-    def mark_mail(mbox, world, uid, key, flags):
+    def mark_mail(box, world, uid, key, flags):
         """添加标志"""
-        folder = MailServer.get_mail_folder(mbox, world, uid)
+        folder = MailServer.get_mail_folder(box, world, uid)
         for mid, m in folder.iteritems():
             if mid == key:
                 m.add_flag(flags)
@@ -194,15 +194,15 @@ class MailServer:
         return deleted
 
     @staticmethod
-    def get_mail(mbox, world, uid, subfolders):
+    def get_mail(box, world, uid, subfolders):
         """ 获取邮件
-        mbox: mailbox.Maildir对象
+        box: mailbox.Maildir对象
         world: 获取的邮件所在世界
         uid: 获取的邮件所在用户uid
         subfolders: 子文件夹列表
         return: 返回邮件信息列表
         """
-        return MailServer.read_subfolders(MailServer.get_mail_folder(mbox, world, uid), subfolders)
+        return MailServer.read_subfolders(MailServer.get_mail_folder(box, world, uid), subfolders)
 
 
 

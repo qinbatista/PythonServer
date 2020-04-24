@@ -162,6 +162,7 @@ if __name__ == '__main__':
     token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
 
+    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token, 'items': '3:5:100'}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'bind_phone', 'data' : {'token' : token, 'phone_number': '18323019610'}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'activate_achievement', 'data' : {'token' : token, 'aid': 30}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token' : token, 'cid': '21', 'qty': 2}})
@@ -239,7 +240,6 @@ if __name__ == '__main__':
     # token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODEyMzY2NzYsInVpZCI6IkMxNjA0NUQ1LTNBODUtNDVFRC04OTdELTI4ODNERjlDMDA1MCJ9.iG0319v13oHAfxijOkwOvqPMwT42Rptu_TCbjTRAVrg"
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'change_player_name', 'data': {'token': token, 'gn': 'bhjb  mnjk csa'}})
     # user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id' : '', 'account': 'account00', 'password': '0password'}})
-    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_config_notice', 'data': {'token' : token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'buy_refresh_diamond', 'data': {'token' : token}})
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'buy_refresh_coin', 'data': {'token' : token}})

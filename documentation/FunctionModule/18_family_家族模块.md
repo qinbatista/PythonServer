@@ -9,7 +9,7 @@
 * √[`get_all_family`](##get_all_family)
 * √[`get_store_family`](##get_store_family)
 * √[`market_purchase_family`](##market_purchase_family)
-* √内部[`welfare_purchase_family`](##welfare_purchase_family)
+* √[`welfare_purchase_family`](##welfare_purchase_family)
 * √[`set_notice_family`](##set_notice_family)
 * √[`set_blackboard_family`](##set_blackboard_family)
 * √[`set_icon_family`](##set_icon_family)
@@ -590,17 +590,25 @@ Purchase an item from the family store.
 
 ##### 发送消息JSON格式
 
+> items: "3:5:100"，消耗100钻石购买
+
 ```json
 {
 	"world": 0, 
 	"function": "welfare_purchase_family",
 	"data": {
-		"token": "my token ^_^"
+		"token": "my token ^_^",
+        "items": "3:5:100"
 	}
 }
 ```
 
 ##### 接受消息JSON格式
+
+> remain：剩余物资情况
+>
+> reward：改变物资情况
+>
 
 
 ```json
@@ -608,17 +616,13 @@ Purchase an item from the family store.
     "status": 0,
     "message": "success",
     "data": {
-        "remaining": [
-            {
-                "iid": 5,
-                "qty": 20
-            }
+        "remain": [
+            "3:5:9820",
+            "3:5:9810"
         ],
         "reward": [
-            {
-                "iid": 5,
-                "qty": 10
-            }
+            "3:5:10",
+            "3:5:100"
         ]
     }
 }

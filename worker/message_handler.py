@@ -201,7 +201,7 @@ class MessageHandler:
 		return await family.purchase(data['data']['unique_id'], data['data']['item'], **data)
 
 	async def _welfare_purchase_family(self, data: dict) -> str:
-		return await family.welfare(data['data']['unique_id'], **data)
+		return await family.welfare(data['data']['unique_id'], data['data']['items'], **data)
 
 	async def _disband_family(self, data: dict) -> str:
 		return await family.disband(data['data']['unique_id'], **data)
