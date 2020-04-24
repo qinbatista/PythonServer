@@ -2,7 +2,6 @@
 family.py
 '''
 import asyncio
-import pymysql
 
 from module import mail
 from module import enums
@@ -225,7 +224,7 @@ async def set_icon(uid, icon, **kwargs):
     return common.mt(0, 'success', {'icon': icon})
 
 async def set_role(uid, gn_target, role, **kwargs):
-    if role not in enums.FamilyRole._value2member_map_.keys(): return common.mt(95, 'role type error')
+    if role not in enums.FamilyRole._value2member_map_: return common.mt(95, 'role type error')
     new_role = enums.FamilyRole(role)
     uid_target = await common.get_uid(gn_target, **kwargs)
     if uid == uid_target: return common.mt(99, 'can not modify self')
@@ -237,10 +236,10 @@ async def set_role(uid, gn_target, role, **kwargs):
     targets_role = await _get_role(uid_target, name, **kwargs)
     if targets_role == new_role: return common.mt(94, 'Membership has always been this identity')
     if not _check_set_role_permissions(actors_role, targets_role, new_role): return common.mt(96, 'insufficient permissions')
-    await common.execute(f'UPDATE familyrole SET role = {new_role.value} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
+    await common.execute(f'UPDATE familyrole SET role = {new_role} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
     gn = await common.get_gn(uid, **kwargs)
-    await _record_family_change(name, f'{enums.FamilyHistoryKeys.ROLE.value}:{gn},{gn_target}', **kwargs)
-    return common.mt(0, 'success', {'gn' : gn_target, 'role' : new_role.value})
+    await _record_family_change(name, f'{enums.FamilyHistoryKeys.ROLE}:{gn},{gn_target}', **kwargs)
+    return common.mt(0, 'success', {'gn' : gn_target, 'role' : new_role})
 
 async def change_name(uid, new_name, **kwargs):
     if not _valid_family_name(new_name): return common.mt(99, 'invalid family name')

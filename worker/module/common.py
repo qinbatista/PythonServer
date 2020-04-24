@@ -315,8 +315,8 @@ async def __update_energy(uid, energy, tim, **kwargs):
     await set_timer(uid, enums.Timer.ENERGY_RECOVER, tim, **kwargs)
 
 
-def mt(status, message, data={}):
-    return {'status': status, 'message': message, 'data': data}
+def mt(status, message, data=None):
+    return {'status': status, 'message': message, 'data': data or {}}
 
 
 # private message
@@ -329,7 +329,7 @@ async def _send_text_mail(uid, gn_target, msg, **kwargs):
     #kwargs['msg'] = msg
     #kwargs['from_'] = await get_gn(uid, **kwargs)
     #sent = await mail.send_mail(0, fid, **kwargs)
-    await mail.send_mail({'type' : enums.MailType.SIMPLE.value, 'from' : await get_gn(uid, **kwargs), 'subj' : 'subj', 'body' : msg}, fid, **kwargs)
+    await mail.send_mail({'type' : enums.MailType.SIMPLE, 'from' : await get_gn(uid, **kwargs), 'subj' : 'subj', 'body' : msg}, fid, **kwargs)
     return mt(0, 'success')
 
 
@@ -339,8 +339,8 @@ async def _send_gift_mail(uid, gn_target, group_id, item_id, quantity, **kwargs)
     #kwargs['items'] = encode_item(enums.Group(group_id), enums.Item(item_id), quantity)
     #kwargs['from_'] = await get_gn(uid, **kwargs)
     #sent = await mail.send_mail(1, fid, **kwargs)
-    await mail.send_mail({'type' : enums.MailType.GIFT.value, 'from' : await get_gn(uid, **kwargs), \
-            'subj' : enums.MailTemplate.SYSTEM_REWARD.name, 'body' : enums.MailTemplate.GIFT_1.name, \
+    await mail.send_mail({'type' : enums.MailType.GIFT, 'from' : await get_gn(uid, **kwargs),
+            'subj' : enums.MailTemplate.SYSTEM_REWARD.name, 'body' : enums.MailTemplate.GIFT_1.name,
             'items' : encode_item(enums.Group(group_id), enums.Item(item_id), quantity)}, fid, **kwargs)
     return mt(0, 'success')
 
@@ -388,13 +388,14 @@ async def reward_items(uid, items: str,  mul=1, module=None, **kwargs):
             remain_v = await try_weapon(uid, iid, value, **kwargs)
         elif gid == enums.Group.ROLE:
             remain_v = await try_role(uid, iid, value, **kwargs)
+        elif gid == enums.Group.ARMOR:
+            _, remain_v = await try_armor(uid, iid, 1, value, **kwargs)
         elif gid == enums.Group.SKILL:
             can = await try_skill(uid, iid, **kwargs)
+            remain_v = 1
             if not can:
                 gid, iid, value = enums.Group.ITEM, enums.Item.SKILL_SCROLL_10, 1
                 _, remain_v = await try_item(uid, iid, value, **kwargs)
-            else:
-                remain_v = 1
         else:
             print(f'不解析此组物品gid={gid},iid={iid}')
             remain_v = 0  # gid不属于以上四种情况时需要处理
