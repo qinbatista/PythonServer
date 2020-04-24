@@ -25,15 +25,15 @@ class MailServer:
         self.mailbox  = mailbox.Maildir(path)
         self.executor = concurrent.futures.ThreadPoolExecutor()
 
-    async def init(self, aiohttp_app):
-        aiohttp_app.router.add_post('/mark_read', self.mark)
-        aiohttp_app.router.add_post('/send', self.send)
-        aiohttp_app.router.add_post('/delete', self.delete)
-        aiohttp_app.router.add_post('/all', self.get_all)
-        aiohttp_app.router.add_post('/new', self.get_new)
-        aiohttp_app.router.add_post('/delete_read', self.delete_read)
+    async def init(self, app):
+        app.router.add_post('/mark_read', self.mark)
+        app.router.add_post('/send', self.send)
+        app.router.add_post('/delete', self.delete)
+        app.router.add_post('/all', self.get_all)
+        app.router.add_post('/new', self.get_new)
+        app.router.add_post('/delete_read', self.delete_read)
         asyncio.create_task(self.clean_temp())
-        return aiohttp_app
+        return app
 
     async def send(self, request):
         post = await request.json()
