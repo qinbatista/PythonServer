@@ -78,7 +78,7 @@ async def level_up_star(uid, wid, **kwargs):
         wnp = wid.name[:2]
         if wnp in lottery.RECORD_GET:
             await lottery.RECORD_GET[wnp](uid, **kwargs)
-    return common.mt(0, 'success', {'remaining' : {'wid' : wid, 'star' : star + 1, \
+    return common.mt(0, 'success', {'remaining' : {'wid' : wid, 'star' : star + 1,
             'seg' : segment - cost}, 'reward' : {'wid' : wid, 'star' : 1, 'seg' : cost}})
 
 async def reset_skill_point(uid, wid, **kwargs):
