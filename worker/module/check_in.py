@@ -29,7 +29,7 @@ async def supplement(uid, **kwargs):
     if not can:
         return common.mt(97, 'materials insufficient')
     results = {'supplement': {}}
-    results['remain'], results['reward'] = stage.rm_rw(cmw)
+    results['remain'], results['reward'] = common.rm_rw(cmw)
     for d in range(1, today):
         day = f'{d}'.zfill(2)
         result = await sign(uid, day, **kwargs)
@@ -50,7 +50,7 @@ async def sign(uid, day=None, **kwargs):
     mul = 1 if wd >= vds['level'] else 2
     rms = [kwargs['config']['check_in']['reward'][f'{wd}']]
     results = {}
-    await stage.rw_common(uid, rms, results, mul=mul, **kwargs)
+    await common.rw_common(uid, rms, results, mul=mul, **kwargs)
     await common.execute(f'INSERT INTO check_in(uid, date, reward) '
                          f'VALUES("{uid}", "{tim}", 1)', **kwargs)
     await task.record(uid, enums.Task.CHECK_IN, **kwargs)

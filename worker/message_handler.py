@@ -198,10 +198,10 @@ class MessageHandler:
 		return await family.get_store(**data)
 
 	async def _market_purchase_family(self, data: dict) -> str:
-		return await family.purchase(data['data']['unique_id'], data['data']['item'], **data)
+		return await family.purchase(data['data']['unique_id'], data['data']['sid'], **data)
 
 	async def _welfare_purchase_family(self, data: dict) -> str:
-		return await family.welfare(data['data']['unique_id'], data['data']['items'], **data)
+		return await family.welfare(data['data']['unique_id'], data['data']['sid'], **data)
 
 	async def _disband_family(self, data: dict) -> str:
 		return await family.disband(data['data']['unique_id'], **data)
@@ -574,7 +574,7 @@ class MessageHandler:
 
 	async def _add_resources(self, data: dict) -> str:
 		results = {}
-		await stage.rw_common(data['data']['unique_id'], data['data']['items'], results, **data)
+		await common.rw_common(data['data']['unique_id'], data['data']['items'], results, **data)
 		# await stage.increase_exp(data['data']['unique_id'], random.randint(15000, 5000000), **data)
 		return common.mt(0, 'success', results)
 

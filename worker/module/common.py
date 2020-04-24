@@ -367,10 +367,39 @@ async def consume_items(uid, items, mul=1, **kwargs):
     return True, results
 
 
-# async def rw_common(uid, items, rewards, mul=1, **kwargs):
-#     """通用奖励信息的处理和修改"""
-#     results = await reward_items(uid, ','.join(items), mul=mul, **kwargs)
-#     rewards['remain'], rewards['reward'] = rm_rw(results)
+async def rw_common(uid, items, results, mul=1, **kwargs):
+    """通用奖励信息的处理和修改"""
+    res = await reward_items(uid, ','.join(items), mul=mul, **kwargs)
+    results['remain'], results['reward'] = rm_rw(res)
+
+
+def rm_rw(results):
+    """剩余和改变情况的构造"""
+    return [f'{g}:{i}:{v}' for g, i, v, _ in results], [f'{g}:{i}:{v}' for g, i, _, v in results]
+
+
+async def reward_items(uid, items: str,  mul=1, module=None, **kwargs):
+    """返回奖励之后的改变情况"""
+    decoded, results = decode_items(items, mul=mul), []
+    for gid, iid, value in decoded:
+        if gid == enums.Group.ITEM:
+            _, remain_v = await try_item(uid, iid, value, **kwargs)
+        elif gid == enums.Group.WEAPON:
+            remain_v = await try_weapon(uid, iid, value, **kwargs)
+        elif gid == enums.Group.ROLE:
+            remain_v = await try_role(uid, iid, value, **kwargs)
+        elif gid == enums.Group.SKILL:
+            can = await try_skill(uid, iid, **kwargs)
+            if not can:
+                gid, iid, value = enums.Group.ITEM, enums.Item.SKILL_SCROLL_10, 1
+                _, remain_v = await try_item(uid, iid, value, **kwargs)
+            else:
+                remain_v = 1
+        else:
+            print(f'不解析此组物品gid={gid},iid={iid}')
+            remain_v = 0  # gid不属于以上四种情况时需要处理
+        results.append((gid, iid, remain_v, value))
+    return results
 
 
 def __calculate(config: list, sql_exp: int) -> (int, int):

@@ -66,7 +66,7 @@ async def enter(uid, sid, stage, **kwargs):
     can, cmw = await common.consume_items(uid, ','.join(config['consumes']['common']), **kwargs)
     if not can:
         return common.mt(95, 'materials insufficient')
-    results['remain'], results['reward'] = rm_rw(cmw)
+    results['remain'], results['reward'] = common.rm_rw(cmw)
     # H 保存待消耗
     eds['energy'] = energy
     # H 消耗特殊物资(体力)
@@ -112,7 +112,7 @@ async def victory(uid, sid, stage, damage=0, **kwargs):
     rwc = config['rewards']['common']
     if config['constraint']['random'] == 1:
         rwc = random.choices(rwc, k=config['rewards']['random'])
-    await rw_common(uid, rwc, rewards, **kwargs)
+    await common.rw_common(uid, rwc, rewards, **kwargs)
     # H 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['rewards']['special'].get('exp', 0), **kwargs)
     rewards['max_stage'] = max(stage, _stage)
@@ -140,13 +140,13 @@ async def mopping_up(uid, stage, count=1, **kwargs):
     energy = config['consumes']['special'].get('energy', 0) * count
     if (await common.try_energy(uid, 0, **kwargs))['data']['energy'] < energy: return common.mt(97, 'energy insufficient')
     # H 尝试消耗通用物资
-    if not (await common.consume_items(uid, ','.join([f'{r[:r.rfind(":")]}:{int(r[r.rfind(":") + 1:]) * count}' for r in config['consumes']['common']]), **kwargs))[0]:
+    if not (await common.consume_items(uid, ','.join(config['consumes']['common']), mul=count, **kwargs))[0]:
         return common.mt(95, 'materials insufficient')
     # H 消耗特殊物资(体力)
     data = (await common.try_energy(uid, -energy, **kwargs))['data']
     rewards = {'energy': {'cooling': data['cooling_time'], 'remain': data['energy'], 'reward': -energy}}
     # H 奖励普通物资
-    await rw_common(uid, config['rewards']['common'], rewards, mul=count, **kwargs)
+    await common.rw_common(uid, config['rewards']['common'], rewards, mul=count, **kwargs)
     # H 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['rewards']['special']['exp'] * count, **kwargs)
     # H 任务记录
@@ -222,7 +222,7 @@ async def hang_up(uid, new=True, **kwargs):
     config = kwargs['config']['stages']['hang-up'][f'{stage}']['rewards']
     rewards = {}
     # H 奖励普通物资
-    await rw_common(uid, config['common'], rewards, mul=mul, **kwargs)
+    await common.rw_common(uid, config['common'], rewards, mul=mul, **kwargs)
     # H 奖励特殊物资
     rewards['exp_info'] = await increase_exp(uid, config['special'].get('exp', 0) * mul, **kwargs)
     await common.set_timer(uid, enums.Timer.STAGE_HANG_UP, now, **kwargs)
@@ -335,17 +335,6 @@ async def b_dispose(uid, stage, damage, results, **kwargs):
 async def e_dispose(uid, stage, _stage, **kwargs):
     await task.record(uid, enums.Task.PASS_SPECIAL_STAGE, **kwargs)
     if stage == 1001 and stage > _stage: await hang_up(uid, **kwargs)
-
-
-async def rw_common(uid, items, rewards, mul=1, **kwargs):
-    """通用奖励信息的处理和修改"""
-    results = await summoning.reward_items(uid, ','.join(items), mul=mul, **kwargs)
-    rewards['remain'], rewards['reward'] = rm_rw(results)
-
-
-def rm_rw(results):
-    """剩余和改变情况的构造"""
-    return [f'{g}:{i}:{v}' for g, i, v, _ in results], [f'{g}:{i}:{v}' for g, i, _, v in results]
 
 
 async def v_coin(uid, lids, **kwargs):

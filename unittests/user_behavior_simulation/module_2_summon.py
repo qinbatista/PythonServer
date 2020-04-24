@@ -162,7 +162,8 @@ if __name__ == '__main__':
     token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
 
-    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token, 'items': '3:5:100'}})
+    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'market_purchase_family', 'data': {'token' : token, 'pid': '1'}})
+    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token, 'pid': '1'}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'bind_phone', 'data' : {'token' : token, 'phone_number': '18323019610'}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'activate_achievement', 'data' : {'token' : token, 'aid': 30}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token' : token, 'cid': '21', 'qty': 2}})

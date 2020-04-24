@@ -63,7 +63,7 @@ async def up(uid, ssa, **kwargs):
         return common.mt(96, 'materials insufficient')
     await common.set_science(uid, ssa, _lv, **kwargs)
     results = {'science': await _all(uid, **kwargs), 'rws': {f'{ssa}': 1}}
-    results['remain'], results['reward'] = stage.rm_rw(cmw)
+    results['remain'], results['reward'] = common.rm_rw(cmw)
     return common.mt(0, 'success', results)
 
 
