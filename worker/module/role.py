@@ -11,15 +11,15 @@ from collections import defaultdict
 
 
 async def level_up(uid, rid, delta, **kwargs):
+    max_lv = kwargs['config']['role']['standard_costs']['upgrade_lv'].get(f'{rid//100}', 120)
     rid = enums.Role(rid)
     exists, payload = await _get_role_info(uid, rid, 'star', 'level', **kwargs)
     if not exists: return common.mt(99, 'invalid target')
     star, level = payload
     if star == 0: return common.mt(96, "You don't have the role")
-    if delta <= 0: return common.mt(98, 'The delta must be a positive integer')
-    max_lv = kwargs['config']['role']['standard_costs']['upgrade_lv']['max']
-    if max_lv <= level: return common.mt(95, 'max lv')
     delta = delta if delta + level <= max_lv else (max_lv - level)
+    if delta <= 0: return common.mt(98, 'The delta must be a positive integer')
+    if max_lv <= level: return common.mt(95, 'max lv')
     sums = sum([(50+50*max(1, int(lv/20)))*max(1, int(lv-9)) for lv in range(level, level + delta)])
     items = f'{enums.Group.ITEM}:{enums.Item.EXP_POINT}:{sums},{enums.Group.ITEM}:{enums.Item.COIN}:{sums}'
     can_pay, results = await common.consume_items(uid, items, **kwargs)
@@ -92,8 +92,6 @@ async def get_config(**kwargs):
     return common.mt(0, 'success', kwargs['config']['role'])
 
 #################################################################################
-
-
 async def _update_ps_lv(uid, rid, pid, lv, **kwargs):
     await common.execute(f'INSERT INTO rolepassive(uid, rid, pid, level) VALUES ("{uid}", {rid}, {pid}, {lv}) ON DUPLICATE KEY UPDATE level = {lv};', **kwargs)
 

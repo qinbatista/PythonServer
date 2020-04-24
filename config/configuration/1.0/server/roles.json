@@ -1,7 +1,12 @@
 {
 	"standard_costs": {
 		"upgrade_lv": {
-			"max": 120
+			"1": 30,
+			"2": 50,
+			"3": 80,
+			"4": 100,
+			"5": 120,
+			"6": 120
 		},
 		"unlock_ps": {
             "comment": "cty是消耗物品类型,consume是消耗的详细内容",

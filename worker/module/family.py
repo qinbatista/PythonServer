@@ -40,7 +40,7 @@ async def leave(uid, **kwargs):
     await common.execute(f'INSERT INTO timer (uid, tid, time) VALUES ("{uid}", {enums.Timer.FAMILY_JOIN_END.value}, "{(datetime.now(tz=common.TZ_SH) + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")}") ON DUPLICATE KEY UPDATE `time`= "{(datetime.now(tz=common.TZ_SH) + timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")}";', **kwargs)
     await _remove_from_family(uid, name, **kwargs)
     gn = await common.get_gn(uid, **kwargs)
-    await _record_family_change(name, f'{enums.FamilyHistoryKeys.LEAVE}:{gn}', **kwargs)
+    await _record_family_change(name, f'{enums.FamilyHistoryKeys.LEAVE.value}:{gn}', **kwargs)
     return common.mt(0, 'left family', {"cd_time": days * 24 * 3600})
 
 async def remove_user(uid, gn_target, **kwargs):
@@ -176,7 +176,7 @@ async def purchase(uid, sid, **kwargs):
     await common.rw_common(uid, [cfg[consume]], rewards, **kwargs)
     results['remain'].extend(rewards['remain'])
     results['reward'].extend(rewards['reward'])
-    await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE}:{gn}', **kwargs)
+    await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE.value}:{gn}', **kwargs)
     return common.mt(0, 'success', results)
 
 async def set_notice(uid, msg, **kwargs):
@@ -238,7 +238,7 @@ async def set_role(uid, gn_target, role, **kwargs):
     if not _check_set_role_permissions(actors_role, targets_role, new_role): return common.mt(96, 'insufficient permissions')
     await common.execute(f'UPDATE familyrole SET role = {new_role} WHERE uid = "{uid_target}" AND `name` = "{name}";', **kwargs)
     gn = await common.get_gn(uid, **kwargs)
-    await _record_family_change(name, f'{enums.FamilyHistoryKeys.ROLE}:{gn},{gn_target}', **kwargs)
+    await _record_family_change(name, f'{enums.FamilyHistoryKeys.ROLE.value}:{gn},{gn_target}', **kwargs)
     return common.mt(0, 'success', {'gn' : gn_target, 'role' : new_role})
 
 async def change_name(uid, new_name, **kwargs):
@@ -347,7 +347,7 @@ async def welfare(uid, sid, **kwargs):
     [await common.rw_common(mid, cfg[consume], rewards if mgn == gn else {}, **kwargs) for mid, mgn in members]
     results['remain'].extend(rewards['remain'])
     results['reward'].extend(rewards['reward'])
-    await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE}:{gn}', **kwargs)
+    await _record_family_change(name, f'{enums.FamilyHistoryKeys.PURCHASE.value}:{gn}', **kwargs)
     return common.mt(0, 'success', results)
 
 async def search(name, **kwargs):
