@@ -31,20 +31,22 @@ async def level_up(uid, wid, delta, **kwargs):
 	if max_lv <= level: return common.mt(95, 'max lv')
 	delta = delta if delta + level <= max_lv else (max_lv - level)
 	consume = config[level + delta - 1] - config[level - 1]
-	_, remain_i = await common.try_item(uid, enums.Item.IRON, 0, **kwargs)
+	ii, ic = enums.Item.IRON, enums.Item.COIN
+	_, remain_i = await common.try_item(uid, ii, 0, **kwargs)
 	if remain_i < consume: return common.mt(97, 'can not pay for upgrade')
-	can_pay, remain_c = await common.try_item(uid, enums.Item.COIN, -consume, **kwargs)
+	can_pay, remain_c = await common.try_item(uid, ic, -consume, **kwargs)
 	if not can_pay: return common.mt(97, 'can not pay for upgrade')
-	_, remain_i = await common.try_item(uid, enums.Item.IRON, -consume, **kwargs)
+	_, remain_i = await common.try_item(uid, ii, -consume, **kwargs)
 	_sp = (level + delta) // 10 - level // 10
 	level += delta
 	await common.execute(f'UPDATE weapon SET level = {level}, skillpoint = {sp + _sp} WHERE uid = "{uid}" AND wid = {wid}', **kwargs)
 	await task.record(uid, enums.Task.WEAPON_LEVEL_UP, **kwargs)
 	await achievement.record(uid, enums.Achievement.LV_UPW, **kwargs)
-	return common.mt(0, 'success', {'remaining': {enums.Group.WEAPON : {'wid' : wid, 'level' : level, 'sp' : sp + _sp},
-													enums.Group.ITEM : [{'iid' : enums.Item.IRON, 'value' : remain_i}, {'iid' : enums.Item.COIN, 'value' : remain_c}]},
-										'reward': {enums.Group.WEAPON : {'wid' : wid, 'level' : delta, 'sp' : _sp},
-													enums.Group.ITEM : [{'iid' : enums.Item.IRON, 'value' :consume}, {'iid' : enums.Item.COIN, 'value' : consume}]}})
+	gi, gw = enums.Group.ITEM, enums.Group.WEAPON
+	return common.mt(0, 'success', {'remaining': {f'{gw}': {'wid': wid, 'level': level, 'sp': sp + _sp},
+													f'{gi}': [{'iid': ii, 'value': remain_i}, {'iid': ic, 'value': remain_c}]},
+										'reward': {f'{gw}': {'wid': wid, 'level': delta, 'sp': _sp},
+													f'{gi}': [{'iid': ii, 'value': consume}, {'iid': ic, 'value': consume}]}})
 
 async def level_up_passive(uid, wid, pid, **kwargs):
 	max_pid = 4 if wid // 100 > 2 else 3
@@ -99,9 +101,9 @@ async def get_all(uid, **kwargs):
 	for wep in weps:
 		for pid in enums.WeaponPassive:
 			try:
-				wep[f'p{str(pid)}'] = passives[wep['wid']][pid.value]
+				wep[f'p{pid}'] = passives[wep['wid']][pid.value]
 			except KeyError:
-				wep[f'p{str(pid)}'] = 0
+				wep[f'p{pid}'] = 0
 	return common.mt(0, 'success', {'weapons' : weps})
 
 
