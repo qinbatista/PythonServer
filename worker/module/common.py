@@ -142,6 +142,14 @@ async def get_player(uid, pid, **kwargs):
 async def set_player(uid, pid, value, **kwargs):
     await execute(f'UPDATE `player` SET {pid}="{value}" WHERE uid="{uid}";', **kwargs)
 
+async def get_friend(uid, fid, **kwargs):
+    data = await execute(f'SELECT recover, since, isre FROM `friend` WHERE `uid` = "{uid}" AND `fid` = "{fid}";', **kwargs)
+    return data[0] if data != () else None
+
+async def set_friend(uid, fid, *conditions, **kwargs):
+    condition = ', '.join([f'`{cond[0]}` = "{cond[1]}"' for cond in conditions])
+    await execute(f'UPDATE `friend` SET {condition} WHERE uid="{uid}" AND `fid` = "{fid}";', **kwargs)
+
 async def set_famliy(name, fid, value, **kwargs):
     await execute(f'UPDATE `family` SET {fid}="{value}" WHERE name="{name}";', **kwargs)
 

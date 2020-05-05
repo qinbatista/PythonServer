@@ -317,7 +317,7 @@ async def b_dispose(uid, stage, damage, results, **kwargs):
     boss_hp = config['hp'][kwargs['world']]
     lid, tlid = enums.LeaderBoard.WORLD_BOSS, enums.LeaderBoard.TOTAL_WB
     _damage = await get_leaderboard(uid, lid, stage, **kwargs)
-    damage = min(damage, kwargs['config']['boss'].get('damage', 100_0000))
+    damage = max(min(damage, kwargs['config']['boss'].get('damage', 100_0000)), _damage)
     record = _damage < damage
     total = await get_leaderboard(uid, tlid, stage, **kwargs) + damage
     if total != 0:

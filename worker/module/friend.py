@@ -19,11 +19,11 @@ MAX_PERSON = 50
 
 
 async def get_all(uid, **kwargs):
-    info = await _get_friend_info(uid, **kwargs)
+    info = await _get_friend(uid, **kwargs)
     return common.mt(0, 'got all friends', {'friends': [
         {'gn': i[0], 'exp': i[1], 'recover': i[2], 'since': i[3],
-         'fid': '' if i[4] is None else i[4], 'icon': i[5], 'intro': i[6]}
-        for i in info]})
+         'fid': '' if i[4] is None else i[4], 'icon': i[5], 'intro': i[6],
+         'isre': i[7]} for i in info]})
 
 
 async def remove(uid, gn_target, **kwargs):
@@ -43,10 +43,9 @@ async def request(uid, gn_target, **kwargs):
     if uid == uid_target: return common.mt(99, 'do not be an idiot')
     friends, _, _ = await _are_friends(uid, uid_target, **kwargs)
     if friends: return common.mt(95, 'already friends')
-    await common.execute(
-        f'INSERT INTO friend (uid, fid) VALUES ("{uid}", "{uid_target}") ON DUPLICATE KEY UPDATE uid = uid;',
-        **kwargs)
-
+    await common.execute(f'INSERT INTO friend (uid, fid) VALUES ("{uid}", '
+                         f'"{uid_target}") ON DUPLICATE KEY UPDATE uid = uid;',
+                         **kwargs)
     sent = await mail.send_mail({'type': enums.MailType.FRIEND_REQUEST.value,
                                  'from': await common.get_gn(uid, **kwargs),
                                  'subj': '', 'body': '', 'uid_sender': uid},
@@ -69,7 +68,7 @@ async def respond(uid, nonce, **kwargs):
     if count >= MAX_PERSON:
         return common.mt(97, 'Your buddy list is full')
     await _add_friend(uid, uid_sender, **kwargs)
-    info = await _get_friend_info(uid_sender, **kwargs)
+    info = await _get_friend(uid_sender, **kwargs)
     await mail.delete_mail(uid, nonce, **kwargs)
     if info == ():
         return common.mt(98, 'this person has date exception')
@@ -86,23 +85,8 @@ async def send_gift(uid, gn_target, infos=None, **kwargs):
         fid, recover = infos
     now = datetime.now(tz=common.TZ_SH)
     if not _can_send_gift(now, recover): return common.mt(98, 'gift cooldown')
-
-    sent = await mail.send_mail({'type': enums.MailType.GIFT.value,
-                                 'from': await common.get_gn(uid, **kwargs),
-                                 'subj': enums.MailTemplate.FRIEND_GIFT.name,
-                                 'body': '',
-                                 'items': common.encode_item(enums.Group.ITEM,
-                                                             enums.Item.FRIEND_GIFT,
-                                                             1)},
-                                fid, **kwargs)
-    if sent[fid]['status'] == 1:
-        return common.mt(96, 'target mailbox full')
-    if sent[fid]['status'] != 0:
-        return common.mt(97, 'mailbox error')
-
-    await common.execute(
-        f'UPDATE friend SET recover = "{now.strftime("%Y-%m-%d")}" WHERE uid = "{uid}" AND fid = "{fid}";',
-        **kwargs)
+    await common.set_friend(uid, fid, ('isre', 0),
+                            ('recover', now.strftime("%Y-%m-%d")), **kwargs)
     await task.record(uid, enums.Task.SEND_FRIEND_GIFT, **kwargs)
     await achievement.record(uid, enums.Achievement.FRIEND_GIFT, **kwargs)
     return common.mt(0, 'success')
@@ -110,18 +94,34 @@ async def send_gift(uid, gn_target, infos=None, **kwargs):
 
 async def send_gift_all(uid, **kwargs):
     """info ==> 0:uid 2:fid 2:fgn 3:recover 4:since"""
-    # info = await get_info(**kwargs)
-    info = await common.execute(f'SELECT friend.uid, player.uid, player.gn, friend.recover, friend.since FROM friend JOIN player ON player.uid = friend.fid;', **kwargs)
-    results = [(i[2], await send_gift(uid, i[2], infos=[i[1], i[3]], **kwargs))
-               for i in info if i[0] == uid and i[4] != '']
+    info = await common.execute(f'SELECT friend.uid, player.uid, player.gn, '
+                                f'friend.recover, friend.since FROM friend JOIN'
+                                f' player ON player.uid = friend.fid;', **kwargs)
+    now = datetime.now(tz=common.TZ_SH)
+    results = [(i[2], await send_gift(uid, i[2], infos=(i[1], i[3]), **kwargs))
+               for i in info if i[0] == uid and i[4] != '' and _can_send_gift(now, i[3])]
     if not results: return common.mt(99, 'no friend to send gift')
     msgs = [r[0] for r in results if r[1]["status"] == 0]
     return common.mt(0, 'you send all friend gift success', msgs)
 
 
+async def get_gifts(uid, gns, **kwargs):
+    fis = [(gn, await common.get_uid(gn, **kwargs)) for gn in gns]
+    friends = {fi: await common.get_friend(uid, fi[1], **kwargs) for fi in fis if fi[1] != ''}
+    now = datetime.now(tz=common.TZ_SH)
+    gifts = {fi: ('isre', 1) for fi, info in friends.items() if info[2] == 0
+             and not _can_send_gift(now ,info[0])}
+    [await common.set_friend(uid, fi[1], cond, **kwargs) for fi, cond in gifts.items()]
+    gid, iid, val = enums.Group.ITEM, enums.Item.FRIEND_GIFT, len(gifts)
+    _, _val = await common.try_item(uid, iid, val, **kwargs)
+    return common.mt(0, 'success', {'gns': [fi[0] for fi in gifts.keys()],
+                                    'reward': f'{gid}:{iid}:{val}',
+                                    'remain': f'{gid}:{iid}:{_val}'})
+
+
 async def find_person(uid, gn_target, **kwargs):
     tid = await common.get_uid(gn_target, **kwargs)
-    info = await _get_person_info(tid, **kwargs)
+    info = await _get_person(tid, **kwargs)
     if uid == tid: return common.mt(98, "can't add yourself")
     if info == (): return common.mt(99, 'no such person')
     stage, _ = await common.get_stage(uid, enums.Stage.GENERAL, **kwargs)
@@ -148,9 +148,9 @@ async def find_person(uid, gn_target, **kwargs):
 
 def _can_send_gift(now, recover):
     if recover == '': return True
-    delta_time = now - datetime.strptime(recover, '%Y-%m-%d').replace(
+    delta = now - datetime.strptime(recover, '%Y-%m-%d').replace(
         tzinfo=common.TZ_SH)
-    return delta_time.days >= 1
+    return delta.days >= 1
 
 
 async def _is_request_max(uid, **kwargs):
@@ -194,16 +194,9 @@ async def _add_friend(uid, fid, **kwargs):
 
 
 async def _are_friends(uid, fid, **kwargs):
-    data = await common.execute(
-        f'SELECT recover, since FROM friend WHERE uid = "{uid}" AND fid = "{fid}";',
-        **kwargs)
-    return (True, data[0][0], data[0][1]) if data != () else (
-        False, None, None)
-    # info = await get_info(**kwargs)
-    # for u, f, fgn, r, s in info:
-    #     if u == uid and f == fid:
-    #         return True, r, s
-    # return False, None, None
+    data = await common.execute(f'SELECT recover, since FROM friend WHERE '
+                                f'uid = "{uid}" AND fid = "{fid}";', **kwargs)
+    return (True, data[0][0], data[0][1]) if data != () else (False, None, None)
 
 
 async def _can_invite_family(uid, fid, **kwargs):
@@ -223,11 +216,11 @@ async def _are_family(uid, fid, **kwargs):
     return u_fid is not None and u_fid == f_fid, u_fid, f_fid is not None
 
 
-async def _get_friend_info(uid, **kwargs):
-    return await common.execute(f'SELECT player.gn, progress.exp, friend.recover, friend.since, player.fid, player.icon, player.intro FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
+async def _get_friend(uid, **kwargs):
+    return await common.execute(f'SELECT player.gn, progress.exp, friend.recover, friend.since, player.fid, player.icon, player.intro, friend.isre FROM friend JOIN progress ON progress.uid = friend.fid JOIN player ON player.uid = friend.fid WHERE friend.uid = "{uid}";', **kwargs)
 
 
-async def _get_person_info(uid, **kwargs):
+async def _get_person(uid, **kwargs):
     return await common.execute(f'SELECT player.gn, player.fid, player.icon, player.intro, progress.exp FROM progress JOIN player ON progress.uid = player.uid WHERE player.uid = "{uid}";', **kwargs)
 
 

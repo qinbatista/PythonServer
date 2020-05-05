@@ -5,6 +5,7 @@
 * [`remove_friend`](##remove_friend)
 * [`send_gift_friend`](##send_gift_friend)
 * [`send_gift_all`](##send_gift_all)
+* [`get_gifts_friend`](##get_gifts_friend)
 * [`find_person`](##find_person)
 
 ## get_all_friend
@@ -27,7 +28,7 @@
 
 [成功]()
 
-> friends：返回玩家的个人信息，返回方式为列表形式，每一个索引代表每一个朋友，其中`gn`表示玩家个名字，`exp`表示经验值（需要客户端自行计算等级），`recover`表示发送爱心的时间，`since`表示成为好朋友的日期，`fid`表示朋友的家族id，`intro`表示玩家的个人签名， `icon`头像id
+> friends：返回玩家的个人信息，返回方式为列表形式，每一个索引代表每一个朋友，其中`gn`表示玩家个名字，`exp`表示经验值（需要客户端自行计算等级），`recover`表示发送爱心的时间，`since`表示成为好朋友的日期，`fid`表示朋友的家族id，`intro`表示玩家的个人签名， `icon`头像id，`isre`奖励领取状态0:未领取 1:已领取
 
 ```json
 {
@@ -42,7 +43,8 @@
 				"since": "2019-10-28",
 				"fid": "",
 				"intro": "",
-				"icon": 0
+				"icon": 0,
+                "isre": 0
 			},
 			{
 				"gn": "222",
@@ -51,7 +53,8 @@
 				"since": "2019-10-28",
 				"fid": "",
 				"intro": "",
-				"icon": 0
+				"icon": 0,
+                "isre": 0
 			}
 		]
 	}
@@ -189,8 +192,6 @@
 
 * 99: 不是朋友
 * 98: 礼物冷却中
-* 97: 邮箱错误 (internal mailbox error)
-* 96: target's mailbox full
 
 
 
@@ -231,6 +232,52 @@
 [失败]()
 
 * 99: 没有朋友可以发送，一个朋友也没有
+
+
+
+## get_gifts_friend
+
+##### 发送消息JSON格式
+
+向好友发送爱心
+
+> gns：可以发送的好友名字列表
+
+```json
+{
+	"world": 0, 
+	"function": "get_gifts_friend",
+	"data": {
+		"token": "my toekn ^_^",
+        "gns": ["gnt100", "gnt101"]
+	}
+}
+```
+
+##### 接受消息JSON格式
+
+[成功]()
+
+> gns：发送成功的好友名字列表
+>
+> reward：奖励物资情况
+>
+> remain：剩余物资情况
+
+```json
+{
+    "status": 0,
+    "message": "success",
+    "data": {
+        "gns": [
+            "gnt100",
+            "gnt101"
+        ],
+        "reward": "3:16:2",
+        "remain": "3:16:10000518"
+    }
+}
+```
 
 
 

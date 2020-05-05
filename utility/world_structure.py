@@ -143,12 +143,12 @@ FRIEND = \
 CREATE TABLE `friend` (
 	  `uid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一id',
 	  `fid` VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '朋友唯一id',
-	  `recover` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '发生礼物当天日期',
 	  `since` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '成为好友的当天日期',
-	  `gift` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '发送爱心的日期',
-	  `receive` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '爱心领取情况0:未领取,1:已领取',
+	  `recover` VARCHAR(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT '发生礼物当天日期',
+	  `isre` SMALLINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '爱心领取情况0:未领取,1:已领取',
 	  PRIMARY KEY (`uid`,`fid`),
-	  CONSTRAINT `friend_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
+	  CONSTRAINT `friend_player_1` FOREIGN KEY (`uid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE,
+	  CONSTRAINT `friend_player_2` FOREIGN KEY (`fid`) REFERENCES `player` (`uid`) ON DELETE CASCADE ON UPDATE CASCADE
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 """
 

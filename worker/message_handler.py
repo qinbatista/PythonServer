@@ -316,6 +316,9 @@ class MessageHandler:
 	async def _send_gift_all(self, data: dict) -> str:
 		return await friend.send_gift_all(data['data']['unique_id'], **data)
 
+	async def _get_gifts_friend(self, data: dict) -> str:
+		return await friend.get_gifts(data['data']['unique_id'], data['data']['gns'], **data)
+
 	async def _find_person(self, data: dict) -> str:
 		return await friend.find_person(data['data']['unique_id'],data['data']['gn_target'], **data)
 	###################### factory.py ######################
@@ -685,6 +688,7 @@ FUNCTION_LIST = {
 	'request_friend' : MessageHandler._request_friend,
 	'send_gift_friend' : MessageHandler._send_gift_friend,
 	'send_gift_all' : MessageHandler._send_gift_all,
+	'get_gifts_friend' : MessageHandler._get_gifts_friend,
 	'respond_friend':MessageHandler._respond_friend,
 	'find_person':MessageHandler._find_person,
 

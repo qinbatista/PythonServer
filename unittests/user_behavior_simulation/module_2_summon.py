@@ -154,16 +154,20 @@ def encrypt(pid, sid, aid=0):
 
 if __name__ == '__main__':
     world = 's6'
-    uid = 't101'
+    uid = '7162107ba0e57687c8407194512fc1dfb426d462'
     # res = user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
 
     # user_behavior_simulation.send_tcp_message({"function":"level_up_passive_weapon","random":"-284","world":"s6","data":{"weapon":"302","passive":"4","token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODgxNTUwNjksInVpZCI6IjEwMCJ9.NKnPGjQWul4LXG5HnQrMK--LBIWotQZJloCxQVm2VXg"}})
     # user_behavior_simulation.send_tcp_message({'function': 'register', 'data': {'unique_id': uid, 'account': f'account{uid}', 'password': f'password{uid}'}})
-    token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
+    token = user_behavior_simulation.send_tcp_message({'function': 'login_unique', 'data': {'unique_id': uid}})['data']['token']
+    # token = user_behavior_simulation.send_tcp_message({'function': 'login', 'data': {'identifier': 'account', 'value': f'account{uid}', 'password': f'password{uid}'}})['data']['token']
     # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'create_player', 'data': {'token': token, 'unique_id': uid, 'gn': f'gn{uid}'}})
 
-    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'market_purchase_family', 'data': {'token' : token, 'pid': '1'}})
-    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token, 'pid': '1'}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'send_gift_all', 'data': {'token' : token}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'send_gift_friend', 'data': {'token' : token, 'gn_target': 'gnt101'}})
+    user_behavior_simulation.send_tcp_message({'world': world, 'function': 'get_gifts_friend', 'data': {'token' : token, 'gns': ['gnt100', 'gnt101']}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'market_purchase_family', 'data': {'token' : token, 'pid': '1'}})
+    # user_behavior_simulation.send_tcp_message({'world': world, 'function': 'welfare_purchase_family', 'data': {'token' : token, 'pid': '1'}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'bind_phone', 'data' : {'token' : token, 'phone_number': '18323019610'}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'activate_achievement', 'data' : {'token' : token, 'aid': 30}})
     # user_behavior_simulation.send_tcp_message({'world' : world, 'function' : 'exchange_card', 'data' : {'token' : token, 'cid': '21', 'qty': 2}})
